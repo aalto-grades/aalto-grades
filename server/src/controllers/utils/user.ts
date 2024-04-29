@@ -34,8 +34,9 @@ export const findAndValidateUserId = async (userId: string): Promise<User> => {
 };
 
 /**
- * Validates user id url param. @Throws ApiError(400|404) if invalid or user not
- * found.
+ * Validates user id url param.
+ *
+ * @throws ApiError(400|404) if invalid or user not found.
  */
 export const validateUserId = async (userId: string): Promise<number> => {
   const result = stringToIdSchema.safeParse(userId);
@@ -47,8 +48,9 @@ export const validateUserId = async (userId: string): Promise<number> => {
 };
 
 /**
- * Fetches user role in given course. Throws ApiError if the course role is not
- * found.
+ * Fetches user role in given course.
+ *
+ * @throws ApiError(404) if the course role is not found.
  */
 export const getUserCourseRole = async (
   courseId: number,
@@ -70,8 +72,10 @@ export const getUserCourseRole = async (
 
 /**
  * Checks if the user making the request is an admin or the owner of the data
- * being accessed. Throws ApiError if the user id is invalid or the user does
- * not have correct permissions.
+ * being accessed.
+ *
+ * @throws ApiError(403) if the user id is invalid or the user does not have
+ *   correct permissions.
  */
 export const isAdminOrOwner = (userToken: JwtClaims, userId: number): void => {
   if (userId !== userToken.id && userToken.role !== SystemRole.Admin) {

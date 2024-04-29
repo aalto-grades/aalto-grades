@@ -15,7 +15,9 @@ import {findAndValidateCourseId, findCourseById} from './course';
 
 /**
  * Retrieves the date of the latest grade for a user based on an assessment
- * model ID. Throws Error if there are no grades for the user.
+ * model ID.
+ *
+ * @throws ApiError(400) if there are no grades for the user.
  */
 export const getDateOfLatestGrade = async (
   userId: number,
@@ -40,9 +42,10 @@ export const getDateOfLatestGrade = async (
   }
 
   if (maxSoFar) return maxSoFar;
-  throw new Error(
+  throw new ApiError(
     `Failed to find the date of the latest grade, user ${userId} has` +
-      ` no grades for course ${courseId}.`
+      ` no grades for course ${courseId}.`,
+    HttpCode.BadRequest
   );
 };
 
@@ -127,7 +130,11 @@ export const getFinalGradesFor = async (
   return finalGrades;
 };
 
-/** Finds an attainment grade by its ID. Throws ApiError if not found. */
+/**
+ * Finds an attainment grade by its ID.
+ *
+ * @throws ApiError(404) if not found.
+ */
 export const findAttainmentGradeById = async (
   id: number
 ): Promise<AttainmentGrade> => {

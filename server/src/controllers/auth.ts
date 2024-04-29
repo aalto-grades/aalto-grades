@@ -92,6 +92,7 @@ export const authLogout = (_req: Request, res: Response): void => {
   res.sendStatus(HttpCode.Ok);
 };
 
+/** @throws ApiError(401) */
 export const authSamlLogin = (
   req: Request,
   res: Response,
@@ -133,7 +134,11 @@ export const authSamlLogin = (
   )(req, res, next);
 };
 
-/** Responds with application/xml */
+/**
+ * Responds with application/xml
+ *
+ * @throws ApiError(401)
+ */
 export const samlMetadata = async (
   req: Request,
   res: Response
@@ -146,6 +151,7 @@ export const samlMetadata = async (
     );
 };
 
+/** @throws ApiError(401) */
 passport.use(
   'login',
   new LocalStrategy(
@@ -195,6 +201,7 @@ passport.use(
   )
 );
 
+/** @throws ApiError(401) */
 const useSamlStrategy = async (): Promise<void> => {
   passport.use('saml', await getSamlStrategy());
 };

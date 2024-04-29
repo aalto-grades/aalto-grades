@@ -150,3 +150,5 @@ definitions:
     responses:
       200:
         description: Xml read successfully
+      401:
+        $ref: '#/components/responses/Unauthorized'

@@ -23,6 +23,7 @@ import User from '../../database/models/user';
 import {ApiError} from '../../types';
 import {getIdpSignCert} from './saml';
 
+/** @throws ApiError(401) */
 export const validateLogin = async (
   email: string,
   password: string
@@ -46,6 +47,7 @@ export const validateLogin = async (
   };
 };
 
+/** @throws ApiError(401) */
 export const getSamlStrategy = async (): Promise<SamlStrategy> =>
   new SamlStrategy(
     {
