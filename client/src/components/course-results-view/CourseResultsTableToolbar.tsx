@@ -45,7 +45,13 @@ const toggleString = (arr: string[], str: string): string[] => {
 const CourseResultsTableToolbar = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
-  const {table, gradeSelectOption, setGradeSelectOption} = useTableContext();
+  const {
+    table,
+    gradeSelectOption,
+    setGradeSelectOption,
+    selectedAssessmentModel,
+    setSelectedAssessmentModel,
+  } = useTableContext();
   const navigate = useNavigate();
   const theme = useTheme();
 
@@ -184,6 +190,29 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         >
           <MenuItem value="best">Best</MenuItem>
           <MenuItem value="latest">Latest</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl>
+        <InputLabel id="select-assessment-model-option">
+          Assessment Model
+        </InputLabel>
+        <Select
+          labelId="select-assessment-model-option"
+          value={selectedAssessmentModel}
+          label="Assessment Model"
+          onChange={e =>
+            setSelectedAssessmentModel(e.target.value as 'any' | number)
+          }
+        >
+          <MenuItem value="any">Any</MenuItem>
+          {(assessmentModels.data ?? []).map(model => (
+            <MenuItem
+              key={`assessment-model-select-${model.id}`}
+              value={model.id}
+            >
+              {model.name}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
       <Divider orientation="vertical" sx={{mx: 1}} flexItem />

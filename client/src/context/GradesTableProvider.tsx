@@ -22,6 +22,7 @@ import {
   PropsWithChildren,
   SetStateAction,
   createContext,
+  useCallback,
   useContext,
   useMemo,
   useState,
@@ -29,7 +30,7 @@ import {
 } from 'react';
 import {useParams} from 'react-router-dom';
 
-import {StudentRow} from '@common/types';
+import {AttainmentData, StudentRow} from '@common/types';
 import GradeCell from '../components/course-results-view/GradeCell';
 import PredictedGradeCell from '../components/course-results-view/PredictedGradeCell';
 import UserGraphDialog from '../components/course-results-view/UserGraphDialog';
@@ -43,6 +44,8 @@ type TableContextProps = {
   //   setTable: Dispatch<SetStateAction<typeof table>;
   gradeSelectOption: 'best' | 'latest';
   setGradeSelectOption: Dispatch<SetStateAction<'best' | 'latest'>>;
+  selectedAssessmentModel: 'any' | number;
+  setSelectedAssessmentModel: Dispatch<SetStateAction<'any' | number>>;
 };
 // Create the context
 export const GradesTableContext = createContext<TableContextProps | undefined>(
@@ -74,10 +77,9 @@ const columnHelper = createColumnHelper<GroupedStudentRow>();
 // Create a provider component
 export const GradesTableProvider = (props: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
+  const assessmentModels = useGetAllAssessmentModels(courseId);
+  const attainments = useGetAttainments(courseId);
   const [_isPending, startTransition] = useTransition();
-  const attainmentList = useGetAttainments(courseId).data ?? [];
-  const {data: assessmentModels, isLoading} =
-    useGetAllAssessmentModels(courseId);
 
   const [rowSelection, setRowSelection] = useState({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
@@ -91,15 +93,18 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   const [gradeSelectOption, setGradeSelectOption] = useState<'best' | 'latest'>(
     'best'
   );
+  const [selectedAssessmentModel, setSelectedAssessmentModel] = useState<
+    'any' | number
+  >('any');
 
   // Row are always grouped, toggling grouping just add the grouping column to the table
   const groupedData = useMemo(() => {
     let predictedGrades: ReturnType<typeof predictGrades> = [];
-    if (assessmentModels) {
+    if (assessmentModels.data) {
       startTransition(() => {
         predictedGrades = predictGrades(
           props.data,
-          assessmentModels,
+          assessmentModels.data,
           gradeSelectOption
         );
       });
@@ -117,7 +122,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       }),
       gradeSelectOption
     );
-  }, [assessmentModels, props.data, gradeSelectOption]);
+  }, [assessmentModels.data, props.data, gradeSelectOption]);
 
   // const [globalFilter, setGlobalFilter] = useState('');
 
@@ -133,25 +138,53 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   // console.log(expanded);
   // console.log(rowSelection);
 
+  const getAttainmentsForAssessmentModel = useCallback(
+    (modelId: number | 'any'): AttainmentData[] => {
+      if (modelId === 'any') return attainments.data ?? [];
+      if (assessmentModels.data === undefined || attainments.data === undefined)
+        return [];
+
+      const assessmentModel = assessmentModels.data.find(
+        model => model.id === modelId
+      );
+      if (assessmentModel === undefined) return [];
+
+      const attainmentIds = assessmentModel.graphStructure.nodes
+        .filter(node => node.id.startsWith('attainment'))
+        .map(node => parseInt(node.id.split('-')[1]));
+
+      return attainments.data.filter(attainment =>
+        attainmentIds.includes(attainment.id)
+      );
+    },
+    [assessmentModels.data, attainments.data]
+  );
+
   // Creating Grades columns
-  const dynamicColumns = attainmentList.map(att => {
-    return columnHelper.accessor(
-      row => row.attainments.find(a => a.attainmentId === att.id),
-      {
-        header: att.name,
-        meta: {PrettyChipPosition: 'alone'},
-        enableSorting: false,
-        size: 120,
-        cell: ({getValue, row}) => (
-          <GradeCell
-            studentNumber={row.original.user.studentNumber ?? 'N/A'}
-            attainemntResults={getValue()}
-          />
-        ),
-        footer: att.name,
-      }
+  const dynamicColumns = useMemo(() => {
+    const selectedAttainments = getAttainmentsForAssessmentModel(
+      selectedAssessmentModel
     );
-  });
+
+    return selectedAttainments.map(att =>
+      columnHelper.accessor(
+        row => row.attainments.find(a => a.attainmentId === att.id),
+        {
+          header: att.name,
+          meta: {PrettyChipPosition: 'alone'},
+          enableSorting: false,
+          size: 120,
+          cell: ({getValue, row}) => (
+            <GradeCell
+              studentNumber={row.original.user.studentNumber ?? 'N/A'}
+              attainemntResults={getValue()}
+            />
+          ),
+          footer: att.name,
+        }
+      )
+    );
+  }, [getAttainmentsForAssessmentModel, selectedAssessmentModel]);
 
   const groupingColumns =
     grouping.length > 0
@@ -304,9 +337,12 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       cell: info => (
         <PredictedGradeCell
           row={info.getValue()}
-          assessmentModelIds={assessmentModels?.map(model => model.id)}
+          assessmentModelIds={assessmentModels.data?.map(model => model.id)}
           onClick={() => {
-            if (assessmentModels === undefined || assessmentModels.length === 0)
+            if (
+              assessmentModels.data === undefined ||
+              assessmentModels.data.length === 0
+            )
               return;
             setUserGraphData(info.getValue());
             setUserGraphOpen(true);
@@ -384,12 +420,18 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   });
   return (
     <GradesTableContext.Provider
-      value={{table, gradeSelectOption, setGradeSelectOption}}
+      value={{
+        table,
+        gradeSelectOption,
+        setGradeSelectOption,
+        selectedAssessmentModel,
+        setSelectedAssessmentModel,
+      }}
     >
       <UserGraphDialog
         open={userGraphOpen}
         onClose={() => setUserGraphOpen(false)}
-        assessmentModels={assessmentModels}
+        assessmentModels={assessmentModels.data}
         row={userGraphData}
       />
       {props.children}
