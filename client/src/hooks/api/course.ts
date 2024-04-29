@@ -6,9 +6,9 @@ import {
   CourseData,
   CourseDataArraySchema,
   CourseDataSchema,
-  CreateCourseData,
   EditCourseData,
   IdSchema,
+  NewCourseData,
 } from '@common/types';
 import {
   UseMutationOptions,
@@ -44,12 +44,12 @@ export const useGetAllCourses = (
   });
 
 export const useAddCourse = (
-  options?: UseMutationOptions<number, unknown, CreateCourseData>
-): UseMutationResult<number, unknown, CreateCourseData> => {
+  options?: UseMutationOptions<number, unknown, NewCourseData>
+): UseMutationResult<number, unknown, NewCourseData> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (course: CreateCourseData) =>
+    mutationFn: async (course: NewCourseData) =>
       IdSchema.parse((await axios.post('/v1/courses', course)).data),
 
     onSuccess: () => {

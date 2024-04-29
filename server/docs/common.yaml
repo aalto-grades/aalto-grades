@@ -20,16 +20,6 @@ components:
       required: true
       example: 1
       description: The ID of the course.
-    instanceId:
-      in: path
-      name: instanceId
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-      required: true
-      example: 1
-      description: The ID of the course instance.
     assessmentModelId:
       in: path
       name: assessmentModelId
@@ -40,14 +30,6 @@ components:
       required: true
       example: 1
       description: The ID of the assessment model.
-    formulaId:
-      in: path
-      name: formulaId
-      schema:
-        type: string
-      required: true
-      example: WEIGHTED_AVERAGE
-      description: Enum value identifying the grading formula.
     attainmentId:
       in: path
       name: attainmentId
@@ -68,25 +50,6 @@ components:
       required: true
       example: 1
       description: The ID of the user grade.
-    tree:
-      in: query
-      name: tree
-      schema:
-        type: string
-        enum: [children, descendants]
-      description: >
-        The type of the attainment tree fetched. Optional.
-        `children` - Fetch only the direct subattainments of the attainment.
-        `descendants` - Fetch the whole tree of subattainments.
-    studentNumbers:
-      in: query
-      name: studentNumbers
-      schema:
-        type: array
-        description: List of student numbers.
-        example: ['735333', '393518', '925163']
-        items:
-          type: string
     userId:
       in: path
       name: userId
@@ -97,17 +60,6 @@ components:
       required: true
       example: 1
       description: The ID of the user.
-    instanceIdQuery:
-      in: query
-      name: instanceId
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-      required: false
-      example: 1
-      description: >
-        The ID of the course instance. For filtering results based on course instance ID.
 
   responses:
     BadRequest:

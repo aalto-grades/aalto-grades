@@ -45,7 +45,7 @@ export enum CourseRoleType {
   Assistant = 'ASSISTANT',
   Student = 'STUDENT',
 }
-export const CreateCourseDataSchema = BaseCourseDataSchema.omit({id: true})
+export const NewCourseDataSchema = BaseCourseDataSchema.omit({id: true})
   .extend({
     teachersInCharge: z.array(z.string().email()),
     assistants: z.array(z.string().email()),
@@ -67,5 +67,5 @@ export const EditCourseDataSchema = BaseCourseDataSchema.omit({id: true})
   );
 
 export type CourseData = z.infer<typeof CourseDataSchema>;
-export type CreateCourseData = z.infer<typeof CreateCourseDataSchema>;
+export type NewCourseData = z.infer<typeof NewCourseDataSchema>;
 export type EditCourseData = z.infer<typeof EditCourseDataSchema>;

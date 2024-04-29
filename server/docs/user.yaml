@@ -2,18 +2,19 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-
 definitions:
+  UserId:
+    type: integer
+    description: Internal user database ID.
+    format: int32
+    minimum: 1
+    example: 1
   UserData:
     type: object
     description: User's personal information.
     properties:
       id:
-        type: integer
-        description: Internal user database ID.
-        format: int32
-        minimum: 1
-        example: 1
+        $ref: '#/definitions/UserId'
       studentNumber:
         $ref: '#/definitions/StudentNumber'
       name:

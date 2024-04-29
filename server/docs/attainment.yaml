@@ -83,6 +83,8 @@ definitions:
         $ref: '#/components/responses/BadRequest'
       401:
         $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
       404:
         $ref: '#/components/responses/NotFound'
     security:
@@ -105,10 +107,7 @@ definitions:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                data:
-                  $ref: '#/definitions/Attainment'
+              $ref: '#/definitions/AttainmentId'
       400:
         $ref: '#/components/responses/BadRequest'
       401:
