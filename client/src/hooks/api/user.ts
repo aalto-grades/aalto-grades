@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AddIdpUser,
   CourseData,
   CourseDataArraySchema,
   IdpUsersSchema,
+  NewIdpUser,
 } from '@common/types';
 import {
   UseMutationOptions,
@@ -35,8 +35,8 @@ export const useGetCoursesOfUser = (
 };
 
 export const useAddUser = (
-  options?: UseMutationOptions<unknown, unknown, AddIdpUser>
-): UseMutationResult<unknown, unknown, AddIdpUser> => {
+  options?: UseMutationOptions<unknown, unknown, NewIdpUser>
+): UseMutationResult<unknown, unknown, NewIdpUser> => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async idpUser => await axios.post('/v1/idp-users', idpUser),

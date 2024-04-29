@@ -6,13 +6,13 @@ import {z} from 'zod';
 import {GraphStructureSchema} from './graph';
 
 // Types
-export const NewAssessmentModelDataSchema = z.object({
-  name: z.string(),
-  graphStructure: GraphStructureSchema,
-});
 export const AssessmentModelDataSchema = z.object({
   id: z.number().int(),
   courseId: z.number().int(),
+  name: z.string(),
+  graphStructure: GraphStructureSchema,
+});
+export const NewAssessmentModelDataSchema = z.object({
   name: z.string(),
   graphStructure: GraphStructureSchema,
 });
@@ -20,6 +20,7 @@ export const EditAssessmentModelDataSchema = AssessmentModelDataSchema.omit({
   id: true,
   courseId: true,
 }).partial();
+
 export const AssessmentModelDataArraySchema = z.array(
   AssessmentModelDataSchema
 );

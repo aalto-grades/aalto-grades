@@ -4,13 +4,13 @@
 
 import {z} from 'zod';
 
-export const NewAttainmentDataSchema = z.object({
-  name: z.string(),
-  daysValid: z.number().int().nonnegative(),
-});
 export const AttainmentDataSchema = z.object({
   id: z.number().int(),
   courseId: z.number().int(),
+  name: z.string(),
+  daysValid: z.number().int().nonnegative(),
+});
+export const NewAttainmentDataSchema = z.object({
   name: z.string(),
   daysValid: z.number().int().nonnegative(),
 });
@@ -18,6 +18,7 @@ export const EditAttainmentDataSchema = AttainmentDataSchema.omit({
   id: true,
   courseId: true,
 }).partial();
+
 export const AttainmentDataArraySchema = z.array(AttainmentDataSchema);
 
 export type NewAttainmentData = z.infer<typeof NewAttainmentDataSchema>;

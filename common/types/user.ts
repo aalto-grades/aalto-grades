@@ -16,12 +16,12 @@ export const TeacherDataSchema = z.object({
   email: z.string().email(),
   studentNumber: z.string().optional(),
 });
-export const NewIdpUserSchema = z.object({
-  email: z.string().email(),
-});
 export const IdpUserSchema = z.object({
   id: z.number().int(),
   email: z.string().email().nullable(),
+});
+export const NewIdpUserSchema = z.object({
+  email: z.string().email(),
 });
 export const IdpUsersSchema = z.array(IdpUserSchema);
 

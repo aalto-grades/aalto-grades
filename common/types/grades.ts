@@ -30,7 +30,6 @@ export const NewGradeSchema = z
     comment: z.string().nullable(),
   })
   .refine(val => val.expiryDate >= val.date, {path: ['date']});
-export const NewGradeArraySchema = z.array(NewGradeSchema);
 export const EditGradeDataSchema = BaseGradeDataSchema.omit({
   gradeId: true,
   grader: true,
@@ -43,6 +42,8 @@ export const EditGradeDataSchema = BaseGradeDataSchema.omit({
       val.expiryDate >= val.date,
     {path: ['date']}
   );
+
+export const NewGradeArraySchema = z.array(NewGradeSchema);
 
 export const AttainmentGradesDataSchema = z.object({
   attainmentId: z.number().int(),
