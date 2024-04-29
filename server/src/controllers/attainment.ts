@@ -19,7 +19,11 @@ import {
 } from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 
-/** Responds with AttainmentData[] */
+/**
+ * Responds with AttainmentData[]
+ *
+ * @throws ApiError(400|404)
+ */
 export const getAttainments = async (
   req: Request,
   res: Response
@@ -32,7 +36,11 @@ export const getAttainments = async (
   res.json(attainmentData);
 };
 
-/** Responds with number */
+/**
+ * Responds with number
+ *
+ * @throws ApiError(400|404)
+ */
 export const addAttainment = async (
   req: Request<ParamsDictionary, unknown, NewAttainmentData>,
   res: Response
@@ -48,6 +56,7 @@ export const addAttainment = async (
   res.status(HttpCode.Created).json(newAttainment.id);
 };
 
+/** @throws ApiError(400|404|409) */
 export const editAttainment = async (
   req: TypedRequestBody<typeof EditAttainmentDataSchema>,
   res: Response
@@ -67,6 +76,7 @@ export const editAttainment = async (
   res.sendStatus(HttpCode.Ok);
 };
 
+/** @throws ApiError(400|404|409) */
 export const deleteAttainment = async (
   req: Request,
   res: Response

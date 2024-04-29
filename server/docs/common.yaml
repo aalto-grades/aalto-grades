@@ -57,7 +57,7 @@ components:
         minimum: 1
       required: true
       example: 1
-      description: The ID of the study attainment.
+      description: Internal attainment database ID.
     gradeId:
       in: path
       name: gradeId
