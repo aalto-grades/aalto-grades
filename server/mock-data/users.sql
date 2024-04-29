@@ -37,6 +37,9 @@ INSERT INTO public.user (email, student_number, password, name, created_at, upda
 -- User test
 ('arthur.james@aalto.fi', '118345', 'pxdgrricyrevfyskewnjaicpgcghuiafbpaijrbqkhzzwlinehjaqvmksbwr', 'Arthur James', '2022-6-10', '2022-5-20', 'USER'), -- id 24
 
+-- e2e test
+('idpuser@aalto.fi', '435215', null, 'idp user', '2023-1-24', '2023-1-25', 'USER'),
+
 -- Misc
 ('laila.schulz@aalto.fi', '349825', 'owtghhhbjjsnixdvdzvoctxodttfhelmmhxmnsihnrprmvlssibzpshuvovg', 'Laila Schulz', '2021-1-19', '2021-3-19', 'USER'),
 ('jazmine.joyce@aalto.fi', '261258', 'jnegbicwagqklzoccmasarbfmrnpenbklnuchqjjrkyvkdsfzrweobrquloc', 'Jazmine Joyce', '2020-4-11', '2020-7-10', 'USER'),
