@@ -8,9 +8,7 @@ import Course from '../../database/models/course';
 import {ApiError, stringToIdSchema} from '../../types';
 import {findAndValidateCourseId} from './course';
 
-/**
- * Finds an attainment by its ID and throws ApiError if not found
- */
+/** Finds an attainment by its ID and throws ApiError if not found */
 export const findAttainmentById = async (id: number): Promise<Attainment> => {
   const attainment = await Attainment.findByPk(id);
   if (!attainment) {
@@ -19,9 +17,7 @@ export const findAttainmentById = async (id: number): Promise<Attainment> => {
   return attainment;
 };
 
-/**
- * Finds all attainments of a specific assessment model.
- */
+/** Finds all attainments of a specific assessment model. */
 export const findAttainmentsByCourseId = async (
   courseId: number
 ): Promise<AttainmentData[]> => {
@@ -56,8 +52,8 @@ const findAndValidateAttainmentId = async (
 };
 
 /**
- * Validates that the attainment id belongs to the course.
- * Throws ApiError if attainment not found or didn't belong to course.
+ * Validates that the attainment id belongs to the course. Throws ApiError if
+ * attainment not found or didn't belong to course.
  */
 export const validateAttainmentBelongsToCourse = async (
   courseId: number,
@@ -76,8 +72,8 @@ export const validateAttainmentBelongsToCourse = async (
 };
 
 /**
- * Finds the course and the assessment model by url param ids and also validates the url params.
- * Throws ApiError if either not found.
+ * Finds the course and the assessment model by url param ids and also validates
+ * the url params. Throws ApiError if either not found.
  */
 export const validateAttainmentPath = async (
   courseId: string,

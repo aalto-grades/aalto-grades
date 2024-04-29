@@ -14,8 +14,11 @@ import {useTableContext} from '../../context/GradesTableProvider';
 import PrettyChip from '../shared/PrettyChip';
 
 /**
- * Finds a previous grade that has been exported to Sisu, excluding the best grade.
- * @returns The previous grade that has been exported to Sisu, or null if not found.
+ * Finds a previous grade that has been exported to Sisu, excluding the best
+ * grade.
+ *
+ * @returns The previous grade that has been exported to Sisu, or null if not
+ *   found.
  */
 const findPreviouslyExportedToSisu = (
   bestGrade: FinalGradeData,

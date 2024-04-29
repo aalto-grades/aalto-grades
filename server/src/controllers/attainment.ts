@@ -19,9 +19,7 @@ import {
 } from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 
-/**
- * Responds with AttainmentData[]
- */
+/** Responds with AttainmentData[] */
 export const getAttainments = async (
   req: Request,
   res: Response
@@ -34,9 +32,7 @@ export const getAttainments = async (
   res.json(attainmentData);
 };
 
-/**
- * Responds with number
- */
+/** Responds with number */
 export const addAttainment = async (
   req: Request<ParamsDictionary, unknown, NewAttainmentData>,
   res: Response

@@ -15,9 +15,9 @@ import {
 import {
   addAssessmentModel,
   deleteAssessmentModel,
+  editAssessmentModel,
   getAllAssessmentModels,
   getAssessmentModel,
-  updateAssessmentModel,
 } from '../controllers/assessmentModel';
 import {handleInvalidRequestJson} from '../middleware';
 import {courseAuthorization} from '../middleware/authorization';
@@ -56,7 +56,7 @@ router.put(
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(EditAssessmentModelDataSchema),
-  controllerDispatcher(updateAssessmentModel)
+  controllerDispatcher(editAssessmentModel)
 );
 
 router.delete(

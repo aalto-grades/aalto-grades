@@ -32,7 +32,8 @@ import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
 import SisuDownloadDialog from './SisuDownloadDialog';
 
 /**
- * Toggle a string in an array: Adds it if not present, removes it if already present.
+ * Toggle a string in an array: Adds it if not present, removes it if already
+ * present.
  */
 const toggleString = (arr: string[], str: string): string[] => {
   const index = arr.indexOf(str);

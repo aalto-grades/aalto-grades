@@ -10,9 +10,7 @@ import {JwtClaims} from '../types';
 import {FinalGradeModelData} from '../types/finalGrade';
 import {validateCourseId} from './utils/course';
 
-/**
- * Responds with FinalGradeData[]
- */
+/** Responds with FinalGradeData[] */
 export const getFinalGrades = async (
   req: Request,
   res: Response

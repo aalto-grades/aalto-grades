@@ -19,9 +19,7 @@ import {ApiError, CourseFull} from '../types';
 import {parseCourseFull} from './utils/course';
 import {findAndValidateUserId, validateUserId} from './utils/user';
 
-/**
- * Responds with CourseData[]
- */
+/** Responds with CourseData[] */
 export const getCoursesOfUser = async (
   req: Request,
   res: Response
@@ -78,9 +76,7 @@ export const addIdpUser = async (
   res.sendStatus(HttpCode.Created);
 };
 
-/**
- * Responds with IdpUsers
- */
+/** Responds with IdpUsers */
 export const getIdpUsers = async (
   req: Request,
   res: Response

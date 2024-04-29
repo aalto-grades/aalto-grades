@@ -14,8 +14,8 @@ import {findAttainmentById} from './attainment';
 import {findAndValidateCourseId, findCourseById} from './course';
 
 /**
- * Retrieves the date of the latest grade for a user based on an assessment model ID.
- * Throws Error if there are no grades for the user.
+ * Retrieves the date of the latest grade for a user based on an assessment
+ * model ID. Throws Error if there are no grades for the user.
  */
 export const getDateOfLatestGrade = async (
   userId: number,
@@ -117,9 +117,7 @@ export const getFinalGradesFor = async (
   return finalGrades;
 };
 
-/**
- * Finds an attainment grade by its ID. Throws ApiError if not found.
- */
+/** Finds an attainment grade by its ID. Throws ApiError if not found. */
 export const findAttainmentGradeById = async (
   id: number
 ): Promise<AttainmentGrade> => {
@@ -134,9 +132,8 @@ export const findAttainmentGradeById = async (
 };
 
 /**
- * Finds and attainment grade by id and also validates
- * that it belongs to the correct course.
- * Throws ApiError if invalid ids, not found, or didn't match.
+ * Finds and attainment grade by id and also validates that it belongs to the
+ * correct course. Throws ApiError if invalid ids, not found, or didn't match.
  */
 export const findAndValidateAttainmentGradePath = async (
   courseId: string,

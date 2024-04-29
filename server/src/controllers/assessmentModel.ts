@@ -19,6 +19,8 @@ import {findAndValidateCourseId, validateCourseId} from './utils/course';
 
 /**
  * Responds with AssessmentModelData
+ *
+ * @throws ApiError(400|404|409)
  */
 export const getAssessmentModel = async (
   req: Request,
@@ -41,6 +43,8 @@ export const getAssessmentModel = async (
 
 /**
  * Responds with AssessmentModelData[]
+ *
+ * @throws ApiError(400|404)
  */
 export const getAllAssessmentModels = async (
   req: Request,
@@ -69,6 +73,8 @@ export const getAllAssessmentModels = async (
 
 /**
  * Responds with number
+ *
+ * @throws ApiError(400|404|409)
  */
 export const addAssessmentModel = async (
   req: TypedRequestBody<typeof NewAssessmentModelDataSchema>,
@@ -98,7 +104,8 @@ export const addAssessmentModel = async (
   res.status(HttpCode.Created).json(assessmentModel.id);
 };
 
-export const updateAssessmentModel = async (
+/** @throws ApiError(400|404|409) */
+export const editAssessmentModel = async (
   req: TypedRequestBody<typeof EditAssessmentModelDataSchema>,
   res: Response
 ): Promise<void> => {
@@ -119,6 +126,7 @@ export const updateAssessmentModel = async (
   res.sendStatus(HttpCode.Ok);
 };
 
+/** @throws ApiError(400|404|409) */
 export const deleteAssessmentModel = async (
   req: Request,
   res: Response

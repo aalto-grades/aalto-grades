@@ -27,9 +27,8 @@ export default class CourseRole extends Model<
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   /**
-   * Updates database to match new teachers and assistants.
-   * If value is null, it won't be updated.
-   * Will mutate the arrays.
+   * Updates database to match new teachers and assistants. If value is null, it
+   * won't be updated. Will mutate the arrays.
    */
   static updateCourseRoles: (
     teachers: User[] | null,

@@ -15,9 +15,11 @@ export type Cookies = {
 };
 
 /**
- * Utility function to generate and retrieve cookies for an admin and teacher account.
- * The function simulates login requests for both roles and extracts cookies from the response.
- * These cookies can be used to simulate authenticated requests in testing scenarios.
+ * Utility function to generate and retrieve cookies for an admin and teacher
+ * account. The function simulates login requests for both roles and extracts
+ * cookies from the response. These cookies can be used to simulate
+ * authenticated requests in testing scenarios.
+ *
  * @returns {Promise<Cookies>} Generated cookies.
  */
 export const getCookies = async (): Promise<Cookies> => {

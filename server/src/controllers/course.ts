@@ -28,9 +28,7 @@ import {
   validateEmailList,
 } from './utils/course';
 
-/**
- * Responds with CourseData
- */
+/** Responds with CourseData */
 export const getCourse = async (req: Request, res: Response): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
 
@@ -41,9 +39,7 @@ export const getCourse = async (req: Request, res: Response): Promise<void> => {
   res.json(courseData);
 };
 
-/**
- * Responds with CourseData[]
- */
+/** Responds with CourseData[] */
 export const getAllCourses = async (
   _req: Request,
   res: Response
@@ -61,9 +57,7 @@ export const getAllCourses = async (
   res.json(coursesData);
 };
 
-/**
- * Responds with number
- */
+/** Responds with number */
 export const addCourse = async (
   req: Request<ParamsDictionary, unknown, CreateCourseData>,
   res: Response

@@ -9,7 +9,9 @@ import {ApiError, stringToIdSchema} from '../../types';
 import {findAndValidateCourseId} from './course';
 
 /**
- * Finds an assessment model by id and throws ApiError if not found.
+ * Finds an assessment model by id.
+ *
+ * @throws ApiError(404) if not found.
  */
 export const findAssessmentModelById = async (
   assessmentModelId: number
@@ -27,7 +29,8 @@ export const findAssessmentModelById = async (
 
 /**
  * Finds an assessment model by url param id and also validates the url param.
- * Throws ApiError if not found.
+ *
+ * @throws ApiError(400|404) if invalid or not found.
  */
 const findAndValidateAssessmentModelId = async (
   courseId: string
@@ -43,8 +46,11 @@ const findAndValidateAssessmentModelId = async (
 };
 
 /**
- * Finds the course and the assessment model by url param ids and also validates the url params.
- * Throws ApiError if either not found.
+ * Finds the course and the assessment model by url param ids and also validates
+ * the url params.
+ *
+ * @throws ApiError(400|404|409) if either invalid or not found or assessment
+ *   model does not belong to the course.
  */
 export const validateAssessmentModelPath = async (
   courseId: string,

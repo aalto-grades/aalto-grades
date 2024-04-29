@@ -45,13 +45,15 @@ const gradeIsBetter = (
 export type GradeSelectOption = 'best' | 'latest';
 /**
  * Finds the best grade from a list of grades based on provided search options.
- * @param {readonly T[]} grades - An array of grades to search through.
- * @param {Object} [searchOptions] - Options for customizing the search behavior.
+ *
+ * @param {readonly T[]} grades An array of grades to search through.
+ * @param {Object} [searchOptions] Options for customizing the search behavior.
  * @param {'any' | 'prefer_non_expired' | 'non_expired'} [searchOptions.expiredOption='any']
- *   - Specifies how to handle expired grades.
- * @param {'best' | 'latest'} [searchOptions.gradeSelectOption='best']
- *   - Specifies the criteria for selecting the best grade.
- * @returns {T | null} The best grade found based on the search options, or null if no suitable grade is found.
+ *   Specifies how to handle expired grades. Default is `'any'`
+ * @param {'best' | 'latest'} [searchOptions.gradeSelectOption='best'] -
+ *   Specifies the criteria for selecting the best grade. Default is `'best'`
+ * @returns {T | null} The best grade found based on the search options, or null
+ *   if no suitable grade is found.
  */
 export const findBestGrade = <T extends BaseType>(
   grades: readonly T[],

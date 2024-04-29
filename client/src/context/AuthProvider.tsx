@@ -8,8 +8,8 @@ import {Context, createContext, JSX, useState} from 'react';
 import {State} from '../types';
 
 /**
- * AuthContext stores both the users authentication information and
- * is the user teacher in charge on the currently selected course.
+ * AuthContext stores both the users authentication information and is the user
+ * teacher in charge on the currently selected course.
  */
 export interface AuthContextType {
   auth: LoginResult | null;

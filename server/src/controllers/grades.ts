@@ -30,9 +30,7 @@ import {
   studentNumbersExist,
 } from './utils/grades';
 
-/**
- * Responds with StudentRow[]
- */
+/** Responds with StudentRow[] */
 export const getGrades = async (req: Request, res: Response): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
 
@@ -133,9 +131,10 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
- * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
- * Documentation and requirements for Sisu CSV file structure available at
+ * Get grading data formatted to Sisu compatible format for exporting grades to
+ * Sisu. Documentation and requirements for Sisu CSV file structure available at
  * https://wiki.aalto.fi/display/SISEN/Assessment+of+implementations
+ *
  * Responds with text/csv
  */
 export const getSisuFormattedGradingCSV = async (
@@ -147,9 +146,7 @@ export const getSisuFormattedGradingCSV = async (
 
   const sisuExportDate = new Date();
 
-  /**
-   * TODO: only one grade per user per instance is allowed
-   */
+  // TODO: only one grade per user per instance is allowed
   const finalGrades = await getFinalGradesFor(
     course.id,
     req.body.studentNumbers
