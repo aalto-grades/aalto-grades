@@ -14,17 +14,33 @@ import {
 import {JSX} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-import {CourseData} from '@common/types';
+import {CourseData, SystemRole} from '@common/types';
+import useAuth from '../../hooks/useAuth';
 import {HeadCellData} from '../../types';
 
 const headCells: HeadCellData[] = [
   {id: 'code', label: 'Code'},
   {id: 'name', label: 'Name'},
   {id: 'department', label: 'Organizing department'},
+  {id: 'role', label: 'Role'},
 ];
 
 const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
   const navigate = useNavigate();
+  const {auth} = useAuth();
+
+  const getCourseRole = (course: CourseData): string => {
+    if (auth === null) return 'Not logged in';
+    if (auth.role === SystemRole.Admin) return 'Admin';
+
+    const {teachersInCharge, assistants} = course;
+    const isTeacher = teachersInCharge.find(teacher => teacher.id === auth.id);
+    const isAssistant = assistants.find(assistant => assistant.id === auth.id);
+
+    if (isTeacher !== undefined) return 'Teacher';
+    if (isAssistant !== undefined) return 'Assistant';
+    return 'Student';
+  };
 
   return (
     <Table>
@@ -72,6 +88,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
               <TableCell>{course.courseCode}</TableCell>
               <TableCell>{course.name.en}</TableCell>
               <TableCell>{course.department.en}</TableCell>
+              <TableCell>{getCourseRole(course)}</TableCell>
             </TableRow>
           ))}
       </TableBody>
