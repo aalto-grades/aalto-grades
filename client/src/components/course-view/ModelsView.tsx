@@ -72,11 +72,32 @@ const ModelsView = (): JSX.Element => {
     }
   }, [loadGraphId, models.data]);
 
-  const loadGraph = useCallback((model: AssessmentModelData): void => {
-    setModelsListOpen(false);
-    setCurrentModel(JSON.parse(JSON.stringify(model)) as AssessmentModelData); // To remove references
-    setGraphOpen(true);
-  }, []);
+  const renameAttainments = useCallback(
+    (model: AssessmentModelData): AssessmentModelData => {
+      if (attainments.data === undefined) return model;
+
+      for (const node of model.graphStructure.nodes) {
+        if (node.type !== 'attainment') continue;
+        const attainmentId = parseInt(node.id.split('-')[1]);
+
+        const attainment = attainments.data.find(
+          att => att.id === attainmentId
+        )!;
+        model.graphStructure.nodeData[node.id].title = attainment.name;
+      }
+      return model;
+    },
+    [attainments.data]
+  );
+
+  const loadGraph = useCallback(
+    (model: AssessmentModelData): void => {
+      setModelsListOpen(false);
+      setCurrentModel(renameAttainments(structuredClone(model))); // To remove references
+      setGraphOpen(true);
+    },
+    [renameAttainments]
+  );
 
   // Load modelId url param
   useEffect(() => {
@@ -123,8 +144,9 @@ const ModelsView = (): JSX.Element => {
   const onSave = async (graphStructure: GraphStructure): Promise<void> => {
     if (currentModel === null) throw new Error('Tried to save null model');
 
+    const simplifiedGraphStructure = structuredClone(graphStructure);
     // Remove unnecessary keys from data.
-    for (const node of graphStructure.nodes) {
+    for (const node of simplifiedGraphStructure.nodes) {
       delete node.dragging;
       delete node.selected;
       delete node.positionAbsolute;
@@ -139,7 +161,7 @@ const ModelsView = (): JSX.Element => {
       assessmentModelId: currentModel.id,
       assessmentModel: {
         name: currentModel.name,
-        graphStructure,
+        graphStructure: simplifiedGraphStructure,
       },
     });
   };

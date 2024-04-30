@@ -66,7 +66,7 @@ const BaseNode = ({
       <div>
         <h4
           style={{margin: 0}}
-          contentEditable
+          contentEditable={type !== 'attainment'}
           suppressContentEditableWarning
           onBlur={e => setNodeTitle(id, e.target.innerText)}
         >

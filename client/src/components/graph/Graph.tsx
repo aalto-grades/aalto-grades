@@ -103,11 +103,14 @@ const Graph = ({
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Old values are strings to avoid problematic references
-  const [savedNodes, setSavedNodes] = useState<Node[]>([]);
-  const [savedEdges, setSavedEdges] = useState<Edge[]>([]);
-  const [savedNodeSettings, setSavedNodeSettings] = useState<string>('{}');
-  const [savedNodeValues, setSavedNodeValues] = useState<string>('{}');
+  const [savedNodes, setSavedNodes] = useState<Node[] | null>(null);
+  const [savedEdges, setSavedEdges] = useState<Edge[] | null>(null);
+  const [savedNodeSettings, setSavedNodeSettings] = useState<{
+    [key: string]: NodeSettings | undefined;
+  } | null>(null);
+  const [savedNodeValues, setSavedNodeValues] = useState<NodeValues | null>(
+    null
+  );
 
   const [unsaved, setUnsaved] = useState<boolean>(false);
   const [attainmentsSelectOpen, setAttainmentsSelectOpen] =
@@ -166,7 +169,7 @@ const Graph = ({
         nodes,
         filteredEdges
       );
-      setSavedNodeValues(JSON.stringify(newNodeValues));
+      setSavedNodeValues(structuredClone(newNodeValues));
       setNodeValues(newNodeValues);
       if (disconnectedEdges.length > 0) setEdges(filteredEdges);
     },
@@ -180,15 +183,15 @@ const Graph = ({
 
     if (
       !loading &&
-      (savedNodes.length !== nodes.length ||
-        savedEdges.length !== edges.length ||
-        savedNodeValues !== JSON.stringify(nodeValues) ||
-        savedNodeSettings !== JSON.stringify(nodeSettings))
+      (savedNodes?.length !== nodes.length ||
+        savedEdges?.length !== edges.length ||
+        JSON.stringify(savedNodeValues) !== JSON.stringify(nodeValues) ||
+        JSON.stringify(savedNodeSettings) !== JSON.stringify(nodeSettings))
     ) {
-      setSavedNodes(nodes);
-      setSavedEdges(edges);
-      setSavedNodeValues(JSON.stringify(nodeValues));
-      setSavedNodeSettings(JSON.stringify(nodeSettings));
+      setSavedNodes(structuredClone(nodes));
+      setSavedEdges(structuredClone(edges));
+      setSavedNodeValues(structuredClone(nodeValues));
+      setSavedNodeSettings(structuredClone(nodeSettings));
       updateValues();
     }
 
@@ -229,6 +232,7 @@ const Graph = ({
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [unsaved]);
 
+  // Load graph for the first time
   useEffect(() => {
     console.debug('Loading graph');
     setLoading(true);
@@ -271,7 +275,7 @@ const Graph = ({
       setNodeData(initGraph.nodeData);
       setNodeValues(initNodeValues);
 
-      setOriginalGraphStructure(initGraph);
+      setOriginalGraphStructure(structuredClone(initGraph));
       setUnsaved(false);
       setLoading(false);
       reactFlowInstance?.fitView();
@@ -661,7 +665,9 @@ const Graph = ({
                       enqueueSnackbar('Model saved successfully.', {
                         variant: 'success',
                       });
-                      setOriginalGraphStructure({nodes, edges, nodeData});
+                      setOriginalGraphStructure(
+                        structuredClone({nodes, edges, nodeData})
+                      );
                       setUnsaved(false);
                     }}
                     sx={{float: 'right'}}
