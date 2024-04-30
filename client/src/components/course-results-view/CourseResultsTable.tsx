@@ -62,7 +62,7 @@ const CourseResultsTable = (): JSX.Element => {
         style={{
           overflowY: 'auto', // our scrollable table container
           position: 'relative', // needed for sticky header
-          height: '80vh', // should be a fixed height
+          height: '85vh', // should be a fixed height
           width: 'fit-content',
           maxWidth: '100%',
         }}
@@ -79,7 +79,7 @@ const CourseResultsTable = (): JSX.Element => {
               // display: 'grid',
               position: 'sticky',
               top: 0,
-              zIndex: 2,
+              zIndex: 50,
             }}
           >
             {table.getHeaderGroups().map(headerGroup => (
@@ -175,6 +175,7 @@ const CourseResultsTable = (): JSX.Element => {
                     position: 'absolute',
                     transform: `translateY(${virtualRow.start}px)`, // this should always be a `style` as it changes on scroll
                     width: '100%',
+                    zIndex: row.getIsGrouped() ? 5 : 'auto',
                   }}
                 >
                   {row.getVisibleCells().map(cell => {
