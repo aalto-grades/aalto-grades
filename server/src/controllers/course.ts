@@ -3,13 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
-import {ParamsDictionary} from 'express-serve-static-core';
 import {Transaction} from 'sequelize';
 
 import {
   CourseData,
   CourseRoleType,
-  EditCourseData,
+  EditCourseDataSchema,
   HttpCode,
   Language,
   NewCourseDataSchema,
@@ -139,7 +138,7 @@ export const addCourse = async (
 
 /** @throws ApiError(400|404|422) */
 export const editCourse = async (
-  req: Request<ParamsDictionary, unknown, EditCourseData>,
+  req: TypedRequestBody<typeof EditCourseDataSchema>,
   res: Response
 ): Promise<void> => {
   const course = await findAndValidateCourseId(req.params.courseId);

@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
-import {ParamsDictionary} from 'express-serve-static-core';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   AttainmentData,
   EditAttainmentDataSchema,
   HttpCode,
-  NewAttainmentData,
+  NewAttainmentDataSchema,
 } from '@common/types';
 import Attainment from '../database/models/attainment';
 import {
@@ -42,7 +41,7 @@ export const getAttainments = async (
  * @throws ApiError(400|404)
  */
 export const addAttainment = async (
-  req: Request<ParamsDictionary, unknown, NewAttainmentData>,
+  req: TypedRequestBody<typeof NewAttainmentDataSchema>,
   res: Response
 ): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);

@@ -15,6 +15,7 @@ import {
   SisuCsvUploadSchema,
   StudentRow,
 } from '@common/types';
+import logger from '../configs/winston';
 import {sequelize} from '../database';
 import Attainment from '../database/models/attainment';
 import AttainmentGrade from '../database/models/attainmentGrade';
@@ -63,7 +64,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
   const usersDict: {[key: string]: User} = {};
   for (const grade of grades) {
     if (grade.User === undefined) {
-      console.error('Found an grade with no user');
+      logger.error('Found an grade with no user');
       continue;
     }
     if (!(grade.User.id in usersDict)) {
@@ -75,7 +76,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
   const userGrades: {[key: string]: {[key: string]: GradeData[]}} = {};
   for (const grade of grades) {
     if (grade.grader === undefined) {
-      console.error('Found an grade with no grader');
+      logger.error('Found an grade with no grader');
       continue;
     }
 
@@ -316,7 +317,7 @@ export const getSisuFormattedGradingCSV = async (
 
   for (const finalGrade of finalGrades) {
     if (finalGrade.User === undefined) {
-      console.error(
+      logger.error(
         'Final grade found with no matching user even though student nubmers were validated'
       );
       continue;

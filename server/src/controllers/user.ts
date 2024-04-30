@@ -3,15 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
-import {ParamsDictionary} from 'express-serve-static-core';
 
 import {
   CourseData,
   HttpCode,
   IdpUsers,
-  NewIdpUser,
+  NewIdpUserSchema,
   SystemRole,
 } from '@common/types';
+import {TypedRequestBody} from 'zod-express-middleware';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
@@ -81,7 +81,7 @@ export const getIdpUsers = async (
 
 /** @throws ApiError(409) */
 export const addIdpUser = async (
-  req: Request<ParamsDictionary, unknown, NewIdpUser>,
+  req: TypedRequestBody<typeof NewIdpUserSchema>,
   res: Response
 ): Promise<void> => {
   const email = req.body.email;

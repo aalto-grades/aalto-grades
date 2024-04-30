@@ -20,7 +20,7 @@ export default class CourseTranslation extends Model<
 > {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
-  declare language: string;
+  declare language: 'EN' | 'FI' | 'SV';
   declare department: string;
   declare courseName: string;
   declare createdAt: CreationOptional<Date>;
@@ -43,7 +43,7 @@ CourseTranslation.init(
       },
     },
     language: {
-      type: new DataTypes.ENUM('EN', 'FI', 'SE'),
+      type: new DataTypes.ENUM('EN', 'FI', 'SV'),
       allowNull: false,
     },
     department: {

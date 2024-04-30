@@ -2,9 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 import {Request, Response} from 'express';
-import {ParamsDictionary} from 'express-serve-static-core';
 
-import {FinalGradeData, HttpCode, NewFinalGrade} from '@common/types';
+import {
+  FinalGradeData,
+  HttpCode,
+  NewFinalGradeArraySchema,
+} from '@common/types';
+import {TypedRequestBody} from 'zod-express-middleware';
 import FinalGrade from '../database/models/finalGrade';
 import {JwtClaims} from '../types';
 import {FinalGradeModelData} from '../types/finalGrade';
@@ -42,7 +46,7 @@ export const getFinalGrades = async (
 
 /** @throws ApiError(400|404) */
 export const addFinalGrades = async (
-  req: Request<ParamsDictionary, unknown, NewFinalGrade[]>,
+  req: TypedRequestBody<typeof NewFinalGradeArraySchema>,
   res: Response
 ): Promise<void | Response> => {
   const grader = req.user as JwtClaims;

@@ -69,22 +69,16 @@ export const parseCourseFull = (course: CourseFull): CourseData => {
   };
 
   for (const translation of course.CourseTranslations) {
-    // TODO: Mismatch in database languages and Language enum
-    const language: Language.English | Language.Finnish | Language.Swedish =
-      (translation.language as 'EN' | 'FI' | 'SE') === 'SE'
-        ? Language.Swedish
-        : (translation.language as Language.English | Language.Finnish);
-
-    switch (language) {
-      case Language.English:
+    switch (translation.language) {
+      case 'EN':
         courseData.department.en = translation.department;
         courseData.name.en = translation.courseName;
         break;
-      case Language.Finnish:
+      case 'FI':
         courseData.department.fi = translation.department;
         courseData.name.fi = translation.courseName;
         break;
-      case Language.Swedish:
+      case 'SV':
         courseData.department.sv = translation.department;
         courseData.name.sv = translation.courseName;
         break;
