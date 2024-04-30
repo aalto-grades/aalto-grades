@@ -72,16 +72,16 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
 
     expect(res.text)
       .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-325235,2,5,21.6.2023,EN,
-826139,3,5,21.6.2023,EN,
-849946,2,5,21.6.2023,EN,
-183958,0,5,21.6.2023,EN,
-686426,0,5,21.6.2023,EN,
-753213,3,5,21.6.2023,EN,
-279337,5,5,21.6.2023,EN,
-495298,5,5,21.6.2023,EN,
-638843,3,5,21.6.2023,EN,
-216384,2,5,21.6.2023,EN,
+325235,2,5,21.6.2023,en,
+826139,3,5,21.6.2023,en,
+849946,2,5,21.6.2023,en,
+183958,0,5,21.6.2023,en,
+686426,0,5,21.6.2023,en,
+753213,3,5,21.6.2023,en,
+279337,5,5,21.6.2023,en,
+495298,5,5,21.6.2023,en,
+638843,3,5,21.6.2023,en,
+216384,2,5,21.6.2023,en,
 `);
     expect(res.headers['content-disposition']).toBe(
       'attachment; filename="final_grades_course_CS-A????_' +
@@ -99,16 +99,16 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
 
     expect(res.text)
       .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-325235,2,5,21.6.2023,EN,
-826139,3,5,21.6.2023,EN,
-849946,2,5,21.6.2023,EN,
-183958,0,5,21.6.2023,EN,
-686426,0,5,21.6.2023,EN,
-753213,3,5,21.6.2023,EN,
-279337,5,5,21.6.2023,EN,
-495298,5,5,21.6.2023,EN,
-638843,3,5,21.6.2023,EN,
-216384,2,5,21.6.2023,EN,
+325235,2,5,21.6.2023,en,
+826139,3,5,21.6.2023,en,
+849946,2,5,21.6.2023,en,
+183958,0,5,21.6.2023,en,
+686426,0,5,21.6.2023,en,
+753213,3,5,21.6.2023,en,
+279337,5,5,21.6.2023,en,
+495298,5,5,21.6.2023,en,
+638843,3,5,21.6.2023,en,
+216384,2,5,21.6.2023,en,
 `);
     expect(res.headers['content-disposition']).toBe(
       'attachment; filename="final_grades_course_CS-A????_' +
@@ -126,9 +126,9 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
 
     expect(res.text)
       .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-183958,0,5,21.6.2023,EN,
-279337,5,5,21.6.2023,EN,
-216384,2,5,21.6.2023,EN,
+183958,0,5,21.6.2023,en,
+279337,5,5,21.6.2023,en,
+216384,2,5,21.6.2023,en,
 `);
     expect(res.headers['content-disposition']).toBe(
       'attachment; filename="final_grades_course_CS-A????_' +
@@ -150,16 +150,16 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
 
     expect(res.text)
       .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-325235,2,5,12.5.2023,JA,
-826139,3,5,12.5.2023,JA,
-849946,2,5,12.5.2023,JA,
-183958,0,5,12.5.2023,JA,
-686426,0,5,12.5.2023,JA,
-753213,3,5,12.5.2023,JA,
-279337,5,5,12.5.2023,JA,
-495298,5,5,12.5.2023,JA,
-638843,3,5,12.5.2023,JA,
-216384,2,5,12.5.2023,JA,
+325235,2,5,12.5.2023,ja,
+826139,3,5,12.5.2023,ja,
+849946,2,5,12.5.2023,ja,
+183958,0,5,12.5.2023,ja,
+686426,0,5,12.5.2023,ja,
+753213,3,5,12.5.2023,ja,
+279337,5,5,12.5.2023,ja,
+495298,5,5,12.5.2023,ja,
+638843,3,5,12.5.2023,ja,
+216384,2,5,12.5.2023,ja,
 `);
     expect(res.headers['content-disposition']).toBe(
       'attachment; filename="final_grades_course_CS-A????_' +

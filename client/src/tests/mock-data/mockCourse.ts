@@ -17,6 +17,13 @@ export const mockCourse: CourseData = {
   name: {fi: 'Example Average', en: 'Example Average', sv: 'Example Average'},
   gradingScale: GradingScale.Numerical,
   languageOfInstruction: Language.English,
-  teachersInCharge: [{id: 2, name: 'Timmy Teacher', email: 'teacher@aalto.fi'}],
+  teachersInCharge: [
+    {
+      id: 2,
+      name: 'Timmy Teacher',
+      email: 'teacher@aalto.fi',
+      studentNumber: '123456',
+    },
+  ],
   assistants: [],
 };

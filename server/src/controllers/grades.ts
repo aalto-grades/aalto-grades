@@ -14,6 +14,7 @@ import {
   NewGradeArraySchema,
   SisuCsvUploadSchema,
   StudentRow,
+  UserData,
 } from '@common/types';
 import logger from '../configs/winston';
 import {sequelize} from '../database';
@@ -61,14 +62,30 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
   });
 
   // User dict of unique users {userId: User, ...}
-  const usersDict: {[key: string]: User} = {};
+  const usersDict: {[key: string]: UserData & {studentNumber: string}} = {};
   for (const grade of grades) {
     if (grade.User === undefined) {
-      logger.error('Found an grade with no user');
-      continue;
+      logger.error(`Found a grade ${grade.id} with no user`);
+      throw new ApiError(
+        'Found a grade with no grader',
+        HttpCode.InternalServerError
+      );
     }
+    if (grade.User.studentNumber === null) {
+      logger.error(
+        `Found a grade ${grade.id} where user ${grade.User.id} studentNumber was null`
+      );
+      throw new ApiError(
+        'Found a grade where user studentNumber was null',
+        HttpCode.InternalServerError
+      );
+    }
+
     if (!(grade.User.id in usersDict)) {
-      usersDict[grade.User.id] = grade.User;
+      usersDict[grade.User.id] = {
+        ...grade.User,
+        studentNumber: grade.User.studentNumber,
+      };
     }
   }
 
@@ -76,8 +93,18 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
   const userGrades: {[key: string]: {[key: string]: GradeData[]}} = {};
   for (const grade of grades) {
     if (grade.grader === undefined) {
-      logger.error('Found an grade with no grader');
-      continue;
+      logger.error(`Found a grade ${grade.id} with no grader`);
+      throw new ApiError(
+        'Found a grade with no grader',
+        HttpCode.InternalServerError
+      );
+    }
+    if (grade.grader.name === null) {
+      logger.error(`Grade ${grade.id} grader ${grade.grader.id} name is null`);
+      throw new ApiError(
+        'Grade grader name is null',
+        HttpCode.InternalServerError
+      );
     }
 
     const userId = grade.userId;
@@ -87,11 +114,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
 
     userGrades[userId][grade.attainmentId].push({
       gradeId: grade.id,
-      grader: {
-        id: grade.grader.id,
-        name: grade.grader.name,
-        studentNumber: '',
-      },
+      grader: grade.grader,
       grade: grade.grade,
       exportedToSisu: grade.sisuExportDate,
       date: new Date(grade.date),
@@ -118,19 +141,18 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
     });
   }
 
-  const result: StudentRow[] = Object.keys(userGrades).map(userId => ({
-    user: {
-      id: usersDict[userId].id,
-      studentNumber: usersDict[userId].studentNumber,
-    },
-    finalGrades: finalGradesDict[userId],
-    attainments: attainments.map(attainment => ({
-      attainmentId: attainment.id,
-      attainmentName: attainment.name,
-      grades:
-        (userGrades[userId][attainment.id] as GradeData[] | undefined) ?? [],
-    })),
-  }));
+  const result: StudentRow[] = Object.keys(userGrades).map(
+    (userId): StudentRow => ({
+      user: usersDict[userId],
+      finalGrades: finalGradesDict[userId],
+      attainments: attainments.map(attainment => ({
+        attainmentId: attainment.id,
+        attainmentName: attainment.name,
+        grades:
+          (userGrades[userId][attainment.id] as GradeData[] | undefined) ?? [],
+      })),
+    })
+  );
 
   res.json(result);
 };
@@ -156,12 +178,12 @@ export const addGrades = async (
     new Set(req.body.map(grade => grade.studentNumber))
   );
 
-  let students = await User.findAll({
+  let students = (await User.findAll({
     attributes: ['id', 'studentNumber'],
     where: {
       studentNumber: {[Op.in]: studentNumbers},
     },
-  });
+  })) as (UserData & {studentNumber: string})[];
   const foundStudents = students.map(student => student.studentNumber);
   const nonExistingStudents = studentNumbers.filter(
     id => !foundStudents.includes(id)
@@ -171,24 +193,24 @@ export const addGrades = async (
     if (nonExistingStudents.length === 0) return;
 
     // Create new users (students) from the CSV.
-    const newUsers = await User.bulkCreate(
+    const newUsers = (await User.bulkCreate(
       nonExistingStudents.map(studentNumber => ({
         studentNumber: studentNumber,
       })),
       {transaction: t}
-    );
+    )) as (UserData & {studentNumber: string})[];
     students = students.concat(newUsers);
   });
 
   // All students now exists in the database.
-  students = await User.findAll({
+  students = (await User.findAll({
     attributes: ['id', 'studentNumber'],
     where: {
       studentNumber: {
         [Op.in]: studentNumbers,
       },
     },
-  });
+  })) as (UserData & {studentNumber: string})[];
 
   const studentNumberToId = Object.fromEntries(
     students.map(student => [student.studentNumber, student.id])
@@ -295,7 +317,7 @@ export const getSisuFormattedGradingCSV = async (
 
   const sisuExportDate = new Date();
 
-  // TODO: only one grade per user per instance is allowed
+  // TODO: Only one grade per user per instance is allowed
   const finalGrades = await getFinalGradesFor(
     course.id,
     req.body.studentNumbers
@@ -315,20 +337,35 @@ export const getSisuFormattedGradingCSV = async (
   const courseResults: SisuCsvFormat[] = [];
   const exportedToSisu: MarkSisuExport[] = [];
 
+  // TODO: Confirm that finalgrade.grade is valid
   for (const finalGrade of finalGrades) {
     if (finalGrade.User === undefined) {
       logger.error(
-        'Final grade found with no matching user even though student nubmers were validated'
+        `Final grade ${finalGrade.id} user was undefined even though student nubmers were validated`
       );
-      continue;
+      throw new ApiError(
+        'Final grade user was undefined',
+        HttpCode.InternalServerError
+      );
     }
+    if (finalGrade.User.studentNumber === null) {
+      logger.error(
+        `Final grade ${finalGrade.id} user student number was null even though student nubmers were validated`
+      );
+      throw new ApiError(
+        'Final grade user student number was null',
+        HttpCode.InternalServerError
+      );
+    }
+
     const existingResult = courseResults.find(
       value => value.studentNumber === finalGrade.User?.studentNumber
     );
 
     if (existingResult) {
-      if (finalGrade.grade <= parseInt(existingResult.grade)) continue; // TODO: Maybe more options than just best grade
-      existingResult.grade = finalGrade.grade.toString(); // TODO: Confirm that finalgrade.grade is valid
+      // TODO: Maybe more options than just best grade
+      if (finalGrade.grade <= parseInt(existingResult.grade)) continue;
+      existingResult.grade = finalGrade.grade.toString();
 
       // There can be multiple grades, make sure only the exported grade is marked with timestamp.
       const userData = exportedToSisu.find(
@@ -338,22 +375,25 @@ export const getSisuFormattedGradingCSV = async (
     } else {
       exportedToSisu.push({gradeId: finalGrade.id, userId: finalGrade.userId});
 
-      courseResults.push({
-        studentNumber: finalGrade.User.studentNumber,
-        // Round to get final grades as an integer.
-        grade: String(Math.round(finalGrade.grade)),
-        credits: course.maxCredits,
-        // Assessment date must be in form dd.mm.yyyy.
-        // HERE we want to find the latest completed attainment grade for student
-        assessmentDate: (req.body.assessmentDate
+      // Assessment date must be in form dd.mm.yyyy.
+      // HERE we want to find the latest completed attainment grade for student
+      const assessmentDate = (
+        req.body.assessmentDate
           ? req.body.assessmentDate
           : await getDateOfLatestGrade(finalGrade.userId, course.id)
-        ).toLocaleDateString('fi-FI'),
-        completionLanguage: req.body.completionLanguage
-          ? req.body.completionLanguage
-          : course.languageOfInstruction, // TODO: Confirm that is in lower case
-        // Comment column is required, but can be empty.
-        comment: '', // finalGrade.comment, TODO: Add comment to finalGrade DB table
+      ).toLocaleDateString('fi-FI');
+
+      const completionLanguage = req.body.completionLanguage
+        ? req.body.completionLanguage.toLowerCase()
+        : course.languageOfInstruction.toLowerCase();
+
+      courseResults.push({
+        studentNumber: finalGrade.User.studentNumber,
+        grade: finalGrade.grade.toString(),
+        credits: course.maxCredits,
+        assessmentDate: assessmentDate,
+        completionLanguage: completionLanguage,
+        comment: finalGrade.comment ?? '', // Comment column is required, but can be empty.
       });
     }
   }

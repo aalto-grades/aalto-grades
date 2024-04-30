@@ -11,6 +11,7 @@ import {
   Model,
 } from 'sequelize';
 
+import {GraphStructure} from '@common/types';
 import {sequelize} from '..';
 import Course from './course';
 
@@ -21,7 +22,7 @@ export default class AssessmentModel extends Model<
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare name: string;
-  declare graphStructure: JSON;
+  declare graphStructure: GraphStructure;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }

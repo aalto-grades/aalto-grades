@@ -6,15 +6,15 @@ import {z} from 'zod';
 
 export const UserDataSchema = z.object({
   id: z.number().int(),
-  name: z.string().optional(),
-  email: z.string().email().optional(),
-  studentNumber: z.string().optional(),
+  name: z.string().nullable(),
+  email: z.string().email().nullable(),
+  studentNumber: z.string().nullable(),
 });
 export const TeacherDataSchema = z.object({
   id: z.number().int(),
-  name: z.string().optional(),
+  name: z.string().nullable(),
   email: z.string().email(),
-  studentNumber: z.string().optional(),
+  studentNumber: z.string().nullable(),
 });
 export const IdpUserSchema = z.object({
   id: z.number().int(),

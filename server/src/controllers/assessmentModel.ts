@@ -90,7 +90,7 @@ export const addAssessmentModel = async (
     },
     defaults: {
       name: req.body.name,
-      graphStructure: req.body.graphStructure as unknown as JSON,
+      graphStructure: req.body.graphStructure,
     },
   });
 
@@ -120,7 +120,7 @@ export const editAssessmentModel = async (
     graphStructure:
       req.body.graphStructure === undefined
         ? assessmentModel.graphStructure
-        : (req.body.graphStructure as unknown as JSON),
+        : req.body.graphStructure,
   });
 
   res.sendStatus(HttpCode.Ok);
