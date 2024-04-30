@@ -47,7 +47,14 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
 
   // Get grades of all attainments
   const grades = await AttainmentGrade.findAll({
-    include: {all: true},
+    include: [
+      {model: User, attributes: ['id', 'name', 'email', 'studentNumber']},
+      {
+        model: User,
+        as: 'grader',
+        attributes: ['id', 'name', 'email', 'studentNumber'],
+      },
+    ],
     where: {
       attainmentId: {
         [Op.in]: attainments.map(attainment => attainment.id),
@@ -83,7 +90,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
 
     if (!(grade.User.id in usersDict)) {
       usersDict[grade.User.id] = {
-        ...grade.User,
+        ...grade.User.dataValues,
         studentNumber: grade.User.studentNumber,
       };
     }
