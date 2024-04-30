@@ -134,7 +134,7 @@ const FormField = ({
     InputLabelProps={{shrink: true}}
     margin="normal"
     helperText={form.errors[value] ? form.errors[value] : helperText}
-    error={form.touched[value] && Boolean(form.errors[value])}
+    error={form.touched[value] && form.errors[value] !== undefined}
     onChange={form.handleChange}
     select={select}
     // SelectProps={{native: true}}
@@ -184,8 +184,6 @@ export default function EditCourseView(): JSX.Element {
   const [teachersInCharge, setTeachersInCharge] = useState<string[]>([]);
   const [initAssistants, setInitAssistants] = useState<string[]>([]);
   const [assistants, setAssistants] = useState<string[]>([]);
-  const [email, setEmail] = useState<string>('');
-  const [assistantEmail, setAssistantEmail] = useState<string>('');
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [initialValues, setInitialValues] = useState<FormData | null>(null);
 
@@ -218,22 +216,11 @@ export default function EditCourseView(): JSX.Element {
   }, [course.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const removeTeacher = (value: string): void => {
-    setTeachersInCharge(
-      teachersInCharge.filter((teacher: string) => teacher !== value)
-    );
-  };
-
-  const addTeacher = (): void => {
-    setTeachersInCharge([...teachersInCharge, email]);
-    setEmail('');
+    setTeachersInCharge(teachersInCharge.filter(teacher => teacher !== value));
   };
 
   const removeAssistant = (value: string): void => {
     setAssistants(assistants.filter(assistant => assistant !== value));
-  };
-
-  const addAssistant = (): void => {
-    setAssistants([...assistants, assistantEmail]);
   };
 
   const handleSubmit = (
@@ -395,34 +382,35 @@ export default function EditCourseView(): JSX.Element {
                     margin="normal"
                     InputLabelProps={{shrink: true}}
                     helperText={
-                      form.errors.teacherEmail
+                      form.errors.teacherEmail !== undefined
                         ? form.errors.teacherEmail
                         : teachersInCharge.length === 0
                           ? 'Input the email address of at least one teacher in charge of the course'
-                          : teachersInCharge.includes(email)
+                          : teachersInCharge.includes(form.values.teacherEmail)
                             ? 'Email already on list.'
                             : 'Add emails of the teachers in charge of the course.'
                     }
                     error={
                       form.touched.teacherEmail &&
-                      Boolean(form.errors.teacherEmail)
+                      form.errors.teacherEmail !== undefined
                     }
-                    onChange={e => {
-                      setEmail(e.currentTarget.value);
-                      form.handleChange(e);
-                    }}
+                    onChange={form.handleChange}
                   />
                   <Button
                     variant="outlined"
                     startIcon={<PersonAddAlt1Icon />}
                     disabled={
-                      // Allow submit of email only if validation passes and not on list.
-                      Boolean(form.errors.teacherEmail) ||
+                      form.errors.teacherEmail !== undefined ||
                       form.values.teacherEmail.length === 0 ||
-                      teachersInCharge.includes(email) ||
+                      teachersInCharge.includes(form.values.teacherEmail) ||
                       form.isSubmitting
                     }
-                    onClick={() => addTeacher()}
+                    onClick={() => {
+                      setTeachersInCharge(oldTeachers =>
+                        oldTeachers.concat(form.values.teacherEmail)
+                      );
+                      form.setFieldValue('teacherEmail', '');
+                    }}
                     sx={{mt: 1, float: 'left'}}
                   >
                     Add
@@ -467,32 +455,34 @@ export default function EditCourseView(): JSX.Element {
                     margin="normal"
                     InputLabelProps={{shrink: true}}
                     helperText={
-                      form.errors.assistantEmail
+                      form.errors.assistantEmail !== undefined
                         ? form.errors.assistantEmail
-                        : assistants.includes(assistantEmail)
+                        : assistants.includes(form.values.assistantEmail)
                           ? 'Email already on list.'
                           : 'Add emails of the assistants of the course.'
                     }
                     error={
                       form.touched.assistantEmail &&
-                      Boolean(form.errors.assistantEmail)
+                      form.errors.assistantEmail !== undefined
                     }
-                    onChange={e => {
-                      setAssistantEmail(e.currentTarget.value);
-                      form.handleChange(e);
-                    }}
+                    onChange={form.handleChange}
                   />
                   <Button
                     variant="outlined"
                     startIcon={<PersonAddAlt1Icon />}
                     disabled={
                       // Allow submit of email only if validation passes and not on list.
-                      Boolean(form.errors.assistantEmail) ||
+                      form.errors.assistantEmail !== undefined ||
                       form.values.assistantEmail.length === 0 ||
-                      assistants.includes(assistantEmail) ||
+                      assistants.includes(form.values.assistantEmail) ||
                       form.isSubmitting
                     }
-                    onClick={() => addAssistant()}
+                    onClick={() => {
+                      setAssistants(oldAssistants =>
+                        oldAssistants.concat(form.values.assistantEmail)
+                      );
+                      form.setFieldValue('assistantEmail', '');
+                    }}
                     sx={{mt: 1, float: 'left'}}
                   >
                     Add
