@@ -19,6 +19,8 @@ import {findUserById} from './utils/user';
 
 /**
  * Responds with LoginResult
+ *
+ * @throws ApiError(404)
  */
 export const authSelfInfo = async (
   req: Request,
@@ -38,6 +40,8 @@ export const authSelfInfo = async (
 
 /**
  * Responds with LoginResult
+ *
+ * @throws ApiError(401)
  */
 export const authLogin = (
   req: Request,
@@ -88,6 +92,7 @@ export const authLogout = (_req: Request, res: Response): void => {
   res.sendStatus(HttpCode.Ok);
 };
 
+/** @throws ApiError(401) */
 export const authSamlLogin = (
   req: Request,
   res: Response,
@@ -131,6 +136,8 @@ export const authSamlLogin = (
 
 /**
  * Responds with application/xml
+ *
+ * @throws ApiError(401)
  */
 export const samlMetadata = async (
   req: Request,
@@ -144,6 +151,7 @@ export const samlMetadata = async (
     );
 };
 
+/** @throws ApiError(401) */
 passport.use(
   'login',
   new LocalStrategy(
@@ -193,6 +201,7 @@ passport.use(
   )
 );
 
+/** @throws ApiError(401) */
 const useSamlStrategy = async (): Promise<void> => {
   passport.use('saml', await getSamlStrategy());
 };

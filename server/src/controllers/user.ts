@@ -6,10 +6,10 @@ import {Request, Response} from 'express';
 import {ParamsDictionary} from 'express-serve-static-core';
 
 import {
-  AddIdpUser,
   CourseData,
   HttpCode,
   IdpUsers,
+  NewIdpUser,
   SystemRole,
 } from '@common/types';
 import Course from '../database/models/course';
@@ -21,6 +21,8 @@ import {findAndValidateUserId, validateUserId} from './utils/user';
 
 /**
  * Responds with CourseData[]
+ *
+ * @throws ApiError(400|404)
  */
 export const getCoursesOfUser = async (
   req: Request,
@@ -63,24 +65,7 @@ export const getCoursesOfUser = async (
   res.json(courseData);
 };
 
-export const addIdpUser = async (
-  req: Request<ParamsDictionary, unknown, AddIdpUser>,
-  res: Response
-): Promise<void> => {
-  const email = req.body.email;
-
-  const userAlreadyExists = await User.findIdpUserByEmail(email);
-  if (userAlreadyExists) {
-    throw new ApiError('User already exists', HttpCode.Conflict);
-  }
-
-  await User.create({email: email, role: SystemRole.User, name: email});
-  res.sendStatus(HttpCode.Created);
-};
-
-/**
- * Responds with IdpUsers
- */
+/** Responds with IdpUsers */
 export const getIdpUsers = async (
   req: Request,
   res: Response
@@ -94,6 +79,23 @@ export const getIdpUsers = async (
   res.json(users);
 };
 
+/** @throws ApiError(409) */
+export const addIdpUser = async (
+  req: Request<ParamsDictionary, unknown, NewIdpUser>,
+  res: Response
+): Promise<void> => {
+  const email = req.body.email;
+
+  const userAlreadyExists = await User.findIdpUserByEmail(email);
+  if (userAlreadyExists) {
+    throw new ApiError('User already exists', HttpCode.Conflict);
+  }
+
+  await User.create({email: email, role: SystemRole.User, name: email});
+  res.sendStatus(HttpCode.Created);
+};
+
+/** @throws ApiError(400|404) */
 export const deleteIdpUser = async (
   req: Request,
   res: Response

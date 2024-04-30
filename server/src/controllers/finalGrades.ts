@@ -12,6 +12,8 @@ import {validateCourseId} from './utils/course';
 
 /**
  * Responds with FinalGradeData[]
+ *
+ * @throws ApiError(400|404)
  */
 export const getFinalGrades = async (
   req: Request,
@@ -38,6 +40,7 @@ export const getFinalGrades = async (
   return res.json(finalGrades);
 };
 
+/** @throws ApiError(400|404) */
 export const addFinalGrades = async (
   req: Request<ParamsDictionary, unknown, NewFinalGrade[]>,
   res: Response

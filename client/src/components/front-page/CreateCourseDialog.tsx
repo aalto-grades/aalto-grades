@@ -31,9 +31,9 @@ import {z} from 'zod';
 
 import {
   AaltoEmailSchema,
-  CreateCourseData,
   GradingScale,
   Language,
+  NewCourseData,
 } from '@common/types';
 import {useAddCourse} from '../../hooks/useApi';
 import {sisuLanguageOptions} from '../../utils';
@@ -217,7 +217,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
     values: FormData,
     {setSubmitting}: FormikHelpers<FormData>
   ): void => {
-    const courseData: CreateCourseData = {
+    const courseData: NewCourseData = {
       courseCode: values.courseCode,
       minCredits: values.minCredits,
       maxCredits: values.maxCredits,

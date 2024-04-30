@@ -9,15 +9,12 @@ import {getUserCourseRole, isAdminOrOwner} from '../controllers/utils/user';
 import {JwtClaims, stringToIdSchema} from '../types';
 
 /**
- * Middleware function to ensure that the user has the necessary role to proceed.
- * @param {SystemRole[]} allowedRoles - List of roles that are permitted to access
- * the resource.
- * @returns {Function} Returns a middleware function that checks the user's role against
- * the allowed roles.
+ * Middleware function to ensure that the user has the necessary role to
+ * proceed.
  *
  * @example
- * // Protect an endpoint so only admins can access it.
- * app.post('/v1/courses', authorization([SystemRole.Admin]), (req, res) => { ... });
+ *   // Protect an endpoint so only admins can access it.
+ *   app.post('/v1/courses', authorization([SystemRole.Admin]), (req, res) => { ... });
  */
 export const authorization = (
   allowedRoles: SystemRole[]
@@ -40,8 +37,10 @@ type HandlerType = (
   res: Response,
   next: NextFunction
 ) => Promise<void | Response>;
+
 /**
- * Validates that the user is either an admin or has one of the given roles in the course.
+ * Validates that the user is either an admin or has one of the given roles in
+ * the course.
  */
 export const courseAuthorization = (
   allowedRoles: CourseRoleType[]
@@ -84,7 +83,8 @@ export const courseAuthorization = (
 };
 
 /**
- * Validates that the user is either an admin or the same user as in the url param.
+ * Validates that the user is either an admin or the same user as in the url
+ * param.
  */
 export const adminOrOwner = (): ((
   req: Request,

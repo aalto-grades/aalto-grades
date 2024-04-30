@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-
 components:
   securitySchemes:
     jwtCookie:
@@ -21,16 +20,6 @@ components:
       required: true
       example: 1
       description: The ID of the course.
-    instanceId:
-      in: path
-      name: instanceId
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-      required: true
-      example: 1
-      description: The ID of the course instance.
     assessmentModelId:
       in: path
       name: assessmentModelId
@@ -41,14 +30,6 @@ components:
       required: true
       example: 1
       description: The ID of the assessment model.
-    formulaId:
-      in: path
-      name: formulaId
-      schema:
-        type: string
-      required: true
-      example: WEIGHTED_AVERAGE
-      description: Enum value identifying the grading formula.
     attainmentId:
       in: path
       name: attainmentId
@@ -58,7 +39,7 @@ components:
         minimum: 1
       required: true
       example: 1
-      description: The ID of the study attainment.
+      description: Internal attainment database ID.
     gradeId:
       in: path
       name: gradeId
@@ -69,25 +50,6 @@ components:
       required: true
       example: 1
       description: The ID of the user grade.
-    tree:
-      in: query
-      name: tree
-      schema:
-        type: string
-        enum: [children, descendants]
-      description: >
-        The type of the attainment tree fetched. Optional.
-        `children` - Fetch only the direct subattainments of the attainment.
-        `descendants` - Fetch the whole tree of subattainments.
-    studentNumbers:
-      in: query
-      name: studentNumbers
-      schema:
-        type: array
-        description: List of student numbers.
-        example: ['735333', '393518', '925163']
-        items:
-          type: string
     userId:
       in: path
       name: userId
@@ -98,34 +60,47 @@ components:
       required: true
       example: 1
       description: The ID of the user.
-    instanceIdQuery:
-      in: query
-      name: instanceId
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-      required: false
-      example: 1
-      description: >
-        The ID of the course instance. For filtering results based on course instance ID.
 
   responses:
-    AuthenticationError:
-      description: Authentication credentials were missing or JWT expired.
+    BadRequest:
+      description: Request body or url parameters invalid.
       content:
         application/json:
           schema:
-            $ref: '#/definitions/Failure'
-    AuthorizationError:
+            oneOf:
+              - $ref: '#/definitions/Error'
+              - $ref: '#/definitions/ZodError'
+    Unauthorized:
+      description: Cookie missing.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/definitions/Error'
+              - $ref: '#/definitions/UnauthorizedError'
+    Forbidden:
       description: The requester is not authorized to execute actions.
       content:
         application/json:
           schema:
-            $ref: '#/definitions/Failure'
+            $ref: '#/definitions/Error'
+    NotFound:
+      description: Item with id given in the url or request body not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/Error'
+    Conflict:
+      description: >
+        The url params do not belong to each other or
+        a similar item already exists in the database.
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/Error'
 
 definitions:
-  Failure:
+  Error:
     type: object
     description: A reason for a failure.
     properties:
@@ -134,4 +109,48 @@ definitions:
         items:
           type: string
         description: Error message(s) explaining the error(s).
-        example: ['course with ID 157 not found', 'course instance ID must be type of integer']
+        example:
+          [
+            'course with ID 157 not found',
+            'course instance ID must be type of integer',
+          ]
+
+  UnauthorizedError:
+    type: object
+    description: Empty object returned when authentication fails
+    example: {}
+
+  ZodError:
+    type: array
+    description: Zod error from parsing body
+    items:
+      type: object
+      properties:
+        errors:
+          type: object
+          properties:
+            issues:
+              type: array
+              items: {}
+    example:
+      [
+        {
+          'type': 'Body',
+          'errors':
+            {
+              'issues':
+                [
+                  {
+                    'code': 'too_small',
+                    'minimum': 0,
+                    'type': 'number',
+                    'inclusive': true,
+                    'exact': false,
+                    'message': 'Number must be greater than or equal to 0',
+                    'path': ['minCredits'],
+                  },
+                ],
+              'name': 'ZodError',
+            },
+        },
+      ]

@@ -2,5 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 module.exports = {
-    ...require("gts/.prettierrc.json"),
-}
+  plugins: ['prettier-plugin-jsdoc'],
+  ...require('gts/.prettierrc.json'),
+};

@@ -8,11 +8,11 @@ import {z} from 'zod';
 import {
   BaseCourseDataSchema,
   CourseData,
-  CreateCourseData,
   EditCourseData,
   GradingScale,
   HttpCode,
   Language,
+  NewCourseData,
   TeacherData,
 } from '@common/types';
 import {app} from '../../src/app';
@@ -112,7 +112,7 @@ describe('Test GET /v1/courses - get all courses', () => {
 
 describe('Test POST /v1/courses - create new course', () => {
   it('should respond with course ID on correct input (admin user)', async () => {
-    let input: CreateCourseData = {
+    let input: NewCourseData = {
       courseCode: 'ELEC-A7200',
       minCredits: 5,
       maxCredits: 5,
@@ -208,7 +208,7 @@ describe('Test POST /v1/courses - create new course', () => {
 
   // TODO: Implement
   // it('should respond with 200 and add email to allowed idp users, if teacher email is not found from database', async () => {
-  //   const input: CreateCourseData = {
+  //   const input: NewCourseData = {
   //     courseCode: 'ELEC-A7200',
   //     minCredits: 5,
   //     maxCredits: 5,

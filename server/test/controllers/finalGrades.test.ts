@@ -38,8 +38,8 @@ beforeAll(async () => {
 });
 
 /**
- * Check that the expected number of grades exist for a user for
- * a specific attainment, including checking the numeric values of those grades.
+ * Check that the expected number of grades exist for a user for a specific
+ * attainment, including checking the numeric values of those grades.
  */
 const checkGradeAmount = async (
   student: {id: number},

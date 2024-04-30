@@ -9,7 +9,9 @@ import User from '../../database/models/user';
 import {ApiError, CourseFull, stringToIdSchema} from '../../types';
 
 /**
- * Finds a course by its ID. Throws ApiError if not found.
+ * Finds a course by its ID.
+ *
+ * @throws ApiError(404) if not found.
  */
 export const findCourseById = async (courseId: number): Promise<Course> => {
   const course = await Course.findByPk(courseId);
@@ -24,7 +26,9 @@ export const findCourseById = async (courseId: number): Promise<Course> => {
 
 /**
  * Finds a course, its translations, and the teachers in charge of that course
- * by a course ID. Throws ApiError if course not found
+ * by a course ID.
+ *
+ * @throws ApiError(404) if course not found
  */
 export const findCourseFullById = async (
   courseId: number,
@@ -107,7 +111,9 @@ export const parseCourseFull = (course: CourseFull): CourseData => {
 };
 
 /**
- * Checks that all emails are existing users. Throws ApiError if that's not the case.
+ * Checks that all emails are existing users.
+ *
+ * @throws ApiError(422) if that's not the case.
  */
 export const validateEmailList = async (
   emailList: string[]
@@ -137,7 +143,8 @@ export const validateEmailList = async (
 
 /**
  * Finds a course by url param id and also validates the url param.
- * Throws ApiError if invalid or course not found.
+ *
+ * @throws ApiError(400|404) if invalid or course not found.
  */
 export const findAndValidateCourseId = async (
   courseId: string
@@ -150,7 +157,8 @@ export const findAndValidateCourseId = async (
 
 /**
  * Validates course id url param and returns it as a number.
- * Throws ApiError if invalid or course not found.
+ *
+ * @throws ApiError(400|404) if invalid or course not found.
  */
 export const validateCourseId = async (courseId: string): Promise<number> => {
   const result = stringToIdSchema.safeParse(courseId);

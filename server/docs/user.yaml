@@ -2,18 +2,25 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-
 definitions:
+  UserId:
+    type: integer
+    description: Internal user database ID.
+    format: int32
+    minimum: 1
+    example: 1
+
+  UserEmail:
+    type: string
+    description: User's email address.
+    example: john.doe@aalto.fi
+
   UserData:
     type: object
     description: User's personal information.
     properties:
       id:
-        type: integer
-        description: Internal user database ID.
-        format: int32
-        minimum: 1
-        example: 1
+        $ref: '#/definitions/UserId'
       studentNumber:
         $ref: '#/definitions/StudentNumber'
       name:
@@ -21,23 +28,50 @@ definitions:
         description: User's name.
         example: Eddy Engineer
       email:
+        $ref: '#/definitions/UserEmail'
+    required:
+      - id
+
+  UserWithEmail:
+    type: object
+    properties:
+      id:
+        $ref: '#/definitions/UserId'
+      name:
         type: string
-        description: User's email address.
-        example: Eddy.Engineer@aalto.fi
+        description: User's name.
+        example: John Doe
+      email:
+        $ref: '#/definitions/UserEmail'
+      studentNumber:
+        type: string
+        description: User's student number
+        example: 1234567
+    required:
+      - id
+      - email
+
   IdpUser:
     type: object
     description: Minimal idp user information.
     properties:
       id:
-        type: integer
-        description: Internal user database ID.
-        format: int32
-        minimum: 1
-        example: 1
+        $ref: '#/definitions/UserId'
       email:
-        type: string
-        description: User's email address.
-        example: Eddy.Engineer@aalto.fi
+        $ref: '#/definitions/UserEmail'
+        nullable: true
+    required:
+      - id
+      - email
+
+  NewIdpUser:
+    type: object
+    description: Minimal idp user information.
+    properties:
+      email:
+        $ref: '#/definitions/UserEmail'
+    required:
+      - email
 
 /v1/user/{userId}/courses:
   get:
@@ -54,67 +88,17 @@ definitions:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                data:
-                  type: array
-                  items:
-                    $ref: '#/definitions/CourseData'
+              type: array
+              items:
+                $ref: '#/definitions/CourseData'
       400:
-        description: User ID validation failed. Must be positive integer.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
+        $ref: '#/components/responses/BadRequest'
       401:
-        $ref: '#/components/responses/AuthenticationError'
+        $ref: '#/components/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/AuthorizationError'
+        $ref: '#/components/responses/Forbidden'
       404:
-        description: A user with the given user ID was not found.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-    security:
-      - cookieAuth: []
-
-/v1/user/{userId}:
-  get:
-    tags: [User]
-    description: >
-      Get information of the user based on ID. Regular users can only access
-      their own information. Admin users can access the information of any user.
-    parameters:
-      - $ref: '#/components/parameters/userId'
-    responses:
-      200:
-        description: User information.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                data:
-                  type: array
-                  items:
-                    $ref: '#/definitions/UserData'
-      400:
-        description: User ID validation failed. Must be positive integer.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      401:
-        $ref: '#/components/responses/AuthenticationError'
-      403:
-        $ref: '#/components/responses/AuthorizationError'
-      404:
-        description: A user with the given user ID was not found.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
+        $ref: '#/components/responses/NotFound'
     security:
       - cookieAuth: []
 
@@ -122,52 +106,42 @@ definitions:
   get:
     tags: [User]
     description: >
-      Get all users that can login with aalto idp. Only for admins
-    parameters:
-      - $ref: '#/components/parameters/userId'
+      Get all users that can login with aalto idp.
+      Available only to admin users.
     responses:
       200:
         description: User information.
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                data:
-                  type: array
-                  items:
-                    $ref: '#/definitions/UserData'
+              type: array
+              items:
+                $ref: '#/definitions/IdpUser'
       401:
-        $ref: '#/components/responses/AuthenticationError'
+        $ref: '#/components/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/AuthorizationError'
+        $ref: '#/components/responses/Forbidden'
     security:
       - cookieAuth: []
   post:
     tags: [User]
     description: >
-      Add users that can login with aalto idp. Only for admins
+      Add users that can login with aalto idp.
+      Available only to admin users.
     requestBody:
     content:
       application/json:
         schema:
-          type: object
-          properties:
-            email:
-              type: string
-              description: Email of the user to be added
-              example: firstname.lastname@aalto.fi
+          $ref: '#/definitions/NewIdpUser'
     responses:
       201:
         description: User created.
-        content:
-          application/json:
-            schema:
-              type: object
       401:
-        $ref: '#/components/responses/AuthenticationError'
+        $ref: '#/components/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/AuthorizationError'
+        $ref: '#/components/responses/Forbidden'
+      409:
+        $ref: '#/components/responses/Conflict'
     security:
       - cookieAuth: []
 
@@ -175,24 +149,20 @@ definitions:
   delete:
     tags: [User]
     description: >
-      delete idp user. Only for admins
+      delete idp user.
+      Available only to admin users.
     parameters:
       - $ref: '#/components/parameters/userId'
     responses:
       200:
-        description: Deleted.
-        content:
-          application/json:
-            schema:
-              type: object
-
+        description: User deleted.
       400:
-        description: bad request
+        $ref: '#/components/responses/BadRequest'
       401:
-        $ref: '#/components/responses/AuthenticationError'
+        $ref: '#/components/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/AuthorizationError'
+        $ref: '#/components/responses/Forbidden'
       404:
-        description: user doesnt exist
+        $ref: '#/components/responses/NotFound'
     security:
       - cookieAuth: []

@@ -33,17 +33,6 @@ router.get(
   controllerDispatcher(getGrades)
 );
 
-// Actually gets the csv but the requirest type must be post to be able to use request.body
-router.post(
-  '/v1/courses/:courseId/grades/csv/sisu',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
-  courseAuthorization([CourseRoleType.Teacher]),
-  express.json({limit: '10mb'}),
-  handleInvalidRequestJson,
-  processRequestBody(SisuCsvUploadSchema),
-  controllerDispatcher(getSisuFormattedGradingCSV)
-);
-
 router.post(
   '/v1/courses/:courseId/grades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
@@ -69,4 +58,15 @@ router.delete(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(deleteGrade)
+);
+
+// Actually gets the csv but the requirest type must be post to be able to use request.body
+router.post(
+  '/v1/courses/:courseId/grades/csv/sisu',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([CourseRoleType.Teacher]),
+  express.json({limit: '10mb'}),
+  handleInvalidRequestJson,
+  processRequestBody(SisuCsvUploadSchema),
+  controllerDispatcher(getSisuFormattedGradingCSV)
 );

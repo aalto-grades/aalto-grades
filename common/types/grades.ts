@@ -7,7 +7,7 @@ import {FinalGradeDataArraySchema} from './finalGrade';
 import {DateSchema, LanguageSchema} from './general';
 import {UserDataSchema} from './user';
 
-export const GradeDataSchema = z.object({
+export const BaseGradeDataSchema = z.object({
   gradeId: z.number().int(),
   grader: UserDataSchema,
   grade: z.number(),
@@ -16,6 +16,10 @@ export const GradeDataSchema = z.object({
   expiryDate: DateSchema,
   comment: z.string().nullable(),
 });
+export const GradeDataSchema = BaseGradeDataSchema.refine(
+  val => val.expiryDate >= val.date,
+  {path: ['date']}
+);
 export const NewGradeSchema = z
   .object({
     studentNumber: z.string(),
@@ -23,10 +27,24 @@ export const NewGradeSchema = z
     grade: z.number(),
     date: DateSchema,
     expiryDate: DateSchema,
-    comment: z.string(),
+    comment: z.string().nullable(),
   })
-  .refine(val => val.expiryDate >= val.date);
+  .refine(val => val.expiryDate >= val.date, {path: ['date']});
+export const EditGradeDataSchema = BaseGradeDataSchema.omit({
+  gradeId: true,
+  grader: true,
+})
+  .partial()
+  .refine(
+    val =>
+      val.date === undefined ||
+      val.expiryDate === undefined ||
+      val.expiryDate >= val.date,
+    {path: ['date']}
+  );
+
 export const NewGradeArraySchema = z.array(NewGradeSchema);
+
 export const AttainmentGradesDataSchema = z.object({
   attainmentId: z.number().int(),
   attainmentName: z.string(),
@@ -38,18 +56,6 @@ export const StudentRowSchema = z.object({
   finalGrades: FinalGradeDataArraySchema.optional(),
 });
 export const StudentRowArraySchema = z.array(StudentRowSchema);
-export const EditGradeDataSchema = GradeDataSchema.omit({
-  gradeId: true,
-  grader: true,
-})
-  .partial()
-  .refine(
-    val =>
-      val.date === undefined ||
-      val.expiryDate === undefined ||
-      val.expiryDate >= val.date,
-    {path: ['maxCredits']}
-  );
 export const SisuCsvUploadSchema = z.object({
   assessmentDate: DateSchema.optional(), // Assessment date override
   completionLanguage: LanguageSchema.optional(), // Defaults to course language TODO: confirm that the Language enum is valid for SISU

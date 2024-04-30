@@ -11,16 +11,14 @@ export enum GradingScale {
   Numerical = 'NUMERICAL',
   SecondNationalLanguage = 'SECOND_NATIONAL_LANGUAGE',
 }
-export enum Period {
-  I = 'I',
-  II = 'II',
-  III = 'III',
-  IV = 'IV',
-  V = 'V',
+
+export enum CourseRoleType {
+  Teacher = 'TEACHER',
+  Assistant = 'ASSISTANT',
+  Student = 'STUDENT',
 }
 
 export const GradingScaleSchema = z.nativeEnum(GradingScale);
-export const PeriodSchema = z.nativeEnum(Period);
 
 export const BaseCourseDataSchema = z.object({
   id: z.number().int(),
@@ -38,20 +36,12 @@ export const BaseCourseDataSchema = z.object({
 export const CourseDataSchema = BaseCourseDataSchema.refine(
   val => val.maxCredits >= val.minCredits
 );
-export const CourseDataArraySchema = z.array(CourseDataSchema);
-
-export enum CourseRoleType {
-  Teacher = 'TEACHER',
-  Assistant = 'ASSISTANT',
-  Student = 'STUDENT',
-}
-export const CreateCourseDataSchema = BaseCourseDataSchema.omit({id: true})
+export const NewCourseDataSchema = BaseCourseDataSchema.omit({id: true})
   .extend({
     teachersInCharge: z.array(z.string().email()),
     assistants: z.array(z.string().email()),
   })
   .refine(val => val.maxCredits >= val.minCredits, {path: ['maxCredits']});
-
 export const EditCourseDataSchema = BaseCourseDataSchema.omit({id: true})
   .extend({
     teachersInCharge: z.array(z.string().email()),
@@ -66,6 +56,8 @@ export const EditCourseDataSchema = BaseCourseDataSchema.omit({id: true})
     {path: ['maxCredits']}
   );
 
+export const CourseDataArraySchema = z.array(CourseDataSchema);
+
 export type CourseData = z.infer<typeof CourseDataSchema>;
-export type CreateCourseData = z.infer<typeof CreateCourseDataSchema>;
+export type NewCourseData = z.infer<typeof NewCourseDataSchema>;
 export type EditCourseData = z.infer<typeof EditCourseDataSchema>;

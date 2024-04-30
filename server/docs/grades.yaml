@@ -2,306 +2,252 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-
 definitions:
-  Status:
-    type: string
-    description: Grading status indicator.
-    enum: [PASS, FAIL, PENDING]
-    example: PASS
-    required: false
+  GradeId:
+    type: integer
+    description: Internal attainment grade database ID.
+    format: int32
+    minimum: 0
+    example: 1
   Grade:
     type: number
     description: The numerical grade of a student for an attainment.
     format: int32
     minimum: 0
     example: 5
-    required: false
-  GradeOption:
+
+  SisuUploadData:
     type: object
-    description:
+    description: Sisu CSV options
+    properties:
+      assessmentDate:
+        type: string
+        format: date
+        description: Override existing attainment date
+        example: 2024-05-01T00:00:00.000Z
+      completionLanguage:
+        type: string
+        enum: [FI, SV, EN, ES, JA, ZH, PT, FR, DE, RU]
+        description: Override existing completion language
+        example: EN
+      studentNumbers:
+        type: array
+        description: Student numbers to download csv for
+        items:
+          type: string
+          description: User's student number
+          example: 1234567
+
+  GradeData:
+    type: object
+    description: Grade data.
     properties:
       gradeId:
-        type: integer
-        description: Internal attainment grade database ID.
-        format: int32
-        minimum: 0
-        example: 5
+        $ref: '#/definitions/GradeId'
       grader:
         $ref: '#/definitions/UserData'
       grade:
         $ref: '#/definitions/Grade'
-      status:
-        $ref: '#/definitions/Status'
-      manual:
-        type: boolean
-        description: >
-          True if this grade was manually inserted by a teacher, false if it
-          is the result of grade calculation.
-        example: true
+      exportedToSisu:
+        type: string
+        nullable: true
+        format: date
+        description: Date when attainment is exported to sisu
+        example: 2024-05-01T00:00:00.000Z
       date:
         type: string
         format: date
         description: Date when attainment is completed (e.g., deadline or exam date)
-        example: 2022-09-22
+        example: 2024-04-01T00:00:00.000Z
       expiryDate:
         type: string
         format: date
         description: Date when the grade expires.
-        example: 2022-09-22
+        example: 2025-04-01T00:00:00.000Z
       comment:
         type: string
+        nullable: true
         description: Comment for grade.
         example: Good job!
-  FinalGradeData:
+    required:
+      - gradeId
+      - grader
+      - grade
+      - exportedToSisu
+      - date
+      - expiryDate
+      - comment
+
+  NewGrade:
     type: object
-    description: Students final grade data.
+    description: Grade data.
     properties:
-      userId:
-        type: integer
-        description: User ID.
-        format: int32
-        minimum: 1
-        example: 1
       studentNumber:
-        $ref: '#/definitions/StudentNumber'
-      credits:
-        type: integer
-        description: How many course credits (ECTS) student receives from course.
-        format: int32
-        minimum: 0
-        example: 5
-      grades:
-        type: array
-        description: All of the potential final grades the student has.
-        items:
-          $ref: '#/definitions/GradeOption'
-  AttainmentGradeData:
-    type: object
-    description: Students grading data for all attainments of the assessment model.
-    properties:
-      userId:
-        type: integer
-        description: User ID.
-        format: int32
-        minimum: 1
-        example: 1
+        type: string
+        description: User's student number
+        example: 1234567
       attainmentId:
         $ref: '#/definitions/AttainmentId'
-      attainmentName:
-        $ref: '#/definitions/AttainmentName'
-      grades:
-        type: array
-        description: All of the grades the student has for this attainment.
-        items:
-          $ref: '#/definitions/GradeOption'
-      subAttainments:
-        type: array
-        description: Sublevel attainment grades.
-  AttainmentFullTreeData:
-    type: array
-    description: Students grading data for all attainments of the assessment model.
-    properties:
-    items:
-      type: object
-      description: Attainment grading data.
-      properties:
-        userId:
-          type: integer
-          description: User ID.
-          format: int32
-          minimum: 1
-          example: 1
-        attainmentId:
-          $ref: '#/definitions/AttainmentId'
-        attainmentName:
-          $ref: '#/definitions/AttainmentName'
-        grades:
-          type: array
-          description: All of the grades the student has for this attainment.
-          items:
-            $ref: '#/definitions/GradeOption'
-        subAttainments:
-          type: array
-          description: Sublevel attainment grades.
-          items:
-            type: object
-            description: Sublevel attainment grading data.
-            properties:
-              attainmentId:
-                $ref: '#/definitions/AttainmentId'
-              attainmentName:
-                $ref: '#/definitions/AttainmentName'
-              grades:
-                type: array
-                description: All of the grades the student has for this attainment.
-                items:
-                  $ref: '#/definitions/GradeOption'
-              subAttainments:
-                type: array
-                description: Sublevel attainment grades.
-                items:
-                  type: object
-                  description: Sublevel attainment grading data.
-
-  EditGrade:
-    type: object
-    properties:
-      status:
-        $ref: '#/definitions/Status'
       grade:
         $ref: '#/definitions/Grade'
       date:
         type: string
         format: date
         description: Date when attainment is completed (e.g., deadline or exam date)
-        example: 2022-09-22
-        required: false
+        example: 2024-04-01T00:00:00.000Z
       expiryDate:
         type: string
         format: date
         description: Date when the grade expires.
-        example: 2022-09-22
-        required: false
+        example: 2025-04-01T00:00:00.000Z
       comment:
         type: string
+        nullable: true
         description: Comment for grade.
         example: Good job!
-        required: false
+    required:
+      - studentNumber
+      - attainmentId
+      - grade
+      - date
+      - expiryDate
+      - comment
 
-/v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/csv:
+  EditGrade:
+    type: object
+    description: Grade data.
+    properties:
+      grade:
+        $ref: '#/definitions/Grade'
+      exportedToSisu:
+        type: string
+        nullable: true
+        format: date
+        description: Date when attainment is exported to sisu
+        example: 2024-05-01T00:00:00.000Z
+      date:
+        type: string
+        format: date
+        description: Date when attainment is completed (e.g., deadline or exam date)
+        example: 2024-04-01T00:00:00.000Z
+      expiryDate:
+        type: string
+        format: date
+        description: Date when the grade expires.
+        example: 2025-04-01T00:00:00.000Z
+      comment:
+        type: string
+        nullable: true
+        description: Comment for grade.
+        example: Good job!
+
+/v1/courses/{courseId}/grades:
   get:
     tags: [Grades]
     description: >
-      Returns a template CSV file for a particular assessment model for
-      uploading grades. Available only to admin users and teachers in charge of the course.
-    parameters:
-      - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
-    responses:
-      200:
-        description: Template generated succesfully.
-        content:
-          text/csv:
-            description: CSV template for uploading grades.
-            schema:
-              type: string
-            example: |
-              StudentNumber,exam,exercises,project
-      400:
-        description: Fetching failed, due to validation errors in parameters.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      401:
-        $ref: '#/components/responses/AuthenticationError'
-      403:
-        $ref: '#/components/responses/AuthorizationError'
-      404:
-        description: >
-          The given course or assessment model does not exist, or the
-          assessment model has no attainments.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      409:
-        description: >
-          The given assessment model does not belong to the given course.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-  post:
-    tags: [Grades]
-    description: >
-      Add attainment grades for users in a particular assessment model.
-      Attainment grading data is provided in a CSV file. When sending data,
-      set the **Content-Type** header as **multipart/form-data** and the
-      file name as "csv_data". Example CSV files available
-      [here](https://github.com/aalto-grades/base-repository/tree/main/server/test/mock-data/csv)
+      Get the grades of all students.
       Available only to admin users and teachers in charge of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
-      - in: query
-        name: completionDate
-        schema:
-          type: string
-          format: date
-        required: true
-        description: Completion date for the grades.
-        example: 2022-9-22
-      - in: query
-        name: expiryDate
-        schema:
-          type: string
-          format: date
-        required: false
-        description: Expiry date for the grades.
-        example: 2022-9-25
-    requestBody:
-      content:
-        multipart/form-data:
-          schema:
-            type: object
-            properties:
-              csv_data:
-                type: string
-                format: binary
     responses:
       200:
-        description: Grading CSV uploaded and parsed succesfully.
+        description: Returns all grades of the course.
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                data:
-                  description: Empty data object.
-                  type: object
+              type: array
+              items:
+                $ref: '#/definitions/GradeData'
       400:
-        description: A validation or parsing error with the CSV has occurred.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
+        $ref: '#/components/responses/BadRequest'
       401:
-        $ref: '#/components/responses/AuthenticationError'
+        $ref: '#/components/responses/Unauthorized'
       403:
-        description: >
-          The requester is not authorized to add grading data
-          to the course instance (not teacher in the course).
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
+        $ref: '#/components/responses/Forbidden'
       404:
-        description: >
-          A course or assessment model with the given ID was not found.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
+        $ref: '#/components/responses/NotFound'
+    security:
+      - cookieAuth: []
+  post:
+    tags: [Grades]
+    description: >
+      Add new grades to the course.
+      Available only to admin users and course teachers & assistants.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/NewGrade'
+    responses:
+      201:
+        description: Grades added.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
       409:
-        description: >
-          Assessment model does not belong to the course or attainment does
-          not belong to the assessment model. User with course role
-          'TEACHER' or 'TEACHER_IN_CHARGE' listed in the grading data.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      422:
-        description: >
-          At least one of the attainments listed in the CSV file was not
-          found with the given ID or does not belong to the assessment model
-          to which the grading data is being imported.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+
+/v1/courses/{courseId}/grades/{gradeId}:
+  put:
+    tags: [Grades]
+    description: >
+      Edit grade.
+      Available only to admin users and teachers in charge of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/components/parameters/gradeId'
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/EditGrade'
+    responses:
+      200:
+        description: Grade edited.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+  delete:
+    tags: [Grades]
+    description: >
+      Delete grade.
+      Available only to admin users and teachers in charge of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/components/parameters/gradeId'
+    responses:
+      200:
+        description: Grade deleted.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
     security:
       - cookieAuth: []
 
@@ -314,38 +260,14 @@ definitions:
       Available only to admin users and teachers in charge of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
-      - $ref: '#/components/parameters/studentNumbers'
-      - $ref: '#/components/parameters/instanceIdQuery'
-      - in: query
-        name: assessmentDate
-        schema:
-          type: string
-          format: date
-        required: false
-        description: >
-          Assessment date marked on the grade CSV.
-          Defaults to end date of the course instance.
-        example: 2022-9-22
-      - in: query
-        name: override
-        schema:
-          type: boolean
-        required: false
-        description: >
-          Flag to override the export to include previously exported grades.
-        example: true
-      - in: query
-        name: completionLanguage
-        schema:
-          type: string
-          enum: [FI, SV, EN, ES, JA, ZH, PT, FR, DE, RU]
-        required: false
-        description: Completion language marked on the grade CSV. Defaults to course language.
-        example: EN
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/SisuUploadData'
     responses:
       200:
-        description: Grades calculated successfully.
+        description: Sisu formatted CSV.
         content:
           text/csv:
             description: CSV file with course results.
@@ -358,265 +280,18 @@ definitions:
               545761,5,5,26.5.2023,fi
               662292,2,5,26.5.2023,fi
       400:
-        description: Fetching failed, due to validation errors in the query parameters.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
+        $ref: '#/components/responses/BadRequest'
       401:
-        $ref: '#/components/responses/AuthenticationError'
+        $ref: '#/components/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/AuthorizationError'
+        $ref: '#/components/responses/Forbidden'
       404:
-        description: >
-          The given course or assessment model does not exist
-          or no course results found for the instance.
+        $ref: '#/components/responses/NotFound'
+      422:
+        description: Student number(s) not found in the database.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/Failure'
-      409:
-        description: >
-          The given assessment model does not belong to the given course.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-
-/v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades:
-  get:
-    tags: [Grades]
-    description: >
-      Get the final grades of all students.
-      Results can be filtered by student numbers or particular instance ID.
-      Available only to admin users and teachers in charge of the course.
-    parameters:
-      - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
-      - $ref: '#/components/parameters/studentNumbers'
-      - $ref: '#/components/parameters/instanceIdQuery'
-    responses:
-      200:
-        description: Grades fetched successfully.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                data:
-                  type: array
-                  items:
-                    $ref: '#/definitions/FinalGradeData'
-      400:
-        description: Fetching failed, due to validation errors in parameters.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      401:
-        $ref: '#/components/responses/AuthenticationError'
-      403:
-        $ref: '#/components/responses/AuthorizationError'
-      404:
-        description: >
-          The given course or assessment model does not exist
-          or no course results found for the instance.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      409:
-        description: >
-          The given assessment model does not belong to the given course.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-
-/v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/fullTree:
-  get:
-    tags: [Grades]
-    description: >
-      Get the all grades of all studens for assessment model.
-      Results can be filtered by student numbers or particular instance ID.
-      Available only to admin users and teachers in charge of the course.
-    parameters:
-      - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
-      - $ref: '#/components/parameters/instanceIdQuery'
-    responses:
-      '200':
-        description: Grades fetched successfully.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                data:
-                  type: array
-                  items:
-                    $ref: '#/definitions/AttainmentFullTreeData'
-
-
-/v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/user/{userId}:
-  get:
-    tags: [Grades]
-    description: >
-      Get all attainment grades for assessment model, using user ID.
-      Available only to admin users and teachers in charge of the course.
-    parameters:
-      - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
-      - $ref: '#/components/parameters/userId'
-    responses:
-      200:
-        description: User grades fetched successfully.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                data:
-                  type: array
-                  items:
-                    $ref: '#/definitions/AttainmentGradeData'
-      400:
-        description: Fetching failed, due to validation errors in parameters.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      401:
-        $ref: '#/components/responses/AuthenticationError'
-      403:
-        $ref: '#/components/responses/AuthorizationError'
-      404:
-        description: >
-          The given course or assessment model does not exist.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      409:
-        description: >
-          The given assessment model does not belong to the given course.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-
-/v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/calculate:
-  post:
-    tags: [Grades]
-    description: >
-      Calculate the final grades of all students.
-      Calculation can be executed to particular set of student numbers or particular instance ID.
-      At least one of these must be provided.
-      Available only to admin users and teachers in charge of the course.
-    parameters:
-      - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
-    requestBody:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              studentNumbers:
-                type: array
-                required: false
-                description: List of students to include in the calculation.
-                example: ['111111', '222222', '333333']
-                items:
-                  type: string
-              instanceId:
-                type: number
-                required: false
-                description: Instance ID to which students the calculation is executed.
-                example: 8
-    responses:
-      200:
-        description: Grades calculated successfully.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                data:
-                  description: Empty data object.
-                  type: object
-      400:
-        description: >
-          Calculation failed, due to validation errors or missing parameters.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      401:
-        $ref: '#/components/responses/AuthenticationError'
-      403:
-        $ref: '#/components/responses/AuthorizationError'
-      404:
-        description: The given course or assessment model does not exist.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      409:
-        description: >
-          The given assessment model does not belong to the given course.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-
-/v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/{gradeId}:
-  put:
-    tags: [Grades]
-    description: >
-      Edit existing user grading data.
-      Available only to admin users and teachers in charge of the course.
-    parameters:
-      - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
-      - $ref: '#/components/parameters/gradeId'
-    requestBody:
-      content:
-        application/json:
-          schema:
-            $ref: '#/definitions/EditGrade'
-    responses:
-      200:
-        description: Grade editing executed successfully.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                data:
-                  description: Empty data object.
-                  type: object
-      400:
-        description: >
-          Operation failed, due to validation errors or missing parameters.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      401:
-        $ref: '#/components/responses/AuthenticationError'
-      403:
-        $ref: '#/components/responses/AuthorizationError'
-      404:
-        description: The given course, grade or assessment model does not exist.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
-      409:
-        description: >
-          The given assessment model does not belong to the given course.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
+              $ref: '#/definitions/Error'
+    security:
+      - cookieAuth: []

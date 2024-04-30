@@ -7,7 +7,7 @@ import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
-import {AddIdpUserSchema, SystemRole} from '@common/types';
+import {NewIdpUserSchema, SystemRole} from '@common/types';
 import {
   addIdpUser,
   deleteIdpUser,
@@ -27,21 +27,21 @@ router.get(
   controllerDispatcher(getCoursesOfUser)
 );
 
+router.get(
+  '/v1/idp-users',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authorization([SystemRole.Admin]),
+  controllerDispatcher(getIdpUsers)
+);
+
 router.post(
   '/v1/idp-users',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(AddIdpUserSchema),
+  processRequestBody(NewIdpUserSchema),
   controllerDispatcher(addIdpUser)
-);
-
-router.get(
-  '/v1/idp-users',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authorization([SystemRole.Admin]),
-  controllerDispatcher(getIdpUsers)
 );
 
 router.delete(

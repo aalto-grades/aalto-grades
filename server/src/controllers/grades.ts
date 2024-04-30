@@ -32,6 +32,8 @@ import {
 
 /**
  * Responds with StudentRow[]
+ *
+ * @throws ApiError(400|404)
  */
 export const getGrades = async (req: Request, res: Response): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
@@ -132,11 +134,156 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
   res.json(result);
 };
 
+/** @throws ApiError(400|404|409) */
+export const addGrades = async (
+  req: TypedRequestBody<typeof NewGradeArraySchema>,
+  res: Response
+): Promise<Response | void> => {
+  const grader = req.user as JwtClaims;
+  const courseId = await validateCourseId(req.params.courseId);
+
+  // Validate that attainments belong to correct course
+  const attainmentIds = new Set<number>();
+  for (const grade of req.body) attainmentIds.add(grade.attainmentId);
+  for (const gradeId of attainmentIds) {
+    await validateAttainmentBelongsToCourse(courseId, gradeId);
+  }
+
+  // Check all users (students) exists in db, create new users if needed.
+  // Make sure each studentNumber is only in the list once
+  const studentNumbers = Array.from(
+    new Set(req.body.map(grade => grade.studentNumber))
+  );
+
+  let students = await User.findAll({
+    attributes: ['id', 'studentNumber'],
+    where: {
+      studentNumber: {[Op.in]: studentNumbers},
+    },
+  });
+  const foundStudents = students.map(student => student.studentNumber);
+  const nonExistingStudents = studentNumbers.filter(
+    id => !foundStudents.includes(id)
+  );
+
+  await sequelize.transaction(async t => {
+    if (nonExistingStudents.length === 0) return;
+
+    // Create new users (students) from the CSV.
+    const newUsers = await User.bulkCreate(
+      nonExistingStudents.map(studentNumber => ({
+        studentNumber: studentNumber,
+      })),
+      {transaction: t}
+    );
+    students = students.concat(newUsers);
+  });
+
+  // All students now exists in the database.
+  students = await User.findAll({
+    attributes: ['id', 'studentNumber'],
+    where: {
+      studentNumber: {
+        [Op.in]: studentNumbers,
+      },
+    },
+  });
+
+  const studentNumberToId = Object.fromEntries(
+    students.map(student => [student.studentNumber, student.id])
+  );
+
+  // Use studentsWithId to update attainments by flatmapping each
+  // students grades into a one array of all the grades.
+  const preparedBulkCreate: AttainmentGradeModelData[] = req.body.map(
+    gradeEntry => ({
+      userId: studentNumberToId[gradeEntry.studentNumber],
+      attainmentId: gradeEntry.attainmentId,
+      graderId: grader.id,
+      date: gradeEntry.date,
+      expiryDate: gradeEntry.expiryDate,
+      grade: gradeEntry.grade,
+    })
+  );
+
+  // TODO: Optimize if datasets are big.
+  await AttainmentGrade.bulkCreate(preparedBulkCreate);
+
+  // After this point all the students' attainment grades have been created
+  return res.sendStatus(HttpCode.Created);
+};
+
+/** @throws ApiError(400, 404, 409) */
+export const editGrade = async (
+  req: TypedRequestBody<typeof EditGradeDataSchema>,
+  res: Response
+): Promise<void> => {
+  const grader = req.user as JwtClaims;
+  const [_, gradeData] = await findAndValidateAttainmentGradePath(
+    req.params.courseId,
+    req.params.gradeId
+  );
+
+  const {grade, date, expiryDate, comment} = req.body;
+
+  if (
+    date !== undefined &&
+    expiryDate === undefined &&
+    date > gradeData.expiryDate
+  ) {
+    throw new ApiError(
+      `New date (${date.toString()}) can't be later than` +
+        ` existing expiration date (${gradeData.expiryDate.toString()})`,
+      HttpCode.BadRequest
+    );
+  } else if (
+    expiryDate !== undefined &&
+    date === undefined &&
+    gradeData.date > expiryDate
+  ) {
+    throw new ApiError(
+      `New expiration date (${expiryDate.toString()}) can't be before` +
+        ` existing date (${gradeData.date.toString()})`,
+      HttpCode.BadRequest
+    );
+  }
+
+  await gradeData
+    .set({
+      grade: grade ?? gradeData.grade,
+      date: date === undefined ? gradeData.date : date,
+      expiryDate: expiryDate === undefined ? gradeData.expiryDate : expiryDate,
+      comment: comment && comment.length > 0 ? comment : gradeData.comment,
+      graderId: grader.id,
+    })
+    .save();
+
+  res.sendStatus(HttpCode.Ok);
+};
+
+/** @throws ApiError(400|404|409) */
+export const deleteGrade = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const [_, grade] = await findAndValidateAttainmentGradePath(
+    req.params.courseId,
+    req.params.gradeId
+  );
+
+  await grade.destroy();
+
+  res.sendStatus(HttpCode.Ok);
+};
+
 /**
- * Get grading data formatted to Sisu compatible format for exporting grades to Sisu.
- * Documentation and requirements for Sisu CSV file structure available at
+ * Get grading data formatted to Sisu compatible format for exporting grades to
+ * Sisu. Documentation and requirements for Sisu CSV file structure available at
  * https://wiki.aalto.fi/display/SISEN/Assessment+of+implementations
+ *
  * Responds with text/csv
+ *
+ * @throws ApiError(400|404|422)
  */
 export const getSisuFormattedGradingCSV = async (
   req: TypedRequestBody<typeof SisuCsvUploadSchema>,
@@ -147,9 +294,7 @@ export const getSisuFormattedGradingCSV = async (
 
   const sisuExportDate = new Date();
 
-  /**
-   * TODO: only one grade per user per instance is allowed
-   */
+  // TODO: only one grade per user per instance is allowed
   const finalGrades = await getFinalGradesFor(
     course.id,
     req.body.studentNumbers
@@ -240,143 +385,4 @@ export const getSisuFormattedGradingCSV = async (
         .send(data);
     }
   );
-};
-
-export const addGrades = async (
-  req: TypedRequestBody<typeof NewGradeArraySchema>,
-  res: Response
-): Promise<Response | void> => {
-  const grader = req.user as JwtClaims;
-  const courseId = await validateCourseId(req.params.courseId);
-
-  // Validate that attainments belong to correct course
-  const attainmentIds = new Set<number>();
-  for (const grade of req.body) attainmentIds.add(grade.attainmentId);
-  for (const gradeId of attainmentIds) {
-    await validateAttainmentBelongsToCourse(courseId, gradeId);
-  }
-
-  // Check all users (students) exists in db, create new users if needed.
-  // Make sure each studentNumber is only in the list once
-  const studentNumbers = Array.from(
-    new Set(req.body.map(grade => grade.studentNumber))
-  );
-
-  let students = await User.findAll({
-    attributes: ['id', 'studentNumber'],
-    where: {
-      studentNumber: {[Op.in]: studentNumbers},
-    },
-  });
-  const foundStudents = students.map(student => student.studentNumber);
-  const nonExistingStudents = studentNumbers.filter(
-    id => !foundStudents.includes(id)
-  );
-
-  await sequelize.transaction(async t => {
-    if (nonExistingStudents.length === 0) return;
-
-    // Create new users (students) from the CSV.
-    const newUsers = await User.bulkCreate(
-      nonExistingStudents.map(studentNumber => ({
-        studentNumber: studentNumber,
-      })),
-      {transaction: t}
-    );
-    students = students.concat(newUsers);
-  });
-
-  // All students now exists in the database.
-  students = await User.findAll({
-    attributes: ['id', 'studentNumber'],
-    where: {
-      studentNumber: {
-        [Op.in]: studentNumbers,
-      },
-    },
-  });
-
-  const studentNumberToId = Object.fromEntries(
-    students.map(student => [student.studentNumber, student.id])
-  );
-
-  // Use studentsWithId to update attainments by flatmapping each
-  // students grades into a one array of all the grades.
-  const preparedBulkCreate: AttainmentGradeModelData[] = req.body.map(
-    gradeEntry => ({
-      userId: studentNumberToId[gradeEntry.studentNumber],
-      attainmentId: gradeEntry.attainmentId,
-      graderId: grader.id,
-      date: gradeEntry.date,
-      expiryDate: gradeEntry.expiryDate,
-      grade: gradeEntry.grade,
-    })
-  );
-
-  // TODO: Optimize if datasets are big.
-  await AttainmentGrade.bulkCreate(preparedBulkCreate);
-
-  // After this point all the students' attainment grades have been created
-  return res.sendStatus(HttpCode.Created);
-};
-
-export const editGrade = async (
-  req: TypedRequestBody<typeof EditGradeDataSchema>,
-  res: Response
-): Promise<void> => {
-  const grader = req.user as JwtClaims;
-  const [_, gradeData] = await findAndValidateAttainmentGradePath(
-    req.params.courseId,
-    req.params.gradeId
-  );
-
-  const {grade, date, expiryDate, comment} = req.body;
-
-  if (
-    date !== undefined &&
-    expiryDate === undefined &&
-    date > gradeData.expiryDate
-  ) {
-    throw new ApiError(
-      `New date (${date.toString()}) can't be later than` +
-        ` existing expiration date (${gradeData.expiryDate.toString()})`,
-      HttpCode.BadRequest
-    );
-  } else if (
-    expiryDate !== undefined &&
-    date === undefined &&
-    gradeData.date > expiryDate
-  ) {
-    throw new ApiError(
-      `New expiration date (${expiryDate.toString()}) can't be before` +
-        ` existing date (${gradeData.date.toString()})`,
-      HttpCode.BadRequest
-    );
-  }
-
-  await gradeData
-    .set({
-      grade: grade ?? gradeData.grade,
-      date: date === undefined ? gradeData.date : date,
-      expiryDate: expiryDate === undefined ? gradeData.expiryDate : expiryDate,
-      comment: comment && comment.length > 0 ? comment : gradeData.comment,
-      graderId: grader.id,
-    })
-    .save();
-
-  res.sendStatus(HttpCode.Ok);
-};
-
-export const deleteGrade = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const [_, grade] = await findAndValidateAttainmentGradePath(
-    req.params.courseId,
-    req.params.gradeId
-  );
-
-  await grade.destroy();
-
-  res.sendStatus(HttpCode.Ok);
 };

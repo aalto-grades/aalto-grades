@@ -5,10 +5,12 @@
 import {HttpCode} from '@common/types';
 
 /**
- * ApiError class represents a custom API related error, extends the native Error class. Includes
- * error message that is either string or an array of strings describing multiple errors. Status
- * code represents HTTP status code associated with the error. Useful for providing more context
- * about an API-related error that occurred during the execution of an operation.
+ * ApiError class represents a custom API related error, extends the native
+ * Error class. Includes error message that is either string or an array of
+ * strings describing multiple errors. Status code represents HTTP status code
+ * associated with the error. Useful for providing more context about an
+ * API-related error that occurred during the execution of an operation.
+ *
  * @extends {Error}
  */
 export class ApiError extends Error {
@@ -17,8 +19,10 @@ export class ApiError extends Error {
 
   /**
    * Creates an instance of ApiError.
-   * @param {string | Array<string>} message - The error message(s).
-   * @param {HttpCode} statusCode - The HTTP status code associated with the error.
+   *
+   * @param {string | string[]} message The error message(s).
+   * @param {HttpCode} statusCode The HTTP status code associated with the
+   *   error.
    */
   constructor(message: string | Array<string>, statusCode: HttpCode) {
     if (Array.isArray(message)) {

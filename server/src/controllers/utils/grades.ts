@@ -14,8 +14,10 @@ import {findAttainmentById} from './attainment';
 import {findAndValidateCourseId, findCourseById} from './course';
 
 /**
- * Retrieves the date of the latest grade for a user based on an assessment model ID.
- * Throws Error if there are no grades for the user.
+ * Retrieves the date of the latest grade for a user based on an assessment
+ * model ID.
+ *
+ * @throws ApiError(400) if there are no grades for the user.
  */
 export const getDateOfLatestGrade = async (
   userId: number,
@@ -40,12 +42,18 @@ export const getDateOfLatestGrade = async (
   }
 
   if (maxSoFar) return maxSoFar;
-  throw new Error(
+  throw new ApiError(
     `Failed to find the date of the latest grade, user ${userId} has` +
-      ` no grades for course ${courseId}.`
+      ` no grades for course ${courseId}.`,
+    HttpCode.BadRequest
   );
 };
 
+/**
+ * Validates that all student numbers in the array exist
+ *
+ * @throws Apierror(422) If a student number is not found in the database
+ */
 export const studentNumbersExist = async (
   studentNumbers: string[]
 ): Promise<void> => {
@@ -71,6 +79,11 @@ export const studentNumbersExist = async (
   }
 };
 
+/**
+ * Find all final grades for given course and student numbers
+ *
+ * @throws ApiError(404)
+ */
 export const getFinalGradesFor = async (
   courseId: number,
   studentNumbers: string[],
@@ -118,7 +131,9 @@ export const getFinalGradesFor = async (
 };
 
 /**
- * Finds an attainment grade by its ID. Throws ApiError if not found.
+ * Finds an attainment grade by its ID.
+ *
+ * @throws ApiError(404) if not found.
  */
 export const findAttainmentGradeById = async (
   id: number
@@ -134,9 +149,10 @@ export const findAttainmentGradeById = async (
 };
 
 /**
- * Finds and attainment grade by id and also validates
- * that it belongs to the correct course.
- * Throws ApiError if invalid ids, not found, or didn't match.
+ * Finds and attainment grade by id and also validates that it belongs to the
+ * correct course.
+ *
+ * @throws ApiError(400|404|409) if invalid ids, not found, or didn't match.
  */
 export const findAndValidateAttainmentGradePath = async (
   courseId: string,

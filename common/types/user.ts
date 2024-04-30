@@ -16,16 +16,16 @@ export const TeacherDataSchema = z.object({
   email: z.string().email(),
   studentNumber: z.string().optional(),
 });
-export const AddIdpUserSchema = z.object({
-  email: z.string().email(),
-});
 export const IdpUserSchema = z.object({
   id: z.number().int(),
   email: z.string().email().nullable(),
+});
+export const NewIdpUserSchema = z.object({
+  email: z.string().email(),
 });
 export const IdpUsersSchema = z.array(IdpUserSchema);
 
 export type UserData = z.infer<typeof UserDataSchema>;
 export type TeacherData = z.infer<typeof TeacherDataSchema>;
-export type AddIdpUser = z.infer<typeof AddIdpUserSchema>;
+export type NewIdpUser = z.infer<typeof NewIdpUserSchema>;
 export type IdpUsers = z.infer<typeof IdpUsersSchema>;

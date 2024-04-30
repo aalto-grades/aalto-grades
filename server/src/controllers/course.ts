@@ -9,11 +9,12 @@ import {Transaction} from 'sequelize';
 import {
   CourseData,
   CourseRoleType,
-  CreateCourseData,
   EditCourseData,
   HttpCode,
   Language,
+  NewCourseDataSchema,
 } from '@common/types';
+import {TypedRequestBody} from 'zod-express-middleware';
 import {sequelize} from '../database';
 import Course from '../database/models/course';
 import CourseRole from '../database/models/courseRole';
@@ -30,6 +31,8 @@ import {
 
 /**
  * Responds with CourseData
+ *
+ * @throws ApiError(400|404)
  */
 export const getCourse = async (req: Request, res: Response): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
@@ -41,9 +44,7 @@ export const getCourse = async (req: Request, res: Response): Promise<void> => {
   res.json(courseData);
 };
 
-/**
- * Responds with CourseData[]
- */
+/** Responds with CourseData[] */
 export const getAllCourses = async (
   _req: Request,
   res: Response
@@ -63,9 +64,11 @@ export const getAllCourses = async (
 
 /**
  * Responds with number
+ *
+ * @throws ApiError(422)
  */
 export const addCourse = async (
-  req: Request<ParamsDictionary, unknown, CreateCourseData>,
+  req: TypedRequestBody<typeof NewCourseDataSchema>,
   res: Response
 ): Promise<void> => {
   const teachers = await validateEmailList(req.body.teachersInCharge);
@@ -134,6 +137,7 @@ export const addCourse = async (
   res.status(HttpCode.Created).json(course.id);
 };
 
+/** @throws ApiError(400|404|422) */
 export const editCourse = async (
   req: Request<ParamsDictionary, unknown, EditCourseData>,
   res: Response
