@@ -4,10 +4,21 @@
 ---
 name: Dev Image Creation Workflow
 run-name: ${{ github.actor }} dev container creation
+
+# Run on every push
 on:
   push:
     branches:
       - dev
+
+# Run on dev push workflow success
+# on:
+#   workflow_run:
+#     workflows: ['Dev Push Workflow']
+#     branches: [dev]
+#     types:
+#       - completed
+
 env:
   REGISTRY: ghcr.io
   FRONTEND_IMAGE_NAME: aalto-grades/aalto-grades-frontend-dev
@@ -15,6 +26,8 @@ env:
 
 jobs:
   build_and_push_frontend_and_backend:
+    # Run on dev push workflow success
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
