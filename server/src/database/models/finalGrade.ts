@@ -29,7 +29,7 @@ export default class FinalGrade extends Model<
   declare sisuExportDate: Date | null;
   // Date when attainment is completed (e.g., deadline or exam date)
   declare date: CreationOptional<Date | string>; // Database outputs yyyy-mm-dd but inserting date is allowed
-  declare comment: CreationOptional<string | null>; // Database outputs yyyy-mm-dd but inserting date is allowed
+  declare comment: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   grader?: User;
