@@ -23,7 +23,7 @@ export default class CourseRole extends Model<
 > {
   declare userId: ForeignKey<User['id']>;
   declare courseId: ForeignKey<Course['id']>;
-  declare role: string;
+  declare role: CourseRoleType;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   /**
@@ -101,7 +101,7 @@ CourseRole.updateCourseRoles = async (
     if (users === null) return;
 
     for (const oldRole of oldRoles) {
-      if ((oldRole.role as CourseRoleType) !== role) continue;
+      if (oldRole.role !== role) continue;
 
       const existingUserIndex = users.findIndex(
         teacher => teacher.id === oldRole.userId

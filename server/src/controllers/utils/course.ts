@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseData, CourseRoleType, HttpCode, Language} from '@common/types';
+import {CourseData, CourseRoleType, HttpCode} from '@common/types';
+import logger from '../../configs/winston';
 import Course from '../../database/models/course';
 import CourseTranslation from '../../database/models/courseTranslation';
 import User from '../../database/models/user';
@@ -61,7 +62,7 @@ export const parseCourseFull = (course: CourseFull): CourseData => {
     minCredits: course.minCredits,
     maxCredits: course.maxCredits,
     gradingScale: course.gradingScale,
-    languageOfInstruction: course.languageOfInstruction as Language,
+    languageOfInstruction: course.languageOfInstruction,
     teachersInCharge: [],
     assistants: [],
     department: {en: '', fi: '', sv: ''},
@@ -86,18 +87,32 @@ export const parseCourseFull = (course: CourseFull): CourseData => {
   }
 
   for (const user of course.Users) {
-    if (user.CourseRole.role === CourseRoleType.Teacher) {
-      courseData.teachersInCharge.push({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      });
-    } else if (user.CourseRole.role === CourseRoleType.Assistant) {
-      courseData.assistants.push({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      });
+    const role = user.CourseRole.role;
+    if (role === CourseRoleType.Student) continue;
+
+    if (user.name === null || user.email === null) {
+      logger.error(
+        `Teacher or assistant user ${user.id} is missing a name or an email`
+      );
+      throw new ApiError(
+        'Teacher or assistant user is missing a name or an email',
+        HttpCode.InternalServerError
+      );
+    }
+
+    const userData = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      studentNumber: user.studentNumber,
+    };
+    switch (role) {
+      case CourseRoleType.Teacher:
+        courseData.teachersInCharge.push(userData);
+        break;
+      case CourseRoleType.Assistant:
+        courseData.assistants.push(userData);
+        break;
     }
   }
 

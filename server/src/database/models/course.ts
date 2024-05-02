@@ -10,7 +10,7 @@ import {
   Model,
 } from 'sequelize';
 
-import {GradingScale} from '@common/types';
+import {GradingScale, Language} from '@common/types';
 import {sequelize} from '..';
 
 export default class Course extends Model<
@@ -19,7 +19,7 @@ export default class Course extends Model<
 > {
   declare id: CreationOptional<number>;
   declare courseCode: string;
-  declare languageOfInstruction: string;
+  declare languageOfInstruction: Language;
   declare minCredits: number;
   declare maxCredits: number;
   declare gradingScale: GradingScale;

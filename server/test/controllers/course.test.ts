@@ -30,9 +30,24 @@ const testCourseId = 5;
 const editCourseId = 7;
 const badId = 1000000;
 const teachers: TeacherData[] = [
-  {id: 5, name: 'Amanda Germain', email: 'teacher1@aalto.fi'},
-  {id: 6, name: 'Beth Holmes', email: 'teacher2@aalto.fi'},
-  {id: 7, name: 'Mark Ortiz', email: 'teacher3@aalto.fi'},
+  {
+    id: 5,
+    name: 'Amanda Germain',
+    email: 'teacher1@aalto.fi',
+    studentNumber: '352772',
+  },
+  {
+    id: 6,
+    name: 'Beth Holmes',
+    email: 'teacher2@aalto.fi',
+    studentNumber: '476617',
+  },
+  {
+    id: 7,
+    name: 'Mark Ortiz',
+    email: 'teacher3@aalto.fi',
+    studentNumber: '344625',
+  },
 ];
 
 const CourseSchema = BaseCourseDataSchema.strict().refine(

@@ -80,7 +80,7 @@ export const addCourse = async (
         minCredits: req.body.minCredits,
         maxCredits: req.body.maxCredits,
         gradingScale: req.body.gradingScale,
-        languageOfInstruction: req.body.languageOfInstruction.toUpperCase(),
+        languageOfInstruction: req.body.languageOfInstruction,
       },
       {transaction: t}
     );

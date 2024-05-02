@@ -24,11 +24,11 @@ export default class AttainmentGrade extends Model<
   declare attainmentId: ForeignKey<Attainment['id']>;
   declare graderId: ForeignKey<User['id']>;
   declare grade: number;
-  declare sisuExportDate: CreationOptional<Date>;
+  declare sisuExportDate: CreationOptional<Date | null>;
   // Date when attainment is completed (e.g., deadline or exam date)
   declare date: CreationOptional<Date | string>; // Database outputs yyyy-mm-dd but inserting date is allowed
   declare expiryDate: CreationOptional<Date | string>; // Database outputs yyyy-mm-dd but inserting date is allowed
-  declare comment: CreationOptional<string>;
+  declare comment: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   grader?: User;

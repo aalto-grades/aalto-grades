@@ -62,7 +62,7 @@ export const courseAuthorization = (
         result.data,
         req.user as JwtClaims
       );
-      if (!allowedRoles.includes(courseRole.role as CourseRoleType)) {
+      if (!allowedRoles.includes(courseRole.role)) {
         return res
           .status(HttpCode.Forbidden)
           .send({success: false, errors: ['forbidden']});

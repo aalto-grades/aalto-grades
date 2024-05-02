@@ -19,6 +19,7 @@ import {
   SAML_METADATA_URL,
   SAML_PRIVATE_KEY,
 } from '../../configs/environment';
+import logger from '../../configs/winston';
 import User from '../../database/models/user';
 import {ApiError} from '../../types';
 import {getIdpSignCert} from './saml';
@@ -33,11 +34,23 @@ export const validateLogin = async (
   if (user === null) {
     throw new ApiError('invalid credentials', HttpCode.Unauthorized);
   }
+  if (user.password === null) {
+    logger.warn(`User password was null for user ${user.id}`);
+    throw new ApiError('invalid credentials', HttpCode.Unauthorized);
+  }
 
   const match = await argon.verify(user.password.trim(), password);
 
   if (!match) {
     throw new ApiError('invalid credentials', HttpCode.Unauthorized);
+  }
+
+  if (user.name === null) {
+    logger.error(`User name was null for user ${user.id}`);
+    throw new ApiError(
+      'User does not have a name',
+      HttpCode.InternalServerError
+    );
   }
 
   return {

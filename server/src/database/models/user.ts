@@ -11,6 +11,7 @@ import {
   Op,
 } from 'sequelize';
 
+import {SystemRole} from '@common/types';
 import {sequelize} from '..';
 
 export default class User extends Model<
@@ -18,12 +19,12 @@ export default class User extends Model<
   InferCreationAttributes<User>
 > {
   declare id: CreationOptional<number>;
-  declare studentNumber: CreationOptional<string>;
-  declare eduUser: CreationOptional<string>;
-  declare name: CreationOptional<string>;
-  declare role: CreationOptional<string>;
-  declare email: CreationOptional<string>;
-  declare password: CreationOptional<string>;
+  declare eduUser: CreationOptional<string | null>;
+  declare studentNumber: CreationOptional<string | null>;
+  declare name: CreationOptional<string | null>;
+  declare role: CreationOptional<SystemRole>;
+  declare email: CreationOptional<string | null>;
+  declare password: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   static findByEmail: (email: string) => Promise<User | null>;
