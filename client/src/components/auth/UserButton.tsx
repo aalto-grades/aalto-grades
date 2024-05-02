@@ -23,10 +23,7 @@ const UserButton = (): JSX.Element => {
     onSuccess: () => {
       setAuth(null);
       setAnchorEl(null);
-      queryClient.invalidateQueries({
-        queryKey: ['refresh-token'],
-        refetchType: 'none',
-      });
+      queryClient.clear();
       navigate('/login', {replace: true});
     },
   });
