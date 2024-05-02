@@ -11,7 +11,7 @@ const config: Config = {
   testTimeout: 5000,
   globalSetup: './test/util/setup.js',
   moduleNameMapper: {
-    '^@common/(.*)$': '<rootDir>/build/common/$1',
+    '^@/common/(.*)$': '<rootDir>/build/common/$1',
   },
 };
 

@@ -6,9 +6,9 @@ import {JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import {AdditionNodeValue} from '@common/types/graph';
-import {NodeValuesContext} from '../../context/GraphProvider';
+import {AdditionNodeValue} from '@/common/types/graph';
 import BaseNode from './BaseNode';
+import {NodeValuesContext} from '../../context/GraphProvider';
 
 const handleStartHeight = 45.5 + 30;
 const rowHeight = 30;

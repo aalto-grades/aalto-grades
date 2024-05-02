@@ -24,10 +24,10 @@ import {
   GridRowsProp,
   GridToolbarContainer,
 } from '@mui/x-data-grid';
+import {enqueueSnackbar} from 'notistack';
 import {parse, unparse} from 'papaparse';
 import {Dispatch, JSX, SetStateAction, useEffect, useState} from 'react';
 
-import {enqueueSnackbar} from 'notistack';
 import {GradeUploadColTypes} from './UploadDialog';
 import MismatchDialog, {MismatchData} from './UploadDialogMismatchDialog';
 

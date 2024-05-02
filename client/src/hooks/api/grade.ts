@@ -3,13 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  EditGradeData,
-  NewGrade,
-  SisuCsvUpload,
-  StudentRow,
-  StudentRowArraySchema,
-} from '@common/types';
-import {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -18,8 +11,15 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import axios from './axios';
 
+import {
+  EditGradeData,
+  NewGrade,
+  SisuCsvUpload,
+  StudentRow,
+  StudentRowArraySchema,
+} from '@/common/types';
+import axios from './axios';
 import {Numeric} from '../../types';
 
 export const useGetGrades = (

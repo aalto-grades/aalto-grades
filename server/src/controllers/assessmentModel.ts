@@ -10,11 +10,11 @@ import {
   EditAssessmentModelDataSchema,
   HttpCode,
   NewAssessmentModelDataSchema,
-} from '@common/types';
-import AssessmentModel from '../database/models/assessmentModel';
-import {ApiError} from '../types';
+} from '@/common/types';
 import {validateAssessmentModelPath} from './utils/assessmentModel';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
+import AssessmentModel from '../database/models/assessmentModel';
+import {ApiError} from '../types';
 
 /**
  * Responds with AssessmentModelData

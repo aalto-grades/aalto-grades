@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {expect, test} from '@playwright/test';
+
 import {cleanDb, setupDb} from './helper';
 
 test.beforeAll(async () => {

@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData} from '@common/types';
-import {FullNodeData, GraphStructure, NodeData} from '@common/types/graph';
 import {Edge, Node} from 'reactflow';
+
+import {AttainmentData, FullNodeData, GraphStructure, NodeData} from '../types';
 
 export type GraphTemplate = 'none' | 'addition' | 'average';
 

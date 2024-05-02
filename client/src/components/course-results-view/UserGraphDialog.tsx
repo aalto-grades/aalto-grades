@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
 
-import {AssessmentModelData} from '@common/types';
+import {AssessmentModelData} from '@/common/types';
 import {
   GroupedStudentRow,
   useTableContext,

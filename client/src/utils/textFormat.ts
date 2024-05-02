@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {GradingScale} from '@common/types';
+import {GradingScale} from '@/common/types';
 
 // Change course type from "NUMERICAL", "PASSFAIL" and from "SECOND_NATIONAL_LANGUAGE"
 // to a more readable types.

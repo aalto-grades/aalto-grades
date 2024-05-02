@@ -7,10 +7,10 @@ import {Box, IconButton, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import {JSX, useState} from 'react';
 
-import {AttainmentGradesData} from '@common/types';
+import {AttainmentGradesData} from '@/common/types';
+import EditGradesDialog from './EditGradesDialog';
 import {useTableContext} from '../../context/GradesTableProvider';
 import {findBestGrade, gradeIsExpired} from '../../utils';
-import EditGradesDialog from './EditGradesDialog';
 
 type GradeCellProps = {
   studentNumber: string;

@@ -14,7 +14,8 @@ import {
   useState,
 } from 'react';
 import {useBlocker} from 'react-router-dom';
-import ReactFlow, {
+import {
+  ReactFlow,
   Background,
   BackgroundVariant,
   Connection,
@@ -29,7 +30,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import {AttainmentData, AttainmentGradesData} from '@common/types';
+import {AttainmentData, AttainmentGradesData} from '@/common/types';
 import {
   AttainmentNodeValue,
   CustomNodeTypes,
@@ -39,16 +40,8 @@ import {
   NodeSettings,
   NodeValue,
   NodeValues,
-} from '@common/types/graph';
-import {calculateNewNodeValues, initNode} from '@common/util/calculateGraph';
-import {
-  ExtraNodeData,
-  ExtraNodeDataContext,
-  NodeDataContext,
-  NodeValuesContext,
-} from '../../context/GraphProvider';
-import {GradeSelectOption, findBestGrade} from '../../utils';
-import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+} from '@/common/types/graph';
+import {calculateNewNodeValues, initNode} from '@/common/util/calculateGraph';
 import AdditionNode from './AdditionNode';
 import AttanmentNode from './AttainmentNode';
 import AttainmentValuesDialog from './AttainmentValuesDialog';
@@ -63,6 +56,14 @@ import StepperNode from './StepperNode';
 import SubstituteNode from './SubstituteNode';
 import './flow.scss';
 import {findDisconnectedEdges, formatGraph} from './graphUtil';
+import {
+  ExtraNodeData,
+  ExtraNodeDataContext,
+  NodeDataContext,
+  NodeValuesContext,
+} from '../../context/GraphProvider';
+import {GradeSelectOption, findBestGrade} from '../../utils';
+import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 const nodeTypesMap = {
   addition: AdditionNode,

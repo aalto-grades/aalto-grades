@@ -11,10 +11,10 @@ import {
   Model,
 } from 'sequelize';
 
-import {sequelize} from '..';
 import AssessmentModel from './assessmentModel';
 import Course from './course';
 import User from './user';
+import {sequelize} from '..';
 
 export default class FinalGrade extends Model<
   InferAttributes<FinalGrade>,

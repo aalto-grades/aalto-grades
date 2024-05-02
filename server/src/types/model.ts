@@ -4,7 +4,7 @@
 
 // This file defines extensions of Sequelize models to represent query results.
 
-import {CourseRoleType} from '@common/types';
+import {CourseRoleType} from '@/common/types';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';

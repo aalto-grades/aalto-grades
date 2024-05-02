@@ -27,7 +27,7 @@ import {OverridableComponent} from '@mui/types';
 import {JSX} from 'react';
 import {NavLink, useNavigate, useParams} from 'react-router-dom';
 
-import {SystemRole} from '@common/types';
+import {SystemRole} from '@/common/types';
 import useAuth from '../../hooks/useAuth';
 
 const SideMenuButton = ({

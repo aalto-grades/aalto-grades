@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {StudentRow} from '@common/types';
 import {
   Button,
   Collapse,
@@ -24,6 +23,8 @@ import dayjs, {Dayjs} from 'dayjs';
 import 'dayjs/locale/en-gb';
 import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
+
+import {StudentRow} from '@/common/types';
 import {useGetAllAssessmentModels} from '../../hooks/useApi';
 import {GradeSelectOption} from '../../utils';
 

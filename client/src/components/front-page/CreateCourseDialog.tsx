@@ -34,7 +34,7 @@ import {
   GradingScale,
   Language,
   NewCourseData,
-} from '@common/types';
+} from '@/common/types';
 import {useAddCourse} from '../../hooks/useApi';
 import {sisuLanguageOptions} from '../../utils';
 import {convertToClientGradingScale} from '../../utils/textFormat';

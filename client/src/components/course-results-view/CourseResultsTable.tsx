@@ -4,12 +4,11 @@
 
 import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
 import {Badge, Icon, IconButton} from '@mui/material';
-import '@tanstack/react-table';
 import {flexRender} from '@tanstack/react-table';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import {JSX, useRef} from 'react';
 
-import {FinalGradeData, StudentRow} from '@common/types';
+import {FinalGradeData, StudentRow} from '@/common/types';
 import {useTableContext} from '../../context/GradesTableProvider';
 import PrettyChip from '../shared/PrettyChip';
 

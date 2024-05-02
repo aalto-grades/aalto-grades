@@ -14,9 +14,9 @@ import {
 } from '@mui/material';
 import {JSX, useState} from 'react';
 
+import DeleteUserDialog from './DeleteUserDialog';
 import {useDeleteUser, useGetIdpUsers} from '../../../hooks/useApi';
 import {HeadCellData} from '../../../types';
-import DeleteUserDialog from './DeleteUserDialog';
 
 const headCells: HeadCellData[] = [
   {id: 'email', label: 'Email'},
