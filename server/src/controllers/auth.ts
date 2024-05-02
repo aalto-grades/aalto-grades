@@ -65,7 +65,6 @@ export const authLogin = (
 
         if (typeof loginResult === 'boolean') {
           return res.status(HttpCode.Unauthorized).send({
-            success: false,
             errors: ['incorrect email or password'],
           });
         }
@@ -115,7 +114,6 @@ export const authSamlLogin = (
 
         if (loginResult === undefined) {
           return res.status(HttpCode.Unauthorized).send({
-            success: false,
             errors: ['Authentication failed'],
           });
         }
