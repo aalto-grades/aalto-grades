@@ -13,9 +13,6 @@ import {requestLogger, requestSyslogger} from './middleware/requestLogger';
 import {router} from './routes/index';
 import {ApiError} from './types';
 
-// Register formulas before starting Express.
-// require('./formulas');
-
 export const app: Application = express();
 
 if (NODE_ENV !== 'production') {
