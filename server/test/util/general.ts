@@ -5,7 +5,7 @@
 import {z} from 'zod';
 
 export const ErrorSchema = z
-  .object({success: z.literal(false), errors: z.array(z.string()).nonempty()})
+  .object({errors: z.array(z.string()).nonempty()})
   .strict();
 
 export const ZodErrorSchema = z.array(

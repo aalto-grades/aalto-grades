@@ -35,7 +35,6 @@ export const handleInvalidRequestJson = (
     err.body !== undefined
   ) {
     res.status(400).send({
-      success: false,
       errors: [`SyntaxError: ${err.message}: ${err.body}`],
     });
   } else {
