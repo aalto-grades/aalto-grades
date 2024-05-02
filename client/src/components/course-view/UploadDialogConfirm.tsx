@@ -22,7 +22,14 @@ import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {Dayjs} from 'dayjs';
 import 'dayjs/locale/en-gb';
-import {Dispatch, JSX, SetStateAction, useMemo} from 'react';
+import {
+  Dispatch,
+  JSX,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import {GradeUploadColTypes} from './UploadDialog';
 
@@ -44,11 +51,14 @@ type PropsType = {
 const UploadDialogConfirm = ({
   columns,
   rows,
+  setReady,
   dates,
   setDates,
   expanded,
   setExpanded,
 }: PropsType): JSX.Element => {
+  const [error, setError] = useState<boolean>(false);
+
   const nonEmptyCols = useMemo(() => {
     const newNonEmptyCols: string[] = [];
     for (const row of rows) {
@@ -59,6 +69,18 @@ const UploadDialogConfirm = ({
     }
     return newNonEmptyCols;
   }, [rows]);
+
+  useEffect(() => {
+    let newError = false;
+    for (const date of dates) {
+      if (date.expirationDate <= date.completionDate) newError = true;
+    }
+    if (newError !== error) {
+      setError(newError);
+      if (newError) setReady(false);
+      else setReady(true);
+    }
+  }, [dates, error, setReady]);
 
   const handleCompletionDateChange = (
     newCompletionDate: Dayjs | null,
@@ -134,7 +156,17 @@ const UploadDialogConfirm = ({
                           </TableCell>
                           <TableCell>
                             <DatePicker
-                              slotProps={{textField: {size: 'small'}}}
+                              slotProps={{
+                                textField: {
+                                  size: 'small',
+                                  error:
+                                    date.expirationDate <= date.completionDate,
+                                  helperText:
+                                    date.expirationDate <= date.completionDate
+                                      ? 'Expiry date must be after completion date'
+                                      : '',
+                                },
+                              }}
                               value={date.expirationDate}
                               onChange={e =>
                                 setDates(oldDates =>
@@ -162,6 +194,7 @@ const UploadDialogConfirm = ({
           onChange={(_, newExpanded) =>
             setExpanded(newExpanded ? 'confirm' : '')
           }
+          disabled={error}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
             Confirm Data
