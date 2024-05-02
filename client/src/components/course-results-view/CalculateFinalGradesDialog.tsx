@@ -101,12 +101,12 @@ const CalculateFinalGradesDialog = ({
         </Typography>
         <FormControl disabled fullWidth sx={{mb: 2}}>
           <InputLabel id="select-grade-select-option">
-            Grade selection criteria
+            Grade selection criterion
           </InputLabel>
           <Select
             labelId="select-grade-select-option"
             value={gradeSelectOption}
-            label="Grade selection criteria"
+            label="Grade selection criterion"
           >
             <MenuItem value="best">Select best grade</MenuItem>
             <MenuItem value="latest">Select latest grade</MenuItem>

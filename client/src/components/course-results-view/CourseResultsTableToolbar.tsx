@@ -181,12 +181,12 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       <Divider orientation="vertical" sx={{mx: 1}} flexItem />
       <FormControl>
         <InputLabel id="select-grade-select-option">
-          Grade selection criteria
+          Grade selection criterion
         </InputLabel>
         <Select
           labelId="select-grade-select-option"
           value={gradeSelectOption}
-          label="Grade selection criteria"
+          label="Grade selection criterion"
           onChange={e =>
             setGradeSelectOption(e.target.value as GradeSelectOption)
           }

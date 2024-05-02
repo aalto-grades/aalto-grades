@@ -51,7 +51,7 @@ export type GradeSelectOption = 'best' | 'latest';
  * @param {'any' | 'prefer_non_expired' | 'non_expired'} [searchOptions.expiredOption='any']
  *   Specifies how to handle expired grades. Default is `'any'`
  * @param {'best' | 'latest'} [searchOptions.gradeSelectOption='best'] -
- *   Specifies the criteria for selecting the best grade. Default is `'best'`
+ *   Specifies the criterion for selecting the best grade. Default is `'best'`
  * @returns {T | null} The best grade found based on the search options, or null
  *   if no suitable grade is found.
  */
