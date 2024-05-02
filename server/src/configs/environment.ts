@@ -13,15 +13,7 @@ import logger from './winston';
 const parsedPort: number = Number(process.env.AALTO_GRADES_BACKEND_PORT);
 export const PORT: number = isNaN(parsedPort) ? 3000 : parsedPort;
 
-export const SISU_API_KEY: string | undefined = process.env.SISU_API_KEY;
-export const SISU_API_URL: string | undefined = process.env.SISU_API_URL;
 export const NODE_ENV: string = process.env.NODE_ENV ?? 'development';
-
-if ((!SISU_API_KEY || !SISU_API_URL) && NODE_ENV === 'production') {
-  throw new Error(
-    'SISU_API_KEY and/or SISU_API_URL environment variable(s) undefined, required in production.'
-  );
-}
 
 export const JWT_SECRET: string =
   process.env.AALTO_GRADES_JWT_SECRET || 'TOP_SECRET';
