@@ -180,17 +180,19 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       </Button>
       <Divider orientation="vertical" sx={{mx: 1}} flexItem />
       <FormControl>
-        <InputLabel id="select-grade-select-option">Best Grade</InputLabel>
+        <InputLabel id="select-grade-select-option">
+          Grade selection criteria
+        </InputLabel>
         <Select
           labelId="select-grade-select-option"
           value={gradeSelectOption}
-          label="Best Grade"
+          label="Grade selection criteria"
           onChange={e =>
             setGradeSelectOption(e.target.value as GradeSelectOption)
           }
         >
-          <MenuItem value="best">Best</MenuItem>
-          <MenuItem value="latest">Latest</MenuItem>
+          <MenuItem value="best">Select best grade</MenuItem>
+          <MenuItem value="latest">Select latest grade</MenuItem>
         </Select>
       </FormControl>
       <FormControl>
@@ -311,6 +313,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
             open={showCalculateDialog}
             onClose={() => setShowCalculateDialog(false)}
             selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
+            gradeSelectOption={gradeSelectOption}
             calculateFinalGrades={handleCalculateFinalGrades}
           />
           <SisuDownloadDialog

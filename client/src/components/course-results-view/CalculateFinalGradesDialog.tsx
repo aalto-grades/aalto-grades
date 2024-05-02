@@ -25,11 +25,13 @@ import 'dayjs/locale/en-gb';
 import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {useGetAllAssessmentModels} from '../../hooks/useApi';
+import {GradeSelectOption} from '../../utils';
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
   selectedRows: StudentRow[];
+  gradeSelectOption: GradeSelectOption;
   calculateFinalGrades: (
     selectedRows: StudentRow[],
     modelId: number,
@@ -42,6 +44,7 @@ const CalculateFinalGradesDialog = ({
   open,
   onClose,
   selectedRows,
+  gradeSelectOption,
   calculateFinalGrades,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
@@ -96,6 +99,19 @@ const CalculateFinalGradesDialog = ({
             ? 'Calculating final grade for 1 student'
             : `Calculating final grades for ${selectedRows.length} students`}
         </Typography>
+        <FormControl disabled fullWidth sx={{mb: 2}}>
+          <InputLabel id="select-grade-select-option">
+            Grade selection criteria
+          </InputLabel>
+          <Select
+            labelId="select-grade-select-option"
+            value={gradeSelectOption}
+            label="Grade selection criteria"
+          >
+            <MenuItem value="best">Select best grade</MenuItem>
+            <MenuItem value="latest">Select latest grade</MenuItem>
+          </Select>
+        </FormControl>
         <FormControl sx={{display: 'block', mb: 2}}>
           <InputLabel id="calculateGradesSelect">Assessment model</InputLabel>
           <Select
