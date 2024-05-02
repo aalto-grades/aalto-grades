@@ -61,16 +61,12 @@ export const courseAuthorization = (
         req.user as JwtClaims
       );
       if (!allowedRoles.includes(courseRole.role)) {
-        return res
-          .status(HttpCode.Forbidden)
-          .send({errors: ['forbidden']});
+        return res.status(HttpCode.Forbidden).send({errors: ['forbidden']});
       }
 
       return next();
     } catch (e) {
-      return res
-        .status(HttpCode.Forbidden)
-        .send({errors: ['forbidden']});
+      return res.status(HttpCode.Forbidden).send({errors: ['forbidden']});
     }
   };
 
@@ -101,9 +97,7 @@ export const adminOrOwner = (): ((
       isAdminOrOwner(req.user as JwtClaims, result.data);
       return next();
     } catch (e) {
-      return res
-        .status(HttpCode.Forbidden)
-        .send({errors: ['forbidden']});
+      return res.status(HttpCode.Forbidden).send({errors: ['forbidden']});
     }
   };
 };
