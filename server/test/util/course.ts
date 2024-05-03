@@ -28,11 +28,24 @@ class CourseCreator {
   /** Next free course code */
   private freeId: number = 10;
 
+  /** Next free attainment name */
+  private freeAttId: number = 10;
+
   /** Next free assessment model code */
   private freeModelId: number = 10;
 
   private randInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  async createAttainment(courseId: number): Promise<AttainmentData> {
+    const newAttainment = await Attainment.create({
+      courseId: courseId,
+      name: `Round ${this.freeAttId}`,
+      daysValid: this.randInt(10, 365),
+    });
+    this.freeAttId += 1;
+    return newAttainment;
   }
 
   private async createAttainments(courseId: number): Promise<AttainmentData[]> {
