@@ -45,7 +45,6 @@ export const errorHandler = (
     logger.error(`${err.name}: ${err.statusCode} - ${err.errors.toString()}`);
 
     res.status(err.statusCode).send({
-      success: false,
       errors: err.errors,
     });
     return;
@@ -55,7 +54,6 @@ export const errorHandler = (
     logger.error(`${err.name}: ${err.message}`);
 
     res.status(HttpCode.BadGateway).send({
-      success: false,
       errors: [
         err.response
           ? `external API error: ${err.response.status}`
@@ -71,7 +69,6 @@ export const errorHandler = (
 
   // Fallback if no other error matches
   res.status(HttpCode.InternalServerError).send({
-    success: false,
     errors: ['internal server error'],
   });
   return;

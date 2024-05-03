@@ -122,18 +122,6 @@ Login credentials for pgAdmin:
 From left side menu, select `Servers` and `Grades server` to access the Aalto
 Grades database. If prompted, use the password `postgres` to connect.
 
-### Sisu API
-
-To use the routes which communicate with Sisu, the environment variables
-`SISU_API_KEY` and `SISU_API_URL` must be provided. For example:
-
-```
-$ export SISU_API_KEY="your-api-key"
-$ export SISU_API_URL=www.api.com/api/sisu/v1
-```
-
-Defining these variables is optional outside of the production environment.
-
 ## Tests
 
 [Jest](https://jestjs.io/docs/getting-started) is used as the unit test

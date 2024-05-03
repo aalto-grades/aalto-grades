@@ -24,7 +24,6 @@ export const authorization = (
 
     if (!allowedRoles.includes(user.role)) {
       return res.status(HttpCode.Forbidden).send({
-        success: false,
         errors: ['forbidden'],
       });
     }
@@ -52,7 +51,6 @@ export const courseAuthorization = (
     const result = stringToIdSchema.safeParse(req.params.courseId);
     if (!result.success) {
       return res.status(HttpCode.BadRequest).send({
-        success: false,
         errors: [`Invalid course id ${req.params.courseId}`],
       });
     }
@@ -63,16 +61,12 @@ export const courseAuthorization = (
         req.user as JwtClaims
       );
       if (!allowedRoles.includes(courseRole.role)) {
-        return res
-          .status(HttpCode.Forbidden)
-          .send({success: false, errors: ['forbidden']});
+        return res.status(HttpCode.Forbidden).send({errors: ['forbidden']});
       }
 
       return next();
     } catch (e) {
-      return res
-        .status(HttpCode.Forbidden)
-        .send({success: false, errors: ['forbidden']});
+      return res.status(HttpCode.Forbidden).send({errors: ['forbidden']});
     }
   };
 
@@ -95,7 +89,6 @@ export const adminOrOwner = (): ((
     const result = stringToIdSchema.safeParse(req.params.userId);
     if (!result.success) {
       return res.status(HttpCode.BadRequest).send({
-        success: false,
         errors: [`Invalid course id ${req.params.courseId}`],
       });
     }
@@ -104,9 +97,7 @@ export const adminOrOwner = (): ((
       isAdminOrOwner(req.user as JwtClaims, result.data);
       return next();
     } catch (e) {
-      return res
-        .status(HttpCode.Forbidden)
-        .send({success: false, errors: ['forbidden']});
+      return res.status(HttpCode.Forbidden).send({errors: ['forbidden']});
     }
   };
 };
