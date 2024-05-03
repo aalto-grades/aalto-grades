@@ -4,13 +4,14 @@
 
 import {z} from 'zod';
 import {DateSchema} from './general';
+import {UserDataSchema} from './user';
 
 export const FinalGradeDataSchema = z.object({
   finalGradeId: z.number().int(),
-  userId: z.number().int(),
+  user: UserDataSchema,
   courseId: z.number().int(),
   assessmentModelId: z.number().int(),
-  graderId: z.number().int(),
+  grader: UserDataSchema,
   grade: z.number().int().min(0).max(5),
   date: DateSchema,
   sisuExportDate: DateSchema.nullable(),
