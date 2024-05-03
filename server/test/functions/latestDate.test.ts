@@ -2,7 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
+import supertest from 'supertest';
+import {app} from '../../src/app';
 import {getDateOfLatestGrade} from '../../src/controllers/utils/grades';
+
+// Fails without this due to the logger being undefined?
+supertest(app);
 
 describe('Test latest date finder', () => {
   it('should return the correct date', async () => {

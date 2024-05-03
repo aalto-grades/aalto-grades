@@ -219,7 +219,9 @@ export const validateUserAndGrader = (
   }
 
   if (grade.grader.name === null) {
-    logger.error(`Found a ${gradeType} ${grade.id} where grader ${grade.grader.id} name is null`);
+    logger.error(
+      `Found a ${gradeType} ${grade.id} where grader ${grade.grader.id} name is null`
+    );
     throw new ApiError(
       `Found a ${gradeType} where grader name is null`,
       HttpCode.InternalServerError
@@ -227,4 +229,4 @@ export const validateUserAndGrader = (
   }
 
   return [grade.User as User & {studentNumber: string}, grade.grader];
-}
+};
