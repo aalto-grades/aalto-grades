@@ -13,9 +13,11 @@ import {initGraph} from '@common/util/initGraph';
 import {sequelize} from '../../src/database';
 import AssessmentModel from '../../src/database/models/assessmentModel';
 import Attainment from '../../src/database/models/attainment';
+import AttainmentGrade from '../../src/database/models/attainmentGrade';
 import Course from '../../src/database/models/course';
 import CourseRole from '../../src/database/models/courseRole';
 import CourseTranslation from '../../src/database/models/courseTranslation';
+import FinalGrade from '../../src/database/models/finalGrade';
 import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';
 
 /**
@@ -60,6 +62,43 @@ class CourseCreator {
       attainments.push(newAttainment);
     }
     return attainments;
+  }
+
+  async createGrade(
+    userId: number,
+    attainmentId: number,
+    graderId: number,
+    grade?: number
+  ): Promise<number> {
+    const attGrade = await AttainmentGrade.create({
+      userId: userId,
+      attainmentId: attainmentId,
+      graderId: graderId,
+      date: new Date(),
+      expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),
+      grade: grade ?? this.randInt(0, 10),
+    });
+
+    return attGrade.id;
+  }
+
+  async createFinalGrade(
+    courseId: number,
+    userId: number,
+    assessmentModelId: number,
+    graderId: number,
+    grade?: number
+  ): Promise<number> {
+    const finalGrade = await FinalGrade.create({
+      userId: userId,
+      assessmentModelId: assessmentModelId,
+      courseId: courseId,
+      graderId: graderId,
+      date: new Date(),
+      grade: grade ?? this.randInt(0, 5),
+    });
+
+    return finalGrade.id;
   }
 
   /** Creates an assessment model that uses the average model */

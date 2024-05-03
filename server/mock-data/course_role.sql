@@ -8,10 +8,4 @@ INSERT INTO public.course_role (user_id, course_id, role, created_at, updated_at
 (4, 1, 'STUDENT', NOW(), NOW()),
 (2, 2, 'TEACHER', NOW(), NOW()),
 (2, 3, 'TEACHER', NOW(), NOW()),
-(2, 4, 'TEACHER', NOW(), NOW()),
-
-(2, 5, 'TEACHER', NOW(), NOW()),
-(2, 7, 'TEACHER', NOW(), NOW()),
-(2, 8, 'TEACHER', NOW(), NOW()),
-(2, 10, 'TEACHER', NOW(), NOW()),
-(2, 11, 'TEACHER', NOW(), NOW());
+(2, 4, 'TEACHER', NOW(), NOW());

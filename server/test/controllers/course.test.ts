@@ -20,15 +20,17 @@ import {
   findCourseFullById,
   parseCourseFull,
 } from '../../src/controllers/utils/course';
+import {courseCreator} from '../util/course';
+import {cleanDb, setupDb} from '../util/dbReset';
 import {ErrorSchema, ZodErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 
 const request = supertest(app);
-let cookies: Cookies = {} as Cookies;
 
-const testCourseId = 5;
-const editCourseId = 7;
-const badId = 1000000;
+let cookies: Cookies = {} as Cookies;
+let courseId = -1;
+
+const nonExistentId = 1000000;
 const teachers: TeacherData[] = [
   {
     id: 5,
@@ -50,18 +52,25 @@ const teachers: TeacherData[] = [
   },
 ];
 
+beforeAll(async () => {
+  await setupDb();
+  cookies = await getCookies();
+
+  [courseId] = await courseCreator.createCourse({});
+});
+
+afterAll(async () => {
+  await cleanDb();
+});
+
 const CourseSchema = BaseCourseDataSchema.strict().refine(
   val => val.maxCredits >= val.minCredits
 );
 
-beforeAll(async () => {
-  cookies = await getCookies();
-});
-
 describe('Test GET /v1/courses/:courseId - get course by ID', () => {
   it('should respond with correct data when course exists', async () => {
     const res = await request
-      .get(`/v1/courses/${testCourseId}`)
+      .get(`/v1/courses/${courseId}`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
@@ -83,7 +92,7 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
     const res = await request
-      .get(`/v1/courses/${testCourseId}`)
+      .get(`/v1/courses/${courseId}`)
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
 
@@ -92,7 +101,7 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
 
   it('should respond with 404 not found, if nonexistent course id', async () => {
     const res = await request
-      .get(`/v1/courses/${badId}`)
+      .get(`/v1/courses/${nonExistentId}`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
@@ -322,10 +331,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     uneditedTeachersInCharge: TeacherData[],
     editedTeachersInCharge: TeacherData[]
   ): Promise<void> => {
-    const checkCourseData = async (
-      courseId: number,
-      expected: CourseData
-    ): Promise<void> => {
+    const checkCourseData = async (expected: CourseData): Promise<void> => {
       const dbCourse = parseCourseFull(
         await findCourseFullById(courseId, HttpCode.InternalServerError)
       );
@@ -336,34 +342,34 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
 
     const course: CourseData = {
       ...uneditedCourseData,
-      id: editCourseId,
+      id: courseId,
       teachersInCharge: uneditedTeachersInCharge,
     } as unknown as CourseData;
 
     const editedCourseData: CourseData = {
       ...uneditedCourseData,
       ...edits,
-      id: editCourseId,
+      id: courseId,
       teachersInCharge: editedTeachersInCharge,
     } as unknown as CourseData;
 
     await request
-      .put(`/v1/courses/${editCourseId}`)
+      .put(`/v1/courses/${courseId}`)
       .send(uneditedCourseData)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    await checkCourseData(editCourseId, course);
+    await checkCourseData(course);
 
     await request
-      .put(`/v1/courses/${editCourseId}`)
+      .put(`/v1/courses/${courseId}`)
       .send(edits)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    await checkCourseData(editCourseId, editedCourseData);
+    await checkCourseData(editedCourseData);
   };
 
   it('should successfully update course information', async () => {
@@ -448,7 +454,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
   it('should respond with 400 bad request, if body validation fails', async () => {
     const badInput = async (input: object): Promise<void> => {
       const res = await request
-        .put(`/v1/courses/${editCourseId}`)
+        .put(`/v1/courses/${courseId}`)
         .send(input)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
@@ -469,7 +475,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
     const res = await request
-      .put(`/v1/courses/${editCourseId}`)
+      .put(`/v1/courses/${courseId}`)
       .send(courseDataEdits)
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
@@ -479,7 +485,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
 
   it('should respond with 403 forbidden, if not admin user', async () => {
     const res = await request
-      .put(`/v1/courses/${editCourseId}`)
+      .put(`/v1/courses/${courseId}`)
       .send(courseDataEdits)
       .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
@@ -491,7 +497,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
 
   it('should respond with 404 not found, if the course ID does not exist', async () => {
     const res = await request
-      .put(`/v1/courses/${badId}`)
+      .put(`/v1/courses/${nonExistentId}`)
       .send(courseDataEdits)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')

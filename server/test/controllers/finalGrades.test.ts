@@ -8,16 +8,19 @@ import {z} from 'zod';
 import {FinalGradeDataSchema, HttpCode, NewFinalGrade} from '@common/types';
 import {app} from '../../src/app';
 import FinalGrade from '../../src/database/models/finalGrade';
-import {ErrorSchema} from '../util/general';
+import {courseCreator} from '../util/course';
+import {cleanDb, setupDb} from '../util/dbReset';
+import {ErrorSchema, TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 
 const request = supertest(app);
-let cookies: Cookies = {} as Cookies;
 
-const testCourseId = 8;
-const testCourse2Id = 9; // Not teacher in charge, final grade not calculated
-const testCourseAddId = 10;
-const badId = 1000000;
+let cookies: Cookies = {} as Cookies;
+let courseId = -1;
+let editCourseId = -1;
+let noRoleCourseId = -1;
+const nonExistentId = 1000000;
+
 const students = [
   {id: 8, studentNumber: '325235', finalGrade: 2},
   {id: 9, studentNumber: '826139', finalGrade: 3},
@@ -31,11 +34,36 @@ const students = [
   {id: 17, studentNumber: '216384', finalGrade: 2},
 ];
 
-// TODO: Test multiple final grades
-
 beforeAll(async () => {
+  await setupDb();
   cookies = await getCookies();
+
+  let assessmentModelId;
+  let _; // To be able to use spread
+  [courseId, _, assessmentModelId] = await courseCreator.createCourse({});
+  for (const student of students) {
+    await courseCreator.createFinalGrade(
+      courseId,
+      student.id,
+      assessmentModelId,
+      TEACHER_ID
+    );
+  }
+
+  [editCourseId] = await courseCreator.createCourse({});
+
+  [noRoleCourseId] = await courseCreator.createCourse({
+    hasTeacher: false,
+    hasAssistant: false,
+    hasStudent: false,
+  });
 });
+
+afterAll(async () => {
+  await cleanDb();
+});
+
+// TODO: Test multiple final grades
 
 /**
  * Check that the expected number of grades exist for a user for a specific
@@ -46,7 +74,7 @@ const checkGradeAmount = async (
   expectedGrades: number[]
 ): Promise<void> => {
   const dbAttainmentGrades = await FinalGrade.findAll({
-    where: {userId: student.id, courseId: testCourseAddId},
+    where: {userId: student.id, courseId: editCourseId},
   });
 
   const dbGrades = dbAttainmentGrades.map(
@@ -58,7 +86,7 @@ const checkGradeAmount = async (
 describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => {
   it('should get final grades succesfully when course results are found (admin user)', async () => {
     const res = await request
-      .get(`/v1/courses/${testCourseId}/finalGrades`)
+      .get(`/v1/courses/${courseId}/finalGrades`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
@@ -70,7 +98,7 @@ describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => 
 
   it('should get final grades succesfully when course results are found (teacher in charge)', async () => {
     const res = await request
-      .get(`/v1/courses/${testCourseId}/finalGrades`)
+      .get(`/v1/courses/${courseId}/finalGrades`)
       .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
@@ -93,7 +121,7 @@ describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => 
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
     const res = await request
-      .get(`/v1/courses/${testCourseId}/finalGrades`)
+      .get(`/v1/courses/${courseId}/finalGrades`)
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
 
@@ -102,7 +130,7 @@ describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => 
 
   it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
     const res = await request
-      .get(`/v1/courses/${testCourse2Id}/finalGrades`)
+      .get(`/v1/courses/${noRoleCourseId}/finalGrades`)
       .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
@@ -113,7 +141,7 @@ describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => 
 
   it('should respond with 404 not found, if course does not exist', async () => {
     const res = await request
-      .get(`/v1/courses/${badId}/finalGrades`)
+      .get(`/v1/courses/${nonExistentId}/finalGrades`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
@@ -138,16 +166,16 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
     finalGrade: number;
   }): Promise<void> => {
     const result = await FinalGrade.findOne({
-      where: {userId: student.id, courseId: testCourseAddId},
+      where: {userId: student.id, courseId: editCourseId},
     });
 
     expect(result).not.toBe(null);
     expect(result?.grade).toBe(student.finalGrade);
   };
 
-  it('should calculate correct grade, numeric grade (admin user)', async () => {
+  it('should add a grade (admin user)', async () => {
     const res = await request
-      .post(`/v1/courses/${testCourseAddId}/finalGrades`)
+      .post(`/v1/courses/${editCourseId}/finalGrades`)
       .send([getData(students[0])])
       .set('Cookie', cookies.adminCookie)
       .expect(HttpCode.Created);
@@ -156,9 +184,9 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
     await checkGrade(students[0]);
   });
 
-  it('should calculate correct grade, numeric grade (teacher in charge)', async () => {
+  it('should add a grade (teacher in charge)', async () => {
     const res = await request
-      .post(`/v1/courses/${testCourseAddId}/finalGrades`)
+      .post(`/v1/courses/${editCourseId}/finalGrades`)
       .send([getData(students[1])])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Created);
@@ -167,9 +195,9 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
     await checkGrade(students[1]);
   });
 
-  it('should calculate multiple correct grades based on student numbers', async () => {
+  it('should add multiple correct grades based on student numbers', async () => {
     const res = await request
-      .post(`/v1/courses/${testCourseAddId}/finalGrades`)
+      .post(`/v1/courses/${editCourseId}/finalGrades`)
       .send([getData(students[2]), getData(students[3])])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Created);
@@ -179,11 +207,11 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
     await checkGrade(students[3]);
   });
 
-  it('should calculate multiple grades for the same attainment on repeated runs', async () => {
+  it('should add multiple grades for the same final grade on repeated runs', async () => {
     await checkGradeAmount(students[4], []);
 
     const res = await request
-      .post(`/v1/courses/${testCourseAddId}/finalGrades`)
+      .post(`/v1/courses/${editCourseId}/finalGrades`)
       .send([getData(students[4])])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Created);
@@ -192,7 +220,7 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
     await checkGradeAmount(students[4], [students[4].finalGrade]);
 
     const res2 = await request
-      .post(`/v1/courses/${testCourseAddId}/finalGrades`)
+      .post(`/v1/courses/${editCourseId}/finalGrades`)
       .send([getData(students[4])])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Created);
@@ -206,7 +234,7 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
     const res = await request
-      .post(`/v1/courses/${testCourseAddId}/finalGrades`)
+      .post(`/v1/courses/${editCourseId}/finalGrades`)
       .send([getData(students[4])])
       .expect(HttpCode.Unauthorized);
 
@@ -215,7 +243,7 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
 
   it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
     const res = await request
-      .post(`/v1/courses/${testCourse2Id}/finalGrades`)
+      .post(`/v1/courses/${noRoleCourseId}/finalGrades`)
       .send([getData(students[4])])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Forbidden);
