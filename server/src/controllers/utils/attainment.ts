@@ -41,7 +41,7 @@ export const findAttainmentsByCourseId = async (
 /**
  * Finds an assessment model by url param id and also validates the url param.
  *
- * @throws ApiError(400,404) if not found.
+ * @throws ApiError(400|404) if not found.
  */
 const findAndValidateAttainmentId = async (
   attainmentId: string

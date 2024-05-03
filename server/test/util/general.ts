@@ -4,6 +4,10 @@
 
 import {z} from 'zod';
 
+export const TEACHER_ID = 2;
+export const ASSISTANT_ID = 3;
+export const STUDENT_ID = 4;
+
 export const ErrorSchema = z
   .object({errors: z.array(z.string()).nonempty()})
   .strict();

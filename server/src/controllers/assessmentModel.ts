@@ -8,7 +8,6 @@ import {TypedRequestBody} from 'zod-express-middleware';
 import {
   AssessmentModelData,
   EditAssessmentModelDataSchema,
-  GraphStructure,
   HttpCode,
   NewAssessmentModelDataSchema,
 } from '@common/types';
@@ -35,7 +34,7 @@ export const getAssessmentModel = async (
     id: assessmentModel.id,
     courseId: assessmentModel.courseId,
     name: assessmentModel.name,
-    graphStructure: assessmentModel.graphStructure as object as GraphStructure,
+    graphStructure: assessmentModel.graphStructure,
   };
 
   res.json(assessmentModelData);
@@ -63,8 +62,7 @@ export const getAllAssessmentModels = async (
       id: assessmentModel.id,
       courseId: assessmentModel.courseId,
       name: assessmentModel.name,
-      graphStructure:
-        assessmentModel.graphStructure as object as GraphStructure,
+      graphStructure: assessmentModel.graphStructure,
     });
   }
 
