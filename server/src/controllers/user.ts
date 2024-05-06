@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
+import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   CourseData,
@@ -11,7 +12,6 @@ import {
   NewIdpUserSchema,
   SystemRole,
 } from '@common/types';
-import {TypedRequestBody} from 'zod-express-middleware';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';

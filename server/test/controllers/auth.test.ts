@@ -57,6 +57,21 @@ describe('Test GET /v1/auth/self-info - check users own info', () => {
 });
 
 describe('Test POST /v1/auth/login - logging in with an existing user', () => {
+  it('should allow logging in with the correct credentials', async () => {
+    const res = await request
+      .post('/v1/auth/login')
+      .send({email: 'admin@aalto.fi', password: 'password'})
+      .expect('Content-Type', /json/)
+      .expect(HttpCode.Ok);
+
+    const result = await LoginResultSchema.strict().safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
+    if (result.success) {
+      expect(result.data.role).toBe(SystemRole.Admin);
+      expect(result.data.name).toBe('Andy Admin');
+    }
+  });
+
   it('should respond with 401 unauthorized, if logging in with invalid credentials', async () => {
     const badCreds = async (credentials: {
       email: string;
@@ -79,21 +94,6 @@ describe('Test POST /v1/auth/login - logging in with an existing user', () => {
     await badCreds({email: 'aalto.fi', password: 'password'});
     await badCreds({email: 'admin@aalto.fi', password: ''});
     await badCreds({email: 'admin@aalto.fi', password: 'password '});
-  });
-
-  it('should allow logging in with the correct credentials', async () => {
-    const res = await request
-      .post('/v1/auth/login')
-      .send({email: 'admin@aalto.fi', password: 'password'})
-      .expect('Content-Type', /json/)
-      .expect(HttpCode.Ok);
-
-    const result = await LoginResultSchema.strict().safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-    if (result.success) {
-      expect(result.data.role).toBe(SystemRole.Admin);
-      expect(result.data.name).toBe('Andy Admin');
-    }
   });
 });
 

@@ -3,14 +3,82 @@
 // SPDX-License-Identifier: MIT
 
 import {getDateOfLatestGrade} from '../../src/controllers/utils/grades';
+import {courseCreator} from '../util/course';
+import {cleanDb, setupDb} from '../util/dbReset';
+import {TEACHER_ID} from '../util/general';
+
+let courseId = -1;
+let extraStudentId = -1;
+const students: {id: number; latestGrade: Date}[] = [];
+const randomDate = (start: Date, end: Date): Date =>
+  new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+
+beforeAll(async () => {
+  await setupDb();
+
+  let attainments;
+  [courseId, attainments] = await courseCreator.createCourse({});
+
+  const now = new Date();
+
+  // Create 10 students
+  for (let i = 0; i < 100; i++) {
+    let newestGrade = new Date(1970, 0, 0);
+    const gradeDates = [];
+
+    // Create 10 grade dates
+    for (let j = 0; j < 10; j++) {
+      const gradeDate = randomDate(new Date(2020), now);
+      if (gradeDate > newestGrade) newestGrade = gradeDate;
+      gradeDates.push(gradeDate);
+    }
+
+    const newUserId = (await courseCreator.createUser()).id;
+    students.push({
+      id: newUserId,
+      latestGrade: newestGrade,
+    });
+
+    // Create the grades
+    for (const gradeDate of gradeDates) {
+      const attainmentIndex = Math.floor(Math.random() * attainments.length);
+      await courseCreator.createGrade(
+        newUserId,
+        attainments[attainmentIndex].id,
+        TEACHER_ID,
+        Math.floor(Math.random() * 30),
+        gradeDate
+      );
+    }
+  }
+  extraStudentId = (await courseCreator.createUser()).id;
+});
+
+afterAll(async () => {
+  await cleanDb();
+});
 
 describe('Test latest date finder', () => {
   it('should return the correct date', async () => {
-    expect(await getDateOfLatestGrade(13, 7)).toEqual(new Date('2022-02-02'));
-    expect(await getDateOfLatestGrade(14, 7)).toEqual(new Date('2022-05-01'));
+    for (const student of students) {
+      // Set date time portion to UTC midnight.
+      // Example: 03:00:00 +3:00 / 02:00:00 +2:00
+      const gradeDate = new Date(
+        Date.UTC(
+          student.latestGrade.getFullYear(),
+          student.latestGrade.getMonth(),
+          student.latestGrade.getDate()
+        )
+      );
+
+      const resultDate = await getDateOfLatestGrade(student.id, courseId);
+      expect(resultDate).toEqual(gradeDate);
+    }
   });
 
   it('should throw an error when no grades exist', async () => {
-    await expect(getDateOfLatestGrade(8, 1)).rejects.toThrow();
+    await expect(
+      getDateOfLatestGrade(extraStudentId, courseId)
+    ).rejects.toThrow();
   });
 });

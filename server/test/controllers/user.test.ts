@@ -8,20 +8,29 @@ import {z} from 'zod';
 import {BaseCourseDataSchema, HttpCode, IdpUserSchema} from '@common/types';
 import {app} from '../../src/app';
 import User from '../../src/database/models/user';
+import {courseCreator} from '../util/course';
+import {cleanDb, setupDb} from '../util/dbReset';
 import {ErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 
 const request = supertest(app);
 let cookies: Cookies = {} as Cookies;
 
-const deleteUserId = 24;
+let deleteUserId = -1;
 
 const CourseSchema = BaseCourseDataSchema.strict().refine(
   val => val.maxCredits >= val.minCredits
 );
 
 beforeAll(async () => {
+  await setupDb();
   cookies = await getCookies();
+
+  deleteUserId = (await courseCreator.createUser()).id;
+});
+
+afterAll(async () => {
+  await cleanDb();
 });
 
 describe('Test GET /v1/user/:userId/courses - get all courses user has role in', () => {

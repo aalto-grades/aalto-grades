@@ -23,33 +23,32 @@ let editGradeId = -1;
 let noRoleCourseId = -1;
 let noRoleGradeId = -1;
 const nonExistentId = 1000000;
-
-const students = [
-  {id: 8, studentNumber: '325235', finalGrade: 2},
-  {id: 9, studentNumber: '826139', finalGrade: 3},
-  {id: 10, studentNumber: '849946', finalGrade: 2},
-  {id: 11, studentNumber: '183958', finalGrade: 0},
-  {id: 12, studentNumber: '686426', finalGrade: 0},
-  {id: 13, studentNumber: '753213', finalGrade: 3},
-  {id: 14, studentNumber: '279337', finalGrade: 5},
-  {id: 15, studentNumber: '495298', finalGrade: 5},
-  {id: 16, studentNumber: '638843', finalGrade: 3},
-  {id: 17, studentNumber: '216384', finalGrade: 2},
-];
-const students2 = [
-  {id: 18, studentNumber: '573857'},
-  {id: 19, studentNumber: '169639'},
-  {id: 20, studentNumber: '581953'},
-  {id: 21, studentNumber: '156214'},
-  {id: 22, studentNumber: '519334'},
-  {id: 23, studentNumber: '112239'},
-];
 const newStudentNumber = '867493';
-const studentNumbers = students.map(student => student.studentNumber);
+
+const students: {id: number; studentNumber: string; finalGrade: number}[] = [];
+const students2: {id: number; studentNumber: string}[] = [];
+let studentNumbers: string[] = [];
 
 beforeAll(async () => {
   await setupDb();
   cookies = await getCookies();
+
+  for (let i = 0; i < 10; i++) {
+    const newUser = await courseCreator.createUser();
+    students.push({
+      id: newUser.id,
+      studentNumber: newUser.studentNumber as string,
+      finalGrade: Math.floor(Math.random() * 6),
+    });
+  }
+  for (let i = 0; i < 10; i++) {
+    const newUser = await courseCreator.createUser();
+    students2.push({
+      id: newUser.id,
+      studentNumber: newUser.studentNumber as string,
+    });
+  }
+  studentNumbers = students.map(student => student.studentNumber);
 
   let assessmentModelId;
   [courseId, courseAttainments, assessmentModelId] =
@@ -93,6 +92,19 @@ afterAll(async () => {
 // TODO: Test grades/attainments not belonging to course
 // TODO: Test deleting grades
 
+const createCSV = (
+  studentData: {studentNumber: string; finalGrade: number}[],
+  dateStr: string,
+  language: string
+): string[] => {
+  const data = [];
+  for (const student of studentData) {
+    const csvStudent = `${student.studentNumber},${student.finalGrade}`;
+    data.push(`${csvStudent},5,${dateStr},${language}`);
+  }
+  return data;
+};
+
 describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatible grading in CSV', () => {
   jest
     .spyOn(global.Date, 'now')
@@ -115,17 +127,7 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
 
     expect(res.text)
       .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-325235,2,5,21.6.2023,en,
-826139,3,5,21.6.2023,en,
-849946,2,5,21.6.2023,en,
-183958,0,5,21.6.2023,en,
-686426,0,5,21.6.2023,en,
-753213,3,5,21.6.2023,en,
-279337,5,5,21.6.2023,en,
-495298,5,5,21.6.2023,en,
-638843,3,5,21.6.2023,en,
-216384,2,5,21.6.2023,en,
-`);
+${createCSV(students, '21.6.2023', 'en').join(',\n')},\n`);
     expect(res.headers['content-disposition']).toBe(
       'attachment; filename="final_grades_course_CS-A????_' +
         `${new Date().toLocaleDateString('fi-FI')}.csv"`
@@ -142,17 +144,7 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
 
     expect(res.text)
       .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-325235,2,5,21.6.2023,en,
-826139,3,5,21.6.2023,en,
-849946,2,5,21.6.2023,en,
-183958,0,5,21.6.2023,en,
-686426,0,5,21.6.2023,en,
-753213,3,5,21.6.2023,en,
-279337,5,5,21.6.2023,en,
-495298,5,5,21.6.2023,en,
-638843,3,5,21.6.2023,en,
-216384,2,5,21.6.2023,en,
-`);
+${createCSV(students, '21.6.2023', 'en').join(',\n')},\n`);
     expect(res.headers['content-disposition']).toBe(
       'attachment; filename="final_grades_course_CS-A????_' +
         `${new Date().toLocaleDateString('fi-FI')}.csv"`
@@ -160,19 +152,19 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
   });
 
   it('should export only selected grades', async () => {
+    const selectedStudents = [students[0], students[3], students[6]];
     const res = await request
       .post(`/v1/courses/${courseId}/grades/csv/sisu`)
-      .send({studentNumbers: ['183958', '279337', '216384']})
+      .send({
+        studentNumbers: selectedStudents.map(student => student.studentNumber),
+      })
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'text/csv')
       .expect(HttpCode.Ok);
 
     expect(res.text)
       .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-183958,0,5,21.6.2023,en,
-279337,5,5,21.6.2023,en,
-216384,2,5,21.6.2023,en,
-`);
+${createCSV(selectedStudents, '21.6.2023', 'en').join(',\n')},\n`);
     expect(res.headers['content-disposition']).toBe(
       'attachment; filename="final_grades_course_CS-A????_' +
         `${new Date().toLocaleDateString('fi-FI')}.csv"`
@@ -193,17 +185,7 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
 
     expect(res.text)
       .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-325235,2,5,12.5.2023,ja,
-826139,3,5,12.5.2023,ja,
-849946,2,5,12.5.2023,ja,
-183958,0,5,12.5.2023,ja,
-686426,0,5,12.5.2023,ja,
-753213,3,5,12.5.2023,ja,
-279337,5,5,12.5.2023,ja,
-495298,5,5,12.5.2023,ja,
-638843,3,5,12.5.2023,ja,
-216384,2,5,12.5.2023,ja,
-`);
+${createCSV(students, '12.5.2023', 'ja').join(',\n')},\n`);
     expect(res.headers['content-disposition']).toBe(
       'attachment; filename="final_grades_course_CS-A????_' +
         `${new Date().toLocaleDateString('fi-FI')}.csv"`
@@ -244,7 +226,7 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
   it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
     const res = await request
       .post(`/v1/courses/${noRoleCourseId}/grades/csv/sisu`)
-      .send({studentNumbers: ['325235']})
+      .send({studentNumbers: [studentNumbers[0]]})
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Forbidden);
 
@@ -255,7 +237,7 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
   it('should respond with 404 not found, if grades have not been calculated yet', async () => {
     const res = await request
       .post(`/v1/courses/${noRoleCourseId}/grades/csv/sisu`)
-      .send({studentNumbers: ['325235']})
+      .send({studentNumbers: [studentNumbers[0]]})
       .set('Cookie', cookies.adminCookie)
       .expect(HttpCode.NotFound);
 

@@ -29,34 +29,23 @@ const request = supertest(app);
 
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
+const teachers: TeacherData[] = [];
 
 const nonExistentId = 1000000;
-const teachers: TeacherData[] = [
-  {
-    id: 5,
-    name: 'Amanda Germain',
-    email: 'teacher1@aalto.fi',
-    studentNumber: '352772',
-  },
-  {
-    id: 6,
-    name: 'Beth Holmes',
-    email: 'teacher2@aalto.fi',
-    studentNumber: '476617',
-  },
-  {
-    id: 7,
-    name: 'Mark Ortiz',
-    email: 'teacher3@aalto.fi',
-    studentNumber: '344625',
-  },
-];
 
 beforeAll(async () => {
   await setupDb();
   cookies = await getCookies();
 
   [courseId] = await courseCreator.createCourse({});
+
+  for (let i = 1; i <= 3; i++) {
+    const newUser = await courseCreator.createUser({
+      email: `teacher${i}@aalto.fi`,
+      name: `teacher${i}`,
+    });
+    teachers.push(newUser as TeacherData);
+  }
 });
 
 afterAll(async () => {

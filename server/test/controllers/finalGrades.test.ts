@@ -18,25 +18,24 @@ const request = supertest(app);
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
 let editCourseId = -1;
+let editCourseModelId = -1;
 let noRoleCourseId = -1;
 const nonExistentId = 1000000;
 
-const students = [
-  {id: 8, studentNumber: '325235', finalGrade: 2},
-  {id: 9, studentNumber: '826139', finalGrade: 3},
-  {id: 10, studentNumber: '849946', finalGrade: 2},
-  {id: 11, studentNumber: '183958', finalGrade: 0},
-  {id: 12, studentNumber: '686426', finalGrade: 0},
-  {id: 13, studentNumber: '753213', finalGrade: 3},
-  {id: 14, studentNumber: '279337', finalGrade: 5},
-  {id: 15, studentNumber: '495298', finalGrade: 5},
-  {id: 16, studentNumber: '638843', finalGrade: 3},
-  {id: 17, studentNumber: '216384', finalGrade: 2},
-];
+const students: {id: number; studentNumber: string; finalGrade: number}[] = [];
 
 beforeAll(async () => {
   await setupDb();
   cookies = await getCookies();
+
+  for (let i = 0; i < 10; i++) {
+    const newUser = await courseCreator.createUser();
+    students.push({
+      id: newUser.id,
+      studentNumber: newUser.studentNumber as string,
+      finalGrade: Math.floor(Math.random() * 6),
+    });
+  }
 
   let assessmentModelId;
   let _; // To be able to use spread
@@ -50,7 +49,7 @@ beforeAll(async () => {
     );
   }
 
-  [editCourseId] = await courseCreator.createCourse({});
+  [editCourseId, _, editCourseModelId] = await courseCreator.createCourse({});
 
   [noRoleCourseId] = await courseCreator.createCourse({
     hasTeacher: false,
@@ -152,19 +151,14 @@ describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => 
 });
 
 describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () => {
-  const getData = (student: {
-    id: number;
-    finalGrade: number;
-  }): NewFinalGrade => ({
+  type StudentData = {id: number; finalGrade: number};
+  const getData = (student: StudentData): NewFinalGrade => ({
     userId: student.id,
-    assessmentModelId: 9,
+    assessmentModelId: editCourseModelId,
     grade: student.finalGrade,
     date: new Date(),
   });
-  const checkGrade = async (student: {
-    id: number;
-    finalGrade: number;
-  }): Promise<void> => {
+  const checkGrade = async (student: StudentData): Promise<void> => {
     const result = await FinalGrade.findOne({
       where: {userId: student.id, courseId: editCourseId},
     });
@@ -235,7 +229,7 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
   it('should respond with 401 unauthorized, if not logged in', async () => {
     const res = await request
       .post(`/v1/courses/${editCourseId}/finalGrades`)
-      .send([getData(students[4])])
+      .send([getData(students[5])])
       .expect(HttpCode.Unauthorized);
 
     expect(JSON.stringify(res.body)).toBe('{}');
@@ -244,7 +238,7 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
   it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
     const res = await request
       .post(`/v1/courses/${noRoleCourseId}/finalGrades`)
-      .send([getData(students[4])])
+      .send([getData(students[5])])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Forbidden);
 

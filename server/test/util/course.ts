@@ -8,6 +8,8 @@ import {
   GradingScale,
   Language,
   NewCourseData,
+  SystemRole,
+  UserData,
 } from '@common/types';
 import {initGraph} from '@common/util/initGraph';
 import {sequelize} from '../../src/database';
@@ -18,6 +20,7 @@ import Course from '../../src/database/models/course';
 import CourseRole from '../../src/database/models/courseRole';
 import CourseTranslation from '../../src/database/models/courseTranslation';
 import FinalGrade from '../../src/database/models/finalGrade';
+import User from '../../src/database/models/user';
 import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';
 
 /**
@@ -29,15 +32,31 @@ import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';
 class CourseCreator {
   /** Next free course code */
   private freeId: number = 10;
-
   /** Next free attainment name */
   private freeAttId: number = 10;
-
   /** Next free assessment model code */
   private freeModelId: number = 10;
+  /** Next free user name */
+  private freeUserId: number = 10;
 
   private randInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  async createUser(user?: Partial<UserData>): Promise<UserData> {
+    const newUser = await User.create({
+      email: user?.email ?? `testuser${this.freeUserId}@aalto.fi`,
+      name: user?.name ?? `test user${this.freeUserId}`,
+      studentNumber: user?.studentNumber ?? `12345${this.freeUserId}`,
+      role: SystemRole.User,
+    });
+    this.freeUserId += 1;
+    return {
+      id: newUser.id,
+      email: newUser.email,
+      name: newUser.name,
+      studentNumber: newUser.studentNumber,
+    };
   }
 
   async createAttainment(courseId: number): Promise<AttainmentData> {
@@ -68,14 +87,16 @@ class CourseCreator {
     userId: number,
     attainmentId: number,
     graderId: number,
-    grade?: number
+    grade?: number,
+    date?: Date
   ): Promise<number> {
+    const gradeDate = date ?? new Date();
     const attGrade = await AttainmentGrade.create({
       userId: userId,
       attainmentId: attainmentId,
       graderId: graderId,
-      date: new Date(),
-      expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),
+      date: gradeDate,
+      expiryDate: new Date(gradeDate.getTime() + 365 * 24 * 3600 * 1000),
       grade: grade ?? this.randInt(0, 10),
     });
 
