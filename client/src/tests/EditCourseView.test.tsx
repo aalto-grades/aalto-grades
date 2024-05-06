@@ -6,21 +6,21 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {RenderResult, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {http} from 'msw';
-import {MemoryRouter, Route, Routes} from 'react-router-dom';
+import {RouterProvider, createMemoryRouter} from 'react-router-dom';
 
 import {GradingScale, Language} from '@common/types';
 import EditCourseView from '../components/course-view/EditCourseView';
 import {mockPostSuccess, server} from './mock-data/server';
 
 describe('Tests for EditCourseView components', () => {
+  const router = createMemoryRouter(
+    [{path: '/:courseId/edit', element: <EditCourseView />}],
+    {initialEntries: ['/1/edit']}
+  );
   const renderEditCourseView = (): RenderResult =>
     render(
       <QueryClientProvider client={new QueryClient()}>
-        <MemoryRouter initialEntries={['/1/edit']}>
-          <Routes>
-            <Route path=":courseId/edit" element={<EditCourseView />} />
-          </Routes>
-        </MemoryRouter>
+        <RouterProvider router={router} />
       </QueryClientProvider>
     );
 

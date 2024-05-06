@@ -30,7 +30,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import {useParams} from 'react-router-dom';
+import {useBlocker, useParams} from 'react-router-dom';
 
 import {
   AaltoEmailSchema,
@@ -184,8 +184,27 @@ export default function EditCourseView(): JSX.Element {
   const [teachersInCharge, setTeachersInCharge] = useState<string[]>([]);
   const [initAssistants, setInitAssistants] = useState<string[]>([]);
   const [assistants, setAssistants] = useState<string[]>([]);
-  const [showDialog, setShowDialog] = useState<boolean>(false);
   const [initialValues, setInitialValues] = useState<FormData | null>(null);
+
+  const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState<boolean>(false);
+
+  const blocker = useBlocker(
+    ({currentLocation, nextLocation}) =>
+      unsavedChanges && currentLocation.pathname !== nextLocation.pathname
+  );
+
+  // Warning if leaving with unsaved
+  useEffect(() => {
+    const onBeforeUnload = (e: BeforeUnloadEvent): void => {
+      if (unsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [unsavedChanges]);
 
   useEffect(() => {
     if (initialValues || !course.data) return;
@@ -256,6 +275,7 @@ export default function EditCourseView(): JSX.Element {
           setInitialValues(values);
           setInitTeachersInCharge(teachersInCharge);
           setInitAssistants(assistants);
+          setUnsavedChanges(false);
         },
         onError: () => {
           setSubmitting(false);
@@ -264,16 +284,6 @@ export default function EditCourseView(): JSX.Element {
     );
   };
 
-  const validateForm = (
-    values: FormData
-  ): {[key in keyof FormData]?: string[]} | void => {
-    const result = ValidationSchema.safeParse(values);
-    if (result.success) return;
-    const fieldErrors = result.error.formErrors.fieldErrors;
-    return Object.fromEntries(
-      Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
-    );
-  };
   const changed = (formData: FormData): boolean => {
     if (initialValues === null) return false;
     return (
@@ -286,6 +296,17 @@ export default function EditCourseView(): JSX.Element {
             JSON.stringify(initialValues[key as keyof FormData]) ===
             JSON.stringify(formData[key as keyof FormData])
         )
+    );
+  };
+  const validateForm = (
+    values: FormData
+  ): {[key in keyof FormData]?: string[]} | void => {
+    setUnsavedChanges(changed(values)); // Hacky workaround to get form data
+    const result = ValidationSchema.safeParse(values);
+    if (result.success) return;
+    const fieldErrors = result.error.formErrors.fieldErrors;
+    return Object.fromEntries(
+      Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
     );
   };
 
@@ -301,12 +322,19 @@ export default function EditCourseView(): JSX.Element {
         {form => (
           <>
             <UnsavedChangesDialog
-              open={showDialog}
-              onClose={() => setShowDialog(false)}
+              open={unsavedDialogOpen || blocker.state === 'blocked'}
+              onClose={() => {
+                setUnsavedDialogOpen(false);
+                if (blocker.state === 'blocked') blocker.reset();
+              }}
               handleDiscard={() => {
                 form.resetForm();
                 setTeachersInCharge(initTeachersInCharge);
                 setAssistants(initAssistants);
+
+                if (blocker.state === 'blocked') {
+                  blocker.proceed();
+                }
               }}
             />
             <Form>
@@ -546,7 +574,7 @@ export default function EditCourseView(): JSX.Element {
                       disabled={form.isSubmitting}
                       sx={{float: 'right', mr: 2}}
                       color="error"
-                      onClick={() => setShowDialog(true)}
+                      onClick={() => setUnsavedDialogOpen(true)}
                     >
                       Discard changes
                     </Button>

@@ -22,7 +22,7 @@ import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
 
 import {EditGradeData, GradeData, NewGrade} from '@common/types';
-import {useParams} from 'react-router-dom';
+import {useBlocker, useParams} from 'react-router-dom';
 import {useTableContext} from '../../context/GradesTableProvider';
 import {useAddGrades, useDeleteGrade, useEditGrade} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
@@ -86,6 +86,23 @@ const EditGradesDialog = ({
       }),
     [gradeSelectOption, rows]
   );
+
+  const blocker = useBlocker(
+    ({currentLocation, nextLocation}) =>
+      changes && currentLocation.pathname !== nextLocation.pathname
+  );
+
+  // Warning if leaving with unsaved
+  useEffect(() => {
+    const onBeforeUnload = (e: BeforeUnloadEvent): void => {
+      if (changes) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [changes]);
 
   useEffect(() => {
     const newRows = rows.map(row => ({
@@ -250,14 +267,29 @@ const EditGradesDialog = ({
   return (
     <>
       <UnsavedChangesDialog
-        open={unsavedOpen}
-        onClose={() => setUnsavedOpen(false)}
+        open={unsavedOpen || blocker.state === 'blocked'}
+        onClose={() => {
+          setUnsavedOpen(false);
+          if (blocker.state === 'blocked') blocker.reset();
+        }}
         handleDiscard={() => {
           onClose();
           setRows(structuredClone(initRows));
+          if (blocker.state === 'blocked') {
+            blocker.proceed();
+          }
         }}
       />
-      <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+
+      <Dialog
+        open={open}
+        onClose={() => {
+          if (changes) setUnsavedOpen(true);
+          else onClose();
+        }}
+        fullWidth
+        maxWidth="md"
+      >
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
           <DataGrid
