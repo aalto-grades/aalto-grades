@@ -17,8 +17,8 @@ import {initGraph} from '@common/util/initGraph';
 import {app} from '../../src/app';
 import AssessmentModel from '../../src/database/models/assessmentModel';
 import {createData} from '../util/createData';
-import {cleanDb, setupDb} from '../util/dbReset';
 import {Cookies, getCookies} from '../util/getCookies';
+import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
 
 const request = supertest(app);
@@ -38,7 +38,6 @@ const nonExistentId = 1000000;
 const otherAssessmentModId = 1;
 
 beforeAll(async () => {
-  await setupDb();
   cookies = await getCookies();
 
   [courseId, courseAttainments, assessmentModId] =
@@ -59,7 +58,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await cleanDb();
+  await resetDb();
 });
 
 // Helper functions

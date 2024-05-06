@@ -9,9 +9,9 @@ import {BaseCourseDataSchema, HttpCode, IdpUserSchema} from '@common/types';
 import {app} from '../../src/app';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
-import {cleanDb, setupDb} from '../util/dbReset';
 import {ErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
+import {resetDb} from '../util/resetDb';
 
 const request = supertest(app);
 let cookies: Cookies = {} as Cookies;
@@ -23,14 +23,13 @@ const CourseSchema = BaseCourseDataSchema.strict().refine(
 );
 
 beforeAll(async () => {
-  await setupDb();
   cookies = await getCookies();
 
   deleteUserId = (await createData.createUser()).id;
 });
 
 afterAll(async () => {
-  await cleanDb();
+  await resetDb();
 });
 
 describe('Test GET /v1/user/:userId/courses - get all courses user has role in', () => {

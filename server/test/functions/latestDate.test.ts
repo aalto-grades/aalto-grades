@@ -4,8 +4,8 @@
 
 import {getDateOfLatestGrade} from '../../src/controllers/utils/grades';
 import {createData} from '../util/createData';
-import {cleanDb, setupDb} from '../util/dbReset';
 import {TEACHER_ID} from '../util/general';
+import {resetDb} from '../util/resetDb';
 
 let courseId = -1;
 let extraStudentId = -1;
@@ -14,8 +14,6 @@ const randomDate = (start: Date, end: Date): Date =>
   new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 
 beforeAll(async () => {
-  await setupDb();
-
   let attainments;
   [courseId, attainments] = await createData.createCourse({});
 
@@ -55,7 +53,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await cleanDb();
+  await resetDb();
 });
 
 describe('Test latest date finder', () => {

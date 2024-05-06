@@ -9,9 +9,9 @@ import {FinalGradeDataSchema, HttpCode, NewFinalGrade} from '@common/types';
 import {app} from '../../src/app';
 import FinalGrade from '../../src/database/models/finalGrade';
 import {createData} from '../util/createData';
-import {cleanDb, setupDb} from '../util/dbReset';
 import {ErrorSchema, TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
+import {resetDb} from '../util/resetDb';
 
 const request = supertest(app);
 
@@ -25,7 +25,6 @@ const nonExistentId = 1000000;
 const students: {id: number; studentNumber: string; finalGrade: number}[] = [];
 
 beforeAll(async () => {
-  await setupDb();
   cookies = await getCookies();
 
   for (let i = 0; i < 10; i++) {
@@ -59,7 +58,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await cleanDb();
+  await resetDb();
 });
 
 // TODO: Test multiple final grades

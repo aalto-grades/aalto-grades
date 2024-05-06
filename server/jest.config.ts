@@ -9,6 +9,7 @@ const config: Config = {
   testEnvironment: 'node',
   roots: ['test'],
   testTimeout: 5000,
+  globalSetup: './test/util/setup.js',
   moduleNameMapper: {
     '^@common/(.*)$': '<rootDir>/build/common/$1',
   },

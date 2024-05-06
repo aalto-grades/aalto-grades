@@ -21,9 +21,9 @@ import {
   parseCourseFull,
 } from '../../src/controllers/utils/course';
 import {createData} from '../util/createData';
-import {cleanDb, setupDb} from '../util/dbReset';
 import {ErrorSchema, ZodErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
+import {resetDb} from '../util/resetDb';
 
 const request = supertest(app);
 
@@ -34,7 +34,6 @@ const teachers: TeacherData[] = [];
 const nonExistentId = 1000000;
 
 beforeAll(async () => {
-  await setupDb();
   cookies = await getCookies();
 
   [courseId] = await createData.createCourse({});
@@ -49,7 +48,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await cleanDb();
+  await resetDb();
 });
 
 const CourseSchema = BaseCourseDataSchema.strict().refine(

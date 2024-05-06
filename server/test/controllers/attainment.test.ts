@@ -16,8 +16,8 @@ import {
 import {app} from '../../src/app';
 import Attainment from '../../src/database/models/attainment';
 import {createData} from '../util/createData';
-import {cleanDb, setupDb} from '../util/dbReset';
 import {Cookies, getCookies} from '../util/getCookies';
+import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
 
 const request = supertest(app);
@@ -33,7 +33,6 @@ let noRoleAttainmentId = 26;
 const nonExistentId = 1000000;
 
 beforeAll(async () => {
-  await setupDb();
   cookies = await getCookies();
 
   let courseAttainments: AttainmentData[] = [];
@@ -49,7 +48,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await cleanDb();
+  await resetDb();
 });
 
 const checkAttainment = async (

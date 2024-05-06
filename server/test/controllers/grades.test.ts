@@ -10,9 +10,9 @@ import * as gradesUtil from '../../src/controllers/utils/grades';
 import AttainmentGrade from '../../src/database/models/attainmentGrade';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
-import {cleanDb, setupDb} from '../util/dbReset';
 import {ErrorSchema, TEACHER_ID, ZodErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
+import {resetDb} from '../util/resetDb';
 
 const request = supertest(app);
 
@@ -30,7 +30,6 @@ const students2: {id: number; studentNumber: string}[] = [];
 let studentNumbers: string[] = [];
 
 beforeAll(async () => {
-  await setupDb();
   cookies = await getCookies();
 
   for (let i = 0; i < 10; i++) {
@@ -84,7 +83,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await cleanDb();
+  await resetDb();
 });
 
 // TODO: Test multiple final grades
