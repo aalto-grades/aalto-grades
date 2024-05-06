@@ -16,7 +16,7 @@ import {
 import {initGraph} from '@common/util/initGraph';
 import {app} from '../../src/app';
 import AssessmentModel from '../../src/database/models/assessmentModel';
-import {courseCreator} from '../util/course';
+import {createData} from '../util/createData';
 import {cleanDb, setupDb} from '../util/dbReset';
 import {Cookies, getCookies} from '../util/getCookies';
 import {ResponseTests} from '../util/responses';
@@ -42,16 +42,16 @@ beforeAll(async () => {
   cookies = await getCookies();
 
   [courseId, courseAttainments, assessmentModId] =
-    await courseCreator.createCourse({});
-  await courseCreator.createAssessmentModel(courseId, courseAttainments);
+    await createData.createCourse({});
+  await createData.createAssessmentModel(courseId, courseAttainments);
   testStructure = initGraph('addition', courseAttainments);
 
-  [NoModelscourseId] = await courseCreator.createCourse({
+  [NoModelscourseId] = await createData.createCourse({
     createAssessmentModel: false,
   });
 
   let _; // To be able to use spread
-  [noRoleCourseId, _, noRoleModelId] = await courseCreator.createCourse({
+  [noRoleCourseId, _, noRoleModelId] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
@@ -377,7 +377,7 @@ describe('Test Delete /v1/courses/:courseId/assessment-models/:assessmentModId -
   it('should delete an assessment model when course exists', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
-      const modelId = await courseCreator.createAssessmentModel(
+      const modelId = await createData.createAssessmentModel(
         courseId,
         courseAttainments
       );

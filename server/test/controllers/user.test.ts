@@ -8,7 +8,7 @@ import {z} from 'zod';
 import {BaseCourseDataSchema, HttpCode, IdpUserSchema} from '@common/types';
 import {app} from '../../src/app';
 import User from '../../src/database/models/user';
-import {courseCreator} from '../util/course';
+import {createData} from '../util/createData';
 import {cleanDb, setupDb} from '../util/dbReset';
 import {ErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
@@ -26,7 +26,7 @@ beforeAll(async () => {
   await setupDb();
   cookies = await getCookies();
 
-  deleteUserId = (await courseCreator.createUser()).id;
+  deleteUserId = (await createData.createUser()).id;
 });
 
 afterAll(async () => {

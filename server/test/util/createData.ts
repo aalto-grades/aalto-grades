@@ -29,7 +29,7 @@ import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';
  */
 
 /** Course creator */
-class CourseCreator {
+class CreateData {
   /** Next free course code */
   private freeId: number = 10;
   /** Next free attainment name */
@@ -261,4 +261,4 @@ class CourseCreator {
   }
 }
 
-export const courseCreator = new CourseCreator();
+export const createData = new CreateData();

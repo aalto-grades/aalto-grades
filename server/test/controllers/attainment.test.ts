@@ -15,7 +15,7 @@ import {
 } from '@common/types';
 import {app} from '../../src/app';
 import Attainment from '../../src/database/models/attainment';
-import {courseCreator} from '../util/course';
+import {createData} from '../util/createData';
 import {cleanDb, setupDb} from '../util/dbReset';
 import {Cookies, getCookies} from '../util/getCookies';
 import {ResponseTests} from '../util/responses';
@@ -37,10 +37,10 @@ beforeAll(async () => {
   cookies = await getCookies();
 
   let courseAttainments: AttainmentData[] = [];
-  [courseId, courseAttainments] = await courseCreator.createCourse({});
+  [courseId, courseAttainments] = await createData.createCourse({});
   editAttainmentId = courseAttainments[0].id;
 
-  [noRoleCourseId, courseAttainments] = await courseCreator.createCourse({
+  [noRoleCourseId, courseAttainments] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
@@ -264,7 +264,7 @@ describe('Test Delete /v1/courses/:courseId/attainments/:attainmentId - delete a
   it('should delete attainment', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
-      const attainment = await courseCreator.createAttainment(courseId);
+      const attainment = await createData.createAttainment(courseId);
       await checkAttainment(attainment.id, {}); // Validate that exists
 
       const res = await request

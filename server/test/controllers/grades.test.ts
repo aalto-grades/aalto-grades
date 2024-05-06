@@ -9,7 +9,7 @@ import {app} from '../../src/app';
 import * as gradesUtil from '../../src/controllers/utils/grades';
 import AttainmentGrade from '../../src/database/models/attainmentGrade';
 import User from '../../src/database/models/user';
-import {courseCreator} from '../util/course';
+import {createData} from '../util/createData';
 import {cleanDb, setupDb} from '../util/dbReset';
 import {ErrorSchema, TEACHER_ID, ZodErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
@@ -34,7 +34,7 @@ beforeAll(async () => {
   cookies = await getCookies();
 
   for (let i = 0; i < 10; i++) {
-    const newUser = await courseCreator.createUser();
+    const newUser = await createData.createUser();
     students.push({
       id: newUser.id,
       studentNumber: newUser.studentNumber as string,
@@ -42,7 +42,7 @@ beforeAll(async () => {
     });
   }
   for (let i = 0; i < 10; i++) {
-    const newUser = await courseCreator.createUser();
+    const newUser = await createData.createUser();
     students2.push({
       id: newUser.id,
       studentNumber: newUser.studentNumber as string,
@@ -52,11 +52,11 @@ beforeAll(async () => {
 
   let assessmentModelId;
   [courseId, courseAttainments, assessmentModelId] =
-    await courseCreator.createCourse({
+    await createData.createCourse({
       courseData: {maxCredits: 5, courseCode: 'CS-A????'},
     });
   for (const student of students) {
-    await courseCreator.createFinalGrade(
+    await createData.createFinalGrade(
       courseId,
       student.id,
       assessmentModelId,
@@ -64,19 +64,19 @@ beforeAll(async () => {
       student.finalGrade
     );
   }
-  editGradeId = await courseCreator.createGrade(
+  editGradeId = await createData.createGrade(
     students[0].id,
     courseAttainments[0].id,
     TEACHER_ID
   );
 
   let noRoleAttainments;
-  [noRoleCourseId, noRoleAttainments] = await courseCreator.createCourse({
+  [noRoleCourseId, noRoleAttainments] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
   });
-  noRoleGradeId = await courseCreator.createGrade(
+  noRoleGradeId = await createData.createGrade(
     students[0].id,
     noRoleAttainments[0].id,
     TEACHER_ID

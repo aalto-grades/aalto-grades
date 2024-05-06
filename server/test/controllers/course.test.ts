@@ -20,7 +20,7 @@ import {
   findCourseFullById,
   parseCourseFull,
 } from '../../src/controllers/utils/course';
-import {courseCreator} from '../util/course';
+import {createData} from '../util/createData';
 import {cleanDb, setupDb} from '../util/dbReset';
 import {ErrorSchema, ZodErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
@@ -37,10 +37,10 @@ beforeAll(async () => {
   await setupDb();
   cookies = await getCookies();
 
-  [courseId] = await courseCreator.createCourse({});
+  [courseId] = await createData.createCourse({});
 
   for (let i = 1; i <= 3; i++) {
-    const newUser = await courseCreator.createUser({
+    const newUser = await createData.createUser({
       email: `teacher${i}@aalto.fi`,
       name: `teacher${i}`,
     });

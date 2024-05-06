@@ -8,7 +8,7 @@ import {z} from 'zod';
 import {FinalGradeDataSchema, HttpCode, NewFinalGrade} from '@common/types';
 import {app} from '../../src/app';
 import FinalGrade from '../../src/database/models/finalGrade';
-import {courseCreator} from '../util/course';
+import {createData} from '../util/createData';
 import {cleanDb, setupDb} from '../util/dbReset';
 import {ErrorSchema, TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
@@ -29,7 +29,7 @@ beforeAll(async () => {
   cookies = await getCookies();
 
   for (let i = 0; i < 10; i++) {
-    const newUser = await courseCreator.createUser();
+    const newUser = await createData.createUser();
     students.push({
       id: newUser.id,
       studentNumber: newUser.studentNumber as string,
@@ -39,9 +39,9 @@ beforeAll(async () => {
 
   let assessmentModelId;
   let _; // To be able to use spread
-  [courseId, _, assessmentModelId] = await courseCreator.createCourse({});
+  [courseId, _, assessmentModelId] = await createData.createCourse({});
   for (const student of students) {
-    await courseCreator.createFinalGrade(
+    await createData.createFinalGrade(
       courseId,
       student.id,
       assessmentModelId,
@@ -49,9 +49,9 @@ beforeAll(async () => {
     );
   }
 
-  [editCourseId, _, editCourseModelId] = await courseCreator.createCourse({});
+  [editCourseId, _, editCourseModelId] = await createData.createCourse({});
 
-  [noRoleCourseId] = await courseCreator.createCourse({
+  [noRoleCourseId] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,

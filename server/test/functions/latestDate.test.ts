@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {getDateOfLatestGrade} from '../../src/controllers/utils/grades';
-import {courseCreator} from '../util/course';
+import {createData} from '../util/createData';
 import {cleanDb, setupDb} from '../util/dbReset';
 import {TEACHER_ID} from '../util/general';
 
@@ -17,7 +17,7 @@ beforeAll(async () => {
   await setupDb();
 
   let attainments;
-  [courseId, attainments] = await courseCreator.createCourse({});
+  [courseId, attainments] = await createData.createCourse({});
 
   const now = new Date();
 
@@ -33,7 +33,7 @@ beforeAll(async () => {
       gradeDates.push(gradeDate);
     }
 
-    const newUserId = (await courseCreator.createUser()).id;
+    const newUserId = (await createData.createUser()).id;
     students.push({
       id: newUserId,
       latestGrade: newestGrade,
@@ -42,7 +42,7 @@ beforeAll(async () => {
     // Create the grades
     for (const gradeDate of gradeDates) {
       const attainmentIndex = Math.floor(Math.random() * attainments.length);
-      await courseCreator.createGrade(
+      await createData.createGrade(
         newUserId,
         attainments[attainmentIndex].id,
         TEACHER_ID,
@@ -51,7 +51,7 @@ beforeAll(async () => {
       );
     }
   }
-  extraStudentId = (await courseCreator.createUser()).id;
+  extraStudentId = (await createData.createUser()).id;
 });
 
 afterAll(async () => {
