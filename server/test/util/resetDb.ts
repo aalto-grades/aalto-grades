@@ -20,10 +20,12 @@ const dbConfigClean = {
   database: 'postgres_copy',
 };
 
+/** Resets db to the state it was in before any tests ran */
 export const resetDb = async (): Promise<void> => {
-  // Remove current database and replace with copy
   const client = new Client(dbConfigClean);
   await client.connect();
+
+  // Remove current database and replace with copy
   const dbQuery = await client.query(
     `SELECT FROM pg_database WHERE datname = '${pgdb}'`
   );

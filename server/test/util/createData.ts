@@ -28,7 +28,7 @@ import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';
  * assistant@aalto.fi, student@aalto.fi being created in the seed.
  */
 
-/** Course creator */
+/** Create data into the database */
 class CreateData {
   /** Next free course code */
   private freeId: number = 10;
