@@ -22,7 +22,7 @@ import Attainment from '../database/models/attainment';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
-import {ApiError, AttainmentGradeModelData, JwtClaims} from '../types';
+import {ApiError, JwtClaims, NewDbGradeData} from '../types';
 import {validateAttainmentBelongsToCourse} from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
@@ -205,16 +205,14 @@ export const addGrades = async (
 
   // Use studentsWithId to update attainments by flatmapping each
   // students grades into a one array of all the grades.
-  const preparedBulkCreate: AttainmentGradeModelData[] = req.body.map(
-    gradeEntry => ({
-      userId: studentNumberToId[gradeEntry.studentNumber],
-      attainmentId: gradeEntry.attainmentId,
-      graderId: grader.id,
-      date: gradeEntry.date,
-      expiryDate: gradeEntry.expiryDate,
-      grade: gradeEntry.grade,
-    })
-  );
+  const preparedBulkCreate: NewDbGradeData[] = req.body.map(gradeEntry => ({
+    userId: studentNumberToId[gradeEntry.studentNumber],
+    attainmentId: gradeEntry.attainmentId,
+    graderId: grader.id,
+    date: gradeEntry.date,
+    expiryDate: gradeEntry.expiryDate,
+    grade: gradeEntry.grade,
+  }));
 
   // TODO: Optimize if datasets are big.
   await AttainmentGrade.bulkCreate(preparedBulkCreate);

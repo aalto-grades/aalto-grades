@@ -11,8 +11,7 @@ import {
 import {TypedRequestBody} from 'zod-express-middleware';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
-import {JwtClaims} from '../types';
-import {FinalGradeModelData} from '../types/finalGrade';
+import {JwtClaims, NewDbFinalGradeData} from '../types';
 import {validateCourseId} from './utils/course';
 import {validateUserAndGrader} from './utils/grades';
 
@@ -68,7 +67,7 @@ export const addFinalGrades = async (
   const grader = req.user as JwtClaims;
   const courseId = await validateCourseId(req.params.courseId);
 
-  const preparedBulkCreate: FinalGradeModelData[] = req.body.map(
+  const preparedBulkCreate: NewDbFinalGradeData[] = req.body.map(
     gradeEntry => ({
       userId: gradeEntry.userId,
       assessmentModelId: gradeEntry.assessmentModelId,
