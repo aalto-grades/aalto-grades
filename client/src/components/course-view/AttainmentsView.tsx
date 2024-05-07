@@ -2,34 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  AccessTime,
-  Delete,
-  TableRows,
-  TableRowsOutlined,
-  Tag,
-  Window,
-  WindowOutlined,
-} from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Chip,
-  IconButton,
-  Typography,
-} from '@mui/material';
+import {Delete} from '@mui/icons-material';
+import {Box, Button} from '@mui/material';
 import {
   DataGrid,
   GridActionsCellItem,
   GridColDef,
   GridRowsProp,
 } from '@mui/x-data-grid';
+import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
 import {useBlocker, useParams} from 'react-router-dom';
 
 import {EditAttainmentData, NewAttainmentData, SystemRole} from '@common/types';
-import {enqueueSnackbar} from 'notistack';
 import {
   useAddAttainment,
   useDeleteAttainment,
@@ -37,7 +22,6 @@ import {
   useGetAttainments,
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {Numeric} from '../../types';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import NewAttainmentDialog from './NewAttainmentDialog';
 
@@ -62,8 +46,6 @@ const AttainmentsView = (): JSX.Element => {
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
-  const [layout, setLayout] = useState<'table' | 'grid'>('table');
-  const [layoutChange, setLayoutChange] = useState<boolean>(false);
   const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false);
   const [unsavedDialogOpen, setUnsavedDialogOpen] = useState<boolean>(false);
 
@@ -108,25 +90,18 @@ const AttainmentsView = (): JSX.Element => {
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [unsavedChanges]);
 
-  const handleAddAttainment = async (
-    name: string,
-    daysValid: number
-  ): Promise<void> => {
-    if (layout === 'grid') {
-      await addAttainment.mutateAsync({name, daysValid});
-    } else {
-      setRows(oldRows => {
-        const freeId =
-          oldRows.reduce((mxVal, row) => Math.max(mxVal, row.id), 0) + 1;
-        return oldRows.concat({
-          id: freeId,
-          attainmentId: -1,
-          name,
-          daysValid,
-          dateValid: null,
-        });
+  const handleAddAttainment = (name: string, daysValid: number): void => {
+    setRows(oldRows => {
+      const freeId =
+        oldRows.reduce((mxVal, row) => Math.max(mxVal, row.id), 0) + 1;
+      return oldRows.concat({
+        id: freeId,
+        attainmentId: -1,
+        name,
+        daysValid,
+        dateValid: null,
       });
-    }
+    });
   };
 
   const handleSubmit = async (): Promise<void> => {
@@ -169,10 +144,6 @@ const AttainmentsView = (): JSX.Element => {
 
     enqueueSnackbar('Attainments saved successfully', {variant: 'success'});
     setInitRows(structuredClone(rows));
-  };
-
-  const handleConfirmDelete = (attId: Numeric): void => {
-    deleteAttainment.mutate(attId);
   };
 
   const columns: GridColDef<ColTypes>[] = [
@@ -233,13 +204,7 @@ const AttainmentsView = (): JSX.Element => {
         }}
         handleDiscard={() => {
           setRows(structuredClone(initRows));
-
-          if (layoutChange) {
-            setLayoutChange(false);
-            setLayout('grid');
-          } else if (blocker.state === 'blocked') {
-            blocker.proceed();
-          }
+          if (blocker.state === 'blocked') blocker.proceed();
         }}
       />
 
@@ -247,22 +212,8 @@ const AttainmentsView = (): JSX.Element => {
         {editRights && (
           <Button onClick={() => setAddDialogOpen(true)}>Add attainment</Button>
         )}
-        <ButtonGroup>
-          <Button onClick={() => setLayout('table')}>
-            {layout === 'table' ? <TableRows /> : <TableRowsOutlined />}
-          </Button>
-          <Button
-            onClick={() => {
-              if (unsavedChanges) {
-                setLayoutChange(true);
-                setUnsavedDialogOpen(true);
-              } else setLayout('grid');
-            }}
-          >
-            {layout === 'grid' ? <Window /> : <WindowOutlined />}
-          </Button>
-        </ButtonGroup>
-        {editRights && layout === 'table' && (
+
+        {editRights && (
           <div style={{marginLeft: '10px'}}>
             {unsavedChanges && (
               <Button onClick={() => setUnsavedDialogOpen(true)}>
@@ -280,98 +231,37 @@ const AttainmentsView = (): JSX.Element => {
         )}
       </Box>
 
-      {layout === 'grid' && (
-        <Box
-          style={{
-            display: 'flex',
-            width: '100%',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
-          }}
-        >
-          {attainments.data &&
-            attainments.data.map(attainment => (
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                key={attainment.id}
-              >
-                <Box
-                  sx={{
-                    border: 1,
-                    borderColor: 'info.grey',
-                    borderRadius: 1,
-                    p: 1,
-                  }}
-                >
-                  <Typography sx={{py: 1.7}}>{attainment.name}</Typography>
-                  <Chip
-                    icon={<Tag />}
-                    label={`${attainment.id}`}
-                    variant="outlined"
-                    size="small"
-                    sx={{mr: 1}}
-                  />
-                  <Chip
-                    icon={<AccessTime />}
-                    label={`${attainment.daysValid} days`}
-                    variant="outlined"
-                    size="small"
-                  />
-
-                  {editRights && (
-                    <IconButton
-                      onClick={() => handleConfirmDelete(attainment.id)}
-                      aria-description="delete attainment"
-                    >
-                      <Delete />
-                    </IconButton>
-                  )}
-                </Box>
-              </Box>
-            ))}
-        </Box>
-      )}
-      {layout === 'table' && (
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          rowHeight={25}
-          editMode="row"
-          rowSelection={false}
-          disableColumnSelector
-          sx={{maxHeight: '70vh', minHeight: '20vh'}}
-          onRowEditStart={() => setEditing(true)}
-          onRowEditStop={() => setEditing(false)}
-          processRowUpdate={updatedRow => {
-            setRows(oldRows =>
-              oldRows.map(row => (row.id === updatedRow.id ? updatedRow : row))
-            );
-            // TODO: do some validation. Code below is an example.
-            // for (const [key, val] of Object.entries(updatedRow)) {
-            //   if (key === 'id' || key === 'StudentNo') continue;
-            //   if ((val as number) < 0)
-            //     throw new Error('Value cannot be negative');
-            //   else if ((val as number) > 5000)
-            //     throw new Error('Value cannot be over 5000');
-            // }
-            // setSnackBar({message: 'Row saved!', severity: 'success'});
-            setError(false);
-            return updatedRow;
-          }}
-          onProcessRowUpdateError={(rowError: Error) => {
-            setError(true);
-            enqueueSnackbar(rowError.message, {variant: 'error'});
-          }}
-        />
-      )}
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        rowHeight={25}
+        editMode="row"
+        rowSelection={false}
+        disableColumnSelector
+        sx={{maxHeight: '70vh', minHeight: '20vh'}}
+        onRowEditStart={() => setEditing(true)}
+        onRowEditStop={() => setEditing(false)}
+        processRowUpdate={updatedRow => {
+          setRows(oldRows =>
+            oldRows.map(row => (row.id === updatedRow.id ? updatedRow : row))
+          );
+          // TODO: do some validation. Code below is an example.
+          // for (const [key, val] of Object.entries(updatedRow)) {
+          //   if (key === 'id' || key === 'StudentNo') continue;
+          //   if ((val as number) < 0)
+          //     throw new Error('Value cannot be negative');
+          //   else if ((val as number) > 5000)
+          //     throw new Error('Value cannot be over 5000');
+          // }
+          // setSnackBar({message: 'Row saved!', severity: 'success'});
+          setError(false);
+          return updatedRow;
+        }}
+        onProcessRowUpdateError={(rowError: Error) => {
+          setError(true);
+          enqueueSnackbar(rowError.message, {variant: 'error'});
+        }}
+      />
     </>
   );
 };
