@@ -2,12 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Delete} from '@mui/icons-material';
+import {Archive, Delete, Unarchive} from '@mui/icons-material';
 import {Box, Button} from '@mui/material';
 import {
   DataGrid,
   GridActionsCellItem,
   GridColDef,
+  GridRowParams,
   GridRowsProp,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
@@ -30,7 +31,8 @@ type ColTypes = {
   attainmentId: number;
   name: string;
   daysValid: number;
-  dateValid: Date | null;
+  validUntil: Date | null;
+  archived: boolean;
 };
 
 const AttainmentsView = (): JSX.Element => {
@@ -71,7 +73,8 @@ const AttainmentsView = (): JSX.Element => {
       attainmentId: att.id,
       name: att.name,
       daysValid: att.daysValid,
-      dateValid: null,
+      validUntil: null,
+      archived: att.archived,
     }));
     if (JSON.stringify(newRows) === JSON.stringify(rows)) return;
     setRows(newRows);
@@ -99,7 +102,8 @@ const AttainmentsView = (): JSX.Element => {
         attainmentId: -1,
         name,
         daysValid,
-        dateValid: null,
+        validUntil: null,
+        archived: false,
       });
     });
   };
@@ -121,6 +125,7 @@ const AttainmentsView = (): JSX.Element => {
           attainmentId: row.attainmentId,
           name: row.name,
           daysValid: row.daysValid,
+          archived: row.archived,
         });
       }
     }
@@ -146,44 +151,70 @@ const AttainmentsView = (): JSX.Element => {
     setInitRows(structuredClone(rows));
   };
 
+  const getActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
+    const elements = [];
+    if (params.row.attainmentId !== -1) {
+      elements.push(
+        <GridActionsCellItem
+          icon={params.row.archived ? <Unarchive /> : <Archive />}
+          label={params.row.archived ? 'Unarchive' : 'Archive'}
+          onClick={() =>
+            setRows(oldRows =>
+              oldRows.map(row =>
+                row.id !== params.id
+                  ? row
+                  : {...row, archived: !params.row.archived}
+              )
+            )
+          }
+        />
+      );
+    }
+    // TODO: Don't allow deletion if has grades
+    elements.push(
+      <GridActionsCellItem
+        icon={<Delete />}
+        label="Delete"
+        onClick={() =>
+          setRows(oldRows => oldRows.filter(row => row.id !== params.id))
+        }
+      />
+    );
+
+    return elements;
+  };
+
   const columns: GridColDef<ColTypes>[] = [
     {
       field: 'name',
       headerName: 'Name',
       type: 'string',
-      width: 120,
       editable: true,
     },
     {
       field: 'daysValid',
       headerName: 'Days valid',
       type: 'number',
-      width: 120,
       editable: true,
     },
     {
-      field: 'dateValid',
-      headerName: 'Date valid',
+      field: 'validUntil',
+      headerName: 'Valid until',
       type: 'date',
-      width: 120,
       editable: true,
+    },
+    {
+      field: 'archived',
+      headerName: 'Archived',
+      type: 'boolean',
+      editable: false,
     },
     ...(editRights
       ? [
           {
             field: 'actions',
             type: 'actions',
-            getActions: params => [
-              <GridActionsCellItem
-                icon={<Delete />}
-                label="Delete"
-                onClick={() =>
-                  setRows(oldRows =>
-                    oldRows.filter(row => row.id !== params.id)
-                  )
-                }
-              />,
-            ],
+            getActions: getActions,
           } as GridColDef,
         ]
       : []),

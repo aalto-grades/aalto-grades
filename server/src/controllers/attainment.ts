@@ -69,6 +69,7 @@ export const editAttainment = async (
     .set({
       name: req.body.name ?? attainment.name,
       daysValid: req.body.daysValid ?? attainment.daysValid,
+      archived: req.body.archived ?? attainment.archived,
     })
     .save();
 
