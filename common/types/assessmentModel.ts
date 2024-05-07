@@ -11,10 +11,12 @@ export const AssessmentModelDataSchema = z.object({
   courseId: z.number().int(),
   name: z.string(),
   graphStructure: GraphStructureSchema,
+  archived: z.boolean(),
 });
-export const NewAssessmentModelDataSchema = z.object({
-  name: z.string(),
-  graphStructure: GraphStructureSchema,
+export const NewAssessmentModelDataSchema = AssessmentModelDataSchema.omit({
+  id: true,
+  courseId: true,
+  archived: true,
 });
 export const EditAssessmentModelDataSchema = AssessmentModelDataSchema.omit({
   id: true,

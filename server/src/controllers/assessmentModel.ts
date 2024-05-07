@@ -35,6 +35,7 @@ export const getAssessmentModel = async (
     courseId: assessmentModel.courseId,
     name: assessmentModel.name,
     graphStructure: assessmentModel.graphStructure,
+    archived: assessmentModel.archived,
   };
 
   res.json(assessmentModelData);
@@ -63,6 +64,7 @@ export const getAllAssessmentModels = async (
       courseId: assessmentModel.courseId,
       name: assessmentModel.name,
       graphStructure: assessmentModel.graphStructure,
+      archived: assessmentModel.archived,
     });
   }
 

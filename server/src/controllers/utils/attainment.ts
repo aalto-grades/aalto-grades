@@ -35,6 +35,7 @@ export const findAttainmentsByCourseId = async (
     courseId: attainment.courseId,
     name: attainment.name,
     daysValid: attainment.daysValid,
+    archived: attainment.archived,
   }));
 };
 
