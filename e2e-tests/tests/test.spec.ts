@@ -88,7 +88,7 @@ test.describe('Test Courses as Admin', () => {
     await page.getByLabel('Teachers In Charge*').fill('teacher@aalto.fi');
     await page.getByRole('button', {name: 'Add'}).first().click();
     await page.getByLabel('Assistants*').click();
-    await page.getByLabel('Assistants*').fill('teacher2@aalto.fi');
+    await page.getByLabel('Assistants*').fill('assistant@aalto.fi');
     await page.getByRole('button', {name: 'Add'}).nth(1).click();
     await page.getByRole('button', {name: 'Submit'}).click();
     await expect(page.getByRole('heading', {name: 'testcourse'})).toBeVisible();

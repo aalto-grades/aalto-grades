@@ -223,7 +223,7 @@ export const addGrades = async (
   return res.sendStatus(HttpCode.Created);
 };
 
-/** @throws ApiError(400, 404, 409) */
+/** @throws ApiError(400|404|409) */
 export const editGrade = async (
   req: TypedRequestBody<typeof EditGradeDataSchema>,
   res: Response
