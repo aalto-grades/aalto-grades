@@ -16,10 +16,12 @@ import {
 import {JSX, useEffect, useState} from 'react';
 
 import {AssessmentModelData} from '@common/types';
+import {useParams} from 'react-router-dom';
 import {
   GroupedStudentRow,
   useTableContext,
 } from '../../context/GradesTableProvider';
+import {useGetAttainments} from '../../hooks/useApi';
 import Graph from '../graph/Graph';
 
 type PropsType = {
@@ -34,7 +36,10 @@ const UserGraphDialog = ({
   assessmentModels,
   row,
 }: PropsType): JSX.Element => {
+  const {courseId} = useParams() as {courseId: string};
   const {gradeSelectOption} = useTableContext();
+  const attainments = useGetAttainments(courseId);
+
   const [selectedModel, setSelectedModel] =
     useState<AssessmentModelData | null>(null);
 
@@ -49,14 +54,17 @@ const UserGraphDialog = ({
       <DialogContent>
         {row === null ? (
           <>Data is undefined</>
-        ) : selectedModel === null ? (
+        ) : selectedModel === null || attainments.data === undefined ? (
           <>Loading</>
         ) : (
           <Graph
             initGraph={selectedModel.graphStructure}
-            attainments={row.attainments.map(att => ({
-              id: att.attainmentId,
-              name: att.attainmentName,
+            attainments={row.attainments.map(rowAtt => ({
+              id: rowAtt.attainmentId,
+              name: rowAtt.attainmentName,
+              archived:
+                attainments.data.find(att => att.id === rowAtt.attainmentId)
+                  ?.archived ?? false,
             }))}
             userGrades={row.attainments}
             gradeSelectOption={gradeSelectOption}

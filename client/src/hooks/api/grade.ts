@@ -97,10 +97,6 @@ export const useDeleteGrade = (
       queryClient.invalidateQueries({
         queryKey: ['attainments', courseId],
       });
-
-      queryClient.invalidateQueries({
-        queryKey: ['root-attainment', courseId],
-      });
     },
     ...options,
   });

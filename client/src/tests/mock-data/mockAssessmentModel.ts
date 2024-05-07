@@ -9,6 +9,8 @@ export const mockAssessmentModel: AssessmentModelData = {
   courseId: 1,
   name: 'Average',
   archived: false,
+  hasArchivedAttainments: false,
+  hasDeletedAttainments: false,
   graphStructure: {
     nodes: [
       {id: 'final-grade', position: {x: 1201, y: 218}, data: {}, type: 'grade'},

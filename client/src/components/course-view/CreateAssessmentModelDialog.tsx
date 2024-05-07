@@ -44,7 +44,10 @@ const CreateAssessmentModelDialog = ({
         courseId: courseId,
         assessmentModel: {
           name,
-          graphStructure: initGraph(template, attainments.data),
+          graphStructure: initGraph(
+            template,
+            attainments.data.filter(att => !att.archived)
+          ),
         },
       },
       {

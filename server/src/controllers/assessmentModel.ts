@@ -13,7 +13,11 @@ import {
 } from '@common/types';
 import AssessmentModel from '../database/models/assessmentModel';
 import {ApiError} from '../types';
-import {validateAssessmentModelPath} from './utils/assessmentModel';
+import {
+  checkAssessmentModelAttainments,
+  validateAssessmentModelPath,
+} from './utils/assessmentModel';
+import {findAttainmentsByCourseId} from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 
 /**
@@ -25,10 +29,11 @@ export const getAssessmentModel = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [_course, assessmentModel] = await validateAssessmentModelPath(
+  const [course, assessmentModel] = await validateAssessmentModelPath(
     req.params.courseId,
     req.params.assessmentModelId
   );
+  const attainmentData = await findAttainmentsByCourseId(course.id);
 
   const assessmentModelData: AssessmentModelData = {
     id: assessmentModel.id,
@@ -36,6 +41,7 @@ export const getAssessmentModel = async (
     name: assessmentModel.name,
     graphStructure: assessmentModel.graphStructure,
     archived: assessmentModel.archived,
+    ...checkAssessmentModelAttainments(assessmentModel, attainmentData),
   };
 
   res.json(assessmentModelData);
@@ -51,6 +57,7 @@ export const getAllAssessmentModels = async (
   res: Response
 ): Promise<void> => {
   const course = await findAndValidateCourseId(req.params.courseId);
+  const attainmentData = await findAttainmentsByCourseId(course.id);
 
   const assessmentModels = await AssessmentModel.findAll({
     where: {courseId: course.id},
@@ -65,6 +72,7 @@ export const getAllAssessmentModels = async (
       name: assessmentModel.name,
       graphStructure: assessmentModel.graphStructure,
       archived: assessmentModel.archived,
+      ...checkAssessmentModelAttainments(assessmentModel, attainmentData),
     });
   }
 
@@ -117,10 +125,8 @@ export const editAssessmentModel = async (
   // Update assessment model name.
   await assessmentModel.update({
     name: req.body.name ?? assessmentModel.name,
-    graphStructure:
-      req.body.graphStructure === undefined
-        ? assessmentModel.graphStructure
-        : req.body.graphStructure,
+    graphStructure: req.body.graphStructure ?? assessmentModel.graphStructure,
+    archived: req.body.archived ?? assessmentModel.archived,
   });
 
   res.sendStatus(HttpCode.Ok);

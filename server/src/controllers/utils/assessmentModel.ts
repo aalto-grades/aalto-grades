@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from '@common/types';
+import {AttainmentData, HttpCode} from '@common/types';
 import AssessmentModel from '../../database/models/assessmentModel';
 import Course from '../../database/models/course';
 import {ApiError, stringToIdSchema} from '../../types';
@@ -25,6 +25,34 @@ export const findAssessmentModelById = async (
     );
   }
   return assessmentModel;
+};
+
+/** Checks if assessment model has deleted or archived attainments. */
+export const checkAssessmentModelAttainments = (
+  assessmentModel: AssessmentModel,
+  attainmentData: AttainmentData[]
+): {hasDeletedAttainments: boolean; hasArchivedAttainments: boolean} => {
+  let hasDeleted = false;
+  let hasArchived = false;
+
+  const attainmentIds = attainmentData.map(att => att.id);
+  const modelAttainmentIds = [];
+  for (const node of assessmentModel.graphStructure.nodes) {
+    if (node.type !== 'attainment') continue;
+    modelAttainmentIds.push(parseInt(node.id.split('-')[1]));
+  }
+
+  for (const attId of modelAttainmentIds) {
+    if (!attainmentIds.includes(attId)) hasDeleted = true;
+  }
+  for (const att of attainmentData) {
+    if (modelAttainmentIds.includes(att.id) && att.archived) hasArchived = true;
+  }
+
+  return {
+    hasDeletedAttainments: hasDeleted,
+    hasArchivedAttainments: hasArchived,
+  };
 };
 
 /**
