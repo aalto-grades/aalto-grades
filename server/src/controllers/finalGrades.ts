@@ -51,9 +51,9 @@ export const getFinalGrades = async (
       grade: finalGrade.grade,
       date: new Date(finalGrade.date),
       sisuExportDate:
-      finalGrade.sisuExportDate === null
-        ? null
-        : new Date(finalGrade.sisuExportDate),
+        finalGrade.sisuExportDate === null
+          ? null
+          : new Date(finalGrade.sisuExportDate),
     });
   }
 

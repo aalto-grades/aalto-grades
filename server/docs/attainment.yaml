@@ -10,6 +10,11 @@ definitions:
     minimum: 1
     example: 1
 
+  AttainmentName:
+    type: string
+    decription: Name of the attainment.
+    example: Exam
+
   Attainment:
     description: Course attainment information.
     type: object
@@ -19,9 +24,7 @@ definitions:
       courseId:
         $ref: '#/definitions/CourseId'
       name:
-        type: string
-        decription: Name of the assessment model.
-        example: Exam
+        $ref: '#/definitions/AttainmentName'
       daysValid:
         type: number
         decription: Number of days valid.
@@ -38,9 +41,7 @@ definitions:
     type: object
     properties:
       name:
-        type: string
-        decription: Name of the assessment model.
-        example: Exam
+        $ref: '#/definitions/AttainmentName'
       daysValid:
         type: number
         decription: Number of days valid.
@@ -55,9 +56,7 @@ definitions:
     type: object
     properties:
       name:
-        type: string
-        decription: Name of the assessment model.
-        example: Exam
+        $ref: '#/definitions/AttainmentName'
       daysValid:
         type: number
         decription: Number of days valid.

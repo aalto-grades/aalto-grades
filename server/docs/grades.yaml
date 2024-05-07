@@ -141,6 +141,30 @@ definitions:
         description: Comment for grade.
         example: Good job!
 
+  StudentRow:
+    type: object
+    description:
+    properties:
+      user:
+        $ref: '#/definitions/UserData'
+      finalGrades:
+        type: array
+        items:
+          $ref: '#/definitions/FinalGradeData'
+      attainments:
+        type: array
+        items:
+          type: object
+          properties:
+            attainmentId:
+              $ref: '#/definitions/AttainmentId'
+            attainmentName:
+              $ref: '#/definitions/AttainmentName'
+            grades:
+              type: array
+              items:
+                $ref: '#/definitions/GradeData'
+
 /v1/courses/{courseId}/grades:
   get:
     tags: [Grades]
@@ -157,7 +181,7 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/GradeData'
+                $ref: '#/definitions/StudentRow'
       400:
         $ref: '#/components/responses/BadRequest'
       401:
