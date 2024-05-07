@@ -10,9 +10,11 @@ import {
 } from '@common/types';
 import {TypedRequestBody} from 'zod-express-middleware';
 import FinalGrade from '../database/models/finalGrade';
+import User from '../database/models/user';
 import {JwtClaims} from '../types';
 import {FinalGradeModelData} from '../types/finalGrade';
 import {validateCourseId} from './utils/course';
+import {validateUserAndGrader} from './utils/grades';
 
 /**
  * Responds with FinalGradeData[]
@@ -25,21 +27,35 @@ export const getFinalGrades = async (
 ): Promise<void | Response> => {
   const courseId = await validateCourseId(req.params.courseId);
 
-  const dbFinalGrades = await FinalGrade.findAll({where: {courseId: courseId}});
+  const dbFinalGrades = await FinalGrade.findAll({
+    where: {courseId: courseId},
+    include: [
+      {model: User, attributes: ['id', 'name', 'email', 'studentNumber']},
+      {
+        model: User,
+        as: 'grader',
+        attributes: ['id', 'name', 'email', 'studentNumber'],
+      },
+    ],
+  });
 
-  const finalGrades: FinalGradeData[] = dbFinalGrades.map(finalGrade => ({
-    finalGradeId: finalGrade.id,
-    userId: finalGrade.userId,
-    courseId: finalGrade.courseId,
-    assessmentModelId: finalGrade.assessmentModelId,
-    graderId: finalGrade.graderId,
-    grade: finalGrade.grade,
-    date: new Date(finalGrade.date),
-    sisuExportDate:
-      finalGrade.sisuExportDate === null
-        ? null
-        : new Date(finalGrade.sisuExportDate),
-  }));
+  const finalGrades: FinalGradeData[] = [];
+  for (const finalGrade of dbFinalGrades) {
+    const [user, grader] = validateUserAndGrader(finalGrade);
+    finalGrades.push({
+      finalGradeId: finalGrade.id,
+      user: user,
+      courseId: finalGrade.courseId,
+      assessmentModelId: finalGrade.assessmentModelId,
+      grader: grader,
+      grade: finalGrade.grade,
+      date: new Date(finalGrade.date),
+      sisuExportDate:
+        finalGrade.sisuExportDate === null
+          ? null
+          : new Date(finalGrade.sisuExportDate),
+    });
+  }
 
   return res.json(finalGrades);
 };

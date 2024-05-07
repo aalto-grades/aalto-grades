@@ -83,10 +83,20 @@ export const mockGrades: StudentRow[] = [
     finalGrades: [
       {
         finalGradeId: 1,
-        userId: 6,
+        user: {
+          id: 8,
+          name: 'Carolyn Janek',
+          email: 'carolyn.janek@aalto.fi',
+          studentNumber: '325235',
+        },
         courseId: 1,
         assessmentModelId: 1,
-        graderId: 2,
+        grader: {
+          id: 2,
+          name: 'Timmy Teacher',
+          email: 'teacher@aalto.fi',
+          studentNumber: '123456',
+        },
         grade: 4,
         date: new Date(),
         sisuExportDate: null,
@@ -171,10 +181,20 @@ export const mockGrades: StudentRow[] = [
     finalGrades: [
       {
         finalGradeId: 2,
-        userId: 7,
+        user: {
+          id: 9,
+          name: 'Vonda Morgan',
+          email: 'vonda.morgan@aalto.fi',
+          studentNumber: '826139',
+        },
         courseId: 1,
         assessmentModelId: 1,
-        graderId: 2,
+        grader: {
+          id: 2,
+          name: 'Timmy Teacher',
+          email: 'teacher@aalto.fi',
+          studentNumber: '123456',
+        },
         grade: 0,
         date: new Date(),
         sisuExportDate: null,

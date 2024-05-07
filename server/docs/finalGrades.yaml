@@ -23,14 +23,14 @@ definitions:
     properties:
       finalGradeId:
         $ref: '#/definitions/FinalGradeId'
-      userId:
-        $ref: '#/definitions/UserId'
+      user:
+        $ref: '#/definitions/UserData'
       courseId:
         $ref: '#/definitions/CourseId'
       assessmentModelId:
         $ref: '#/definitions/AssessmentModelId'
-      graderId:
-        $ref: '#/definitions/UserId'
+      grader:
+        $ref: '#/definitions/UserData'
       grade:
         $ref: '#/definitions/FinalGrade'
       date:

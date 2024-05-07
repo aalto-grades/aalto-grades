@@ -4,6 +4,7 @@
 
 import {HttpCode} from '@common/types';
 import {Includeable, Op} from 'sequelize';
+import logger from '../../configs/winston';
 import Attainment from '../../database/models/attainment';
 import AttainmentGrade from '../../database/models/attainmentGrade';
 import Course from '../../database/models/course';
@@ -149,7 +150,7 @@ export const findAttainmentGradeById = async (
 };
 
 /**
- * Finds and attainment grade by id and also validates that it belongs to the
+ * Finds an attainment grade by id and also validates that it belongs to the
  * correct course.
  *
  * @throws ApiError(400|404|409) if invalid ids, not found, or didn't match.
@@ -178,4 +179,54 @@ export const findAndValidateAttainmentGradePath = async (
   }
 
   return [course, grade];
+};
+
+/**
+ * Validates that the user and grader of an AttainmentGrade or FinalGrade are
+ * defined and that the user has a studentNumber and the grader a name.
+ *
+ * @throws ApiError(500) if any values are undefined or null.
+ */
+export const validateUserAndGrader = (
+  grade: AttainmentGrade | FinalGrade
+): [User & {studentNumber: string}, User] => {
+  const gradeType = grade instanceof AttainmentGrade ? 'grade' : 'final grade';
+
+  if (grade.User === undefined) {
+    logger.error(`Found a ${gradeType} ${grade.id} with no user`);
+    throw new ApiError(
+      `Found a ${gradeType} with no user`,
+      HttpCode.InternalServerError
+    );
+  }
+
+  if (grade.User.studentNumber === null) {
+    logger.error(
+      `Found a ${gradeType} ${grade.id} where user ${grade.User.id} studentNumber was null`
+    );
+    throw new ApiError(
+      `Found a ${gradeType} where user studentNumber was null`,
+      HttpCode.InternalServerError
+    );
+  }
+
+  if (grade.grader === undefined) {
+    logger.error(`Found a ${gradeType} ${grade.id} with no grader`);
+    throw new ApiError(
+      `Found a ${gradeType} with no grader`,
+      HttpCode.InternalServerError
+    );
+  }
+
+  if (grade.grader.name === null) {
+    logger.error(
+      `Found a ${gradeType} ${grade.id} where grader ${grade.grader.id} name is null`
+    );
+    throw new ApiError(
+      `Found a ${gradeType} where grader name is null`,
+      HttpCode.InternalServerError
+    );
+  }
+
+  return [grade.User as User & {studentNumber: string}, grade.grader];
 };

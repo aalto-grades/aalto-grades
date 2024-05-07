@@ -30,6 +30,7 @@ import {
   getDateOfLatestGrade,
   getFinalGradesFor,
   studentNumbersExist,
+  validateUserAndGrader,
 } from './utils/grades';
 
 /**
@@ -64,54 +65,31 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
 
   // Get finalGrades for all students
   const finalGrades = await FinalGrade.findAll({
-    include: {all: true},
+    include: [
+      {model: User, attributes: ['id', 'name', 'email', 'studentNumber']},
+      {
+        model: User,
+        as: 'grader',
+        attributes: ['id', 'name', 'email', 'studentNumber'],
+      },
+    ],
     where: {courseId: courseId},
   });
 
   // User dict of unique users {userId: User, ...}
   const usersDict: {[key: string]: UserData & {studentNumber: string}} = {};
-  for (const grade of grades) {
-    if (grade.User === undefined) {
-      logger.error(`Found a grade ${grade.id} with no user`);
-      throw new ApiError(
-        'Found a grade with no grader',
-        HttpCode.InternalServerError
-      );
-    }
-    if (grade.User.studentNumber === null) {
-      logger.error(
-        `Found a grade ${grade.id} where user ${grade.User.id} studentNumber was null`
-      );
-      throw new ApiError(
-        'Found a grade where user studentNumber was null',
-        HttpCode.InternalServerError
-      );
-    }
-
-    if (!(grade.User.id in usersDict)) {
-      usersDict[grade.User.id] = {
-        ...grade.User.dataValues,
-        studentNumber: grade.User.studentNumber,
-      };
-    }
-  }
 
   // Grades dict {userId: {attId: GradeData[], ...}, ...}
   const userGrades: {[key: string]: {[key: string]: GradeData[]}} = {};
+
   for (const grade of grades) {
-    if (grade.grader === undefined) {
-      logger.error(`Found a grade ${grade.id} with no grader`);
-      throw new ApiError(
-        'Found a grade with no grader',
-        HttpCode.InternalServerError
-      );
-    }
-    if (grade.grader.name === null) {
-      logger.error(`Grade ${grade.id} grader ${grade.grader.id} name is null`);
-      throw new ApiError(
-        'Grade grader name is null',
-        HttpCode.InternalServerError
-      );
+    const [user, grader] = validateUserAndGrader(grade);
+
+    if (!(user.id in usersDict)) {
+      usersDict[user.id] = {
+        ...user.dataValues,
+        studentNumber: user.studentNumber,
+      };
     }
 
     const userId = grade.userId;
@@ -121,7 +99,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
 
     userGrades[userId][grade.attainmentId].push({
       gradeId: grade.id,
-      grader: grade.grader,
+      grader: grader,
       grade: grade.grade,
       exportedToSisu: grade.sisuExportDate,
       date: new Date(grade.date),
@@ -133,15 +111,17 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
   // FinalGrades dict {userId: FinalGradeData[], ...}
   const finalGradesDict: {[key: string]: FinalGradeData[]} = {};
   for (const fGrade of finalGrades) {
-    const userId = fGrade.userId;
+    const [user, grader] = validateUserAndGrader(fGrade);
+
+    const userId = user.id;
     if (!(userId in finalGradesDict)) finalGradesDict[userId] = [];
 
     finalGradesDict[userId].push({
       finalGradeId: fGrade.id,
-      userId: fGrade.userId,
+      user: user,
       courseId: fGrade.courseId,
       assessmentModelId: fGrade.assessmentModelId,
-      graderId: fGrade.graderId,
+      grader: grader,
       grade: fGrade.grade,
       date: new Date(fGrade.date),
       sisuExportDate: fGrade.sisuExportDate,
