@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+export * from './aplus';
 export * from './assessmentModel';
 export * from './attainment';
 export * from './auth';
