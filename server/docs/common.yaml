@@ -93,7 +93,8 @@ components:
     Conflict:
       description: >
         The url params do not belong to each other or
-        a similar item already exists in the database.
+        a similar item already exists in the database or
+        deletion of item failed due to some dependency.
       content:
         application/json:
           schema:
