@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
+import {ForeignKeyConstraintError} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
@@ -12,6 +13,7 @@ import {
   NewAttainmentDataSchema,
 } from '@common/types';
 import Attainment from '../database/models/attainment';
+import {ApiError} from '../types';
 import {
   findAttainmentsByCourseId,
   validateAttainmentPath,
@@ -86,7 +88,23 @@ export const deleteAttainment = async (
     req.params.attainmentId
   );
 
-  await attainment.destroy();
+  try {
+    await attainment.destroy();
+  } catch (e) {
+    // Catch deletion of attainment with grades
+    if (
+      e instanceof ForeignKeyConstraintError &&
+      e.index === 'attainment_grade_attainment_id_fkey'
+    ) {
+      throw new ApiError(
+        'Tried to delete attainment with grades',
+        HttpCode.Conflict
+      );
+    }
+
+    // Other error
+    throw e;
+  }
 
   res.sendStatus(HttpCode.Ok);
 };

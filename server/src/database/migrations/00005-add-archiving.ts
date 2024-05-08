@@ -23,6 +23,26 @@ export default {
         {type: DataTypes.BOOLEAN, defaultValue: false, allowNull: true},
         {transaction}
       );
+
+      // Convert attainment grade from cascade to restrict
+      // Remove the old constraint
+      await queryInterface.removeConstraint(
+        'attainment_grade',
+        'attainment_grade_attainment_id_fkey',
+        {transaction}
+      );
+
+      // Add the new constraint
+      await queryInterface.addConstraint('attainment_grade', {
+        type: 'foreign key',
+        fields: ['attainment_id'],
+        name: 'attainment_grade_attainment_id_fkey',
+        references: {table: 'attainment', field: 'id'},
+        onDelete: 'RESTRICT',
+        onUpdate: 'CASCADE',
+        transaction,
+      });
+
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
@@ -36,6 +56,25 @@ export default {
         transaction,
       });
       await queryInterface.removeColumn('assessment_model', 'archived', {
+        transaction,
+      });
+
+      // Undo convert attainment grade from cascade to restrict
+      // Remove the new constraint
+      await queryInterface.removeConstraint(
+        'attainment_grade',
+        'attainment_grade_attainment_id_fkey',
+        {transaction}
+      );
+
+      // Add the old constraint
+      await queryInterface.addConstraint('attainment_grade', {
+        type: 'foreign key',
+        fields: ['attainment_id'],
+        name: 'attainment_grade_attainment_id_fkey',
+        references: {table: 'attainment', field: 'id'},
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
         transaction,
       });
       await transaction.commit();

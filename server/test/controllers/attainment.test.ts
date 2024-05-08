@@ -16,6 +16,7 @@ import {
 import {app} from '../../src/app';
 import Attainment from '../../src/database/models/attainment';
 import {createData} from '../util/createData';
+import {TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
@@ -312,6 +313,16 @@ describe('Test Delete /v1/courses/:courseId/attainments/:attainmentId - delete a
 
   it('should respond with 409 conflict when attainment does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/attainments/${noRoleAttainmentId}`;
+    await responseTests.testConflict(url, cookies.adminCookie).delete();
+  });
+
+  it('should respond with 409 if trying to delete attainment with grades', async () => {
+    const attainment = await createData.createAttainment(courseId);
+    await checkAttainment(attainment.id, {}); // Validate that exists
+    const user = await createData.createUser();
+    await createData.createGrade(user.id, attainment.id, TEACHER_ID);
+
+    const url = `/v1/courses/${courseId}/attainments/${attainment.id}`;
     await responseTests.testConflict(url, cookies.adminCookie).delete();
   });
 });
