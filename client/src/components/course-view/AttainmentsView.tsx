@@ -20,7 +20,9 @@ import {
   useAddAttainment,
   useDeleteAttainment,
   useEditAttainment,
+  useGetAllAssessmentModels,
   useGetAttainments,
+  useGetGrades,
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
@@ -39,6 +41,8 @@ const AttainmentsView = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
 
+  const grades = useGetGrades(courseId);
+  const assessmentModels = useGetAllAssessmentModels(courseId);
   const attainments = useGetAttainments(courseId);
   const addAttainment = useAddAttainment(courseId);
   const editAttainment = useEditAttainment(courseId);
@@ -50,6 +54,31 @@ const AttainmentsView = (): JSX.Element => {
   const [error, setError] = useState<boolean>(false);
   const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false);
   const [unsavedDialogOpen, setUnsavedDialogOpen] = useState<boolean>(false);
+
+  const attsWithGrades = useMemo(() => {
+    const withGrades = new Set<number>();
+    if (grades.data === undefined) return withGrades;
+    for (const grade of grades.data) {
+      for (const att of grade.attainments) {
+        if (att.grades.length > 0) {
+          withGrades.add(att.attainmentId);
+        }
+      }
+    }
+    return withGrades;
+  }, [grades.data]);
+
+  const attsWithModels = useMemo(() => {
+    const withModels = new Set<number>();
+    if (assessmentModels.data === undefined) return withModels;
+    for (const model of assessmentModels.data) {
+      for (const node of model.graphStructure.nodes) {
+        if (node.type !== 'attainment') continue;
+        withModels.add(parseInt(node.id.split('-')[1]));
+      }
+    }
+    return withModels;
+  }, [assessmentModels.data]);
 
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge,
@@ -170,16 +199,20 @@ const AttainmentsView = (): JSX.Element => {
         />
       );
     }
-    // TODO: Don't allow deletion if has grades
-    elements.push(
-      <GridActionsCellItem
-        icon={<Delete />}
-        label="Delete"
-        onClick={() =>
-          setRows(oldRows => oldRows.filter(row => row.id !== params.id))
-        }
-      />
-    );
+    if (!attsWithGrades.has(params.row.attainmentId)) {
+      elements.push(
+        <GridActionsCellItem
+          icon={<Delete />}
+          label="Delete"
+          onClick={() => {
+            if (attsWithModels.has(params.row.attainmentId)) {
+              // TODO: Show confirm
+            }
+            setRows(oldRows => oldRows.filter(row => row.id !== params.id));
+          }}
+        />
+      );
+    }
 
     return elements;
   };
