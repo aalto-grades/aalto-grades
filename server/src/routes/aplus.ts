@@ -2,11 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Router} from 'express';
-// import {RequestHandler} from 'express-serve-static-core';
-// import passport from 'passport';
+import express, {Router} from 'express';
+import {RequestHandler} from 'express-serve-static-core';
+import passport from 'passport';
+import {processRequestBody} from 'zod-express-middleware';
 
-import {fetchAplusExerciseData} from '../controllers/aplus';
+import {CourseRoleType, NewAplusAttainmentArraySchema} from '@common/types';
+import {
+  addAplusGradeSources,
+  fetchAplusExerciseData,
+} from '../controllers/aplus';
+import {handleInvalidRequestJson} from '../middleware';
+import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
@@ -14,7 +21,16 @@ export const router = Router();
 // TODO: Authorization?
 router.get(
   '/v1/aplus/courses/:aplusCourseId',
-  // Temporarily commented out for testing purposes
-  // passport.authenticate('jwt', {session: false}) as RequestHandler,
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
   controllerDispatcher(fetchAplusExerciseData)
+);
+
+router.post(
+  '/v1/courses/:courseId/aplus-source',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([CourseRoleType.Teacher]),
+  express.json(),
+  handleInvalidRequestJson,
+  processRequestBody(NewAplusAttainmentArraySchema),
+  controllerDispatcher(addAplusGradeSources)
 );

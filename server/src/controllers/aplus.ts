@@ -4,10 +4,18 @@
 
 import axios, {AxiosResponse} from 'axios';
 import {Request, Response} from 'express';
+import {TypedRequestBody} from 'zod-express-middleware';
 
-import {AplusExerciseData, HttpCode} from '@common/types';
+import {
+  AplusAttainmentData,
+  AplusExerciseData,
+  HttpCode,
+  NewAplusAttainmentArraySchema,
+} from '@common/types';
 import {AXIOS_TIMEOUT} from '../configs/constants';
+import AplusAttainment from '../database/models/aplusAttainment';
 import {ApiError, stringToIdSchema} from '../types';
+import {validateCourseId} from './utils/course';
 
 // TODO: Teacher must provide API token somehow
 const APLUS_API_TOKEN: string = process.env.APLUS_API_TOKEN || '';
@@ -73,4 +81,17 @@ export const fetchAplusExerciseData = async (
   };
 
   res.json(exerciseData);
+};
+
+// TODO: Comment
+export const addAplusGradeSources = async (
+  req: TypedRequestBody<typeof NewAplusAttainmentArraySchema>,
+  res: Response
+): Promise<void> => {
+  await validateCourseId(req.params.courseId);
+
+  const preparedBulkCreate: AplusAttainmentData[] = req.body;
+  await AplusAttainment.bulkCreate(preparedBulkCreate);
+
+  res.sendStatus(HttpCode.Created);
 };
