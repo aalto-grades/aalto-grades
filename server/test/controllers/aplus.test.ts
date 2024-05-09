@@ -7,13 +7,13 @@ import supertest from 'supertest';
 
 import {
   AttainmentData,
-  AplusAttainmentData,
   AplusExerciseDataSchema,
-  AplusGradeSource,
+  AplusGradeSourceData,
+  AplusGradeSourceType,
   HttpCode,
 } from '@common/types';
 import {app} from '../../src/app';
-import AplusAttainment from '../../src/database/models/aplusAttainment';
+import AplusGradeSource from '../../src/database/models/aplusGradeSource';
 import {createData} from '../util/createData';
 import {ErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
@@ -90,38 +90,38 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
 });
 
 describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', () => {
-  const getAplusAttainment = (
-    gradeSource: AplusGradeSource,
+  const getGradeSource = (
+    sourceType: AplusGradeSourceType,
     {withModuleId = false, withDifficulty = false}
-  ): AplusAttainmentData => ({
+  ): AplusGradeSourceData => ({
     attainmentId: attainments[0].id,
     aplusCourseId: 1,
-    gradeSource: gradeSource,
+    sourceType: sourceType,
     moduleId: withModuleId ? 1 : undefined,
     difficulty: withDifficulty ? 'A' : undefined,
   });
 
-  const getFullPoints = (): AplusAttainmentData =>
-    getAplusAttainment(AplusGradeSource.FullPoints, {});
+  const getFullPoints = (): AplusGradeSourceData =>
+    getGradeSource(AplusGradeSourceType.FullPoints, {});
 
-  const getModule = (): AplusAttainmentData =>
-    getAplusAttainment(AplusGradeSource.Module, {withModuleId: true});
+  const getModule = (): AplusGradeSourceData =>
+    getGradeSource(AplusGradeSourceType.Module, {withModuleId: true});
 
-  const getDifficulty = (): AplusAttainmentData =>
-    getAplusAttainment(AplusGradeSource.Difficulty, {withDifficulty: true});
+  const getDifficulty = (): AplusGradeSourceData =>
+    getGradeSource(AplusGradeSourceType.Difficulty, {withDifficulty: true});
 
-  const checkAplusAttainment = async (
-    aplusAttainment: AplusAttainmentData
+  const checkAplusGradeSource = async (
+    gradeSource: AplusGradeSourceData
   ): Promise<void> => {
-    const result = await AplusAttainment.findOne({
+    const result = await AplusGradeSource.findOne({
       // TODO: Remove
       // @ts-ignore
       where: {
-        attainmentId: aplusAttainment.attainmentId,
-        aplusCourseId: aplusAttainment.aplusCourseId,
-        gradeSource: aplusAttainment.gradeSource,
-        moduleId: aplusAttainment.moduleId ?? null,
-        difficulty: aplusAttainment.difficulty ?? null,
+        attainmentId: gradeSource.attainmentId,
+        aplusCourseId: gradeSource.aplusCourseId,
+        sourceType: gradeSource.sourceType,
+        moduleId: gradeSource.moduleId ?? null,
+        difficulty: gradeSource.difficulty ?? null,
       },
     });
 
@@ -136,9 +136,9 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
       .expect(HttpCode.Created);
 
     expect(JSON.stringify(res.body)).toBe('{}');
-    await checkAplusAttainment(getFullPoints());
-    await checkAplusAttainment(getModule());
-    await checkAplusAttainment(getDifficulty());
+    await checkAplusGradeSource(getFullPoints());
+    await checkAplusGradeSource(getModule());
+    await checkAplusGradeSource(getDifficulty());
   });
 
   it('should add sources (teacher user)', async () => {
@@ -149,9 +149,9 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
       .expect(HttpCode.Created);
 
     expect(JSON.stringify(res.body)).toBe('{}');
-    await checkAplusAttainment(getFullPoints());
-    await checkAplusAttainment(getModule());
-    await checkAplusAttainment(getDifficulty());
+    await checkAplusGradeSource(getFullPoints());
+    await checkAplusGradeSource(getModule());
+    await checkAplusGradeSource(getDifficulty());
   });
 
   it('should respond with 400 bad request, if course ID is invalid', async () => {
@@ -167,13 +167,13 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
 
   it('should respond with 400 bad request, if input data is invalid', async () => {
     const testInvalid = async (
-      gradeSource: AplusGradeSource,
+      sourceType: AplusGradeSourceType,
       withModuleId: boolean,
       withDifficulty: boolean
     ): Promise<void> => {
       await request
         .post(`/v1/courses/${courseId}/aplus-source`)
-        .send([getAplusAttainment(gradeSource, {withModuleId, withDifficulty})])
+        .send([getGradeSource(sourceType, {withModuleId, withDifficulty})])
         .set('Cookie', cookies.adminCookie)
         .expect(HttpCode.BadRequest);
 
@@ -182,15 +182,15 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
       // expect(result.success).toBeTruthy();
     };
 
-    await testInvalid(AplusGradeSource.FullPoints, true, true);
-    await testInvalid(AplusGradeSource.FullPoints, true, false);
-    await testInvalid(AplusGradeSource.FullPoints, false, true);
-    await testInvalid(AplusGradeSource.Module, true, true);
-    await testInvalid(AplusGradeSource.Module, false, true);
-    await testInvalid(AplusGradeSource.Module, false, false);
-    await testInvalid(AplusGradeSource.Difficulty, true, true);
-    await testInvalid(AplusGradeSource.Difficulty, true, false);
-    await testInvalid(AplusGradeSource.Difficulty, false, false);
+    await testInvalid(AplusGradeSourceType.FullPoints, true, true);
+    await testInvalid(AplusGradeSourceType.FullPoints, true, false);
+    await testInvalid(AplusGradeSourceType.FullPoints, false, true);
+    await testInvalid(AplusGradeSourceType.Module, true, true);
+    await testInvalid(AplusGradeSourceType.Module, false, true);
+    await testInvalid(AplusGradeSourceType.Module, false, false);
+    await testInvalid(AplusGradeSourceType.Difficulty, true, true);
+    await testInvalid(AplusGradeSourceType.Difficulty, true, false);
+    await testInvalid(AplusGradeSourceType.Difficulty, false, false);
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {

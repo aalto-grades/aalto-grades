@@ -11,25 +11,25 @@ import {
   Model,
 } from 'sequelize';
 
-import {AplusGradeSource} from '@common/types';
+import {AplusGradeSourceType} from '@common/types';
 import {sequelize} from '..';
 import Attainment from './attainment';
 
-export default class AplusAttainment extends Model<
-  InferAttributes<AplusAttainment>,
-  InferCreationAttributes<AplusAttainment>
+export default class AplusGradeSource extends Model<
+  InferAttributes<AplusGradeSource>,
+  InferCreationAttributes<AplusGradeSource>
 > {
   declare id: CreationOptional<number>;
   declare attainmentId: ForeignKey<Attainment['id']>;
   declare aplusCourseId: number;
-  declare gradeSource: AplusGradeSource;
+  declare sourceType: AplusGradeSourceType;
   declare moduleId: CreationOptional<number>;
   declare difficulty: CreationOptional<string>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-AplusAttainment.init(
+AplusGradeSource.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -48,7 +48,7 @@ AplusAttainment.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    gradeSource: {
+    sourceType: {
       type: DataTypes.ENUM('FULL_POINTS', 'MODULE', 'DIFFICULTY'),
       allowNull: false,
     },
@@ -65,9 +65,12 @@ AplusAttainment.init(
   },
   {
     sequelize,
-    tableName: 'aplus_attainment',
+    tableName: 'aplus_grade_source',
   }
 );
 
-Attainment.hasMany(AplusAttainment, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
-AplusAttainment.belongsTo(Attainment, {foreignKey: 'attainmentId'});
+Attainment.hasMany(AplusGradeSource, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+AplusGradeSource.belongsTo(Attainment, {foreignKey: 'attainmentId'});

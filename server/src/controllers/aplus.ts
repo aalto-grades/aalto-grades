@@ -7,13 +7,13 @@ import {Request, Response} from 'express';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
-  AplusAttainmentData,
   AplusExerciseData,
+  AplusGradeSourceData,
   HttpCode,
-  NewAplusAttainmentArraySchema,
+  NewAplusGradeSourceArraySchema,
 } from '@common/types';
 import {AXIOS_TIMEOUT} from '../configs/constants';
-import AplusAttainment from '../database/models/aplusAttainment';
+import AplusGradeSource from '../database/models/aplusGradeSource';
 import {ApiError, stringToIdSchema} from '../types';
 import {validateCourseId} from './utils/course';
 
@@ -85,13 +85,13 @@ export const fetchAplusExerciseData = async (
 
 // TODO: Comment
 export const addAplusGradeSources = async (
-  req: TypedRequestBody<typeof NewAplusAttainmentArraySchema>,
+  req: TypedRequestBody<typeof NewAplusGradeSourceArraySchema>,
   res: Response
 ): Promise<void> => {
   await validateCourseId(req.params.courseId);
 
-  const preparedBulkCreate: AplusAttainmentData[] = req.body;
-  await AplusAttainment.bulkCreate(preparedBulkCreate);
+  const preparedBulkCreate: AplusGradeSourceData[] = req.body;
+  await AplusGradeSource.bulkCreate(preparedBulkCreate);
 
   res.sendStatus(HttpCode.Created);
 };

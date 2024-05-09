@@ -12,7 +12,7 @@ export default {
     const transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.createTable(
-        'aplus_attainment',
+        'aplus_grade_source',
         {
           id: {
             type: DataTypes.INTEGER,
@@ -33,7 +33,7 @@ export default {
             type: DataTypes.INTEGER,
             allowNull: false,
           },
-          grade_source: {
+          source_type: {
             type: DataTypes.ENUM('FULL_POINTS', 'MODULE', 'DIFFICULTY'),
             allowNull: false,
           },
@@ -60,7 +60,7 @@ export default {
   down: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.dropTable('aplus_attainment', {transaction});
+      await queryInterface.dropTable('aplus_grade_source', {transaction});
 
       await transaction.commit();
     } catch (error) {

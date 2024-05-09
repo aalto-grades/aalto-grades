@@ -4,13 +4,13 @@
 
 import {z} from 'zod';
 
-export enum AplusGradeSource {
+export enum AplusGradeSourceType {
   FullPoints = 'FULL_POINTS',
   Module = 'MODULE',
   Difficulty = 'DIFFICULTY',
 }
 
-export const AplusGradeSourceSchema = z.nativeEnum(AplusGradeSource);
+export const AplusGradeSourceTypeSchema = z.nativeEnum(AplusGradeSourceType);
 
 export const AplusExerciseDataSchema = z.object({
   modules: z.array(
@@ -22,11 +22,11 @@ export const AplusExerciseDataSchema = z.object({
   difficulties: z.array(z.string()),
 });
 
-export const AplusAttainmentDataSchema = z
+export const AplusGradeSourceDataSchema = z
   .object({
     attainmentId: z.number().int(),
     aplusCourseId: z.number().int(),
-    gradeSource: AplusGradeSourceSchema,
+    sourceType: AplusGradeSourceTypeSchema,
     moduleId: z.number().int().optional(),
     difficulty: z.string().optional(),
   })
@@ -36,17 +36,19 @@ export const AplusAttainmentDataSchema = z
       (m ? val.moduleId !== undefined : val.moduleId === undefined) &&
       (d ? val.difficulty !== undefined : val.difficulty === undefined);
 
-    switch (val.gradeSource) {
-      case AplusGradeSource.FullPoints:
+    switch (val.sourceType) {
+      case AplusGradeSourceType.FullPoints:
         return sources(false, false);
-      case AplusGradeSource.Module:
+      case AplusGradeSourceType.Module:
         return sources(true, false);
-      case AplusGradeSource.Difficulty:
+      case AplusGradeSourceType.Difficulty:
         return sources(false, true);
     }
   });
 
-export const NewAplusAttainmentArraySchema = z.array(AplusAttainmentDataSchema);
+export const NewAplusGradeSourceArraySchema = z.array(
+  AplusGradeSourceDataSchema
+);
 
 export type AplusExerciseData = z.infer<typeof AplusExerciseDataSchema>;
-export type AplusAttainmentData = z.infer<typeof AplusAttainmentDataSchema>;
+export type AplusGradeSourceData = z.infer<typeof AplusGradeSourceDataSchema>;

@@ -7,7 +7,7 @@ import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
-import {CourseRoleType, NewAplusAttainmentArraySchema} from '@common/types';
+import {CourseRoleType, NewAplusGradeSourceArraySchema} from '@common/types';
 import {
   addAplusGradeSources,
   fetchAplusExerciseData,
@@ -31,6 +31,6 @@ router.post(
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(NewAplusAttainmentArraySchema),
+  processRequestBody(NewAplusGradeSourceArraySchema),
   controllerDispatcher(addAplusGradeSources)
 );
