@@ -9,17 +9,18 @@ import {TypedRequestBody} from 'zod-express-middleware';
 import {
   AplusExerciseData,
   AplusGradeSourceData,
+  AplusGradeSourceType,
   HttpCode,
   NewAplusGradeSourceArraySchema,
 } from '@common/types';
 import {AXIOS_TIMEOUT} from '../configs/constants';
 import AplusGradeSource from '../database/models/aplusGradeSource';
-import {ApiError, stringToIdSchema} from '../types';
+import {ApiError, JwtClaims, stringToIdSchema} from '../types';
 import {validateCourseId} from './utils/course';
 
 // TODO: Teacher must provide API token somehow
 const APLUS_API_TOKEN: string = process.env.APLUS_API_TOKEN || '';
-const APLUS_URL = 'https://plus.cs.aalto.fi';
+const APLUS_URL = 'https://plus.cs.aalto.fi/api/v2';
 
 const validateAplusCourseId = (aplusCourseId: string): number => {
   const result = stringToIdSchema.safeParse(aplusCourseId);
@@ -52,7 +53,7 @@ export const fetchAplusExerciseData = async (
       }[];
     }[];
   }> = await axios.get(
-    `${APLUS_URL}/api/v2/courses/${aplusCourseId}/exercises?format=json`,
+    `${APLUS_URL}/courses/${aplusCourseId}/exercises?format=json`,
     {
       timeout: AXIOS_TIMEOUT,
       validateStatus: (status: number) => status === 200,
@@ -94,4 +95,55 @@ export const addAplusGradeSources = async (
   await AplusGradeSource.bulkCreate(preparedBulkCreate);
 
   res.sendStatus(HttpCode.Created);
+};
+
+// WIP
+// TODO: What exactly should be fetched at a time?
+export const fetchAplusGrades = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const grader = req.user as JwtClaims;
+  const courseId = Number(req.params.courseId);
+  const attainmentId = Number(req.params.attainmentId);
+
+  // TODO: There can be multiple sources
+  const gradeSource = await AplusGradeSource.findOne({
+    where: {attainmentId}
+  }) as AplusGradeSource;
+
+  const aplusRes: AxiosResponse<{
+    results: {
+      points: string
+    }[];
+  }> = await axios.get(
+    `${APLUS_URL}/courses/${gradeSource.aplusCourseId}/points?format=json`,
+    {
+      timeout: AXIOS_TIMEOUT,
+      validateStatus: (status: number) => status === 200,
+      headers: {Authorization: `Token ${APLUS_API_TOKEN}`},
+    }
+  );
+
+  for (const result of aplusRes.data.results) {
+    // TODO: This seems bad
+    const pointsRes: AxiosResponse<{
+      student_id: string,
+      points: number,
+      points_by_difficulty: {
+        [key: string]: number
+      },
+      modules: {
+        id: number,
+        points: number
+      }[]
+    }> = await axios.get(
+      result.points,
+      {
+        timeout: AXIOS_TIMEOUT,
+        validateStatus: (status: number) => status === 200,
+        headers: {Authorization: `Token ${APLUS_API_TOKEN}`},
+      }
+    );
+  }
 };
