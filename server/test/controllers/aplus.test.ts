@@ -114,8 +114,6 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     gradeSource: AplusGradeSourceData
   ): Promise<void> => {
     const result = await AplusGradeSource.findOne({
-      // TODO: Remove
-      // @ts-ignore
       where: {
         attainmentId: gradeSource.attainmentId,
         aplusCourseId: gradeSource.aplusCourseId,

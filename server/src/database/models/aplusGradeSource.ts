@@ -23,8 +23,8 @@ export default class AplusGradeSource extends Model<
   declare attainmentId: ForeignKey<Attainment['id']>;
   declare aplusCourseId: number;
   declare sourceType: AplusGradeSourceType;
-  declare moduleId: CreationOptional<number>;
-  declare difficulty: CreationOptional<string>;
+  declare moduleId: CreationOptional<number | null>;
+  declare difficulty: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
