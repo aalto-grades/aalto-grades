@@ -83,7 +83,7 @@ export const fetchAplusExerciseData = async (
   res.json(exerciseData);
 };
 
-// TODO: Comment
+/** @throws ApiError(400|404) */
 export const addAplusGradeSources = async (
   req: TypedRequestBody<typeof NewAplusGradeSourceArraySchema>,
   res: Response
