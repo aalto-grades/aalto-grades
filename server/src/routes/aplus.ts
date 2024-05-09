@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
-// SPDX-License-Identifier: MTI
+// SPDX-License-Identifier: MIT
 
 import {Router} from 'express';
 // import {RequestHandler} from 'express-serve-static-core';
