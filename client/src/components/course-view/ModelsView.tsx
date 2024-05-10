@@ -67,9 +67,10 @@ const ModelsView = (): JSX.Element => {
         setCurrentModel(model);
         setGraphOpen(true);
         setLoadGraphId(-1);
+        navigate(`/${courseId}/models/${model.id}`);
       }
     }
-  }, [loadGraphId, models.data]);
+  }, [courseId, loadGraphId, models.data, navigate]);
 
   const renameAttainments = useCallback(
     (model: AssessmentModelData): AssessmentModelData => {
@@ -100,6 +101,7 @@ const ModelsView = (): JSX.Element => {
 
   // Load modelId url param
   useEffect(() => {
+    // If modelId is undefined, unload current model
     if (modelId === undefined && currentModel !== null) {
       setCurrentModel(null);
       setGraphOpen(false);

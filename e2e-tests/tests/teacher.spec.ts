@@ -52,7 +52,6 @@ test.describe('Test Courses as Teacher', () => {
     await page.getByLabel('Select template').click();
     await page.getByRole('option', {name: 'Addition'}).click();
     await page.getByRole('button', {name: 'Submit'}).click();
-    await page.getByRole('button', {name: 'Test Model'}).click();
     await expect(page.getByTestId('rf__node-addition')).toBeVisible();
     await page.getByRole('button', {name: 'Format'}).click();
     await expect(
