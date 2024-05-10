@@ -116,12 +116,13 @@ export const fetchAplusGrades = async (
 ): Promise<void> => {
   const grader = req.user as JwtClaims;
   const [_, attainment] = await validateAttainmentPath(
-    req.params.courseId, req.params.attainmentId
+    req.params.courseId,
+    req.params.attainmentId
   );
 
   // TODO: There can be multiple sources
   const gradeSource = await AplusGradeSource.findOne({
-    where: {attainmentId: attainment.id}
+    where: {attainmentId: attainment.id},
   });
 
   if (!gradeSource) {
@@ -139,7 +140,13 @@ export const fetchAplusGrades = async (
     `${APLUS_URL}/courses/${gradeSource.aplusCourseId}/points?format=json`
   );
 
-  const preparedBulkCreate: AttainmentGradeModelData[] = [];
+  const studentNumberToId: {[key: string]: number} = {};
+  const nonexistentStudents: string[] = [];
+
+  const gradesWithStudentNumber: (Omit<AttainmentGradeModelData, 'userId'> & {
+    studentNumber: string;
+  })[] = [];
+
   for (const result of allPointsRes.data.results) {
     // TODO: Fetching points individually for each student may not be the best idea
     const pointsRes: AxiosResponse<{
@@ -154,13 +161,16 @@ export const fetchAplusGrades = async (
       }[];
     }> = await fetchFromAplus(result.points);
 
-    // TODO: Bulk create all users
-    let user = await User.findOne({
+    const user = await User.findOne({
       where: {studentNumber: pointsRes.data.student_id},
     });
 
-    if (!user) {
-      user = await User.create({studentNumber: pointsRes.data.student_id});
+    if (user) {
+      // User was found using their student number
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      studentNumberToId[user.studentNumber!] = user.id;
+    } else {
+      nonexistentStudents.push(pointsRes.data.student_id);
     }
 
     let grade: number | undefined;
@@ -206,8 +216,8 @@ export const fetchAplusGrades = async (
         break;
     }
 
-    preparedBulkCreate.push({
-      userId: user.id,
+    gradesWithStudentNumber.push({
+      studentNumber: pointsRes.data.student_id,
       attainmentId: attainment.id,
       graderId: grader.id,
       date: new Date(), // TODO: Which date?
@@ -215,6 +225,26 @@ export const fetchAplusGrades = async (
       grade: grade,
     });
   }
+
+  const newUsers = await User.bulkCreate(
+    nonexistentStudents.map(val => ({studentNumber: val}))
+  );
+
+  for (const newUser of newUsers) {
+    // User was just created with a student number
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    studentNumberToId[newUser.studentNumber!] = newUser.id;
+  }
+
+  const preparedBulkCreate: AttainmentGradeModelData[] =
+    gradesWithStudentNumber.map(val => ({
+      userId: studentNumberToId[val.studentNumber],
+      attainmentId: val.attainmentId,
+      graderId: val.graderId,
+      date: val.date,
+      expiryDate: val.expiryDate,
+      grade: val.grade,
+    }));
 
   await AttainmentGrade.bulkCreate(preparedBulkCreate);
 
