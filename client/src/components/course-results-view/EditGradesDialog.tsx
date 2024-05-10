@@ -23,7 +23,7 @@ import {JSX, useEffect, useMemo, useState} from 'react';
 import {useBlocker, useParams} from 'react-router-dom';
 
 import {EditGradeData, GradeData, NewGrade} from '@/common/types';
-import {useTableContext} from '../../context/GradesTableProvider';
+import {useTableContext} from '../../context/useTableContext';
 import {useAddGrades, useDeleteGrade, useEditGrade} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import {findBestGrade} from '../../utils';

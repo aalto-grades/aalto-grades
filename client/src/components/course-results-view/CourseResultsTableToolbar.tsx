@@ -22,7 +22,7 @@ import {StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateGraph} from '@/common/util/calculateGraph';
 import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
 import SisuDownloadDialog from './SisuDownloadDialog';
-import {useTableContext} from '../../context/GradesTableProvider';
+import {useTableContext} from '../../context/useTableContext';
 import {useAddFinalGrades} from '../../hooks/api/finalGrade';
 import {useGetAllAssessmentModels, useGetGrades} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';

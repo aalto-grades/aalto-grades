@@ -63,8 +63,8 @@ export default function UsersTable(): JSX.Element {
             users.data.map(
               user =>
                 user.email && (
-                  <TableRow key={user.email ?? `user-${user.id}`} hover={true}>
-                    <TableCell>{user.email ?? 'No email'}</TableCell>
+                  <TableRow key={user.email} hover={true}>
+                    <TableCell>{user.email}</TableCell>
                     <TableCell>
                       <IconButton
                         aria-label="delete"
