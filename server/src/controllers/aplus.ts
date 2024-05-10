@@ -16,11 +16,7 @@ import {
 import AplusGradeSource from '../database/models/aplusGradeSource';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import User from '../database/models/user';
-import {
-  ApiError,
-  AttainmentGradeModelData,
-  JwtClaims,
-} from '../types';
+import {ApiError, AttainmentGradeModelData, JwtClaims} from '../types';
 import {fetchFromAplus, validateAplusCourseId} from './utils/aplus';
 import {validateAttainmentPath} from './utils/attainment';
 import {validateCourseId} from './utils/course';

@@ -204,3 +204,21 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     // TODO
   });
 });
+
+describe('Test POST /v1/courses/:courseId/attainments/:attainmentId/aplus-fetch - Fetch grades from A+', () => {
+  it('should fetch grades for full points (admin user)', async () => {
+    // TODO
+  });
+
+  it('should fetch grades for full points (teacher user)', async () => {
+    // TODO
+  });
+
+  it('should fetch grades for module', async () => {
+    // TODO
+  });
+
+  it('should fetch grades for difficulty', async () => {
+    // TODO
+  });
+});
