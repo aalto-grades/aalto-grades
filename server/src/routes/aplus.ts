@@ -11,6 +11,7 @@ import {CourseRoleType, NewAplusGradeSourceArraySchema} from '@common/types';
 import {
   addAplusGradeSources,
   fetchAplusExerciseData,
+  fetchAplusGrades,
 } from '../controllers/aplus';
 import {handleInvalidRequestJson} from '../middleware';
 import {courseAuthorization} from '../middleware/authorization';
@@ -33,4 +34,11 @@ router.post(
   handleInvalidRequestJson,
   processRequestBody(NewAplusGradeSourceArraySchema),
   controllerDispatcher(addAplusGradeSources)
+);
+
+router.post(
+  '/v1/courses/:courseId/attainments/:attainmentId/aplus-fetch',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([CourseRoleType.Teacher]),
+  controllerDispatcher(fetchAplusGrades)
 );
