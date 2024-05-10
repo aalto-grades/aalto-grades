@@ -23,6 +23,7 @@ import {
   JwtClaims,
   stringToIdSchema,
 } from '../types';
+import {validateAttainmentPath} from './utils/attainment';
 import {validateCourseId} from './utils/course';
 
 // TODO: Teacher must provide API token somehow
@@ -59,7 +60,7 @@ export const fetchAplusExerciseData = async (
 ): Promise<void> => {
   const aplusCourseId = validateAplusCourseId(req.params.aplusCourseId);
 
-  const aplusRes: AxiosResponse<{
+  const exercisesRes: AxiosResponse<{
     results: {
       id: number;
       display_name: string;
@@ -73,7 +74,7 @@ export const fetchAplusExerciseData = async (
 
   // TODO: Is there an easier way to get difficulties?
   const difficulties = new Set<string>();
-  for (const result of aplusRes.data.results) {
+  for (const result of exercisesRes.data.results) {
     for (const exercise of result.exercises) {
       if (exercise.difficulty) {
         difficulties.add(exercise.difficulty);
@@ -82,7 +83,7 @@ export const fetchAplusExerciseData = async (
   }
 
   const exerciseData: AplusExerciseData = {
-    modules: aplusRes.data.results.map(result => {
+    modules: exercisesRes.data.results.map(result => {
       return {
         id: result.id,
         name: result.display_name,
@@ -107,25 +108,30 @@ export const addAplusGradeSources = async (
   res.sendStatus(HttpCode.Created);
 };
 
-// WIP
 // TODO: What exactly should be fetched at a time?
+/** @throws ApiError(400|404|409|422) */
 export const fetchAplusGrades = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const grader = req.user as JwtClaims;
-  const attainmentId = Number(req.params.attainmentId);
+  const [_, attainment] = await validateAttainmentPath(
+    req.params.courseId, req.params.attainmentId
+  );
 
   // TODO: There can be multiple sources
-  const gradeSource = await AplusGradeSource.findOne({where: {attainmentId}});
+  const gradeSource = await AplusGradeSource.findOne({
+    where: {attainmentId: attainment.id}
+  });
+
   if (!gradeSource) {
     throw new ApiError(
-      `attainment with ID ${attainmentId} has no A+ grade sources`,
+      `attainment with ID ${attainment.id} has no A+ grade sources`,
       HttpCode.UnprocessableEntity
     );
   }
 
-  const aplusRes: AxiosResponse<{
+  const allPointsRes: AxiosResponse<{
     results: {
       points: string;
     }[];
@@ -134,7 +140,7 @@ export const fetchAplusGrades = async (
   );
 
   const preparedBulkCreate: AttainmentGradeModelData[] = [];
-  for (const result of aplusRes.data.results) {
+  for (const result of allPointsRes.data.results) {
     // TODO: Fetching points individually for each student may not be the best idea
     const pointsRes: AxiosResponse<{
       student_id: string;
@@ -202,7 +208,7 @@ export const fetchAplusGrades = async (
 
     preparedBulkCreate.push({
       userId: user.id,
-      attainmentId: attainmentId,
+      attainmentId: attainment.id,
       graderId: grader.id,
       date: new Date(), // TODO: Which date?
       expiryDate: new Date(), // TODO: date + daysValid by default, manually set?
