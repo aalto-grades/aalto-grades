@@ -16,14 +16,14 @@ import {controllerDispatcher} from '../middleware/errorHandler';
 export const router = Router();
 
 router.get(
-  '/v1/courses/:courseId/finalGrades',
+  '/v1/courses/:courseId/final-grades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(getFinalGrades)
 );
 
 router.post(
-  '/v1/courses/:courseId/finalGrades',
+  '/v1/courses/:courseId/final-grades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
