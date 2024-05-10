@@ -192,6 +192,15 @@ const ModelsView = (): JSX.Element => {
 
   return (
     <>
+      <CreateAssessmentModelDialog
+        open={createViewOpen}
+        handleClose={(): void => setCreateViewOpen(false)}
+        onSubmit={id => {
+          models.refetch();
+          setLoadGraphId(id);
+        }}
+      />
+
       <Box sx={{display: 'flex', mb: 1}}>
         {(auth?.role === SystemRole.Admin || isTeacherInCharge) &&
           !graphOpen && (
@@ -217,15 +226,6 @@ const ModelsView = (): JSX.Element => {
       </Box>
 
       <Box>
-        <CreateAssessmentModelDialog
-          open={createViewOpen}
-          handleClose={(): void => setCreateViewOpen(false)}
-          onSubmit={id => {
-            models.refetch();
-            setLoadGraphId(id);
-          }}
-        />
-
         <Collapse in={!graphOpen}>
           {models.data.length === 0 ? (
             <Typography textAlign="left" sx={{p: 2}}>
