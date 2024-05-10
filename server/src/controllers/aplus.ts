@@ -41,15 +41,12 @@ const validateAplusCourseId = (aplusCourseId: string): number => {
 };
 
 const fetchFromAplus = async (url: string): Promise<AxiosResponse> => {
-  return await axios.get(
-    url,
-    {
-      timeout: AXIOS_TIMEOUT,
-      validateStatus: (status: number) => status === 200,
-      headers: {Authorization: `Token ${APLUS_API_TOKEN}`},
-    }
-  );
-}
+  return await axios.get(url, {
+    timeout: AXIOS_TIMEOUT,
+    validateStatus: (status: number) => status === 200,
+    headers: {Authorization: `Token ${APLUS_API_TOKEN}`},
+  });
+};
 
 /**
  * Responds with AplusExerciseData
@@ -130,30 +127,30 @@ export const fetchAplusGrades = async (
 
   const aplusRes: AxiosResponse<{
     results: {
-      points: string
+      points: string;
     }[];
   }> = await fetchFromAplus(
     `${APLUS_URL}/courses/${gradeSource.aplusCourseId}/points?format=json`
   );
 
-  const preparedBulkCreate: AttainmentGradeModelData[] = []
+  const preparedBulkCreate: AttainmentGradeModelData[] = [];
   for (const result of aplusRes.data.results) {
     // TODO: Fetching points individually for each student may not be the best idea
     const pointsRes: AxiosResponse<{
-      student_id: string,
-      points: number,
+      student_id: string;
+      points: number;
       points_by_difficulty: {
-        [key: string]: number
-      },
+        [key: string]: number;
+      };
       modules: {
-        id: number,
-        points: number
-      }[]
+        id: number;
+        points: number;
+      }[];
     }> = await fetchFromAplus(result.points);
 
     // TODO: Bulk create all users
     let user = await User.findOne({
-      where: {studentNumber: pointsRes.data.student_id}
+      where: {studentNumber: pointsRes.data.student_id},
     });
 
     if (!user) {
@@ -170,7 +167,7 @@ export const fetchAplusGrades = async (
         if (!gradeSource.moduleId) {
           throw new ApiError(
             `grade source with ID ${gradeSource.id} has module type but does not define moduleId`,
-            HttpCode.InternalServerError,
+            HttpCode.InternalServerError
           );
         }
         for (const module of pointsRes.data.modules) {
@@ -181,7 +178,7 @@ export const fetchAplusGrades = async (
         if (!grade) {
           throw new ApiError(
             `A+ course with ID ${gradeSource.aplusCourseId} has no module with ID ${gradeSource.moduleId}`,
-            HttpCode.InternalServerError,
+            HttpCode.InternalServerError
           );
         }
         break;
@@ -190,14 +187,14 @@ export const fetchAplusGrades = async (
         if (!gradeSource.difficulty) {
           throw new ApiError(
             `grade source with ID ${gradeSource.id} has difficulty type but does not define difficulty`,
-            HttpCode.InternalServerError,
+            HttpCode.InternalServerError
           );
         }
         if (!(gradeSource.difficulty in pointsRes.data.points_by_difficulty)) {
           throw new ApiError(
             `A+ course with ID ${gradeSource.aplusCourseId} has no difficulty ${gradeSource.difficulty}`,
-            HttpCode.InternalServerError,
-          )
+            HttpCode.InternalServerError
+          );
         }
         grade = pointsRes.data.points_by_difficulty[gradeSource.difficulty];
         break;
