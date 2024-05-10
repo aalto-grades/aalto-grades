@@ -32,8 +32,7 @@ export const findCourseById = async (courseId: number): Promise<Course> => {
  * @throws ApiError(404) if course not found
  */
 export const findCourseFullById = async (
-  courseId: number,
-  errorCode?: HttpCode
+  courseId: number
 ): Promise<CourseFull> => {
   const course: CourseFull | null = (await Course.findByPk(courseId, {
     include: [
@@ -48,7 +47,7 @@ export const findCourseFullById = async (
   if (course === null) {
     throw new ApiError(
       `course with ID ${courseId} not found`,
-      errorCode ?? HttpCode.NotFound
+      HttpCode.NotFound
     );
   }
 
