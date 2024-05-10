@@ -225,73 +225,71 @@ const ModelsView = (): JSX.Element => {
         )}
       </Box>
 
-      <Box>
-        <Collapse in={!graphOpen}>
-          {models.data.length === 0 ? (
-            <Typography textAlign="left" sx={{p: 2}}>
-              No models
-            </Typography>
-          ) : (
-            <List sx={{width: 400}} disablePadding>
-              {models.data.map(model => (
-                <ListItem
-                  key={`graph-${model.id}-select`}
-                  disablePadding
-                  secondaryAction={
-                    editRights ? (
-                      <>
-                        <IconButton
-                          onClick={() =>
-                            handleArchiveModel(model.id, !model.archived)
-                          }
-                        >
-                          {model.archived ? <Unarchive /> : <Archive />}
-                        </IconButton>
-                        <IconButton
-                          edge="end"
-                          onClick={() => handleDelModel(model.id)}
-                        >
-                          <Delete />
-                        </IconButton>
-                      </>
-                    ) : null
-                  }
+      <Collapse in={!graphOpen}>
+        {models.data.length === 0 ? (
+          <Typography textAlign="left" sx={{p: 2}}>
+            No models
+          </Typography>
+        ) : (
+          <List sx={{width: 400}} disablePadding>
+            {models.data.map(model => (
+              <ListItem
+                key={`graph-${model.id}-select`}
+                disablePadding
+                secondaryAction={
+                  editRights ? (
+                    <>
+                      <IconButton
+                        onClick={() =>
+                          handleArchiveModel(model.id, !model.archived)
+                        }
+                      >
+                        {model.archived ? <Unarchive /> : <Archive />}
+                      </IconButton>
+                      <IconButton
+                        edge="end"
+                        onClick={() => handleDelModel(model.id)}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </>
+                  ) : null
+                }
+              >
+                <ListItemButton
+                  onClick={() => {
+                    if (userId !== undefined)
+                      navigate(`/${courseId}/models/${model.id}/${userId}`);
+                    else navigate(`/${courseId}/models/${model.id}`);
+                  }}
                 >
-                  <ListItemButton
-                    onClick={() => {
-                      if (userId !== undefined)
-                        navigate(`/${courseId}/models/${model.id}/${userId}`);
-                      else navigate(`/${courseId}/models/${model.id}`);
-                    }}
-                  >
-                    <ListItemText primary={model.name} />
-                    {(model.hasArchivedAttainments ||
-                      model.hasDeletedAttainments) && (
-                      <ListItemIcon sx={{mr: 1.6}}>
-                        <Tooltip title={getWarning(model)} placement="top">
-                          <Warning color="warning" />
-                        </Tooltip>
-                      </ListItemIcon>
-                    )}
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-          )}
-        </Collapse>
-
-        {graphOpen && currentModel !== null && (
-          <Graph
-            initGraph={currentModel.graphStructure}
-            attainments={attainments.data}
-            userGrades={
-              currentUserRow === null ? null : currentUserRow.attainments
-            }
-            readOnly={!editRights}
-            onSave={onSave}
-          />
+                  <ListItemText primary={model.name} />
+                  {(model.hasArchivedAttainments ||
+                    model.hasDeletedAttainments) && (
+                    <ListItemIcon sx={{mr: 1.6}}>
+                      <Tooltip title={getWarning(model)} placement="top">
+                        <Warning color="warning" />
+                      </Tooltip>
+                    </ListItemIcon>
+                  )}
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
         )}
-      </Box>
+      </Collapse>
+
+      {graphOpen && currentModel !== null && (
+        <Graph
+          initGraph={currentModel.graphStructure}
+          attainments={attainments.data}
+          userGrades={
+            currentUserRow === null ? null : currentUserRow.attainments
+          }
+          readOnly={!editRights}
+          onSave={onSave}
+        />
+      )}
     </>
   );
 };
