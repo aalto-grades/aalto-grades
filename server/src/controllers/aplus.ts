@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import axios, {AxiosResponse} from 'axios';
+import {AxiosResponse} from 'axios';
 import {Request, Response} from 'express';
 import {TypedRequestBody} from 'zod-express-middleware';
 
@@ -13,7 +13,6 @@ import {
   HttpCode,
   NewAplusGradeSourceArraySchema,
 } from '@common/types';
-import {AXIOS_TIMEOUT} from '../configs/constants';
 import AplusGradeSource from '../database/models/aplusGradeSource';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import User from '../database/models/user';
@@ -21,33 +20,12 @@ import {
   ApiError,
   AttainmentGradeModelData,
   JwtClaims,
-  stringToIdSchema,
 } from '../types';
+import {fetchFromAplus, validateAplusCourseId} from './utils/aplus';
 import {validateAttainmentPath} from './utils/attainment';
 import {validateCourseId} from './utils/course';
 
-// TODO: Teacher must provide API token somehow
-const APLUS_API_TOKEN: string = process.env.APLUS_API_TOKEN || '';
 const APLUS_URL = 'https://plus.cs.aalto.fi/api/v2';
-
-const validateAplusCourseId = (aplusCourseId: string): number => {
-  const result = stringToIdSchema.safeParse(aplusCourseId);
-  if (!result.success) {
-    throw new ApiError(
-      `Invalid A+ course ID ${aplusCourseId}`,
-      HttpCode.BadRequest
-    );
-  }
-  return result.data;
-};
-
-const fetchFromAplus = async (url: string): Promise<AxiosResponse> => {
-  return await axios.get(url, {
-    timeout: AXIOS_TIMEOUT,
-    validateStatus: (status: number) => status === 200,
-    headers: {Authorization: `Token ${APLUS_API_TOKEN}`},
-  });
-};
 
 /**
  * Responds with AplusExerciseData
