@@ -75,7 +75,7 @@ definitions:
       - grade
       - date
 
-/v1/courses/{courseId}/finalGrades:
+/v1/courses/{courseId}/final-grades:
   get:
     tags: [FinalGrades]
     description: >
