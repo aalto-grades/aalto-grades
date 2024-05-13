@@ -74,8 +74,8 @@ const CourseSchema = BaseCourseDataSchema.strict().refine(
   val => val.maxCredits >= val.minCredits
 );
 
-describe('Test GET /v1/courses/:courseId - get course by ID', () => {
-  it('should respond with correct data when course exists', async () => {
+describe('Test GET /v1/courses/:courseId - get a course', () => {
+  it('should get a course', async () => {
     const testCookies = [
       cookies.adminCookie,
       cookies.teacherCookie,
@@ -122,7 +122,7 @@ describe('Test GET /v1/courses/:courseId - get course by ID', () => {
 });
 
 describe('Test GET /v1/courses - get all courses', () => {
-  it('should respond with correct data', async () => {
+  it('should get all courses', async () => {
     const res = await request
       .get('/v1/courses')
       .set('Cookie', cookies.adminCookie)
@@ -182,7 +182,7 @@ describe('Test POST /v1/courses - create new course', () => {
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 400 bad request if validation fails', async () => {
+  it('should respond with 400 if validation fails', async () => {
     const url = '/v1/courses';
     await responseTests.testBadRequest(url, cookies.adminCookie).post({});
   });
@@ -347,7 +347,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     await checkCourseData(courseEdit2);
   };
 
-  it('should successfully update course information', async () => {
+  it('should edit a course', async () => {
     await testCourseEditSuccess(uneditedCourseDataBase, courseDataEdits);
   });
 
@@ -404,7 +404,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
   //   expect(result.success).toBeTruthy();
   // });
 
-  it('should respond with 400 bad request, if body validation fails', async () => {
+  it('should respond with 400 if body validation fails', async () => {
     const url = `/v1/courses/${courseId}`;
     const badRequest = responseTests.testBadRequest(url, cookies.adminCookie);
 
@@ -416,7 +416,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     await badRequest.put({minCredits: 9});
   });
 
-  it('should respond with 400 bad request if id is invalid', async () => {
+  it('should respond with 400 if id is invalid', async () => {
     const url = `/v1/courses/${-1}`;
     const data: EditCourseData = {maxCredits: 10};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
@@ -436,7 +436,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       .put(data);
   });
 
-  it('should respond with 404 not found, if the course ID does not exist', async () => {
+  it('should respond with 404 if not found', async () => {
     const url = `/v1/courses/${nonExistentId}`;
     const data: EditCourseData = {maxCredits: 10};
     await responseTests.testNotFound(url, cookies.adminCookie).put(data);

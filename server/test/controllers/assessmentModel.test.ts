@@ -49,8 +49,7 @@ beforeAll(async () => {
     createAssessmentModel: false,
   });
 
-  let _; // To be able to use spread
-  [noRoleCourseId, _, noRoleModelId] = await createData.createCourse({
+  [noRoleCourseId, , noRoleModelId] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
@@ -87,7 +86,7 @@ const modelDoesNotExist = async (
 };
 
 describe('Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId - get assessment model', () => {
-  it('should respond with correct data when assessment model exists', async () => {
+  it('should get the assessment model', async () => {
     const testCookies = [
       cookies.adminCookie,
       cookies.teacherCookie,
@@ -127,7 +126,7 @@ describe('Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId - 
       .get();
   });
 
-  it('should respond with 404 when not found', async () => {
+  it('should respond with 404 if not found', async () => {
     let url = `/v1/courses/${courseId}/assessment-models/${nonExistentId}`;
     await responseTests.testNotFound(url, cookies.adminCookie).get();
 
@@ -135,14 +134,14 @@ describe('Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId - 
     await responseTests.testNotFound(url, cookies.adminCookie).get();
   });
 
-  it('should respond with 409 conflict when assessment model does not belong to course', async () => {
+  it('should respond with 409 when assessment model does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/assessment-models/${otherAssessmentModId}`;
     await responseTests.testConflict(url, cookies.adminCookie).get();
   });
 });
 
 describe('Test GET /v1/courses/:courseId/assessment-models - get all assessment models', () => {
-  it('should respond with correct data when assessment models exists', async () => {
+  it('should get the assessment models', async () => {
     const testCookies = [
       cookies.adminCookie,
       cookies.teacherCookie,
@@ -161,7 +160,7 @@ describe('Test GET /v1/courses/:courseId/assessment-models - get all assessment 
     }
   });
 
-  it('should respond with correct data when no assessment models exist', async () => {
+  it('should get the assessment models when no assessment models exist', async () => {
     const res = await request
       .get(`/v1/courses/${NoModelscourseId}/assessment-models`)
       .set('Cookie', cookies.adminCookie)
@@ -196,14 +195,14 @@ describe('Test GET /v1/courses/:courseId/assessment-models - get all assessment 
       .get();
   });
 
-  it('should respond with 404 when not found', async () => {
+  it('should respond with 404 if not found', async () => {
     const url = `/v1/courses/${nonExistentId}/assessment-models`;
     await responseTests.testNotFound(url, cookies.adminCookie).get();
   });
 });
 
 describe('Test POST /v1/courses/:courseId/assessment-models - add assessment model', () => {
-  it('should add an assessment model when course exists', async () => {
+  it('should add an assessment model', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
 
     let i = 0;
@@ -224,7 +223,7 @@ describe('Test POST /v1/courses/:courseId/assessment-models - add assessment mod
     }
   });
 
-  it('should respond with 400 bad request if validation fails', async () => {
+  it('should respond with 400 if validation fails', async () => {
     const url = `/v1/courses/${courseId}/assessment-models`;
     const badRequest = responseTests.testBadRequest(url, cookies.adminCookie);
 
@@ -237,7 +236,7 @@ describe('Test POST /v1/courses/:courseId/assessment-models - add assessment mod
     });
   });
 
-  it('should respond with 400 bad request if id is invalid', async () => {
+  it('should respond with 400 if id is invalid', async () => {
     const url = `/v1/courses/${-1}/assessment-models`;
     const data = {name: 'Not added', graphStructure: testStructure};
     await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
@@ -262,13 +261,13 @@ describe('Test POST /v1/courses/:courseId/assessment-models - add assessment mod
       .post(data);
   });
 
-  it('should respond with 404 not found when course does not exist', async () => {
+  it('should respond with 404 if not found', async () => {
     const url = `/v1/courses/${nonExistentId}/assessment-models`;
     const data = {name: 'Not added', graphStructure: testStructure};
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
-  it('should respond with 409 Conflict, if course already has assessment model with same name', async () => {
+  it('should respond with 409 when course already has assessment model with same name', async () => {
     const url = `/v1/courses/${courseId}/assessment-models`;
     const data = {name: 'Model 1', graphStructure: testStructure};
     await responseTests.testConflict(url, cookies.adminCookie).post(data);
@@ -276,7 +275,7 @@ describe('Test POST /v1/courses/:courseId/assessment-models - add assessment mod
 });
 
 describe('Test Put /v1/courses/:courseId/assessment-models/:assessmentModId - edit an assessment model', () => {
-  it('should edit an assessment model when course exists', async () => {
+  it('should edit an assessment model', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     let i = 0;
     for (const cookie of testCookies) {
@@ -297,7 +296,7 @@ describe('Test Put /v1/courses/:courseId/assessment-models/:assessmentModId - ed
     }
   });
 
-  it('should partially edit an assessment model when course exists (teacher in charge)', async () => {
+  it('should partially edit an assessment model', async () => {
     const data: EditAssessmentModelData[] = [
       {name: 'Edited 3 Addition model'},
       {graphStructure: testStructure},
@@ -316,7 +315,7 @@ describe('Test Put /v1/courses/:courseId/assessment-models/:assessmentModId - ed
     }
   });
 
-  it('should respond with 400 bad request if validation fails', async () => {
+  it('should respond with 400 if validation fails', async () => {
     const url = `/v1/courses/${courseId}/assessment-models/${assessmentModId}`;
     const badRequest = responseTests.testBadRequest(url, cookies.adminCookie);
 
@@ -328,7 +327,7 @@ describe('Test Put /v1/courses/:courseId/assessment-models/:assessmentModId - ed
     });
   });
 
-  it('should respond with 400 bad request if id is invalid', async () => {
+  it('should respond with 400 if id is invalid', async () => {
     let url = `/v1/courses/${courseId}/assessment-models/${'bad'}`;
     const data = {name: 'Not added', graphStructure: testStructure};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
@@ -356,7 +355,7 @@ describe('Test Put /v1/courses/:courseId/assessment-models/:assessmentModId - ed
       .put(data);
   });
 
-  it('should respond with 404 not found when course or model does not exist', async () => {
+  it('should respond with 404 if not found', async () => {
     let url = `/v1/courses/${courseId}/assessment-models/${nonExistentId}`;
     const data = {name: 'Not added', graphStructure: testStructure};
     await responseTests.testNotFound(url, cookies.adminCookie).put(data);
@@ -372,8 +371,8 @@ describe('Test Put /v1/courses/:courseId/assessment-models/:assessmentModId - ed
   });
 });
 
-describe('Test Delete /v1/courses/:courseId/assessment-models/:assessmentModId - delete an assessment model', () => {
-  it('should delete an assessment model when course exists', async () => {
+describe('Test DELETE /v1/courses/:courseId/assessment-models/:assessmentModId - delete an assessment model', () => {
+  it('should delete an assessment model', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
       const modelId = await createData.createAssessmentModel(
@@ -393,7 +392,7 @@ describe('Test Delete /v1/courses/:courseId/assessment-models/:assessmentModId -
     }
   });
 
-  it('should respond with 400 bad request if id is invalid', async () => {
+  it('should respond with 400 if id is invalid', async () => {
     let url = `/v1/courses/${courseId}/assessment-models/${'bad'}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).delete();
 
@@ -419,7 +418,7 @@ describe('Test Delete /v1/courses/:courseId/assessment-models/:assessmentModId -
       .delete();
   });
 
-  it('should respond with 404 not found when course or model does not exist', async () => {
+  it('should respond with 404 if not found', async () => {
     let url = `/v1/courses/${courseId}/assessment-models/${nonExistentId}`;
     await responseTests.testNotFound(url, cookies.adminCookie).delete();
 
