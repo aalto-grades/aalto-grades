@@ -6,7 +6,7 @@ import {HttpCode} from '@common/types';
 import AssessmentModel from '../../database/models/assessmentModel';
 import Course from '../../database/models/course';
 import {ApiError, stringToIdSchema} from '../../types';
-import {findAndValidateCourseId} from './course';
+import {findAndValidateCourseId, findCourseById} from './course';
 
 /**
  * Finds an assessment model by id.
@@ -43,6 +43,32 @@ const findAndValidateAssessmentModelId = async (
     );
   }
   return await findAssessmentModelById(result.data);
+};
+
+/**
+ * Finds the course and the assessment model and validates that the model
+ * belongs to the course.
+ *
+ * @throws ApiError(404|409) if either not found or assessment model does not
+ *   belong to the course.
+ */
+export const validateAssessmentModelBelongsToCourse = async (
+  courseId: number,
+  assessmentModelId: number
+): Promise<[Course, AssessmentModel]> => {
+  const course = await findCourseById(courseId);
+  const assessmentModel = await findAssessmentModelById(assessmentModelId);
+
+  // Check that assessment model belongs to the course.
+  if (assessmentModel.courseId !== course.id) {
+    throw new ApiError(
+      `Assessment model with ID ${assessmentModel.id} ` +
+        `does not belong to the course with ID ${course.id}`,
+      HttpCode.Conflict
+    );
+  }
+
+  return [course, assessmentModel];
 };
 
 /**

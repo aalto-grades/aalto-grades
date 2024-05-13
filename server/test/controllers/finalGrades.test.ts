@@ -9,11 +9,13 @@ import {FinalGradeDataSchema, HttpCode, NewFinalGrade} from '@common/types';
 import {app} from '../../src/app';
 import FinalGrade from '../../src/database/models/finalGrade';
 import {createData} from '../util/createData';
-import {ErrorSchema, TEACHER_ID} from '../util/general';
+import {TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
+import {ResponseTests} from '../util/responses';
 
 const request = supertest(app);
+const responseTests = new ResponseTests(request);
 
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
@@ -22,33 +24,32 @@ let editCourseModelId = -1;
 let noRoleCourseId = -1;
 const nonExistentId = 1000000;
 
-const students: {id: number; studentNumber: string; finalGrade: number}[] = [];
-
 beforeAll(async () => {
   cookies = await getCookies();
 
-  for (let i = 0; i < 10; i++) {
-    const newUser = await createData.createUser();
-    students.push({
-      id: newUser.id,
-      studentNumber: newUser.studentNumber as string,
-      finalGrade: Math.floor(Math.random() * 6),
-    });
-  }
-
   let assessmentModelId;
-  let _; // To be able to use spread
-  [courseId, _, assessmentModelId] = await createData.createCourse({});
-  for (const student of students) {
+  [courseId, , assessmentModelId] = await createData.createCourse({});
+  // Create 10 final grades
+  for (let i = 0; i < 10; i++) {
+    const student = await createData.createUser();
     await createData.createFinalGrade(
       courseId,
       student.id,
       assessmentModelId,
       TEACHER_ID
     );
+    // Create multiple final grades for some students
+    if (i < 2) {
+      await createData.createFinalGrade(
+        courseId,
+        student.id,
+        assessmentModelId,
+        TEACHER_ID
+      );
+    }
   }
 
-  [editCourseId, _, editCourseModelId] = await createData.createCourse({});
+  [editCourseId, , editCourseModelId] = await createData.createCourse({});
 
   [noRoleCourseId] = await createData.createCourse({
     hasTeacher: false,
@@ -60,8 +61,6 @@ beforeAll(async () => {
 afterAll(async () => {
   await resetDb();
 });
-
-// TODO: Test multiple final grades
 
 /**
  * Check that the expected number of grades exist for a user for a specific
@@ -81,76 +80,65 @@ const checkGradeAmount = async (
   expect(dbGrades).toEqual(expectedGrades);
 };
 
-describe('Test GET /v1/courses/:courseId/final-grades - get final grades', () => {
-  it('should get final grades succesfully when course results are found (admin user)', async () => {
-    const res = await request
-      .get(`/v1/courses/${courseId}/final-grades`)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
+describe('Test GET /v1/courses/:courseId/final-grades - get all final grades', () => {
+  it('should get all final grades', async () => {
+    const testCookies = [
+      cookies.adminCookie,
+      cookies.teacherCookie,
+      cookies.assistantCookie,
+    ];
+    for (const cookie of testCookies) {
+      const res = await request
+        .get(`/v1/courses/${courseId}/final-grades`)
+        .set('Cookie', cookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
 
-    const Schema = z.array(FinalGradeDataSchema.strict()).nonempty();
-    const result = await Schema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+      const Schema = z.array(FinalGradeDataSchema.strict()).nonempty();
+      const result = await Schema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
+    }
   });
 
-  it('should get final grades succesfully when course results are found (teacher in charge)', async () => {
-    const res = await request
-      .get(`/v1/courses/${courseId}/final-grades`)
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
+  it('should respond with 400 if id is invalid', async () => {
+    let url = `/v1/courses/${'bad'}/final-grades`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).get();
 
-    const Schema = z.array(FinalGradeDataSchema.strict()).nonempty();
-    const result = await Schema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    url = `/v1/courses/${1.5}/final-grades`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 
-  it('should respond with 400 bad request, if course ID is invalid', async () => {
-    const res = await request
-      .get('/v1/courses/bad/final-grades')
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.BadRequest);
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const url = `/v1/courses/${courseId}/final-grades`;
+    await responseTests.testUnauthorized(url).get();
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    await responseTests
+      .testForbidden(`/v1/courses/${courseId}/final-grades`, [
+        cookies.studentCookie,
+      ])
+      .get();
+
+    await responseTests
+      .testForbidden(`/v1/courses/${noRoleCourseId}/final-grades`, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .get();
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res = await request
-      .get(`/v1/courses/${courseId}/final-grades`)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
-
-    expect(JSON.stringify(res.body)).toBe('{}');
-  });
-
-  it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-    const res = await request
-      .get(`/v1/courses/${noRoleCourseId}/final-grades`)
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Forbidden);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-  });
-
-  it('should respond with 404 not found, if course does not exist', async () => {
-    const res = await request
-      .get(`/v1/courses/${nonExistentId}/final-grades`)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.NotFound);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+  it('should respond with 404 when not found', async () => {
+    const url = `/v1/courses/${nonExistentId}/final-grades`;
+    await responseTests.testNotFound(url, cookies.adminCookie).get();
   });
 });
 
 describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () => {
   type StudentData = {id: number; finalGrade: number};
+  const createStudent = async (): Promise<StudentData> => {
+    const user = await createData.createUser();
+    return {id: user.id, finalGrade: Math.floor(Math.random() * 6)};
+  };
   const getData = (student: StudentData): NewFinalGrade => ({
     userId: student.id,
     assessmentModelId: editCourseModelId,
@@ -166,82 +154,123 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
     expect(result?.grade).toBe(student.finalGrade);
   };
 
-  it('should add a grade (admin user)', async () => {
-    const res = await request
-      .post(`/v1/courses/${editCourseId}/final-grades`)
-      .send([getData(students[0])])
-      .set('Cookie', cookies.adminCookie)
-      .expect(HttpCode.Created);
+  it('should add a final grade', async () => {
+    const testCookies = [cookies.adminCookie, cookies.teacherCookie];
 
-    expect(JSON.stringify(res.body)).toBe('{}');
-    await checkGrade(students[0]);
+    for (const cookie of testCookies) {
+      const student = await createStudent();
+
+      const res = await request
+        .post(`/v1/courses/${editCourseId}/final-grades`)
+        .send([getData(student)])
+        .set('Cookie', cookie)
+        .expect(HttpCode.Created);
+
+      expect(JSON.stringify(res.body)).toBe('{}');
+      await checkGrade(student);
+    }
   });
 
-  it('should add a grade (teacher in charge)', async () => {
+  it('should add multiple final grades', async () => {
+    const student1 = await createStudent();
+    const student2 = await createStudent();
+
     const res = await request
       .post(`/v1/courses/${editCourseId}/final-grades`)
-      .send([getData(students[1])])
+      .send([getData(student1), getData(student2)])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Created);
 
     expect(JSON.stringify(res.body)).toBe('{}');
-    await checkGrade(students[1]);
+    await checkGrade(student1);
+    await checkGrade(student2);
   });
 
-  it('should add multiple correct grades based on student numbers', async () => {
+  it('should add multiple final grades for the same student', async () => {
+    const student = await createStudent();
+    await checkGradeAmount(student, []);
+
     const res = await request
       .post(`/v1/courses/${editCourseId}/final-grades`)
-      .send([getData(students[2]), getData(students[3])])
+      .send([getData(student)])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Created);
 
     expect(JSON.stringify(res.body)).toBe('{}');
-    await checkGrade(students[2]);
-    await checkGrade(students[3]);
-  });
-
-  it('should add multiple grades for the same final grade on repeated runs', async () => {
-    await checkGradeAmount(students[4], []);
-
-    const res = await request
-      .post(`/v1/courses/${editCourseId}/final-grades`)
-      .send([getData(students[4])])
-      .set('Cookie', cookies.teacherCookie)
-      .expect(HttpCode.Created);
-
-    expect(JSON.stringify(res.body)).toBe('{}');
-    await checkGradeAmount(students[4], [students[4].finalGrade]);
+    await checkGradeAmount(student, [student.finalGrade]);
 
     const res2 = await request
       .post(`/v1/courses/${editCourseId}/final-grades`)
-      .send([getData(students[4])])
+      .send([getData(student)])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Created);
 
     expect(JSON.stringify(res2.body)).toBe('{}');
-    await checkGradeAmount(students[4], [
-      students[4].finalGrade,
-      students[4].finalGrade,
-    ]);
+    await checkGradeAmount(student, [student.finalGrade, student.finalGrade]);
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res = await request
-      .post(`/v1/courses/${editCourseId}/final-grades`)
-      .send([getData(students[5])])
-      .expect(HttpCode.Unauthorized);
+  it('should respond with 400 if validation fails', async () => {
+    const student = await createStudent();
+    const data = {
+      userId: student.id,
+      assessmentModelId: editCourseModelId,
+      grade: student.finalGrade,
+      date: new Date(),
+    };
 
-    expect(JSON.stringify(res.body)).toBe('{}');
+    const url = `/v1/courses/${editCourseId}/final-grades`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
   });
 
-  it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-    const res = await request
-      .post(`/v1/courses/${noRoleCourseId}/final-grades`)
-      .send([getData(students[5])])
-      .set('Cookie', cookies.teacherCookie)
-      .expect(HttpCode.Forbidden);
+  it('should respond with 400 if id is invalid', async () => {
+    const student = await createStudent();
+    const data = [getData(student)];
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    const url = `/v1/courses/${'bad'}/final-grades`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
+  });
+
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const student = await createStudent();
+    const data = [getData(student)];
+
+    let url = `/v1/courses/${editCourseId}/final-grades`;
+    await responseTests.testUnauthorized(url).post(data);
+
+    await responseTests
+      .testForbidden(url, [cookies.assistantCookie, cookies.studentCookie])
+      .post(data);
+
+    url = `/v1/courses/${noRoleCourseId}/final-grades`;
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .post(data);
+  });
+
+  it('should respond with 409 when assessment model doe snot belong to the course', async () => {
+    const student = await createStudent();
+    const [, , otherCourseModelId] = await createData.createCourse({});
+    const data = [
+      {
+        userId: student.id,
+        assessmentModelId: otherCourseModelId,
+        grade: student.finalGrade,
+        date: new Date(),
+      },
+    ];
+
+    const url = `/v1/courses/${editCourseId}/final-grades`;
+    await responseTests.testConflict(url, cookies.adminCookie).post(data);
+  });
+
+  it('should respond with 404 when not found', async () => {
+    const student = await createStudent();
+    const data = [getData(student)];
+    const url = `/v1/courses/${nonExistentId}/final-grades`;
+    await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 });
