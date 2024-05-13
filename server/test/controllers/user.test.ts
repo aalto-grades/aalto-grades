@@ -9,23 +9,19 @@ import {BaseCourseDataSchema, HttpCode, IdpUserSchema} from '@common/types';
 import {app} from '../../src/app';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
-import {ErrorSchema} from '../util/general';
+import {ADMIN_ID, ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
+import {ResponseTests} from '../util/responses';
 
 const request = supertest(app);
+const responseTests = new ResponseTests(request);
+
 let cookies: Cookies = {} as Cookies;
-
-let deleteUserId = -1;
-
-const CourseSchema = BaseCourseDataSchema.strict().refine(
-  val => val.maxCredits >= val.minCredits
-);
+const nonExistentId = 1000000;
 
 beforeAll(async () => {
   cookies = await getCookies();
-
-  deleteUserId = (await createData.createUser()).id;
 });
 
 afterAll(async () => {
@@ -33,85 +29,72 @@ afterAll(async () => {
 });
 
 describe('Test GET /v1/user/:userId/courses - get all courses user has role in', () => {
-  it('should respond with correct data for other user (admin user)', async () => {
+  const UserCoursesSchema = BaseCourseDataSchema.strict().refine(
+    val => val.maxCredits >= val.minCredits
+  );
+
+  it('should get user courses', async () => {
+    await createData.createCourse({}); // Create course the student is a part of
+
+    const testUsers: [number, string[]][] = [
+      [ADMIN_ID, cookies.adminCookie],
+      [TEACHER_ID, cookies.teacherCookie],
+      [ASSISTANT_ID, cookies.assistantCookie],
+      [STUDENT_ID, cookies.studentCookie],
+    ];
+    for (const [userId, cookie] of testUsers) {
+      const res = await request
+        .get(`/v1/user/${userId}/courses`)
+        .set('Cookie', cookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
+
+      const Schema = z.array(UserCoursesSchema);
+      const result = await Schema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
+    }
+  });
+
+  it('should get data data for other user (admin user)', async () => {
     const res = await request
-      .get('/v1/user/2/courses')
+      .get(`/v1/user/${TEACHER_ID}/courses`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    const Schema = z.array(CourseSchema);
+    const Schema = z.array(UserCoursesSchema).nonempty();
     const result = await Schema.safeParseAsync(res.body);
     expect(result.success).toBeTruthy();
-    if (result.success) expect(result.data.length).toBeGreaterThan(0);
   });
 
-  it('should respond with correct data for user (teacher user)', async () => {
-    const res = await request
-      .get('/v1/user/1/courses')
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
-
-    const Schema = z.array(CourseSchema);
-    const result = await Schema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-
-    const res2 = await request
-      .get('/v1/user/2/courses')
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
-
-    const result2 = await Schema.safeParseAsync(res2.body);
-    expect(result2.success).toBeTruthy();
+  it('should respond with 400 if id is invalid', async () => {
+    const url = `/v1/user/${'bad'}/courses`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 
-  it('should respond with 400 bad request, if validation fails (non-number user id)', async () => {
-    const res = await request
-      .get('/v1/user/abc/courses')
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.BadRequest);
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const user = await createData.createUser();
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    const url = `/v1/user/${user.id}/courses`;
+    await responseTests.testUnauthorized(url).get();
+
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .get();
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res = await request
-      .get('/v1/user/1/courses')
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
-
-    expect(JSON.stringify(res.body)).toBe('{}');
-  });
-
-  it('should respond with 403 forbidden, if trying to access other users courses (not admin)', async () => {
-    const res = await request
-      .get('/v1/user/1/courses')
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Forbidden);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-  });
-
-  it('should respond with 404 not found, if non-existing user id', async () => {
-    const res = await request
-      .get('/v1/user/9999999/courses')
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.NotFound);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+  it('should respond with 404 when not found', async () => {
+    const url = `/v1/user/${nonExistentId}/courses`;
+    await responseTests.testNotFound(url, cookies.adminCookie).get();
   });
 });
 
-describe('Test GET /v1/idp-users/ - get idp users information', () => {
-  it('should respond with idp users data when querying as admin', async () => {
+describe('Test GET /v1/idp-users/ - get all idp users', () => {
+  it('should get all idp users', async () => {
     const res = await request
       .get('/v1/idp-users')
       .set('Cookie', cookies.adminCookie)
@@ -123,107 +106,89 @@ describe('Test GET /v1/idp-users/ - get idp users information', () => {
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res = await request
-      .get('/v1/idp-users')
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const url = '/v1/idp-users';
+    await responseTests.testUnauthorized(url).get();
 
-    expect(JSON.stringify(res.body)).toBe('{}');
-  });
-
-  it('should respond with 403 forbidden, if not admin', async () => {
-    const res = await request
-      .get('/v1/idp-users')
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Forbidden);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .get();
   });
 });
 
-describe('Test POST /v1/idp-users/ - get idp users information', () => {
-  it('should create idp user when admin', async () => {
+describe('Test POST /v1/idp-users/ - add an idp user', () => {
+  it('should add idp user', async () => {
     const res = await request
       .post('/v1/idp-users')
-      .send({email: 'test.id@aalto.fi'})
+      .send({email: 'idpuser1@aalto.fi'})
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Created);
 
-    const user = await User.findByEmail('test.id@aalto.fi');
-
     expect(JSON.stringify(res.body)).toBe('{}');
+
+    const user = await User.findByEmail('idpuser1@aalto.fi');
     expect(user).not.toBe(null);
   });
 
-  it('should respond 401 unauthorized if not logged in', async () => {
-    const res = await request
-      .post('/v1/idp-users')
-      .send({email: 'idp@user.com'})
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const url = '/v1/idp-users';
+    const data = {email: 'idpuser2@aalto.fi'};
+    await responseTests.testUnauthorized(url).post(data);
 
-    expect(JSON.stringify(res.body)).toBe('{}');
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .post(data);
   });
 
-  it('should respond 403 forbidden if not admin', async () => {
-    const res = await request
-      .post('/v1/idp-users')
-      .send({email: 'idp@user.com'})
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Forbidden);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+  it('should respond with 409 when idp user with email already exists', async () => {
+    const url = '/v1/idp-users';
+    const data = {email: 'idpuser1@aalto.fi'};
+    await responseTests.testConflict(url, cookies.adminCookie).post(data);
   });
 });
 
-describe('Test DELETE /v1/idp-users/:userId - get idp users information', () => {
-  it('should delete idp user when admin', async () => {
+describe('Test DELETE /v1/idp-users/:userId - delete an idp user', () => {
+  it('should delete an idp user', async () => {
+    const user = await createData.createUser();
+
     const res = await request
-      .delete(`/v1/idp-users/${deleteUserId}`)
+      .delete(`/v1/idp-users/${user.id}`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    const deletedUser = await User.findByPk(deleteUserId);
-
     expect(JSON.stringify(res.body)).toBe('{}');
+
+    const deletedUser = await User.findByPk(user.id);
     expect(deletedUser).toBe(null);
   });
 
-  it('should respond 404 if idp user with id not found', async () => {
-    const res = await request
-      .delete('/v1/idp-users/99999')
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.NotFound);
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const user = await createData.createUser();
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    const url = `/v1/idp-users/${user.id}`;
+    await responseTests.testUnauthorized(url).delete();
+
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .delete();
   });
 
-  it('should respond 401 unauthorized if not logged in', async () => {
-    const res = await request
-      .delete('/v1/idp-users/24')
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
-
-    expect(JSON.stringify(res.body)).toBe('{}');
-  });
-
-  it('should respond 403 forbidden if not admin', async () => {
-    const res = await request
-      .delete('/v1/idp-users/24')
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Forbidden);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+  it('should respond with 404 when not found', async () => {
+    const url = `/v1/idp-users/${nonExistentId}`;
+    await responseTests.testNotFound(url, cookies.adminCookie).delete();
   });
 });
