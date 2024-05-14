@@ -50,15 +50,20 @@ const CalculateFinalGradesDialog = ({
   calculateFinalGrades,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const assessmentModels = useGetAllAssessmentModels(courseId);
+  const allAssessmentModels = useGetAllAssessmentModels(courseId);
 
   const [dateOverride, setDateOverride] = useState<boolean>(false);
   const [gradingDate, setGradingDate] = useState<Dayjs>(dayjs());
   const [selectedModel, setSelectedModel] =
     useState<AssessmentModelData | null>(null);
+
+  // Filter out archived models
   const modelList = useMemo(
-    () => assessmentModels.data ?? [],
-    [assessmentModels.data]
+    () =>
+      allAssessmentModels.data !== undefined
+        ? allAssessmentModels.data.filter(model => !model.archived)
+        : [],
+    [allAssessmentModels.data]
   );
 
   useEffect(() => {
