@@ -11,9 +11,9 @@ import {
   Model,
 } from 'sequelize';
 
-import {AplusGradeSourceType} from '@common/types';
-import {sequelize} from '..';
+import {AplusGradeSourceType} from '@/common/types';
 import Attainment from './attainment';
+import {sequelize} from '..';
 
 export default class AplusGradeSource extends Model<
   InferAttributes<AplusGradeSource>,

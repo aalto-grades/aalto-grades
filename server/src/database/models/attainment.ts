@@ -11,8 +11,8 @@ import {
   Model,
 } from 'sequelize';
 
-import {sequelize} from '..';
 import Course from './course';
+import {sequelize} from '..';
 
 export default class Attainment extends Model<
   InferAttributes<Attainment>,
@@ -23,6 +23,7 @@ export default class Attainment extends Model<
   declare name: string;
   // Default value, expiry date in AttainmentGrade takes precedence
   declare daysValid: number;
+  declare archived: CreationOptional<boolean>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -50,6 +51,11 @@ Attainment.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 365,
+    },
+    archived: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

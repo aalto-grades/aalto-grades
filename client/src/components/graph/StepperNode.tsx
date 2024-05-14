@@ -5,9 +5,9 @@
 import {JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 
-import {StepperNodeSettings, StepperNodeValue} from '@common/types/graph';
-import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
+import {StepperNodeSettings, StepperNodeValue} from '@/common/types/graph';
 import BaseNode from './BaseNode';
+import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 
 type LocalSettings = {
   numSteps: number;

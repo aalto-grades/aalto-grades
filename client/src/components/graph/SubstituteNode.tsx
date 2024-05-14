@@ -5,9 +5,12 @@
 import {JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 
-import {SubstituteNodeSettings, SubstituteNodeValue} from '@common/types/graph';
-import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
+import {
+  SubstituteNodeSettings,
+  SubstituteNodeValue,
+} from '@/common/types/graph';
 import BaseNode from './BaseNode';
+import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 
 type LocalSettings = {maxSubstitutions: string; substituteValues: string[]};
 const initialSettings = {maxSubstitutions: '0', substituteValues: []};

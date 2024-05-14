@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import bodyParser from 'body-parser';
-import express, {Router} from 'express';
-import {RequestHandler} from 'express-serve-static-core';
+import express, {RequestHandler, Router} from 'express';
 import passport from 'passport';
 
 import {

@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AssessmentModelData, StudentRow} from '@common/types';
-import {batchCalculateGraph} from '@common/util/calculateGraph';
+import {AssessmentModelData, StudentRow} from '@/common/types';
+import {batchCalculateGraph} from '@/common/util/calculateGraph';
 import {GradeSelectOption, findBestGrade} from '.';
 import {
   ExtendedStudentRow,

@@ -29,7 +29,7 @@ import {enqueueSnackbar} from 'notistack';
 import {JSX, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
-import {FinalGradeData, Language, StudentRow} from '@common/types';
+import {FinalGradeData, Language, StudentRow} from '@/common/types';
 import {useDownloadSisuGradeCsv} from '../../hooks/useApi';
 import {sisuLanguageOptions} from '../../utils';
 

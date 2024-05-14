@@ -14,22 +14,25 @@ import {
   Language,
   NewCourseData,
   TeacherData,
-} from '@common/types';
+} from '@/common/types';
 import {app} from '../../src/app';
 import {
   findCourseFullById,
   parseCourseFull,
 } from '../../src/controllers/utils/course';
 import {createData} from '../util/createData';
-import {ErrorSchema, ZodErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
+import {ResponseTests} from '../util/responses';
 
 const request = supertest(app);
+const responseTests = new ResponseTests(request);
 
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
+let noRoleCourseId = -1;
 const teachers: TeacherData[] = [];
+const assistants: TeacherData[] = [];
 
 const nonExistentId = 1000000;
 
@@ -38,10 +41,26 @@ beforeAll(async () => {
 
   [courseId] = await createData.createCourse({});
 
+  [noRoleCourseId] = await createData.createCourse({
+    hasTeacher: false,
+    hasAssistant: false,
+    hasStudent: false,
+  });
+
+  // Create teacher{1,2,3}@aalto.fi accounts
   for (let i = 1; i <= 3; i++) {
     const newUser = await createData.createUser({
       email: `teacher${i}@aalto.fi`,
       name: `teacher${i}`,
+    });
+    teachers.push(newUser as TeacherData);
+  }
+
+  // Create assistant{1,2,3}@aalto.fi accounts
+  for (let i = 1; i <= 3; i++) {
+    const newUser = await createData.createUser({
+      email: `assistant${i}@aalto.fi`,
+      name: `assistant${i}`,
     });
     teachers.push(newUser as TeacherData);
   }
@@ -57,45 +76,48 @@ const CourseSchema = BaseCourseDataSchema.strict().refine(
 
 describe('Test GET /v1/courses/:courseId - get course by ID', () => {
   it('should respond with correct data when course exists', async () => {
-    const res = await request
-      .get(`/v1/courses/${courseId}`)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
+    const testCookies = [
+      cookies.adminCookie,
+      cookies.teacherCookie,
+      cookies.assistantCookie,
+      cookies.studentCookie,
+    ];
+    for (const cookie of testCookies) {
+      const res = await request
+        .get(`/v1/courses/${courseId}`)
+        .set('Cookie', cookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
 
-    const result = await CourseSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+      const result = await CourseSchema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
+    }
   });
 
-  it('should respond with 400 bad request, if validation fails (non-number course id)', async () => {
-    const res = await request
-      .get('/v1/courses/abc')
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.BadRequest);
+  it('should respond with 400 if id is invalid', async () => {
+    let url = `/v1/courses/${1.2}`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).get();
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    url = `/v1/courses/${'abc'}`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res = await request
-      .get(`/v1/courses/${courseId}`)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const url = `/v1/courses/${courseId}`;
+    await responseTests.testUnauthorized(url).get();
 
-    expect(JSON.stringify(res.body)).toBe('{}'); // Passport does not call next() on error
+    await responseTests
+      .testForbidden(`/v1/courses/${noRoleCourseId}`, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .get();
   });
 
-  it('should respond with 404 not found, if nonexistent course id', async () => {
-    const res = await request
-      .get(`/v1/courses/${nonExistentId}`)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.NotFound);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+  it('should respond with 404 when not found', async () => {
+    const url = `/v1/courses/${nonExistentId}`;
+    await responseTests.testNotFound(url, cookies.adminCookie).get();
   });
 });
 
@@ -112,110 +134,70 @@ describe('Test GET /v1/courses - get all courses', () => {
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res = await request
-      .get('/v1/courses')
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
+  it('should respond with 401 or 403 if not authorized', async () => {
+    await responseTests.testUnauthorized('/v1/courses').get();
 
-    expect(JSON.stringify(res.body)).toBe('{}'); // Passport does not call next() on error
+    await responseTests
+      .testForbidden('/v1/courses', [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .get();
   });
 });
 
 describe('Test POST /v1/courses - create new course', () => {
-  it('should respond with course ID on correct input (admin user)', async () => {
-    let input: NewCourseData = {
-      courseCode: 'ELEC-A7200',
-      minCredits: 5,
-      maxCredits: 5,
-      gradingScale: GradingScale.Numerical,
-      languageOfInstruction: Language.English,
-      teachersInCharge: ['teacher1@aalto.fi'],
-      assistants: [],
-      department: {
-        fi: 'Sähkötekniikan korkeakoulu',
-        en: 'School of Electrical Engineering',
-        sv: 'Högskolan för elektroteknik',
-      },
-      name: {
-        fi: 'Signaalit ja järjestelmät',
-        en: 'Signals and Systems',
-        sv: '',
-      },
-    };
-    let res = await request
+  let newCourseI = 0;
+  const createCourse = (): NewCourseData => ({
+    courseCode: `ELEC-A720${newCourseI++}`,
+    minCredits: 5,
+    maxCredits: 5,
+    gradingScale: GradingScale.Numerical,
+    languageOfInstruction: Language.English,
+    teachersInCharge: ['teacher@aalto.fi'],
+    assistants: ['assistant@aalto.fi'],
+    department: {
+      fi: 'Sähkötekniikan korkeakoulu',
+      en: 'School of Electrical Engineering',
+      sv: 'Högskolan för elektroteknik',
+    },
+    name: {
+      fi: 'Signaalit ja järjestelmät',
+      en: 'Signals and Systems',
+      sv: '',
+    },
+  });
+
+  it('should create a course', async () => {
+    const res = await request
       .post('/v1/courses')
-      .send(input)
+      .send(createCourse())
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Created);
 
     const Schema = z.number().int();
-    let result = await Schema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-
-    input = {
-      courseCode: 'ELEC-A7200',
-      minCredits: 5,
-      maxCredits: 5,
-      gradingScale: GradingScale.PassFail,
-      languageOfInstruction: Language.Finnish,
-      teachersInCharge: ['teacher1@aalto.fi', 'teacher2@aalto.fi'],
-      assistants: [],
-      department: {
-        fi: 'Sähkötekniikan korkeakoulu',
-        en: 'School of Electrical Engineering',
-        sv: 'Högskolan för elektroteknik',
-      },
-      name: {
-        fi: 'Signaalit ja järjestelmät',
-        en: 'Signals and Systems',
-        sv: '',
-      },
-    };
-    res = await request
-      .post('/v1/courses')
-      .send(input)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Created);
-
-    result = await Schema.safeParseAsync(res.body);
+    const result = await Schema.safeParseAsync(res.body);
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 400 bad request, if required fields are undefined', async () => {
-    const res = await request
-      .post('/v1/courses')
-      .send({})
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.BadRequest);
-
-    const result = await ZodErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+  it('should respond with 400 bad request if validation fails', async () => {
+    const url = '/v1/courses';
+    await responseTests.testBadRequest(url, cookies.adminCookie).post({});
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res = await request
-      .post('/v1/courses')
-      .send({})
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const courseData = createCourse();
+    await responseTests.testUnauthorized('/v1/courses').post(courseData);
 
-    expect(JSON.stringify(res.body)).toBe('{}'); // Passport does not call next() on error
-  });
-
-  it('should respond with 403 forbidden, if not admin user', async () => {
-    const res = await request
-      .post('/v1/courses')
-      .send({})
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Forbidden);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    await responseTests
+      .testForbidden('/v1/courses', [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .post(courseData);
   });
 
   // TODO: Implement
@@ -251,26 +233,6 @@ describe('Test POST /v1/courses - create new course', () => {
   //   const result = await Schema.safeParseAsync(res.body);
   //   expect(result.success).toBeTruthy();
   // });
-
-  /*
-   * TODO: move next test case elsewhere in future, after refactoring commonly
-   * reusable functionality (e.g. middleware) to their own modules / functions
-   */
-  it('should respond with syntax error, if parsing request JSON fails', async () => {
-    const res = await request
-      .post('/v1/courses')
-      .send('{"courseCode": "ELEC-A7200"')
-      .set('Content-Type', 'application/json')
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.BadRequest);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-
-    if (result.success)
-      expect(result.data.errors[0].startsWith('SyntaxError:')).toBeTruthy();
-  });
 });
 
 describe('Test PUT /v1/courses/:courseId - edit course', () => {
@@ -313,115 +275,118 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     },
   };
 
+  const findUsers = (emails: string[] | undefined): TeacherData[] => {
+    if (emails === undefined) return [];
+    const users = [];
+    for (const email of emails) {
+      let user = teachers.find(teacher => teacher.email === email);
+      if (user !== undefined) {
+        users.push(user);
+        continue;
+      }
+
+      user = assistants.find(assistant => assistant.email === email);
+      if (user !== undefined) {
+        users.push(user);
+        continue;
+      }
+
+      throw new Error(`Email ${email} not in test teachers | assistants`);
+    }
+    return users;
+  };
+
   const testCourseEditSuccess = async (
-    uneditedCourseData: EditCourseData,
-    edits: EditCourseData,
-    uneditedTeachersInCharge: TeacherData[],
-    editedTeachersInCharge: TeacherData[]
+    edit1: EditCourseData,
+    edit2: EditCourseData
   ): Promise<void> => {
     const checkCourseData = async (expected: CourseData): Promise<void> => {
-      const dbCourse = parseCourseFull(
-        await findCourseFullById(courseId, HttpCode.InternalServerError)
-      );
+      const dbCourse = parseCourseFull(await findCourseFullById(courseId));
       dbCourse.teachersInCharge.sort((a, b) => a.id - b.id);
       expected.teachersInCharge.sort((a, b) => a.id - b.id);
+      dbCourse.assistants.sort((a, b) => a.id - b.id);
+      expected.assistants.sort((a, b) => a.id - b.id);
       expect(dbCourse).toStrictEqual(expected);
     };
 
-    const course: CourseData = {
-      ...uneditedCourseData,
+    const initState = parseCourseFull(await findCourseFullById(courseId));
+
+    const courseEdit1: CourseData = {
+      ...initState,
+      ...edit1,
       id: courseId,
-      teachersInCharge: uneditedTeachersInCharge,
+      teachersInCharge: findUsers(edit1.teachersInCharge),
+      assistants: findUsers(edit1.assistants),
     } as unknown as CourseData;
 
-    const editedCourseData: CourseData = {
-      ...uneditedCourseData,
-      ...edits,
+    const courseEdit2: CourseData = {
+      ...initState,
+      ...edit1,
+      ...edit2,
       id: courseId,
-      teachersInCharge: editedTeachersInCharge,
+      teachersInCharge: findUsers(edit2.teachersInCharge),
+      assistants: findUsers(edit2.assistants),
     } as unknown as CourseData;
 
     await request
       .put(`/v1/courses/${courseId}`)
-      .send(uneditedCourseData)
+      .send(edit1)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    await checkCourseData(course);
+    await checkCourseData(courseEdit1);
 
     await request
       .put(`/v1/courses/${courseId}`)
-      .send(edits)
+      .send(edit2)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    await checkCourseData(editedCourseData);
+    await checkCourseData(courseEdit2);
   };
 
   it('should successfully update course information', async () => {
-    await testCourseEditSuccess(
-      {
-        ...uneditedCourseDataBase,
-        courseCode: 'Test edit course',
-        teachersInCharge: ['teacher1@aalto.fi'],
-        assistants: [],
-      },
-      courseDataEdits,
-      [teachers[0]],
-      []
-    );
+    await testCourseEditSuccess(uneditedCourseDataBase, courseDataEdits);
   });
 
-  it('should successfully add a single teacher in charge', async () => {
+  it('should successfully add a single teacher in charge / assistant', async () => {
     await testCourseEditSuccess(
       {
-        ...uneditedCourseDataBase,
-        ...courseDataEdits,
         teachersInCharge: ['teacher1@aalto.fi'],
-        assistants: [],
+        assistants: ['assistant1@aalto.fi'],
       },
       {
         teachersInCharge: ['teacher1@aalto.fi', 'teacher2@aalto.fi'],
-      },
-      [teachers[0]],
-      [teachers[0], teachers[1]]
+        assistants: ['assistant1@aalto.fi', 'assistant2@aalto.fi'],
+      }
     );
   });
 
-  it('should successfully delete a single teacher in charge', async () => {
+  it('should successfully delete a single teacher in charge / assistant', async () => {
     await testCourseEditSuccess(
       {
-        ...uneditedCourseDataBase,
-        ...courseDataEdits,
         teachersInCharge: ['teacher1@aalto.fi', 'teacher2@aalto.fi'],
-        assistants: [],
+        assistants: ['assistant1@aalto.fi', 'assistant2@aalto.fi'],
       },
-      {teachersInCharge: ['teacher2@aalto.fi']},
-      [teachers[0], teachers[1]],
-      [teachers[1]]
+      {
+        teachersInCharge: ['teacher1@aalto.fi'],
+        assistants: ['assistant1@aalto.fi'],
+      }
     );
   });
 
-  it('should successfully update course information and teachers in charge', async () => {
+  it('should successfully edit teachers in charge / assistants', async () => {
     await testCourseEditSuccess(
       {
-        ...uneditedCourseDataBase,
-        courseCode: 'Test edit course and teachers',
-        teachersInCharge: [
-          'teacher1@aalto.fi',
-          'teacher2@aalto.fi',
-          'teacher3@aalto.fi',
-        ],
-        assistants: [],
+        teachersInCharge: ['teacher1@aalto.fi', 'teacher2@aalto.fi'],
+        assistants: ['assistant1@aalto.fi', 'assistant2@aalto.fi'],
       },
       {
-        ...courseDataEdits,
         teachersInCharge: ['teacher2@aalto.fi', 'teacher3@aalto.fi'],
-      },
-      [teachers[0], teachers[1], teachers[2]],
-      [teachers[1], teachers[2]]
+        assistants: ['assistant2@aalto.fi', 'assistant3@aalto.fi'],
+      }
     );
   });
 
@@ -440,58 +405,40 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
   // });
 
   it('should respond with 400 bad request, if body validation fails', async () => {
-    const badInput = async (input: object): Promise<void> => {
-      const res = await request
-        .put(`/v1/courses/${courseId}`)
-        .send(input)
-        .set('Cookie', cookies.adminCookie)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.BadRequest);
+    const url = `/v1/courses/${courseId}`;
+    const badRequest = responseTests.testBadRequest(url, cookies.adminCookie);
 
-      const Schema = z.union([ZodErrorSchema, ErrorSchema]);
-      const result = await Schema.safeParseAsync(res.body);
-      expect(result.success).toBeTruthy();
-    };
-
-    await badInput({teachersInCharge: [123]});
-    await badInput({minCredits: 10, maxCredits: 5});
-    await badInput({department: 'wrong', name: false});
-    await badInput({minCredits: -10});
-    await badInput({maxCredits: 1});
-    await badInput({minCredits: 9});
+    await badRequest.put({teachersInCharge: [123]});
+    await badRequest.put({minCredits: 10, maxCredits: 5});
+    await badRequest.put({department: 'wrong', name: false});
+    await badRequest.put({minCredits: -10});
+    await badRequest.put({maxCredits: 1});
+    await badRequest.put({minCredits: 9});
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res = await request
-      .put(`/v1/courses/${courseId}`)
-      .send(courseDataEdits)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
-
-    expect(JSON.stringify(res.body)).toBe('{}'); // Passport does not call next() on error
+  it('should respond with 400 bad request if id is invalid', async () => {
+    const url = `/v1/courses/${-1}`;
+    const data: EditCourseData = {maxCredits: 10};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 
-  it('should respond with 403 forbidden, if not admin user', async () => {
-    const res = await request
-      .put(`/v1/courses/${courseId}`)
-      .send(courseDataEdits)
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Forbidden);
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const url = `/v1/courses/${-1}`;
+    const data: EditCourseData = {maxCredits: 10};
+    await responseTests.testUnauthorized(url).put(data);
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .put(data);
   });
 
   it('should respond with 404 not found, if the course ID does not exist', async () => {
-    const res = await request
-      .put(`/v1/courses/${nonExistentId}`)
-      .send(courseDataEdits)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.NotFound);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    const url = `/v1/courses/${nonExistentId}`;
+    const data: EditCourseData = {maxCredits: 10};
+    await responseTests.testNotFound(url, cookies.adminCookie).put(data);
   });
 });

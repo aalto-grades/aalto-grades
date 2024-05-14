@@ -2,20 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useNamespaces, SelectReturnType, isArrayOfNodes} from 'xpath';
-import {DOMParser} from 'xmldom';
 import axios from 'axios';
+import {DOMParser} from 'xmldom';
+import {SelectReturnType, isArrayOfNodes, useNamespaces} from 'xpath';
 
 type selectFun = (query: string) => SelectReturnType;
 
-export async function fetchIdpMetadata(
+export const fetchIdpMetadata = async (
   metadataUrl: string
-): Promise<selectFun | null> {
+): Promise<selectFun | null> => {
   try {
-    const res = await axios.get(metadataUrl);
-    const data = await res.data;
+    const res = await axios.get<string>(metadataUrl);
     const parser = new DOMParser();
-    const xml = parser.parseFromString(data, 'application/xml');
+    const xml = parser.parseFromString(res.data, 'application/xml');
     const select = useNamespaces({
       md: 'urn:oasis:names:tc:SAML:2.0:metadata',
       saml: 'urn:oasis:names:tc:SAML:2.0:assertion',
@@ -26,11 +25,11 @@ export async function fetchIdpMetadata(
     console.log(e);
     return null;
   }
-}
+};
 
-export async function getIdpSignCert(
+export const getIdpSignCert = async (
   metadataUrl: string
-): Promise<string | null | undefined> {
+): Promise<string | null | undefined> => {
   const query = await fetchIdpMetadata(metadataUrl);
   if (query) {
     const res = query(
@@ -41,4 +40,4 @@ export async function getIdpSignCert(
     }
   }
   return null;
-}
+};

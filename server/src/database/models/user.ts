@@ -11,7 +11,7 @@ import {
   Op,
 } from 'sequelize';
 
-import {SystemRole} from '@common/types';
+import {SystemRole} from '@/common/types';
 import {sequelize} from '..';
 
 export default class User extends Model<

@@ -4,13 +4,13 @@
 
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {RenderResult, render, screen, waitFor} from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import {userEvent} from '@testing-library/user-event';
 import {http} from 'msw';
 import {BrowserRouter} from 'react-router-dom';
 
+import {mockPostSuccess, server} from './mock-data/server';
 import Login from '../components/auth/Login';
 import AuthContext from '../context/AuthProvider';
-import {mockPostSuccess, server} from './mock-data/server';
 
 describe('Tests for Login and LoginForm components', () => {
   const renderLogin = (): RenderResult =>

@@ -5,7 +5,7 @@
 import supertest from 'supertest';
 import {z} from 'zod';
 
-import {FinalGradeDataSchema, HttpCode, NewFinalGrade} from '@common/types';
+import {FinalGradeDataSchema, HttpCode, NewFinalGrade} from '@/common/types';
 import {app} from '../../src/app';
 import FinalGrade from '../../src/database/models/finalGrade';
 import {createData} from '../util/createData';
@@ -81,10 +81,10 @@ const checkGradeAmount = async (
   expect(dbGrades).toEqual(expectedGrades);
 };
 
-describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => {
+describe('Test GET /v1/courses/:courseId/final-grades - get final grades', () => {
   it('should get final grades succesfully when course results are found (admin user)', async () => {
     const res = await request
-      .get(`/v1/courses/${courseId}/finalGrades`)
+      .get(`/v1/courses/${courseId}/final-grades`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
@@ -96,7 +96,7 @@ describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => 
 
   it('should get final grades succesfully when course results are found (teacher in charge)', async () => {
     const res = await request
-      .get(`/v1/courses/${courseId}/finalGrades`)
+      .get(`/v1/courses/${courseId}/final-grades`)
       .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
@@ -108,7 +108,7 @@ describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => 
 
   it('should respond with 400 bad request, if course ID is invalid', async () => {
     const res = await request
-      .get('/v1/courses/bad/finalGrades')
+      .get('/v1/courses/bad/final-grades')
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.BadRequest);
@@ -119,7 +119,7 @@ describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => 
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
     const res = await request
-      .get(`/v1/courses/${courseId}/finalGrades`)
+      .get(`/v1/courses/${courseId}/final-grades`)
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
 
@@ -128,7 +128,7 @@ describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => 
 
   it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
     const res = await request
-      .get(`/v1/courses/${noRoleCourseId}/finalGrades`)
+      .get(`/v1/courses/${noRoleCourseId}/final-grades`)
       .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
@@ -139,7 +139,7 @@ describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => 
 
   it('should respond with 404 not found, if course does not exist', async () => {
     const res = await request
-      .get(`/v1/courses/${nonExistentId}/finalGrades`)
+      .get(`/v1/courses/${nonExistentId}/final-grades`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.NotFound);
@@ -149,7 +149,7 @@ describe('Test GET /v1/courses/:courseId/finalGrades - get final grades', () => 
   });
 });
 
-describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () => {
+describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () => {
   type StudentData = {id: number; finalGrade: number};
   const getData = (student: StudentData): NewFinalGrade => ({
     userId: student.id,
@@ -168,7 +168,7 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
 
   it('should add a grade (admin user)', async () => {
     const res = await request
-      .post(`/v1/courses/${editCourseId}/finalGrades`)
+      .post(`/v1/courses/${editCourseId}/final-grades`)
       .send([getData(students[0])])
       .set('Cookie', cookies.adminCookie)
       .expect(HttpCode.Created);
@@ -179,7 +179,7 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
 
   it('should add a grade (teacher in charge)', async () => {
     const res = await request
-      .post(`/v1/courses/${editCourseId}/finalGrades`)
+      .post(`/v1/courses/${editCourseId}/final-grades`)
       .send([getData(students[1])])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Created);
@@ -190,7 +190,7 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
 
   it('should add multiple correct grades based on student numbers', async () => {
     const res = await request
-      .post(`/v1/courses/${editCourseId}/finalGrades`)
+      .post(`/v1/courses/${editCourseId}/final-grades`)
       .send([getData(students[2]), getData(students[3])])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Created);
@@ -204,7 +204,7 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
     await checkGradeAmount(students[4], []);
 
     const res = await request
-      .post(`/v1/courses/${editCourseId}/finalGrades`)
+      .post(`/v1/courses/${editCourseId}/final-grades`)
       .send([getData(students[4])])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Created);
@@ -213,7 +213,7 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
     await checkGradeAmount(students[4], [students[4].finalGrade]);
 
     const res2 = await request
-      .post(`/v1/courses/${editCourseId}/finalGrades`)
+      .post(`/v1/courses/${editCourseId}/final-grades`)
       .send([getData(students[4])])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Created);
@@ -227,7 +227,7 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
     const res = await request
-      .post(`/v1/courses/${editCourseId}/finalGrades`)
+      .post(`/v1/courses/${editCourseId}/final-grades`)
       .send([getData(students[5])])
       .expect(HttpCode.Unauthorized);
 
@@ -236,7 +236,7 @@ describe('Test POST /v1/courses/:courseId/finalGrades - add final grades', () =>
 
   it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
     const res = await request
-      .post(`/v1/courses/${noRoleCourseId}/finalGrades`)
+      .post(`/v1/courses/${noRoleCourseId}/final-grades`)
       .send([getData(students[5])])
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Forbidden);

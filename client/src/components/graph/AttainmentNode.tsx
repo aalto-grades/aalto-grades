@@ -5,9 +5,12 @@
 import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 
-import {AttainmentNodeSettings, AttainmentNodeValue} from '@common/types/graph';
-import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
+import {
+  AttainmentNodeSettings,
+  AttainmentNodeValue,
+} from '@/common/types/graph';
 import BaseNode from './BaseNode';
+import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
 
 type OnFailSetting = 'coursefail' | 'fail';
 type LocalSettings = {onFailSetting: OnFailSetting; minPoints: string};

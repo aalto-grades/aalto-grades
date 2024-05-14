@@ -2,8 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Language} from '@common/types';
 import {Dispatch, SetStateAction} from 'react';
+
+import {Language} from '@/common/types';
 
 export interface HeadCellData {
   id: string;

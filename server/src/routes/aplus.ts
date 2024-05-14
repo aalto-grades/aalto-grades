@@ -7,7 +7,7 @@ import {RequestHandler} from 'express-serve-static-core';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
-import {CourseRoleType, NewAplusGradeSourceArraySchema} from '@common/types';
+import {CourseRoleType, NewAplusGradeSourceArraySchema} from '@/common/types';
 import {
   addAplusGradeSources,
   fetchAplusExerciseData,

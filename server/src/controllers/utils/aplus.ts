@@ -4,7 +4,7 @@
 
 import axios, {AxiosResponse} from 'axios';
 
-import {HttpCode} from '@common/types';
+import {HttpCode} from '@/common/types';
 import {AXIOS_TIMEOUT} from '../../configs/constants';
 import {ApiError, stringToIdSchema} from '../../types';
 

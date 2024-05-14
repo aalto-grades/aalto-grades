@@ -6,7 +6,7 @@ import cors from 'cors';
 import express, {Application, Request} from 'express';
 import helmet from 'helmet';
 
-import {HttpCode} from '@common/types';
+import {HttpCode} from '@/common/types';
 import {FRONTEND_ORIGIN, NODE_ENV} from './configs/environment';
 import {errorHandler} from './middleware/errorHandler';
 import {requestLogger, requestSyslogger} from './middleware/requestLogger';

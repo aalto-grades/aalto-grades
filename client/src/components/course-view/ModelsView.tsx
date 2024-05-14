@@ -2,16 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Delete} from '@mui/icons-material';
+import {Archive, Delete, Unarchive, Warning} from '@mui/icons-material';
 import {
   Box,
   Button,
   Collapse,
-  Divider,
   IconButton,
   List,
   ListItem,
   ListItemButton,
+  ListItemIcon,
   ListItemText,
   Tooltip,
   Typography,
@@ -20,8 +20,9 @@ import {enqueueSnackbar} from 'notistack';
 import {JSX, useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
-import {AssessmentModelData, StudentRow, SystemRole} from '@common/types';
-import {GraphStructure} from '@common/types/graph';
+import {AssessmentModelData, StudentRow, SystemRole} from '@/common/types';
+import {GraphStructure} from '@/common/types/graph';
+import CreateAssessmentModelDialog from './CreateAssessmentModelDialog';
 import {
   useDeleteAssessmentModel,
   useEditAssessmentModel,
@@ -31,7 +32,6 @@ import {
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import Graph from '../graph/Graph';
-import CreateAssessmentModelDialog from './CreateAssessmentModelDialog';
 
 type ParamsType = {courseId: string; modelId?: string; userId?: string};
 const ModelsView = (): JSX.Element => {
@@ -52,7 +52,6 @@ const ModelsView = (): JSX.Element => {
   const [loadGraphId, setLoadGraphId] = useState<number>(-1);
 
   const [createViewOpen, setCreateViewOpen] = useState(false);
-  const [modelsListOpen, setModelsListOpen] = useState(true);
   const [graphOpen, setGraphOpen] = useState(false);
 
   const editRights = useMemo(
@@ -68,9 +67,10 @@ const ModelsView = (): JSX.Element => {
         setCurrentModel(model);
         setGraphOpen(true);
         setLoadGraphId(-1);
+        navigate(`/${courseId}/models/${model.id}`);
       }
     }
-  }, [loadGraphId, models.data]);
+  }, [courseId, loadGraphId, models.data, navigate]);
 
   const renameAttainments = useCallback(
     (model: AssessmentModelData): AssessmentModelData => {
@@ -82,8 +82,9 @@ const ModelsView = (): JSX.Element => {
 
         const attainment = attainments.data.find(
           att => att.id === attainmentId
-        )!;
-        model.graphStructure.nodeData[node.id].title = attainment.name;
+        );
+        if (attainment !== undefined)
+          model.graphStructure.nodeData[node.id].title = attainment.name;
       }
       return model;
     },
@@ -92,7 +93,6 @@ const ModelsView = (): JSX.Element => {
 
   const loadGraph = useCallback(
     (model: AssessmentModelData): void => {
-      setModelsListOpen(false);
       setCurrentModel(renameAttainments(structuredClone(model))); // To remove references
       setGraphOpen(true);
     },
@@ -101,6 +101,12 @@ const ModelsView = (): JSX.Element => {
 
   // Load modelId url param
   useEffect(() => {
+    // If modelId is undefined, unload current model
+    if (modelId === undefined && currentModel !== null) {
+      setCurrentModel(null);
+      setGraphOpen(false);
+    }
+
     if (modelId === undefined || models.data === undefined) return;
     if (currentModel !== null && currentModel.id === parseInt(modelId)) return;
 
@@ -134,11 +140,18 @@ const ModelsView = (): JSX.Element => {
     navigate(`/${courseId}/models/${modelId}`);
   }, [courseId, currentUserRow, grades.data, modelId, navigate, userId]);
 
+  const handleArchiveModel = (
+    assessmentModelId: number,
+    archived: boolean
+  ): void => {
+    editModel.mutate({
+      courseId,
+      assessmentModelId,
+      assessmentModel: {archived},
+    });
+  };
   const handleDelModel = (assessmentModelId: number): void => {
     delModel.mutate({courseId, assessmentModelId});
-    if (currentModel !== null && assessmentModelId === currentModel.id) {
-      setGraphOpen(false);
-    }
   };
 
   const onSave = async (graphStructure: GraphStructure): Promise<void> => {
@@ -169,71 +182,96 @@ const ModelsView = (): JSX.Element => {
   if (models.data === undefined || attainments.data === undefined)
     return <>Loading</>;
 
+  const getWarning = (model: AssessmentModelData): string => {
+    if (model.hasArchivedAttainments && model.hasDeletedAttainments)
+      return 'Contains deleted & archived attainments';
+    if (model.hasArchivedAttainments) return 'Contains archived attainments';
+    if (model.hasDeletedAttainments) return 'Contains deleted attainments';
+    return '';
+  };
+
   return (
-    <Box sx={{border: '1px solid'}}>
-      {(auth?.role === SystemRole.Admin || isTeacherInCharge) && (
-        <Tooltip sx={{ml: 2}} title="New assessment model" placement="top">
-          <Button
-            sx={{mt: 1}}
-            variant="outlined"
-            onClick={(): void => setCreateViewOpen(true)}
-          >
-            Create New
-          </Button>
-        </Tooltip>
-      )}
+    <>
       <CreateAssessmentModelDialog
         open={createViewOpen}
         handleClose={(): void => setCreateViewOpen(false)}
         onSubmit={id => {
           models.refetch();
-          setModelsListOpen(false);
           setLoadGraphId(id);
         }}
       />
 
-      <Button
-        sx={{ml: 1, mt: 1}}
-        variant="outlined"
-        onClick={() => setModelsListOpen(open => !open)}
-      >
-        {modelsListOpen ? 'Hide Models' : 'Show Models'}
-      </Button>
+      <Box sx={{display: 'flex', mb: 1}}>
+        {(auth?.role === SystemRole.Admin || isTeacherInCharge) &&
+          !graphOpen && (
+            <Tooltip title="New assessment model" placement="top">
+              <Button
+                sx={{mt: 1}}
+                variant="outlined"
+                onClick={() => setCreateViewOpen(true)}
+              >
+                Create New
+              </Button>
+            </Tooltip>
+          )}
+        {graphOpen && (
+          <Button
+            sx={{mt: 1}}
+            variant="outlined"
+            onClick={() => navigate(`/${courseId}/models`)}
+          >
+            Back to models
+          </Button>
+        )}
+      </Box>
 
-      <Collapse in={modelsListOpen}>
+      <Collapse in={!graphOpen}>
         {models.data.length === 0 ? (
           <Typography textAlign="left" sx={{p: 2}}>
             No models
           </Typography>
         ) : (
-          <List sx={{width: 300}} disablePadding>
+          <List sx={{width: 400}} disablePadding>
             {models.data.map(model => (
               <ListItem
                 key={`graph-${model.id}-select`}
                 disablePadding
                 secondaryAction={
                   editRights ? (
-                    <IconButton
-                      edge="end"
-                      onClick={() => handleDelModel(model.id)}
-                    >
-                      <Delete />
-                    </IconButton>
+                    <>
+                      <IconButton
+                        onClick={() =>
+                          handleArchiveModel(model.id, !model.archived)
+                        }
+                      >
+                        {model.archived ? <Unarchive /> : <Archive />}
+                      </IconButton>
+                      <IconButton
+                        edge="end"
+                        onClick={() => handleDelModel(model.id)}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </>
                   ) : null
                 }
               >
                 <ListItemButton
                   onClick={() => {
-                    if (currentModel !== null && model.id === currentModel.id) {
-                      setModelsListOpen(false);
-                      return;
-                    }
                     if (userId !== undefined)
                       navigate(`/${courseId}/models/${model.id}/${userId}`);
                     else navigate(`/${courseId}/models/${model.id}`);
                   }}
                 >
                   <ListItemText primary={model.name} />
+                  {(model.hasArchivedAttainments ||
+                    model.hasDeletedAttainments) && (
+                    <ListItemIcon sx={{mr: 1.6}}>
+                      <Tooltip title={getWarning(model)} placement="top">
+                        <Warning color="warning" />
+                      </Tooltip>
+                    </ListItemIcon>
+                  )}
                 </ListItemButton>
               </ListItem>
             ))}
@@ -242,20 +280,17 @@ const ModelsView = (): JSX.Element => {
       </Collapse>
 
       {graphOpen && currentModel !== null && (
-        <>
-          <Divider sx={{my: 1}} />
-          <Graph
-            initGraph={currentModel.graphStructure}
-            attainments={attainments.data}
-            userGrades={
-              currentUserRow === null ? null : currentUserRow.attainments
-            }
-            readOnly={!editRights}
-            onSave={onSave}
-          />
-        </>
+        <Graph
+          initGraph={currentModel.graphStructure}
+          attainments={attainments.data}
+          userGrades={
+            currentUserRow === null ? null : currentUserRow.attainments
+          }
+          readOnly={!editRights}
+          onSave={onSave}
+        />
       )}
-    </Box>
+    </>
   );
 };
 

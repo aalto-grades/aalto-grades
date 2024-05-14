@@ -23,6 +23,7 @@ import {
   Typography,
 } from '@mui/material';
 import {Form, Formik, FormikHelpers, FormikProps} from 'formik';
+import {enqueueSnackbar} from 'notistack';
 import {
   HTMLInputTypeAttribute,
   JSX,
@@ -31,15 +32,14 @@ import {
   useState,
 } from 'react';
 import {useBlocker, useParams} from 'react-router-dom';
+import {z} from 'zod';
 
 import {
   AaltoEmailSchema,
   EditCourseData,
   GradingScale,
   Language,
-} from '@common/types';
-import {enqueueSnackbar} from 'notistack';
-import {z} from 'zod';
+} from '@/common/types';
 import {useEditCourse, useGetCourse} from '../../hooks/useApi';
 import {sisuLanguageOptions} from '../../utils';
 import {convertToClientGradingScale} from '../../utils/textFormat';

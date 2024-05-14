@@ -11,14 +11,14 @@ import {
   AplusGradeSourceType,
   HttpCode,
   NewAplusGradeSourceArraySchema,
-} from '@common/types';
-import AplusGradeSource from '../database/models/aplusGradeSource';
-import AttainmentGrade from '../database/models/attainmentGrade';
-import User from '../database/models/user';
-import {ApiError, AttainmentGradeModelData, JwtClaims} from '../types';
+} from '@/common/types';
 import {fetchFromAplus, validateAplusCourseId} from './utils/aplus';
 import {validateAttainmentPath} from './utils/attainment';
 import {validateCourseId} from './utils/course';
+import AplusGradeSource from '../database/models/aplusGradeSource';
+import AttainmentGrade from '../database/models/attainmentGrade';
+import User from '../database/models/user';
+import {ApiError, NewDbGradeData, JwtClaims} from '../types';
 
 const APLUS_URL = 'https://plus.cs.aalto.fi/api/v2';
 
@@ -113,7 +113,7 @@ export const fetchAplusGrades = async (
   const studentNumberToId: {[key: string]: number} = {};
   const nonexistentStudents: string[] = [];
 
-  const gradesWithStudentNumber: (Omit<AttainmentGradeModelData, 'userId'> & {
+  const gradesWithStudentNumber: (Omit<NewDbGradeData, 'userId'> & {
     studentNumber: string;
   })[] = [];
 
@@ -206,15 +206,16 @@ export const fetchAplusGrades = async (
     studentNumberToId[newUser.studentNumber!] = newUser.id;
   }
 
-  const preparedBulkCreate: AttainmentGradeModelData[] =
-    gradesWithStudentNumber.map(val => ({
+  const preparedBulkCreate: NewDbGradeData[] = gradesWithStudentNumber.map(
+    val => ({
       userId: studentNumberToId[val.studentNumber],
       attainmentId: val.attainmentId,
       graderId: val.graderId,
       date: val.date,
       expiryDate: val.expiryDate,
       grade: val.grade,
-    }));
+    })
+  );
 
   await AttainmentGrade.bulkCreate(preparedBulkCreate);
 

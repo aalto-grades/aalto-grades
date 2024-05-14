@@ -8,9 +8,6 @@ import {Router} from 'express';
 import swaggerJsdoc, {OAS3Options} from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
-import {FRONTEND_ORIGIN} from '../configs/environment';
-import {definition} from '../configs/swagger';
-
 import {router as aplusRouter} from './aplus';
 import {router as assessmentModelRouter} from './assessmentModel';
 import {router as attainmentRouter} from './attainment';
@@ -19,6 +16,8 @@ import {router as courseRouter} from './course';
 import {router as finalGradesRouter} from './finalGrades';
 import {router as gradesRouter} from './grades';
 import {router as userRouter} from './user';
+import {FRONTEND_ORIGIN} from '../configs/environment';
+import {definition} from '../configs/swagger';
 
 const options: OAS3Options = {
   definition,

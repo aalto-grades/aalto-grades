@@ -11,7 +11,7 @@ import {
   AplusGradeSourceData,
   AplusGradeSourceType,
   HttpCode,
-} from '@common/types';
+} from '@/common/types';
 import {app} from '../../src/app';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
 import {createData} from '../util/createData';

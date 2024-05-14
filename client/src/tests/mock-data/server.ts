@@ -50,7 +50,7 @@ export const server: SetupServer = setupServer(
     '/v1/courses/1/assessment-models',
     mockSuccess([mockAssessmentModel])
   ),
-  http.get('/v1/courses/1/finalGrades', mockSuccess(mockFinalGrades)),
+  http.get('/v1/courses/1/final-grades', mockSuccess(mockFinalGrades)),
   http.get('/v1/courses/1/attainments', mockSuccess(mockAttainments)),
   http.get('/v1/courses/1', mockSuccess(mockCourse))
 );

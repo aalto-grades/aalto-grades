@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode, SystemRole} from '@common/types';
+import {HttpCode, SystemRole} from '@/common/types';
 import CourseRole from '../../database/models/courseRole';
 import User from '../../database/models/user';
 import {ApiError, JwtClaims, stringToIdSchema} from '../../types';
