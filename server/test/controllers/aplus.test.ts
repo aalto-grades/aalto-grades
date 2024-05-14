@@ -23,6 +23,7 @@ const request = supertest(app);
 
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
+let noRoleCourseId = -1;
 let attainments: AttainmentData[] = [];
 
 jest.mock('axios');
@@ -33,6 +34,11 @@ beforeAll(async () => {
 
   let _;
   [courseId, attainments, _] = await createData.createCourse({});
+  [noRoleCourseId] = await createData.createCourse({
+    hasTeacher: false,
+    hasAssistant: false,
+    hasStudent: false,
+  });
 });
 
 afterAll(async () => {
@@ -174,10 +180,6 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
         .send([getGradeSource(sourceType, {withModuleId, withDifficulty})])
         .set('Cookie', cookies.adminCookie)
         .expect(HttpCode.BadRequest);
-
-      // TODO: Zod errors are not passed to the error handler?
-      // const result = await ErrorSchema.safeParseAsync(res.body);
-      // expect(result.success).toBeTruthy();
     };
 
     await testInvalid(AplusGradeSourceType.FullPoints, true, true);
@@ -201,7 +203,14 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
   });
 
   it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-    // TODO
+    const res = await request
+      .post(`/v1/courses/${noRoleCourseId}/aplus-source`)
+      .send([getFullPoints(), getModule(), getDifficulty()])
+      .set('Cookie', cookies.teacherCookie)
+      .expect(HttpCode.Forbidden);
+
+    const result = await ErrorSchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 });
 
