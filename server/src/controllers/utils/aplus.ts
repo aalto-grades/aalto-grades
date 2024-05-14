@@ -32,7 +32,9 @@ export const validateAplusCourseId = (aplusCourseId: string): number => {
  *
  * @throws AxiosError if fetching fails.
  */
-export const fetchFromAplus = async (url: string): Promise<AxiosResponse> => {
+export const fetchFromAplus = async (
+  url: string
+): Promise<AxiosResponse<unknown>> => {
   return await axios.get(url, {
     timeout: AXIOS_TIMEOUT,
     validateStatus: (status: number) => status === 200,
