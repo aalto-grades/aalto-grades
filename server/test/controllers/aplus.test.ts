@@ -26,11 +26,12 @@ const APLUS_URL = 'https://plus.cs.aalto.fi/api/v2';
 
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
+let attainments: AttainmentData[] = [];
 let fullPointsAttainmentId = -1;
 let moduleAttainmentId = -1;
 let difficultyAttainmentId = -1;
 let noRoleCourseId = -1;
-let attainments: AttainmentData[] = [];
+let otherAttainments: AttainmentData[] = [];
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<AxiosStatic>;
@@ -43,7 +44,7 @@ beforeAll(async () => {
   [fullPointsAttainmentId, moduleAttainmentId, difficultyAttainmentId] =
     await createData.createAplusGradeSources(courseId);
 
-  [noRoleCourseId] = await createData.createCourse({
+  [noRoleCourseId, otherAttainments, _] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
@@ -351,8 +352,15 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 400 bad request, if attainment list validation fails', async () => {
-    // TODO
+  it('should respond with 400 bad request, if attainment list is not provided', async () => {
+    const res = await request
+      .get(`/v1/courses/${courseId}/aplus-fetch`)
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.BadRequest);
+
+    const result = await ErrorSchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 
   it('should respond with 401 unauthorized, if not logged in', async () => {
@@ -376,10 +384,28 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
   });
 
   it('should respond with 409 conflict, if an attainment does not belong to the course', async () => {
-    // TODO
+    const res = await request
+      .get(
+        `/v1/courses/${courseId}/aplus-fetch?attainments=[${otherAttainments[0].id}]`
+      )
+      .set('Cookie', cookies.teacherCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Conflict);
+
+    const result = await ErrorSchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 
   it('should respond with 422 unprocessable entity, if an attainment has no grade source', async () => {
-    // TODO
+    const res = await request
+      .get(
+        `/v1/courses/${courseId}/aplus-fetch?attainments=[${attainments[3].id}]`
+      )
+      .set('Cookie', cookies.teacherCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.UnprocessableEntity);
+
+    const result = await ErrorSchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 });
