@@ -291,7 +291,7 @@ export const deleteGrade = async (
  *
  * Responds with text/csv
  *
- * @throws ApiError(400|404|422)
+ * @throws ApiError(400|404)
  */
 export const getSisuFormattedGradingCSV = async (
   req: TypedRequestBody<typeof SisuCsvUploadSchema>,

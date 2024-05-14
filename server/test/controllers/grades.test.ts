@@ -90,6 +90,7 @@ afterAll(async () => {
 // TODO: Test getting grades
 // TODO: Test grades/attainments not belonging to course
 // TODO: Test deleting grades
+// TODO: Test not found studentnumber
 
 const createCSV = (
   studentData: {studentNumber: string; finalGrade: number}[],

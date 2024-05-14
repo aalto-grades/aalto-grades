@@ -149,7 +149,7 @@ describe('Test GET /v1/courses - get all courses', () => {
 
 describe('Test POST /v1/courses - create new course', () => {
   let newCourseI = 0;
-  const createCourse = (): NewCourseData => ({
+  const createCourseData = (): NewCourseData => ({
     courseCode: `ELEC-A720${newCourseI++}`,
     minCredits: 5,
     maxCredits: 5,
@@ -172,7 +172,7 @@ describe('Test POST /v1/courses - create new course', () => {
   it('should create a course', async () => {
     const res = await request
       .post('/v1/courses')
-      .send(createCourse())
+      .send(createCourseData())
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Created);
@@ -188,7 +188,7 @@ describe('Test POST /v1/courses - create new course', () => {
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
-    const courseData = createCourse();
+    const courseData = createCourseData();
     await responseTests.testUnauthorized('/v1/courses').post(courseData);
 
     await responseTests
@@ -198,6 +198,47 @@ describe('Test POST /v1/courses - create new course', () => {
         cookies.studentCookie,
       ])
       .post(courseData);
+  });
+
+  it('should respond with 404 when email does not exist', async () => {
+    const courseData = createCourseData();
+    const url = '/v1/courses';
+
+    const testData = {
+      ...courseData,
+      teachersInCharge: ['teacher@aalto.fi', 'teacher1000@aalto.fi'],
+    };
+    await responseTests.testNotFound(url, cookies.adminCookie).post(testData);
+  });
+
+  it('should respond with 422 when course has duplicate roles', async () => {
+    const courseData = createCourseData();
+    const url = '/v1/courses';
+
+    let testData = {
+      ...courseData,
+      teachersInCharge: ['teacher@aalto.fi', 'teacher@aalto.fi'],
+    };
+    await responseTests
+      .testUnprocessableEntity(url, cookies.adminCookie)
+      .post(testData);
+
+    testData = {
+      ...courseData,
+      assistants: ['assistant@aalto.fi', 'assistant@aalto.fi'],
+    };
+    await responseTests
+      .testUnprocessableEntity(url, cookies.adminCookie)
+      .post(testData);
+
+    testData = {
+      ...courseData,
+      teachersInCharge: ['teacher@aalto.fi'],
+      assistants: ['teacher@aalto.fi'],
+    };
+    await responseTests
+      .testUnprocessableEntity(url, cookies.adminCookie)
+      .post(testData);
   });
 
   // TODO: Implement
@@ -440,5 +481,40 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     const url = `/v1/courses/${nonExistentId}`;
     const data: EditCourseData = {maxCredits: 10};
     await responseTests.testNotFound(url, cookies.adminCookie).put(data);
+  });
+
+  it('should respond with 404 when email does not exist', async () => {
+    const url = `/v1/courses/${courseId}`;
+
+    const testData: EditCourseData = {
+      teachersInCharge: ['teacher@aalto.fi', 'teacher1000@aalto.fi'],
+    };
+    await responseTests.testNotFound(url, cookies.adminCookie).post(testData);
+  });
+
+  it('should respond with 422 when course has duplicate roles', async () => {
+    const url = `/v1/courses/${courseId}`;
+
+    let testData: EditCourseData = {
+      teachersInCharge: ['teacher@aalto.fi', 'teacher@aalto.fi'],
+    };
+    await responseTests
+      .testUnprocessableEntity(url, cookies.adminCookie)
+      .put(testData);
+
+    testData = {
+      assistants: ['assistant@aalto.fi', 'assistant@aalto.fi'],
+    };
+    await responseTests
+      .testUnprocessableEntity(url, cookies.adminCookie)
+      .put(testData);
+
+    testData = {
+      teachersInCharge: ['teacher@aalto.fi'],
+      assistants: ['teacher@aalto.fi'],
+    };
+    await responseTests
+      .testUnprocessableEntity(url, cookies.adminCookie)
+      .put(testData);
   });
 });

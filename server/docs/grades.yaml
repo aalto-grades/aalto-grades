@@ -311,11 +311,5 @@ definitions:
         $ref: '#/components/responses/Forbidden'
       404:
         $ref: '#/components/responses/NotFound'
-      422:
-        description: Student number(s) not found in the database.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Error'
     security:
       - cookieAuth: []
