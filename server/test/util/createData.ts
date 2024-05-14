@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  AplusGradeSourceType,
   AttainmentData,
   CourseRoleType,
   GradingScale,
@@ -14,6 +15,7 @@ import {
 import {initGraph} from '@/common/util/initGraph';
 import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';
 import {sequelize} from '../../src/database';
+import AplusGradeSource from '../../src/database/models/aplusGradeSource';
 import AssessmentModel from '../../src/database/models/assessmentModel';
 import Attainment from '../../src/database/models/attainment';
 import AttainmentGrade from '../../src/database/models/attainmentGrade';
@@ -81,6 +83,39 @@ class CreateData {
       attainments.push(newAttainment);
     }
     return attainments;
+  }
+
+  async createAplusGradeSources(
+    courseId: number
+  ): Promise<[number, number, number]> {
+    const fullPointsAttainment = await this.createAttainment(courseId);
+    await AplusGradeSource.create({
+      attainmentId: fullPointsAttainment.id,
+      aplusCourseId: 1,
+      sourceType: AplusGradeSourceType.FullPoints,
+    });
+
+    const moduleAttainment = await this.createAttainment(courseId);
+    await AplusGradeSource.create({
+      attainmentId: moduleAttainment.id,
+      aplusCourseId: 1,
+      sourceType: AplusGradeSourceType.Module,
+      moduleId: 1,
+    });
+
+    const difficultyAttainment = await this.createAttainment(courseId);
+    await AplusGradeSource.create({
+      attainmentId: difficultyAttainment.id,
+      aplusCourseId: 1,
+      sourceType: AplusGradeSourceType.Difficulty,
+      difficulty: 'A',
+    });
+
+    return [
+      fullPointsAttainment.id,
+      moduleAttainment.id,
+      difficultyAttainment.id,
+    ];
   }
 
   async createGrade(

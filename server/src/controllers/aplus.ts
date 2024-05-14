@@ -17,8 +17,7 @@ import {fetchFromAplus, validateAplusCourseId} from './utils/aplus';
 import {validateAttainmentPath} from './utils/attainment';
 import {validateCourseId} from './utils/course';
 import AplusGradeSource from '../database/models/aplusGradeSource';
-import User from '../database/models/user';
-import {ApiError, NewDbGradeData, JwtClaims} from '../types';
+import {ApiError} from '../types';
 
 const APLUS_URL = 'https://plus.cs.aalto.fi/api/v2';
 

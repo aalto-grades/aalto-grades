@@ -11,6 +11,7 @@ import {
   AplusGradeSourceData,
   AplusGradeSourceType,
   HttpCode,
+  NewGradeArraySchema,
 } from '@/common/types';
 import {app} from '../../src/app';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
@@ -21,9 +22,14 @@ import {resetDb} from '../util/resetDb';
 
 const request = supertest(app);
 
+const APLUS_URL = 'https://plus.cs.aalto.fi/api/v2';
+
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
 let noRoleCourseId = -1;
+let fullPointsAttainmentId = -1;
+let moduleAttainmentId = -1;
+let difficultyAttainmentId = -1;
 let attainments: AttainmentData[] = [];
 
 jest.mock('axios');
@@ -34,10 +40,93 @@ beforeAll(async () => {
 
   let _;
   [courseId, attainments, _] = await createData.createCourse({});
+  [fullPointsAttainmentId, moduleAttainmentId, difficultyAttainmentId] =
+    await createData.createAplusGradeSources(courseId);
+
   [noRoleCourseId] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
+  });
+  await createData.createAplusGradeSources(courseId);
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  mockedAxios.get.mockImplementation(async url => {
+    const urlExercises = `${APLUS_URL}/courses/1/exercises?format=json`;
+    const urlPoints = `${APLUS_URL}/courses/1/points?format=json`;
+    const urlA = `${APLUS_URL}/courses/1/points/1?format=json`;
+    const urlB = `${APLUS_URL}/courses/1/points/2?format=json`;
+
+    /* eslint-disable camelcase */
+    switch (url) {
+      case urlExercises:
+        return {
+          data: {
+            results: [
+              {
+                id: 1,
+                display_name: 'First',
+                exercises: [{difficulty: 'A'}, {difficulty: ''}],
+              },
+              {
+                id: 2,
+                display_name: 'Second',
+                exercises: [{difficulty: ''}],
+              },
+            ],
+          },
+        };
+
+      case urlPoints:
+        return {
+          data: {
+            results: [{points: urlA}, {points: urlB}],
+          },
+        };
+
+      case urlA:
+        return {
+          data: {
+            student_id: '123456',
+            points: 50,
+            points_by_difficulty: {
+              A: 30,
+            },
+            modules: [
+              {
+                id: 1,
+                points: 10,
+              },
+              {
+                id: 2,
+                points: 40,
+              },
+            ],
+          },
+        };
+
+      case urlB:
+        return {
+          data: {
+            student_id: '654321',
+            points: 40,
+            points_by_difficulty: {
+              A: 25,
+            },
+            modules: [
+              {
+                id: 1,
+                points: 7,
+              },
+              {
+                id: 2,
+                points: 33,
+              },
+            ],
+          },
+        };
+    }
+    /* eslint-enable camelcase */
   });
 });
 
@@ -47,23 +136,6 @@ afterAll(async () => {
 
 describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () => {
   it('should respond with correct data when validation passes', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: {
-        results: [
-          {
-            id: 1,
-            display_name: 'First', // eslint-disable-line camelcase
-            exercises: [{difficulty: 'A'}, {difficulty: ''}],
-          },
-          {
-            id: 2,
-            display_name: 'Second', // eslint-disable-line camelcase
-            exercises: [{difficulty: ''}],
-          },
-        ],
-      },
-    });
-
     const res = await request
       .get('/v1/aplus/courses/1')
       .set('Cookie', cookies.adminCookie)
@@ -214,20 +286,56 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
   });
 });
 
-describe('Test POST /v1/courses/:courseId/attainments/:attainmentId/aplus-fetch - Fetch grades from A+', () => {
+describe('Test GET /v1/courses/:courseId/attainments/:attainmentId/aplus-fetch - Fetch grades from A+', () => {
   it('should fetch grades for full points (admin user)', async () => {
-    // TODO
+    const res = await request
+      .get(
+        `/v1/courses/${courseId}/attainments/${fullPointsAttainmentId}/aplus-fetch`
+      )
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    const result = await NewGradeArraySchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 
   it('should fetch grades for full points (teacher user)', async () => {
-    // TODO
+    const res = await request
+      .get(
+        `/v1/courses/${courseId}/attainments/${fullPointsAttainmentId}/aplus-fetch`
+      )
+      .set('Cookie', cookies.teacherCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    const result = await NewGradeArraySchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 
   it('should fetch grades for module', async () => {
-    // TODO
+    const res = await request
+      .get(
+        `/v1/courses/${courseId}/attainments/${moduleAttainmentId}/aplus-fetch`
+      )
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    const result = await NewGradeArraySchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 
   it('should fetch grades for difficulty', async () => {
-    // TODO
+    const res = await request
+      .get(
+        `/v1/courses/${courseId}/attainments/${difficultyAttainmentId}/aplus-fetch`
+      )
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    const result = await NewGradeArraySchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
   });
 });
