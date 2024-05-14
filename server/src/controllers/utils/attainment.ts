@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData, HttpCode} from '@common/types';
+import {AttainmentData, HttpCode} from '@/common/types';
+import {findAndValidateCourseId} from './course';
 import Attainment from '../../database/models/attainment';
 import Course from '../../database/models/course';
 import {ApiError, stringToIdSchema} from '../../types';
-import {findAndValidateCourseId} from './course';
 
 /**
  * Finds an attainment by its ID.

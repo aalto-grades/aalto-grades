@@ -12,7 +12,7 @@ import {
   HttpCode,
   IdSchema,
   NewAttainmentData,
-} from '@common/types';
+} from '@/common/types';
 import {app} from '../../src/app';
 import Attainment from '../../src/database/models/attainment';
 import {createData} from '../util/createData';

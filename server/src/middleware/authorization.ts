@@ -4,7 +4,7 @@
 
 import {NextFunction, Request, Response} from 'express';
 
-import {CourseRoleType, HttpCode, SystemRole} from '@common/types';
+import {CourseRoleType, HttpCode, SystemRole} from '@/common/types';
 import {getUserCourseRole, isAdminOrOwner} from '../controllers/utils/user';
 import {JwtClaims, stringToIdSchema} from '../types';
 

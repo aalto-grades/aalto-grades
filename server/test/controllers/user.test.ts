@@ -5,7 +5,7 @@
 import supertest from 'supertest';
 import {z} from 'zod';
 
-import {BaseCourseDataSchema, HttpCode, IdpUserSchema} from '@common/types';
+import {BaseCourseDataSchema, HttpCode, IdpUserSchema} from '@/common/types';
 import {app} from '../../src/app';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';

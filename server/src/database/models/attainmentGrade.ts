@@ -11,9 +11,9 @@ import {
   Model,
 } from 'sequelize';
 
-import {sequelize} from '..';
 import Attainment from './attainment';
 import User from './user';
+import {sequelize} from '..';
 
 export default class AttainmentGrade extends Model<
   InferAttributes<AttainmentGrade>,

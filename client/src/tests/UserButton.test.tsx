@@ -10,10 +10,10 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import {userEvent} from '@testing-library/user-event';
 import {BrowserRouter} from 'react-router-dom';
 
-import {LoginResult, SystemRole} from '@common/types';
+import {LoginResult, SystemRole} from '@/common/types';
 import UserButton from '../components/auth/UserButton';
 import AuthContext from '../context/AuthProvider';
 

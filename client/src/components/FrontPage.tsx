@@ -5,12 +5,12 @@
 import {Box, Button, Typography, useTheme} from '@mui/material';
 import {JSX, useState} from 'react';
 
-import {LoginResult, SystemRole} from '@common/types';
-import {useGetAllCourses, useGetCoursesOfUser} from '../hooks/useApi';
-import useAuth from '../hooks/useAuth';
+import {LoginResult, SystemRole} from '@/common/types';
 import CourseTable from './front-page/CourseTable';
 import CreateCourseDialog from './front-page/CreateCourseDialog';
 import UsersView from './front-page/users-view/UsersView';
+import {useGetAllCourses, useGetCoursesOfUser} from '../hooks/useApi';
+import useAuth from '../hooks/useAuth';
 
 export default function FrontPage(): JSX.Element {
   const theme = useTheme();

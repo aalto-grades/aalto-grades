@@ -10,8 +10,9 @@ import {
   NewCourseData,
   SystemRole,
   UserData,
-} from '@common/types';
-import {initGraph} from '@common/util/initGraph';
+} from '@/common/types';
+import {initGraph} from '@/common/util/initGraph';
+import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';
 import {sequelize} from '../../src/database';
 import AssessmentModel from '../../src/database/models/assessmentModel';
 import Attainment from '../../src/database/models/attainment';
@@ -21,7 +22,6 @@ import CourseRole from '../../src/database/models/courseRole';
 import CourseTranslation from '../../src/database/models/courseTranslation';
 import FinalGrade from '../../src/database/models/finalGrade';
 import User from '../../src/database/models/user';
-import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';
 
 /**
  * Still relies on the test users admin@aalto.fi, teacher@aalto.fi,

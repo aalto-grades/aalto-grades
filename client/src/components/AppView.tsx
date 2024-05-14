@@ -5,6 +5,7 @@
 import {Container, useTheme} from '@mui/material';
 import {JSX} from 'react';
 import {Outlet} from 'react-router-dom';
+
 import Footer from './Footer';
 import Header from './Header';
 

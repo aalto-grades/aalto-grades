@@ -11,9 +11,9 @@ import {
   Model,
 } from 'sequelize';
 
-import {GraphStructure} from '@common/types';
-import {sequelize} from '..';
+import {GraphStructure} from '@/common/types';
 import Course from './course';
+import {sequelize} from '..';
 
 export default class AssessmentModel extends Model<
   InferAttributes<AssessmentModel>,

@@ -23,14 +23,13 @@ import {
   SetStateAction,
   createContext,
   useCallback,
-  useContext,
   useMemo,
   useState,
   useTransition,
 } from 'react';
 import {useParams} from 'react-router-dom';
 
-import {AttainmentData, StudentRow} from '@common/types';
+import {AttainmentData, StudentRow} from '@/common/types';
 import GradeCell from '../components/course-results-view/GradeCell';
 import PredictedGradeCell from '../components/course-results-view/PredictedGradeCell';
 import UserGraphDialog from '../components/course-results-view/UserGraphDialog';
@@ -39,7 +38,7 @@ import {useGetAllAssessmentModels, useGetAttainments} from '../hooks/useApi';
 import {groupByLatestBestGrade, predictGrades} from '../utils/table';
 
 // Define the shape of the context
-type TableContextProps = {
+export type TableContextProps = {
   table: ReturnType<typeof useReactTable<GroupedStudentRow>>;
   //   setTable: Dispatch<SetStateAction<typeof table>;
   gradeSelectOption: 'best' | 'latest';
@@ -294,10 +293,10 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     columnHelper.accessor('user.studentNumber', {
       header: 'Student Number',
       meta: {PrettyChipPosition: 'first'},
-      cell: ({row, getValue}) => {
-        // TODO: Remove link
-        return getValue();
-      },
+      // cell: ({row, getValue}) => {
+      //   // TODO: Remove link
+      //   return getValue();
+      // },
     }),
     // columnHelper.accessor('credits', {
     //   header: 'Credits',
@@ -386,7 +385,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     // Selection
     onRowSelectionChange: selection => {
       setRowSelection(selection);
-      if (table) table.options.state.rowSelection = rowSelection;
+      table.options.state.rowSelection = rowSelection;
     },
     // enableRowSelection: row => {
     //   if (row.subRows && row.subRows.length > 0) {
@@ -437,11 +436,4 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       {props.children}
     </GradesTableContext.Provider>
   );
-};
-export const useTableContext = (): TableContextProps => {
-  const context = useContext(GradesTableContext);
-  if (context === undefined) {
-    throw new Error('useTableContext must be used within a TableProvider');
-  }
-  return context;
 };

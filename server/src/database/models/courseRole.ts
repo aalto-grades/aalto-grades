@@ -12,10 +12,10 @@ import {
   Op,
 } from 'sequelize';
 
-import {CourseRoleType} from '@common/types';
-import {sequelize} from '..';
+import {CourseRoleType} from '@/common/types';
 import Course from './course';
 import User from './user';
+import {sequelize} from '..';
 
 export default class CourseRole extends Model<
   InferAttributes<CourseRole>,

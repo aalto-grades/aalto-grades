@@ -8,6 +8,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 import {readFileSync} from 'fs';
+
 import logger from './winston';
 
 const parsedPort: number = Number(process.env.AALTO_GRADES_BACKEND_PORT);

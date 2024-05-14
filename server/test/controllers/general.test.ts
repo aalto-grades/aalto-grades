@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from '@common/types';
 import supertest from 'supertest';
 
+import {HttpCode} from '@/common/types';
 import {app} from '../../src/app';
 import {ErrorSchema} from '../util/general';
 

@@ -11,14 +11,14 @@ import {
   EditAttainmentDataSchema,
   HttpCode,
   NewAttainmentDataSchema,
-} from '@common/types';
-import Attainment from '../database/models/attainment';
-import {ApiError} from '../types';
+} from '@/common/types';
 import {
   findAttainmentsByCourseId,
   validateAttainmentPath,
 } from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
+import Attainment from '../database/models/attainment';
+import {ApiError} from '../types';
 
 /**
  * Responds with AttainmentData[]

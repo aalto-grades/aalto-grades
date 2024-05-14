@@ -2,13 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {IdSchema} from '@common/types';
-import {
-  AttainmentData,
-  AttainmentDataArraySchema,
-  EditAttainmentData,
-  NewAttainmentData,
-} from '@common/types/attainment';
 import {
   UseMutationOptions,
   UseMutationResult,
@@ -18,8 +11,16 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import {Numeric} from '../../types';
+
+import {IdSchema} from '@/common/types';
+import {
+  AttainmentData,
+  AttainmentDataArraySchema,
+  EditAttainmentData,
+  NewAttainmentData,
+} from '@/common/types/attainment';
 import axios from './axios';
+import {Numeric} from '../../types';
 
 export const useGetAttainments = (
   courseId: Numeric,

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import supertest from 'supertest';
+
 import {app} from '../../src/app';
 import {getDateOfLatestGrade} from '../../src/controllers/utils/grades';
 import {createData} from '../util/createData';

@@ -3,11 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  FinalGradeData,
-  FinalGradeDataArraySchema,
-  NewFinalGrade,
-} from '@common/types';
-import {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -16,8 +11,14 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import {Numeric} from '../../types';
+
+import {
+  FinalGradeData,
+  FinalGradeDataArraySchema,
+  NewFinalGrade,
+} from '@/common/types';
 import axios from './axios';
+import {Numeric} from '../../types';
 
 export const useAddFinalGrades = (
   courseId: Numeric,
@@ -27,7 +28,7 @@ export const useAddFinalGrades = (
 
   return useMutation({
     mutationFn: async (newFinalGrades: NewFinalGrade[]) =>
-      await axios.post(`/v1/courses/${courseId}/finalGrades`, newFinalGrades),
+      await axios.post(`/v1/courses/${courseId}/final-grades`, newFinalGrades),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -49,7 +50,7 @@ export const useGetFinalGrades = (
     queryKey: ['final-grades', courseId],
     queryFn: async () =>
       FinalGradeDataArraySchema.parse(
-        (await axios.get(`/v1/courses/${courseId}/finalGrades`)).data
+        (await axios.get(`/v1/courses/${courseId}/final-grades`)).data
       ),
     ...options,
   });

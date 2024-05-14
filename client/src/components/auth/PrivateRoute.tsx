@@ -8,7 +8,7 @@
 import {JSX, useEffect, useState} from 'react';
 import {Navigate, Outlet} from 'react-router-dom';
 
-import {SystemRole} from '@common/types';
+import {SystemRole} from '@/common/types';
 import {useGetRefreshToken} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 

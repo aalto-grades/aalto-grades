@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {z} from 'zod';
+
 import {GraphStructureSchema} from './graph';
 
 // Types

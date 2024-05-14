@@ -14,13 +14,11 @@ import {
   Select,
 } from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
-
-import {AssessmentModelData} from '@common/types';
 import {useParams} from 'react-router-dom';
-import {
-  GroupedStudentRow,
-  useTableContext,
-} from '../../context/GradesTableProvider';
+
+import {AssessmentModelData} from '@/common/types';
+import {GroupedStudentRow} from '../../context/GradesTableProvider';
+import {useTableContext} from '../../context/useTableContext';
 import {useGetAttainments} from '../../hooks/useApi';
 import Graph from '../graph/Graph';
 

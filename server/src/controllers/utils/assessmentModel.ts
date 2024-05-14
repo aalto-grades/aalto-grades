@@ -2,11 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData, HttpCode} from '@common/types';
+import {AttainmentData, HttpCode} from '@/common/types';
 import AssessmentModel from '../../database/models/assessmentModel';
 import Course from '../../database/models/course';
 import {ApiError, stringToIdSchema} from '../../types';
-import {findAndValidateCourseId} from './course';
 
 /**
  * Finds an assessment model by id.

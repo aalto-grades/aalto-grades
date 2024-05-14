@@ -4,7 +4,7 @@
 
 import {z} from 'zod';
 
-import {CourseRoleType, SystemRole} from '@common/types';
+import {CourseRoleType, SystemRole} from '@/common/types';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';

@@ -14,7 +14,7 @@ import {
 import {JSX} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-import {CourseData, SystemRole} from '@common/types';
+import {CourseData, SystemRole} from '@/common/types';
 import useAuth from '../../hooks/useAuth';
 import {HeadCellData} from '../../types';
 

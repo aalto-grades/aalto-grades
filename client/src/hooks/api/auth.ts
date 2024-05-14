@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {LoginResult, LoginResultSchema} from '@common/types';
 import {
   UseMutationOptions,
   UseMutationResult,
@@ -11,8 +10,10 @@ import {
   useMutation,
   useQuery,
 } from '@tanstack/react-query';
-import {LoginCredentials} from '../../types';
+
+import {LoginResult, LoginResultSchema} from '@/common/types';
 import axios from './axios';
+import {LoginCredentials} from '../../types';
 
 export const useGetRefreshToken = (
   options?: Partial<UseQueryOptions<LoginResult>>
