@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {useNamespaces, SelectReturnType, isArrayOfNodes} from 'xpath';
-import {DOMParser} from 'xmldom';
 import axios from 'axios';
+import {DOMParser} from 'xmldom';
+import {useNamespaces, SelectReturnType, isArrayOfNodes} from 'xpath';
 
 type selectFun = (query: string) => SelectReturnType;
 

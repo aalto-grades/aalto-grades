@@ -30,7 +30,7 @@ import {
 } from 'react';
 import {useParams} from 'react-router-dom';
 
-import {AttainmentData, StudentRow} from '@common/types';
+import {AttainmentData, StudentRow} from '@/common/types';
 import GradeCell from '../components/course-results-view/GradeCell';
 import PredictedGradeCell from '../components/course-results-view/PredictedGradeCell';
 import UserGraphDialog from '../components/course-results-view/UserGraphDialog';

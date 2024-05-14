@@ -20,8 +20,9 @@ import {enqueueSnackbar} from 'notistack';
 import {JSX, useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
-import {AssessmentModelData, StudentRow, SystemRole} from '@common/types';
-import {GraphStructure} from '@common/types/graph';
+import {AssessmentModelData, StudentRow, SystemRole} from '@/common/types';
+import {GraphStructure} from '@/common/types/graph';
+import CreateAssessmentModelDialog from './CreateAssessmentModelDialog';
 import {
   useDeleteAssessmentModel,
   useEditAssessmentModel,
@@ -31,7 +32,6 @@ import {
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import Graph from '../graph/Graph';
-import CreateAssessmentModelDialog from './CreateAssessmentModelDialog';
 
 type ParamsType = {courseId: string; modelId?: string; userId?: string};
 const ModelsView = (): JSX.Element => {

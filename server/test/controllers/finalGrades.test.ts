@@ -5,7 +5,7 @@
 import supertest from 'supertest';
 import {z} from 'zod';
 
-import {FinalGradeDataSchema, HttpCode, NewFinalGrade} from '@common/types';
+import {FinalGradeDataSchema, HttpCode, NewFinalGrade} from '@/common/types';
 import {app} from '../../src/app';
 import FinalGrade from '../../src/database/models/finalGrade';
 import {createData} from '../util/createData';

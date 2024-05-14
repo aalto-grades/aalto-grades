@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {z} from 'zod';
+
 import {FinalGradeDataArraySchema} from './finalGrade';
 import {DateSchema, LanguageSchema} from './general';
 import {UserDataSchema} from './user';

@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, {Router} from 'express';
-import {RequestHandler} from 'express-serve-static-core';
+import express, {RequestHandler, Router} from 'express';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
@@ -12,7 +11,7 @@ import {
   EditCourseDataSchema,
   NewCourseDataSchema,
   SystemRole,
-} from '@common/types';
+} from '@/common/types';
 import {
   addCourse,
   editCourse,

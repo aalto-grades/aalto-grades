@@ -14,7 +14,7 @@ import {
   Language,
   NewCourseData,
   TeacherData,
-} from '@common/types';
+} from '@/common/types';
 import {app} from '../../src/app';
 import {
   findCourseFullById,

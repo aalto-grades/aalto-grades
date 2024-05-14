@@ -15,6 +15,11 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   parser: '@typescript-eslint/parser',
   ignorePatterns: ['node_modules', 'build', '.eslintrc.cjs'],
+  settings: {
+    'import/resolver': {
+      typescript: {project: `${__dirname}/`}, // this loads <rootdir>/tsconfig.json to eslint
+    },
+  },
   rules: {
     '@typescript-eslint/no-non-null-assertion': 'error',
   },

@@ -12,8 +12,8 @@ import {
   GraphStructure,
   HttpCode,
   NewAssessmentModelData,
-} from '@common/types';
-import {initGraph} from '@common/util/initGraph';
+} from '@/common/types';
+import {initGraph} from '@/common/util/initGraph';
 import {app} from '../../src/app';
 import AssessmentModel from '../../src/database/models/assessmentModel';
 import {createData} from '../util/createData';

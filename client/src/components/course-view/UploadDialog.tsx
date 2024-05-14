@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {NewGrade} from '@common/types';
 import {Delete} from '@mui/icons-material';
 import {Button, Dialog, DialogActions} from '@mui/material';
 import {GridActionsCellItem, GridColDef, GridRowsProp} from '@mui/x-data-grid';
@@ -10,9 +9,11 @@ import dayjs, {Dayjs} from 'dayjs';
 import {enqueueSnackbar} from 'notistack';
 import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
-import {useAddGrades, useGetAttainments} from '../../hooks/useApi';
+
+import {NewGrade} from '@/common/types';
 import UploadDialogConfirm from './UploadDialogConfirm';
 import UploadDialogUpload from './UploadDialogUpload';
+import {useAddGrades, useGetAttainments} from '../../hooks/useApi';
 
 export type GradeUploadColTypes = Record<string, number | null> & {
   id: number;

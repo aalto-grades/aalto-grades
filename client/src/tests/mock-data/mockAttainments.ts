@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData} from '@common/types';
+import {AttainmentData} from '@/common/types';
 
 export const mockAttainments: AttainmentData[] = [
   {

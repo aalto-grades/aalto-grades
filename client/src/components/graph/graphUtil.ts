@@ -5,7 +5,7 @@
 import ElkConstructor, {ElkNode} from 'elkjs/lib/elk.bundled';
 import {Edge, Node} from 'reactflow';
 
-import {NodeValues} from '@common/types/graph';
+import {NodeValues} from '@/common/types/graph';
 import {ExtraNodeData} from '../../context/GraphProvider';
 
 export const findDisconnectedEdges = (

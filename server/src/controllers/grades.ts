@@ -15,14 +15,7 @@ import {
   SisuCsvUploadSchema,
   StudentRow,
   UserData,
-} from '@common/types';
-import logger from '../configs/winston';
-import {sequelize} from '../database';
-import Attainment from '../database/models/attainment';
-import AttainmentGrade from '../database/models/attainmentGrade';
-import FinalGrade from '../database/models/finalGrade';
-import User from '../database/models/user';
-import {ApiError, AttainmentGradeModelData, JwtClaims} from '../types';
+} from '@/common/types';
 import {validateAttainmentBelongsToCourse} from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
@@ -32,6 +25,13 @@ import {
   studentNumbersExist,
   validateUserAndGrader,
 } from './utils/grades';
+import logger from '../configs/winston';
+import {sequelize} from '../database';
+import Attainment from '../database/models/attainment';
+import AttainmentGrade from '../database/models/attainmentGrade';
+import FinalGrade from '../database/models/finalGrade';
+import User from '../database/models/user';
+import {ApiError, AttainmentGradeModelData, JwtClaims} from '../types';
 
 /**
  * Responds with StudentRow[]

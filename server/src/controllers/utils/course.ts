@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseData, CourseRoleType, HttpCode} from '@common/types';
+import {CourseData, CourseRoleType, HttpCode} from '@/common/types';
 import logger from '../../configs/winston';
 import Course from '../../database/models/course';
 import CourseTranslation from '../../database/models/courseTranslation';

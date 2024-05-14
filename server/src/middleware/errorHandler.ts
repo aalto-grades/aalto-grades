@@ -5,7 +5,7 @@
 import {AxiosError} from 'axios';
 import {NextFunction, Request, RequestHandler, Response} from 'express';
 
-import {HttpCode} from '@common/types';
+import {HttpCode} from '@/common/types';
 import logger from '../configs/winston';
 import {ApiError} from '../types';
 

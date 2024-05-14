@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 {
+  "extends": ["plugin:import/recommended", "plugin:import/typescript"],
+  "plugins": ["import"],
   "rules": {
     // Disable all rules from the 'node' plugin inside gts
     "node/no-extraneous-import": "off",
@@ -21,6 +23,32 @@
     "spaced-comment": ["warn", "always", {"markers": ["/"]}],
     "eqeqeq": "warn",
     "dot-notation": "warn",
+
+    "import/no-unresolved": "warn",
+    "import/no-named-as-default-member": "off",
+    "import/order": [
+      "warn",
+      {
+        "groups": [
+          ["builtin", "external"],
+          ["internal", "parent", "sibling", "index"]
+        ],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc"
+        },
+        // https://github.com/import-js/eslint-plugin-import/issues/2008#issuecomment-801263294
+        "pathGroups": [
+          {
+            "pattern": "@/**",
+            "group": "internal",
+            "position": "before"
+          }
+        ],
+        "distinctGroup": false,
+        "pathGroupsExcludedImportTypes": ["builtin", "object"]
+      }
+    ],
 
     "@typescript-eslint/explicit-function-return-type": [
       "warn",

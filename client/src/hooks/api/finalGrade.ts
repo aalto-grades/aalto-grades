@@ -3,11 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  FinalGradeData,
-  FinalGradeDataArraySchema,
-  NewFinalGrade,
-} from '@common/types';
-import {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -16,8 +11,14 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import {Numeric} from '../../types';
+
+import {
+  FinalGradeData,
+  FinalGradeDataArraySchema,
+  NewFinalGrade,
+} from '@/common/types';
 import axios from './axios';
+import {Numeric} from '../../types';
 
 export const useAddFinalGrades = (
   courseId: Numeric,

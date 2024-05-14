@@ -6,10 +6,10 @@ import {Box} from '@mui/material';
 import {JSX} from 'react';
 import {useParams} from 'react-router-dom';
 
-import {GradesTableProvider} from '../context/GradesTableProvider';
-import {useGetGrades} from '../hooks/useApi';
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
+import {GradesTableProvider} from '../context/GradesTableProvider';
+import {useGetGrades} from '../hooks/useApi';
 
 export default function CourseResultsView(): JSX.Element {
   const {courseId} = useParams() as {courseId: string};

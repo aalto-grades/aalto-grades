@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode, LoginResult, SystemRole} from '@common/types';
 import {
   Profile,
   Strategy as SamlStrategy,
@@ -10,6 +9,9 @@ import {
 } from '@node-saml/passport-saml';
 import argon from 'argon2';
 import {Request} from 'express';
+
+import {HttpCode, LoginResult, SystemRole} from '@/common/types';
+import {getIdpSignCert} from './saml';
 import {
   SAML_CALLBACK,
   SAML_ENCRYPT_PVK,
@@ -22,7 +24,6 @@ import {
 import logger from '../../configs/winston';
 import User from '../../database/models/user';
 import {ApiError} from '../../types';
-import {getIdpSignCert} from './saml';
 
 /** @throws ApiError(401) */
 export const validateLogin = async (

@@ -18,7 +18,7 @@ import {enqueueSnackbar} from 'notistack';
 import {CSSProperties, JSX} from 'react';
 import {Outlet, RouterProvider, createBrowserRouter} from 'react-router-dom';
 
-import {SystemRole} from '@common/types';
+import {SystemRole} from '@/common/types';
 import AppView from './components/AppView';
 import CourseResultsView from './components/CourseResultsView';
 import CourseView from './components/CourseView';

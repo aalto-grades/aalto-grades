@@ -18,7 +18,7 @@ import {
 import {JSX, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
-import {GraphTemplate, initGraph} from '@common/util/initGraph';
+import {GraphTemplate, initGraph} from '@/common/util/initGraph';
 import {useAddAssessmentModel, useGetAttainments} from '../../hooks/useApi';
 
 const CreateAssessmentModelDialog = ({

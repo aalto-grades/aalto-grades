@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData} from '@common/types';
 import {
   Button,
   Checkbox,
@@ -15,6 +14,8 @@ import {
 } from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
 import {Node} from 'reactflow';
+
+import {AttainmentData} from '@/common/types';
 
 const SelectAttainmentsDialog = ({
   nodes,

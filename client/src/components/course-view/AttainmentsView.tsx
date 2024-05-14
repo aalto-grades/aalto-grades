@@ -25,11 +25,16 @@ import {
   GridColDef,
   GridRowsProp,
 } from '@mui/x-data-grid';
+import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
 import {useBlocker, useParams} from 'react-router-dom';
 
-import {EditAttainmentData, NewAttainmentData, SystemRole} from '@common/types';
-import {enqueueSnackbar} from 'notistack';
+import {
+  EditAttainmentData,
+  NewAttainmentData,
+  SystemRole,
+} from '@/common/types';
+import NewAttainmentDialog from './NewAttainmentDialog';
 import {
   useAddAttainment,
   useDeleteAttainment,
@@ -39,7 +44,6 @@ import {
 import useAuth from '../../hooks/useAuth';
 import {Numeric} from '../../types';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
-import NewAttainmentDialog from './NewAttainmentDialog';
 
 type ColTypes = {
   id: number;

@@ -2,8 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {SystemRole} from '@common/types';
 import {z} from 'zod';
+
+import {SystemRole} from '@/common/types';
 
 export const stringToIdSchema = z
   .string()

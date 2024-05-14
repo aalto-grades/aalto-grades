@@ -6,7 +6,7 @@ import TestAgent from 'supertest/lib/agent';
 import Test from 'supertest/lib/test';
 import {z} from 'zod';
 
-import {HttpCode} from '@common/types';
+import {HttpCode} from '@/common/types';
 import {ErrorSchema, ZodErrorSchema} from './general';
 
 type ReqData = string | object | undefined;

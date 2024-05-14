@@ -20,9 +20,9 @@ import {
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
-
-import {EditGradeData, GradeData, NewGrade} from '@common/types';
 import {useBlocker, useParams} from 'react-router-dom';
+
+import {EditGradeData, GradeData, NewGrade} from '@/common/types';
 import {useTableContext} from '../../context/GradesTableProvider';
 import {useAddGrades, useDeleteGrade, useEditGrade} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';

@@ -2,19 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 import {Request, Response} from 'express';
+import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   FinalGradeData,
   HttpCode,
   NewFinalGradeArraySchema,
-} from '@common/types';
-import {TypedRequestBody} from 'zod-express-middleware';
+} from '@/common/types';
+import {validateCourseId} from './utils/course';
+import {validateUserAndGrader} from './utils/grades';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
 import {JwtClaims} from '../types';
 import {FinalGradeModelData} from '../types/finalGrade';
-import {validateCourseId} from './utils/course';
-import {validateUserAndGrader} from './utils/grades';
 
 /**
  * Responds with FinalGradeData[]
