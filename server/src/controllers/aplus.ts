@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
+import {z} from 'zod';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
@@ -81,98 +82,110 @@ export const fetchAplusGrades = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [_, attainment] = await validateAttainmentPath(
-    req.params.courseId,
-    req.params.attainmentId
-  );
-
-  // TODO: There can be multiple sources
-  const gradeSource = await AplusGradeSource.findOne({
-    where: {attainmentId: attainment.id},
-  });
-
-  if (!gradeSource) {
-    throw new ApiError(
-      `attainment with ID ${attainment.id} has no A+ grade sources`,
-      HttpCode.UnprocessableEntity
-    );
-  }
-
-  const allPointsRes = await fetchFromAplus<{
-    results: {
-      points: string;
-    }[];
-  }>(`${APLUS_URL}/courses/${gradeSource.aplusCourseId}/points?format=json`);
+  const attainmentIds = z
+    .array(z.number().int().positive())
+    .parse(JSON.parse(String(req.query.attainments)));
 
   const newGradesFromAplus: NewGrade[] = [];
-  for (const result of allPointsRes.data.results) {
-    // TODO: Fetching points individually for each student may not be the best idea
-    // Related: https://github.com/apluslms/a-plus/issues/1360
-    const pointsRes = await fetchFromAplus<{
-      student_id: string;
-      points: number;
-      points_by_difficulty: {
-        [key: string]: number;
-      };
-      modules: {
-        id: number;
-        points: number;
-      }[];
-    }>(result.points);
+  for (const attainmentId of attainmentIds) {
+    // TODO: Batch validation?
+    const [_, attainment] = await validateAttainmentPath(
+      req.params.courseId,
+      String(attainmentId)
+    );
 
-    let grade: number | undefined;
-    switch (gradeSource.sourceType) {
-      case AplusGradeSourceType.FullPoints:
-        grade = pointsRes.data.points;
-        break;
+    // TODO: Find all grade sources at once?
+    // TODO: There can be multiple sources
+    const gradeSource = await AplusGradeSource.findOne({
+      where: {attainmentId: attainment.id},
+    });
 
-      case AplusGradeSourceType.Module:
-        if (!gradeSource.moduleId) {
-          throw new ApiError(
-            `grade source with ID ${gradeSource.id} has module type but does not define moduleId`,
-            HttpCode.InternalServerError
-          );
-        }
-        for (const module of pointsRes.data.modules) {
-          if (module.id === gradeSource.moduleId) {
-            grade = module.points;
-          }
-        }
-        if (!grade) {
-          throw new ApiError(
-            `A+ course with ID ${gradeSource.aplusCourseId} has no module with ID ${gradeSource.moduleId}`,
-            HttpCode.InternalServerError
-          );
-        }
-        break;
-
-      case AplusGradeSourceType.Difficulty:
-        if (!gradeSource.difficulty) {
-          throw new ApiError(
-            `grade source with ID ${gradeSource.id} has difficulty type but does not define difficulty`,
-            HttpCode.InternalServerError
-          );
-        }
-        if (!(gradeSource.difficulty in pointsRes.data.points_by_difficulty)) {
-          throw new ApiError(
-            `A+ course with ID ${gradeSource.aplusCourseId} has no difficulty ${gradeSource.difficulty}`,
-            HttpCode.InternalServerError
-          );
-        }
-        grade = pointsRes.data.points_by_difficulty[gradeSource.difficulty];
-        break;
+    if (!gradeSource) {
+      throw new ApiError(
+        `attainment with ID ${attainment.id} has no A+ grade sources`,
+        HttpCode.UnprocessableEntity
+      );
     }
 
-    // TODO: Proper dates
-    // Related: https://github.com/apluslms/a-plus/issues/1361
-    newGradesFromAplus.push({
-      studentNumber: pointsRes.data.student_id,
-      attainmentId: attainment.id,
-      grade: grade,
-      date: new Date(),
-      expiryDate: new Date(), // TODO: date + daysValid by default
-      comment: null,
-    });
+    // We cannot fetch the student list outside this loop because attainment
+    // grade sources may point to different A+ courses
+    const allPointsRes = await fetchFromAplus<{
+      results: {
+        points: string;
+      }[];
+    }>(`${APLUS_URL}/courses/${gradeSource.aplusCourseId}/points?format=json`);
+
+    for (const result of allPointsRes.data.results) {
+      // TODO: Fetching points individually for each student may not be the best idea
+      // Related: https://github.com/apluslms/a-plus/issues/1360
+      const pointsRes = await fetchFromAplus<{
+        student_id: string;
+        points: number;
+        points_by_difficulty: {
+          [key: string]: number;
+        };
+        modules: {
+          id: number;
+          points: number;
+        }[];
+      }>(result.points);
+
+      let grade: number | undefined;
+      switch (gradeSource.sourceType) {
+        case AplusGradeSourceType.FullPoints:
+          grade = pointsRes.data.points;
+          break;
+
+        case AplusGradeSourceType.Module:
+          if (!gradeSource.moduleId) {
+            throw new ApiError(
+              `grade source with ID ${gradeSource.id} has module type but does not define moduleId`,
+              HttpCode.InternalServerError
+            );
+          }
+          for (const module of pointsRes.data.modules) {
+            if (module.id === gradeSource.moduleId) {
+              grade = module.points;
+            }
+          }
+          if (!grade) {
+            throw new ApiError(
+              `A+ course with ID ${gradeSource.aplusCourseId} has no module with ID ${gradeSource.moduleId}`,
+              HttpCode.InternalServerError
+            );
+          }
+          break;
+
+        case AplusGradeSourceType.Difficulty:
+          if (!gradeSource.difficulty) {
+            throw new ApiError(
+              `grade source with ID ${gradeSource.id} has difficulty type but does not define difficulty`,
+              HttpCode.InternalServerError
+            );
+          }
+          if (
+            !(gradeSource.difficulty in pointsRes.data.points_by_difficulty)
+          ) {
+            throw new ApiError(
+              `A+ course with ID ${gradeSource.aplusCourseId} has no difficulty ${gradeSource.difficulty}`,
+              HttpCode.InternalServerError
+            );
+          }
+          grade = pointsRes.data.points_by_difficulty[gradeSource.difficulty];
+          break;
+      }
+
+      // TODO: Proper dates
+      // Related: https://github.com/apluslms/a-plus/issues/1361
+      newGradesFromAplus.push({
+        studentNumber: pointsRes.data.student_id,
+        attainmentId: attainment.id,
+        grade: grade,
+        date: new Date(),
+        expiryDate: new Date(), // TODO: date + daysValid by default
+        comment: null,
+      });
+    }
   }
 
   res.json(newGradesFromAplus);

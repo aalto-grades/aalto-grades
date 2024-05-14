@@ -37,7 +37,7 @@ router.post(
 );
 
 router.get(
-  '/v1/courses/:courseId/attainments/:attainmentId/aplus-fetch',
+  '/v1/courses/:courseId/aplus-fetch',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   controllerDispatcher(fetchAplusGrades)

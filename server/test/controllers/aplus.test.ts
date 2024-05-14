@@ -30,7 +30,6 @@ let fullPointsAttainmentId = -1;
 let moduleAttainmentId = -1;
 let difficultyAttainmentId = -1;
 let noRoleCourseId = -1;
-let noRoleAttainmentId = -1;
 let attainments: AttainmentData[] = [];
 
 jest.mock('axios');
@@ -49,7 +48,6 @@ beforeAll(async () => {
     hasAssistant: false,
     hasStudent: false,
   });
-  [noRoleAttainmentId, _, _] = await createData.createAplusGradeSources(courseId);
 
   // eslint-disable-next-line @typescript-eslint/require-await
   mockedAxios.get.mockImplementation(async url => {
@@ -248,7 +246,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
       withModuleId: boolean,
       withDifficulty: boolean
     ): Promise<void> => {
-      const res = await request
+      await request
         .post(`/v1/courses/${courseId}/aplus-source`)
         .send([getGradeSource(sourceType, {withModuleId, withDifficulty})])
         .set('Cookie', cookies.adminCookie)
@@ -287,11 +285,11 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
   });
 });
 
-describe('Test GET /v1/courses/:courseId/attainments/:attainmentId/aplus-fetch - Fetch grades from A+', () => {
+describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', () => {
   it('should fetch grades for full points (admin user)', async () => {
     const res = await request
       .get(
-        `/v1/courses/${courseId}/attainments/${fullPointsAttainmentId}/aplus-fetch`
+        `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`
       )
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
@@ -304,7 +302,7 @@ describe('Test GET /v1/courses/:courseId/attainments/:attainmentId/aplus-fetch -
   it('should fetch grades for full points (teacher user)', async () => {
     const res = await request
       .get(
-        `/v1/courses/${courseId}/attainments/${fullPointsAttainmentId}/aplus-fetch`
+        `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`
       )
       .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
@@ -317,7 +315,7 @@ describe('Test GET /v1/courses/:courseId/attainments/:attainmentId/aplus-fetch -
   it('should fetch grades for module', async () => {
     const res = await request
       .get(
-        `/v1/courses/${courseId}/attainments/${moduleAttainmentId}/aplus-fetch`
+        `/v1/courses/${courseId}/aplus-fetch?attainments=[${moduleAttainmentId}]`
       )
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
@@ -330,7 +328,7 @@ describe('Test GET /v1/courses/:courseId/attainments/:attainmentId/aplus-fetch -
   it('should fetch grades for difficulty', async () => {
     const res = await request
       .get(
-        `/v1/courses/${courseId}/attainments/${difficultyAttainmentId}/aplus-fetch`
+        `/v1/courses/${courseId}/aplus-fetch?attainments=[${difficultyAttainmentId}]`
       )
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
@@ -340,27 +338,48 @@ describe('Test GET /v1/courses/:courseId/attainments/:attainmentId/aplus-fetch -
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
+  it('should fetch grades for multiple attainments', async () => {
     const res = await request
       .get(
-        `/v1/courses/${courseId}/attainments/${fullPointsAttainmentId}/aplus-fetch`
+        `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}, ${moduleAttainmentId}, ${difficultyAttainmentId}]`
       )
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    const result = await NewGradeArraySchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
+  });
+
+  it('should respond with 400 bad request, if attainment list validation fails', async () => {
+    // TODO
+  });
+
+  it('should respond with 401 unauthorized, if not logged in', async () => {
+    const res = await request
+      .get(`/v1/courses/${courseId}/aplus-fetch`)
       .set('Accept', 'application/json')
       .expect(HttpCode.Unauthorized);
 
     expect(JSON.stringify(res.body)).toBe('{}');
   });
 
-  it('should respond with 403 forbidden if user is not an admin or teacher in charge', async () => {
+  it('should respond with 403 forbidden, if user is not an admin or teacher in charge', async () => {
     const res = await request
-      .get(
-        `/v1/courses/${noRoleCourseId}/attainments/${noRoleAttainmentId}/aplus-fetch`
-      )
+      .get(`/v1/courses/${noRoleCourseId}/aplus-fetch`)
       .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Forbidden);
 
     const result = await ErrorSchema.safeParseAsync(res.body);
     expect(result.success).toBeTruthy();
+  });
+
+  it('should respond with 409 conflict, if an attainment does not belong to the course', async () => {
+    // TODO
+  });
+
+  it('should respond with 422 unprocessable entity, if an attainment has no grade source', async () => {
+    // TODO
   });
 });
