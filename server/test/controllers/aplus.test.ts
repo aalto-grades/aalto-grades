@@ -26,10 +26,11 @@ const APLUS_URL = 'https://plus.cs.aalto.fi/api/v2';
 
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
-let noRoleCourseId = -1;
 let fullPointsAttainmentId = -1;
 let moduleAttainmentId = -1;
 let difficultyAttainmentId = -1;
+let noRoleCourseId = -1;
+let noRoleAttainmentId = -1;
 let attainments: AttainmentData[] = [];
 
 jest.mock('axios');
@@ -48,7 +49,7 @@ beforeAll(async () => {
     hasAssistant: false,
     hasStudent: false,
   });
-  await createData.createAplusGradeSources(courseId);
+  [noRoleAttainmentId, _, _] = await createData.createAplusGradeSources(courseId);
 
   // eslint-disable-next-line @typescript-eslint/require-await
   mockedAxios.get.mockImplementation(async url => {
@@ -247,7 +248,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
       withModuleId: boolean,
       withDifficulty: boolean
     ): Promise<void> => {
-      await request
+      const res = await request
         .post(`/v1/courses/${courseId}/aplus-source`)
         .send([getGradeSource(sourceType, {withModuleId, withDifficulty})])
         .set('Cookie', cookies.adminCookie)
@@ -274,7 +275,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     expect(JSON.stringify(res.body)).toBe('{}');
   });
 
-  it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
+  it('should respond with 403 forbidden if user is not an admin or teacher in charge', async () => {
     const res = await request
       .post(`/v1/courses/${noRoleCourseId}/aplus-source`)
       .send([getFullPoints(), getModule(), getDifficulty()])
@@ -336,6 +337,30 @@ describe('Test GET /v1/courses/:courseId/attainments/:attainmentId/aplus-fetch -
       .expect(HttpCode.Ok);
 
     const result = await NewGradeArraySchema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
+  });
+
+  it('should respond with 401 unauthorized, if not logged in', async () => {
+    const res = await request
+      .get(
+        `/v1/courses/${courseId}/attainments/${fullPointsAttainmentId}/aplus-fetch`
+      )
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Unauthorized);
+
+    expect(JSON.stringify(res.body)).toBe('{}');
+  });
+
+  it('should respond with 403 forbidden if user is not an admin or teacher in charge', async () => {
+    const res = await request
+      .get(
+        `/v1/courses/${noRoleCourseId}/attainments/${noRoleAttainmentId}/aplus-fetch`
+      )
+      .set('Cookie', cookies.teacherCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Forbidden);
+
+    const result = await ErrorSchema.safeParseAsync(res.body);
     expect(result.success).toBeTruthy();
   });
 });
