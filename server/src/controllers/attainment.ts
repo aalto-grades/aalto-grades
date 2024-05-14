@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
+import {ForeignKeyConstraintError} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
@@ -10,13 +11,14 @@ import {
   EditAttainmentDataSchema,
   HttpCode,
   NewAttainmentDataSchema,
-} from '@common/types';
-import Attainment from '../database/models/attainment';
+} from '@/common/types';
 import {
   findAttainmentsByCourseId,
   validateAttainmentPath,
 } from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
+import Attainment from '../database/models/attainment';
+import {ApiError} from '../types';
 
 /**
  * Responds with AttainmentData[]
@@ -69,6 +71,7 @@ export const editAttainment = async (
     .set({
       name: req.body.name ?? attainment.name,
       daysValid: req.body.daysValid ?? attainment.daysValid,
+      archived: req.body.archived ?? attainment.archived,
     })
     .save();
 
@@ -85,7 +88,23 @@ export const deleteAttainment = async (
     req.params.attainmentId
   );
 
-  await attainment.destroy();
+  try {
+    await attainment.destroy();
+  } catch (e) {
+    // Catch deletion of attainment with grades
+    if (
+      e instanceof ForeignKeyConstraintError &&
+      e.index === 'attainment_grade_attainment_id_fkey'
+    ) {
+      throw new ApiError(
+        'Tried to delete attainment with grades',
+        HttpCode.Conflict
+      );
+    }
+
+    // Other error
+    throw e;
+  }
 
   res.sendStatus(HttpCode.Ok);
 };

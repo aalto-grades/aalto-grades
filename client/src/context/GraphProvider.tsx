@@ -2,8 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {NodeData, NodeSettings, NodeValues} from '@common/types/graph';
 import {createContext} from 'react';
+
+import {NodeData, NodeSettings, NodeValues} from '@/common/types/graph';
 
 type NodeValuesContext = {nodeValues: NodeValues};
 export const NodeValuesContext = createContext<NodeValuesContext>(

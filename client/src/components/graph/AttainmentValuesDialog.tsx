@@ -13,7 +13,7 @@ import {
 import {ChangeEvent, JSX, useEffect, useMemo, useState} from 'react';
 import {Node} from 'reactflow';
 
-import {NodeValues} from '@common/types/graph';
+import {NodeValues} from '@/common/types/graph';
 
 const testFloat = (val: string): boolean => /^\d+(?:\.\d+?)?$/.test(val);
 

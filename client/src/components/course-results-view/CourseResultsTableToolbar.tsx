@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {Add} from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -13,14 +14,15 @@ import {
   Tooltip,
   useTheme,
 } from '@mui/material';
+import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
-import {StudentRow, SystemRole} from '@common/types';
-import {batchCalculateGraph} from '@common/util/calculateGraph';
-import {Add} from '@mui/icons-material';
-import {enqueueSnackbar} from 'notistack';
-import {useTableContext} from '../../context/GradesTableProvider';
+import {StudentRow, SystemRole} from '@/common/types';
+import {batchCalculateGraph} from '@/common/util/calculateGraph';
+import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
+import SisuDownloadDialog from './SisuDownloadDialog';
+import {useTableContext} from '../../context/useTableContext';
 import {useAddFinalGrades} from '../../hooks/api/finalGrade';
 import {useGetAllAssessmentModels, useGetGrades} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
@@ -28,8 +30,6 @@ import {GradeSelectOption, findBestGrade} from '../../utils';
 import {findLatestGrade} from '../../utils/table';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import UploadDialog from '../course-view/UploadDialog';
-import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
-import SisuDownloadDialog from './SisuDownloadDialog';
 
 /**
  * Toggle a string in an array: Adds it if not present, removes it if already

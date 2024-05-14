@@ -26,11 +26,26 @@ definitions:
         type: object
         description: Graph structure
         example: {'nodes': [], 'edges': [], 'nodeData': {}}
+      archived:
+        type: boolean
+        description: If assessment model has been archived
+        example: false
+      hasArchivedAttainments:
+        type: boolean
+        description: If assessment model has archived attainments
+        example: false
+      hasDeletedAttainments:
+        type: boolean
+        description: If assessment model has deleted attainments
+        example: false
     required:
       - id
       - courseId
       - name
       - graphStructure
+      - archived
+      - hasArchivedAttainments
+      - hasDeletedAttainments
 
   NewAssessmentModelData:
     type: object
@@ -60,6 +75,10 @@ definitions:
         type: object
         description: Graph structure
         example: {'nodes': [], 'edges': [], 'nodeData': {}}
+      archived:
+        type: boolean
+        description: If assessment model has been archived
+        example: false
 
 /v1/courses/{courseId}/assessment-models/{assessmentModelId}:
   get:

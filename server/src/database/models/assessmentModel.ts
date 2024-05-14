@@ -11,9 +11,9 @@ import {
   Model,
 } from 'sequelize';
 
-import {GraphStructure} from '@common/types';
-import {sequelize} from '..';
+import {GraphStructure} from '@/common/types';
 import Course from './course';
+import {sequelize} from '..';
 
 export default class AssessmentModel extends Model<
   InferAttributes<AssessmentModel>,
@@ -23,6 +23,7 @@ export default class AssessmentModel extends Model<
   declare courseId: ForeignKey<Course['id']>;
   declare name: string;
   declare graphStructure: GraphStructure;
+  declare archived: CreationOptional<boolean>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -48,6 +49,11 @@ AssessmentModel.init(
     },
     graphStructure: {
       type: DataTypes.JSONB,
+      allowNull: false,
+    },
+    archived: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
       allowNull: false,
     },
     createdAt: DataTypes.DATE,

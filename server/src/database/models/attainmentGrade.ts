@@ -11,9 +11,9 @@ import {
   Model,
 } from 'sequelize';
 
-import {sequelize} from '..';
 import Attainment from './attainment';
 import User from './user';
+import {sequelize} from '..';
 
 export default class AttainmentGrade extends Model<
   InferAttributes<AttainmentGrade>,
@@ -26,8 +26,8 @@ export default class AttainmentGrade extends Model<
   declare grade: number;
   declare sisuExportDate: CreationOptional<Date | null>;
   // Date when attainment is completed (e.g., deadline or exam date)
-  declare date: CreationOptional<Date | string>; // Database outputs yyyy-mm-dd but inserting date is allowed
-  declare expiryDate: CreationOptional<Date | string>; // Database outputs yyyy-mm-dd but inserting date is allowed
+  declare date: Date | string; // Database outputs yyyy-mm-dd but inserting date is allowed
+  declare expiryDate: Date | string; // Database outputs yyyy-mm-dd but inserting date is allowed
   declare comment: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -97,7 +97,10 @@ AttainmentGrade.init(
 User.hasMany(AttainmentGrade, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
 AttainmentGrade.belongsTo(User, {foreignKey: 'userId'});
 
-Attainment.hasMany(AttainmentGrade, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+Attainment.hasMany(AttainmentGrade, {
+  onDelete: 'RESTRICT',
+  onUpdate: 'CASCADE',
+});
 AttainmentGrade.belongsTo(Attainment, {foreignKey: 'attainmentId'});
 
 User.hasMany(AttainmentGrade, {

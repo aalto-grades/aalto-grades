@@ -18,7 +18,7 @@ import {
 import {JSX, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
-import {GraphTemplate, initGraph} from '@common/util/initGraph';
+import {GraphTemplate, initGraph} from '@/common/util/initGraph';
 import {useAddAssessmentModel, useGetAttainments} from '../../hooks/useApi';
 
 const CreateAssessmentModelDialog = ({
@@ -44,7 +44,10 @@ const CreateAssessmentModelDialog = ({
         courseId: courseId,
         assessmentModel: {
           name,
-          graphStructure: initGraph(template, attainments.data),
+          graphStructure: initGraph(
+            template,
+            attainments.data.filter(att => !att.archived)
+          ),
         },
       },
       {

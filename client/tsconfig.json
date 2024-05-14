@@ -7,7 +7,7 @@
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {
-      "@common/*": ["../common/*"]
+      "@/common/*": ["../common/*"]
     },
     "allowJs": true,
     "skipLibCheck": true,

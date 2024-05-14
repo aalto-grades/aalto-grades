@@ -7,7 +7,7 @@
     "module": "commonjs",
     // "module": "ESNext",
     "paths": {
-      "@common/*": ["../common/*"]
+      "@/common/*": ["../common/*"]
     },
     "outDir": "build",
     "types": ["node", "jest"],

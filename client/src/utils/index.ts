@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Language} from '@common/types';
+import {Language} from '@/common/types';
 import {LanguageOption} from '../types';
 
 type BaseType = {

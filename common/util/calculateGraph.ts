@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Edge, Node} from 'reactflow';
+
 import {
   AttainmentNodeSettings,
   AverageNodeSettings,

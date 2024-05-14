@@ -14,8 +14,9 @@ import {
   useTheme,
 } from '@mui/material';
 import {Link, NavLink, useParams} from 'react-router-dom';
-import {useGetCourse} from '../hooks/useApi';
+
 import UserButton from './auth/UserButton';
+import {useGetCourse} from '../hooks/useApi';
 
 export default function Header(): JSX.Element {
   const theme = useTheme();

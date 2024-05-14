@@ -16,9 +16,9 @@ import {
 import {JSX, SyntheticEvent, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
+import ExternalAuth from './ExternalAuth';
 import {useLogIn} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import ExternalAuth from './ExternalAuth';
 
 export default function Login(): JSX.Element {
   const navigate = useNavigate();

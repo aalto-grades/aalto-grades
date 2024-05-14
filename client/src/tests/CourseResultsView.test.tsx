@@ -11,10 +11,10 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import {userEvent} from '@testing-library/user-event';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 
-import {SystemRole} from '@common/types';
+import {SystemRole} from '@/common/types';
 import CourseResultsView from '../components/CourseResultsView';
 import AuthContext from '../context/AuthProvider';
 

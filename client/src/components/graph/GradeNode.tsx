@@ -5,9 +5,9 @@
 import {JSX, useContext} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 
-import {GradeNodeValue} from '@common/types/graph';
-import {NodeValuesContext} from '../../context/GraphProvider';
+import {GradeNodeValue} from '@/common/types/graph';
 import BaseNode from './BaseNode';
+import {NodeValuesContext} from '../../context/GraphProvider';
 
 const GradeNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;

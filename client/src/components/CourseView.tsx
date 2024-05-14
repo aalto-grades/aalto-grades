@@ -7,10 +7,10 @@ import {UseQueryResult} from '@tanstack/react-query';
 import {JSX, useEffect} from 'react';
 import {Outlet, Params, useParams} from 'react-router-dom';
 
-import {CourseData} from '@common/types';
+import {CourseData} from '@/common/types';
+import SideMenu from './course-view/SideMenu';
 import {useGetCourse} from '../hooks/useApi';
 import useAuth, {AuthContextType} from '../hooks/useAuth';
-import SideMenu from './course-view/SideMenu';
 
 export default function CourseView(): JSX.Element {
   const theme = useTheme();

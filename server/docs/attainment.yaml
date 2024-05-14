@@ -30,11 +30,16 @@ definitions:
         decription: Number of days valid.
         minimum: 1
         example: 365
+      archived:
+        type: boolean
+        description: If attainment has been archived
+        example: false
     required:
       - id
       - courseId
       - name
       - daysValid
+      - archived
 
   NewAttainment:
     description: Course attainment information.
@@ -62,6 +67,10 @@ definitions:
         decription: Number of days valid.
         minimum: 1
         example: 365
+      archived:
+        type: boolean
+        description: If attainment has been archived
+        example: false
 
 /v1/courses/{courseId}/attainments:
   get:

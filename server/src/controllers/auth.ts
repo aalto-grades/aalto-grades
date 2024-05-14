@@ -2,21 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {NextFunction, Request, Response} from 'express';
-import {RequestHandler} from 'express-serve-static-core';
+import {NextFunction, Request, RequestHandler, Response} from 'express';
 import {readFileSync} from 'fs';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';
 import {IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
 
-import {HttpCode, LoginResult, SystemRole} from '@common/types';
+import {HttpCode, LoginResult, SystemRole} from '@/common/types';
+import {getSamlStrategy, validateLogin} from './utils/auth';
+import {findUserById} from './utils/user';
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
 import {JWT_SECRET, NODE_ENV, SAML_SP_CERT_PATH} from '../configs/environment';
 import logger from '../configs/winston';
 import {ApiError, JwtClaims} from '../types';
-import {getSamlStrategy, validateLogin} from './utils/auth';
-import {findUserById} from './utils/user';
 
 /**
  * Responds with LoginResult

@@ -14,7 +14,7 @@ import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
 import {z} from 'zod';
 
-import {AaltoEmailSchema} from '@common/types';
+import {AaltoEmailSchema} from '@/common/types';
 import {useAddUser} from '../../../hooks/useApi';
 import UnsavedChangesDialog from '../../alerts/UnsavedChangesDialog';
 

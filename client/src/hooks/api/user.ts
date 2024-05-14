@@ -3,12 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  CourseData,
-  CourseDataArraySchema,
-  IdpUsersSchema,
-  NewIdpUser,
-} from '@common/types';
-import {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -17,8 +11,15 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import {Numeric} from '../../types';
+
+import {
+  CourseData,
+  CourseDataArraySchema,
+  IdpUsersSchema,
+  NewIdpUser,
+} from '@/common/types';
 import axios from './axios';
+import {Numeric} from '../../types';
 
 export const useGetCoursesOfUser = (
   userId: Numeric,

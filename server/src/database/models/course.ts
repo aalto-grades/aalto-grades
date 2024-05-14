@@ -10,7 +10,7 @@ import {
   Model,
 } from 'sequelize';
 
-import {GradingScale, Language} from '@common/types';
+import {GradingScale, Language} from '@/common/types';
 import {sequelize} from '..';
 
 export default class Course extends Model<

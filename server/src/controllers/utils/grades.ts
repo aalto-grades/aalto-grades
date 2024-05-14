@@ -2,8 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from '@common/types';
 import {Includeable, Op} from 'sequelize';
+
+import {HttpCode} from '@/common/types';
+import {findAttainmentById} from './attainment';
+import {findAndValidateCourseId, findCourseById} from './course';
 import logger from '../../configs/winston';
 import Attainment from '../../database/models/attainment';
 import AttainmentGrade from '../../database/models/attainmentGrade';
@@ -11,8 +14,6 @@ import Course from '../../database/models/course';
 import FinalGrade from '../../database/models/finalGrade';
 import User from '../../database/models/user';
 import {ApiError, stringToIdSchema} from '../../types';
-import {findAttainmentById} from './attainment';
-import {findAndValidateCourseId, findCourseById} from './course';
 
 /**
  * Retrieves the date of the latest grade for a user based on an assessment

@@ -4,6 +4,7 @@
 
 import {Request, Response} from 'express';
 import {Transaction} from 'sequelize';
+import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   CourseData,
@@ -12,14 +13,7 @@ import {
   HttpCode,
   Language,
   NewCourseDataSchema,
-} from '@common/types';
-import {TypedRequestBody} from 'zod-express-middleware';
-import {sequelize} from '../database';
-import Course from '../database/models/course';
-import CourseRole from '../database/models/courseRole';
-import CourseTranslation from '../database/models/courseTranslation';
-import User from '../database/models/user';
-import {ApiError, CourseFull} from '../types';
+} from '@/common/types';
 import {
   findAndValidateCourseId,
   findCourseFullById,
@@ -27,6 +21,12 @@ import {
   validateCourseId,
   validateEmailList,
 } from './utils/course';
+import {sequelize} from '../database';
+import Course from '../database/models/course';
+import CourseRole from '../database/models/courseRole';
+import CourseTranslation from '../database/models/courseTranslation';
+import User from '../database/models/user';
+import {ApiError, CourseFull} from '../types';
 
 /**
  * Responds with CourseData

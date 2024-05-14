@@ -11,13 +11,13 @@ import {
   IdpUsers,
   NewIdpUserSchema,
   SystemRole,
-} from '@common/types';
+} from '@/common/types';
+import {parseCourseFull} from './utils/course';
+import {findAndValidateUserId, validateUserId} from './utils/user';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 import {ApiError, CourseFull} from '../types';
-import {parseCourseFull} from './utils/course';
-import {findAndValidateUserId, validateUserId} from './utils/user';
 
 /**
  * Responds with CourseData[]

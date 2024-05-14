@@ -2,20 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 import {Request, Response} from 'express';
+import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   FinalGradeData,
   HttpCode,
   NewFinalGradeArraySchema,
-} from '@common/types';
-import {TypedRequestBody} from 'zod-express-middleware';
-import FinalGrade from '../database/models/finalGrade';
-import User from '../database/models/user';
-import {JwtClaims} from '../types';
-import {FinalGradeModelData} from '../types/finalGrade';
+} from '@/common/types';
 import {validateAssessmentModelBelongsToCourse} from './utils/assessmentModel';
 import {validateCourseId} from './utils/course';
 import {validateUserAndGrader} from './utils/grades';
+import FinalGrade from '../database/models/finalGrade';
+import User from '../database/models/user';
+import {JwtClaims, NewDbFinalGradeData} from '../types';
 
 /**
  * Responds with FinalGradeData[]
@@ -76,7 +75,7 @@ export const addFinalGrades = async (
     await validateAssessmentModelBelongsToCourse(courseId, modelId);
   }
 
-  const preparedBulkCreate: FinalGradeModelData[] = req.body.map(
+  const preparedBulkCreate: NewDbFinalGradeData[] = req.body.map(
     gradeEntry => ({
       userId: gradeEntry.userId,
       assessmentModelId: gradeEntry.assessmentModelId,

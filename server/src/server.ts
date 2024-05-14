@@ -2,12 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {PORT} from './configs/environment';
-
 import {app} from './app';
+import {PORT} from './configs/environment';
 import logger from './configs/winston';
 import {connectToDatabase} from './database/index';
 
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 app.listen(PORT, async () => {
   try {
     await connectToDatabase();

@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import mockdate from 'mockdate';
 import supertest from 'supertest';
 
-import {HttpCode, LoginResultSchema, SystemRole} from '@common/types';
+import {HttpCode, LoginResultSchema, SystemRole} from '@/common/types';
 import {app} from '../../src/app';
 import {
   JWT_COOKIE_EXPIRY_MS,
