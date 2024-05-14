@@ -9,7 +9,7 @@ import {JSX, useState} from 'react';
 
 import {AttainmentGradesData} from '@/common/types';
 import EditGradesDialog from './EditGradesDialog';
-import {useTableContext} from '../../context/GradesTableProvider';
+import {useTableContext} from '../../context/useTableContext';
 import {findBestGrade, gradeIsExpired} from '../../utils';
 
 type GradeCellProps = {

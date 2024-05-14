@@ -16,10 +16,8 @@ import {
 import {JSX, useEffect, useState} from 'react';
 
 import {AssessmentModelData} from '@/common/types';
-import {
-  GroupedStudentRow,
-  useTableContext,
-} from '../../context/GradesTableProvider';
+import {GroupedStudentRow} from '../../context/GradesTableProvider';
+import {useTableContext} from '../../context/useTableContext';
 import Graph from '../graph/Graph';
 
 type PropsType = {
