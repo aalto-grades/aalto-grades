@@ -23,6 +23,7 @@ export default class AssessmentModel extends Model<
   declare courseId: ForeignKey<Course['id']>;
   declare name: string;
   declare graphStructure: GraphStructure;
+  declare archived: CreationOptional<boolean>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -48,6 +49,11 @@ AssessmentModel.init(
     },
     graphStructure: {
       type: DataTypes.JSONB,
+      allowNull: false,
+    },
+    archived: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
       allowNull: false,
     },
     createdAt: DataTypes.DATE,

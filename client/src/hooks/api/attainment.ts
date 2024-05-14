@@ -51,10 +51,6 @@ export const useAddAttainment = (
       queryClient.invalidateQueries({
         queryKey: ['attainments', courseId],
       });
-
-      queryClient.invalidateQueries({
-        queryKey: ['root-attainment', courseId],
-      });
     },
     ...options,
   });
@@ -83,7 +79,7 @@ export const useEditAttainment = (
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['root-attainment', courseId],
+        queryKey: ['all-assessment-models', courseId],
       });
     },
     ...options,
@@ -106,7 +102,7 @@ export const useDeleteAttainment = (
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['root-attainment', courseId],
+        queryKey: ['all-assessment-models', courseId],
       });
     },
     ...options,

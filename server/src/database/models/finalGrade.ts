@@ -26,9 +26,9 @@ export default class FinalGrade extends Model<
   declare assessmentModelId: ForeignKey<AssessmentModel['id']>;
   declare graderId: ForeignKey<User['id']>;
   declare grade: number;
-  declare sisuExportDate: Date | null;
+  declare sisuExportDate: CreationOptional<Date | null>;
   // Date when attainment is completed (e.g., deadline or exam date)
-  declare date: CreationOptional<Date | string>; // Database outputs yyyy-mm-dd but inserting date is allowed
+  declare date: Date | string; // Database outputs yyyy-mm-dd but inserting date is allowed
   declare comment: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;

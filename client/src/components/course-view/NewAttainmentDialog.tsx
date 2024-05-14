@@ -15,7 +15,7 @@ import {useState} from 'react';
 type PropsType = {
   handleClose: () => void;
   open: boolean;
-  onSave: (name: string, daysValid: number) => Promise<void>;
+  onSave: (name: string, daysValid: number) => void;
 };
 
 const AddAttainmentDialog = ({
@@ -25,8 +25,8 @@ const AddAttainmentDialog = ({
 }: PropsType): JSX.Element => {
   const [attainment, setAttainment] = useState({name: '', daysValid: 365});
 
-  const handleSave = async (): Promise<void> => {
-    await onSave(attainment.name, attainment.daysValid);
+  const handleSave = (): void => {
+    onSave(attainment.name, attainment.daysValid);
     setAttainment({name: '', daysValid: 365});
     handleClose();
   };

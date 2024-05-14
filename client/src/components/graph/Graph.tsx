@@ -80,7 +80,7 @@ const nodeTypesMap = {
 
 type GraphProps = {
   initGraph: GraphStructure;
-  attainments: {id: number; name: string}[];
+  attainments: {id: number; name: string; archived: boolean}[];
   userGrades: AttainmentGradesData[] | null;
   gradeSelectOption?: GradeSelectOption;
   onSave?: (graphStructure: GraphStructure) => Promise<void>;
@@ -118,7 +118,7 @@ const Graph = ({
     useState<boolean>(false);
   const [attainmentValuesOpen, setAttainmentValuesOpen] =
     useState<boolean>(false);
-  const [archivedAttainments, setArchivedAttainments] = useState<string[]>([]);
+  const [delAttainments, setDelAttainments] = useState<string[]>([]); // Attainment nodes that the user is allowed to delete
   const [originalGraphStructure, setOriginalGraphStructure] =
     useState<GraphStructure>({nodes: [], edges: [], nodeData: {}});
 
@@ -242,13 +242,13 @@ const Graph = ({
 
     // Timeout to prevent nodes updating with missing data
     setTimeout(() => {
-      // Check for archived attainments
-      const attainmentIds = attainments.map(attainment => attainment.id);
+      // Check for deleted & archived attainments (edit extra data)
       for (const node of initGraph.nodes) {
         if (node.type !== 'attainment') continue;
         const attainmentId = parseInt(node.id.split('-')[1]);
 
-        if (!attainmentIds.includes(attainmentId)) {
+        const attainment = attainments.find(att => att.id === attainmentId);
+        if (attainment === undefined) {
           setExtraNodeData(oldExtraNodeData => ({
             ...oldExtraNodeData,
             [node.id]: {
@@ -256,7 +256,18 @@ const Graph = ({
               warning: 'Attainment has been deleted',
             },
           }));
-          setArchivedAttainments(oldArchivedAttainments =>
+          setDelAttainments(oldDelAttainments =>
+            oldDelAttainments.concat(node.id)
+          );
+        } else if (attainment.archived) {
+          setExtraNodeData(oldExtraNodeData => ({
+            ...oldExtraNodeData,
+            [node.id]: {
+              ...oldExtraNodeData[node.id],
+              warning: 'Attainment is archived',
+            },
+          }));
+          setDelAttainments(oldArchivedAttainments =>
             oldArchivedAttainments.concat(node.id)
           );
         }
@@ -534,7 +545,7 @@ const Graph = ({
                     changes.filter(
                       change =>
                         change.type !== 'remove' ||
-                        archivedAttainments.includes(change.id) ||
+                        delAttainments.includes(change.id) ||
                         (nodeMap[change.id].type !== 'attainment' &&
                           nodeMap[change.id].type !== 'grade')
                     )
@@ -565,7 +576,6 @@ const Graph = ({
             </div>
             {!readOnly && onSave !== undefined && (
               <>
-                <Divider />
                 <div style={{marginBottom: '5px'}}>
                   <div
                     className="dndnode"
@@ -624,7 +634,8 @@ const Graph = ({
                     Substitute
                   </div>
                 </div>
-                <div style={{float: 'left', marginTop: '5px'}}>
+                <Divider sx={{my: 1}} />
+                <div style={{float: 'left'}}>
                   <Button
                     onClick={() => setAttainmentsSelectOpen(true)}
                     variant="outlined"

@@ -49,7 +49,7 @@ test.describe('Test Courses as Teacher', () => {
     await page.getByRole('button', {name: 'Grading Models'}).click();
     await page.getByLabel('New assessment model').click();
     await page.getByLabel('Name *').click();
-    await page.getByLabel('Name *').fill('test');
+    await page.getByLabel('Name *').fill('Test Model');
     await page.getByLabel('Select template').click();
     await page.getByRole('option', {name: 'Addition'}).click();
     await page.getByRole('button', {name: 'Submit'}).click();
@@ -59,9 +59,10 @@ test.describe('Test Courses as Teacher', () => {
       page.locator('p').filter({hasText: 'Unsaved changes'})
     ).toBeVisible();
     await page.getByRole('button', {name: 'Save'}).click();
+    await expect(page.getByText('Model saved successfully.')).toBeVisible();
     await page.getByRole('button', {name: 'Grades', exact: true}).click();
     await page.getByRole('button', {name: 'Grading Models'}).click();
-    await expect(page.getByRole('button', {name: 'test'})).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Test Model'})).toBeVisible();
   });
 
   test('View Attainments', async ({page}) => {

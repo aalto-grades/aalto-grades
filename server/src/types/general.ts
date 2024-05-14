@@ -4,14 +4,20 @@
 
 import {z} from 'zod';
 
-import {SystemRole} from '@/common/types';
+import {CourseRoleType, SystemRole} from '@/common/types';
+import Course from '../database/models/course';
+import CourseTranslation from '../database/models/courseTranslation';
+import User from '../database/models/user';
 
 export const stringToIdSchema = z
   .string()
   .regex(/^\d+$/)
   .pipe(z.coerce.number().int().min(1));
 
-export interface JwtClaims {
-  role: SystemRole;
-  id: number;
-}
+export type JwtClaims = {role: SystemRole; id: number};
+
+type UserWithRole = User & {CourseRole: {role: CourseRoleType}};
+export type CourseFull = Course & {
+  CourseTranslations: CourseTranslation[];
+  Users: UserWithRole[];
+};

@@ -9,10 +9,12 @@ export const AttainmentDataSchema = z.object({
   courseId: z.number().int(),
   name: z.string(),
   daysValid: z.number().int().nonnegative(),
+  archived: z.boolean(),
 });
-export const NewAttainmentDataSchema = z.object({
-  name: z.string(),
-  daysValid: z.number().int().nonnegative(),
+export const NewAttainmentDataSchema = AttainmentDataSchema.omit({
+  id: true,
+  courseId: true,
+  archived: true,
 });
 export const EditAttainmentDataSchema = AttainmentDataSchema.omit({
   id: true,
