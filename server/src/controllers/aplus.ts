@@ -11,12 +11,12 @@ import {
   AplusGradeSourceType,
   HttpCode,
   NewAplusGradeSourceArraySchema,
+  NewGrade,
 } from '@/common/types';
 import {fetchFromAplus, validateAplusCourseId} from './utils/aplus';
 import {validateAttainmentPath} from './utils/attainment';
 import {validateCourseId} from './utils/course';
 import AplusGradeSource from '../database/models/aplusGradeSource';
-import AttainmentGrade from '../database/models/attainmentGrade';
 import User from '../database/models/user';
 import {ApiError, NewDbGradeData, JwtClaims} from '../types';
 
@@ -54,12 +54,10 @@ export const fetchAplusExerciseData = async (
   }
 
   const exerciseData: AplusExerciseData = {
-    modules: exercisesRes.data.results.map(result => {
-      return {
-        id: result.id,
-        name: result.display_name,
-      };
-    }),
+    modules: exercisesRes.data.results.map(result => ({
+      id: result.id,
+      name: result.display_name,
+    })),
     difficulties: Array.from(difficulties),
   };
 
@@ -79,14 +77,11 @@ export const addAplusGradeSources = async (
   res.sendStatus(HttpCode.Created);
 };
 
-// TODO: What exactly should be fetched at a time?
-// TODO: Should fetched points be immediately stored in the database?
 /** @throws ApiError(400|404|409|422) */
 export const fetchAplusGrades = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const grader = req.user as JwtClaims;
   const [_, attainment] = await validateAttainmentPath(
     req.params.courseId,
     req.params.attainmentId
@@ -110,15 +105,10 @@ export const fetchAplusGrades = async (
     }[];
   }>(`${APLUS_URL}/courses/${gradeSource.aplusCourseId}/points?format=json`);
 
-  const studentNumberToId: {[key: string]: number} = {};
-  const nonexistentStudents: string[] = [];
-
-  const gradesWithStudentNumber: (Omit<NewDbGradeData, 'userId'> & {
-    studentNumber: string;
-  })[] = [];
-
+  const newGradesFromAplus: NewGrade[] = [];
   for (const result of allPointsRes.data.results) {
     // TODO: Fetching points individually for each student may not be the best idea
+    // Related: https://github.com/apluslms/a-plus/issues/1360
     const pointsRes = await fetchFromAplus<{
       student_id: string;
       points: number;
@@ -130,18 +120,6 @@ export const fetchAplusGrades = async (
         points: number;
       }[];
     }>(result.points);
-
-    const user = await User.findOne({
-      where: {studentNumber: pointsRes.data.student_id},
-    });
-
-    if (user) {
-      // User was found using their student number
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      studentNumberToId[user.studentNumber!] = user.id;
-    } else {
-      nonexistentStudents.push(pointsRes.data.student_id);
-    }
 
     let grade: number | undefined;
     switch (gradeSource.sourceType) {
@@ -186,38 +164,17 @@ export const fetchAplusGrades = async (
         break;
     }
 
-    gradesWithStudentNumber.push({
+    // TODO: Proper dates
+    // Related: https://github.com/apluslms/a-plus/issues/1361
+    newGradesFromAplus.push({
       studentNumber: pointsRes.data.student_id,
       attainmentId: attainment.id,
-      graderId: grader.id,
-      date: new Date(), // TODO: Which date?
-      expiryDate: new Date(), // TODO: date + daysValid by default, manually set?
       grade: grade,
+      date: new Date(),
+      expiryDate: new Date(), // TODO: date + daysValid by default
+      comment: null,
     });
   }
 
-  const newUsers = await User.bulkCreate(
-    nonexistentStudents.map(val => ({studentNumber: val}))
-  );
-
-  for (const newUser of newUsers) {
-    // User was just created with a student number
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    studentNumberToId[newUser.studentNumber!] = newUser.id;
-  }
-
-  const preparedBulkCreate: NewDbGradeData[] = gradesWithStudentNumber.map(
-    val => ({
-      userId: studentNumberToId[val.studentNumber],
-      attainmentId: val.attainmentId,
-      graderId: val.graderId,
-      date: val.date,
-      expiryDate: val.expiryDate,
-      grade: val.grade,
-    })
-  );
-
-  await AttainmentGrade.bulkCreate(preparedBulkCreate);
-
-  res.sendStatus(HttpCode.Created);
+  res.json(newGradesFromAplus);
 };

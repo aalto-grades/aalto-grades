@@ -36,7 +36,7 @@ router.post(
   controllerDispatcher(addAplusGradeSources)
 );
 
-router.post(
+router.get(
   '/v1/courses/:courseId/attainments/:attainmentId/aplus-fetch',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
