@@ -60,7 +60,7 @@ const SisuDownloadDialog = ({
       document.body.removeChild(linkElement);
 
       enqueueSnackbar(
-        'Final grades downloaded in the Sisu CSV format succesfully.',
+        'Final grades downloaded in the Sisu CSV format successfully.',
         {variant: 'success'}
       );
     },

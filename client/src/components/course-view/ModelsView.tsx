@@ -16,6 +16,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import {grey} from '@mui/material/colors';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
@@ -39,7 +40,7 @@ const ModelsView = (): JSX.Element => {
   const {courseId, modelId, userId} = useParams() as ParamsType;
   const navigate = useNavigate();
 
-  const models = useGetAllAssessmentModels(courseId);
+  const allAssessmentModels = useGetAllAssessmentModels(courseId);
   const editModel = useEditAssessmentModel();
   const delModel = useDeleteAssessmentModel();
   const attainments = useGetAttainments(courseId);
@@ -54,15 +55,26 @@ const ModelsView = (): JSX.Element => {
   const [createViewOpen, setCreateViewOpen] = useState(false);
   const [graphOpen, setGraphOpen] = useState(false);
 
+  // Sort models by archived status
+  const models = useMemo(
+    () =>
+      allAssessmentModels.data !== undefined
+        ? allAssessmentModels.data.toSorted(
+            (m1, m2) => Number(m1.archived) - Number(m2.archived)
+          )
+        : undefined,
+    [allAssessmentModels.data]
+  );
+
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge,
     [auth?.role, isTeacherInCharge]
   );
 
   useEffect(() => {
-    if (loadGraphId === -1 || models.data === undefined) return;
+    if (loadGraphId === -1 || models === undefined) return;
 
-    for (const model of models.data) {
+    for (const model of models) {
       if (model.id === loadGraphId) {
         setCurrentModel(model);
         setGraphOpen(true);
@@ -70,7 +82,7 @@ const ModelsView = (): JSX.Element => {
         navigate(`/${courseId}/models/${model.id}`);
       }
     }
-  }, [courseId, loadGraphId, models.data, navigate]);
+  }, [courseId, loadGraphId, models, navigate]);
 
   const renameAttainments = useCallback(
     (model: AssessmentModelData): AssessmentModelData => {
@@ -107,10 +119,10 @@ const ModelsView = (): JSX.Element => {
       setGraphOpen(false);
     }
 
-    if (modelId === undefined || models.data === undefined) return;
+    if (modelId === undefined || models === undefined) return;
     if (currentModel !== null && currentModel.id === parseInt(modelId)) return;
 
-    for (const model of models.data) {
+    for (const model of models) {
       if (model.id === parseInt(modelId)) {
         loadGraph(model);
         return;
@@ -120,7 +132,7 @@ const ModelsView = (): JSX.Element => {
       variant: 'error',
     });
     navigate(`/${courseId}/models`);
-  }, [courseId, currentModel, loadGraph, modelId, models.data, navigate]);
+  }, [courseId, currentModel, loadGraph, modelId, models, navigate]);
 
   // Load userId url param
   useEffect(() => {
@@ -179,7 +191,7 @@ const ModelsView = (): JSX.Element => {
     });
   };
 
-  if (models.data === undefined || attainments.data === undefined)
+  if (models === undefined || attainments.data === undefined)
     return <>Loading</>;
 
   const getWarning = (model: AssessmentModelData): string => {
@@ -196,7 +208,7 @@ const ModelsView = (): JSX.Element => {
         open={createViewOpen}
         handleClose={(): void => setCreateViewOpen(false)}
         onSubmit={id => {
-          models.refetch();
+          allAssessmentModels.refetch();
           setLoadGraphId(id);
         }}
       />
@@ -226,14 +238,15 @@ const ModelsView = (): JSX.Element => {
       </Box>
 
       <Collapse in={!graphOpen}>
-        {models.data.length === 0 ? (
+        {models.length === 0 ? (
           <Typography textAlign="left" sx={{p: 2}}>
             No models
           </Typography>
         ) : (
           <List sx={{width: 400}} disablePadding>
-            {models.data.map(model => (
+            {models.map(model => (
               <ListItem
+                sx={{backgroundColor: model.archived ? grey[200] : ''}}
                 key={`graph-${model.id}-select`}
                 disablePadding
                 secondaryAction={

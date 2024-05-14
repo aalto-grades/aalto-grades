@@ -74,7 +74,7 @@ const attainmentDoesNotExist = async (id: number): Promise<void> => {
 };
 
 describe('Test GET /v1/courses/:courseId/attainments - get attainments', () => {
-  it('should get the attainments succesfully (admin user)', async () => {
+  it('should get the attainments successfully (admin user)', async () => {
     const testCookies = [
       cookies.adminCookie,
       cookies.teacherCookie,

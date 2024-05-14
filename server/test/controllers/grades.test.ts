@@ -116,7 +116,7 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
         Promise.resolve(new Date('2023-06-21'))
     );
 
-  it('should export CSV succesfully when course results are found (admin user)', async () => {
+  it('should export CSV successfully when course results are found (admin user)', async () => {
     const res = await request
       .post(`/v1/courses/${courseId}/grades/csv/sisu`)
       .send({studentNumbers})
@@ -133,7 +133,7 @@ ${createCSV(students, '21.6.2023', 'en').join(',\n')},\n`);
     );
   });
 
-  it('should export CSV succesfully when course results are found (teacher in charge)', async () => {
+  it('should export CSV successfully when course results are found (teacher in charge)', async () => {
     const res = await request
       .post(`/v1/courses/${courseId}/grades/csv/sisu`)
       .send({studentNumbers})
@@ -170,7 +170,7 @@ ${createCSV(selectedStudents, '21.6.2023', 'en').join(',\n')},\n`);
     );
   });
 
-  it('should export CSV succesfully with custom assessmentDate and completionLanguage', async () => {
+  it('should export CSV successfully with custom assessmentDate and completionLanguage', async () => {
     const res = await request
       .post(`/v1/courses/${courseId}/grades/csv/sisu`)
       .send({
@@ -284,7 +284,7 @@ describe('Test POST /v1/courses/:courseId/grades - post grades', () => {
     },
   ];
 
-  it('should post succesfully when attainments and users exist (admin user)', async () => {
+  it('should post successfully when attainments and users exist (admin user)', async () => {
     const res = await request
       .post(`/v1/courses/${courseId}/grades`)
       .send(genGrades(students2[0]))
@@ -295,7 +295,7 @@ describe('Test POST /v1/courses/:courseId/grades - post grades', () => {
     expect(JSON.stringify(res.body)).toBe('{}');
   });
 
-  it('should post succesfully when attainments and users exist (teacher user)', async () => {
+  it('should post successfully when attainments and users exist (teacher user)', async () => {
     const res = await request
       .post(`/v1/courses/${courseId}/grades`)
       .send(genGrades(students2[1]))
@@ -397,7 +397,7 @@ describe('Test POST /v1/courses/:courseId/grades - post grades', () => {
     expect(grades.find(val => val.grade === data2[0].grade)).toBeDefined();
   });
 
-  it('should process big json succesfully (5 000 x 3 x 2 = 90 000 individual attainment grades)', async () => {
+  it('should process big json successfully (5 000 x 3 x 2 = 90 000 individual attainment grades)', async () => {
     const data: NewGrade[] = [];
     for (let i = 10000; i < 15000; i++) {
       for (let j = 0; j < 2; j++) {

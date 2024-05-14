@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  Alert,
   Button,
   Collapse,
   Dialog,
@@ -24,7 +25,7 @@ import 'dayjs/locale/en-gb';
 import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
-import {StudentRow} from '@/common/types';
+import {AssessmentModelData, StudentRow} from '@/common/types';
 import {useGetAllAssessmentModels} from '../../hooks/useApi';
 import {GradeSelectOption} from '../../utils';
 
@@ -49,14 +50,20 @@ const CalculateFinalGradesDialog = ({
   calculateFinalGrades,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const assessmentModels = useGetAllAssessmentModels(courseId);
+  const allAssessmentModels = useGetAllAssessmentModels(courseId);
 
   const [dateOverride, setDateOverride] = useState<boolean>(false);
   const [gradingDate, setGradingDate] = useState<Dayjs>(dayjs());
-  const [selectedModel, setSelectedModel] = useState<string>('');
+  const [selectedModel, setSelectedModel] =
+    useState<AssessmentModelData | null>(null);
+
+  // Filter out archived models
   const modelList = useMemo(
-    () => assessmentModels.data ?? [],
-    [assessmentModels.data]
+    () =>
+      allAssessmentModels.data !== undefined
+        ? allAssessmentModels.data.filter(model => !model.archived)
+        : [],
+    [allAssessmentModels.data]
   );
 
   useEffect(() => {
@@ -75,20 +82,30 @@ const CalculateFinalGradesDialog = ({
   }, [open, selectedRows]);
 
   useEffect(() => {
-    if (selectedModel === '' && modelList.length > 0)
-      setSelectedModel(modelList[0].name);
+    if (selectedModel === null && modelList.length > 0)
+      setSelectedModel(modelList[0]);
   }, [modelList, selectedModel]);
 
   const handleSubmit = async (): Promise<void> => {
-    const modelId = modelList.find(model => model.name === selectedModel)?.id;
-    if (modelId === undefined) return;
+    if (selectedModel === null) return;
     const success = await calculateFinalGrades(
       selectedRows,
-      modelId,
+      selectedModel.id,
       dateOverride,
       gradingDate.toDate()
     );
     if (success) onClose();
+  };
+
+  const getWarning = (model: AssessmentModelData | null): string => {
+    if (model === null) return '';
+    if (model.hasArchivedAttainments && model.hasDeletedAttainments)
+      return 'Assessment model contains deleted & archived attainments';
+    if (model.hasArchivedAttainments)
+      return 'Assessment model contains archived attainments';
+    if (model.hasDeletedAttainments)
+      return 'Assessment model contains deleted attainments';
+    return '';
   };
 
   return (
@@ -113,13 +130,17 @@ const CalculateFinalGradesDialog = ({
             <MenuItem value="latest">Select latest grade</MenuItem>
           </Select>
         </FormControl>
-        <FormControl sx={{display: 'block', mb: 2}}>
+        <FormControl sx={{display: 'block'}}>
           <InputLabel id="calculateGradesSelect">Assessment model</InputLabel>
           <Select
             sx={{width: '100%'}}
             labelId="calculateGradesSelect"
-            value={selectedModel}
-            onChange={e => setSelectedModel(e.target.value)}
+            value={selectedModel?.name ?? ''}
+            onChange={e => {
+              setSelectedModel(
+                modelList.find(model => model.name === e.target.value)!
+              );
+            }}
             label="Assessment model"
           >
             {modelList.map(model => (
@@ -132,7 +153,18 @@ const CalculateFinalGradesDialog = ({
             ))}
           </Select>
         </FormControl>
+        <Collapse
+          in={
+            selectedModel?.hasDeletedAttainments ||
+            selectedModel?.hasArchivedAttainments
+          }
+        >
+          <Alert sx={{mt: 1}} severity="warning">
+            {getWarning(selectedModel)}
+          </Alert>
+        </Collapse>
         <FormControlLabel
+          sx={{mt: 1}}
           control={
             <Switch
               checked={dateOverride}
