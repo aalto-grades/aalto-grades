@@ -43,7 +43,7 @@ export const fetchAplusExerciseData = async (
     }[];
   }>(`${APLUS_URL}/courses/${aplusCourseId}/exercises?format=json`);
 
-  // TODO: Is there an easier way to get difficulties?
+  // There doesn't appear to be a better way to get difficulties
   const difficulties = new Set<string>();
   for (const result of exercisesRes.data.results) {
     for (const exercise of result.exercises) {
@@ -80,6 +80,7 @@ export const addAplusGradeSources = async (
 };
 
 // TODO: What exactly should be fetched at a time?
+// TODO: Should fetched points be immediately stored in the database?
 /** @throws ApiError(400|404|409|422) */
 export const fetchAplusGrades = async (
   req: Request,
