@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AxiosResponse} from 'axios';
 import {Request, Response} from 'express';
 import {TypedRequestBody} from 'zod-express-middleware';
 
@@ -34,7 +33,7 @@ export const fetchAplusExerciseData = async (
 ): Promise<void> => {
   const aplusCourseId = validateAplusCourseId(req.params.aplusCourseId);
 
-  const exercisesRes: AxiosResponse<{
+  const exercisesRes = await fetchFromAplus<{
     results: {
       id: number;
       display_name: string;
@@ -42,9 +41,7 @@ export const fetchAplusExerciseData = async (
         difficulty: string;
       }[];
     }[];
-  }> = await fetchFromAplus(
-    `${APLUS_URL}/courses/${aplusCourseId}/exercises?format=json`
-  );
+  }>(`${APLUS_URL}/courses/${aplusCourseId}/exercises?format=json`);
 
   // TODO: Is there an easier way to get difficulties?
   const difficulties = new Set<string>();
@@ -106,13 +103,11 @@ export const fetchAplusGrades = async (
     );
   }
 
-  const allPointsRes: AxiosResponse<{
+  const allPointsRes = await fetchFromAplus<{
     results: {
       points: string;
     }[];
-  }> = await fetchFromAplus(
-    `${APLUS_URL}/courses/${gradeSource.aplusCourseId}/points?format=json`
-  );
+  }>(`${APLUS_URL}/courses/${gradeSource.aplusCourseId}/points?format=json`);
 
   const studentNumberToId: {[key: string]: number} = {};
   const nonexistentStudents: string[] = [];
@@ -123,7 +118,7 @@ export const fetchAplusGrades = async (
 
   for (const result of allPointsRes.data.results) {
     // TODO: Fetching points individually for each student may not be the best idea
-    const pointsRes: AxiosResponse<{
+    const pointsRes = await fetchFromAplus<{
       student_id: string;
       points: number;
       points_by_difficulty: {
@@ -133,7 +128,7 @@ export const fetchAplusGrades = async (
         id: number;
         points: number;
       }[];
-    }> = await fetchFromAplus(result.points);
+    }>(result.points);
 
     const user = await User.findOne({
       where: {studentNumber: pointsRes.data.student_id},
