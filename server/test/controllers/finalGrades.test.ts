@@ -82,7 +82,7 @@ const checkGradeAmount = async (
 };
 
 describe('Test GET /v1/courses/:courseId/final-grades - get final grades', () => {
-  it('should get final grades succesfully when course results are found (admin user)', async () => {
+  it('should get final grades successfully when course results are found (admin user)', async () => {
     const res = await request
       .get(`/v1/courses/${courseId}/final-grades`)
       .set('Cookie', cookies.adminCookie)
@@ -94,7 +94,7 @@ describe('Test GET /v1/courses/:courseId/final-grades - get final grades', () =>
     expect(result.success).toBeTruthy();
   });
 
-  it('should get final grades succesfully when course results are found (teacher in charge)', async () => {
+  it('should get final grades successfully when course results are found (teacher in charge)', async () => {
     const res = await request
       .get(`/v1/courses/${courseId}/final-grades`)
       .set('Cookie', cookies.teacherCookie)

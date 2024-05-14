@@ -38,7 +38,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
       {email: values.email},
       {
         onSuccess: () => {
-          enqueueSnackbar('User added succesfully', {variant: 'success'});
+          enqueueSnackbar('User added successfully', {variant: 'success'});
           resetForm();
           onClose();
           setSubmitting(false);
