@@ -83,10 +83,7 @@ export const fetchAplusGrades = async (
   res: Response
 ): Promise<void> => {
   if (!req.query.attainments) {
-    throw new ApiError(
-      'No attainment list provided',
-      HttpCode.BadRequest
-    );
+    throw new ApiError('No attainment list provided', HttpCode.BadRequest);
   }
 
   const attainmentIds = z

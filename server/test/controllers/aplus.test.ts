@@ -25,13 +25,16 @@ const request = supertest(app);
 const APLUS_URL = 'https://plus.cs.aalto.fi/api/v2';
 
 let cookies: Cookies = {} as Cookies;
+
 let courseId = -1;
 let attainments: AttainmentData[] = [];
+let addGradeSourceAttainmentId = -1;
+let noGradeSourceAttainmentId = -1;
 let fullPointsAttainmentId = -1;
 let moduleAttainmentId = -1;
 let difficultyAttainmentId = -1;
 let noRoleCourseId = -1;
-let otherAttainments: AttainmentData[] = [];
+let differentCourseAttainmentId = -1;
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<AxiosStatic>;
@@ -43,12 +46,16 @@ beforeAll(async () => {
   [courseId, attainments, _] = await createData.createCourse({});
   [fullPointsAttainmentId, moduleAttainmentId, difficultyAttainmentId] =
     await createData.createAplusGradeSources(courseId);
+  addGradeSourceAttainmentId = attainments[0].id;
+  noGradeSourceAttainmentId = attainments[3].id;
 
+  let otherAttainments: AttainmentData[];
   [noRoleCourseId, otherAttainments, _] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
   });
+  differentCourseAttainmentId = otherAttainments[0].id;
 
   // eslint-disable-next-line @typescript-eslint/require-await
   mockedAxios.get.mockImplementation(async url => {
@@ -172,7 +179,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     sourceType: AplusGradeSourceType,
     {withModuleId = false, withDifficulty = false}
   ): AplusGradeSourceData => ({
-    attainmentId: attainments[0].id,
+    attainmentId: addGradeSourceAttainmentId,
     aplusCourseId: 1,
     sourceType: sourceType,
     moduleId: withModuleId ? 1 : undefined,
@@ -386,7 +393,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
   it('should respond with 409 conflict, if an attainment does not belong to the course', async () => {
     const res = await request
       .get(
-        `/v1/courses/${courseId}/aplus-fetch?attainments=[${otherAttainments[0].id}]`
+        `/v1/courses/${courseId}/aplus-fetch?attainments=[${differentCourseAttainmentId}]`
       )
       .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
@@ -399,7 +406,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
   it('should respond with 422 unprocessable entity, if an attainment has no grade source', async () => {
     const res = await request
       .get(
-        `/v1/courses/${courseId}/aplus-fetch?attainments=[${attainments[3].id}]`
+        `/v1/courses/${courseId}/aplus-fetch?attainments=[${noGradeSourceAttainmentId}]`
       )
       .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
