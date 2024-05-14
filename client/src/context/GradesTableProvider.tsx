@@ -76,7 +76,7 @@ const columnHelper = createColumnHelper<GroupedStudentRow>();
 // Create a provider component
 export const GradesTableProvider = (props: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const assessmentModels = useGetAllAssessmentModels(courseId);
+  const allAssessmentModels = useGetAllAssessmentModels(courseId);
   const attainments = useGetAttainments(courseId);
   const [_isPending, startTransition] = useTransition();
 
@@ -96,14 +96,23 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     'any' | number
   >('any');
 
+  // Filter out archived models
+  const assessmentModels = useMemo(
+    () =>
+      allAssessmentModels.data !== undefined
+        ? allAssessmentModels.data.filter(model => !model.archived)
+        : undefined,
+    [allAssessmentModels.data]
+  );
+
   // Row are always grouped, toggling grouping just add the grouping column to the table
   const groupedData = useMemo(() => {
     let predictedGrades: ReturnType<typeof predictGrades> = [];
-    if (assessmentModels.data) {
+    if (assessmentModels) {
       startTransition(() => {
         predictedGrades = predictGrades(
           props.data,
-          assessmentModels.data,
+          assessmentModels,
           gradeSelectOption
         );
         console.log(predictedGrades);
@@ -125,7 +134,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       }),
       gradeSelectOption
     );
-  }, [assessmentModels.data, props.data, gradeSelectOption]);
+  }, [assessmentModels, props.data, gradeSelectOption]);
 
   // const [globalFilter, setGlobalFilter] = useState('');
 
@@ -144,10 +153,10 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   const getAttainmentsForAssessmentModel = useCallback(
     (modelId: number | 'any'): AttainmentData[] => {
       if (modelId === 'any') return attainments.data ?? [];
-      if (assessmentModels.data === undefined || attainments.data === undefined)
+      if (assessmentModels === undefined || attainments.data === undefined)
         return [];
 
-      const assessmentModel = assessmentModels.data.find(
+      const assessmentModel = assessmentModels.find(
         model => model.id === modelId
       );
       if (assessmentModel === undefined) return [];
@@ -160,7 +169,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         attainmentIds.includes(attainment.id)
       );
     },
-    [assessmentModels.data, attainments.data]
+    [assessmentModels, attainments.data]
   );
 
   // Creating Grades columns
@@ -331,8 +340,8 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         const modelId =
           selectedAssessmentModel !== 'any'
             ? selectedAssessmentModel
-            : assessmentModels.data?.length === 1
-              ? assessmentModels.data[0].id
+            : assessmentModels?.length === 1
+              ? assessmentModels[0].id
               : 'any';
         if (modelId === 'any') return 0; // Makes no sense to sort if there is more than one model
 
@@ -358,14 +367,11 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
           row={info.getValue()}
           assessmentModelIds={
             selectedAssessmentModel === 'any'
-              ? assessmentModels.data?.map(model => model.id)
+              ? assessmentModels?.map(model => model.id)
               : [selectedAssessmentModel]
           }
           onClick={() => {
-            if (
-              assessmentModels.data === undefined ||
-              assessmentModels.data.length === 0
-            )
+            if (assessmentModels === undefined || assessmentModels.length === 0)
               return;
             setUserGraphData(info.getValue());
             setUserGraphOpen(true);
@@ -455,12 +461,12 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         open={userGraphOpen}
         onClose={() => setUserGraphOpen(false)}
         assessmentModels={[
-          ...(assessmentModels.data?.filter(
+          ...(assessmentModels?.filter(
             model =>
               model.id === selectedAssessmentModel ||
               selectedAssessmentModel === 'any'
           ) || []),
-          ...(assessmentModels.data?.filter(
+          ...(assessmentModels?.filter(
             model =>
               model.id !== selectedAssessmentModel &&
               selectedAssessmentModel !== 'any'
