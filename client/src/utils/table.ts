@@ -10,7 +10,13 @@ import {
   GroupedStudentRow,
 } from '../context/GradesTableProvider';
 
-// Group the rows by the latest best grade date
+/**
+ * Groups the student rows by their latest best grade date.
+ *
+ * @param gradesList - The list of extended student rows.
+ * @param gradeSelectOption - The grade select option.
+ * @returns An array of grouped student rows.
+ */
 export const groupByLatestBestGrade = (
   gradesList: ExtendedStudentRow[],
   gradeSelectOption: GradeSelectOption
@@ -50,22 +56,47 @@ export const findLatestGrade = (row: StudentRow): Date => {
   return latestDate;
 };
 
-// predicted grade for by model
+/**
+ * Predicts grades based on assessment models and student rows.
+ *
+ * @param rows - An array of student rows.
+ * @param assessmentModels - An array of assessment models.
+ * @param gradeSelectOption - The grade select option.
+ * @returns
+ */
 export const predictGrades = (
   rows: StudentRow[],
   assessmentModels: AssessmentModelData[],
   gradeSelectOption: GradeSelectOption
-): {[key: number]: {finalGrade: number}}[] => {
-  return assessmentModels.map(model =>
-    batchCalculateGraph(
-      model.graphStructure,
+): {
+  [key: AssessmentModelData['id']]: ReturnType<typeof batchCalculateGraph>;
+} => {
+  const result: {
+    [key: AssessmentModelData['id']]: ReturnType<typeof batchCalculateGraph>;
+  } = {};
+  for (const assessmentModel of assessmentModels) {
+    result[assessmentModel.id] = batchCalculateGraph(
+      assessmentModel.graphStructure,
       rows.map(row => ({
         userId: row.user.id,
         attainments: row.attainments.map(att => ({
           attainmentId: att.attainmentId,
-          grade: findBestGrade(att.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Handle grade expiration
+          grade: findBestGrade(att.grades, {gradeSelectOption})?.grade ?? 0,
         })),
       }))
-    )
-  );
+    );
+  }
+  return result;
+  // return assessmentModels.map(model =>
+  //   batchCalculateGraph(
+  //     model.graphStructure,
+  //     rows.map(row => ({
+  //       userId: row.user.id,
+  //       attainments: row.attainments.map(att => ({
+  //         attainmentId: att.attainmentId,
+  //         grade: findBestGrade(att.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Handle grade expiration
+  //       })),
+  //     }))
+  //   )
+  // );
 };

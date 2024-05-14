@@ -2,15 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {MoreVert} from '@mui/icons-material';
+import {AccountTreeRounded} from '@mui/icons-material';
 import {IconButton, Tooltip} from '@mui/material';
 import {JSX, useState} from 'react';
+import {useParams} from 'react-router-dom';
 
 import {GroupedStudentRow} from '../../context/GradesTableProvider';
+import {useGetAllAssessmentModels} from '../../hooks/useApi';
 
 type PropsType = {
   row: GroupedStudentRow;
-  assessmentModelIds: (number | undefined)[] | undefined;
+  assessmentModelIds: number[] | undefined;
   onClick: () => void;
 };
 const PredictedGradeCell = ({
@@ -19,6 +21,8 @@ const PredictedGradeCell = ({
   onClick,
 }: PropsType): JSX.Element => {
   const [hover, setHover] = useState<boolean>(false);
+  const {courseId} = useParams() as {courseId: string};
+  const assessmentModels = useGetAllAssessmentModels(courseId);
 
   return (
     <div
@@ -31,18 +35,33 @@ const PredictedGradeCell = ({
         position: 'relative',
       }}
     >
-      <p style={{margin: 0, display: 'inline'}}>
-        {row.predictedFinalGrades?.join('/')}
-      </p>
+      <Tooltip
+        title={
+          assessmentModelIds !== undefined && assessmentModelIds.length > 1
+            ? `${assessmentModels.data
+                ?.filter(model => assessmentModelIds.includes(model.id))
+                .map(model => model.name)
+                .join(' / ')}`
+            : undefined
+        }
+        placement="top"
+        disableInteractive
+      >
+        <p style={{margin: 0, display: 'inline'}}>
+          {assessmentModelIds
+            ?.map(modelId => row.predictedFinalGrades?.[modelId]?.finalGrade)
+            .join('/') || 'N/A'}
+        </p>
+      </Tooltip>
       {assessmentModelIds !== undefined &&
         assessmentModelIds.length > 0 &&
         hover && (
-          <Tooltip title="View graph" placement="top">
+          <Tooltip title="View graph" placement="top" disableInteractive>
             <IconButton
               sx={{position: 'absolute', right: '0px', top: 'calc(50% - 20px)'}}
               onClick={onClick}
             >
-              <MoreVert color="primary" />
+              <AccountTreeRounded color="primary" />
             </IconButton>
           </Tooltip>
         )}
