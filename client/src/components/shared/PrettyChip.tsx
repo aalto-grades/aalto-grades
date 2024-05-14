@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Button, ButtonProps} from '@mui/material';
+import {Box, ButtonBase, ButtonProps} from '@mui/material';
 import {FC} from 'react';
 
 type PropsType = {
@@ -14,16 +14,19 @@ const PrettyChip: FC<PropsType & ButtonProps> = props => {
   return (
     <Box
       sx={{
-        width: '100%',
-        height: '100%',
-        // borderRight: '1px black solid',
-        // borderLeft: '1px black solid',
-        display: 'flex',
-        alignItems: 'center',
-        // overflow: 'hidden',
+        ...{
+          width: '100%',
+          height: '100%',
+          // borderRight: '1px black solid',
+          // borderLeft: '1px black solid',
+          display: 'flex',
+          alignItems: 'center',
+          // overflow: 'hidden',
+        },
+        ...props.sx,
       }}
     >
-      <Button
+      <ButtonBase
         {...props}
         disableRipple={props.onClick === undefined ? true : false}
         style={{
@@ -42,10 +45,10 @@ const PrettyChip: FC<PropsType & ButtonProps> = props => {
               !props.position
                 ? '50px 50px 50px 50px'
                 : props.position === 'first'
-                  ? '50px 0px 0px 50px'
-                  : props.position === 'last'
-                    ? '0px 50px 50px 0px'
-                    : '0px'
+                ? '50px 0px 0px 50px'
+                : props.position === 'last'
+                ? '0px 50px 50px 0px'
+                : '0px'
             }`,
 
             width: '100%',
@@ -55,7 +58,7 @@ const PrettyChip: FC<PropsType & ButtonProps> = props => {
         }}
       >
         {props.children}
-      </Button>
+      </ButtonBase>
     </Box>
   );
 };

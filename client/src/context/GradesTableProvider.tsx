@@ -68,7 +68,7 @@ export type GroupedStudentRow = {
 } & ExtendedStudentRow;
 
 export type ExtendedStudentRow = StudentRow & {
-  predictedFinalGrades?: (string | number)[];
+  predictedFinalGrades?: {[key: number]: {finalGrade: string}};
 };
 
 const columnHelper = createColumnHelper<GroupedStudentRow>();
@@ -106,6 +106,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
           assessmentModels.data,
           gradeSelectOption
         );
+        console.log(predictedGrades);
       });
     }
 
@@ -113,10 +114,13 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       props.data.map(row => {
         return {
           ...row,
-          predictedFinalGrades:
-            predictedGrades.length > 0
-              ? predictedGrades.map(pg => pg[row.user.id].finalGrade)
-              : ['No models'],
+          // keep the same structure of predictedGrades but only show result for the student
+          predictedFinalGrades: Object.fromEntries(
+            Object.entries(predictedGrades).map(([key, value]) => [
+              key,
+              value[row.user.id],
+            ])
+          ) as unknown as {[key: number]: {finalGrade: string}},
         };
       }),
       gradeSelectOption
@@ -255,9 +259,11 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
               <Badge
                 badgeContent={
                   row.subRows.filter(subRow => subRow.getIsSelected()).length ||
-                  '0'
+                  undefined
                 }
+                max={999}
                 color="secondary"
+                sx={{alignItems: 'end'}}
               />
             </span>
           </>
@@ -275,7 +281,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
             '&::before': {
               content: '""',
               width: '11px',
-              height: '150%',
+              height: '113%',
               // border: '1px solid black',
               borderBlockEnd: '1px solid lightgray',
               borderLeft: '1px solid lightgray',
@@ -283,8 +289,9 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
               // backgroundColor: 'black',
               position: 'absolute',
               left: '0px',
-              top: '-102%',
+              bottom: '50%',
               zIndex: -1,
+              pointerEvents: 'none',
             },
           }}
         />
@@ -321,22 +328,39 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       header: 'Grade preview',
       meta: {PrettyChipPosition: 'middle'},
       sortingFn: (a, b, columnId) => {
+        const modelId =
+          selectedAssessmentModel !== 'any'
+            ? selectedAssessmentModel
+            : assessmentModels.data?.length === 1
+              ? assessmentModels.data[0].id
+              : 'any';
+        if (modelId === 'any') return 0; // Makes no sense to sort if there is more than one model
+
         const valA =
-          a.getValue<GroupedStudentRow>(columnId).predictedFinalGrades;
+          a.getValue<GroupedStudentRow>(columnId).predictedFinalGrades?.[
+            modelId
+          ].finalGrade;
         const valB =
-          b.getValue<GroupedStudentRow>(columnId).predictedFinalGrades;
+          b.getValue<GroupedStudentRow>(columnId).predictedFinalGrades?.[
+            modelId
+          ].finalGrade;
+
         if (valB === undefined) return 1;
         if (valA === undefined) return -1;
-        for (let i = 0; i < valA.length; i++) {
-          if (valA[i] < valB[i]) return -1;
-          if (valA[i] > valB[i]) return 1;
-        }
+
+        if (valA < valB) return -1;
+        if (valA > valB) return 1;
+
         return 0;
       },
       cell: info => (
         <PredictedGradeCell
           row={info.getValue()}
-          assessmentModelIds={assessmentModels.data?.map(model => model.id)}
+          assessmentModelIds={
+            selectedAssessmentModel === 'any'
+              ? assessmentModels.data?.map(model => model.id)
+              : [selectedAssessmentModel]
+          }
           onClick={() => {
             if (
               assessmentModels.data === undefined ||
@@ -430,7 +454,18 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       <UserGraphDialog
         open={userGraphOpen}
         onClose={() => setUserGraphOpen(false)}
-        assessmentModels={assessmentModels.data}
+        assessmentModels={[
+          ...(assessmentModels.data?.filter(
+            model =>
+              model.id === selectedAssessmentModel ||
+              selectedAssessmentModel === 'any'
+          ) || []),
+          ...(assessmentModels.data?.filter(
+            model =>
+              model.id !== selectedAssessmentModel &&
+              selectedAssessmentModel !== 'any'
+          ) || []),
+        ]} // Very ugly way to sort the selected model to be the first
         row={userGraphData}
       />
       {props.children}
