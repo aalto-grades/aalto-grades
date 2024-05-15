@@ -119,13 +119,21 @@ export const parseCourseFull = (course: CourseFull): CourseData => {
 };
 
 /**
- * Checks that all emails are existing users.
+ * Checks that all emails are unique and are existing users.
  *
- * @throws ApiError(422) if that's not the case.
+ * @throws ApiError(404|422) if that's not the case.
  */
 export const validateEmailList = async (
   emailList: string[]
 ): Promise<User[]> => {
+  const emails = new Set<string>(emailList);
+  if (emails.size !== emailList.length) {
+    throw new ApiError(
+      'The same email cannot appear twice',
+      HttpCode.UnprocessableEntity
+    );
+  }
+
   const users = await User.findAll({
     attributes: ['id', 'email'],
     where: {email: emailList},
@@ -142,11 +150,31 @@ export const validateEmailList = async (
       missingEmails.map(
         (email: string) => `No user with email address ${email} found`
       ),
-      HttpCode.UnprocessableEntity
+      HttpCode.NotFound
     );
   }
 
   return users;
+};
+
+/**
+ * Validate that there are no duplicates between the teachers and assistants.
+ *
+ * @throws ApiError(422) if duplicates found
+ */
+export const validateRoleUniqueness = (
+  teachers: User[],
+  assistants: User[]
+): void => {
+  const assistantIds = new Set<number>(assistants.map(teacher => teacher.id));
+  for (const teacher of teachers) {
+    if (assistantIds.has(teacher.id)) {
+      throw new ApiError(
+        'Course cannot contain same user as both a teacher and assistant',
+        HttpCode.UnprocessableEntity
+      );
+    }
+  }
 };
 
 /**

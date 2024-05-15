@@ -202,8 +202,10 @@ definitions:
         $ref: '#/components/responses/Unauthorized'
       403:
         $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
       422:
-        description: Teacher(s) or Assistan(s) not found based on email.
+        description: Duplicate emails found.
         content:
           application/json:
             schema:
@@ -267,7 +269,7 @@ definitions:
       404:
         $ref: '#/components/responses/NotFound'
       422:
-        description: Teacher(s) or Assistan(s) not found based on email.
+        description: Duplicate emails found.
         content:
           application/json:
             schema:

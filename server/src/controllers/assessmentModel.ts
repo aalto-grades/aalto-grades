@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
+import {UniqueConstraintError} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
@@ -122,12 +123,25 @@ export const editAssessmentModel = async (
     req.params.assessmentModelId
   );
 
-  // Update assessment model name.
-  await assessmentModel.update({
-    name: req.body.name ?? assessmentModel.name,
-    graphStructure: req.body.graphStructure ?? assessmentModel.graphStructure,
-    archived: req.body.archived ?? assessmentModel.archived,
-  });
+  // Update assessment model & catch duplicate name error.
+  try {
+    await assessmentModel.update({
+      name: req.body.name ?? assessmentModel.name,
+      graphStructure: req.body.graphStructure ?? assessmentModel.graphStructure,
+      archived: req.body.archived ?? assessmentModel.archived,
+    });
+  } catch (e) {
+    // Duplicate name error
+    if (e instanceof UniqueConstraintError) {
+      throw new ApiError(
+        'There cannot be two assessment models with the same name',
+        HttpCode.Conflict
+      );
+    }
+
+    // Other error
+    throw e;
+  }
 
   res.sendStatus(HttpCode.Ok);
 };

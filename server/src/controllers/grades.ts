@@ -237,7 +237,7 @@ export const editGrade = async (
   if (
     date !== undefined &&
     expiryDate === undefined &&
-    date > gradeData.expiryDate
+    date > new Date(gradeData.expiryDate)
   ) {
     throw new ApiError(
       `New date (${date.toString()}) can't be later than` +
@@ -247,7 +247,7 @@ export const editGrade = async (
   } else if (
     expiryDate !== undefined &&
     date === undefined &&
-    gradeData.date > expiryDate
+    new Date(gradeData.date) > expiryDate
   ) {
     throw new ApiError(
       `New expiration date (${expiryDate.toString()}) can't be before` +
@@ -259,9 +259,9 @@ export const editGrade = async (
   await gradeData
     .set({
       grade: grade ?? gradeData.grade,
-      date: date === undefined ? gradeData.date : date,
-      expiryDate: expiryDate === undefined ? gradeData.expiryDate : expiryDate,
-      comment: comment && comment.length > 0 ? comment : gradeData.comment,
+      date: date ?? gradeData.date,
+      expiryDate: expiryDate ?? gradeData.expiryDate,
+      comment: comment !== undefined ? comment : gradeData.comment,
       graderId: grader.id,
     })
     .save();
@@ -291,7 +291,7 @@ export const deleteGrade = async (
  *
  * Responds with text/csv
  *
- * @throws ApiError(400|404|422)
+ * @throws ApiError(400|404)
  */
 export const getSisuFormattedGradingCSV = async (
   req: TypedRequestBody<typeof SisuCsvUploadSchema>,
