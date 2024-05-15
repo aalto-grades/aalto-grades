@@ -632,7 +632,7 @@ ${createCSVString(selectedStudents, '21.6.2023', 'en').join(',\n')},\n`);
     );
   });
 
-  it('should export CSV succesfully with custom assessmentDate and completionLanguage', async () => {
+  it('should export CSV successfully with custom assessmentDate and completionLanguage', async () => {
     const res = await request
       .post(`/v1/courses/${courseId}/grades/csv/sisu`)
       .send({
