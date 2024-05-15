@@ -369,6 +369,12 @@ describe('Test Put /v1/courses/:courseId/assessment-models/:assessmentModId - ed
     const data = {name: 'Not added', graphStructure: testStructure};
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
+
+  it('should respond with 409 when course already has assessment model with same name', async () => {
+    const url = `/v1/courses/${courseId}/assessment-models/${assessmentModId}`;
+    const data = {name: 'Model 1', graphStructure: testStructure};
+    await responseTests.testConflict(url, cookies.adminCookie).put(data);
+  });
 });
 
 describe('Test DELETE /v1/courses/:courseId/assessment-models/:assessmentModId - delete an assessment model', () => {
