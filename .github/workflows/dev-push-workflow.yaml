@@ -4,7 +4,7 @@
 ---
 name: Dev Push Workflow
 run-name: ${{ github.actor }} dev push workflow
-on:
+on: # yamllint disable-line rule:truthy
   push:
     branches:
       - dev
@@ -17,8 +17,8 @@ jobs:
       run:
         working-directory: ./client
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
       - name: Install dependencies
@@ -42,8 +42,8 @@ jobs:
       run:
         working-directory: ./server
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
       - name: Docker compose down
@@ -70,8 +70,8 @@ jobs:
       run:
         working-directory: ./common
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
       - name: Install dependencies
@@ -85,7 +85,7 @@ jobs:
     name: Lint project YAML files
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install yamllint
         run: pip install yamllint
       - name: Lint YAML files
@@ -95,5 +95,5 @@ jobs:
     name: Check REUSE compliance
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: fsfe/reuse-action@v1
