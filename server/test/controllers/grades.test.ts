@@ -10,6 +10,7 @@ import {
   AttainmentData,
   NewGrade,
   StudentRowSchema,
+  EditGradeData,
 } from '@/common/types';
 import {app} from '../../src/app';
 import * as gradesUtil from '../../src/controllers/utils/grades';
@@ -29,9 +30,11 @@ let courseId = -1;
 let courseAttainments: AttainmentData[] = [];
 let editGradeId = -1;
 let noRoleCourseId = -1;
+let noRoleCourseAttainments: AttainmentData[] = [];
 let noRoleGradeId = -1;
 const nonExistentId = 1000000;
 const newStudentNumber = '867493';
+const nonExistentStudentNumber = '945942';
 
 const students: {id: number; studentNumber: string; finalGrade: number}[] = [];
 let studentNumbers: string[] = [];
@@ -49,12 +52,23 @@ beforeAll(async () => {
   }
   studentNumbers = students.map(student => student.studentNumber);
 
-  let assessmentModelId;
+  let assessmentModelId: number;
   [courseId, courseAttainments, assessmentModelId] =
     await createData.createCourse({
       courseData: {maxCredits: 5, courseCode: 'CS-A????'},
     });
   for (const student of students) {
+    // Create worse final grades before
+    if (student.finalGrade > 0) {
+      await createData.createFinalGrade(
+        courseId,
+        student.id,
+        assessmentModelId,
+        TEACHER_ID,
+        student.finalGrade -
+          Math.floor(Math.random() * (student.finalGrade + 1))
+      );
+    }
     await createData.createFinalGrade(
       courseId,
       student.id,
@@ -62,6 +76,17 @@ beforeAll(async () => {
       TEACHER_ID,
       student.finalGrade
     );
+    // Create worse final grades after
+    if (student.finalGrade > 0) {
+      await createData.createFinalGrade(
+        courseId,
+        student.id,
+        assessmentModelId,
+        TEACHER_ID,
+        student.finalGrade -
+          Math.floor(Math.random() * (student.finalGrade + 1))
+      );
+    }
   }
   editGradeId = await createData.createGrade(
     students[0].id,
@@ -69,15 +94,14 @@ beforeAll(async () => {
     TEACHER_ID
   );
 
-  let noRoleAttainments;
-  [noRoleCourseId, noRoleAttainments] = await createData.createCourse({
+  [noRoleCourseId, noRoleCourseAttainments] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
   });
   noRoleGradeId = await createData.createGrade(
     students[0].id,
-    noRoleAttainments[0].id,
+    noRoleCourseAttainments[0].id,
     TEACHER_ID
   );
 });
@@ -85,11 +109,6 @@ beforeAll(async () => {
 afterAll(async () => {
   await resetDb();
 });
-
-// TODO: Test multiple final grades
-// TODO: Test grades/attainments not belonging to course
-// TODO: Test add/edit grades 409
-// TODO: Test not found studentnumber
 
 describe('Test GET /v1/courses/:courseId/grades - get all grades', () => {
   it('should get the grades', async () => {
@@ -348,6 +367,23 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     const data = await genGrades();
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
+
+  it('should respond with 409 when attainment does not belong to course', async () => {
+    const url = `/v1/courses/${courseId}/grades`;
+    const student = await genStudent();
+    const data = [
+      {
+        studentNumber: student.studentNumber,
+        attainmentId: noRoleCourseAttainments[0].id,
+        grade: Math.floor(Math.random() * 11),
+        date: new Date(),
+        expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),
+        comment: '',
+      },
+    ];
+
+    await responseTests.testConflict(url, cookies.adminCookie).post(data);
+  });
 });
 
 describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => {
@@ -363,6 +399,7 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
         .send({
           grade: Math.floor(Math.random() * 11),
           date: new Date(),
+          expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),
           comment: `testing ${Math.random()}`,
         })
         .set('Cookie', cookie)
@@ -370,6 +407,59 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
 
       expect(JSON.stringify(res.body)).toBe('{}');
     }
+  });
+
+  it('should partially edit grade', async () => {
+    let res = await request
+      .put(`/v1/courses/${courseId}/grades/${editGradeId}`)
+      .send({
+        comment: `testing ${Math.random()}`,
+      })
+      .set('Cookie', cookies.teacherCookie)
+      .expect(HttpCode.Ok);
+
+    expect(JSON.stringify(res.body)).toBe('{}');
+
+    res = await request
+      .put(`/v1/courses/${courseId}/grades/${editGradeId}`)
+      .send({
+        grade: 5,
+      })
+      .set('Cookie', cookies.teacherCookie)
+      .expect(HttpCode.Ok);
+
+    expect(JSON.stringify(res.body)).toBe('{}');
+  });
+
+  it('should respond with 400 if validation fails', async () => {
+    const url = `/v1/courses/${courseId}/grades/${editGradeId}`;
+
+    let data: EditGradeData = {
+      comment: 'not edited',
+      grade: '1' as unknown as number,
+    };
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+
+    // Expiry before date
+    data = {expiryDate: new Date(1970, 0, 1), date: new Date(2000, 0, 1)};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+
+    // Expiry before date
+    data = {expiryDate: new Date(1970, 0, 1)};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+
+    // Date after expiry
+    data = {date: new Date(2100, 0, 1)};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+  });
+
+  it('should respond with 400 if id is invalid', async () => {
+    let url = `/v1/courses/${'bad'}/grades/${editGradeId}`;
+    const data = {comment: 'not edited'};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+
+    url = `/v1/courses/${courseId}/attainments/${-1}`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
@@ -396,6 +486,13 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
 
     url = `/v1/courses/${nonExistentId}/grades/${courseId}`;
     await responseTests.testNotFound(url, cookies.adminCookie).put(data);
+  });
+
+  it('should respond with 409 when grade does not belong to course', async () => {
+    const url = `/v1/courses/${courseId}/grades/${noRoleGradeId}`;
+    const data = {comment: 'not edited'};
+
+    await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
 });
 
@@ -595,6 +692,13 @@ ${createCSVString(students, '12.5.2023', 'ja').join(',\n')},\n`);
   it('should respond with 404 if grades have not been calculated yet', async () => {
     const url = `/v1/courses/${noRoleCourseId}/grades/csv/sisu`;
     const data = {studentNumbers: [studentNumbers[0]]};
+
+    await responseTests.testNotFound(url, cookies.adminCookie).post(data);
+  });
+
+  it('should respond with 404 if student number not found', async () => {
+    const url = `/v1/courses/${noRoleCourseId}/grades/csv/sisu`;
+    const data = {studentNumbers: [nonExistentStudentNumber]};
 
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
