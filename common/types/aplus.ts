@@ -52,3 +52,6 @@ export const NewAplusGradeSourceArraySchema = z.array(
 
 export type AplusExerciseData = z.infer<typeof AplusExerciseDataSchema>;
 export type AplusGradeSourceData = z.infer<typeof AplusGradeSourceDataSchema>;
+
+// In case this changes later
+export type NewAplusGradeSourceData = AplusGradeSourceData;

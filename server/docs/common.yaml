@@ -60,6 +60,15 @@ components:
       required: true
       example: 1
       description: The ID of the user.
+    aplusCourseId:
+      in: path
+      name: aplusCourseId
+      schema:
+        type: integer
+        format: int32
+      required: true
+      example: 1
+      description: The ID of a course in A+.
 
   responses:
     BadRequest:
@@ -95,6 +104,12 @@ components:
         The ids given in the url params or request body do not belong to each other or
         a similar item already exists in the database or
         deletion of item failed due to some dependency.
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/Error'
+    BadGateway:
+      description: An external server returned a response indicating failure.
       content:
         application/json:
           schema:

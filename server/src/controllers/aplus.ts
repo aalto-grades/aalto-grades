@@ -3,20 +3,20 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
-import {z} from 'zod';
+import {z, ZodError} from 'zod';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   AplusExerciseData,
-  AplusGradeSourceData,
   AplusGradeSourceType,
   HttpCode,
+  IdSchema,
   NewAplusGradeSourceArraySchema,
+  NewAplusGradeSourceData,
   NewGrade,
 } from '@/common/types';
 import {fetchFromAplus, validateAplusCourseId} from './utils/aplus';
 import {validateAttainmentPath} from './utils/attainment';
-import {validateCourseId} from './utils/course';
 import {APLUS_API_URL} from '../configs/environment';
 import AplusGradeSource from '../database/models/aplusGradeSource';
 import {ApiError} from '../types';
@@ -24,7 +24,7 @@ import {ApiError} from '../types';
 /**
  * Responds with AplusExerciseData
  *
- * @throws ApiError(400)
+ * @throws ApiError(400|502)
  */
 export const fetchAplusExerciseData = async (
   req: Request,
@@ -63,35 +63,52 @@ export const fetchAplusExerciseData = async (
   res.json(exerciseData);
 };
 
-/** @throws ApiError(400|404) */
+/** @throws ApiError(400|404|409) */
 export const addAplusGradeSources = async (
   req: TypedRequestBody<typeof NewAplusGradeSourceArraySchema>,
   res: Response
 ): Promise<void> => {
-  await validateCourseId(req.params.courseId);
+  const newGradeSources: NewAplusGradeSourceData[] = req.body;
+  for (const newGradeSource of newGradeSources) {
+    await validateAttainmentPath(
+      req.params.courseId,
+      String(newGradeSource.attainmentId)
+    );
+  }
 
-  const preparedBulkCreate: AplusGradeSourceData[] = req.body;
-  await AplusGradeSource.bulkCreate(preparedBulkCreate);
+  await AplusGradeSource.bulkCreate(newGradeSources);
 
   res.sendStatus(HttpCode.Created);
 };
 
-/** @throws ApiError(400|404|409|422) */
+/**
+ * Responds with NewGrade[]
+ *
+ * @throws ApiError(400|404|409|422|502)
+ */
 export const fetchAplusGrades = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  if (!req.query.attainments) {
-    throw new ApiError('No attainment list provided', HttpCode.BadRequest);
+  let attainmentIds: number[] = [];
+  try {
+    attainmentIds = z
+      .array(IdSchema)
+      .parse(JSON.parse(String(req.query.attainments)));
+  } catch (e) {
+    if (e instanceof Error) {
+      throw new ApiError(e.message, HttpCode.BadRequest);
+    }
+    if (e instanceof ZodError) {
+      throw new ApiError(
+        e.issues.map(issue => issue.message),
+        HttpCode.BadRequest
+      );
+    }
   }
 
-  const attainmentIds = z
-    .array(z.number().int().positive())
-    .parse(JSON.parse(String(req.query.attainments)));
-
-  const newGradesFromAplus: NewGrade[] = [];
+  const newGrades: NewGrade[] = [];
   for (const attainmentId of attainmentIds) {
-    // TODO: Batch validation?
     const [_, attainment] = await validateAttainmentPath(
       req.params.courseId,
       String(attainmentId)
@@ -182,7 +199,7 @@ export const fetchAplusGrades = async (
 
       // TODO: Proper dates
       // Related: https://github.com/apluslms/a-plus/issues/1361
-      newGradesFromAplus.push({
+      newGrades.push({
         studentNumber: pointsRes.data.student_id,
         attainmentId: attainment.id,
         grade: grade,
@@ -193,5 +210,5 @@ export const fetchAplusGrades = async (
     }
   }
 
-  res.json(newGradesFromAplus);
+  res.json(newGrades);
 };

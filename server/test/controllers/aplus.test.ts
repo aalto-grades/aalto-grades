@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import axios, {AxiosStatic} from 'axios';
+import axios, {AxiosError, AxiosStatic} from 'axios';
 import supertest from 'supertest';
 
 import {
@@ -17,14 +17,14 @@ import {app} from '../../src/app';
 import {APLUS_API_URL} from '../../src/configs/environment';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
 import {createData} from '../util/createData';
-import {ErrorSchema} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
+import {ResponseTests} from '../util/responses';
 
 const request = supertest(app);
+const responseTests = new ResponseTests(request);
 
 let cookies: Cookies = {} as Cookies;
-
 let courseId = -1;
 let addGradeSourceAttainmentId = -1;
 let noGradeSourceAttainmentId = -1;
@@ -34,18 +34,19 @@ let difficultyAttainmentId = -1;
 let noRoleCourseId = -1;
 let differentCourseAttainmentId = -1;
 
+const nonExistentId = 1000000;
+
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<AxiosStatic>;
 
 beforeAll(async () => {
   cookies = await getCookies();
-
   let _;
+
   let attainments: AttainmentData[];
   [courseId, attainments, _] = await createData.createCourse({});
   [fullPointsAttainmentId, moduleAttainmentId, difficultyAttainmentId] =
     await createData.createAplusGradeSources(courseId);
-
   addGradeSourceAttainmentId = attainments[0].id;
   noGradeSourceAttainmentId = attainments[3].id;
 
@@ -55,36 +56,16 @@ beforeAll(async () => {
     hasAssistant: false,
     hasStudent: false,
   });
-
   differentCourseAttainmentId = otherAttainments[0].id;
 
   // eslint-disable-next-line @typescript-eslint/require-await
   mockedAxios.get.mockImplementation(async url => {
-    const urlExercises = `${APLUS_API_URL}/courses/1/exercises?format=json`;
     const urlPoints = `${APLUS_API_URL}/courses/1/points?format=json`;
     const urlA = `${APLUS_API_URL}/courses/1/points/1?format=json`;
     const urlB = `${APLUS_API_URL}/courses/1/points/2?format=json`;
 
     /* eslint-disable camelcase */
     switch (url) {
-      case urlExercises:
-        return {
-          data: {
-            results: [
-              {
-                id: 1,
-                display_name: 'First',
-                exercises: [{difficulty: 'A'}, {difficulty: ''}],
-              },
-              {
-                id: 2,
-                display_name: 'Second',
-                exercises: [{difficulty: ''}],
-              },
-            ],
-          },
-        };
-
       case urlPoints:
         return {
           data: {
@@ -143,7 +124,26 @@ afterAll(async () => {
 });
 
 describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () => {
-  it('should respond with correct data when validation passes', async () => {
+  it('should respond with correct data', async () => {
+    mockedAxios.get.mockResolvedValueOnce({
+      /* eslint-disable camelcase */
+      data: {
+        results: [
+          {
+            id: 1,
+            display_name: 'First',
+            exercises: [{difficulty: 'A'}, {difficulty: ''}],
+          },
+          {
+            id: 2,
+            display_name: 'Second',
+            exercises: [{difficulty: ''}],
+          },
+        ],
+      },
+      /* eslint-enable camelcase */
+    });
+
     const res = await request
       .get('/v1/aplus/courses/1')
       .set('Cookie', cookies.adminCookie)
@@ -155,32 +155,35 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
   });
 
   it('should respond with 400 if validation fails (non-number A+ course ID)', async () => {
-    const res = await request
-      .get('/v1/aplus/courses/abc')
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.BadRequest);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    const url = '/v1/aplus/courses/abc';
+    await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 
   it('should respond with 401 if not logged in', async () => {
-    const res = await request
-      .get('/v1/aplus/courses/1')
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
+    const url = '/v1/aplus/courses/1';
+    await responseTests.testUnauthorized(url).get();
+  });
 
-    expect(JSON.stringify(res.body)).toBe('{}');
+  it('should respond with 502 if A+ request fails', async () => {
+    mockedAxios.get.mockImplementationOnce(_url => {
+      throw new AxiosError();
+    });
+
+    const url = '/v1/aplus/courses/1';
+    await responseTests.testBadGateway(url, cookies.adminCookie).get();
   });
 });
 
 describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', () => {
   const getGradeSource = (
     sourceType: AplusGradeSourceType,
-    {withModuleId = false, withDifficulty = false}
+    {
+      withModuleId = false,
+      withDifficulty = false,
+      attainmentId = addGradeSourceAttainmentId,
+    }
   ): AplusGradeSourceData => ({
-    attainmentId: addGradeSourceAttainmentId,
+    attainmentId: attainmentId,
     aplusCourseId: 1,
     sourceType: sourceType,
     moduleId: withModuleId ? 1 : undefined,
@@ -239,58 +242,72 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
   });
 
   it('should respond with 400 if course ID is invalid', async () => {
-    const res = await request
-      .post('/v1/courses/abc/aplus-source')
-      .send([getFullPoints(), getModule(), getDifficulty()])
-      .set('Cookie', cookies.adminCookie)
-      .expect(HttpCode.BadRequest);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    const url = '/v1/courses/abc/aplus-source';
+    await responseTests
+      .testBadRequest(url, cookies.adminCookie)
+      .post([getFullPoints(), getModule(), getDifficulty()]);
   });
 
   it('should respond with 400 if input data is invalid', async () => {
-    const testInvalid = async (
-      sourceType: AplusGradeSourceType,
-      withModuleId: boolean,
-      withDifficulty: boolean
-    ): Promise<void> => {
-      await request
-        .post(`/v1/courses/${courseId}/aplus-source`)
-        .send([getGradeSource(sourceType, {withModuleId, withDifficulty})])
-        .set('Cookie', cookies.adminCookie)
-        .expect(HttpCode.BadRequest);
-    };
+    const url = `/v1/courses/${courseId}/aplus-source`;
 
-    await testInvalid(AplusGradeSourceType.FullPoints, true, true);
-    await testInvalid(AplusGradeSourceType.FullPoints, true, false);
-    await testInvalid(AplusGradeSourceType.FullPoints, false, true);
-    await testInvalid(AplusGradeSourceType.Module, true, true);
-    await testInvalid(AplusGradeSourceType.Module, false, true);
-    await testInvalid(AplusGradeSourceType.Module, false, false);
-    await testInvalid(AplusGradeSourceType.Difficulty, true, true);
-    await testInvalid(AplusGradeSourceType.Difficulty, true, false);
-    await testInvalid(AplusGradeSourceType.Difficulty, false, false);
+    // prettier-ignore
+    const invalid: [AplusGradeSourceType, boolean, boolean][] = [
+      [AplusGradeSourceType.FullPoints, true,  true],
+      [AplusGradeSourceType.FullPoints, true,  false],
+      [AplusGradeSourceType.FullPoints, false, true],
+      [AplusGradeSourceType.Module,     true,  true],
+      [AplusGradeSourceType.Module,     false, true],
+      [AplusGradeSourceType.Module,     false, false],
+      [AplusGradeSourceType.Difficulty, true,  true],
+      [AplusGradeSourceType.Difficulty, true,  false],
+      [AplusGradeSourceType.Difficulty, false, false],
+    ];
+
+    for (const [sourceType, withModuleId, withDifficulty] of invalid) {
+      await responseTests
+        .testBadRequest(url, cookies.adminCookie)
+        .post([getGradeSource(sourceType, {withModuleId, withDifficulty})]);
+    }
   });
 
-  it('should respond with 401 if not logged in', async () => {
-    const res = await request
-      .post(`/v1/courses/${courseId}/aplus-source`)
-      .send([getFullPoints(), getModule(), getDifficulty()])
-      .expect(HttpCode.Unauthorized);
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const url401 = `/v1/courses/${courseId}/aplus-source`;
+    await responseTests
+      .testUnauthorized(url401)
+      .post([getFullPoints(), getModule(), getDifficulty()]);
 
-    expect(JSON.stringify(res.body)).toBe('{}');
+    const url403 = `/v1/courses/${noRoleCourseId}/aplus-source`;
+    await responseTests
+      .testForbidden(url403, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .post([getFullPoints(), getModule(), getDifficulty()]);
   });
 
-  it('should respond with 403 if user is not an admin or teacher in charge', async () => {
-    const res = await request
-      .post(`/v1/courses/${noRoleCourseId}/aplus-source`)
-      .send([getFullPoints(), getModule(), getDifficulty()])
-      .set('Cookie', cookies.teacherCookie)
-      .expect(HttpCode.Forbidden);
+  it('should respond with 404 when not found', async () => {
+    const urlNoCourse = `/v1/courses/${nonExistentId}/aplus-source`;
+    await responseTests
+      .testNotFound(urlNoCourse, cookies.adminCookie)
+      .post([getFullPoints(), getModule(), getDifficulty()]);
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    const url = `/v1/courses/${courseId}/aplus-source`;
+    await responseTests.testNotFound(url, cookies.adminCookie).post([
+      getGradeSource(AplusGradeSourceType.FullPoints, {
+        attainmentId: nonExistentId,
+      }),
+    ]);
+  });
+
+  it('should respond with 409 when an attainment does not belong to the course', async () => {
+    const url = `/v1/courses/${courseId}/aplus-source`;
+    await responseTests.testConflict(url, cookies.adminCookie).post([
+      getGradeSource(AplusGradeSourceType.FullPoints, {
+        attainmentId: differentCourseAttainmentId,
+      }),
+    ]);
   });
 });
 
@@ -360,60 +377,69 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 400 if attainment list is not provided', async () => {
-    const res = await request
-      .get(`/v1/courses/${courseId}/aplus-fetch`)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.BadRequest);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+  it('should respond with 400 if course ID is invalid', async () => {
+    const url = `/v1/courses/abc/aplus-fetch?attainments=[${fullPointsAttainmentId}]`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 
-  it('should respond with 401 if not logged in', async () => {
-    const res = await request
-      .get(`/v1/courses/${courseId}/aplus-fetch`)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
-
-    expect(JSON.stringify(res.body)).toBe('{}');
+  it('should respond with 400 if attainments list is invalid', async () => {
+    const url = '/v1/courses/{courseId}/aplus-fetch';
+    const invalid = [
+      '?attainments=["abc"]',
+      '?attainments=[abc]',
+      '?attainments=5',
+      '?attainments=["5"]',
+      '?attainments',
+      '?',
+      '',
+    ];
+    for (const query of invalid) {
+      await responseTests
+        .testBadRequest(url + query, cookies.adminCookie)
+        .get();
+    }
   });
 
-  it('should respond with 403 if user is not an admin or teacher in charge', async () => {
-    const res = await request
-      .get(`/v1/courses/${noRoleCourseId}/aplus-fetch`)
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Forbidden);
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const url401 = `/v1/courses/${courseId}/aplus-fetch`;
+    await responseTests.testUnauthorized(url401).get();
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    const url403 = `/v1/courses/${noRoleCourseId}/aplus-fetch`;
+    await responseTests
+      .testForbidden(url403, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .get();
   });
 
-  it('should respond with 409 if an attainment does not belong to the course', async () => {
-    const res = await request
-      .get(
-        `/v1/courses/${courseId}/aplus-fetch?attainments=[${differentCourseAttainmentId}]`
-      )
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Conflict);
+  it('should respond with 404 when not found', async () => {
+    const urlNoCourse = `/v1/courses/${nonExistentId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`;
+    await responseTests.testNotFound(urlNoCourse, cookies.adminCookie).get();
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    const urlNoAttainment = `/v1/courses/${courseId}/aplus-fetch?attainments=[${nonExistentId}]`;
+    await responseTests
+      .testNotFound(urlNoAttainment, cookies.adminCookie)
+      .get();
+  });
+
+  it('should respond with 409 when an attainment does not belong to the course', async () => {
+    const url = `/v1/courses/${courseId}/aplus-fetch?attainments=[${differentCourseAttainmentId}]`;
+    await responseTests.testConflict(url, cookies.adminCookie).get();
   });
 
   it('should respond with 422 if an attainment has no grade source', async () => {
-    const res = await request
-      .get(
-        `/v1/courses/${courseId}/aplus-fetch?attainments=[${noGradeSourceAttainmentId}]`
-      )
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.UnprocessableEntity);
+    const url = `/v1/courses/${courseId}/aplus-fetch?attainments=[${noGradeSourceAttainmentId}]`;
+    await responseTests.testUnprocessableEntity(url, cookies.adminCookie).get();
+  });
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+  it('should respond with 502 if A+ request fails', async () => {
+    mockedAxios.get.mockImplementationOnce(_url => {
+      throw new AxiosError();
+    });
+
+    const url = `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`;
+    await responseTests.testBadGateway(url, cookies.adminCookie).get();
   });
 });
