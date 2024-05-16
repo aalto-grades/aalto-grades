@@ -56,7 +56,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   const navigate = useNavigate();
   const theme = useTheme();
 
-  const assessmentModels = useGetAllAssessmentModels(courseId);
+  const allAssessmentModels = useGetAllAssessmentModels(courseId);
   const addFinalGrades = useAddFinalGrades(courseId);
   const getGrades = useGetGrades(courseId);
 
@@ -67,6 +67,15 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
 
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
+
+  // Filter out archived models
+  const assessmentModels = useMemo(
+    () =>
+      allAssessmentModels.data !== undefined
+        ? allAssessmentModels.data.filter(model => !model.archived)
+        : undefined,
+    [allAssessmentModels.data]
+  );
 
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge,
@@ -129,7 +138,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
     dateOverride: boolean,
     gradingDate: Date
   ): Promise<boolean> => {
-    const model = assessmentModels.data?.find(
+    const model = assessmentModels?.find(
       assessmentModel => assessmentModel.id === assessmentModelId
     );
     if (model === undefined) return false;
@@ -208,7 +217,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
           }
         >
           <MenuItem value="any">Any</MenuItem>
-          {(assessmentModels.data ?? []).map(model => (
+          {(assessmentModels ?? []).map(model => (
             <MenuItem
               key={`assessment-model-select-${model.id}`}
               value={model.id}

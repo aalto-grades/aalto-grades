@@ -73,8 +73,8 @@ const attainmentDoesNotExist = async (id: number): Promise<void> => {
   expect(result).toBeNull();
 };
 
-describe('Test GET /v1/courses/:courseId/attainments - get attainments', () => {
-  it('should get the attainments succesfully (admin user)', async () => {
+describe('Test GET /v1/courses/:courseId/attainments - get all attainments', () => {
+  it('should get the attainments', async () => {
     const testCookies = [
       cookies.adminCookie,
       cookies.teacherCookie,
@@ -119,7 +119,7 @@ describe('Test GET /v1/courses/:courseId/attainments - get attainments', () => {
 });
 
 describe('Test POST /v1/courses/:courseId/attainments - add an attainment', () => {
-  it('should add new attainment', async () => {
+  it('should add an attainment', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     let i = 0;
 
@@ -169,7 +169,7 @@ describe('Test POST /v1/courses/:courseId/attainments - add an attainment', () =
       .post(data);
   });
 
-  it('should respond with 404 not found when course does not exist', async () => {
+  it('should respond with 404 if not found', async () => {
     const url = `/v1/courses/${nonExistentId}/attainments`;
     const data = {name: 'not added', daysValid: 365};
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
@@ -177,7 +177,7 @@ describe('Test POST /v1/courses/:courseId/attainments - add an attainment', () =
 });
 
 describe('Test PUT /v1/courses/:courseId/attainments/:attainmentId - edit an attainment', () => {
-  it('should edit attainment', async () => {
+  it('should edit an attainment', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     let i = 0;
 
@@ -194,7 +194,7 @@ describe('Test PUT /v1/courses/:courseId/attainments/:attainmentId - edit an att
     }
   });
 
-  it('should partially edit an attainment when course exists (teacher in charge)', async () => {
+  it('should partially edit an attainment', async () => {
     const data: EditAttainmentData[] = [{name: 'edit1 new'}, {daysValid: 80}];
     for (const editData of data) {
       const res = await request
@@ -244,7 +244,7 @@ describe('Test PUT /v1/courses/:courseId/attainments/:attainmentId - edit an att
       .put(data);
   });
 
-  it('should respond with 404 not found when course/attainment does not exist', async () => {
+  it('should respond with 404 if not found', async () => {
     let url = `/v1/courses/${nonExistentId}/attainments/${editAttainmentId}`;
     const data = {name: 'not edited', daysValid: 365};
     await responseTests.testNotFound(url, cookies.adminCookie).put(data);
@@ -253,7 +253,7 @@ describe('Test PUT /v1/courses/:courseId/attainments/:attainmentId - edit an att
     await responseTests.testNotFound(url, cookies.adminCookie).put(data);
   });
 
-  it('should respond with 409 conflict when attainment does not belong to course', async () => {
+  it('should respond with 409 when attainment does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/attainments/${noRoleAttainmentId}`;
     const data = {name: 'not edited', daysValid: 365};
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
@@ -261,7 +261,7 @@ describe('Test PUT /v1/courses/:courseId/attainments/:attainmentId - edit an att
 });
 
 describe('Test Delete /v1/courses/:courseId/attainments/:attainmentId - delete an attainment', () => {
-  it('should delete attainment', async () => {
+  it('should delete an attainment', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
       const attainment = await createData.createAttainment(courseId);
@@ -303,7 +303,7 @@ describe('Test Delete /v1/courses/:courseId/attainments/:attainmentId - delete a
       .delete();
   });
 
-  it('should respond with 404 not found when course/attainment does not exist', async () => {
+  it('should respond with 404 if not found', async () => {
     let url = `/v1/courses/${nonExistentId}/attainments/${editAttainmentId}`;
     await responseTests.testNotFound(url, cookies.adminCookie).delete();
 
@@ -311,7 +311,7 @@ describe('Test Delete /v1/courses/:courseId/attainments/:attainmentId - delete a
     await responseTests.testNotFound(url, cookies.adminCookie).delete();
   });
 
-  it('should respond with 409 conflict when attainment does not belong to course', async () => {
+  it('should respond with 409 when attainment does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/attainments/${noRoleAttainmentId}`;
     await responseTests.testConflict(url, cookies.adminCookie).delete();
   });

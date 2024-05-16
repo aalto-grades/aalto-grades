@@ -54,7 +54,7 @@ export const getDateOfLatestGrade = async (
 /**
  * Validates that all student numbers in the array exist
  *
- * @throws Apierror(422) If a student number is not found in the database
+ * @throws Apierror(404) If a student number is not found in the database
  */
 export const studentNumbersExist = async (
   studentNumbers: string[]
@@ -77,7 +77,7 @@ export const studentNumbersExist = async (
       }
     }
 
-    throw new ApiError(errors, HttpCode.UnprocessableEntity);
+    throw new ApiError(errors, HttpCode.NotFound);
   }
 };
 

@@ -3,30 +3,40 @@
 // SPDX-License-Identifier: MIT
 
 import supertest from 'supertest';
+import {z} from 'zod';
 
-import {AttainmentData, HttpCode, NewGrade} from '@/common/types';
+import {
+  HttpCode,
+  AttainmentData,
+  NewGrade,
+  StudentRowSchema,
+  EditGradeData,
+} from '@/common/types';
 import {app} from '../../src/app';
 import * as gradesUtil from '../../src/controllers/utils/grades';
 import AttainmentGrade from '../../src/database/models/attainmentGrade';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
-import {ErrorSchema, TEACHER_ID, ZodErrorSchema} from '../util/general';
+import {TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
+import {ResponseTests} from '../util/responses';
 
 const request = supertest(app);
+const responseTests = new ResponseTests(request);
 
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
 let courseAttainments: AttainmentData[] = [];
 let editGradeId = -1;
 let noRoleCourseId = -1;
+let noRoleCourseAttainments: AttainmentData[] = [];
 let noRoleGradeId = -1;
 const nonExistentId = 1000000;
 const newStudentNumber = '867493';
+const nonExistentStudentNumber = '945942';
 
 const students: {id: number; studentNumber: string; finalGrade: number}[] = [];
-const students2: {id: number; studentNumber: string}[] = [];
 let studentNumbers: string[] = [];
 
 beforeAll(async () => {
@@ -40,21 +50,25 @@ beforeAll(async () => {
       finalGrade: Math.floor(Math.random() * 6),
     });
   }
-  for (let i = 0; i < 10; i++) {
-    const newUser = await createData.createUser();
-    students2.push({
-      id: newUser.id,
-      studentNumber: newUser.studentNumber as string,
-    });
-  }
   studentNumbers = students.map(student => student.studentNumber);
 
-  let assessmentModelId;
+  let assessmentModelId: number;
   [courseId, courseAttainments, assessmentModelId] =
     await createData.createCourse({
       courseData: {maxCredits: 5, courseCode: 'CS-A????'},
     });
   for (const student of students) {
+    // Create worse final grades before
+    if (student.finalGrade > 0) {
+      await createData.createFinalGrade(
+        courseId,
+        student.id,
+        assessmentModelId,
+        TEACHER_ID,
+        student.finalGrade -
+          Math.floor(Math.random() * (student.finalGrade + 1))
+      );
+    }
     await createData.createFinalGrade(
       courseId,
       student.id,
@@ -62,6 +76,17 @@ beforeAll(async () => {
       TEACHER_ID,
       student.finalGrade
     );
+    // Create worse final grades after
+    if (student.finalGrade > 0) {
+      await createData.createFinalGrade(
+        courseId,
+        student.id,
+        assessmentModelId,
+        TEACHER_ID,
+        student.finalGrade -
+          Math.floor(Math.random() * (student.finalGrade + 1))
+      );
+    }
   }
   editGradeId = await createData.createGrade(
     students[0].id,
@@ -69,15 +94,14 @@ beforeAll(async () => {
     TEACHER_ID
   );
 
-  let noRoleAttainments;
-  [noRoleCourseId, noRoleAttainments] = await createData.createCourse({
+  [noRoleCourseId, noRoleCourseAttainments] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
   });
   noRoleGradeId = await createData.createGrade(
     students[0].id,
-    noRoleAttainments[0].id,
+    noRoleCourseAttainments[0].id,
     TEACHER_ID
   );
 });
@@ -86,227 +110,112 @@ afterAll(async () => {
   await resetDb();
 });
 
-// TODO: Test multiple final grades
-// TODO: Test getting grades
-// TODO: Test grades/attainments not belonging to course
-// TODO: Test deleting grades
+describe('Test GET /v1/courses/:courseId/grades - get all grades', () => {
+  it('should get the grades', async () => {
+    const testCookies = [
+      cookies.adminCookie,
+      cookies.teacherCookie,
+      cookies.assistantCookie,
+    ];
+    for (const cookie of testCookies) {
+      const res = await request
+        .get(`/v1/courses/${courseId}/grades`)
+        .set('Cookie', cookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
 
-const createCSV = (
-  studentData: {studentNumber: string; finalGrade: number}[],
-  dateStr: string,
-  language: string
-): string[] => {
-  const data = [];
-  for (const student of studentData) {
-    const csvStudent = `${student.studentNumber},${student.finalGrade}`;
-    data.push(`${csvStudent},5,${dateStr},${language}`);
-  }
-  return data;
-};
-
-describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatible grading in CSV', () => {
-  jest
-    .spyOn(global.Date, 'now')
-    .mockImplementation((): number => new Date('2023-06-21').getTime());
-
-  jest
-    .spyOn(gradesUtil, 'getDateOfLatestGrade')
-    .mockImplementation(
-      (_userId: number, _assessmentmodelId: number): Promise<Date> =>
-        Promise.resolve(new Date('2023-06-21'))
-    );
-
-  it('should export CSV succesfully when course results are found (admin user)', async () => {
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades/csv/sisu`)
-      .send({studentNumbers})
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'text/csv')
-      .expect(HttpCode.Ok);
-
-    expect(res.text)
-      .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-${createCSV(students, '21.6.2023', 'en').join(',\n')},\n`);
-    expect(res.headers['content-disposition']).toBe(
-      'attachment; filename="final_grades_course_CS-A????_' +
-        `${new Date().toLocaleDateString('fi-FI')}.csv"`
-    );
+      const Schema = z.array(StudentRowSchema.strict()).nonempty();
+      const result = await Schema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
+    }
   });
 
-  it('should export CSV succesfully when course results are found (teacher in charge)', async () => {
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades/csv/sisu`)
-      .send({studentNumbers})
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'text/csv')
-      .expect(HttpCode.Ok);
-
-    expect(res.text)
-      .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-${createCSV(students, '21.6.2023', 'en').join(',\n')},\n`);
-    expect(res.headers['content-disposition']).toBe(
-      'attachment; filename="final_grades_course_CS-A????_' +
-        `${new Date().toLocaleDateString('fi-FI')}.csv"`
-    );
+  it('should respond with 400 if id is invalid', async () => {
+    const url = `/v1/courses/${'bad'}/grades`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 
-  it('should export only selected grades', async () => {
-    const selectedStudents = [students[0], students[3], students[6]];
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades/csv/sisu`)
-      .send({
-        studentNumbers: selectedStudents.map(student => student.studentNumber),
-      })
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'text/csv')
-      .expect(HttpCode.Ok);
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const url = `/v1/courses/${courseId}/grades`;
+    await responseTests.testUnauthorized(url).get();
 
-    expect(res.text)
-      .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-${createCSV(selectedStudents, '21.6.2023', 'en').join(',\n')},\n`);
-    expect(res.headers['content-disposition']).toBe(
-      'attachment; filename="final_grades_course_CS-A????_' +
-        `${new Date().toLocaleDateString('fi-FI')}.csv"`
-    );
+    await responseTests.testForbidden(url, [cookies.studentCookie]).get();
+
+    await responseTests
+      .testForbidden(`/v1/courses/${noRoleCourseId}/grades`, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .get();
   });
 
-  it('should export CSV succesfully with custom assessmentDate and completionLanguage', async () => {
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades/csv/sisu`)
-      .send({
-        studentNumbers,
-        assessmentDate: new Date(2023, 4, 12),
-        completionLanguage: 'JA',
-      })
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'text/csv')
-      .expect(HttpCode.Ok);
-
-    expect(res.text)
-      .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-${createCSV(students, '12.5.2023', 'ja').join(',\n')},\n`);
-    expect(res.headers['content-disposition']).toBe(
-      'attachment; filename="final_grades_course_CS-A????_' +
-        `${new Date().toLocaleDateString('fi-FI')}.csv"`
-    );
-  });
-
-  it('should respond with 400 bad request, if (optional) completionLanguage param is not valid', async () => {
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades/csv/sisu`)
-      .send({studentNumbers, completionLanguage: 'ja'})
-      .set('Cookie', cookies.adminCookie)
-      .expect(HttpCode.BadRequest);
-
-    const result = await ZodErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-  });
-
-  it('should respond with 400 bad request, if (optional) assessmentDate param is not valid date', async () => {
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades/csv/sisu`)
-      .send({studentNumbers, assessmentDate: '2024-12-00T00:00:00.000Z'})
-      .set('Cookie', cookies.adminCookie)
-      .expect(HttpCode.BadRequest);
-
-    const result = await ZodErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-  });
-
-  it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades/csv/sisu`)
-      .send({studentNumbers})
-      .expect(HttpCode.Unauthorized);
-
-    expect(JSON.stringify(res.body)).toBe('{}'); // Passport does not call next() on error
-  });
-
-  it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-    const res = await request
-      .post(`/v1/courses/${noRoleCourseId}/grades/csv/sisu`)
-      .send({studentNumbers: [studentNumbers[0]]})
-      .set('Cookie', cookies.teacherCookie)
-      .expect(HttpCode.Forbidden);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-  });
-
-  it('should respond with 404 not found, if grades have not been calculated yet', async () => {
-    const res = await request
-      .post(`/v1/courses/${noRoleCourseId}/grades/csv/sisu`)
-      .send({studentNumbers: [studentNumbers[0]]})
-      .set('Cookie', cookies.adminCookie)
-      .expect(HttpCode.NotFound);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-  });
-
-  it('should respond with 404 not found, if course does not exist', async () => {
-    const res = await request
-      .post(`/v1/courses/${nonExistentId}/grades/csv/sisu`)
-      .send({studentNumbers})
-      .set('Cookie', cookies.adminCookie)
-      .expect(HttpCode.NotFound);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+  it('should respond with 404 when not found', async () => {
+    const url = `/v1/courses/${nonExistentId}/grades`;
+    await responseTests.testNotFound(url, cookies.adminCookie).get();
   });
 });
 
-describe('Test POST /v1/courses/:courseId/grades - post grades', () => {
-  const genGrades = (student: {studentNumber: string}): NewGrade[] => [
-    {
-      studentNumber: student.studentNumber,
-      attainmentId: courseAttainments[0].id,
-      grade: Math.floor(Math.random() * 11),
-      date: new Date(),
-      expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
-      comment: '',
-    },
-    {
-      studentNumber: student.studentNumber,
-      attainmentId: courseAttainments[1].id,
-      grade: Math.floor(Math.random() * 11),
-      date: new Date(),
-      expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
-      comment: '',
-    },
-    {
-      studentNumber: student.studentNumber,
-      attainmentId: courseAttainments[2].id,
-      grade: Math.floor(Math.random() * 11),
-      date: new Date(),
-      expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
-      comment: '',
-    },
-  ];
+describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
+  const genStudent = async (): Promise<{id: number; studentNumber: string}> => {
+    const newUser = await createData.createUser();
+    return {
+      id: newUser.id,
+      studentNumber: newUser.studentNumber as string,
+    };
+  };
+  const genGrades = async (studentNumber?: string): Promise<NewGrade[]> => {
+    if (studentNumber === undefined)
+      studentNumber = (await genStudent()).studentNumber;
 
-  it('should post succesfully when attainments and users exist (admin user)', async () => {
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades`)
-      .send(genGrades(students2[0]))
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Created);
+    return [
+      {
+        studentNumber: studentNumber,
+        attainmentId: courseAttainments[0].id,
+        grade: Math.floor(Math.random() * 11),
+        date: new Date(),
+        expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
+        comment: '',
+      },
+      {
+        studentNumber: studentNumber,
+        attainmentId: courseAttainments[1].id,
+        grade: Math.floor(Math.random() * 11),
+        date: new Date(),
+        expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
+        comment: '',
+      },
+      {
+        studentNumber: studentNumber,
+        attainmentId: courseAttainments[2].id,
+        grade: Math.floor(Math.random() * 11),
+        date: new Date(),
+        expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
+        comment: '',
+      },
+    ];
+  };
 
-    expect(JSON.stringify(res.body)).toBe('{}');
+  it('should add grades', async () => {
+    const testCookies = [
+      cookies.adminCookie,
+      cookies.teacherCookie,
+      cookies.assistantCookie,
+    ];
+
+    for (const cookie of testCookies) {
+      const res = await request
+        .post(`/v1/courses/${courseId}/grades`)
+        .send(await genGrades())
+        .set('Cookie', cookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Created);
+
+      expect(JSON.stringify(res.body)).toBe('{}');
+    }
   });
 
-  it('should post succesfully when attainments and users exist (teacher user)', async () => {
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades`)
-      .send(genGrades(students2[1]))
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Created);
-
-    expect(JSON.stringify(res.body)).toBe('{}');
-  });
-
-  it('should create users when a user does not exist in database', async () => {
+  it('should create user when it does not exist in database', async () => {
     let users = await User.findAll({
       where: {studentNumber: newStudentNumber},
     });
@@ -314,7 +223,7 @@ describe('Test POST /v1/courses/:courseId/grades - post grades', () => {
 
     const res = await request
       .post(`/v1/courses/${courseId}/grades`)
-      .send(genGrades({studentNumber: newStudentNumber}))
+      .send(await genGrades(newStudentNumber))
       .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Created);
@@ -328,9 +237,10 @@ describe('Test POST /v1/courses/:courseId/grades - post grades', () => {
   });
 
   it('should mark correct grader ID', async () => {
+    const student = await genStudent();
     const res = await request
       .post(`/v1/courses/${courseId}/grades`)
-      .send(genGrades(students2[2]))
+      .send(await genGrades(student.studentNumber))
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Created);
@@ -339,7 +249,7 @@ describe('Test POST /v1/courses/:courseId/grades - post grades', () => {
 
     const userAttainment = await AttainmentGrade.findOne({
       where: {
-        userId: students2[2].id,
+        userId: student.id,
         attainmentId: courseAttainments[0].id,
       },
     });
@@ -348,7 +258,8 @@ describe('Test POST /v1/courses/:courseId/grades - post grades', () => {
   });
 
   it('grades should be in the database', async () => {
-    const data = genGrades(students2[3]);
+    const student = await genStudent();
+    const data = await genGrades(student.studentNumber);
     await request
       .post(`/v1/courses/${courseId}/grades`)
       .send(data)
@@ -358,39 +269,41 @@ describe('Test POST /v1/courses/:courseId/grades - post grades', () => {
 
     const attainmentGrade = await AttainmentGrade.findOne({
       where: {
-        userId: students2[3].id,
+        userId: student.id,
         attainmentId: courseAttainments[0].id,
       },
     });
     expect(attainmentGrade?.grade).toEqual(data[0].grade);
-    expect(attainmentGrade?.userId).toEqual(students2[3].id);
+    expect(attainmentGrade?.userId).toEqual(student.id);
     expect(attainmentGrade?.attainmentId).toEqual(courseAttainments[0].id);
   });
 
   it('should allow uploading multiple grades to the same attainment for a student', async () => {
-    const data1 = genGrades(students2[4]);
-    const data2 = genGrades(students2[4]);
-    const upload = async (i: number): Promise<void> => {
+    const student = await genStudent();
+
+    const upload = async (): Promise<NewGrade[]> => {
+      const data = await genGrades(student.studentNumber);
       const res = await request
         .post(`/v1/courses/${courseId}/grades`)
-        .send(i === 1 ? data1 : data2)
+        .send(data)
         .set('Cookie', cookies.adminCookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Created);
 
       expect(JSON.stringify(res.body)).toBe('{}');
+      return data;
     };
 
-    await upload(1);
+    const data1 = await upload();
     let grades = await AttainmentGrade.findAll({
-      where: {userId: students2[4].id, attainmentId: courseAttainments[0].id},
+      where: {userId: student.id, attainmentId: courseAttainments[0].id},
     });
     expect(grades.length).toEqual(1);
     expect(grades[0].grade).toEqual(data1[0].grade);
 
-    await upload(2);
+    const data2 = await upload();
     grades = await AttainmentGrade.findAll({
-      where: {userId: students2[4].id, attainmentId: courseAttainments[0].id},
+      where: {userId: student.id, attainmentId: courseAttainments[0].id},
     });
     expect(grades.length).toEqual(2);
     expect(grades.find(val => val.grade === data1[0].grade)).toBeDefined();
@@ -401,7 +314,7 @@ describe('Test POST /v1/courses/:courseId/grades - post grades', () => {
     const data: NewGrade[] = [];
     for (let i = 10000; i < 15000; i++) {
       for (let j = 0; j < 2; j++) {
-        const newData = genGrades({studentNumber: i.toString()});
+        const newData = await genGrades(i.toString());
         data.push(newData[0]);
         data.push(newData[1]);
         data.push(newData[2]);
@@ -417,139 +330,383 @@ describe('Test POST /v1/courses/:courseId/grades - post grades', () => {
     expect(JSON.stringify(res.body)).toBe('{}');
   }, 50000);
 
-  it('should respond with 400 bad request, if the CSV has grades with incorrect type', async () => {
-    const data = genGrades(students2[5])[0] as {grade: number | string};
-    data.grade = 'test';
+  it('should respond with 400 if validation fails', async () => {
+    const url = `/v1/courses/${courseId}/grades`;
+    const data = (await genGrades())[0];
 
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades`)
-      .send(data)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.BadRequest);
+    // Invalid grade type
+    await responseTests
+      .testBadRequest(url, cookies.teacherCookie)
+      .post({...data, grade: '10'});
 
-    const result = await ZodErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    await responseTests.testBadRequest(url, cookies.teacherCookie).post({
+      ...data,
+      date: new Date(new Date().getTime() + 2 * 365 * 24 * 60 * 60 * 1000),
+    });
   });
 
-  it('should respond with 400 bad request, if the expiry date is before completion date', async () => {
-    const data = genGrades(students2[5])[0];
-    data.date = new Date(new Date().getTime() + 2 * 365 * 24 * 60 * 60 * 1000);
+  it('should respond with 401 or 403 if not authorized', async () => {
+    let url = `/v1/courses/${courseId}/grades`;
+    const data = await genGrades();
+    await responseTests.testUnauthorized(url).post(data);
 
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades`)
-      .send([data])
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.BadRequest);
+    await responseTests.testForbidden(url, [cookies.studentCookie]).post(data);
 
-    const result = await ZodErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    url = `/v1/courses/${noRoleCourseId}/grades`;
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .post(data);
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades`)
-      .send(genGrades(students2[5]))
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
-
-    expect(JSON.stringify(res.body)).toBe('{}'); // Passport does not call next() on error
+  it('should respond with 404 if not found', async () => {
+    const url = `/v1/courses/${nonExistentId}/grades`;
+    const data = await genGrades();
+    await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
-  it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-    const res = await request
-      .post(`/v1/courses/${noRoleCourseId}/grades`)
-      .send(genGrades(students2[5]))
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Forbidden);
+  it('should respond with 409 when attainment does not belong to course', async () => {
+    const url = `/v1/courses/${courseId}/grades`;
+    const student = await genStudent();
+    const data = [
+      {
+        studentNumber: student.studentNumber,
+        attainmentId: noRoleCourseAttainments[0].id,
+        grade: Math.floor(Math.random() * 11),
+        date: new Date(),
+        expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),
+        comment: '',
+      },
+    ];
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-  });
-
-  it('should respond with 404 not found, if course does not exist', async () => {
-    const res = await request
-      .post(`/v1/courses/${nonExistentId}/grades`)
-      .send(genGrades(students2[5]))
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.NotFound);
-
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    await responseTests.testConflict(url, cookies.adminCookie).post(data);
   });
 });
 
-describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit user grade data', () => {
-  it('should edit user attainment grade data (admin user)', async () => {
-    const res = await request
+describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => {
+  it('should edit grade', async () => {
+    const testCookies = [
+      cookies.adminCookie,
+      cookies.teacherCookie,
+      cookies.assistantCookie,
+    ];
+    for (const cookie of testCookies) {
+      const res = await request
+        .put(`/v1/courses/${courseId}/grades/${editGradeId}`)
+        .send({
+          grade: Math.floor(Math.random() * 11),
+          date: new Date(),
+          expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),
+          comment: `testing ${Math.random()}`,
+        })
+        .set('Cookie', cookie)
+        .expect(HttpCode.Ok);
+
+      expect(JSON.stringify(res.body)).toBe('{}');
+    }
+  });
+
+  it('should partially edit grade', async () => {
+    let res = await request
       .put(`/v1/courses/${courseId}/grades/${editGradeId}`)
       .send({
-        grade: 5,
-        date: new Date(),
-        comment: 'testing',
+        comment: `testing ${Math.random()}`,
       })
-      .set('Cookie', cookies.adminCookie)
-      .expect(HttpCode.Ok);
-
-    expect(JSON.stringify(res.body)).toBe('{}');
-  });
-
-  it('should edit user attainment grade data (teacher in charge)', async () => {
-    const res = await request
-      .put(`/v1/courses/${courseId}/grades/${editGradeId}`)
-      .send({
-        grade: 5,
-        date: new Date(),
-        comment: 'testing',
-      })
-      .set('Cookie', cookies.adminCookie)
-      .expect(HttpCode.Ok);
-
-    expect(JSON.stringify(res.body)).toBe('{}');
-  });
-
-  it('should respond with 401 unauthorized, if not logged in', async () => {
-    const res = await request
-      .put(`/v1/courses/${courseId}/grades/${editGradeId}`)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Unauthorized);
-
-    expect(JSON.stringify(res.body)).toBe('{}');
-  });
-
-  it('should respond with 403 forbidden if user not admin or teacher in charge', async () => {
-    const res = await request
-      .put(`/v1/courses/${noRoleCourseId}/grades/${noRoleGradeId}`)
       .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Forbidden);
+      .expect(HttpCode.Ok);
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    expect(JSON.stringify(res.body)).toBe('{}');
+
+    res = await request
+      .put(`/v1/courses/${courseId}/grades/${editGradeId}`)
+      .send({
+        grade: 5,
+      })
+      .set('Cookie', cookies.teacherCookie)
+      .expect(HttpCode.Ok);
+
+    expect(JSON.stringify(res.body)).toBe('{}');
   });
 
-  it('should respond with 404 not found, if grade does not exist', async () => {
-    const res = await request
-      .put(`/v1/courses/${courseId}/grades/${nonExistentId}`)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.NotFound);
+  it('should respond with 400 if validation fails', async () => {
+    const url = `/v1/courses/${courseId}/grades/${editGradeId}`;
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    let data: EditGradeData = {
+      comment: 'not edited',
+      grade: '1' as unknown as number,
+    };
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+
+    // Expiry before date
+    data = {expiryDate: new Date(1970, 0, 1), date: new Date(2000, 0, 1)};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+
+    // Expiry before date
+    data = {expiryDate: new Date(1970, 0, 1)};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+
+    // Date after expiry
+    data = {date: new Date(2100, 0, 1)};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 
-  it('should respond with 404 not found, if course does not exist', async () => {
-    const res = await request
-      .put(`/v1/courses/${nonExistentId}/grades/${editGradeId}`)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.NotFound);
+  it('should respond with 400 if id is invalid', async () => {
+    let url = `/v1/courses/${'bad'}/grades/${editGradeId}`;
+    const data = {comment: 'not edited'};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
-    const result = await ErrorSchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+    url = `/v1/courses/${courseId}/attainments/${-1}`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+  });
+
+  it('should respond with 401 or 403 if not authorized', async () => {
+    let url = `/v1/courses/${courseId}/grades/${editGradeId}`;
+    const data = {comment: 'not edited'};
+    await responseTests.testUnauthorized(url).put(data);
+
+    await responseTests.testForbidden(url, [cookies.studentCookie]).put(data);
+
+    url = `/v1/courses/${noRoleCourseId}/grades/${noRoleGradeId}`;
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .put(data);
+  });
+
+  it('should respond with 404 if not found', async () => {
+    let url = `/v1/courses/${courseId}/grades/${nonExistentId}`;
+    const data = {comment: 'not edited'};
+    await responseTests.testNotFound(url, cookies.adminCookie).put(data);
+
+    url = `/v1/courses/${nonExistentId}/grades/${courseId}`;
+    await responseTests.testNotFound(url, cookies.adminCookie).put(data);
+  });
+
+  it('should respond with 409 when grade does not belong to course', async () => {
+    const url = `/v1/courses/${courseId}/grades/${noRoleGradeId}`;
+    const data = {comment: 'not edited'};
+
+    await responseTests.testConflict(url, cookies.adminCookie).put(data);
+  });
+});
+
+describe('Test Delete/v1/courses/:courseId/grades/:gradeId - delete a grade', () => {
+  const createGrade = async (): Promise<number> => {
+    const user = await createData.createUser();
+    return await createData.createGrade(
+      user.id,
+      courseAttainments[0].id,
+      TEACHER_ID
+    );
+  };
+  const gradeDoesNotExist = async (id: number): Promise<void> => {
+    const result = await AttainmentGrade.findOne({where: {id: id}});
+    expect(result).toBeNull();
+  };
+
+  it('should delete a grade', async () => {
+    const testCookies = [
+      cookies.adminCookie,
+      cookies.teacherCookie,
+      cookies.assistantCookie,
+    ];
+    for (const cookie of testCookies) {
+      const gradeId = await createGrade();
+
+      const res = await request
+        .delete(`/v1/courses/${courseId}/grades/${gradeId}`)
+        .set('Cookie', cookie)
+        .expect(HttpCode.Ok);
+
+      expect(JSON.stringify(res.body)).toBe('{}');
+      await gradeDoesNotExist(gradeId);
+    }
+  });
+
+  it('should respond with 400 if id is invalid', async () => {
+    let url = `/v1/courses/${'bad'}/grades/${editGradeId}`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).delete();
+
+    url = `/v1/courses/${courseId}/grades/${-1}`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).delete();
+  });
+
+  it('should respond with 401 or 403 if not authorized', async () => {
+    let url = `/v1/courses/${courseId}/grades/${editGradeId}`;
+    await responseTests.testUnauthorized(url).delete();
+
+    await responseTests.testForbidden(url, [cookies.studentCookie]).delete();
+
+    url = `/v1/courses/${noRoleCourseId}/grades/${noRoleGradeId}`;
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .delete();
+  });
+
+  it('should respond with 404 if not found', async () => {
+    let url = `/v1/courses/${nonExistentId}/grades/${editGradeId}`;
+    await responseTests.testNotFound(url, cookies.adminCookie).delete();
+
+    url = `/v1/courses/${courseId}/grades/${nonExistentId}`;
+    await responseTests.testNotFound(url, cookies.adminCookie).delete();
+  });
+
+  it('should respond with 409 when grade does not belong to course', async () => {
+    const url = `/v1/courses/${courseId}/grades/${noRoleGradeId}`;
+    await responseTests.testConflict(url, cookies.adminCookie).delete();
+  });
+});
+
+describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatible grading in CSV', () => {
+  const createCSVString = (
+    studentData: {studentNumber: string; finalGrade: number}[],
+    dateStr: string,
+    language: string
+  ): string[] => {
+    const data = [];
+    for (const student of studentData) {
+      const csvStudent = `${student.studentNumber},${student.finalGrade}`;
+      data.push(`${csvStudent},5,${dateStr},${language}`);
+    }
+    return data;
+  };
+
+  jest
+    .spyOn(global.Date, 'now')
+    .mockImplementation(() => new Date('2023-06-21').getTime());
+
+  jest
+    .spyOn(gradesUtil, 'getDateOfLatestGrade')
+    .mockImplementation(
+      (_userId: number, _assessmentmodelId: number): Promise<Date> =>
+        Promise.resolve(new Date('2023-06-21'))
+    );
+
+  it('should export CSV', async () => {
+    const testCookies = [cookies.adminCookie, cookies.teacherCookie];
+    for (const cookie of testCookies) {
+      const res = await request
+        .post(`/v1/courses/${courseId}/grades/csv/sisu`)
+        .send({studentNumbers})
+        .set('Cookie', cookie)
+        .set('Accept', 'text/csv')
+        .expect(HttpCode.Ok);
+
+      expect(res.text)
+        .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+${createCSVString(students, '21.6.2023', 'en').join(',\n')},\n`);
+      expect(res.headers['content-disposition']).toBe(
+        'attachment; filename="final_grades_course_CS-A????_' +
+          `${new Date().toLocaleDateString('fi-FI')}.csv"`
+      );
+    }
+  });
+
+  it('should export only selected grades', async () => {
+    const selectedStudents = [students[0], students[3], students[6]];
+    const res = await request
+      .post(`/v1/courses/${courseId}/grades/csv/sisu`)
+      .send({
+        studentNumbers: selectedStudents.map(student => student.studentNumber),
+      })
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'text/csv')
+      .expect(HttpCode.Ok);
+
+    expect(res.text)
+      .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+${createCSVString(selectedStudents, '21.6.2023', 'en').join(',\n')},\n`);
+    expect(res.headers['content-disposition']).toBe(
+      'attachment; filename="final_grades_course_CS-A????_' +
+        `${new Date().toLocaleDateString('fi-FI')}.csv"`
+    );
+  });
+
+  it('should export CSV successfully with custom assessmentDate and completionLanguage', async () => {
+    const res = await request
+      .post(`/v1/courses/${courseId}/grades/csv/sisu`)
+      .send({
+        studentNumbers,
+        assessmentDate: new Date(2023, 4, 12),
+        completionLanguage: 'JA',
+      })
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'text/csv')
+      .expect(HttpCode.Ok);
+
+    expect(res.text)
+      .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+${createCSVString(students, '12.5.2023', 'ja').join(',\n')},\n`);
+    expect(res.headers['content-disposition']).toBe(
+      'attachment; filename="final_grades_course_CS-A????_' +
+        `${new Date().toLocaleDateString('fi-FI')}.csv"`
+    );
+  });
+
+  it('should respond with 400 if validation fails', async () => {
+    const url = `/v1/courses/${courseId}/grades/csv/sisu`;
+    const badRequest = responseTests.testBadRequest(url, cookies.adminCookie);
+
+    await badRequest.post({studentNumbers, completionLanguage: 'ja'});
+    await badRequest.post({
+      studentNumbers,
+      assessmentDate: '2024-12-00T00:00:00.000Z',
+    });
+  });
+
+  it('should respond with 400 if id is invalid', async () => {
+    const url = `/v1/courses/${'bad'}/grades/csv/sisu`;
+    const data = {studentNumbers};
+    await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
+  });
+
+  it('should respond with 401 or 403 if not authorized', async () => {
+    let url = `/v1/courses/${courseId}/grades/csv/sisu`;
+    const data = {studentNumbers};
+    await responseTests.testUnauthorized(url).post(data);
+
+    await responseTests
+      .testForbidden(url, [cookies.assistantCookie, cookies.studentCookie])
+      .post(data);
+
+    url = `/v1/courses/${noRoleCourseId}/assessment-models`;
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .post(data);
+  });
+
+  it('should respond with 404 if grades have not been calculated yet', async () => {
+    const url = `/v1/courses/${noRoleCourseId}/grades/csv/sisu`;
+    const data = {studentNumbers: [studentNumbers[0]]};
+
+    await responseTests.testNotFound(url, cookies.adminCookie).post(data);
+  });
+
+  it('should respond with 404 if student number not found', async () => {
+    const url = `/v1/courses/${noRoleCourseId}/grades/csv/sisu`;
+    const data = {studentNumbers: [nonExistentStudentNumber]};
+
+    await responseTests.testNotFound(url, cookies.adminCookie).post(data);
+  });
+
+  it('should respond with 404 if not found', async () => {
+    const url = `/v1/courses/${nonExistentId}/grades/csv/sisu`;
+    const data = {studentNumbers};
+
+    await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 });

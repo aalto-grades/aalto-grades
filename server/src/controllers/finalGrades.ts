@@ -9,6 +9,7 @@ import {
   HttpCode,
   NewFinalGradeArraySchema,
 } from '@/common/types';
+import {validateAssessmentModelBelongsToCourse} from './utils/assessmentModel';
 import {validateCourseId} from './utils/course';
 import {validateUserAndGrader} from './utils/grades';
 import FinalGrade from '../database/models/finalGrade';
@@ -59,13 +60,20 @@ export const getFinalGrades = async (
   return res.json(finalGrades);
 };
 
-/** @throws ApiError(400|404) */
+/** @throws ApiError(400|404|409) */
 export const addFinalGrades = async (
   req: TypedRequestBody<typeof NewFinalGradeArraySchema>,
   res: Response
 ): Promise<void | Response> => {
   const grader = req.user as JwtClaims;
   const courseId = await validateCourseId(req.params.courseId);
+
+  // Validate that assessment models belong to the course
+  const assessmentModels = new Set<number>();
+  for (const fgrade of req.body) assessmentModels.add(fgrade.assessmentModelId);
+  for (const modelId of assessmentModels) {
+    await validateAssessmentModelBelongsToCourse(courseId, modelId);
+  }
 
   const preparedBulkCreate: NewDbFinalGradeData[] = req.body.map(
     gradeEntry => ({

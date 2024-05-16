@@ -20,6 +20,7 @@ import {
   parseCourseFull,
   validateCourseId,
   validateEmailList,
+  validateRoleUniqueness,
 } from './utils/course';
 import {sequelize} from '../database';
 import Course from '../database/models/course';
@@ -64,7 +65,7 @@ export const getAllCourses = async (
 /**
  * Responds with number
  *
- * @throws ApiError(422)
+ * @throws ApiError(404|422)
  */
 export const addCourse = async (
   req: TypedRequestBody<typeof NewCourseDataSchema>,
@@ -72,6 +73,8 @@ export const addCourse = async (
 ): Promise<void> => {
   const teachers = await validateEmailList(req.body.teachersInCharge);
   const assistants = await validateEmailList(req.body.assistants);
+
+  validateRoleUniqueness(teachers, assistants);
 
   const course = await sequelize.transaction(async (t): Promise<Course> => {
     const newCourse = await Course.create(
@@ -222,6 +225,9 @@ export const editCourse = async (
   });
 
   if (newTeachers !== null || newAssistants !== null) {
+    if (newTeachers !== null && newAssistants !== null)
+      validateRoleUniqueness(newTeachers, newAssistants);
+
     await CourseRole.updateCourseRoles(newTeachers, newAssistants, course.id);
   }
 

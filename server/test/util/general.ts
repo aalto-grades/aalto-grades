@@ -4,6 +4,7 @@
 
 import {z} from 'zod';
 
+export const ADMIN_ID = 1;
 export const TEACHER_ID = 2;
 export const ASSISTANT_ID = 3;
 export const STUDENT_ID = 4;

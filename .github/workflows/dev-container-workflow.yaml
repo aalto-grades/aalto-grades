@@ -6,13 +6,13 @@ name: Dev Image Creation Workflow
 run-name: ${{ github.actor }} dev container creation
 
 # Run on every push
-on:
+on: # yamllint disable-line rule:truthy
   push:
     branches:
       - dev
 
 # Run on dev push workflow success
-# on:
+# on: # yamllint disable-line rule:truthy
 #   workflow_run:
 #     workflows: ['Dev Push Workflow']
 #     branches: [dev]
@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Log in to the Container registry
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
