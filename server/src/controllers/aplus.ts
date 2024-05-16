@@ -199,12 +199,15 @@ export const fetchAplusGrades = async (
       // TODO: Proper dates
       // Related: https://github.com/apluslms/a-plus/issues/1361
       const date = new Date();
+      const expiryDate = new Date(date);
+      expiryDate.setDate(date.getDate() + attainment.daysValid);
+
       newGrades.push({
         studentNumber: pointsRes.data.student_id,
         attainmentId: attainment.id,
         grade: grade,
-        date: new Date(),
-        expiryDate: new Date(date.getDate() + attainment.daysValid),
+        date: date,
+        expiryDate: expiryDate,
         comment: null,
       });
     }
