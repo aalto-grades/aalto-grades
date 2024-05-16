@@ -14,6 +14,7 @@ import {
   NewGradeArraySchema,
 } from '@/common/types';
 import {app} from '../../src/app';
+import {APLUS_API_URL} from '../../src/configs/environment';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
 import {createData} from '../util/createData';
 import {ErrorSchema} from '../util/general';
@@ -22,12 +23,9 @@ import {resetDb} from '../util/resetDb';
 
 const request = supertest(app);
 
-const APLUS_URL = 'https://plus.cs.aalto.fi/api/v2';
-
 let cookies: Cookies = {} as Cookies;
 
 let courseId = -1;
-let attainments: AttainmentData[] = [];
 let addGradeSourceAttainmentId = -1;
 let noGradeSourceAttainmentId = -1;
 let fullPointsAttainmentId = -1;
@@ -43,9 +41,11 @@ beforeAll(async () => {
   cookies = await getCookies();
 
   let _;
+  let attainments: AttainmentData[];
   [courseId, attainments, _] = await createData.createCourse({});
   [fullPointsAttainmentId, moduleAttainmentId, difficultyAttainmentId] =
     await createData.createAplusGradeSources(courseId);
+
   addGradeSourceAttainmentId = attainments[0].id;
   noGradeSourceAttainmentId = attainments[3].id;
 
@@ -55,14 +55,15 @@ beforeAll(async () => {
     hasAssistant: false,
     hasStudent: false,
   });
+
   differentCourseAttainmentId = otherAttainments[0].id;
 
   // eslint-disable-next-line @typescript-eslint/require-await
   mockedAxios.get.mockImplementation(async url => {
-    const urlExercises = `${APLUS_URL}/courses/1/exercises?format=json`;
-    const urlPoints = `${APLUS_URL}/courses/1/points?format=json`;
-    const urlA = `${APLUS_URL}/courses/1/points/1?format=json`;
-    const urlB = `${APLUS_URL}/courses/1/points/2?format=json`;
+    const urlExercises = `${APLUS_API_URL}/courses/1/exercises?format=json`;
+    const urlPoints = `${APLUS_API_URL}/courses/1/points?format=json`;
+    const urlA = `${APLUS_API_URL}/courses/1/points/1?format=json`;
+    const urlB = `${APLUS_API_URL}/courses/1/points/2?format=json`;
 
     /* eslint-disable camelcase */
     switch (url) {
