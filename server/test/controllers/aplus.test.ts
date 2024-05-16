@@ -153,7 +153,7 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 400 bad request, if validation fails (non-number A+ course ID)', async () => {
+  it('should respond with 400 if validation fails (non-number A+ course ID)', async () => {
     const res = await request
       .get('/v1/aplus/courses/abc')
       .set('Cookie', cookies.adminCookie)
@@ -164,7 +164,7 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
+  it('should respond with 401 if not logged in', async () => {
     const res = await request
       .get('/v1/aplus/courses/1')
       .set('Accept', 'application/json')
@@ -237,7 +237,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     await checkAplusGradeSource(getDifficulty());
   });
 
-  it('should respond with 400 bad request, if course ID is invalid', async () => {
+  it('should respond with 400 if course ID is invalid', async () => {
     const res = await request
       .post('/v1/courses/abc/aplus-source')
       .send([getFullPoints(), getModule(), getDifficulty()])
@@ -248,7 +248,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 400 bad request, if input data is invalid', async () => {
+  it('should respond with 400 if input data is invalid', async () => {
     const testInvalid = async (
       sourceType: AplusGradeSourceType,
       withModuleId: boolean,
@@ -272,7 +272,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     await testInvalid(AplusGradeSourceType.Difficulty, false, false);
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
+  it('should respond with 401 if not logged in', async () => {
     const res = await request
       .post(`/v1/courses/${courseId}/aplus-source`)
       .send([getFullPoints(), getModule(), getDifficulty()])
@@ -281,7 +281,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     expect(JSON.stringify(res.body)).toBe('{}');
   });
 
-  it('should respond with 403 forbidden if user is not an admin or teacher in charge', async () => {
+  it('should respond with 403 if user is not an admin or teacher in charge', async () => {
     const res = await request
       .post(`/v1/courses/${noRoleCourseId}/aplus-source`)
       .send([getFullPoints(), getModule(), getDifficulty()])
@@ -359,7 +359,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 400 bad request, if attainment list is not provided', async () => {
+  it('should respond with 400 if attainment list is not provided', async () => {
     const res = await request
       .get(`/v1/courses/${courseId}/aplus-fetch`)
       .set('Cookie', cookies.adminCookie)
@@ -370,7 +370,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 401 unauthorized, if not logged in', async () => {
+  it('should respond with 401 if not logged in', async () => {
     const res = await request
       .get(`/v1/courses/${courseId}/aplus-fetch`)
       .set('Accept', 'application/json')
@@ -379,7 +379,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     expect(JSON.stringify(res.body)).toBe('{}');
   });
 
-  it('should respond with 403 forbidden, if user is not an admin or teacher in charge', async () => {
+  it('should respond with 403 if user is not an admin or teacher in charge', async () => {
     const res = await request
       .get(`/v1/courses/${noRoleCourseId}/aplus-fetch`)
       .set('Cookie', cookies.teacherCookie)
@@ -390,7 +390,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 409 conflict, if an attainment does not belong to the course', async () => {
+  it('should respond with 409 if an attainment does not belong to the course', async () => {
     const res = await request
       .get(
         `/v1/courses/${courseId}/aplus-fetch?attainments=[${differentCourseAttainmentId}]`
@@ -403,7 +403,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 422 unprocessable entity, if an attainment has no grade source', async () => {
+  it('should respond with 422 if an attainment has no grade source', async () => {
     const res = await request
       .get(
         `/v1/courses/${courseId}/aplus-fetch?attainments=[${noGradeSourceAttainmentId}]`
