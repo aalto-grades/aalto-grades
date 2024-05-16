@@ -114,7 +114,6 @@ export const fetchAplusGrades = async (
       String(attainmentId)
     );
 
-    // TODO: Find all grade sources at once?
     // TODO: There can be multiple sources
     const gradeSource = await AplusGradeSource.findOne({
       where: {attainmentId: attainment.id},
@@ -138,7 +137,7 @@ export const fetchAplusGrades = async (
     );
 
     for (const result of allPointsRes.data.results) {
-      // TODO: Fetching points individually for each student may not be the best idea
+      // TODO: Don't fetch points individually for each student
       // Related: https://github.com/apluslms/a-plus/issues/1360
       const pointsRes = await fetchFromAplus<{
         student_id: string;
@@ -199,12 +198,13 @@ export const fetchAplusGrades = async (
 
       // TODO: Proper dates
       // Related: https://github.com/apluslms/a-plus/issues/1361
+      const date = new Date();
       newGrades.push({
         studentNumber: pointsRes.data.student_id,
         attainmentId: attainment.id,
         grade: grade,
         date: new Date(),
-        expiryDate: new Date(), // TODO: date + daysValid by default
+        expiryDate: new Date(date.getDate() + attainment.daysValid),
         comment: null,
       });
     }
