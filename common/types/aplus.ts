@@ -24,10 +24,12 @@ export const AplusExerciseDataSchema = z.object({
   difficulties: z.array(z.string()),
 });
 
-const GradeSourceBase = z.object({
-  attainmentId: IdSchema,
-  aplusCourseId: z.number().int(),
-}).strict();
+const GradeSourceBase = z
+  .object({
+    attainmentId: IdSchema,
+    aplusCourseId: z.number().int(),
+  })
+  .strict();
 
 export const AplusGradeSourceDataSchema = z.discriminatedUnion('sourceType', [
   GradeSourceBase.extend({
