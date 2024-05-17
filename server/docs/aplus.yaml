@@ -1,0 +1,163 @@
+# SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+---
+definitions:
+  AplusModuleId:
+    type: integer
+    description: The ID of a module in A+.
+    format: int32
+    example: 1
+  AplusDifficulty:
+    type: string
+    description: The name or identifier of a difficulty level in A+.
+    example: A
+  AplusGradeSourceType:
+    type: string
+    enum: [FULL_POINTS, MODULE, DIFFICULTY]
+    description: A+ grade source type.
+    example: MODULE
+
+  AplusExerciseData:
+    type: object
+    description: Information about exercises of an A+ course.
+    properties:
+      modules:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              $ref: '#/definitions/AplusModuleId'
+            name:
+              type: string
+              description: Name of the module.
+              example: Round 1
+          required:
+            - id
+            - name
+      difficulties:
+        type: array
+        items:
+          $ref: '#/definitions/AplusDifficulty'
+    required:
+      - modules
+      - difficulties
+
+  NewAplusGradeSourceData:
+    type: object
+    description: Information to add a new A+ grade source to an attainment.
+    properties:
+      attainmentId:
+        $ref: '#/definitions/AttainmentId'
+      aplusCourseId:
+        type: integer
+        description: The ID of a course in A+.
+        format: int32
+        example: 1
+      sourceType:
+        $ref: '#/definitions/AplusGradeSourceType'
+      moduleId:
+        $ref: '#/definitions/AplusModuleId'
+      difficulty:
+        $ref: '#/definitions/AplusDifficulty'
+    required:
+      - attainmentId
+      - aplusCourseId
+      - sourceType
+
+/v1/aplus/courses/{aplusCourseId}:
+  get:
+    tags: [A+]
+    description: >
+      Get information about the exercises of an A+ course, namely, which
+      modules and difficulties exist in the course.
+    parameters:
+      - $ref: '#/components/parameters/aplusCourseId'
+    responses:
+      200:
+        description: >
+          An A+ course with the given ID was found and its modules and
+          difficulties are returned in the AplusExerciseData format.
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/AplusExerciseData'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      502:
+        $ref: '#/components/responses/BadGateway'
+    security:
+      - cookieAuth: []
+
+/v1/courses/{courseId}/aplus-source:
+  post:
+    tags: [A+]
+    description: Add A+ grade sources to attainments.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/NewAplusGradeSourceData'
+    responses:
+      201:
+        description: A+ grade sources created.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+
+/v1/courses/{courseId}/aplus-fetch:
+  get:
+    tags: [A+]
+    description: Fetch grades from A+ for the given attainments.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - in: query
+        name: attainments
+        schema:
+          type: array
+          description: List of attainment IDs.
+          example: [1, 2, 3]
+          items:
+            $ref: '#/definitions/AttainmentId'
+    responses:
+      200:
+        description: >
+          Grades were fetched from A+ and they are returned in the NewGrade
+          format, so that they can be inspected, edited, and stored in the
+          database.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/NewGrade'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+      502:
+        $ref: '#/components/responses/BadGateway'
+    security:
+      - cookieAuth: []

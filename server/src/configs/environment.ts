@@ -78,3 +78,6 @@ export const RSYSLOG_TCP_PORT = process.env.RSYSLOG_TCP_PORT
   ? Number(process.env.RSYSLOG_TCP_PORT)
   : 601;
 export const RSYSLOG_HOST = process.env.RSYSLOG_HOST || 'localhost';
+
+export const APLUS_API_URL =
+  process.env.APLUS_API_URL || 'https://plus.cs.aalto.fi/api/v2';

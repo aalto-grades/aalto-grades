@@ -156,4 +156,26 @@ export class ResponseTests {
       delete: async () => await call(this.request.delete(url)),
     };
   }
+
+  /** Send a request and expect a 502 Bad Gateway */
+  testBadGateway(url: string, cookie: string[]): ReturnType {
+    const call = async (request: Test): Promise<void> => {
+      const res = await request
+        .set('Cookie', cookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.BadGateway);
+
+      const result = await ErrorSchema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
+    };
+
+    return {
+      get: async () => await call(this.request.get(url)),
+      post: async (data: ReqData) =>
+        await call(this.request.post(url).send(data)),
+      put: async (data: ReqData) =>
+        await call(this.request.put(url).send(data)),
+      delete: async () => await call(this.request.delete(url)),
+    };
+  }
 }

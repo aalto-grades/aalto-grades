@@ -8,6 +8,7 @@ import {Router} from 'express';
 import swaggerJsdoc, {OAS3Options} from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
+import {router as aplusRouter} from './aplus';
 import {router as assessmentModelRouter} from './assessmentModel';
 import {router as attainmentRouter} from './attainment';
 import {router as authRouter} from './auth';
@@ -28,6 +29,7 @@ const openapiSpecification: object = swaggerJsdoc(options);
 export const router: Router = Router();
 
 router.use(cookieParser());
+router.use(aplusRouter);
 router.use(assessmentModelRouter);
 router.use(attainmentRouter);
 router.use(authRouter);
