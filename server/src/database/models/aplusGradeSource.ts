@@ -70,7 +70,7 @@ AplusGradeSource.init(
 );
 
 Attainment.hasMany(AplusGradeSource, {
-  onDelete: 'CASCADE',
+  onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
 AplusGradeSource.belongsTo(Attainment, {foreignKey: 'attainmentId'});

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
-import {z, ZodError} from 'zod';
+import {z} from 'zod';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
@@ -98,12 +98,6 @@ export const fetchAplusGrades = async (
   } catch (e) {
     if (e instanceof Error) {
       throw new ApiError(e.message, HttpCode.BadRequest);
-    }
-    if (e instanceof ZodError) {
-      throw new ApiError(
-        e.issues.map(issue => issue.message),
-        HttpCode.BadRequest
-      );
     }
   }
 

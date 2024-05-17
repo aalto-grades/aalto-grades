@@ -41,17 +41,16 @@ const mockedAxios = axios as jest.Mocked<AxiosStatic>;
 
 beforeAll(async () => {
   cookies = await getCookies();
-  let _;
 
   let attainments: AttainmentData[];
-  [courseId, attainments, _] = await createData.createCourse({});
+  [courseId, attainments] = await createData.createCourse({});
   [fullPointsAttainmentId, moduleAttainmentId, difficultyAttainmentId] =
     await createData.createAplusGradeSources(courseId);
   addGradeSourceAttainmentId = attainments[0].id;
   noGradeSourceAttainmentId = attainments[3].id;
 
   let otherAttainments: AttainmentData[];
-  [noRoleCourseId, otherAttainments, _] = await createData.createCourse({
+  [noRoleCourseId, otherAttainments] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
@@ -175,6 +174,14 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
 });
 
 describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', () => {
+  type AplusGradeSourceAny = {
+    attainmentId: number;
+    aplusCourseId: number;
+    sourceType: AplusGradeSourceType;
+    moduleId?: number;
+    difficulty?: string;
+  };
+
   const getGradeSource = (
     sourceType: AplusGradeSourceType,
     {
@@ -182,7 +189,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
       withDifficulty = false,
       attainmentId = addGradeSourceAttainmentId,
     }
-  ): AplusGradeSourceData => ({
+  ): AplusGradeSourceAny => ({
     attainmentId: attainmentId,
     aplusCourseId: 1,
     sourceType: sourceType,
@@ -191,54 +198,55 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
   });
 
   const getFullPoints = (): AplusGradeSourceData =>
-    getGradeSource(AplusGradeSourceType.FullPoints, {});
+    getGradeSource(AplusGradeSourceType.FullPoints, {}) as AplusGradeSourceData;
 
   const getModule = (): AplusGradeSourceData =>
-    getGradeSource(AplusGradeSourceType.Module, {withModuleId: true});
+    getGradeSource(AplusGradeSourceType.Module, {
+      withModuleId: true,
+    }) as AplusGradeSourceData;
 
   const getDifficulty = (): AplusGradeSourceData =>
-    getGradeSource(AplusGradeSourceType.Difficulty, {withDifficulty: true});
+    getGradeSource(AplusGradeSourceType.Difficulty, {
+      withDifficulty: true,
+    }) as AplusGradeSourceData;
 
   const checkAplusGradeSource = async (
     gradeSource: AplusGradeSourceData
   ): Promise<void> => {
+    const sourceType = gradeSource.sourceType;
     const result = await AplusGradeSource.findOne({
       where: {
         attainmentId: gradeSource.attainmentId,
         aplusCourseId: gradeSource.aplusCourseId,
-        sourceType: gradeSource.sourceType,
-        moduleId: gradeSource.moduleId ?? null,
-        difficulty: gradeSource.difficulty ?? null,
+        sourceType: sourceType,
+        moduleId:
+          sourceType === AplusGradeSourceType.Module
+            ? gradeSource.moduleId
+            : null,
+        difficulty:
+          sourceType === AplusGradeSourceType.Difficulty
+            ? gradeSource.difficulty
+            : null,
       },
     });
 
     expect(result).not.toBe(null);
   };
 
-  it('should add sources (admin user)', async () => {
-    const res = await request
-      .post(`/v1/courses/${courseId}/aplus-source`)
-      .send([getFullPoints(), getModule(), getDifficulty()])
-      .set('Cookie', cookies.adminCookie)
-      .expect(HttpCode.Created);
+  it('should add sources', async () => {
+    const testCookies = [cookies.adminCookie, cookies.teacherCookie];
+    for (const cookie of testCookies) {
+      const res = await request
+        .post(`/v1/courses/${courseId}/aplus-source`)
+        .send([getFullPoints(), getModule(), getDifficulty()])
+        .set('Cookie', cookie)
+        .expect(HttpCode.Created);
 
-    expect(JSON.stringify(res.body)).toBe('{}');
-    await checkAplusGradeSource(getFullPoints());
-    await checkAplusGradeSource(getModule());
-    await checkAplusGradeSource(getDifficulty());
-  });
-
-  it('should add sources (teacher user)', async () => {
-    const res = await request
-      .post(`/v1/courses/${courseId}/aplus-source`)
-      .send([getFullPoints(), getModule(), getDifficulty()])
-      .set('Cookie', cookies.teacherCookie)
-      .expect(HttpCode.Created);
-
-    expect(JSON.stringify(res.body)).toBe('{}');
-    await checkAplusGradeSource(getFullPoints());
-    await checkAplusGradeSource(getModule());
-    await checkAplusGradeSource(getDifficulty());
+      expect(JSON.stringify(res.body)).toBe('{}');
+      await checkAplusGradeSource(getFullPoints());
+      await checkAplusGradeSource(getModule());
+      await checkAplusGradeSource(getDifficulty());
+    }
   });
 
   it('should respond with 400 if course ID is invalid', async () => {
@@ -312,69 +320,68 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
 });
 
 describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', () => {
-  it('should fetch grades for full points (admin user)', async () => {
-    const res = await request
-      .get(
-        `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`
-      )
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
+  it('should fetch grades for full points', async () => {
+    const testCookies = [cookies.adminCookie, cookies.teacherCookie];
+    for (const cookie of testCookies) {
+      const res = await request
+        .get(
+          `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`
+        )
+        .set('Cookie', cookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
 
-    const result = await NewGradeArraySchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
-  });
-
-  it('should fetch grades for full points (teacher user)', async () => {
-    const res = await request
-      .get(
-        `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`
-      )
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
-
-    const result = await NewGradeArraySchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+      const result = await NewGradeArraySchema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
+    }
   });
 
   it('should fetch grades for module', async () => {
-    const res = await request
-      .get(
-        `/v1/courses/${courseId}/aplus-fetch?attainments=[${moduleAttainmentId}]`
-      )
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
+    const testCookies = [cookies.adminCookie, cookies.teacherCookie];
+    for (const cookie of testCookies) {
+      const res = await request
+        .get(
+          `/v1/courses/${courseId}/aplus-fetch?attainments=[${moduleAttainmentId}]`
+        )
+        .set('Cookie', cookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
 
-    const result = await NewGradeArraySchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+      const result = await NewGradeArraySchema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
+    }
   });
 
   it('should fetch grades for difficulty', async () => {
-    const res = await request
-      .get(
-        `/v1/courses/${courseId}/aplus-fetch?attainments=[${difficultyAttainmentId}]`
-      )
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
+    const testCookies = [cookies.adminCookie, cookies.teacherCookie];
+    for (const cookie of testCookies) {
+      const res = await request
+        .get(
+          `/v1/courses/${courseId}/aplus-fetch?attainments=[${difficultyAttainmentId}]`
+        )
+        .set('Cookie', cookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
 
-    const result = await NewGradeArraySchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+      const result = await NewGradeArraySchema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
+    }
   });
 
   it('should fetch grades for multiple attainments', async () => {
-    const res = await request
-      .get(
-        `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}, ${moduleAttainmentId}, ${difficultyAttainmentId}]`
-      )
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
+    const testCookies = [cookies.adminCookie, cookies.teacherCookie];
+    for (const cookie of testCookies) {
+      const res = await request
+        .get(
+          `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}, ${moduleAttainmentId}, ${difficultyAttainmentId}]`
+        )
+        .set('Cookie', cookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Ok);
 
-    const result = await NewGradeArraySchema.safeParseAsync(res.body);
-    expect(result.success).toBeTruthy();
+      const result = await NewGradeArraySchema.safeParseAsync(res.body);
+      expect(result.success).toBeTruthy();
+    }
   });
 
   it('should respond with 400 if course ID is invalid', async () => {

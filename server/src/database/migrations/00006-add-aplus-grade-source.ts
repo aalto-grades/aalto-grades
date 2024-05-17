@@ -27,7 +27,7 @@ export default {
               model: 'attainment',
               key: 'id',
             },
-            onDelete: 'CASCADE',
+            onDelete: 'RESTRICT',
             onUpdate: 'CASCADE',
           },
           aplus_course_id: {

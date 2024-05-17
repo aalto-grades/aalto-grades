@@ -4,6 +4,8 @@
 
 import {z} from 'zod';
 
+import {IdSchema} from './general';
+
 export enum AplusGradeSourceType {
   FullPoints = 'FULL_POINTS',
   Module = 'MODULE',
@@ -22,29 +24,24 @@ export const AplusExerciseDataSchema = z.object({
   difficulties: z.array(z.string()),
 });
 
-export const AplusGradeSourceDataSchema = z
-  .object({
-    attainmentId: z.number().int(),
-    aplusCourseId: z.number().int(),
-    sourceType: AplusGradeSourceTypeSchema,
-    moduleId: z.number().int().optional(),
-    difficulty: z.string().optional(),
-  })
-  .refine(val => {
-    // Depending on the grade source, different data must be provided
-    const sources = (m: boolean, d: boolean): boolean =>
-      (m ? val.moduleId !== undefined : val.moduleId === undefined) &&
-      (d ? val.difficulty !== undefined : val.difficulty === undefined);
+const GradeSourceBase = z.object({
+  attainmentId: IdSchema,
+  aplusCourseId: z.number().int(),
+});
 
-    switch (val.sourceType) {
-      case AplusGradeSourceType.FullPoints:
-        return sources(false, false);
-      case AplusGradeSourceType.Module:
-        return sources(true, false);
-      case AplusGradeSourceType.Difficulty:
-        return sources(false, true);
-    }
-  });
+export const AplusGradeSourceDataSchema = z.discriminatedUnion('sourceType', [
+  GradeSourceBase.extend({
+    sourceType: z.literal(AplusGradeSourceType.FullPoints),
+  }),
+  GradeSourceBase.extend({
+    sourceType: z.literal(AplusGradeSourceType.Module),
+    moduleId: z.number().int(),
+  }),
+  GradeSourceBase.extend({
+    sourceType: z.literal(AplusGradeSourceType.Difficulty),
+    difficulty: z.string(),
+  }),
+]);
 
 export const NewAplusGradeSourceArraySchema = z.array(
   AplusGradeSourceDataSchema

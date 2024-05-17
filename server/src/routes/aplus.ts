@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, {Router} from 'express';
-import {RequestHandler} from 'express-serve-static-core';
+import express, {RequestHandler, Router} from 'express';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
@@ -19,7 +18,6 @@ import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
 
-// TODO: Authorization?
 router.get(
   '/v1/aplus/courses/:aplusCourseId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
