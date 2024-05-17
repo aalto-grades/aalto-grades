@@ -24,6 +24,20 @@ export class ResponseTests {
     this.request = request;
   }
 
+  private next(
+    call: (request: Test) => Promise<void>,
+    url: string
+  ): ReturnType {
+    return {
+      get: async () => await call(this.request.get(url)),
+      post: async (data: ReqData) =>
+        await call(this.request.post(url).send(data)),
+      put: async (data: ReqData) =>
+        await call(this.request.put(url).send(data)),
+      delete: async () => await call(this.request.delete(url)),
+    };
+  }
+
   /** Send a request and expect a 400 bad request */
   testBadRequest(url: string, cookie: string[]): ReturnType {
     const call = async (request: Test): Promise<void> => {
@@ -37,14 +51,7 @@ export class ResponseTests {
       expect(result.success).toBeTruthy();
     };
 
-    return {
-      get: async () => await call(this.request.get(url)),
-      post: async (data: ReqData) =>
-        await call(this.request.post(url).send(data)),
-      put: async (data: ReqData) =>
-        await call(this.request.put(url).send(data)),
-      delete: async () => await call(this.request.delete(url)),
-    };
+    return this.next(call, url);
   }
 
   /** Send a request and expect a 401 unauthorized */
@@ -57,14 +64,7 @@ export class ResponseTests {
       expect(JSON.stringify(res.body)).toBe('{}');
     };
 
-    return {
-      get: async () => await call(this.request.get(url)),
-      post: async (data: ReqData) =>
-        await call(this.request.post(url).send(data)),
-      put: async (data: ReqData) =>
-        await call(this.request.put(url).send(data)),
-      delete: async () => await call(this.request.delete(url)),
-    };
+    return this.next(call, url);
   }
 
   /** Send a request and expect a 403 forbidden */
@@ -81,14 +81,7 @@ export class ResponseTests {
       }
     };
 
-    return {
-      get: async () => await call(this.request.get(url)),
-      post: async (data: ReqData) =>
-        await call(this.request.post(url).send(data)),
-      put: async (data: ReqData) =>
-        await call(this.request.put(url).send(data)),
-      delete: async () => await call(this.request.delete(url)),
-    };
+    return this.next(call, url);
   }
 
   /** Send a request and expect a 404 not found */
@@ -103,14 +96,7 @@ export class ResponseTests {
       expect(result.success).toBeTruthy();
     };
 
-    return {
-      get: async () => await call(this.request.get(url)),
-      post: async (data: ReqData) =>
-        await call(this.request.post(url).send(data)),
-      put: async (data: ReqData) =>
-        await call(this.request.put(url).send(data)),
-      delete: async () => await call(this.request.delete(url)),
-    };
+    return this.next(call, url);
   }
 
   /** Send a request and expect a 409 conflict */
@@ -125,14 +111,7 @@ export class ResponseTests {
       expect(result.success).toBeTruthy();
     };
 
-    return {
-      get: async () => await call(this.request.get(url)),
-      post: async (data: ReqData) =>
-        await call(this.request.post(url).send(data)),
-      put: async (data: ReqData) =>
-        await call(this.request.put(url).send(data)),
-      delete: async () => await call(this.request.delete(url)),
-    };
+    return this.next(call, url);
   }
 
   /** Send a request and expect a 422 Unprocessable Entity */
@@ -147,14 +126,7 @@ export class ResponseTests {
       expect(result.success).toBeTruthy();
     };
 
-    return {
-      get: async () => await call(this.request.get(url)),
-      post: async (data: ReqData) =>
-        await call(this.request.post(url).send(data)),
-      put: async (data: ReqData) =>
-        await call(this.request.put(url).send(data)),
-      delete: async () => await call(this.request.delete(url)),
-    };
+    return this.next(call, url);
   }
 
   /** Send a request and expect a 502 Bad Gateway */
@@ -169,13 +141,6 @@ export class ResponseTests {
       expect(result.success).toBeTruthy();
     };
 
-    return {
-      get: async () => await call(this.request.get(url)),
-      post: async (data: ReqData) =>
-        await call(this.request.post(url).send(data)),
-      put: async (data: ReqData) =>
-        await call(this.request.put(url).send(data)),
-      delete: async () => await call(this.request.delete(url)),
-    };
+    return this.next(call, url);
   }
 }
