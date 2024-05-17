@@ -116,7 +116,7 @@ export const fetchAplusGrades = async (
     if (!gradeSource) {
       throw new ApiError(
         `attainment with ID ${attainment.id} has no A+ grade sources`,
-        HttpCode.UnprocessableEntity
+        HttpCode.NotFound
       );
     }
 

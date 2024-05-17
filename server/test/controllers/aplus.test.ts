@@ -429,16 +429,16 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     await responseTests
       .testNotFound(urlNoAttainment, cookies.adminCookie)
       .get();
+
+    const urlNoGradeSource = `/v1/courses/${courseId}/aplus-fetch?attainments=[${noGradeSourceAttainmentId}]`;
+    await responseTests
+      .testNotFound(urlNoGradeSource, cookies.adminCookie)
+      .get();
   });
 
   it('should respond with 409 when an attainment does not belong to the course', async () => {
     const url = `/v1/courses/${courseId}/aplus-fetch?attainments=[${differentCourseAttainmentId}]`;
     await responseTests.testConflict(url, cookies.adminCookie).get();
-  });
-
-  it('should respond with 422 if an attainment has no grade source', async () => {
-    const url = `/v1/courses/${courseId}/aplus-fetch?attainments=[${noGradeSourceAttainmentId}]`;
-    await responseTests.testUnprocessableEntity(url, cookies.adminCookie).get();
   });
 
   it('should respond with 502 if A+ request fails', async () => {
