@@ -5,7 +5,12 @@
 import supertest from 'supertest';
 import {z} from 'zod';
 
-import {FinalGradeDataSchema, HttpCode, NewFinalGrade} from '@/common/types';
+import {
+  EditFinalGrade,
+  FinalGradeDataSchema,
+  HttpCode,
+  NewFinalGrade,
+} from '@/common/types';
 import {app} from '../../src/app';
 import FinalGrade from '../../src/database/models/finalGrade';
 import {createData} from '../util/createData';
@@ -312,9 +317,7 @@ describe('Test PUT /v1/courses/:courseId/final-grades/:fGradeId - edit a final g
   it('should partially edit grade', async () => {
     let res = await request
       .put(`/v1/courses/${editCourseId}/final-grades/${editFinalGradeId}`)
-      .send({
-        grade: Math.floor(Math.random() * 6),
-      })
+      .send({grade: Math.floor(Math.random() * 6)})
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Ok);
 
@@ -322,9 +325,7 @@ describe('Test PUT /v1/courses/:courseId/final-grades/:fGradeId - edit a final g
 
     res = await request
       .put(`/v1/courses/${editCourseId}/final-grades/${editFinalGradeId}`)
-      .send({
-        grade: 5,
-      })
+      .send({date: new Date(2023, 0, 1)})
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Ok);
 
@@ -332,9 +333,24 @@ describe('Test PUT /v1/courses/:courseId/final-grades/:fGradeId - edit a final g
   });
 
   it('should respond with 400 if validation fails', async () => {
-    const url = `/v1/courses/${editCourseId}/final-grades/${editFinalGradeId}`;
+    let url = `/v1/courses/${editCourseId}/final-grades/${editFinalGradeId}`;
 
-    const data = {grade: '1' as unknown as number};
+    let data: EditFinalGrade = {grade: '1' as unknown as number};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+
+    // Try editing date / grade of non-manual grade
+    const user = await createData.createUser();
+    const finalGradeId = await createData.createFinalGrade(
+      editCourseId,
+      user.id,
+      editCourseModelId,
+      TEACHER_ID,
+      0
+    );
+    url = `/v1/courses/${editCourseId}/final-grades/${finalGradeId}`;
+    data = {grade: 5};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+    data = {date: new Date(2023, 0, 1)};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 

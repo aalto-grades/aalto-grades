@@ -16,7 +16,7 @@ import {findAndValidateFinalGradePath} from './utils/finalGrade';
 import {validateUserAndGrader} from './utils/grades';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
-import {JwtClaims, NewDbFinalGradeData} from '../types';
+import {ApiError, JwtClaims, NewDbFinalGradeData} from '../types';
 
 /**
  * Responds with FinalGradeData[]
@@ -108,8 +108,20 @@ export const editFinalGrade = async (
     req.params.fGradeId
   );
 
-  // TODO: If final grade is not not manual don't allow editing grade/date
   const {grade, date, sisuExportDate} = req.body;
+
+  // If final grade is not not manual don't allow editing grade/date
+  if (
+    fGrade.assessmentModelId !== null &&
+    ((grade !== undefined && grade !== fGrade.grade) ||
+      (date !== undefined &&
+        date.getTime() !== new Date(fGrade.date).getTime()))
+  ) {
+    throw new ApiError(
+      'Cannot edit grade or date of a non-manual final grade',
+      HttpCode.BadRequest
+    );
+  }
 
   await fGrade
     .set({

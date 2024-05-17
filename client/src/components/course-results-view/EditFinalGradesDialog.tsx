@@ -13,6 +13,7 @@ import {
 import {
   DataGrid,
   GridActionsCellItem,
+  GridCellParams,
   GridColDef,
   GridRowModel,
   GridRowsProp,
@@ -41,7 +42,7 @@ type ColTypes = {
   grade: number;
   date: Date;
   assessmentModel: string;
-  exported: boolean;
+  exported: Date | null;
   selected: string;
 };
 
@@ -133,7 +134,7 @@ const EditFinalGradesDialog = ({
         grade: grade.grade,
         date: grade.date,
         assessmentModel: modelName,
-        exported: grade.sisuExportDate !== null,
+        exported: grade.sisuExportDate,
         selected: '',
       };
     });
@@ -172,8 +173,8 @@ const EditFinalGradesDialog = ({
     {
       field: 'exported',
       headerName: 'Exported',
-      type: 'boolean',
-      editable: false,
+      type: 'date',
+      editable: true,
     },
     {
       field: 'actions',
@@ -208,7 +209,7 @@ const EditFinalGradesDialog = ({
           grade: 0,
           date: new Date(),
           assessmentModel: 'Manual',
-          exported: false,
+          exported: null,
           selected: '',
         };
         return oldRows.concat(newRow);
@@ -303,6 +304,10 @@ const EditFinalGradesDialog = ({
             initialState={{
               sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
             }}
+            isCellEditable={(params: GridCellParams<ColTypes>) =>
+              params.row.assessmentModel === 'Manual' ||
+              params.field === 'exported'
+            }
             onRowEditStart={() => setEditing(true)}
             onRowEditStop={() => setEditing(false)}
             processRowUpdate={(updatedRow: GridRowModel<ColTypes>) => {
