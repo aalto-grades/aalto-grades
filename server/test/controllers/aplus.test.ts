@@ -4,9 +4,11 @@
 
 import axios, {AxiosError, AxiosStatic} from 'axios';
 import supertest from 'supertest';
+import {z} from 'zod';
 
 import {
   AttainmentData,
+  AplusCourseDataSchema,
   AplusExerciseDataSchema,
   AplusGradeSourceData,
   AplusGradeSourceType,
@@ -120,6 +122,57 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await resetDb();
+});
+
+describe('Test GET /v1/aplus/courses - get A+ courses', () => {
+  it('should respond with correct data', async () => {
+    mockedAxios.get.mockResolvedValueOnce({
+      /* eslint-disable camelcase */
+      data: {
+        staff_courses: [
+          {
+            id: 1,
+            code: 'CS-ABC',
+            name: 'Course 1',
+            instance_name: '2024',
+            html_url: 'https://plus.cs.aalto.fi',
+          },
+          {
+            id: 2,
+            code: 'ELEC-XYZ',
+            name: 'Course 2',
+            instance_name: '2025',
+            html_url: 'https://plus.cs.aalto.fi',
+          },
+        ],
+      },
+      /* eslint-enable camelcase */
+    });
+
+    const res = await request
+      .get('/v1/aplus/courses')
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    const Schema = z.array(AplusCourseDataSchema);
+    const result = await Schema.safeParseAsync(res.body);
+    expect(result.success).toBeTruthy();
+  });
+
+  it('should respond with 401 if not logged in', async () => {
+    const url = '/v1/aplus/courses';
+    await responseTests.testUnauthorized(url).get();
+  });
+
+  it('should respond with 502 if A+ request fails', async () => {
+    mockedAxios.get.mockImplementationOnce(_url => {
+      throw new AxiosError();
+    });
+
+    const url = '/v1/aplus/courses';
+    await responseTests.testBadGateway(url, cookies.adminCookie).get();
+  });
 });
 
 describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () => {

@@ -7,6 +7,7 @@ import {z} from 'zod';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
+  AplusCourseData,
   AplusExerciseData,
   AplusGradeSourceType,
   HttpCode,
@@ -20,6 +21,40 @@ import {validateAttainmentPath} from './utils/attainment';
 import {APLUS_API_URL} from '../configs/environment';
 import AplusGradeSource from '../database/models/aplusGradeSource';
 import {ApiError} from '../types';
+
+/**
+ * Responds with AplusCourseData[]
+ *
+ * @throws ApiError(502)
+ */
+export const fetchAplusCourses = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const coursesRes = await fetchFromAplus<{
+    staff_courses: {
+      id: number;
+      code: string;
+      name: string;
+      instance_name: string;
+      html_url: string;
+    }[];
+  }>(`${APLUS_API_URL}/users/me`);
+
+  // TODO: What about if the caller has no staff_courses? What does the API
+  // return?
+  const courses: AplusCourseData[] = coursesRes.data.staff_courses.map(
+    course => ({
+      id: course.id,
+      courseCode: course.code,
+      name: course.name,
+      instance: course.instance_name,
+      url: course.html_url,
+    })
+  );
+
+  res.json(courses);
+};
 
 /**
  * Responds with AplusExerciseData

@@ -9,6 +9,7 @@ import {processRequestBody} from 'zod-express-middleware';
 import {CourseRoleType, NewAplusGradeSourceArraySchema} from '@/common/types';
 import {
   addAplusGradeSources,
+  fetchAplusCourses,
   fetchAplusExerciseData,
   fetchAplusGrades,
 } from '../controllers/aplus';
@@ -17,6 +18,12 @@ import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
+
+router.get(
+  '/v1/aplus/courses',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  controllerDispatcher(fetchAplusCourses)
+);
 
 router.get(
   '/v1/aplus/courses/:aplusCourseId',
