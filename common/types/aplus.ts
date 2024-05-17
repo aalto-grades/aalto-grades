@@ -19,6 +19,7 @@ export const AplusCourseDataSchema = z.object({
   instance: z.string(),
   url: z.string().url(),
 });
+export const AplusCourseDataArraySchema = z.array(AplusCourseDataSchema);
 
 export const AplusGradeSourceTypeSchema = z.nativeEnum(AplusGradeSourceType);
 
@@ -31,6 +32,7 @@ export const AplusExerciseDataSchema = z.object({
   ),
   difficulties: z.array(z.string()),
 });
+export const AplusExerciseDataArraySchema = z.array(AplusExerciseDataSchema);
 
 const GradeSourceBase = z
   .object({
