@@ -12,6 +12,14 @@ export enum AplusGradeSourceType {
   Difficulty = 'DIFFICULTY',
 }
 
+export const AplusCourseDataSchema = z.object({
+  id: z.number().int(),
+  courseCode: z.string(),
+  name: z.string(),
+  instance: z.string(),
+  url: z.string().url(),
+});
+
 export const AplusGradeSourceTypeSchema = z.nativeEnum(AplusGradeSourceType);
 
 export const AplusExerciseDataSchema = z.object({
@@ -49,6 +57,7 @@ export const NewAplusGradeSourceArraySchema = z.array(
   AplusGradeSourceDataSchema
 );
 
+export type AplusCourseData = z.infer<typeof AplusCourseDataSchema>;
 export type AplusExerciseData = z.infer<typeof AplusExerciseDataSchema>;
 export type AplusGradeSourceData = z.infer<typeof AplusGradeSourceDataSchema>;
 

@@ -3,6 +3,11 @@
 # SPDX-License-Identifier: MIT
 ---
 definitions:
+  AplusCourseId:
+    type: integer
+    description: The ID of a course in A+.
+    format: int32
+    example: 1
   AplusModuleId:
     type: integer
     description: The ID of a module in A+.
@@ -17,6 +22,33 @@ definitions:
     enum: [FULL_POINTS, MODULE, DIFFICULTY]
     description: A+ grade source type.
     example: MODULE
+
+  AplusCourseData:
+    type: object
+    description: Information about an A+ course.
+    properties:
+      id:
+        $ref: '#/definitions/AplusCourseId'
+      courseCode:
+        $ref: '#/definitions/CourseCode'
+      name:
+        type: string
+        description: The name of the course.
+        example: Programming 1
+      instance:
+        type: string
+        description: The name of the course instance in A+.
+        example: 2024
+      url:
+        type: string
+        description: The HTML URL of the course in A+.
+        example: https://plus.cs.aalto.fi
+    required:
+      - id
+      - courseCode
+      - name
+      - instance
+      - url
 
   AplusExerciseData:
     type: object
@@ -51,10 +83,7 @@ definitions:
       attainmentId:
         $ref: '#/definitions/AttainmentId'
       aplusCourseId:
-        type: integer
-        description: The ID of a course in A+.
-        format: int32
-        example: 1
+        $ref: '#/definitions/AplusCourseId'
       sourceType:
         $ref: '#/definitions/AplusGradeSourceType'
       moduleId:
@@ -65,6 +94,27 @@ definitions:
       - attainmentId
       - aplusCourseId
       - sourceType
+
+/v1/aplus/courses:
+  get:
+    tags: [A+]
+    description: Gets a list of courses the requester is staff in.
+    responses:
+      200:
+        description: >
+          Courses were found and are returned in the AplusCourseData format.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/AplusCourseData'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      502:
+        $ref: '#/components/responses/BadGateway'
+    security:
+      - cookieAuth: []
 
 /v1/aplus/courses/{aplusCourseId}:
   get:
