@@ -157,12 +157,6 @@ definitions:
         $ref: '#/components/responses/NotFound'
       409:
         $ref: '#/components/responses/Conflict'
-      422:
-        description: An attainment does not have an A+ grade source.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Error'
       502:
         $ref: '#/components/responses/BadGateway'
     security:
