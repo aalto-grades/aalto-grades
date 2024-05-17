@@ -15,12 +15,10 @@ import {findBestGrade, gradeIsExpired} from '../../utils';
 type GradeCellProps = {
   studentNumber: string;
   attainemntResults?: AttainmentGradesData;
-  finalGrade?: boolean;
 };
 const GradeCell = ({
   studentNumber,
   attainemntResults,
-  finalGrade = false,
 }: GradeCellProps): JSX.Element => {
   const {gradeSelectOption} = useTableContext();
   const theme = useTheme();
@@ -33,7 +31,6 @@ const GradeCell = ({
     gradeSelectOption,
   });
   const isGradeExpired = gradeIsExpired(bestGrade);
-  // console.log(bestGrade?.expiryDate, new Date(),bestGrade?.expiryDate < new Date());
 
   return (
     <Box
@@ -68,7 +65,7 @@ const GradeCell = ({
           <Tooltip
             placement="top"
             title={
-              attainemntResults.grades.length === 1
+              attainemntResults.grades.length <= 1
                 ? 'Edit grades'
                 : 'Multiple grades, click to show'
             }
@@ -93,9 +90,7 @@ const GradeCell = ({
           onClose={() => setGradeDialogOpen(false)}
           studentNumber={studentNumber}
           attainmentId={attainemntResults.attainmentId}
-          title={`Grades of ${studentNumber} for ${
-            finalGrade ? 'Final Grade' : attainemntResults.attainmentName
-          }`}
+          title={`Grades of ${studentNumber} for ${attainemntResults.attainmentName}`}
           grades={attainemntResults.grades}
         />
       )}
@@ -132,10 +127,10 @@ const GradeCell = ({
           </Tooltip>
         </>
       )}
-      {
+      {bestGrade?.date && (
         <Tooltip
           placement="top"
-          title={`Grade obtained on ${bestGrade?.date.toString()}`}
+          title={`Grade obtained on ${bestGrade.date.toString()}`}
           disableInteractive
         >
           <Box
@@ -155,10 +150,10 @@ const GradeCell = ({
               },
             }}
           >
-            {bestGrade?.date.toLocaleDateString()}
+            {bestGrade.date.toLocaleDateString()}
           </Box>
         </Tooltip>
-      }
+      )}
     </Box>
   );
 };

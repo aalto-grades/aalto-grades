@@ -30,6 +30,7 @@ import {
 import {useParams} from 'react-router-dom';
 
 import {AttainmentData, StudentRow} from '@/common/types';
+import FinalGradeCell from '../components/course-results-view/FinalGradeCell';
 import GradeCell from '../components/course-results-view/GradeCell';
 import PredictedGradeCell from '../components/course-results-view/PredictedGradeCell';
 import UserGraphDialog from '../components/course-results-view/UserGraphDialog';
@@ -173,7 +174,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   );
 
   // Creating Grades columns
-  const dynamicColumns = useMemo(() => {
+  const gradeColumns = useMemo(() => {
     const selectedAttainments = getAttainmentsForAssessmentModel(
       selectedAssessmentModel
     );
@@ -320,18 +321,16 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     //   cell: info => info.getValue(),
     //   aggregatedCell: () => null,
     // }),
-    columnHelper.accessor(row => row, {
+    columnHelper.accessor(row => row.finalGrades ?? [], {
       header: 'Final Grade',
       enableSorting: false,
-      // cell: info => info.getValue(),
-      cell: ({getValue}) =>
-        // <GradeCell
-        //   studentNumber={'123'}
-        //   attainemntResults={getValue().finalGrades?.[0]}
-        //   finalGrade={true}
-        // />
-        getValue().finalGrades?.[0].grade ?? '-',
-      aggregatedCell: () => null,
+      cell: ({getValue, row}) => (
+        <FinalGradeCell
+          userId={row.original.user.id}
+          studentNumber={row.original.user.studentNumber ?? 'N/A'}
+          finalGrades={getValue()}
+        />
+      ),
     }),
     columnHelper.accessor(row => row, {
       header: 'Grade preview',
@@ -404,7 +403,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     columnHelper.group({
       header: 'Attainments',
       meta: {PrettyChipPosition: 'alone'},
-      columns: dynamicColumns,
+      columns: gradeColumns,
     }),
   ];
 

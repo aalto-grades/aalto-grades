@@ -28,7 +28,9 @@ definitions:
       courseId:
         $ref: '#/definitions/CourseId'
       assessmentModelId:
-        $ref: '#/definitions/AssessmentModelId'
+        nullable: true
+        allOf:
+          - $ref: '#/definitions/AssessmentModelId'
       grader:
         $ref: '#/definitions/UserData'
       grade:
@@ -61,7 +63,9 @@ definitions:
       userId:
         $ref: '#/definitions/UserId'
       assessmentModelId:
-        $ref: '#/definitions/AssessmentModelId'
+        nullable: true
+        allOf:
+          - $ref: '#/definitions/AssessmentModelId'
       grade:
         $ref: '#/definitions/FinalGrade'
       date:
@@ -74,6 +78,24 @@ definitions:
       - assessmentModelId
       - grade
       - date
+
+  EditFinalGrade:
+    type: object
+    description: Final grade data.
+    properties:
+      grade:
+        $ref: '#/definitions/FinalGrade'
+      date:
+        type: string
+        format: date
+        description: Date when attainment is completed (e.g., deadline or exam date)
+        example: 2024-04-01T00:00:00.000Z
+      sisuExportDate:
+        type: string
+        nullable: true
+        format: date
+        description: Date when the grade was exported to sisu.
+        example: 2025-04-01T00:00:00.000Z
 
 /v1/courses/{courseId}/final-grades:
   get:
@@ -119,6 +141,59 @@ definitions:
     responses:
       201:
         description: Final grades added.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+
+/v1/courses/{courseId}/final-grades/{fGradeId}:
+  put:
+    tags: [FinalGrades]
+    description: >
+      Edit a final grade.
+      Available only to admin users and teachers in charge of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/components/parameters/fGradeId'
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/EditFinalGrade'
+    responses:
+      200:
+        description: Final grade edited.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+  delete:
+    tags: [FinalGrades]
+    description: >
+      Delete a final grade.
+      Available only to admin users and teachers in charge of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/components/parameters/fGradeId'
+    responses:
+      200:
+        description: Final grade deleted.
       400:
         $ref: '#/components/responses/BadRequest'
       401:

@@ -143,7 +143,7 @@ export const findAttainmentGradeById = async (
   const attainment = await AttainmentGrade.findByPk(id);
   if (attainment === null) {
     throw new ApiError(
-      `attainment grade with ID ${id} not found`,
+      `Attainment grade with ID ${id} not found`,
       HttpCode.NotFound
     );
   }
@@ -162,7 +162,7 @@ export const findAndValidateAttainmentGradePath = async (
 ): Promise<[Course, AttainmentGrade]> => {
   const result = stringToIdSchema.safeParse(gradeId);
   if (!result.success) {
-    throw new ApiError(`Invalid attainment id ${gradeId}`, HttpCode.BadRequest);
+    throw new ApiError(`Invalid grade ID ${gradeId}`, HttpCode.BadRequest);
   }
   const targetCourse = await findAndValidateCourseId(courseId);
   const grade = await findAttainmentGradeById(result.data);
@@ -173,8 +173,8 @@ export const findAndValidateAttainmentGradePath = async (
   // Check that assessment model belongs to the course.
   if (course.id !== targetCourse.id) {
     throw new ApiError(
-      `Grade ID ${grade.id} ` +
-        `does not belong to the course with ID ${targetCourse.id}`,
+      `Attainment grade with ID ${gradeId} ` +
+        `does not belong to the course with ID ${courseId}`,
       HttpCode.Conflict
     );
   }
