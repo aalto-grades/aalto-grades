@@ -29,13 +29,14 @@ import {
 } from 'react';
 import {useParams} from 'react-router-dom';
 
-import {AttainmentData, StudentRow} from '@/common/types';
+import {AttainmentData, FinalGradeData, StudentRow} from '@/common/types';
 import FinalGradeCell from '../components/course-results-view/FinalGradeCell';
 import GradeCell from '../components/course-results-view/GradeCell';
 import PredictedGradeCell from '../components/course-results-view/PredictedGradeCell';
 import UserGraphDialog from '../components/course-results-view/UserGraphDialog';
 import PrettyChip from '../components/shared/PrettyChip';
 import {useGetAllAssessmentModels, useGetAttainments} from '../hooks/useApi';
+import {findBestGrade} from '../utils';
 import {groupByLatestBestGrade, predictGrades} from '../utils/table';
 
 // Define the shape of the context
@@ -70,6 +71,33 @@ export type GroupedStudentRow = {
 
 export type ExtendedStudentRow = StudentRow & {
   predictedFinalGrades?: {[key: number]: {finalGrade: string}};
+};
+
+/**
+ * Finds a previous grade that has been exported to Sisu, excluding the best
+ * grade.
+ *
+ * @returns The previous grade that has been exported to Sisu, or null if not
+ *   found.
+ */
+const findPreviouslyExportedToSisu = (
+  bestGrade: FinalGradeData,
+  row: StudentRow
+): FinalGradeData | null => {
+  if (row.finalGrades === undefined) return null;
+
+  for (const fg of row.finalGrades) {
+    if (bestGrade.finalGradeId === fg.finalGradeId) continue; // Skip the best grade
+    if (fg.sisuExportDate === null) continue; // and those not exported to sisu
+
+    if (bestGrade.sisuExportDate !== null) {
+      // If the best grade is also exported, we need to check which one is newer
+      if (bestGrade.sisuExportDate < fg.sisuExportDate) return fg;
+    } else {
+      return fg;
+    }
+  }
+  return null;
 };
 
 const columnHelper = createColumnHelper<GroupedStudentRow>();
@@ -383,13 +411,12 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       row => {
         // ATTENTION this function needs to have the same parameters of the one inside the grade cell
         // Clearly can be done in a better way
-        // const bestGrade = findBestGrade(row?.finalGrades);
-        const bestGrade = row.finalGrades?.[0];
+        const bestGrade = findBestGrade(row.finalGrades ?? [], {
+          gradeSelectOption: 'latest',
+        });
         if (!bestGrade) return '-';
-        // console.log(bestGrade);
         if (bestGrade.sisuExportDate) return '✅';
-        // console.log(findPreviouslyExportedToSisu(bestGrade, row));
-        // if (findPreviouslyExportedToSisu(bestGrade, row)) return '⚠️';
+        if (findPreviouslyExportedToSisu(bestGrade, row)) return '⚠️';
         return '-';
       },
 
