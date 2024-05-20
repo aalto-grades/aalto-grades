@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Archive, Delete, Unarchive, Warning} from '@mui/icons-material';
+import {Archive, Delete, Edit, Unarchive, Warning} from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -24,6 +24,7 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {AssessmentModelData, StudentRow, SystemRole} from '@/common/types';
 import {GraphStructure} from '@/common/types/graph';
 import CreateAssessmentModelDialog from './CreateAssessmentModelDialog';
+import EditAssessmentModelDialog from './EditAssessmentModelDialog';
 import {
   useDeleteAssessmentModel,
   useEditAssessmentModel,
@@ -52,8 +53,11 @@ const ModelsView = (): JSX.Element => {
   const [currentUserRow, setCurrentUserRow] = useState<StudentRow | null>(null);
   const [loadGraphId, setLoadGraphId] = useState<number>(-1);
 
-  const [createViewOpen, setCreateViewOpen] = useState(false);
-  const [graphOpen, setGraphOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
+  const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
+  const [editDialogModel, setEditDialogModel] =
+    useState<AssessmentModelData | null>(null);
+  const [graphOpen, setGraphOpen] = useState<boolean>(false);
 
   // Sort models by archived status
   const models = useMemo(
@@ -205,12 +209,19 @@ const ModelsView = (): JSX.Element => {
   return (
     <>
       <CreateAssessmentModelDialog
-        open={createViewOpen}
-        handleClose={(): void => setCreateViewOpen(false)}
+        open={createDialogOpen}
+        onClose={() => setCreateDialogOpen(false)}
         onSubmit={id => {
           allAssessmentModels.refetch();
           setLoadGraphId(id);
         }}
+      />
+
+      <EditAssessmentModelDialog
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        assessmentModelId={editDialogModel?.id ?? null}
+        name={editDialogModel?.name ?? null}
       />
 
       <Box sx={{display: 'flex', mb: 1}}>
@@ -220,7 +231,7 @@ const ModelsView = (): JSX.Element => {
               <Button
                 sx={{mt: 1}}
                 variant="outlined"
-                onClick={() => setCreateViewOpen(true)}
+                onClick={() => setCreateDialogOpen(true)}
               >
                 Create New
               </Button>
@@ -252,19 +263,40 @@ const ModelsView = (): JSX.Element => {
                 secondaryAction={
                   editRights ? (
                     <>
-                      <IconButton
-                        onClick={() =>
-                          handleArchiveModel(model.id, !model.archived)
+                      <Tooltip placement="top" title="Edit assessment model">
+                        <IconButton
+                          onClick={() => {
+                            setEditDialogModel(model);
+                            setEditDialogOpen(true);
+                          }}
+                        >
+                          <Edit />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip
+                        placement="top"
+                        title={
+                          model.archived
+                            ? 'Unarchive assessment model'
+                            : 'Archive assessment model'
                         }
                       >
-                        {model.archived ? <Unarchive /> : <Archive />}
-                      </IconButton>
-                      <IconButton
-                        edge="end"
-                        onClick={() => handleDelModel(model.id)}
-                      >
-                        <Delete />
-                      </IconButton>
+                        <IconButton
+                          onClick={() =>
+                            handleArchiveModel(model.id, !model.archived)
+                          }
+                        >
+                          {model.archived ? <Unarchive /> : <Archive />}
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip placement="top" title="Delete assessment model">
+                        <IconButton
+                          edge="end"
+                          onClick={() => handleDelModel(model.id)}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </Tooltip>
                     </>
                   ) : null
                 }
@@ -279,7 +311,7 @@ const ModelsView = (): JSX.Element => {
                   <ListItemText primary={model.name} />
                   {(model.hasArchivedAttainments ||
                     model.hasDeletedAttainments) && (
-                    <ListItemIcon sx={{mr: 1.6}}>
+                    <ListItemIcon sx={{mr: 6.6}}>
                       <Tooltip title={getWarning(model)} placement="top">
                         <Warning color="warning" />
                       </Tooltip>
