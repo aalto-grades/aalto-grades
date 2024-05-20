@@ -127,7 +127,8 @@ export const editFinalGrade = async (
     .set({
       grade: grade ?? fGrade.grade,
       date: date ?? fGrade.date,
-      sisuExportDate: sisuExportDate ?? fGrade.sisuExportDate,
+      sisuExportDate:
+        sisuExportDate !== undefined ? sisuExportDate : fGrade.sisuExportDate,
       graderId: grader.id,
     })
     .save();

@@ -25,7 +25,6 @@ import {useBlocker, useParams} from 'react-router-dom';
 import {z} from 'zod';
 
 import {EditFinalGrade, FinalGradeData, NewFinalGrade} from '@/common/types';
-import {useTableContext} from '../../context/useTableContext';
 import {
   useAddFinalGrades,
   useDeleteFinalGrade,
@@ -43,7 +42,7 @@ type ColTypes = {
   grade: number;
   date: Date;
   assessmentModel: string | null;
-  exported: Date | null;
+  exportDate: Date | null;
   selected: string;
 };
 
@@ -63,7 +62,6 @@ const EditFinalGradesDialog = ({
 }: PropsType): JSX.Element => {
   const {auth} = useAuth();
   const {courseId} = useParams() as {courseId: string};
-  const {gradeSelectOption} = useTableContext();
 
   const assessmentModels = useGetAllAssessmentModels(courseId);
   const addFinalGrades = useAddFinalGrades(courseId);
@@ -84,12 +82,8 @@ const EditFinalGradesDialog = ({
   );
 
   const bestGrade = useMemo(
-    () =>
-      findBestGrade(rows, {
-        expiredOption: 'prefer_non_expired',
-        gradeSelectOption,
-      }),
-    [gradeSelectOption, rows]
+    () => findBestGrade(rows, {gradeSelectOption: 'latest'}),
+    [rows]
   );
 
   const blocker = useBlocker(
@@ -132,7 +126,7 @@ const EditFinalGradesDialog = ({
       grade: grade.grade,
       date: grade.date,
       assessmentModel: getModelName(grade.assessmentModelId),
-      exported: grade.sisuExportDate,
+      exportDate: grade.sisuExportDate,
       selected: '',
     }));
     setRows(newRows);
@@ -159,7 +153,7 @@ const EditFinalGradesDialog = ({
       headerName: 'Date',
       type: 'date',
       editable: true,
-      width: 120,
+      width: 110, // Enough width to fit the calendar icon
     },
     {
       field: 'assessmentModel',
@@ -168,10 +162,11 @@ const EditFinalGradesDialog = ({
       editable: false,
     },
     {
-      field: 'exported',
-      headerName: 'Exported',
+      field: 'exportDate',
+      headerName: 'Export date',
       type: 'date',
       editable: true,
+      width: 110, // Enough width to fit the calendar icon
     },
     {
       field: 'actions',
@@ -206,7 +201,7 @@ const EditFinalGradesDialog = ({
           grade: 0,
           date: new Date(),
           assessmentModel: null,
-          exported: null,
+          exportDate: null,
           selected: '',
         };
         return oldRows.concat(newRow);
@@ -239,6 +234,7 @@ const EditFinalGradesDialog = ({
           fGradeId: row.fgradeId,
           grade: row.grade,
           date: row.date,
+          sisuExportDate: row.exportDate,
         });
       }
     }
@@ -302,7 +298,8 @@ const EditFinalGradesDialog = ({
               sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
             }}
             isCellEditable={(params: GridCellParams<ColTypes>) =>
-              params.row.assessmentModel === null || params.field === 'exported'
+              params.row.assessmentModel === null ||
+              params.field === 'exportDate'
             }
             onRowEditStart={() => setEditing(true)}
             onRowEditStop={() => setEditing(false)}
