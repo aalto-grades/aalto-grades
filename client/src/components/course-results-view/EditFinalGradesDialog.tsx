@@ -22,6 +22,7 @@ import {
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
 import {useBlocker, useParams} from 'react-router-dom';
+import {z} from 'zod';
 
 import {EditFinalGrade, FinalGradeData, NewFinalGrade} from '@/common/types';
 import {useTableContext} from '../../context/useTableContext';
@@ -41,7 +42,7 @@ type ColTypes = {
   grader: string;
   grade: number;
   date: Date;
-  assessmentModel: string;
+  assessmentModel: string | null;
   exported: Date | null;
   selected: string;
 };
@@ -117,27 +118,23 @@ const EditFinalGradesDialog = ({
   }, [bestGrade, rows]);
 
   useEffect(() => {
-    const newRows = finalGrades.map((grade, gradeId) => {
-      let modelName = '';
-      if (grade.assessmentModelId === null) modelName = 'Manual';
-      else if (assessmentModels.data === undefined) modelName = 'Loading';
-      else
-        modelName =
-          assessmentModels.data.find(
-            model => model.id === grade.assessmentModelId
-          )?.name ?? 'Not found';
+    const getModelName = (modelId: number | null): string | null => {
+      if (modelId === null) return null;
+      if (assessmentModels.data === undefined) return 'Loading...';
+      const model = assessmentModels.data.find(mod => mod.id === modelId);
+      return model?.name ?? 'Not found';
+    };
 
-      return {
-        id: gradeId,
-        fgradeId: grade.finalGradeId,
-        grader: grade.grader.name!,
-        grade: grade.grade,
-        date: grade.date,
-        assessmentModel: modelName,
-        exported: grade.sisuExportDate,
-        selected: '',
-      };
-    });
+    const newRows = finalGrades.map((grade, gradeId) => ({
+      id: gradeId,
+      fgradeId: grade.finalGradeId,
+      grader: grade.grader.name!,
+      grade: grade.grade,
+      date: grade.date,
+      assessmentModel: getModelName(grade.assessmentModelId),
+      exported: grade.sisuExportDate,
+      selected: '',
+    }));
     setRows(newRows);
     setInitRows(structuredClone(newRows));
   }, [assessmentModels.data, finalGrades]);
@@ -208,7 +205,7 @@ const EditFinalGradesDialog = ({
           grader: auth.name,
           grade: 0,
           date: new Date(),
-          assessmentModel: 'Manual',
+          assessmentModel: null,
           exported: null,
           selected: '',
         };
@@ -305,8 +302,7 @@ const EditFinalGradesDialog = ({
               sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
             }}
             isCellEditable={(params: GridCellParams<ColTypes>) =>
-              params.row.assessmentModel === 'Manual' ||
-              params.field === 'exported'
+              params.row.assessmentModel === null || params.field === 'exported'
             }
             onRowEditStart={() => setEditing(true)}
             onRowEditStop={() => setEditing(false)}
@@ -317,13 +313,14 @@ const EditFinalGradesDialog = ({
                 )
               );
               // // TODO: do some validation. Code below is an example.
-              // for (const [key, val] of Object.entries(updatedRow)) {
-              //   if (key === 'id' || key === 'StudentNo') continue;
-              //   if ((val as number) < 0)
-              //     throw new Error('Value cannot be negative');
-              //   else if ((val as number) > 5000)
-              //     throw new Error('Value cannot be over 5000');
-              // }
+              for (const [key, val] of Object.entries(updatedRow)) {
+                if (key === 'grade') {
+                  const GradeSchema = z.number().int().min(0).max(5);
+                  const result = GradeSchema.safeParse(val);
+                  if (!result.success)
+                    throw new Error(result.error.errors[0].message);
+                }
+              }
               // enqueueSnackbar('Row saved!', {variant: 'success'});
               setError(false);
               return updatedRow;
@@ -346,6 +343,7 @@ const EditFinalGradesDialog = ({
           <Button
             onClick={() => {
               if (changes) handleSubmit();
+              else onClose();
             }}
             variant={changes ? 'contained' : 'text'}
             disabled={error || editing}

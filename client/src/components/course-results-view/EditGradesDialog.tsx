@@ -356,6 +356,7 @@ const EditGradesDialog = ({
           <Button
             onClick={() => {
               if (changes) handleSubmit();
+              else onClose();
             }}
             variant={changes ? 'contained' : 'text'}
             disabled={error || editing}
