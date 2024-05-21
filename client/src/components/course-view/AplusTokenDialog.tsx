@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  Link,
-  DialogActions,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Link,
+  TextField,
 } from '@mui/material';
 
 type PropsType = {
@@ -24,10 +24,7 @@ const AplusTokenDialog = ({handleClose, open}: PropsType): JSX.Element => {
       <DialogContent>
         <p>
           You can find your API token by logging in to A+ and navigating to:{' '}
-          <Link
-            sx={{pt: -4}}
-            href="https://plus.cs.aalto.fi/accounts/accounts/"
-          >
+          <Link href="https://plus.cs.aalto.fi/accounts/accounts/">
             https://plus.cs.aalto.fi/accounts/accounts/
           </Link>
         </p>

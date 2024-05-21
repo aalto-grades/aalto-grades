@@ -20,6 +20,7 @@ import {
   NewAttainmentData,
   SystemRole,
 } from '@/common/types';
+import AplusDialog from './AplusDialog';
 import AplusTokenDialog from './AplusTokenDialog';
 import NewAttainmentDialog from './NewAttainmentDialog';
 import {
@@ -266,6 +267,9 @@ const AttainmentsView = (): JSX.Element => {
         handleClose={() => setAddDialogOpen(false)}
         open={addDialogOpen}
         onSave={handleAddAttainment}
+      />
+      <AplusDialog
+        open={true}
       />
       <AplusTokenDialog
         handleClose={() => setAplusTokenDialogOpen(false)}
