@@ -20,6 +20,7 @@ import {
   NewAttainmentData,
   SystemRole,
 } from '@/common/types';
+import AplusTokenDialog from './AplusTokenDialog';
 import NewAttainmentDialog from './NewAttainmentDialog';
 import {
   useAddAttainment,
@@ -57,6 +58,8 @@ const AttainmentsView = (): JSX.Element => {
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false);
+  const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
+    useState<boolean>(false);
   const [unsavedDialogOpen, setUnsavedDialogOpen] = useState<boolean>(false);
 
   const attsWithGrades = useMemo(() => {
@@ -264,6 +267,10 @@ const AttainmentsView = (): JSX.Element => {
         open={addDialogOpen}
         onSave={handleAddAttainment}
       />
+      <AplusTokenDialog
+        handleClose={() => setAplusTokenDialogOpen(false)}
+        open={aplusTokenDialogOpen}
+      />
       <UnsavedChangesDialog
         open={unsavedDialogOpen || blocker.state === 'blocked'}
         onClose={() => {
@@ -279,6 +286,12 @@ const AttainmentsView = (): JSX.Element => {
       <Box sx={{display: 'flex', mb: 1}}>
         {editRights && (
           <Button onClick={() => setAddDialogOpen(true)}>Add attainment</Button>
+        )}
+
+        {editRights && (
+          <Button onClick={() => setAplusTokenDialogOpen(true)}>
+            Add from A+
+          </Button>
         )}
 
         {editRights && (

@@ -58,7 +58,7 @@ export const useAddAplusGradeSources = (
   return useMutation({
     mutationFn: async (gradeSources: AplusGradeSourceData[]) =>
       await axios.post(`/v1/course/${courseId}/aplus-source`, gradeSources),
-    ...options
+    ...options,
   });
 };
 
