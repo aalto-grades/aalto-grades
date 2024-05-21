@@ -9,7 +9,7 @@ import {JSX, useState} from 'react';
 
 import {FinalGradeData} from '@/common/types';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
-import {findBestGrade} from '../../utils';
+import {findLatestFinalGrade} from '../../utils';
 
 type FinalGradeCellProps = {
   userId: number;
@@ -26,9 +26,7 @@ const FinalGradeCell = ({
   const [hover, setHover] = useState<boolean>(false);
   const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
 
-  const latestGrade = findBestGrade(finalGrades, {
-    gradeSelectOption: 'latest',
-  });
+  const latestGrade = findLatestFinalGrade(finalGrades);
 
   return (
     <Box

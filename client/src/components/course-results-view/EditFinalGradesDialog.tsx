@@ -32,7 +32,7 @@ import {
 } from '../../hooks/api/finalGrade';
 import {useGetAllAssessmentModels} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {findBestGrade} from '../../utils';
+import {findLatestFinalGrade} from '../../utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 type ColTypes = {
@@ -82,7 +82,13 @@ const EditFinalGradesDialog = ({
   );
 
   const bestGrade = useMemo(
-    () => findBestGrade(rows, {gradeSelectOption: 'latest'}),
+    () =>
+      findLatestFinalGrade(
+        rows.map(row => ({
+          ...row,
+          assessmentModelId: row.assessmentModel === null ? null : 0,
+        }))
+      ),
     [rows]
   );
 
@@ -256,6 +262,7 @@ const EditFinalGradesDialog = ({
       ),
     ]);
 
+    onClose();
     enqueueSnackbar('Grades saved successfully', {variant: 'success'});
     setInitRows(structuredClone(rows));
   };

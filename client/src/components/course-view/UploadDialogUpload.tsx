@@ -111,16 +111,20 @@ const UploadDialogUpload = ({
         const fields = columns.map(col => col.field);
         const resultKeys = csvRows.data[0].map(value => value.toString());
 
-        const mismatches: string[] = [];
+        // Find matching keys
+        let mismatches = false;
+        let studentNoFound = false;
         const csvKeyMap: {[key: string]: string} = {};
         for (const key of resultKeys) {
+          if (key.toLowerCase() === 'studentno') studentNoFound = true;
           const matchingField = fields.find(
             field => field.toLowerCase() === key.toLowerCase()
           );
-          if (matchingField === undefined) mismatches.push(key);
+          if (matchingField === undefined) mismatches = true;
           else csvKeyMap[key] = matchingField;
         }
 
+        /** Load data using csv key to attainment key map */
         const getData = (keyMap: {
           [key: string]: string;
         }): GridRowModel<GradeUploadColTypes>[] => {
@@ -147,12 +151,11 @@ const UploadDialogUpload = ({
           return newRows;
         };
 
-        if (mismatches.length > 0) {
+        if (mismatches || !studentNoFound) {
           setMismatchDialogOpen(true);
           setMismatchData({
             fields: fields.filter(field => field !== 'actions'),
             keys: resultKeys,
-            mismatches,
             onImport: (keyMap: {[key: string]: string}) => {
               setMismatchDialogOpen(false);
               setRows(getData(keyMap));
@@ -212,12 +215,7 @@ const UploadDialogUpload = ({
         open={mismatchDialogOpen}
         onClose={() => setMismatchDialogOpen(false)}
         mismatchData={
-          mismatchData ?? {
-            fields: [],
-            keys: [],
-            mismatches: [],
-            onImport: () => {},
-          }
+          mismatchData ?? {fields: [], keys: [], onImport: () => {}}
         }
       />
 

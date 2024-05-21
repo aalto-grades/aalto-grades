@@ -25,9 +25,10 @@ import {JSX, useEffect, useState} from 'react';
 export type MismatchData = {
   fields: string[];
   keys: string[];
-  mismatches: string[];
   onImport: (keyMap: {[key: string]: string}) => void;
 };
+
+type MismatchError = '' | 'empty' | 'duplicate' | 'noStudentNo';
 
 const MismatchDialog = ({
   open,
@@ -38,28 +39,32 @@ const MismatchDialog = ({
   onClose: () => void;
   mismatchData: MismatchData;
 }): JSX.Element => {
-  const [selections, setSelections] = useState<{[key: string]: string}>({});
-  const [error, setError] = useState<'' | 'empty' | 'duplicate'>('');
+  const [selections, setSelections] = useState<Record<string, string>>({});
+  const [error, setError] = useState<MismatchError>('');
   const [duplicate, setDuplicate] = useState<string>('');
 
   useEffect(() => {
-    const newSelections = {...selections};
+    const newSelections: Record<string, string> = {};
     for (const key of mismatchData.keys) {
-      if (mismatchData.mismatches.includes(key)) continue;
-      newSelections[key] = mismatchData.fields.find(
+      const matchingField = mismatchData.fields.find(
         field => field.toLowerCase() === key.toLowerCase()
-      ) as string;
+      );
+      if (matchingField) newSelections[key] = matchingField;
     }
     setSelections(newSelections);
-  }, [mismatchData.fields, mismatchData.keys, mismatchData.mismatches]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mismatchData.fields, mismatchData.keys]);
 
+  // Find errors
   useEffect(() => {
+    // Find empty
     for (const key of mismatchData.keys) {
       if (!(key in selections)) {
         setError('empty');
         return;
       }
     }
+
+    // Find duplicates
     const usedSelections: string[] = [];
     for (const value of Object.values(selections)) {
       if (usedSelections.includes(value) && value !== 'Ignore Column') {
@@ -69,19 +74,36 @@ const MismatchDialog = ({
       }
       usedSelections.push(value);
     }
+
+    // Find no student number
+    const found = Object.values(selections).find(key => key === 'studentNo');
+    if (!found) {
+      setError('noStudentNo');
+      return;
+    }
+
     setError('');
   }, [mismatchData.keys, selections]);
+
+  const getErrorText = (): string => {
+    switch (error) {
+      case '':
+        return 'All Done!';
+      case 'duplicate':
+        return 'The same "Import as" value cannot appear twice';
+      case 'empty':
+        return '"Import as" field cannot be empty';
+      case 'noStudentNo':
+        return 'Student number must be specified';
+    }
+  };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle>Mismatching columns found</DialogTitle>
       <DialogContent>
         <Alert severity={error !== '' ? 'error' : 'success'} sx={{mb: 2}}>
-          {error === ''
-            ? 'All Done!'
-            : error === 'empty'
-              ? '"Import as" field cannot be empty'
-              : 'The same "Import as" value cannot appear twice'}
+          {getErrorText()}
         </Alert>
         <TableContainer>
           <Table size="small">
@@ -150,8 +172,10 @@ const MismatchDialog = ({
         </TableContainer>
       </DialogContent>
       <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
         <Button
           onClick={() => mismatchData.onImport(selections)}
+          variant="contained"
           disabled={error !== ''}
         >
           Import

@@ -16,7 +16,7 @@ const GradeNode = (props: NodeProps): JSX.Element => {
   const nodeValue = nodeValues[id] as GradeNodeValue;
 
   return (
-    <BaseNode {...props}>
+    <BaseNode {...props} courseFail={nodeValue.courseFail}>
       <Handle
         type="target"
         id={id}
