@@ -14,13 +14,11 @@ import {findBestGrade, gradeIsExpired} from '../../utils';
 
 type GradeCellProps = {
   studentNumber: string;
-  attainemntResults?: AttainmentGradesData;
-  finalGrade?: boolean;
+  attainmentResults?: AttainmentGradesData;
 };
 const GradeCell = ({
   studentNumber,
-  attainemntResults,
-  finalGrade = false,
+  attainmentResults,
 }: GradeCellProps): JSX.Element => {
   const {gradeSelectOption} = useTableContext();
   const theme = useTheme();
@@ -28,12 +26,11 @@ const GradeCell = ({
   const [hover, setHover] = useState<boolean>(false);
   const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
 
-  const bestGrade = findBestGrade(attainemntResults?.grades ?? [], {
+  const bestGrade = findBestGrade(attainmentResults?.grades ?? [], {
     expiredOption: 'prefer_non_expired',
     gradeSelectOption,
   });
   const isGradeExpired = gradeIsExpired(bestGrade);
-  // console.log(bestGrade?.expiryDate, new Date(),bestGrade?.expiryDate < new Date());
 
   return (
     <Box
@@ -63,12 +60,12 @@ const GradeCell = ({
     >
       <span>{bestGrade?.grade ?? '-'}</span>
       {/* If there are multiple grades "show more" icon*/}
-      {attainemntResults && (attainemntResults.grades.length > 1 || hover) && (
+      {attainmentResults && (attainmentResults.grades.length > 1 || hover) && (
         <>
           <Tooltip
             placement="top"
             title={
-              attainemntResults.grades.length === 1
+              attainmentResults.grades.length <= 1
                 ? 'Edit grades'
                 : 'Multiple grades, click to show'
             }
@@ -87,16 +84,14 @@ const GradeCell = ({
           </Tooltip>
         </>
       )}
-      {attainemntResults && (
+      {attainmentResults && (
         <EditGradesDialog
           open={gradeDialogOpen}
           onClose={() => setGradeDialogOpen(false)}
           studentNumber={studentNumber}
-          attainmentId={attainemntResults.attainmentId}
-          title={`Grades of ${studentNumber} for ${
-            finalGrade ? 'Final Grade' : attainemntResults.attainmentName
-          }`}
-          grades={attainemntResults.grades}
+          attainmentId={attainmentResults.attainmentId}
+          title={`Grades of ${studentNumber} for ${attainmentResults.attainmentName}`}
+          grades={attainmentResults.grades}
         />
       )}
       {/* If grade is expired, show warning icon */}
@@ -132,10 +127,10 @@ const GradeCell = ({
           </Tooltip>
         </>
       )}
-      {
+      {bestGrade?.date && (
         <Tooltip
           placement="top"
-          title={`Grade obtained on ${bestGrade?.date.toString()}`}
+          title={`Grade obtained on ${bestGrade.date.toString()}`}
           disableInteractive
         >
           <Box
@@ -155,10 +150,10 @@ const GradeCell = ({
               },
             }}
           >
-            {bestGrade?.date.toLocaleDateString()}
+            {bestGrade.date.toLocaleDateString()}
           </Box>
         </Tooltip>
-      }
+      )}
     </Box>
   );
 };

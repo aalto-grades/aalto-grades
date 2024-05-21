@@ -40,6 +40,16 @@ components:
       required: true
       example: 1
       description: Internal attainment database ID.
+    finalGradeId:
+      in: path
+      name: finalGradeId
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+      required: true
+      example: 1
+      description: The ID of the final grade.
     gradeId:
       in: path
       name: gradeId

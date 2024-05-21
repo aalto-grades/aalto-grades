@@ -22,11 +22,11 @@ import {GraphTemplate, initGraph} from '@/common/util/initGraph';
 import {useAddAssessmentModel, useGetAttainments} from '../../hooks/useApi';
 
 const CreateAssessmentModelDialog = ({
-  handleClose,
+  onClose,
   open,
   onSubmit,
 }: {
-  handleClose: () => void;
+  onClose: () => void;
   open: boolean;
   onSubmit: (id: number) => void;
 }): JSX.Element => {
@@ -52,7 +52,7 @@ const CreateAssessmentModelDialog = ({
       },
       {
         onSuccess: id => {
-          handleClose();
+          onClose();
           onSubmit(id);
           setName('');
           setTemplate('none');
@@ -62,7 +62,7 @@ const CreateAssessmentModelDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
       <DialogTitle>Create Assessment Model</DialogTitle>
       <DialogContent>
         <TextField
@@ -95,7 +95,7 @@ const CreateAssessmentModelDialog = ({
       <DialogActions>
         <Button
           variant="outlined"
-          onClick={handleClose}
+          onClick={onClose}
           disabled={addAssessmentModel.isPending}
         >
           Cancel
