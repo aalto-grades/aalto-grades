@@ -14,11 +14,11 @@ import {findBestGrade, gradeIsExpired} from '../../utils';
 
 type GradeCellProps = {
   studentNumber: string;
-  attainemntResults?: AttainmentGradesData;
+  attainmentResults?: AttainmentGradesData;
 };
 const GradeCell = ({
   studentNumber,
-  attainemntResults,
+  attainmentResults,
 }: GradeCellProps): JSX.Element => {
   const {gradeSelectOption} = useTableContext();
   const theme = useTheme();
@@ -26,7 +26,7 @@ const GradeCell = ({
   const [hover, setHover] = useState<boolean>(false);
   const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
 
-  const bestGrade = findBestGrade(attainemntResults?.grades ?? [], {
+  const bestGrade = findBestGrade(attainmentResults?.grades ?? [], {
     expiredOption: 'prefer_non_expired',
     gradeSelectOption,
   });
@@ -60,12 +60,12 @@ const GradeCell = ({
     >
       <span>{bestGrade?.grade ?? '-'}</span>
       {/* If there are multiple grades "show more" icon*/}
-      {attainemntResults && (attainemntResults.grades.length > 1 || hover) && (
+      {attainmentResults && (attainmentResults.grades.length > 1 || hover) && (
         <>
           <Tooltip
             placement="top"
             title={
-              attainemntResults.grades.length <= 1
+              attainmentResults.grades.length <= 1
                 ? 'Edit grades'
                 : 'Multiple grades, click to show'
             }
@@ -84,14 +84,14 @@ const GradeCell = ({
           </Tooltip>
         </>
       )}
-      {attainemntResults && (
+      {attainmentResults && (
         <EditGradesDialog
           open={gradeDialogOpen}
           onClose={() => setGradeDialogOpen(false)}
           studentNumber={studentNumber}
-          attainmentId={attainemntResults.attainmentId}
-          title={`Grades of ${studentNumber} for ${attainemntResults.attainmentName}`}
-          grades={attainemntResults.grades}
+          attainmentId={attainmentResults.attainmentId}
+          title={`Grades of ${studentNumber} for ${attainmentResults.attainmentName}`}
+          grades={attainmentResults.grades}
         />
       )}
       {/* If grade is expired, show warning icon */}

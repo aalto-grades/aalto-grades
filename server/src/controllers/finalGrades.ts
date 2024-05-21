@@ -110,7 +110,7 @@ export const editFinalGrade = async (
 
   const {grade, date, sisuExportDate} = req.body;
 
-  // If final grade is not not manual don't allow editing grade/date
+  // If final grade is not manual don't allow editing grade/date
   if (
     fGrade.assessmentModelId !== null &&
     ((grade !== undefined && grade !== fGrade.grade) ||

@@ -16,6 +16,17 @@ definitions:
     format: int32
     minimum: 0
     example: 5
+  FinalGradeDate:
+    type: string
+    format: date
+    description: Date when attainment is completed (e.g., deadline or exam date)
+    example: 2024-04-01T00:00:00.000Z
+  SisuExportDate:
+    type: string
+    nullable: true
+    format: date
+    description: Date when the grade was exported to sisu.
+    example: 2025-04-01T00:00:00.000Z
 
   FinalGradeData:
     type: object
@@ -36,16 +47,9 @@ definitions:
       grade:
         $ref: '#/definitions/FinalGrade'
       date:
-        type: string
-        format: date
-        description: Date when attainment is completed (e.g., deadline or exam date)
-        example: 2024-04-01T00:00:00.000Z
+        $ref: '#/definitions/FinalGradeDate'
       sisuExportDate:
-        type: string
-        nullable: true
-        format: date
-        description: Date when the grade was exported to sisu.
-        example: 2025-04-01T00:00:00.000Z
+        $ref: '#/definitions/SisuExportDate'
     required:
       - finalGradeId
       - userId
@@ -69,10 +73,7 @@ definitions:
       grade:
         $ref: '#/definitions/FinalGrade'
       date:
-        type: string
-        format: date
-        description: Date when attainment is completed (e.g., deadline or exam date)
-        example: 2024-04-01T00:00:00.000Z
+        $ref: '#/definitions/FinalGradeDate'
     required:
       - userId
       - assessmentModelId
@@ -86,16 +87,9 @@ definitions:
       grade:
         $ref: '#/definitions/FinalGrade'
       date:
-        type: string
-        format: date
-        description: Date when attainment is completed (e.g., deadline or exam date)
-        example: 2024-04-01T00:00:00.000Z
+        $ref: '#/definitions/FinalGradeDate'
       sisuExportDate:
-        type: string
-        nullable: true
-        format: date
-        description: Date when the grade was exported to sisu.
-        example: 2025-04-01T00:00:00.000Z
+        $ref: '#/definitions/SisuExportDate'
 
 /v1/courses/{courseId}/final-grades:
   get:

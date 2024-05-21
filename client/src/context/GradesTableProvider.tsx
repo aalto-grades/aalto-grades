@@ -218,7 +218,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
           cell: ({getValue, row}) => (
             <GradeCell
               studentNumber={row.original.user.studentNumber ?? 'N/A'}
-              attainemntResults={getValue()}
+              attainmentResults={getValue()}
             />
           ),
           footer: att.name,
