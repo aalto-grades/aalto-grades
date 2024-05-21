@@ -13,6 +13,7 @@ import {
 import {
   DataGrid,
   GridActionsCellItem,
+  GridCellParams,
   GridColDef,
   GridRowModel,
   GridRowsProp,
@@ -21,49 +22,51 @@ import {
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
 import {useBlocker, useParams} from 'react-router-dom';
+import {z} from 'zod';
 
-import {EditGradeData, GradeData, NewGrade} from '@/common/types';
-import {useTableContext} from '../../context/useTableContext';
-import {useAddGrades, useDeleteGrade, useEditGrade} from '../../hooks/useApi';
+import {EditFinalGrade, FinalGradeData, NewFinalGrade} from '@/common/types';
+import {
+  useAddFinalGrades,
+  useDeleteFinalGrade,
+  useEditFinalGrade,
+} from '../../hooks/api/finalGrade';
+import {useGetAllAssessmentModels} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import {findBestGrade} from '../../utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 type ColTypes = {
   id: number;
-  gradeId: number;
+  finalGradeId: number;
   grader: string;
   grade: number;
   date: Date;
-  expiryDate: Date;
-  exported: boolean;
-  comment: string;
+  assessmentModel: string | null;
+  exportDate: Date | null;
   selected: string;
 };
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
-  studentNumber: string;
-  attainmentId: number;
+  userId: number;
   title: string;
-  grades: GradeData[];
+  finalGrades: FinalGradeData[];
 };
-const EditGradesDialog = ({
+const EditFinalGradesDialog = ({
   open,
   onClose,
-  studentNumber,
-  attainmentId,
+  userId,
   title,
-  grades,
+  finalGrades,
 }: PropsType): JSX.Element => {
   const {auth} = useAuth();
   const {courseId} = useParams() as {courseId: string};
-  const {gradeSelectOption} = useTableContext();
 
-  const addGrades = useAddGrades(courseId);
-  const deleteGrade = useDeleteGrade(courseId);
-  const editGrade = useEditGrade(courseId);
+  const assessmentModels = useGetAllAssessmentModels(courseId);
+  const addFinalGrades = useAddFinalGrades(courseId);
+  const deleteFinalGrade = useDeleteFinalGrade(courseId);
+  const editFinalGrade = useEditFinalGrade(courseId);
 
   const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
@@ -79,12 +82,8 @@ const EditGradesDialog = ({
   );
 
   const bestGrade = useMemo(
-    () =>
-      findBestGrade(rows, {
-        expiredOption: 'prefer_non_expired',
-        gradeSelectOption,
-      }),
-    [gradeSelectOption, rows]
+    () => findBestGrade(rows, {gradeSelectOption: 'latest'}),
+    [rows]
   );
 
   const blocker = useBlocker(
@@ -113,20 +112,26 @@ const EditGradesDialog = ({
   }, [bestGrade, rows]);
 
   useEffect(() => {
-    const newRows = grades.map((grade, gradeId) => ({
+    const getModelName = (modelId: number | null): string | null => {
+      if (modelId === null) return null;
+      if (assessmentModels.data === undefined) return 'Loading...';
+      const model = assessmentModels.data.find(mod => mod.id === modelId);
+      return model?.name ?? 'Not found';
+    };
+
+    const newRows = finalGrades.map((grade, gradeId) => ({
       id: gradeId,
-      gradeId: grade.gradeId,
+      finalGradeId: grade.finalGradeId,
       grader: grade.grader.name!,
       grade: grade.grade,
       date: grade.date,
-      expiryDate: grade.expiryDate,
-      exported: grade.exportedToSisu !== null,
-      comment: grade.comment ?? '',
+      assessmentModel: getModelName(grade.assessmentModelId),
+      exportDate: grade.sisuExportDate,
       selected: '',
     }));
     setRows(newRows);
     setInitRows(structuredClone(newRows));
-  }, [grades]);
+  }, [assessmentModels.data, finalGrades]);
 
   if (!auth) return <>Not permitted</>; // Not needed?
 
@@ -148,26 +153,20 @@ const EditGradesDialog = ({
       headerName: 'Date',
       type: 'date',
       editable: true,
-      width: 120,
+      width: 110, // Enough width to fit the calendar icon
     },
     {
-      field: 'expiryDate',
-      headerName: 'Expiry Date',
-      type: 'date',
-      editable: true,
-      width: 120,
-    },
-    {
-      field: 'exported',
-      headerName: 'Exported',
-      type: 'boolean',
+      field: 'assessmentModel',
+      headerName: 'Assessment model name',
+      type: 'string',
       editable: false,
     },
     {
-      field: 'comment',
-      headerName: 'Comment',
-      type: 'string',
+      field: 'exportDate',
+      headerName: 'Export date',
+      type: 'date',
       editable: true,
+      width: 110, // Enough width to fit the calendar icon
     },
     {
       field: 'actions',
@@ -197,15 +196,12 @@ const EditGradesDialog = ({
           oldRows.reduce((mxVal, row) => Math.max(mxVal, row.id), 0) + 1;
         const newRow: ColTypes = {
           id: freeId,
-          gradeId: -1,
+          finalGradeId: -1,
           grader: auth.name,
           grade: 0,
           date: new Date(),
-          expiryDate: new Date(
-            new Date().getTime() + 365 * 24 * 60 * 60 * 1000
-          ),
-          exported: false,
-          comment: '',
+          assessmentModel: null,
+          exportDate: null,
           selected: '',
         };
         return oldRows.concat(newRow);
@@ -221,42 +217,42 @@ const EditGradesDialog = ({
   };
 
   const handleSubmit = async (): Promise<void> => {
-    const newGrades: NewGrade[] = [];
+    const newGrades: NewFinalGrade[] = [];
     const deletedGrades: number[] = [];
-    const editedGrades: ({gradeId: number} & EditGradeData)[] = [];
+    const editedGrades: ({finalGradeId: number} & EditFinalGrade)[] = [];
 
     for (const row of rows) {
-      if (row.gradeId === -1) {
+      if (row.finalGradeId === -1) {
         newGrades.push({
-          studentNumber,
-          attainmentId,
           grade: row.grade,
           date: row.date,
-          expiryDate: row.expiryDate,
-          comment: row.comment,
+          assessmentModelId: null,
+          userId,
         });
       } else {
         editedGrades.push({
-          gradeId: row.gradeId,
+          finalGradeId: row.finalGradeId,
           grade: row.grade,
           date: row.date,
-          expiryDate: row.expiryDate,
-          comment: row.comment,
+          sisuExportDate: row.exportDate,
         });
       }
     }
 
-    const rowIds = rows.map(row => row.gradeId);
+    const rowIds = rows.map(row => row.finalGradeId);
     for (const initRow of initRows) {
-      if (!rowIds.includes(initRow.gradeId))
-        deletedGrades.push(initRow.gradeId);
+      if (!rowIds.includes(initRow.finalGradeId))
+        deletedGrades.push(initRow.finalGradeId);
     }
 
     await Promise.all([
-      addGrades.mutateAsync(newGrades),
-      ...deletedGrades.map(gradeId => deleteGrade.mutateAsync(gradeId)),
+      addFinalGrades.mutateAsync(newGrades),
+      ...deletedGrades.map(fGradeId => deleteFinalGrade.mutateAsync(fGradeId)),
       ...editedGrades.map(grade =>
-        editGrade.mutateAsync({gradeId: grade.gradeId, data: grade})
+        editFinalGrade.mutateAsync({
+          finalGradeId: grade.finalGradeId,
+          data: grade,
+        })
       ),
     ]);
 
@@ -304,36 +300,27 @@ const EditGradesDialog = ({
             initialState={{
               sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
             }}
+            isCellEditable={(params: GridCellParams<ColTypes>) =>
+              params.row.assessmentModel === null ||
+              params.field === 'exportDate'
+            }
             onRowEditStart={() => setEditing(true)}
             onRowEditStop={() => setEditing(false)}
-            processRowUpdate={(
-              updatedRow: GridRowModel<ColTypes>,
-              oldRow: GridRowModel<ColTypes>
-            ) => {
-              const diff = updatedRow.date.getTime() - oldRow.date.getTime(); // Diff to update expiration date with
-
-              if (
-                diff !== 0 &&
-                updatedRow.expiryDate.getTime() === oldRow.expiryDate.getTime()
-              ) {
-                updatedRow.expiryDate = new Date(
-                  updatedRow.expiryDate.getTime() + diff
-                );
-              }
-
+            processRowUpdate={(updatedRow: GridRowModel<ColTypes>) => {
               setRows((oldRows: GridRowsProp<ColTypes>) =>
                 oldRows.map(row =>
                   row.id === updatedRow.id ? updatedRow : row
                 )
               );
               // // TODO: do some validation. Code below is an example.
-              // for (const [key, val] of Object.entries(updatedRow)) {
-              //   if (key === 'id' || key === 'StudentNo') continue;
-              //   if ((val as number) < 0)
-              //     throw new Error('Value cannot be negative');
-              //   else if ((val as number) > 5000)
-              //     throw new Error('Value cannot be over 5000');
-              // }
+              for (const [key, val] of Object.entries(updatedRow)) {
+                if (key === 'grade') {
+                  const GradeSchema = z.number().int().min(0).max(5);
+                  const result = GradeSchema.safeParse(val);
+                  if (!result.success)
+                    throw new Error(result.error.errors[0].message);
+                }
+              }
               // enqueueSnackbar('Row saved!', {variant: 'success'});
               setError(false);
               return updatedRow;
@@ -369,4 +356,4 @@ const EditGradesDialog = ({
   );
 };
 
-export default EditGradesDialog;
+export default EditFinalGradesDialog;

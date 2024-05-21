@@ -141,7 +141,7 @@ class CreateData {
   async createFinalGrade(
     courseId: number,
     userId: number,
-    assessmentModelId: number,
+    assessmentModelId: number | null,
     graderId: number,
     grade?: number
   ): Promise<number> {

@@ -11,34 +11,6 @@ import {JSX, useRef} from 'react';
 import {useTableContext} from '../../context/useTableContext';
 import PrettyChip from '../shared/PrettyChip';
 
-// TODO: Use
-// /**
-//  * Finds a previous grade that has been exported to Sisu, excluding the best
-//  * grade.
-//  *
-//  * @returns The previous grade that has been exported to Sisu, or null if not
-//  *   found.
-//  */
-// const findPreviouslyExportedToSisu = (
-//   bestGrade: FinalGradeData,
-//   row: StudentRow
-// ): FinalGradeData | null => {
-//   if (row.finalGrades === undefined) return null;
-
-//   for (const gr of row.finalGrades) {
-//     if (bestGrade.finalGradeId === gr.finalGradeId) continue; // Skip the best grade
-//     if (gr.sisuExportDate === null) continue; // and those not exported to sisu
-
-//     if (bestGrade.sisuExportDate !== null) {
-//       // If the best grade is also exported, we need to check which one is newer
-//       if (bestGrade.sisuExportDate < gr.sisuExportDate) return gr;
-//     } else {
-//       return gr;
-//     }
-//   }
-//   return null;
-// };
-
 // TODO: Better column definitions
 // TODO: Better typing and freeze how to access data
 const CourseResultsTable = (): JSX.Element => {

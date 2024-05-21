@@ -5,7 +5,12 @@
 import supertest from 'supertest';
 import {z} from 'zod';
 
-import {FinalGradeDataSchema, HttpCode, NewFinalGrade} from '@/common/types';
+import {
+  EditFinalGrade,
+  FinalGradeDataSchema,
+  HttpCode,
+  NewFinalGrade,
+} from '@/common/types';
 import {app} from '../../src/app';
 import FinalGrade from '../../src/database/models/finalGrade';
 import {createData} from '../util/createData';
@@ -20,8 +25,10 @@ const responseTests = new ResponseTests(request);
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
 let editCourseId = -1;
+let editFinalGradeId = -1;
 let editCourseModelId = -1;
 let noRoleCourseId = -1;
+let noRoleFinalGradeId = -1;
 const nonExistentId = 1000000;
 
 beforeAll(async () => {
@@ -50,12 +57,25 @@ beforeAll(async () => {
   }
 
   [editCourseId, , editCourseModelId] = await createData.createCourse({});
+  const user = await createData.createUser();
+  editFinalGradeId = await createData.createFinalGrade(
+    editCourseId,
+    user.id,
+    null,
+    TEACHER_ID
+  );
 
   [noRoleCourseId] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
   });
+  noRoleFinalGradeId = await createData.createFinalGrade(
+    noRoleCourseId,
+    user.id,
+    null,
+    TEACHER_ID
+  );
 });
 
 afterAll(async () => {
@@ -272,5 +292,181 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
     const data = [getData(student)];
     const url = `/v1/courses/${nonExistentId}/final-grades`;
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
+  });
+});
+
+describe('Test PUT /v1/courses/:courseId/final-grades/:finalGradeId - edit a final grade', () => {
+  it('should edit a final grade', async () => {
+    const testCookies = [cookies.adminCookie, cookies.teacherCookie];
+    for (const cookie of testCookies) {
+      const testDay = new Date(2024, 0, Math.floor(Math.random() * 20));
+      const res = await request
+        .put(`/v1/courses/${editCourseId}/final-grades/${editFinalGradeId}`)
+        .send({
+          grade: Math.floor(Math.random() * 6),
+          date: testDay,
+          sisuExportDate: new Date(testDay.getTime() + 365 * 24 * 3600 * 1000),
+        })
+        .set('Cookie', cookie)
+        .expect(HttpCode.Ok);
+
+      expect(JSON.stringify(res.body)).toBe('{}');
+    }
+  });
+
+  it('should partially edit grade', async () => {
+    let res = await request
+      .put(`/v1/courses/${editCourseId}/final-grades/${editFinalGradeId}`)
+      .send({grade: Math.floor(Math.random() * 6)})
+      .set('Cookie', cookies.teacherCookie)
+      .expect(HttpCode.Ok);
+
+    expect(JSON.stringify(res.body)).toBe('{}');
+
+    res = await request
+      .put(`/v1/courses/${editCourseId}/final-grades/${editFinalGradeId}`)
+      .send({date: new Date(2023, 0, 1)})
+      .set('Cookie', cookies.teacherCookie)
+      .expect(HttpCode.Ok);
+
+    expect(JSON.stringify(res.body)).toBe('{}');
+  });
+
+  it('should respond with 400 if validation fails', async () => {
+    let url = `/v1/courses/${editCourseId}/final-grades/${editFinalGradeId}`;
+
+    let data: EditFinalGrade = {grade: '1' as unknown as number};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+
+    // Try editing date / grade of non-manual grade
+    const user = await createData.createUser();
+    const finalGradeId = await createData.createFinalGrade(
+      editCourseId,
+      user.id,
+      editCourseModelId,
+      TEACHER_ID,
+      0
+    );
+    url = `/v1/courses/${editCourseId}/final-grades/${finalGradeId}`;
+    data = {grade: 5};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+    data = {date: new Date(2023, 0, 1)};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+  });
+
+  it('should respond with 400 if id is invalid', async () => {
+    let url = `/v1/courses/${'bad'}/final-grades/${editFinalGradeId}`;
+    const data = {grade: 3};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+
+    url = `/v1/courses/${editCourseId}/attainments/${-1}`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+  });
+
+  it('should respond with 401 or 403 if not authorized', async () => {
+    let url = `/v1/courses/${editCourseId}/final-grades/${editFinalGradeId}`;
+    const data = {grade: 3};
+    await responseTests.testUnauthorized(url).put(data);
+
+    await responseTests.testForbidden(url, [cookies.studentCookie]).put(data);
+
+    await responseTests
+      .testForbidden(url, [cookies.assistantCookie, cookies.studentCookie])
+      .put(data);
+
+    url = `/v1/courses/${noRoleCourseId}/final-grades/${noRoleFinalGradeId}`;
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .put(data);
+  });
+
+  it('should respond with 404 if not found', async () => {
+    let url = `/v1/courses/${editCourseId}/final-grades/${nonExistentId}`;
+    const data = {comment: 'not edited'};
+    await responseTests.testNotFound(url, cookies.adminCookie).put(data);
+
+    url = `/v1/courses/${nonExistentId}/final-grades/${editFinalGradeId}`;
+    await responseTests.testNotFound(url, cookies.adminCookie).put(data);
+  });
+
+  it('should respond with 409 when grade does not belong to course', async () => {
+    const url = `/v1/courses/${editCourseId}/final-grades/${noRoleFinalGradeId}`;
+    const data = {comment: 'not edited'};
+
+    await responseTests.testConflict(url, cookies.adminCookie).put(data);
+  });
+});
+
+describe('Test Delete/v1/courses/:courseId/final-grades/:finalGradeId - delete a final grade', () => {
+  const createFinalGrade = async (): Promise<number> => {
+    const user = await createData.createUser();
+    return await createData.createFinalGrade(
+      editCourseId,
+      user.id,
+      editCourseModelId,
+      TEACHER_ID
+    );
+  };
+  const gradeDoesNotExist = async (id: number): Promise<void> => {
+    const result = await FinalGrade.findByPk(id);
+    expect(result).toBeNull();
+  };
+
+  it('should delete a final grade', async () => {
+    const testCookies = [cookies.adminCookie, cookies.teacherCookie];
+    for (const cookie of testCookies) {
+      const finalGradeId = await createFinalGrade();
+
+      const res = await request
+        .delete(`/v1/courses/${editCourseId}/final-grades/${finalGradeId}`)
+        .set('Cookie', cookie)
+        .expect(HttpCode.Ok);
+
+      expect(JSON.stringify(res.body)).toBe('{}');
+      await gradeDoesNotExist(finalGradeId);
+    }
+  });
+
+  it('should respond with 400 if id is invalid', async () => {
+    let url = `/v1/courses/${'bad'}/final-grades/${editFinalGradeId}`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).delete();
+
+    url = `/v1/courses/${editCourseId}/final-grades/${-1}`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).delete();
+  });
+
+  it('should respond with 401 or 403 if not authorized', async () => {
+    let url = `/v1/courses/${editCourseId}/final-grades/${editFinalGradeId}`;
+    await responseTests.testUnauthorized(url).delete();
+
+    await responseTests
+      .testForbidden(url, [cookies.assistantCookie, cookies.studentCookie])
+      .delete();
+
+    url = `/v1/courses/${noRoleCourseId}/final-grades/${noRoleFinalGradeId}`;
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .delete();
+  });
+
+  it('should respond with 404 if not found', async () => {
+    let url = `/v1/courses/${nonExistentId}/final-grades/${editFinalGradeId}`;
+    await responseTests.testNotFound(url, cookies.adminCookie).delete();
+
+    url = `/v1/courses/${editCourseId}/final-grades/${nonExistentId}`;
+    await responseTests.testNotFound(url, cookies.adminCookie).delete();
+  });
+
+  it('should respond with 409 when grade does not belong to course', async () => {
+    const url = `/v1/courses/${editCourseId}/final-grades/${noRoleFinalGradeId}`;
+    await responseTests.testConflict(url, cookies.adminCookie).delete();
   });
 });

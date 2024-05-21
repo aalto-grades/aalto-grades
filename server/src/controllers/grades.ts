@@ -110,21 +110,21 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
 
   // FinalGrades dict {userId: FinalGradeData[], ...}
   const finalGradesDict: {[key: string]: FinalGradeData[]} = {};
-  for (const fGrade of finalGrades) {
-    const [user, grader] = validateUserAndGrader(fGrade);
+  for (const finalGrade of finalGrades) {
+    const [user, grader] = validateUserAndGrader(finalGrade);
 
     const userId = user.id;
     if (!(userId in finalGradesDict)) finalGradesDict[userId] = [];
 
     finalGradesDict[userId].push({
-      finalGradeId: fGrade.id,
+      finalGradeId: finalGrade.id,
       user: user,
-      courseId: fGrade.courseId,
-      assessmentModelId: fGrade.assessmentModelId,
+      courseId: finalGrade.courseId,
+      assessmentModelId: finalGrade.assessmentModelId,
       grader: grader,
-      grade: fGrade.grade,
-      date: new Date(fGrade.date),
-      sisuExportDate: fGrade.sisuExportDate,
+      grade: finalGrade.grade,
+      date: new Date(finalGrade.date),
+      sisuExportDate: finalGrade.sisuExportDate,
     });
   }
 
