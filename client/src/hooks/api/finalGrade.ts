@@ -56,7 +56,7 @@ export const useGetFinalGrades = (
     ...options,
   });
 
-type EditFinalGradeVars = {fGradeId: Numeric; data: EditFinalGrade};
+type EditFinalGradeVars = {finalGradeId: Numeric; data: EditFinalGrade};
 export const useEditFinalGrade = (
   courseId: Numeric,
   options?: UseMutationOptions<unknown, unknown, EditFinalGradeVars>
@@ -64,7 +64,7 @@ export const useEditFinalGrade = (
   useMutation({
     mutationFn: async (vars: EditFinalGradeVars) =>
       await axios.put(
-        `/v1/courses/${courseId}/final-grades/${vars.fGradeId}`,
+        `/v1/courses/${courseId}/final-grades/${vars.finalGradeId}`,
         vars.data
       ),
     ...options,
@@ -77,8 +77,10 @@ export const useDeleteFinalGrade = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (fGradeId: Numeric) =>
-      await axios.delete(`/v1/courses/${courseId}/final-grades/${fGradeId}`),
+    mutationFn: async (finalGradeId: Numeric) =>
+      await axios.delete(
+        `/v1/courses/${courseId}/final-grades/${finalGradeId}`
+      ),
 
     onSuccess: () => {
       queryClient.invalidateQueries({

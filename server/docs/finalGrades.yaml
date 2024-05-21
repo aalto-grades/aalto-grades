@@ -148,7 +148,7 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/courses/{courseId}/final-grades/{fGradeId}:
+/v1/courses/{courseId}/final-grades/{finalGradeId}:
   put:
     tags: [FinalGrades]
     description: >
@@ -156,7 +156,7 @@ definitions:
       Available only to admin users and teachers in charge of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/fGradeId'
+      - $ref: '#/components/parameters/finalGradeId'
     requestBody:
       content:
         application/json:
@@ -184,7 +184,7 @@ definitions:
       Available only to admin users and teachers in charge of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/fGradeId'
+      - $ref: '#/components/parameters/finalGradeId'
     responses:
       200:
         description: Final grade deleted.

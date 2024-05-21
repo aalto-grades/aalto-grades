@@ -72,9 +72,9 @@ export const addFinalGrades = async (
 
   // Validate that assessment models belong to the course
   const assessmentModels = new Set<number>();
-  for (const fgrade of req.body) {
-    if (fgrade.assessmentModelId !== null)
-      assessmentModels.add(fgrade.assessmentModelId);
+  for (const finalGrade of req.body) {
+    if (finalGrade.assessmentModelId !== null)
+      assessmentModels.add(finalGrade.assessmentModelId);
   }
   for (const modelId of assessmentModels) {
     await validateAssessmentModelBelongsToCourse(courseId, modelId);
@@ -103,19 +103,19 @@ export const editFinalGrade = async (
   res: Response
 ): Promise<void> => {
   const grader = req.user as JwtClaims;
-  const [_, fGrade] = await findAndValidateFinalGradePath(
+  const [_, finalGrade] = await findAndValidateFinalGradePath(
     req.params.courseId,
-    req.params.fGradeId
+    req.params.finalGradeId
   );
 
   const {grade, date, sisuExportDate} = req.body;
 
   // If final grade is not manual don't allow editing grade/date
   if (
-    fGrade.assessmentModelId !== null &&
-    ((grade !== undefined && grade !== fGrade.grade) ||
+    finalGrade.assessmentModelId !== null &&
+    ((grade !== undefined && grade !== finalGrade.grade) ||
       (date !== undefined &&
-        date.getTime() !== new Date(fGrade.date).getTime()))
+        date.getTime() !== new Date(finalGrade.date).getTime()))
   ) {
     throw new ApiError(
       'Cannot edit grade or date of a non-manual final grade',
@@ -123,12 +123,14 @@ export const editFinalGrade = async (
     );
   }
 
-  await fGrade
+  await finalGrade
     .set({
-      grade: grade ?? fGrade.grade,
-      date: date ?? fGrade.date,
+      grade: grade ?? finalGrade.grade,
+      date: date ?? finalGrade.date,
       sisuExportDate:
-        sisuExportDate !== undefined ? sisuExportDate : fGrade.sisuExportDate,
+        sisuExportDate !== undefined
+          ? sisuExportDate
+          : finalGrade.sisuExportDate,
       graderId: grader.id,
     })
     .save();
@@ -141,12 +143,12 @@ export const deleteFinalGrade = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [_, fGrade] = await findAndValidateFinalGradePath(
+  const [_, finalGrade] = await findAndValidateFinalGradePath(
     req.params.courseId,
-    req.params.fGradeId
+    req.params.finalGradeId
   );
 
-  await fGrade.destroy();
+  await finalGrade.destroy();
 
   res.sendStatus(HttpCode.Ok);
 };

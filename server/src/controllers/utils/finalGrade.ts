@@ -32,26 +32,26 @@ export const findFinalGradeById = async (id: number): Promise<FinalGrade> => {
  */
 export const findAndValidateFinalGradePath = async (
   courseId: string,
-  fGradeId: string
+  finalGradeId: string
 ): Promise<[Course, FinalGrade]> => {
-  const result = stringToIdSchema.safeParse(fGradeId);
+  const result = stringToIdSchema.safeParse(finalGradeId);
   if (!result.success) {
     throw new ApiError(
-      `Invalid final grade ID ${fGradeId}`,
+      `Invalid final grade ID ${finalGradeId}`,
       HttpCode.BadRequest
     );
   }
   const course = await findAndValidateCourseId(courseId);
-  const fGrade = await findFinalGradeById(result.data);
+  const finalGrade = await findFinalGradeById(result.data);
 
   // Check that final grade belongs to the course.
-  if (fGrade.courseId !== course.id) {
+  if (finalGrade.courseId !== course.id) {
     throw new ApiError(
-      `Final grade ID ${fGradeId} ` +
+      `Final grade ID ${finalGradeId} ` +
         `does not belong to the course with ID ${courseId}`,
       HttpCode.Conflict
     );
   }
 
-  return [course, fGrade];
+  return [course, finalGrade];
 };

@@ -40,9 +40,9 @@ components:
       required: true
       example: 1
       description: Internal attainment database ID.
-    fGradeId:
+    finalGradeId:
       in: path
-      name: fGradeId
+      name: finalGradeId
       schema:
         type: integer
         format: int32

@@ -295,7 +295,7 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
   });
 });
 
-describe('Test PUT /v1/courses/:courseId/final-grades/:fGradeId - edit a final grade', () => {
+describe('Test PUT /v1/courses/:courseId/final-grades/:finalGradeId - edit a final grade', () => {
   it('should edit a final grade', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
@@ -401,7 +401,7 @@ describe('Test PUT /v1/courses/:courseId/final-grades/:fGradeId - edit a final g
   });
 });
 
-describe('Test Delete/v1/courses/:courseId/final-grades/:fGradeId - delete a final grade', () => {
+describe('Test Delete/v1/courses/:courseId/final-grades/:finalGradeId - delete a final grade', () => {
   const createFinalGrade = async (): Promise<number> => {
     const user = await createData.createUser();
     return await createData.createFinalGrade(
@@ -419,15 +419,15 @@ describe('Test Delete/v1/courses/:courseId/final-grades/:fGradeId - delete a fin
   it('should delete a final grade', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
-      const fGradeId = await createFinalGrade();
+      const finalGradeId = await createFinalGrade();
 
       const res = await request
-        .delete(`/v1/courses/${editCourseId}/final-grades/${fGradeId}`)
+        .delete(`/v1/courses/${editCourseId}/final-grades/${finalGradeId}`)
         .set('Cookie', cookie)
         .expect(HttpCode.Ok);
 
       expect(JSON.stringify(res.body)).toBe('{}');
-      await gradeDoesNotExist(fGradeId);
+      await gradeDoesNotExist(finalGradeId);
     }
   });
 

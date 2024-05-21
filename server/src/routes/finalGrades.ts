@@ -41,7 +41,7 @@ router.post(
 );
 
 router.put(
-  '/v1/courses/:courseId/final-grades/:fGradeId',
+  '/v1/courses/:courseId/final-grades/:finalGradeId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
@@ -51,7 +51,7 @@ router.put(
 );
 
 router.delete(
-  '/v1/courses/:courseId/final-grades/:fGradeId',
+  '/v1/courses/:courseId/final-grades/:finalGradeId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   controllerDispatcher(deleteFinalGrade)

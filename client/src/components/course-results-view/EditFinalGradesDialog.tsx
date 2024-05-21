@@ -37,7 +37,7 @@ import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 type ColTypes = {
   id: number;
-  fgradeId: number;
+  finalGradeId: number;
   grader: string;
   grade: number;
   date: Date;
@@ -121,7 +121,7 @@ const EditFinalGradesDialog = ({
 
     const newRows = finalGrades.map((grade, gradeId) => ({
       id: gradeId,
-      fgradeId: grade.finalGradeId,
+      finalGradeId: grade.finalGradeId,
       grader: grade.grader.name!,
       grade: grade.grade,
       date: grade.date,
@@ -196,7 +196,7 @@ const EditFinalGradesDialog = ({
           oldRows.reduce((mxVal, row) => Math.max(mxVal, row.id), 0) + 1;
         const newRow: ColTypes = {
           id: freeId,
-          fgradeId: -1,
+          finalGradeId: -1,
           grader: auth.name,
           grade: 0,
           date: new Date(),
@@ -219,10 +219,10 @@ const EditFinalGradesDialog = ({
   const handleSubmit = async (): Promise<void> => {
     const newGrades: NewFinalGrade[] = [];
     const deletedGrades: number[] = [];
-    const editedGrades: ({fGradeId: number} & EditFinalGrade)[] = [];
+    const editedGrades: ({finalGradeId: number} & EditFinalGrade)[] = [];
 
     for (const row of rows) {
-      if (row.fgradeId === -1) {
+      if (row.finalGradeId === -1) {
         newGrades.push({
           grade: row.grade,
           date: row.date,
@@ -231,7 +231,7 @@ const EditFinalGradesDialog = ({
         });
       } else {
         editedGrades.push({
-          fGradeId: row.fgradeId,
+          finalGradeId: row.finalGradeId,
           grade: row.grade,
           date: row.date,
           sisuExportDate: row.exportDate,
@@ -239,17 +239,20 @@ const EditFinalGradesDialog = ({
       }
     }
 
-    const rowIds = rows.map(row => row.fgradeId);
+    const rowIds = rows.map(row => row.finalGradeId);
     for (const initRow of initRows) {
-      if (!rowIds.includes(initRow.fgradeId))
-        deletedGrades.push(initRow.fgradeId);
+      if (!rowIds.includes(initRow.finalGradeId))
+        deletedGrades.push(initRow.finalGradeId);
     }
 
     await Promise.all([
       addFinalGrades.mutateAsync(newGrades),
       ...deletedGrades.map(fGradeId => deleteFinalGrade.mutateAsync(fGradeId)),
       ...editedGrades.map(grade =>
-        editFinalGrade.mutateAsync({fGradeId: grade.fGradeId, data: grade})
+        editFinalGrade.mutateAsync({
+          finalGradeId: grade.finalGradeId,
+          data: grade,
+        })
       ),
     ]);
 
