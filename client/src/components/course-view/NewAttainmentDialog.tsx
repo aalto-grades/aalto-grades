@@ -10,7 +10,7 @@ import {
   DialogTitle,
   TextField,
 } from '@mui/material';
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 
 type PropsType = {
   handleClose: () => void;
@@ -24,6 +24,7 @@ const AddAttainmentDialog = ({
   onSave,
 }: PropsType): JSX.Element => {
   const [attainment, setAttainment] = useState({name: '', daysValid: 365});
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   const handleSave = (): void => {
     onSave(attainment.name, attainment.daysValid);
@@ -36,10 +37,13 @@ const AddAttainmentDialog = ({
       <DialogTitle>Create new attainment</DialogTitle>
       <DialogContent>
         <TextField
-          sx={{mt: 1}}
+          sx={{mt: 1, '&input:user-invalid': {borderColor: 'red'}}}
           label="Name"
           value={attainment.name}
           onChange={e => setAttainment({...attainment, name: e.target.value})}
+          required
+          error={nameInputRef.current?.validity.valueMissing}
+          inputRef={nameInputRef}
         />
 
         <TextField
@@ -57,7 +61,11 @@ const AddAttainmentDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleSave}>
+        <Button
+          disabled={!attainment.name}
+          variant="contained"
+          onClick={handleSave}
+        >
           Save
         </Button>
       </DialogActions>
