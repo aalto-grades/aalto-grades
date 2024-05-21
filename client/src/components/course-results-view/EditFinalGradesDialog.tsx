@@ -262,6 +262,7 @@ const EditFinalGradesDialog = ({
       ),
     ]);
 
+    onClose();
     enqueueSnackbar('Grades saved successfully', {variant: 'success'});
     setInitRows(structuredClone(rows));
   };
