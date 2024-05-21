@@ -200,14 +200,15 @@ const UploadDialogConfirm = ({
             Confirm Data
           </AccordionSummary>
           <AccordionDetails>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              rowHeight={25}
-              rowSelection={false}
-              disableColumnSelector
-              sx={{maxHeight: '70vh', minHeight: '20vh'}}
-            />
+            <div style={{height: '70vh'}}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                rowHeight={25}
+                rowSelection={false}
+                disableColumnSelector
+              />
+            </div>
           </AccordionDetails>
         </Accordion>
       </DialogContent>

@@ -288,48 +288,49 @@ const EditFinalGradesDialog = ({
       >
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            rowHeight={25}
-            editMode="row"
-            rowSelection={false}
-            disableColumnSelector
-            slots={{toolbar: dataGridToolbar}}
-            sx={{maxHeight: '70vh', minHeight: '20vh'}}
-            initialState={{
-              sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
-            }}
-            isCellEditable={(params: GridCellParams<ColTypes>) =>
-              params.row.assessmentModel === null ||
-              params.field === 'exportDate'
-            }
-            onRowEditStart={() => setEditing(true)}
-            onRowEditStop={() => setEditing(false)}
-            processRowUpdate={(updatedRow: GridRowModel<ColTypes>) => {
-              setRows((oldRows: GridRowsProp<ColTypes>) =>
-                oldRows.map(row =>
-                  row.id === updatedRow.id ? updatedRow : row
-                )
-              );
-              // // TODO: do some validation. Code below is an example.
-              for (const [key, val] of Object.entries(updatedRow)) {
-                if (key === 'grade') {
-                  const GradeSchema = z.number().int().min(0).max(5);
-                  const result = GradeSchema.safeParse(val);
-                  if (!result.success)
-                    throw new Error(result.error.errors[0].message);
-                }
+          <div style={{height: '30vh'}}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              rowHeight={25}
+              editMode="row"
+              rowSelection={false}
+              disableColumnSelector
+              slots={{toolbar: dataGridToolbar}}
+              initialState={{
+                sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
+              }}
+              isCellEditable={(params: GridCellParams<ColTypes>) =>
+                params.row.assessmentModel === null ||
+                params.field === 'exportDate'
               }
-              // enqueueSnackbar('Row saved!', {variant: 'success'});
-              setError(false);
-              return updatedRow;
-            }}
-            onProcessRowUpdateError={(rowError: Error) => {
-              setError(true);
-              enqueueSnackbar(rowError.message, {variant: 'error'});
-            }}
-          />
+              onRowEditStart={() => setEditing(true)}
+              onRowEditStop={() => setEditing(false)}
+              processRowUpdate={(updatedRow: GridRowModel<ColTypes>) => {
+                setRows((oldRows: GridRowsProp<ColTypes>) =>
+                  oldRows.map(row =>
+                    row.id === updatedRow.id ? updatedRow : row
+                  )
+                );
+                // // TODO: do some validation. Code below is an example.
+                for (const [key, val] of Object.entries(updatedRow)) {
+                  if (key === 'grade') {
+                    const GradeSchema = z.number().int().min(0).max(5);
+                    const result = GradeSchema.safeParse(val);
+                    if (!result.success)
+                      throw new Error(result.error.errors[0].message);
+                  }
+                }
+                // enqueueSnackbar('Row saved!', {variant: 'success'});
+                setError(false);
+                return updatedRow;
+              }}
+              onProcessRowUpdateError={(rowError: Error) => {
+                setError(true);
+                enqueueSnackbar(rowError.message, {variant: 'error'});
+              }}
+            />
+          </div>
         </DialogContent>
         <DialogActions>
           <Button

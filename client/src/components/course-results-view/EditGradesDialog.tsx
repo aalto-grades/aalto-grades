@@ -292,57 +292,60 @@ const EditGradesDialog = ({
       >
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            rowHeight={25}
-            editMode="row"
-            rowSelection={false}
-            disableColumnSelector
-            slots={{toolbar: dataGridToolbar}}
-            sx={{maxHeight: '70vh', minHeight: '20vh'}}
-            initialState={{
-              sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
-            }}
-            onRowEditStart={() => setEditing(true)}
-            onRowEditStop={() => setEditing(false)}
-            processRowUpdate={(
-              updatedRow: GridRowModel<ColTypes>,
-              oldRow: GridRowModel<ColTypes>
-            ) => {
-              const diff = updatedRow.date.getTime() - oldRow.date.getTime(); // Diff to update expiration date with
+          <div style={{height: '30vh'}}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              rowHeight={25}
+              editMode="row"
+              rowSelection={false}
+              disableColumnSelector
+              slots={{toolbar: dataGridToolbar}}
+              sx={{maxHeight: '70vh', minHeight: '20vh'}}
+              initialState={{
+                sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
+              }}
+              onRowEditStart={() => setEditing(true)}
+              onRowEditStop={() => setEditing(false)}
+              processRowUpdate={(
+                updatedRow: GridRowModel<ColTypes>,
+                oldRow: GridRowModel<ColTypes>
+              ) => {
+                const diff = updatedRow.date.getTime() - oldRow.date.getTime(); // Diff to update expiration date with
 
-              if (
-                diff !== 0 &&
-                updatedRow.expiryDate.getTime() === oldRow.expiryDate.getTime()
-              ) {
-                updatedRow.expiryDate = new Date(
-                  updatedRow.expiryDate.getTime() + diff
+                if (
+                  diff !== 0 &&
+                  updatedRow.expiryDate.getTime() ===
+                    oldRow.expiryDate.getTime()
+                ) {
+                  updatedRow.expiryDate = new Date(
+                    updatedRow.expiryDate.getTime() + diff
+                  );
+                }
+
+                setRows((oldRows: GridRowsProp<ColTypes>) =>
+                  oldRows.map(row =>
+                    row.id === updatedRow.id ? updatedRow : row
+                  )
                 );
-              }
-
-              setRows((oldRows: GridRowsProp<ColTypes>) =>
-                oldRows.map(row =>
-                  row.id === updatedRow.id ? updatedRow : row
-                )
-              );
-              // // TODO: do some validation. Code below is an example.
-              // for (const [key, val] of Object.entries(updatedRow)) {
-              //   if (key === 'id' || key === 'StudentNo') continue;
-              //   if ((val as number) < 0)
-              //     throw new Error('Value cannot be negative');
-              //   else if ((val as number) > 5000)
-              //     throw new Error('Value cannot be over 5000');
-              // }
-              // enqueueSnackbar('Row saved!', {variant: 'success'});
-              setError(false);
-              return updatedRow;
-            }}
-            onProcessRowUpdateError={(rowError: Error) => {
-              setError(true);
-              enqueueSnackbar(rowError.message, {variant: 'error'});
-            }}
-          />
+                // // TODO: do some validation. Code below is an example.
+                // for (const [key, val] of Object.entries(updatedRow)) {
+                //   if (key === 'id' || key === 'StudentNo') continue;
+                //   if ((val as number) < 0)
+                //     throw new Error('Value cannot be negative');
+                //   else if ((val as number) > 5000)
+                //     throw new Error('Value cannot be over 5000');
+                // }
+                // enqueueSnackbar('Row saved!', {variant: 'success'});
+                setError(false);
+                return updatedRow;
+              }}
+              onProcessRowUpdateError={(rowError: Error) => {
+                setError(true);
+                enqueueSnackbar(rowError.message, {variant: 'error'});
+              }}
+            />
+          </div>
         </DialogContent>
         <DialogActions>
           <Button
