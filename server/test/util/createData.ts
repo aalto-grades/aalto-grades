@@ -143,14 +143,15 @@ class CreateData {
     userId: number,
     assessmentModelId: number | null,
     graderId: number,
-    grade?: number
+    grade?: number,
+    date?: Date
   ): Promise<number> {
     const finalGrade = await FinalGrade.create({
       userId: userId,
       assessmentModelId: assessmentModelId,
       courseId: courseId,
       graderId: graderId,
-      date: new Date(),
+      date: date ?? new Date(),
       grade: grade ?? this.randInt(0, 5),
     });
 

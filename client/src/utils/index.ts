@@ -6,14 +6,14 @@ import {Language} from '@/common/types';
 import {LanguageOption} from '../types';
 
 type BaseType = {
-  gradeId?: number | undefined;
+  gradeId: number;
   grade: number;
-  date?: Date;
-  expiryDate?: Date;
+  date: Date;
+  expiryDate: Date;
 };
 
 export const gradeIsExpired = (grade: BaseType | null): boolean => {
-  if (grade === null || grade.expiryDate === undefined) return false;
+  if (grade === null) return false;
   return new Date().getTime() > grade.expiryDate.getTime();
 };
 
@@ -21,12 +21,11 @@ const gradeIsNewer = (
   newGrade: BaseType,
   oldGrade: BaseType | null
 ): boolean => {
-  if (oldGrade === null || oldGrade.date === undefined) return true;
-  if (newGrade.date === undefined) return false;
-  const newDate = new Date(newGrade.date).getTime();
-  const oldDate = new Date(oldGrade.date).getTime();
-  if (newDate !== oldDate) return newDate > oldDate;
-  return (newGrade.gradeId as number) > (oldGrade.gradeId as number);
+  if (oldGrade === null) return true;
+  const newDateTime = new Date(newGrade.date).getTime();
+  const oldDateTime = new Date(oldGrade.date).getTime();
+  if (newDateTime !== oldDateTime) return newDateTime > oldDateTime;
+  return newGrade.gradeId > oldGrade.gradeId;
 };
 
 const gradeIsBetter = (
@@ -79,6 +78,41 @@ export const findBestGrade = <T extends BaseType>(
   if (bestSoFar !== null) return bestSoFar;
   if (searchOptions.expiredOption === 'non_expired') return null;
   return bestSoFarExpired;
+};
+
+type BestFinalGradeData = {
+  grade: number;
+  date: Date;
+  assessmentModelId: number | null;
+};
+/**
+ * Finds the latest final grade from a list of final grades preferring manual
+ * ones.
+ */
+export const findLatestFinalGrade = <T extends BestFinalGradeData>(
+  finalGrades: readonly T[]
+): T | null => {
+  let bestSoFar: T | null = null;
+  for (const finalGrade of finalGrades) {
+    if (bestSoFar === null) {
+      bestSoFar = finalGrade;
+      continue;
+    }
+
+    const newIsManual = finalGrade.assessmentModelId === null;
+    const oldIsManual = bestSoFar.assessmentModelId === null;
+    // Prefer manual
+    if (newIsManual && !oldIsManual) {
+      bestSoFar = finalGrade;
+      continue;
+    } else if (oldIsManual && !newIsManual) {
+      continue;
+    }
+
+    if (finalGrade.date >= bestSoFar.date) bestSoFar = finalGrade;
+  }
+
+  return bestSoFar;
 };
 
 // Available completion languages used in Sisu.

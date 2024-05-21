@@ -58,17 +58,17 @@ beforeAll(async () => {
       courseData: {maxCredits: 5, courseCode: 'CS-A????'},
     });
   for (const student of students) {
-    // Create worse final grades before
-    if (student.finalGrade > 0) {
-      await createData.createFinalGrade(
-        courseId,
-        student.id,
-        assessmentModelId,
-        TEACHER_ID,
-        student.finalGrade -
-          Math.floor(Math.random() * (student.finalGrade + 1))
-      );
-    }
+    // Create an earlier final grades before the actual one
+    let days = Math.floor(Math.random() * 60 + 1);
+    await createData.createFinalGrade(
+      courseId,
+      student.id,
+      assessmentModelId,
+      TEACHER_ID,
+      undefined,
+      new Date(new Date().getTime() - days * 24 * 3600 * 1000)
+    );
+
     await createData.createFinalGrade(
       courseId,
       student.id,
@@ -76,17 +76,17 @@ beforeAll(async () => {
       TEACHER_ID,
       student.finalGrade
     );
-    // Create worse final grades after
-    if (student.finalGrade > 0) {
-      await createData.createFinalGrade(
-        courseId,
-        student.id,
-        assessmentModelId,
-        TEACHER_ID,
-        student.finalGrade -
-          Math.floor(Math.random() * (student.finalGrade + 1))
-      );
-    }
+
+    // Create an earlier final grades after the actual one
+    days = Math.floor(Math.random() * 60 + 1);
+    await createData.createFinalGrade(
+      courseId,
+      student.id,
+      assessmentModelId,
+      TEACHER_ID,
+      undefined,
+      new Date(new Date().getTime() - days * 24 * 3600 * 1000)
+    );
   }
   editGradeId = await createData.createGrade(
     students[0].id,
