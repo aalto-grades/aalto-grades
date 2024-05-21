@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -17,7 +17,7 @@ import {useParams} from 'react-router-dom';
 
 import {useEditAssessmentModel} from '../../hooks/useApi';
 
-type EditAssessmentModelDialogProps = {
+type PropsType = {
   assessmentModelId: number | null;
   name: string | null;
   onClose: () => void;
@@ -28,7 +28,7 @@ const EditAssessmentModelDialog = ({
   name,
   onClose,
   open,
-}: EditAssessmentModelDialogProps): JSX.Element => {
+}: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const editAssessmentModel = useEditAssessmentModel();
 

@@ -263,7 +263,7 @@ const ModelsView = (): JSX.Element => {
                 secondaryAction={
                   editRights ? (
                     <>
-                      <Tooltip placement="top" title="Edit assessment model">
+                      <Tooltip placement="top" title="Rename assessment model">
                         <IconButton
                           onClick={() => {
                             setEditDialogModel(model);
