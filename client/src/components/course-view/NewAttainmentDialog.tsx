@@ -37,7 +37,7 @@ const AddAttainmentDialog = ({
       <DialogTitle>Create new attainment</DialogTitle>
       <DialogContent>
         <TextField
-          sx={{mt: 1, '&input:user-invalid': {borderColor: 'red'}}}
+          sx={{mt: 1}}
           label="Name"
           value={attainment.name}
           onChange={e => setAttainment({...attainment, name: e.target.value})}
