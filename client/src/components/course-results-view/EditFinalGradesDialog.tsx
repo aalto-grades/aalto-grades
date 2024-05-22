@@ -126,15 +126,15 @@ const EditFinalGradesDialog = ({
       return model?.name ?? 'Not found';
     };
 
-    const newRows = finalGrades.map((grade, gradeId) => ({
-      id: gradeId,
-      finalGradeId: grade.finalGradeId,
-      grader: grade.grader.name!,
-      grade: grade.grade,
-      date: grade.date,
-      assessmentModel: getModelName(grade.assessmentModelId),
-      exportDate: grade.sisuExportDate,
-      comment: grade.comment,
+    const newRows = finalGrades.map((finalGrade, finalGradeId) => ({
+      id: finalGradeId,
+      finalGradeId: finalGrade.finalGradeId,
+      grader: finalGrade.grader.name!,
+      grade: finalGrade.grade,
+      date: finalGrade.date,
+      assessmentModel: getModelName(finalGrade.assessmentModelId),
+      exportDate: finalGrade.sisuExportDate,
+      comment: finalGrade.comment,
       selected: '',
     }));
     setRows(newRows);
@@ -265,10 +265,10 @@ const EditFinalGradesDialog = ({
     await Promise.all([
       addFinalGrades.mutateAsync(newGrades),
       ...deletedGrades.map(fGradeId => deleteFinalGrade.mutateAsync(fGradeId)),
-      ...editedGrades.map(grade =>
+      ...editedGrades.map(finalGrade =>
         editFinalGrade.mutateAsync({
-          finalGradeId: grade.finalGradeId,
-          data: grade,
+          finalGradeId: finalGrade.finalGradeId,
+          data: finalGrade,
         })
       ),
     ]);
