@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
-import {ForeignKeyConstraintError} from 'sequelize';
+import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
@@ -67,13 +67,26 @@ export const editAttainment = async (
     req.params.attainmentId
   );
 
-  await attainment
-    .set({
-      name: req.body.name ?? attainment.name,
-      daysValid: req.body.daysValid ?? attainment.daysValid,
-      archived: req.body.archived ?? attainment.archived,
-    })
-    .save();
+  try {
+    await attainment
+      .set({
+        name: req.body.name ?? attainment.name,
+        daysValid: req.body.daysValid ?? attainment.daysValid,
+        archived: req.body.archived ?? attainment.archived,
+      })
+      .save();
+  } catch (e) {
+    // Duplicate name error
+    if (e instanceof UniqueConstraintError) {
+      throw new ApiError(
+        'There cannot be two attainments with the same name',
+        HttpCode.Conflict
+      );
+    }
+
+    // Other error
+    throw e;
+  }
 
   res.sendStatus(HttpCode.Ok);
 };
