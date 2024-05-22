@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
-import {UniqueConstraintError} from 'sequelize';
+import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
@@ -156,7 +156,23 @@ export const deleteAssessmentModel = async (
     req.params.assessmentModelId
   );
 
-  await assessmentModel.destroy(); // Delete assessment model.
+  try {
+    await assessmentModel.destroy();
+  } catch (e) {
+    // Catch deletion of assessment model with final grades
+    if (
+      e instanceof ForeignKeyConstraintError &&
+      e.index === 'final_grade_assessment_model_id_fkey'
+    ) {
+      throw new ApiError(
+        'Tried to delete assessment model with final grades',
+        HttpCode.Conflict
+      );
+    }
+
+    // Other error
+    throw e;
+  }
 
   res.sendStatus(HttpCode.Ok);
 };

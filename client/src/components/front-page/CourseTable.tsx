@@ -14,9 +14,10 @@ import {
 import {JSX} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-import {CourseData, SystemRole} from '@/common/types';
+import {CourseData, CourseRoleType, SystemRole} from '@/common/types';
 import useAuth from '../../hooks/useAuth';
 import {HeadCellData} from '../../types';
+import {getCourseRole} from '../../utils';
 
 const headCells: HeadCellData[] = [
   {id: 'code', label: 'Code'},
@@ -29,17 +30,20 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
   const navigate = useNavigate();
   const {auth} = useAuth();
 
-  const getCourseRole = (course: CourseData): string => {
+  const getCourseRoleString = (course: CourseData): string => {
     if (auth === null) return 'Not logged in';
     if (auth.role === SystemRole.Admin) return 'Admin';
 
-    const {teachersInCharge, assistants} = course;
-    const isTeacher = teachersInCharge.find(teacher => teacher.id === auth.id);
-    const isAssistant = assistants.find(assistant => assistant.id === auth.id);
+    const courseRole = getCourseRole(course, auth);
 
-    if (isTeacher !== undefined) return 'Teacher';
-    if (isAssistant !== undefined) return 'Assistant';
-    return 'Student';
+    switch (courseRole) {
+      case CourseRoleType.Teacher:
+        return 'Teacher';
+      case CourseRoleType.Assistant:
+        return 'Assistant';
+      case CourseRoleType.Student:
+        return 'Student';
+    }
   };
 
   return (
@@ -88,7 +92,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
               <TableCell>{course.courseCode}</TableCell>
               <TableCell>{course.name.en}</TableCell>
               <TableCell>{course.department.en}</TableCell>
-              <TableCell>{getCourseRole(course)}</TableCell>
+              <TableCell>{getCourseRoleString(course)}</TableCell>
             </TableRow>
           ))}
       </TableBody>
