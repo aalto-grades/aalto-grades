@@ -43,6 +43,7 @@ type ColTypes = {
   date: Date;
   assessmentModel: string | null;
   exportDate: Date | null;
+  comment: string | null;
   selected: string;
 };
 
@@ -133,6 +134,7 @@ const EditFinalGradesDialog = ({
       date: grade.date,
       assessmentModel: getModelName(grade.assessmentModelId),
       exportDate: grade.sisuExportDate,
+      comment: grade.comment,
       selected: '',
     }));
     setRows(newRows);
@@ -175,6 +177,12 @@ const EditFinalGradesDialog = ({
       width: 110, // Enough width to fit the calendar icon
     },
     {
+      field: 'comment',
+      headerName: 'Comment',
+      type: 'string',
+      editable: true,
+    },
+    {
       field: 'actions',
       type: 'actions',
       getActions: params => [
@@ -196,7 +204,7 @@ const EditFinalGradesDialog = ({
   ];
 
   const dataGridToolbar = (): JSX.Element => {
-    const handleClick = (): void => {
+    const addFinalGrade = (): void => {
       setRows(oldRows => {
         const freeId =
           oldRows.reduce((mxVal, row) => Math.max(mxVal, row.id), 0) + 1;
@@ -208,6 +216,7 @@ const EditFinalGradesDialog = ({
           date: new Date(),
           assessmentModel: null,
           exportDate: null,
+          comment: '',
           selected: '',
         };
         return oldRows.concat(newRow);
@@ -215,8 +224,8 @@ const EditFinalGradesDialog = ({
     };
     return (
       <GridToolbarContainer>
-        <Button startIcon={<Add />} onClick={handleClick}>
-          Add Grade
+        <Button startIcon={<Add />} onClick={addFinalGrade}>
+          Add Final Grade
         </Button>
       </GridToolbarContainer>
     );
@@ -234,6 +243,7 @@ const EditFinalGradesDialog = ({
           date: row.date,
           assessmentModelId: null,
           userId,
+          comment: row.comment,
         });
       } else {
         editedGrades.push({
@@ -241,6 +251,7 @@ const EditFinalGradesDialog = ({
           grade: row.grade,
           date: row.date,
           sisuExportDate: row.exportDate,
+          comment: row.comment,
         });
       }
     }
@@ -309,7 +320,8 @@ const EditFinalGradesDialog = ({
               }}
               isCellEditable={(params: GridCellParams<ColTypes>) =>
                 params.row.assessmentModel === null ||
-                params.field === 'exportDate'
+                params.field === 'exportDate' ||
+                params.field === 'comment'
               }
               onRowEditStart={() => setEditing(true)}
               onRowEditStop={() => setEditing(false)}

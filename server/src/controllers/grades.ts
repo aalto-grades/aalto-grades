@@ -125,6 +125,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
       grade: finalGrade.grade,
       date: new Date(finalGrade.date),
       sisuExportDate: finalGrade.sisuExportDate,
+      comment: finalGrade.comment,
     });
   }
 

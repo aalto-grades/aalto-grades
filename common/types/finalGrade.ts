@@ -16,18 +16,21 @@ export const FinalGradeDataSchema = z.object({
   grade: z.number().int().min(0).max(5),
   date: DateSchema,
   sisuExportDate: DateSchema.nullable(),
+  comment: z.string().nullable(),
 });
 export const NewFinalGradeSchema = z.object({
   userId: z.number().int(),
   assessmentModelId: z.number().int().nullable(),
   grade: z.number().int().min(0).max(5),
   date: DateSchema,
+  comment: z.string().nullable(),
 });
 export const EditFinalGradeSchema = z
   .object({
     grade: z.number().int().min(0).max(5),
     date: DateSchema,
     sisuExportDate: DateSchema.nullable(),
+    comment: z.string().nullable(),
   })
   .partial();
 
