@@ -8,6 +8,8 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  Card,
+  CardContent,
   Checkbox,
   Dialog,
   DialogActions,
@@ -15,6 +17,7 @@ import {
   DialogTitle,
   FormControlLabel,
   FormGroup,
+  TextField,
 } from '@mui/material';
 import {useState} from 'react';
 
@@ -107,20 +110,80 @@ const SelectAplusGradeSources = ({
   );
 };
 
+type AttainmentCardProps = {
+  name: string;
+};
+
+const AttainmentCard = ({
+  name,
+}: AttainmentCardProps): JSX.Element => {
+  return (
+    <Card>
+      <CardContent>
+        <TextField
+          sx={{mt: 1}}
+          label="Name"
+          value={name}
+        />
+        <TextField
+          sx={{mt: 1}}
+          label="Days valid"
+          type="number"
+          value={365}
+        />
+      </CardContent>
+    </Card>
+  );
+};
+
+type CreateAplusAttainmentsProps = {
+  aplusCourseId: number;
+  createFullPoints: boolean;
+  createModules: AplusModule[];
+  createDifficulties: string[];
+};
+
+const CreateAplusAttainments = ({
+  aplusCourseId,
+  createFullPoints,
+  createModules,
+  createDifficulties,
+}: CreateAplusAttainmentsProps): JSX.Element => {
+  return (
+    <>
+      {createFullPoints && (
+        <AttainmentCard
+          name="A+ Course"
+        />
+      )}
+      {createModules.map(module =>
+        <AttainmentCard
+          name={module.name}
+        />
+      )}
+      {createDifficulties.map(difficulty =>
+        <AttainmentCard
+          name={`A+ Difficulty ${difficulty}`}
+        />
+      )}
+    </>
+  );
+};
+
 type PropsType = {
   handleClose: () => void;
   open: boolean;
 };
 
 const AplusDialog = ({handleClose, open}: PropsType): JSX.Element => {
+  const aplusCourses = useFetchAplusCourses();
+
   const [step, setStep] = useState<number>(0);
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
   const [createFullPoints, setCreateFullPoints] = useState<boolean>(false);
   const [createModules, setCreateModules] = useState<AplusModule[]>([]);
   const [createDifficulties, setCreateDifficulties] = useState<string[]>([]);
-
-  const aplusCourses = useFetchAplusCourses();
 
   return (
     <Dialog open={open} onClose={handleClose}>
@@ -160,13 +223,23 @@ const AplusDialog = ({handleClose, open}: PropsType): JSX.Element => {
             }}
           />
         )}
-        <p>{JSON.stringify(createFullPoints)}</p>
-        <p>{JSON.stringify(createModules)}</p>
-        <p>{JSON.stringify(createDifficulties)}</p>
+        {step === 2 && aplusCourse && (
+          <CreateAplusAttainments
+            aplusCourseId={aplusCourse.id}
+            createFullPoints={createFullPoints}
+            createModules={createModules}
+            createDifficulties={createDifficulties}
+          />
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button disabled={step === 0}>Next</Button>
+        <Button
+          disabled={step === 0}
+          onClick={() => setStep(2)}
+        >
+          Next
+        </Button>
       </DialogActions>
     </Dialog>
   );
