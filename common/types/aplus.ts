@@ -32,7 +32,6 @@ export const AplusExerciseDataSchema = z.object({
   ),
   difficulties: z.array(z.string()),
 });
-export const AplusExerciseDataArraySchema = z.array(AplusExerciseDataSchema);
 
 const GradeSourceBase = z
   .object({

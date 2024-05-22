@@ -16,7 +16,7 @@ import {
   AplusCourseData,
   AplusCourseDataArraySchema,
   AplusExerciseData,
-  AplusExerciseDataArraySchema,
+  AplusExerciseDataSchema,
   AplusGradeSourceData,
   NewGrade,
   NewGradeArraySchema,
@@ -38,12 +38,12 @@ export const useFetchAplusCourses = (
 
 export const useFetchAplusExerciseData = (
   aplusCourseId: Numeric,
-  options?: Partial<UseQueryOptions<AplusExerciseData[]>>
-): UseQueryResult<AplusExerciseData[]> =>
+  options?: Partial<UseQueryOptions<AplusExerciseData>>
+): UseQueryResult<AplusExerciseData> =>
   useQuery({
     queryKey: ['a+-exercises', aplusCourseId],
     queryFn: async () =>
-      AplusExerciseDataArraySchema.parse(
+      AplusExerciseDataSchema.parse(
         (await axios.get(`/v1/aplus/courses/${aplusCourseId}`)).data
       ),
     ...options,
