@@ -105,7 +105,7 @@ export const addAssessmentModel = async (
 
   if (!created) {
     throw new ApiError(
-      `Assessment model with name '${req.params.name}' already exists in course ID ${courseId}`,
+      `Assessment model with name '${req.body.name}' already exists in course ID ${courseId}`,
       HttpCode.Conflict
     );
   }
