@@ -565,7 +565,7 @@ const Graph = ({
                 nodesConnectable={!readOnly}
                 nodesDraggable={!readOnly}
               >
-                <Controls />
+                {!readOnly && <Controls />}
                 <MiniMap />
                 <Background
                   variant={BackgroundVariant.Dots}

@@ -332,7 +332,7 @@ export default {
               model: 'course',
               key: 'id',
             },
-            onDelete: 'NO ACTION', // TODO: Cascade ?
+            onDelete: 'NO ACTION',
             onUpdate: 'CASCADE',
           },
           assessment_model_id: {

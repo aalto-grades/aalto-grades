@@ -23,7 +23,9 @@ export default class FinalGrade extends Model<
   declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
   declare courseId: ForeignKey<Course['id']>;
-  declare assessmentModelId: ForeignKey<AssessmentModel['id']>;
+  declare assessmentModelId: CreationOptional<ForeignKey<
+    AssessmentModel['id']
+  > | null>;
   declare graderId: ForeignKey<User['id']>;
   declare grade: number;
   declare sisuExportDate: CreationOptional<Date | null>;
@@ -62,7 +64,7 @@ FinalGrade.init(
     },
     assessmentModelId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'assessment_model',
         key: 'id',
@@ -104,11 +106,11 @@ FinalGrade.init(
 User.hasMany(FinalGrade, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
 FinalGrade.belongsTo(User, {foreignKey: 'userId'});
 
-Course.hasMany(FinalGrade, {onDelete: 'NO ACTION', onUpdate: 'CASCADE'}); // TODO: Cascade ?
+Course.hasMany(FinalGrade, {onDelete: 'RESTRICT', onUpdate: 'CASCADE'});
 FinalGrade.belongsTo(Course, {foreignKey: 'courseId'});
 
 AssessmentModel.hasMany(FinalGrade, {
-  onDelete: 'NO ACTION',
+  onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
 FinalGrade.belongsTo(AssessmentModel, {foreignKey: 'assessmentModelId'});

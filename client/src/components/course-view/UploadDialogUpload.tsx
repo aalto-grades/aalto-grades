@@ -111,16 +111,20 @@ const UploadDialogUpload = ({
         const fields = columns.map(col => col.field);
         const resultKeys = csvRows.data[0].map(value => value.toString());
 
-        const mismatches: string[] = [];
+        // Find matching keys
+        let mismatches = false;
+        let studentNoFound = false;
         const csvKeyMap: {[key: string]: string} = {};
         for (const key of resultKeys) {
+          if (key.toLowerCase() === 'studentno') studentNoFound = true;
           const matchingField = fields.find(
             field => field.toLowerCase() === key.toLowerCase()
           );
-          if (matchingField === undefined) mismatches.push(key);
+          if (matchingField === undefined) mismatches = true;
           else csvKeyMap[key] = matchingField;
         }
 
+        /** Load data using csv key to attainment key map */
         const getData = (keyMap: {
           [key: string]: string;
         }): GridRowModel<GradeUploadColTypes>[] => {
@@ -147,12 +151,11 @@ const UploadDialogUpload = ({
           return newRows;
         };
 
-        if (mismatches.length > 0) {
+        if (mismatches || !studentNoFound) {
           setMismatchDialogOpen(true);
           setMismatchData({
             fields: fields.filter(field => field !== 'actions'),
             keys: resultKeys,
-            mismatches,
             onImport: (keyMap: {[key: string]: string}) => {
               setMismatchDialogOpen(false);
               setRows(getData(keyMap));
@@ -212,12 +215,7 @@ const UploadDialogUpload = ({
         open={mismatchDialogOpen}
         onClose={() => setMismatchDialogOpen(false)}
         mismatchData={
-          mismatchData ?? {
-            fields: [],
-            keys: [],
-            mismatches: [],
-            onImport: () => {},
-          }
+          mismatchData ?? {fields: [], keys: [], onImport: () => {}}
         }
       />
 
@@ -275,42 +273,44 @@ const UploadDialogUpload = ({
             {editText ? 'Edit' : 'Or add them manually'}
           </AccordionSummary>
           <AccordionDetails>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              rowHeight={25}
-              editMode="row"
-              rowSelection={false}
-              disableColumnSelector
-              slots={{toolbar: dataGridToolbar}}
-              sx={{maxHeight: '70vh', minHeight: '20vh'}}
-              onRowEditStart={() => setEditing(true)}
-              onRowEditStop={() => setEditing(false)}
-              processRowUpdate={(
-                updatedRow: GridRowModel<GradeUploadColTypes>
-              ) => {
-                setRows(oldRows =>
-                  oldRows.map(row =>
-                    row.id === updatedRow.id ? updatedRow : row
-                  )
-                );
-                // TODO: do some validation. Code below is an example.
-                // for (const [key, val] of Object.entries(updatedRow)) {
-                //   if (key === 'id' || key === 'StudentNo') continue;
-                //   if ((val as number) < 0)
-                //     throw new Error('Value cannot be negative');
-                //   else if ((val as number) > 5000)
-                //     throw new Error('Value cannot be over 5000');
-                // }
-                // setSnackBar({message: 'Row saved!', severity: 'success'});
-                setError(false);
-                return updatedRow;
-              }}
-              onProcessRowUpdateError={(rowError: Error) => {
-                setError(true);
-                enqueueSnackbar(rowError.message, {variant: 'error'});
-              }}
-            />
+            <div style={{height: '40vh'}}>
+              <DataGrid
+                // autoHeight
+                rows={rows}
+                columns={columns}
+                rowHeight={25}
+                editMode="row"
+                rowSelection={false}
+                disableColumnSelector
+                slots={{toolbar: dataGridToolbar}}
+                onRowEditStart={() => setEditing(true)}
+                onRowEditStop={() => setEditing(false)}
+                processRowUpdate={(
+                  updatedRow: GridRowModel<GradeUploadColTypes>
+                ) => {
+                  setRows(oldRows =>
+                    oldRows.map(row =>
+                      row.id === updatedRow.id ? updatedRow : row
+                    )
+                  );
+                  // TODO: do some validation. Code below is an example.
+                  // for (const [key, val] of Object.entries(updatedRow)) {
+                  //   if (key === 'id' || key === 'StudentNo') continue;
+                  //   if ((val as number) < 0)
+                  //     throw new Error('Value cannot be negative');
+                  //   else if ((val as number) > 5000)
+                  //     throw new Error('Value cannot be over 5000');
+                  // }
+                  // setSnackBar({message: 'Row saved!', severity: 'success'});
+                  setError(false);
+                  return updatedRow;
+                }}
+                onProcessRowUpdateError={(rowError: Error) => {
+                  setError(true);
+                  enqueueSnackbar(rowError.message, {variant: 'error'});
+                }}
+              />
+            </div>
           </AccordionDetails>
         </Accordion>
       </DialogContent>

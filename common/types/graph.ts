@@ -25,6 +25,7 @@ export type GradeNodeValue = {
   type: 'grade';
   source: number;
   value: number;
+  courseFail: boolean;
 };
 export type MaxNodeValue = {
   type: 'max';

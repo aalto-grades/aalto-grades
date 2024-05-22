@@ -286,7 +286,7 @@ const AttainmentsView = (): JSX.Element => {
           if (blocker.state === 'blocked') blocker.proceed();
         }}
       />
-
+      <>Attainments</>
       <Box sx={{display: 'flex', mb: 1}}>
         {editRights && (
           <Button onClick={() => setAddDialogOpen(true)}>Add attainment</Button>
@@ -316,37 +316,38 @@ const AttainmentsView = (): JSX.Element => {
         )}
       </Box>
 
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        rowHeight={25}
-        editMode="row"
-        rowSelection={false}
-        disableColumnSelector
-        sx={{maxHeight: '70vh', minHeight: '20vh'}}
-        onRowEditStart={() => setEditing(true)}
-        onRowEditStop={() => setEditing(false)}
-        processRowUpdate={updatedRow => {
-          setRows(oldRows =>
-            oldRows.map(row => (row.id === updatedRow.id ? updatedRow : row))
-          );
-          // TODO: do some validation. Code below is an example.
-          // for (const [key, val] of Object.entries(updatedRow)) {
-          //   if (key === 'id' || key === 'StudentNo') continue;
-          //   if ((val as number) < 0)
-          //     throw new Error('Value cannot be negative');
-          //   else if ((val as number) > 5000)
-          //     throw new Error('Value cannot be over 5000');
-          // }
-          // setSnackBar({message: 'Row saved!', severity: 'success'});
-          setError(false);
-          return updatedRow;
-        }}
-        onProcessRowUpdateError={(rowError: Error) => {
-          setError(true);
-          enqueueSnackbar(rowError.message, {variant: 'error'});
-        }}
-      />
+      <div style={{height: '100%', maxHeight: '70vh'}}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          rowHeight={25}
+          editMode="row"
+          rowSelection={false}
+          disableColumnSelector
+          onRowEditStart={() => setEditing(true)}
+          onRowEditStop={() => setEditing(false)}
+          processRowUpdate={updatedRow => {
+            setRows(oldRows =>
+              oldRows.map(row => (row.id === updatedRow.id ? updatedRow : row))
+            );
+            // TODO: do some validation. Code below is an example.
+            // for (const [key, val] of Object.entries(updatedRow)) {
+            //   if (key === 'id' || key === 'StudentNo') continue;
+            //   if ((val as number) < 0)
+            //     throw new Error('Value cannot be negative');
+            //   else if ((val as number) > 5000)
+            //     throw new Error('Value cannot be over 5000');
+            // }
+            // setSnackBar({message: 'Row saved!', severity: 'success'});
+            setError(false);
+            return updatedRow;
+          }}
+          onProcessRowUpdateError={(rowError: Error) => {
+            setError(true);
+            enqueueSnackbar(rowError.message, {variant: 'error'});
+          }}
+        />
+      </div>
     </>
   );
 };

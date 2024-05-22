@@ -13,6 +13,7 @@ import {
 } from '@tanstack/react-query';
 
 import {
+  EditFinalGrade,
   FinalGradeData,
   FinalGradeDataArraySchema,
   NewFinalGrade,
@@ -54,3 +55,38 @@ export const useGetFinalGrades = (
       ),
     ...options,
   });
+
+type EditFinalGradeVars = {finalGradeId: Numeric; data: EditFinalGrade};
+export const useEditFinalGrade = (
+  courseId: Numeric,
+  options?: UseMutationOptions<unknown, unknown, EditFinalGradeVars>
+): UseMutationResult<unknown, unknown, EditFinalGradeVars> =>
+  useMutation({
+    mutationFn: async (vars: EditFinalGradeVars) =>
+      await axios.put(
+        `/v1/courses/${courseId}/final-grades/${vars.finalGradeId}`,
+        vars.data
+      ),
+    ...options,
+  });
+
+export const useDeleteFinalGrade = (
+  courseId: Numeric,
+  options?: UseMutationOptions<unknown, unknown, Numeric>
+): UseMutationResult<unknown, unknown, Numeric> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (finalGradeId: Numeric) =>
+      await axios.delete(
+        `/v1/courses/${courseId}/final-grades/${finalGradeId}`
+      ),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['attainments', courseId],
+      });
+    },
+    ...options,
+  });
+};

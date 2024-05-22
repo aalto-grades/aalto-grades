@@ -27,7 +27,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const addGrades = useAddGrades(courseId!);
 
   const attainmentData = useMemo(
-    () => attainments.data ?? [],
+    () => attainments.data?.filter(att => !att.archived) ?? [],
     [attainments.data]
   );
 
@@ -55,8 +55,6 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     );
   }, [attainmentData, dates.length]);
 
-  if (attainments.data === undefined) return <></>;
-
   const columns: GridColDef<GradeUploadColTypes>[] = [
     {
       field: 'studentNo',
@@ -65,7 +63,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       width: 120,
       editable: true,
     },
-    ...attainments.data.map(
+    ...attainmentData.map(
       (att): GridColDef<GradeUploadColTypes> => ({
         field: att.name,
         headerName: att.name,
@@ -93,7 +91,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       headerName: 'Student Number',
       type: 'string',
     },
-    ...attainments.data.map(
+    ...attainmentData.map(
       (att): GridColDef<GradeUploadColTypes> => ({
         field: att.name,
         headerName: att.name,
@@ -106,7 +104,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     const gradeData: NewGrade[] = [];
 
     for (const row of rows) {
-      for (const attainment of attainments.data) {
+      for (const attainment of attainmentData) {
         const grade = row[attainment.name];
         if (!(attainment.name in row) || grade === null) continue; // Skip empty cells
 

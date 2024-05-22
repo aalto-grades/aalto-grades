@@ -67,7 +67,10 @@ export const initNode = (
         },
       };
     case 'grade':
-      return {value: {type, source: 0, value: 0}, data: {title: 'Grade'}};
+      return {
+        value: {type, source: 0, value: 0, courseFail: false},
+        data: {title: 'Grade'},
+      };
     case 'max':
       return {
         value: {type, sources, value: 0},
@@ -158,6 +161,7 @@ const calculateNodeValue = (
     }
     case 'grade':
       nodeValue.value = nodeValue.source;
+      nodeValue.courseFail = false;
       break;
     case 'max': {
       const settings = nodeData[nodeId].settings as MaxNodeSettings;
@@ -401,7 +405,12 @@ export const calculateNewNodeValues = (
   if (courseFail) {
     for (const node of nodes) {
       const nodeValue = newNodeValues[node.id];
-      if (nodeValue.type === 'grade') nodeValue.value = 0;
+
+      // Failed course
+      if (nodeValue.type === 'grade') {
+        nodeValue.value = 0;
+        nodeValue.courseFail = true;
+      }
     }
   }
 
@@ -530,7 +539,11 @@ export const batchCalculateGraph = (
       const nodeValue = nodeValues[student.userId][node.id];
       if (nodeValue.type !== 'grade') continue;
 
-      if (courseFail[student.userId]) nodeValue.value = 0; // Failed course
+      // Failed course
+      if (courseFail[student.userId]) {
+        nodeValue.value = 0;
+        nodeValue.courseFail = true;
+      }
       finalGrades[student.userId] = {finalGrade: nodeValue.value};
     }
   }

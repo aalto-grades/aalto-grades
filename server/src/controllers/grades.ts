@@ -110,21 +110,21 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
 
   // FinalGrades dict {userId: FinalGradeData[], ...}
   const finalGradesDict: {[key: string]: FinalGradeData[]} = {};
-  for (const fGrade of finalGrades) {
-    const [user, grader] = validateUserAndGrader(fGrade);
+  for (const finalGrade of finalGrades) {
+    const [user, grader] = validateUserAndGrader(finalGrade);
 
     const userId = user.id;
     if (!(userId in finalGradesDict)) finalGradesDict[userId] = [];
 
     finalGradesDict[userId].push({
-      finalGradeId: fGrade.id,
+      finalGradeId: finalGrade.id,
       user: user,
-      courseId: fGrade.courseId,
-      assessmentModelId: fGrade.assessmentModelId,
+      courseId: finalGrade.courseId,
+      assessmentModelId: finalGrade.assessmentModelId,
       grader: grader,
-      grade: fGrade.grade,
-      date: new Date(fGrade.date),
-      sisuExportDate: fGrade.sisuExportDate,
+      grade: finalGrade.grade,
+      date: new Date(finalGrade.date),
+      sisuExportDate: finalGrade.sisuExportDate,
     });
   }
 
@@ -320,9 +320,9 @@ export const getSisuFormattedGradingCSV = async (
   type MarkSisuExport = {gradeId: number; userId: number};
 
   const courseResults: SisuCsvFormat[] = [];
+  const existingResults: FinalGrade[] = [];
   const exportedToSisu: MarkSisuExport[] = [];
 
-  // TODO: Confirm that finalgrade.grade is valid
   for (const finalGrade of finalGrades) {
     if (finalGrade.User === undefined) {
       logger.error(
@@ -343,14 +343,43 @@ export const getSisuFormattedGradingCSV = async (
       );
     }
 
-    const existingResult = courseResults.find(
-      value => value.studentNumber === finalGrade.User?.studentNumber
+    const existingResult = existingResults.find(
+      value => value.User?.studentNumber === finalGrade.User?.studentNumber
     );
 
+    const gradeIsBetter = (
+      newGrade: FinalGrade,
+      oldGrade: FinalGrade
+    ): boolean => {
+      const newIsManual = newGrade.assessmentModelId === null;
+      const oldIsManual = oldGrade.assessmentModelId === null;
+
+      if (newIsManual && !oldIsManual) return true;
+      if (oldIsManual && !newIsManual) return false;
+      return (
+        new Date(newGrade.date).getTime() >= new Date(oldGrade.date).getTime()
+      );
+    };
+
     if (existingResult) {
-      // TODO: Maybe more options than just best grade
-      if (finalGrade.grade <= parseInt(existingResult.grade)) continue;
-      existingResult.grade = finalGrade.grade.toString();
+      // TODO: Maybe more options than just latest grade
+      if (!gradeIsBetter(finalGrade, existingResult)) continue;
+
+      existingResult.date = finalGrade.date;
+      existingResult.assessmentModelId = finalGrade.assessmentModelId;
+
+      // Set existing course result grade
+      const existingCourseResult = courseResults.find(
+        value => value.studentNumber === finalGrade.User?.studentNumber
+      );
+      if (existingCourseResult === undefined) {
+        logger.error("Couldn't find duplicate final grade again");
+        throw new ApiError(
+          "Couldn't find duplicate final grade again",
+          HttpCode.InternalServerError
+        );
+      }
+      existingCourseResult.grade = finalGrade.grade.toString();
 
       // There can be multiple grades, make sure only the exported grade is marked with timestamp.
       const userData = exportedToSisu.find(
@@ -372,6 +401,7 @@ export const getSisuFormattedGradingCSV = async (
         ? req.body.completionLanguage.toLowerCase()
         : course.languageOfInstruction.toLowerCase();
 
+      existingResults.push(finalGrade);
       courseResults.push({
         studentNumber: finalGrade.User.studentNumber,
         grade: finalGrade.grade.toString(),

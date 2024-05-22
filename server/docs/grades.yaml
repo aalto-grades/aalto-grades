@@ -170,7 +170,7 @@ definitions:
     tags: [Grades]
     description: >
       Get the grades of all students.
-      Available only to admin users and teachers in charge of the course.
+      Available only to admin users and teachers & assistants of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
     responses:
@@ -196,7 +196,7 @@ definitions:
     tags: [Grades]
     description: >
       Add new grades to the course.
-      Available only to admin users and course teachers & assistants.
+      Available only to admin users and teachers & assistants of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
     requestBody:
@@ -227,7 +227,7 @@ definitions:
     tags: [Grades]
     description: >
       Edit grade.
-      Available only to admin users and teachers in charge of the course.
+      Available only to admin users and teachers & assistants of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
       - $ref: '#/components/parameters/gradeId'
@@ -255,7 +255,7 @@ definitions:
     tags: [Grades]
     description: >
       Delete grade.
-      Available only to admin users and teachers in charge of the course.
+      Available only to admin users and teachers & assistants of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
       - $ref: '#/components/parameters/gradeId'
