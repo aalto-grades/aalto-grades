@@ -18,12 +18,8 @@ export default function CourseView(): JSX.Element {
   const course: UseQueryResult<CourseData> = useGetCourse(courseId!, {
     enabled: !!courseId,
   });
-  const {
-    auth,
-    isTeacherInCharge: _,
-    setIsTeacherInCharge,
-    setIsAssistant,
-  }: AuthContextType = useAuth();
+  const {auth, setIsTeacherInCharge, setIsAssistant}: AuthContextType =
+    useAuth();
 
   useEffect(() => {
     if (auth && course.data) {

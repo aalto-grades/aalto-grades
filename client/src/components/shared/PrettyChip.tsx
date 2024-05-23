@@ -36,20 +36,17 @@ const PrettyChip: FC<PropsType & ButtonProps> = props => {
             color: 'inherit',
             backgroundColor: 'white',
             border: '1px solid lightgray',
-            borderLeft: `${
+            borderLeft:
               props.position === 'first' || !props.position
                 ? '1px solid lightgray'
-                : '0px'
-            }`,
-            borderRadius: `${
-              !props.position
-                ? '50px 50px 50px 50px'
-                : props.position === 'first'
-                  ? '50px 0px 0px 50px'
-                  : props.position === 'last'
-                    ? '0px 50px 50px 0px'
-                    : '0px'
-            }`,
+                : '0px',
+            borderRadius: !props.position
+              ? '50px 50px 50px 50px'
+              : props.position === 'first'
+                ? '50px 0px 0px 50px'
+                : props.position === 'last'
+                  ? '0px 50px 50px 0px'
+                  : '0px',
 
             width: '100%',
             height: '90%',

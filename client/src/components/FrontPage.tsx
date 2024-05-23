@@ -5,7 +5,7 @@
 import {Box, Button, Typography, useTheme} from '@mui/material';
 import {JSX, useState} from 'react';
 
-import {LoginResult, SystemRole} from '@/common/types';
+import {SystemRole} from '@/common/types';
 import CourseTable from './front-page/CourseTable';
 import CreateCourseDialog from './front-page/CreateCourseDialog';
 import UsersView from './front-page/users-view/UsersView';
@@ -18,7 +18,7 @@ export default function FrontPage(): JSX.Element {
   const courses = useGetAllCourses({
     enabled: auth !== null && auth.role === SystemRole.Admin,
   });
-  const coursesOfUser = useGetCoursesOfUser((auth as LoginResult).id);
+  const coursesOfUser = useGetCoursesOfUser(auth!.id);
   const [createDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
 
   return (
@@ -44,7 +44,7 @@ export default function FrontPage(): JSX.Element {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-evenly',
-            backgroundColor: `${theme.vars.palette.hoverGrey2}`,
+            backgroundColor: theme.vars.palette.hoverGrey2,
             flexDirection: 'row',
           }}
         >

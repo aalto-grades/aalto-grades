@@ -62,7 +62,7 @@ export const editAttainment = async (
   req: TypedRequestBody<typeof EditAttainmentDataSchema>,
   res: Response
 ): Promise<void> => {
-  const [_, attainment] = await validateAttainmentPath(
+  const [, attainment] = await validateAttainmentPath(
     req.params.courseId,
     req.params.attainmentId
   );
@@ -96,7 +96,7 @@ export const deleteAttainment = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [_, attainment] = await validateAttainmentPath(
+  const [, attainment] = await validateAttainmentPath(
     req.params.courseId,
     req.params.attainmentId
   );

@@ -47,7 +47,9 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
     );
   };
 
-  const validateForm = (values: {email: string}): {email?: string[]} | void => {
+  const validateForm = (values: {
+    email: string;
+  }): {email?: string[]} | undefined => {
     const result = ValidationSchema.safeParse(values);
     if (result.success) return;
     const fieldErrors = result.error.formErrors.fieldErrors;

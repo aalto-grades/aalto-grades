@@ -2,11 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import ElkConstructor, {ElkNode} from 'elkjs/lib/elk.bundled';
+import ElkConstructor from 'elkjs/lib/elk.bundled';
 import {Edge, Node} from 'reactflow';
 
 import {NodeValues} from '@/common/types/graph';
-import {ExtraNodeData} from '../../context/GraphProvider';
 
 export const findDisconnectedEdges = (
   oldNodeValues: NodeValues,
@@ -43,7 +42,7 @@ export const findDisconnectedEdges = (
       if (nodeValue.type !== 'require' && nodeValue.type !== 'substitute')
         continue;
 
-      nodeValue.sources[edge.targetHandle as string] = {
+      nodeValue.sources[edge.targetHandle!] = {
         value: 0,
         isConnected: true,
       };
@@ -60,7 +59,7 @@ export const findDisconnectedEdges = (
     )
       continue;
 
-    const sourceHandle = (edge.sourceHandle as string).replace('-source', '');
+    const sourceHandle = edge.sourceHandle!.replace('-source', '');
     if (
       !(sourceHandle in sourceNodeValues.sources) ||
       !sourceNodeValues.sources[sourceHandle].isConnected
@@ -76,14 +75,13 @@ const elk = new ElkConstructor();
 export const formatGraph = async (
   nodes: Node[],
   edges: Edge[],
-  nodeDimensions: ExtraNodeData,
   nodeValues: NodeValues
 ): Promise<Node[]> => {
   const nodesForElk = nodes.map(node => ({
     type: node.type,
     id: node.id,
-    width: node.width as number,
-    height: node.height as number,
+    width: node.width!,
+    height: node.height!,
   }));
   const graph = {
     id: 'root',
@@ -136,15 +134,15 @@ export const formatGraph = async (
           )
             return -1;
           return (
-            parseInt(key1.split('-').at(-1) as string) -
-            parseInt(key2.split('-').at(-1) as string)
+            parseInt(key1.split('-').at(-1)!) -
+            parseInt(key2.split('-').at(-1)!)
           );
         });
       } else {
         sortedKeys.sort(
           (key1, key2) =>
-            parseInt(key1.split('-').at(-1) as string) -
-            parseInt(key2.split('-').at(-1) as string)
+            parseInt(key1.split('-').at(-1)!) -
+            parseInt(key2.split('-').at(-1)!)
         );
       }
       const sourcePorts = sortedKeys.toReversed().map(key => ({
@@ -169,15 +167,15 @@ export const formatGraph = async (
     edges: edges.map(edge => ({
       ...edge,
       sources: [edge.source],
-      targets: [edge.targetHandle as string],
+      targets: [edge.targetHandle!],
     })),
   };
 
-  const newNodes = (await elk.layout(graph)).children as ElkNode[];
+  const newNodes = (await elk.layout(graph)).children!;
   return newNodes.map((node): Node => {
     return {
-      ...(nodes.find(onode => onode.id === node.id) as Node),
-      position: {x: node.x as number, y: node.y as number},
+      ...nodes.find(onode => onode.id === node.id)!,
+      position: {x: node.x!, y: node.y!},
     };
   });
 };

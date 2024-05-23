@@ -148,7 +148,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
 export const addGrades = async (
   req: TypedRequestBody<typeof NewGradeArraySchema>,
   res: Response
-): Promise<Response | void> => {
+): Promise<Response> => {
   const grader = req.user as JwtClaims;
   const courseId = await validateCourseId(req.params.courseId);
 
@@ -227,7 +227,7 @@ export const editGrade = async (
   res: Response
 ): Promise<void> => {
   const grader = req.user as JwtClaims;
-  const [_, gradeData] = await findAndValidateAttainmentGradePath(
+  const [, gradeData] = await findAndValidateAttainmentGradePath(
     req.params.courseId,
     req.params.gradeId
   );
@@ -274,7 +274,7 @@ export const deleteGrade = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [_, grade] = await findAndValidateAttainmentGradePath(
+  const [, grade] = await findAndValidateAttainmentGradePath(
     req.params.courseId,
     req.params.gradeId
   );

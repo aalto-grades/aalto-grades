@@ -15,7 +15,7 @@ import UploadDialogConfirm from './UploadDialogConfirm';
 import UploadDialogUpload from './UploadDialogUpload';
 import {useAddGrades, useGetAttainments} from '../../hooks/useApi';
 
-export type GradeUploadColTypes = Record<string, number | null> & {
+export type GradeUploadColTypes = {[key: string]: number | null} & {
   id: number;
   studentNo: string;
 };

@@ -118,7 +118,7 @@ export const editAssessmentModel = async (
   req: TypedRequestBody<typeof EditAssessmentModelDataSchema>,
   res: Response
 ): Promise<void> => {
-  const [_, assessmentModel] = await validateAssessmentModelPath(
+  const [, assessmentModel] = await validateAssessmentModelPath(
     req.params.courseId,
     req.params.assessmentModelId
   );
@@ -151,7 +151,7 @@ export const deleteAssessmentModel = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [_, assessmentModel] = await validateAssessmentModelPath(
+  const [, assessmentModel] = await validateAssessmentModelPath(
     req.params.courseId,
     req.params.assessmentModelId
   );

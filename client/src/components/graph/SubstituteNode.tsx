@@ -78,7 +78,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
     let newExerciseHandles = [...exerciseHandles];
     let exerciseIndex = -1;
     for (const [key, source] of Object.entries(nodeValue.sources)) {
-      maxId = Math.max(maxId, parseInt(key.split('-').at(-1) as string));
+      maxId = Math.max(maxId, parseInt(key.split('-').at(-1)!));
       if (key.split('-').at(-2) === 'substitute') {
         if (source.isConnected && !newSubstituteHandles.includes(key)) {
           newSubstituteHandles.push(key);
