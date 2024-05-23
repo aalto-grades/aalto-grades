@@ -48,13 +48,25 @@ export const addAttainment = async (
 ): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
 
-  const newAttainment = await Attainment.create({
-    courseId: courseId,
-    name: req.body.name,
-    daysValid: req.body.daysValid,
+  const [attainment, created] = await Attainment.findOrCreate({
+    where: {
+      name: req.body.name,
+      courseId: courseId,
+    },
+    defaults: {
+      name: req.body.name,
+      daysValid: req.body.daysValid,
+    },
   });
 
-  res.status(HttpCode.Created).json(newAttainment.id);
+  if (!created) {
+    throw new ApiError(
+      'There cannot be two attainments with the same name',
+      HttpCode.Conflict
+    );
+  }
+
+  res.status(HttpCode.Created).json(attainment.id);
 };
 
 /** @throws ApiError(400|404|409) */
