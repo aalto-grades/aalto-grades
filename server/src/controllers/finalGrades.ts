@@ -52,10 +52,8 @@ export const getFinalGrades = async (
       grader: grader,
       grade: finalGrade.grade,
       date: new Date(finalGrade.date),
-      sisuExportDate:
-        finalGrade.sisuExportDate === null
-          ? null
-          : new Date(finalGrade.sisuExportDate),
+      sisuExportDate: finalGrade.sisuExportDate,
+      comment: finalGrade.comment,
     });
   }
 
@@ -81,13 +79,14 @@ export const addFinalGrades = async (
   }
 
   const preparedBulkCreate: NewDbFinalGradeData[] = req.body.map(
-    gradeEntry => ({
-      userId: gradeEntry.userId,
-      assessmentModelId: gradeEntry.assessmentModelId,
+    finalGrade => ({
+      userId: finalGrade.userId,
+      assessmentModelId: finalGrade.assessmentModelId,
       courseId: courseId,
       graderId: grader.id,
-      date: gradeEntry.date,
-      grade: gradeEntry.grade,
+      date: finalGrade.date,
+      grade: finalGrade.grade,
+      comment: finalGrade.comment,
     })
   );
 
@@ -108,7 +107,7 @@ export const editFinalGrade = async (
     req.params.finalGradeId
   );
 
-  const {grade, date, sisuExportDate} = req.body;
+  const {grade, date, sisuExportDate, comment} = req.body;
 
   // If final grade is not manual don't allow editing grade/date
   if (
@@ -132,6 +131,7 @@ export const editFinalGrade = async (
           ? sisuExportDate
           : finalGrade.sisuExportDate,
       graderId: grader.id,
+      comment: comment !== undefined ? comment : finalGrade.comment,
     })
     .save();
 
