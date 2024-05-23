@@ -173,7 +173,7 @@ const FormLanguagesField = ({
   </>
 );
 
-export default function EditCourseView(): JSX.Element {
+const EditCourseView = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const editCourse = useEditCourse();
   const course = useGetCourse(courseId);
@@ -300,7 +300,7 @@ export default function EditCourseView(): JSX.Element {
   };
   const validateForm = (
     values: FormData
-  ): {[key in keyof FormData]?: string[]} | void => {
+  ): {[key in keyof FormData]?: string[]} | undefined => {
     setUnsavedChanges(changed(values)); // Hacky workaround to get form data
     const result = ValidationSchema.safeParse(values);
     if (result.success) return;
@@ -410,13 +410,11 @@ export default function EditCourseView(): JSX.Element {
                     margin="normal"
                     InputLabelProps={{shrink: true}}
                     helperText={
-                      form.errors.teacherEmail !== undefined
-                        ? form.errors.teacherEmail
-                        : teachersInCharge.length === 0
-                          ? 'Input the email address of at least one teacher in charge of the course'
-                          : teachersInCharge.includes(form.values.teacherEmail)
-                            ? 'Email already on list.'
-                            : 'Add emails of the teachers in charge of the course.'
+                      form.errors.teacherEmail ?? teachersInCharge.length === 0
+                        ? 'Input the email address of at least one teacher in charge of the course'
+                        : teachersInCharge.includes(form.values.teacherEmail)
+                          ? 'Email already on list.'
+                          : 'Add emails of the teachers in charge of the course.'
                     }
                     error={
                       form.touched.teacherEmail &&
@@ -483,11 +481,10 @@ export default function EditCourseView(): JSX.Element {
                     margin="normal"
                     InputLabelProps={{shrink: true}}
                     helperText={
-                      form.errors.assistantEmail !== undefined
-                        ? form.errors.assistantEmail
-                        : assistants.includes(form.values.assistantEmail)
-                          ? 'Email already on list.'
-                          : 'Add emails of the assistants of the course.'
+                      form.errors.assistantEmail ??
+                      assistants.includes(form.values.assistantEmail)
+                        ? 'Email already on list.'
+                        : 'Add emails of the assistants of the course.'
                     }
                     error={
                       form.touched.assistantEmail &&
@@ -587,4 +584,6 @@ export default function EditCourseView(): JSX.Element {
       </Formik>
     </>
   );
-}
+};
+
+export default EditCourseView;

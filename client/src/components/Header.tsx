@@ -18,7 +18,7 @@ import {Link, NavLink, useParams} from 'react-router-dom';
 import UserButton from './auth/UserButton';
 import {useGetCourse} from '../hooks/useApi';
 
-export default function Header(): JSX.Element {
+const Header = (): JSX.Element => {
   const theme = useTheme();
   const {courseId} = useParams<{courseId: string}>();
   const course = useGetCourse(courseId ?? '', {enabled: !!courseId});
@@ -163,4 +163,6 @@ export default function Header(): JSX.Element {
       </AppBar>
     </>
   );
-}
+};
+
+export default Header;

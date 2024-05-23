@@ -166,7 +166,7 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
   });
 
   it('should respond with 502 if A+ request fails', async () => {
-    mockedAxios.get.mockImplementationOnce(_url => {
+    mockedAxios.get.mockImplementationOnce(() => {
       throw new AxiosError();
     });
 
@@ -217,7 +217,7 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
   });
 
   it('should respond with 502 if A+ request fails', async () => {
-    mockedAxios.get.mockImplementationOnce(_url => {
+    mockedAxios.get.mockImplementationOnce(() => {
       throw new AxiosError();
     });
 
@@ -495,7 +495,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
   });
 
   it('should respond with 502 if A+ request fails', async () => {
-    mockedAxios.get.mockImplementationOnce(_url => {
+    mockedAxios.get.mockImplementationOnce(() => {
       throw new AxiosError();
     });
 

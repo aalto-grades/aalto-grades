@@ -21,18 +21,26 @@ import {enqueueSnackbar} from 'notistack';
 import {JSX, useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
-import {AssessmentModelData, StudentRow, SystemRole} from '@/common/types';
+import {
+  AssessmentModelData,
+  CourseRoleType,
+  StudentRow,
+  SystemRole,
+} from '@/common/types';
 import {GraphStructure} from '@/common/types/graph';
 import CreateAssessmentModelDialog from './CreateAssessmentModelDialog';
 import EditAssessmentModelDialog from './EditAssessmentModelDialog';
+import {useGetFinalGrades} from '../../hooks/api/finalGrade';
 import {
   useDeleteAssessmentModel,
   useEditAssessmentModel,
   useGetAllAssessmentModels,
   useGetAttainments,
+  useGetCourse,
   useGetGrades,
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
+import {getCourseRole} from '../../utils';
 import Graph from '../graph/Graph';
 
 type ParamsType = {courseId: string; modelId?: string; userId?: string};
@@ -42,6 +50,14 @@ const ModelsView = (): JSX.Element => {
   const navigate = useNavigate();
 
   const allAssessmentModels = useGetAllAssessmentModels(courseId);
+  const course = useGetCourse(courseId);
+  const finalGrades = useGetFinalGrades(courseId, {
+    enabled:
+      auth !== null &&
+      (auth.role === SystemRole.Admin ||
+        (course.data &&
+          getCourseRole(course.data, auth) === CourseRoleType.Teacher)),
+  });
   const editModel = useEditAssessmentModel();
   const delModel = useDeleteAssessmentModel();
   const attainments = useGetAttainments(courseId);
@@ -69,6 +85,16 @@ const ModelsView = (): JSX.Element => {
         : undefined,
     [allAssessmentModels.data]
   );
+
+  const modelsWithFinalGrades = useMemo(() => {
+    const withFinalGrades = new Set<number>();
+    if (finalGrades.data === undefined) return withFinalGrades;
+    for (const finalGrade of finalGrades.data) {
+      if (finalGrade.assessmentModelId !== null)
+        withFinalGrades.add(finalGrade.assessmentModelId);
+    }
+    return withFinalGrades;
+  }, [finalGrades.data]);
 
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge,
@@ -291,6 +317,7 @@ const ModelsView = (): JSX.Element => {
                       </Tooltip>
                       <Tooltip placement="top" title="Delete assessment model">
                         <IconButton
+                          disabled={modelsWithFinalGrades.has(model.id)}
                           edge="end"
                           onClick={() => handleDelModel(model.id)}
                         >

@@ -44,7 +44,7 @@ const MaxNode = (props: NodeProps): JSX.Element => {
     let maxId = 0;
     let newHandles = [...handles];
     for (const [key, source] of Object.entries(nodeValue.sources)) {
-      maxId = Math.max(maxId, parseInt(key.split('-').at(-1) as string));
+      maxId = Math.max(maxId, parseInt(key.split('-').at(-1)!));
       if (!handles.includes(key)) {
         newHandles.push(key);
         change = true;
@@ -136,7 +136,7 @@ const MaxNode = (props: NodeProps): JSX.Element => {
           </tr>
 
           {Object.entries(nodeValue.sources)
-            .filter(([_, source]) => source.isConnected)
+            .filter(([, source]) => source.isConnected)
             .map(([key, source], index) => (
               <tr
                 key={`tr-${id}-${key}`}

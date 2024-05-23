@@ -26,7 +26,7 @@ import {ApiError, JwtClaims, NewDbFinalGradeData} from '../types';
 export const getFinalGrades = async (
   req: Request,
   res: Response
-): Promise<void | Response> => {
+): Promise<Response> => {
   const courseId = await validateCourseId(req.params.courseId);
 
   const dbFinalGrades = await FinalGrade.findAll({
@@ -64,7 +64,7 @@ export const getFinalGrades = async (
 export const addFinalGrades = async (
   req: TypedRequestBody<typeof NewFinalGradeArraySchema>,
   res: Response
-): Promise<void | Response> => {
+): Promise<Response> => {
   const grader = req.user as JwtClaims;
   const courseId = await validateCourseId(req.params.courseId);
 
@@ -102,7 +102,7 @@ export const editFinalGrade = async (
   res: Response
 ): Promise<void> => {
   const grader = req.user as JwtClaims;
-  const [_, finalGrade] = await findAndValidateFinalGradePath(
+  const [, finalGrade] = await findAndValidateFinalGradePath(
     req.params.courseId,
     req.params.finalGradeId
   );
@@ -143,7 +143,7 @@ export const deleteFinalGrade = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [_, finalGrade] = await findAndValidateFinalGradePath(
+  const [, finalGrade] = await findAndValidateFinalGradePath(
     req.params.courseId,
     req.params.finalGradeId
   );

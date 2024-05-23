@@ -195,7 +195,7 @@ passport.use(
       secretOrKey: JWT_SECRET,
       jwtFromRequest: (req: Request): string | null =>
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        req && req.cookies ? (req.cookies.jwt as string) : null,
+        req?.cookies ? (req.cookies.jwt as string) : null,
     },
     (token: JwtClaims, done: VerifiedCallback) => {
       try {

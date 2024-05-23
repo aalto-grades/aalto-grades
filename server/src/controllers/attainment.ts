@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
-import {ForeignKeyConstraintError} from 'sequelize';
+import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
@@ -48,13 +48,25 @@ export const addAttainment = async (
 ): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
 
-  const newAttainment = await Attainment.create({
-    courseId: courseId,
-    name: req.body.name,
-    daysValid: req.body.daysValid,
+  const [attainment, created] = await Attainment.findOrCreate({
+    where: {
+      name: req.body.name,
+      courseId: courseId,
+    },
+    defaults: {
+      name: req.body.name,
+      daysValid: req.body.daysValid,
+    },
   });
 
-  res.status(HttpCode.Created).json(newAttainment.id);
+  if (!created) {
+    throw new ApiError(
+      'There cannot be two attainments with the same name',
+      HttpCode.Conflict
+    );
+  }
+
+  res.status(HttpCode.Created).json(attainment.id);
 };
 
 /** @throws ApiError(400|404|409) */
@@ -62,18 +74,31 @@ export const editAttainment = async (
   req: TypedRequestBody<typeof EditAttainmentDataSchema>,
   res: Response
 ): Promise<void> => {
-  const [_, attainment] = await validateAttainmentPath(
+  const [, attainment] = await validateAttainmentPath(
     req.params.courseId,
     req.params.attainmentId
   );
 
-  await attainment
-    .set({
-      name: req.body.name ?? attainment.name,
-      daysValid: req.body.daysValid ?? attainment.daysValid,
-      archived: req.body.archived ?? attainment.archived,
-    })
-    .save();
+  try {
+    await attainment
+      .set({
+        name: req.body.name ?? attainment.name,
+        daysValid: req.body.daysValid ?? attainment.daysValid,
+        archived: req.body.archived ?? attainment.archived,
+      })
+      .save();
+  } catch (e) {
+    // Duplicate name error
+    if (e instanceof UniqueConstraintError) {
+      throw new ApiError(
+        'There cannot be two attainments with the same name',
+        HttpCode.Conflict
+      );
+    }
+
+    // Other error
+    throw e;
+  }
 
   res.sendStatus(HttpCode.Ok);
 };
@@ -83,7 +108,7 @@ export const deleteAttainment = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [_, attainment] = await validateAttainmentPath(
+  const [, attainment] = await validateAttainmentPath(
     req.params.courseId,
     req.params.attainmentId
   );

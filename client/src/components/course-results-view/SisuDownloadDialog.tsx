@@ -76,7 +76,7 @@ const SisuDownloadDialog = ({
     useState<DownloadOption>('unexported');
 
   const selectedStudents = selectedRows.map(row => ({
-    studentNumber: row.user.studentNumber as string,
+    studentNumber: row.user.studentNumber!,
     grades: row.finalGrades ?? [],
   }));
 

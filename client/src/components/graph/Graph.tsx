@@ -118,7 +118,7 @@ const Graph = ({
     useState<boolean>(false);
   const [attainmentValuesOpen, setAttainmentValuesOpen] =
     useState<boolean>(false);
-  const [delAttainments, setDelAttainments] = useState<string[]>([]); // Attainment nodes that the user is allowed to delete
+  const [delAttainments, setDelAttainments] = useState<string[]>([]); // Att nodes that the user is allowed to delete
   const [originalGraphStructure, setOriginalGraphStructure] =
     useState<GraphStructure>({nodes: [], edges: [], nodeData: {}});
 
@@ -158,9 +158,9 @@ const Graph = ({
       const disconnectedEdges = findDisconnectedEdges(
         nodeValues,
         nodes,
-        newEdges || edges
+        newEdges ?? edges
       );
-      const filteredEdges = (newEdges || edges).filter(
+      const filteredEdges = (newEdges ?? edges).filter(
         edge => !disconnectedEdges.includes(edge)
       );
 
@@ -370,7 +370,7 @@ const Graph = ({
   );
 
   const format = async (): Promise<void> => {
-    setNodes(await formatGraph(nodes, edges, extraNodeData, nodeValues));
+    setNodes(await formatGraph(nodes, edges, nodeValues));
   };
 
   const handleAttainmentSelect = (

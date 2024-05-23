@@ -489,12 +489,12 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
             model =>
               model.id === selectedAssessmentModel ||
               selectedAssessmentModel === 'any'
-          ) || []),
+          ) ?? []),
           ...(assessmentModels?.filter(
             model =>
               model.id !== selectedAssessmentModel &&
               selectedAssessmentModel !== 'any'
-          ) || []),
+          ) ?? []),
         ]} // Very ugly way to sort the selected model to be the first
         row={userGraphData}
       />

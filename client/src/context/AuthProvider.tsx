@@ -11,14 +11,14 @@ import {State} from '../types';
  * AuthContext stores both the users authentication information and is the user
  * teacher in charge on the currently selected course.
  */
-export interface AuthContextType {
+export type AuthContextType = {
   auth: LoginResult | null;
   setAuth: (auth: LoginResult | null) => void;
   isTeacherInCharge: boolean;
   setIsTeacherInCharge: (isTeacherIncharge: boolean) => void;
   isAssistant: boolean;
   setIsAssistant: (isAssistant: boolean) => void;
-}
+};
 
 const AuthContext: Context<AuthContextType> = createContext<AuthContextType>({
   auth: null,
@@ -30,7 +30,7 @@ const AuthContext: Context<AuthContextType> = createContext<AuthContextType>({
   setIsAssistant: () => console.error('Called empty setAssistant()'),
 });
 
-export function AuthProvider(params: {children: JSX.Element}): JSX.Element {
+export const AuthProvider = (params: {children: JSX.Element}): JSX.Element => {
   const [auth, setAuth]: State<LoginResult | null> =
     useState<LoginResult | null>(null);
   const [isTeacherInCharge, setIsTeacherInCharge]: State<boolean> =
@@ -51,6 +51,6 @@ export function AuthProvider(params: {children: JSX.Element}): JSX.Element {
       {params.children}
     </AuthContext.Provider>
   );
-}
+};
 
 export default AuthContext;

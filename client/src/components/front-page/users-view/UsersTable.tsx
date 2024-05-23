@@ -23,7 +23,7 @@ const headCells: HeadCellData[] = [
   {id: 'del', label: ''},
 ];
 
-export default function UsersTable(): JSX.Element {
+const UsersTable = (): JSX.Element => {
   const deleteUser = useDeleteUser();
   const users = useGetIdpUsers();
   const [toBeDeleted, setToBeDeleted] = useState<number | null>(null);
@@ -59,25 +59,26 @@ export default function UsersTable(): JSX.Element {
           </TableRow>
         </TableHead>
         <TableBody>
-          {users.data &&
-            users.data.map(
-              user =>
-                user.email && (
-                  <TableRow key={user.email} hover={true}>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => setToBeDeleted(user.id)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                )
-            )}
+          {users.data?.map(
+            user =>
+              user.email && (
+                <TableRow key={user.email} hover={true}>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <IconButton
+                      aria-label="delete"
+                      onClick={() => setToBeDeleted(user.id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              )
+          )}
         </TableBody>
       </Table>
     </>
   );
-}
+};
+
+export default UsersTable;

@@ -2,7 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Language} from '@/common/types';
+import {
+  CourseData,
+  CourseRoleType,
+  Language,
+  LoginResult,
+} from '@/common/types';
 import {LanguageOption} from '../types';
 
 type BaseType = {
@@ -113,6 +118,19 @@ export const findLatestFinalGrade = <T extends BestFinalGradeData>(
   }
 
   return bestSoFar;
+};
+
+export const getCourseRole = (
+  course: CourseData,
+  auth: LoginResult
+): CourseRoleType => {
+  const {teachersInCharge, assistants} = course;
+  const isTeacher = teachersInCharge.find(teacher => teacher.id === auth.id);
+  const isAssistant = assistants.find(assistant => assistant.id === auth.id);
+
+  if (isTeacher !== undefined) return CourseRoleType.Teacher;
+  if (isAssistant !== undefined) return CourseRoleType.Assistant;
+  return CourseRoleType.Student;
 };
 
 // Available completion languages used in Sisu.

@@ -5,7 +5,7 @@
 import {Box, Button, Typography} from '@mui/material';
 import React, {JSX} from 'react';
 
-export default function ExternalAuth(): JSX.Element {
+const ExternalAuth = (): JSX.Element => {
   return (
     <Box
       sx={{
@@ -36,4 +36,6 @@ export default function ExternalAuth(): JSX.Element {
       </Button>
     </Box>
   );
-}
+};
+
+export default ExternalAuth;

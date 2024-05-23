@@ -4,13 +4,13 @@
 
 import {NextFunction, Request, Response} from 'express';
 
-interface JsonError extends Error {
+type JsonError = {
   expose?: boolean;
   status?: number;
   statusCode?: number;
   body?: string;
   type?: string;
-}
+} & Error;
 
 /**
  * Middleware function to handle JSON parsing errors in requests. If the error

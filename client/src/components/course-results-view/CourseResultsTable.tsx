@@ -144,7 +144,8 @@ const CourseResultsTable = (): JSX.Element => {
                   style={{
                     display: 'flex',
                     position: 'absolute',
-                    transform: `translateY(${virtualRow.start}px)`, // this should always be a `style` as it changes on scroll
+                    // This should always be a `style` as it changes on scroll
+                    transform: `translateY(${virtualRow.start}px)`,
                     width: '100%',
                     zIndex: row.getIsGrouped() ? 5 : 'auto',
                   }}

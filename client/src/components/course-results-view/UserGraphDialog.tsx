@@ -79,7 +79,7 @@ const UserGraphDialog = ({
             <Select
               sx={{minWidth: '150px'}}
               labelId="assessment-model-select-label"
-              value={selectedModel?.id || assessmentModels[0].id}
+              value={selectedModel?.id ?? assessmentModels[0].id}
               label="Assessment model"
               onChange={event => {
                 setSelectedModel(

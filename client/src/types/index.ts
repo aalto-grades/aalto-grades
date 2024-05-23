@@ -6,21 +6,21 @@ import {Dispatch, SetStateAction} from 'react';
 
 import {Language} from '@/common/types';
 
-export interface HeadCellData {
+export type HeadCellData = {
   id: string;
   label: string;
-}
+};
 
-export interface LoginCredentials {
+export type LoginCredentials = {
   email: string;
   password: string;
-}
+};
 
 export type Numeric = number | string;
 
 export type State<T> = [T, Dispatch<SetStateAction<T>>];
 
-export interface LanguageOption {
+export type LanguageOption = {
   id: Language;
   language: string;
-}
+};

@@ -38,8 +38,8 @@ const SideMenuButton = ({
 }: {
   text: string;
   to: string;
-  Icon: OverridableComponent<SvgIconTypeMap<{}, 'svg'>> & {muiName: string};
-  IconOutlined: OverridableComponent<SvgIconTypeMap<{}, 'svg'>> & {
+  Icon: OverridableComponent<SvgIconTypeMap> & {muiName: string};
+  IconOutlined: OverridableComponent<SvgIconTypeMap> & {
     muiName: string;
   };
 }): JSX.Element => {

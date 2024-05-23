@@ -174,6 +174,12 @@ describe('Test POST /v1/courses/:courseId/attainments - add an attainment', () =
     const data = {name: 'not added', daysValid: 365};
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
+
+  it('should respond with 409 if trying to create an attainment with duplicate name', async () => {
+    const url = `/v1/courses/${courseId}/attainments`;
+    const data = {name: 'att-1', daysValid: 365};
+    await responseTests.testConflict(url, cookies.adminCookie).post(data);
+  });
 });
 
 describe('Test PUT /v1/courses/:courseId/attainments/:attainmentId - edit an attainment', () => {
@@ -256,6 +262,12 @@ describe('Test PUT /v1/courses/:courseId/attainments/:attainmentId - edit an att
   it('should respond with 409 when attainment does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/attainments/${noRoleAttainmentId}`;
     const data = {name: 'not edited', daysValid: 365};
+    await responseTests.testConflict(url, cookies.adminCookie).put(data);
+  });
+
+  it('should respond with 409 when trying to edit duplicate attainment name', async () => {
+    const url = `/v1/courses/${courseId}/attainments/${editAttainmentId}`;
+    const data = {name: 'att-1', daysValid: 365};
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
 });
