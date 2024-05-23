@@ -5,7 +5,7 @@
 import {Box, Link, Tooltip} from '@mui/material';
 import {JSX} from 'react';
 
-export default function Footer(): JSX.Element {
+const Footer = (): JSX.Element => {
   return (
     <Box
       component="footer"
@@ -58,4 +58,6 @@ export default function Footer(): JSX.Element {
       </Tooltip>
     </Box>
   );
-}
+};
+
+export default Footer;

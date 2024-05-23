@@ -235,7 +235,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
 
   const validateForm = (
     values: FormData
-  ): {[key in keyof FormData]?: string[]} | void => {
+  ): {[key in keyof FormData]?: string[]} | undefined => {
     const result = ValidationSchema.safeParse(values);
     if (result.success) return;
     const fieldErrors = result.error.formErrors.fieldErrors;
@@ -406,13 +406,11 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 margin="normal"
                 InputLabelProps={{shrink: true}}
                 helperText={
-                  form.errors.assistantEmail !== undefined
-                    ? form.errors.assistantEmail
-                    : assistants.length === 0
-                      ? 'Input the email address of at least one assitant of the course'
-                      : assistants.includes(form.values.assistantEmail)
-                        ? 'Email already on list.'
-                        : 'Add emails of the teachers in charge of the course.'
+                  form.errors.assistantEmail ?? assistants.length === 0
+                    ? 'Input the email address of at least one assitant of the course'
+                    : assistants.includes(form.values.assistantEmail)
+                      ? 'Email already on list.'
+                      : 'Add emails of the teachers in charge of the course.'
                 }
                 error={
                   form.touched.assistantEmail &&

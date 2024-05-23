@@ -11,7 +11,7 @@ import CourseResultsTableToolbar from './course-results-view/CourseResultsTableT
 import {GradesTableProvider} from '../context/GradesTableProvider';
 import {useGetGrades} from '../hooks/useApi';
 
-export default function CourseResultsView(): JSX.Element {
+const CourseResultsView = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
 
   const gradesQuery = useGetGrades(courseId);
@@ -26,4 +26,6 @@ export default function CourseResultsView(): JSX.Element {
       )}
     </Box>
   );
-}
+};
+
+export default CourseResultsView;

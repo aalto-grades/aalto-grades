@@ -34,7 +34,7 @@ export const sequelize: Sequelize = new Sequelize(
 );
 
 // Function to establish connection to the database and log the status.
-export async function connectToDatabase(): Promise<void> {
+export const connectToDatabase = async (): Promise<void> => {
   try {
     await sequelize.authenticate();
     logger.info('database connected');
@@ -47,4 +47,4 @@ export async function connectToDatabase(): Promise<void> {
 
     throw new Error('database connection failed');
   }
-}
+};

@@ -138,7 +138,7 @@ export const fetchAplusGrades = async (
 
   const newGrades: NewGrade[] = [];
   for (const attainmentId of attainmentIds) {
-    const [_, attainment] = await validateAttainmentPath(
+    const [, attainment] = await validateAttainmentPath(
       req.params.courseId,
       String(attainmentId)
     );

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
-import {UniqueConstraintError} from 'sequelize';
+import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
@@ -105,7 +105,7 @@ export const addAssessmentModel = async (
 
   if (!created) {
     throw new ApiError(
-      `Assessment model with name '${req.params.name}' already exists in course ID ${courseId}`,
+      `Assessment model with name '${req.body.name}' already exists in course ID ${courseId}`,
       HttpCode.Conflict
     );
   }
@@ -118,7 +118,7 @@ export const editAssessmentModel = async (
   req: TypedRequestBody<typeof EditAssessmentModelDataSchema>,
   res: Response
 ): Promise<void> => {
-  const [_, assessmentModel] = await validateAssessmentModelPath(
+  const [, assessmentModel] = await validateAssessmentModelPath(
     req.params.courseId,
     req.params.assessmentModelId
   );
@@ -151,12 +151,28 @@ export const deleteAssessmentModel = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [_, assessmentModel] = await validateAssessmentModelPath(
+  const [, assessmentModel] = await validateAssessmentModelPath(
     req.params.courseId,
     req.params.assessmentModelId
   );
 
-  await assessmentModel.destroy(); // Delete assessment model.
+  try {
+    await assessmentModel.destroy();
+  } catch (e) {
+    // Catch deletion of assessment model with final grades
+    if (
+      e instanceof ForeignKeyConstraintError &&
+      e.index === 'final_grade_assessment_model_id_fkey'
+    ) {
+      throw new ApiError(
+        'Tried to delete assessment model with final grades',
+        HttpCode.Conflict
+      );
+    }
+
+    // Other error
+    throw e;
+  }
 
   res.sendStatus(HttpCode.Ok);
 };

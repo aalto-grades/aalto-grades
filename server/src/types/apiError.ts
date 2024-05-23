@@ -15,7 +15,7 @@ import {HttpCode} from '@/common/types';
  */
 export class ApiError extends Error {
   public readonly statusCode: number;
-  public readonly multipleErrors: Array<string> | undefined;
+  public readonly multipleErrors: string[] | undefined;
 
   /**
    * Creates an instance of ApiError.
@@ -24,7 +24,7 @@ export class ApiError extends Error {
    * @param {HttpCode} statusCode The HTTP status code associated with the
    *   error.
    */
-  constructor(message: string | Array<string>, statusCode: HttpCode) {
+  constructor(message: string | string[], statusCode: HttpCode) {
     if (Array.isArray(message)) {
       super('');
       this.multipleErrors = message;
@@ -35,7 +35,7 @@ export class ApiError extends Error {
     this.name = 'ApiError';
   }
 
-  get errors(): Array<string> {
+  get errors(): string[] {
     return this.multipleErrors ?? [this.message];
   }
 }

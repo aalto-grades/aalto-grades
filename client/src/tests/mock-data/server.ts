@@ -20,16 +20,16 @@ export const mockSuccess = (data: unknown): ResponseResolver => {
     });
 };
 
-export function mockFailure(
+export const mockFailure = (
   errors: string[],
   status: number
-): ResponseResolver {
+): ResponseResolver => {
   return () =>
     new Response(JSON.stringify({errors: errors}), {
       headers: {'Content-Type': 'application/json'},
       status: status,
     });
-}
+};
 
 export const mockPostSuccess = (
   func: Mock,

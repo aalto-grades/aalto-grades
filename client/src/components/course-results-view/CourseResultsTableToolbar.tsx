@@ -161,6 +161,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         assessmentModelId,
         grade: finalGrades[selectedRow.user.id].finalGrade,
         date: dateOverride ? gradingDate : findLatestGrade(selectedRow),
+        comment: null,
       }))
     );
     enqueueSnackbar('Final grades calculated successfully.', {

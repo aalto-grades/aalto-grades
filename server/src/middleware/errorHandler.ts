@@ -39,7 +39,7 @@ export const errorHandler = (
   err: unknown,
   _req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction // Required for the function to work even though not used
 ): void => {
   if (err instanceof ApiError) {
     logger.error(`${err.name}: ${err.statusCode} - ${err.errors.toString()}`);

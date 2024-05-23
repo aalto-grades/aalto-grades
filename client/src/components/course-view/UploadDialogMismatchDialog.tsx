@@ -39,12 +39,12 @@ const MismatchDialog = ({
   onClose: () => void;
   mismatchData: MismatchData;
 }): JSX.Element => {
-  const [selections, setSelections] = useState<Record<string, string>>({});
+  const [selections, setSelections] = useState<{[key: string]: string}>({});
   const [error, setError] = useState<MismatchError>('');
   const [duplicate, setDuplicate] = useState<string>('');
 
   useEffect(() => {
-    const newSelections: Record<string, string> = {};
+    const newSelections: {[key: string]: string} = {};
     for (const key of mismatchData.keys) {
       const matchingField = mismatchData.fields.find(
         field => field.toLowerCase() === key.toLowerCase()

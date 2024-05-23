@@ -12,18 +12,14 @@ import SideMenu from './course-view/SideMenu';
 import {useGetCourse} from '../hooks/useApi';
 import useAuth, {AuthContextType} from '../hooks/useAuth';
 
-export default function CourseView(): JSX.Element {
+const CourseView = (): JSX.Element => {
   const theme = useTheme();
   const {courseId}: Params = useParams();
   const course: UseQueryResult<CourseData> = useGetCourse(courseId!, {
     enabled: !!courseId,
   });
-  const {
-    auth,
-    isTeacherInCharge: _,
-    setIsTeacherInCharge,
-    setIsAssistant,
-  }: AuthContextType = useAuth();
+  const {auth, setIsTeacherInCharge, setIsAssistant}: AuthContextType =
+    useAuth();
 
   useEffect(() => {
     if (auth && course.data) {
@@ -72,4 +68,6 @@ export default function CourseView(): JSX.Element {
       </Box>
     </>
   );
-}
+};
+
+export default CourseView;

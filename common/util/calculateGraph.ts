@@ -34,13 +34,13 @@ export const initNode = (
   if (edges !== undefined && id !== undefined) {
     for (const edge of edges) {
       if (edge.target === id) {
-        sources[edge.targetHandle as string] = {
+        sources[edge.targetHandle!] = {
           isConnected: true,
           value: 0,
         };
       }
       if (edge.source === id) {
-        values[edge.sourceHandle as string] = 0;
+        values[edge.sourceHandle!] = 0;
       }
     }
   }
@@ -346,7 +346,7 @@ export const calculateNewNodeValues = (
   let courseFail = false;
   const alreadyAdded = new Set();
   while (noSources.length > 0) {
-    const sourceId = noSources.shift() as string;
+    const sourceId = noSources.shift()!;
     calculateNodeValue(sourceId, newNodeValues[sourceId], nodeData);
     const sourceNodeValue = newNodeValues[sourceId];
 
@@ -359,8 +359,8 @@ export const calculateNewNodeValues = (
         sourceNodeValue.type === 'require' ||
         sourceNodeValue.type === 'substitute'
           ? sourceNodeValue.values[
-              (edge.sourceHandle as string)
-                .replace('-substitute-source', '')
+              edge
+                .sourceHandle!.replace('-substitute-source', '')
                 .replace('-exercise-source', '')
                 .replace('-source', '')
             ] ?? 0
@@ -387,14 +387,14 @@ export const calculateNewNodeValues = (
         case 'addition':
         case 'average':
         case 'max':
-          nodeValue.sources[edge.targetHandle as string] = {
+          nodeValue.sources[edge.targetHandle!] = {
             value: sourceValue === 'fail' ? 0 : sourceValue,
             isConnected: true,
           };
           break;
         case 'require':
         case 'substitute':
-          nodeValue.sources[edge.targetHandle as string] = {
+          nodeValue.sources[edge.targetHandle!] = {
             value: sourceValue,
             isConnected: true,
           };
@@ -464,7 +464,7 @@ export const batchCalculateGraph = (
 
   // Calculate values for all nodes
   while (noSources.length > 0) {
-    const sourceId = noSources.shift() as string;
+    const sourceId = noSources.shift()!;
     // Calculate node value for all students
     for (const student of studentData) {
       calculateNodeValue(
@@ -495,8 +495,8 @@ export const batchCalculateGraph = (
           sourceNodeValue.type === 'require' ||
           sourceNodeValue.type === 'substitute'
             ? sourceNodeValue.values[
-                (edge.sourceHandle as string)
-                  .replace('-substitute-source', '')
+                edge
+                  .sourceHandle!.replace('-substitute-source', '')
                   .replace('-exercise-source', '')
                   .replace('-source', '')
               ] ?? 0
@@ -515,14 +515,14 @@ export const batchCalculateGraph = (
           case 'addition':
           case 'average':
           case 'max':
-            nodeValue.sources[edge.targetHandle as string] = {
+            nodeValue.sources[edge.targetHandle!] = {
               value: sourceValue === 'fail' ? 0 : sourceValue,
               isConnected: true,
             };
             break;
           case 'require':
           case 'substitute':
-            nodeValue.sources[edge.targetHandle as string] = {
+            nodeValue.sources[edge.targetHandle!] = {
               value: sourceValue,
               isConnected: true,
             };

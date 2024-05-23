@@ -24,6 +24,7 @@ export const mockFinalGrades: FinalGradeData[] = [
     grade: 4,
     date: new Date(),
     sisuExportDate: null,
+    comment: null,
   },
   {
     finalGradeId: 2,
@@ -44,5 +45,6 @@ export const mockFinalGrades: FinalGradeData[] = [
     grade: 0,
     date: new Date(),
     sisuExportDate: null,
+    comment: null,
   },
 ];

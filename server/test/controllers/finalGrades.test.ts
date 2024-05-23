@@ -164,6 +164,7 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
     assessmentModelId: editCourseModelId,
     grade: student.finalGrade,
     date: new Date(),
+    comment: null,
   });
   const checkGrade = async (student: StudentData): Promise<void> => {
     const result = await FinalGrade.findOne({
@@ -280,6 +281,7 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
         assessmentModelId: otherCourseModelId,
         grade: student.finalGrade,
         date: new Date(),
+        comment: null,
       },
     ];
 
@@ -306,6 +308,7 @@ describe('Test PUT /v1/courses/:courseId/final-grades/:finalGradeId - edit a fin
           grade: Math.floor(Math.random() * 6),
           date: testDay,
           sisuExportDate: new Date(testDay.getTime() + 365 * 24 * 3600 * 1000),
+          comment: `testing ${Math.random()}`,
         })
         .set('Cookie', cookie)
         .expect(HttpCode.Ok);
@@ -325,7 +328,7 @@ describe('Test PUT /v1/courses/:courseId/final-grades/:finalGradeId - edit a fin
 
     res = await request
       .put(`/v1/courses/${editCourseId}/final-grades/${editFinalGradeId}`)
-      .send({date: new Date(2023, 0, 1)})
+      .send({date: new Date(2023, 0, 1), comment: 'Edited!'})
       .set('Cookie', cookies.teacherCookie)
       .expect(HttpCode.Ok);
 

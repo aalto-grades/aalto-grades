@@ -47,7 +47,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
     let maxId = 0;
     let newHandles = [...handles];
     for (const [key, source] of Object.entries(nodeValue.sources)) {
-      maxId = Math.max(maxId, parseInt(key.split('-').at(-1) as string));
+      maxId = Math.max(maxId, parseInt(key.split('-').at(-1)!));
       if (!newHandles.includes(key)) {
         newHandles.push(key);
         change = true;
@@ -164,7 +164,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
             <th>out</th>
           </tr>
           {Object.entries(nodeValue.sources)
-            .filter(([_, source]) => source.isConnected)
+            .filter(([, source]) => source.isConnected)
             .map(([key, source]) => (
               <tr
                 key={`tr-${key}`}

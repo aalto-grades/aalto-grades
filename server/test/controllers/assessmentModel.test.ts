@@ -17,6 +17,7 @@ import {initGraph} from '@/common/util/initGraph';
 import {app} from '../../src/app';
 import AssessmentModel from '../../src/database/models/assessmentModel';
 import {createData} from '../util/createData';
+import {TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
@@ -434,6 +435,18 @@ describe('Test DELETE /v1/courses/:courseId/assessment-models/:assessmentModId -
 
   it('should respond with 409 conflict when assessment model does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/assessment-models/${otherAssessmentModId}`;
+    await responseTests.testConflict(url, cookies.adminCookie).delete();
+  });
+
+  it('should respond with 409 conflict when trying to delete an assessment model with final grades', async () => {
+    const modelId = await createData.createAssessmentModel(
+      courseId,
+      courseAttainments
+    );
+    const user = await createData.createUser();
+    await createData.createFinalGrade(courseId, user.id, modelId, TEACHER_ID);
+
+    const url = `/v1/courses/${courseId}/assessment-models/${modelId}`;
     await responseTests.testConflict(url, cookies.adminCookie).delete();
   });
 });

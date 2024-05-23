@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import assert from 'assert';
 import supertest from 'supertest';
 import {z} from 'zod';
 
@@ -44,9 +45,10 @@ beforeAll(async () => {
 
   for (let i = 0; i < 10; i++) {
     const newUser = await createData.createUser();
+    assert(newUser.studentNumber); // Fix typescript warning
     students.push({
       id: newUser.id,
-      studentNumber: newUser.studentNumber as string,
+      studentNumber: newUser.studentNumber,
       finalGrade: Math.floor(Math.random() * 6),
     });
   }
@@ -159,9 +161,10 @@ describe('Test GET /v1/courses/:courseId/grades - get all grades', () => {
 describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
   const genStudent = async (): Promise<{id: number; studentNumber: string}> => {
     const newUser = await createData.createUser();
+    assert(newUser.studentNumber); // Fix typescript warning
     return {
       id: newUser.id,
-      studentNumber: newUser.studentNumber as string,
+      studentNumber: newUser.studentNumber,
     };
   };
   const genGrades = async (studentNumber?: string): Promise<NewGrade[]> => {
@@ -587,10 +590,7 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
 
   jest
     .spyOn(gradesUtil, 'getDateOfLatestGrade')
-    .mockImplementation(
-      (_userId: number, _assessmentmodelId: number): Promise<Date> =>
-        Promise.resolve(new Date('2023-06-21'))
-    );
+    .mockImplementation(() => Promise.resolve(new Date('2023-06-21')));
 
   it('should export CSV', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];

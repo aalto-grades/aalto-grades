@@ -7,7 +7,7 @@ import {z} from 'zod';
 export const AttainmentDataSchema = z.object({
   id: z.number().int(),
   courseId: z.number().int(),
-  name: z.string(),
+  name: z.string().min(1),
   daysValid: z.number().int().nonnegative(),
   archived: z.boolean(),
 });
