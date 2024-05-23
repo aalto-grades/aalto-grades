@@ -12,7 +12,7 @@ import UsersView from './front-page/users-view/UsersView';
 import {useGetAllCourses, useGetCoursesOfUser} from '../hooks/useApi';
 import useAuth from '../hooks/useAuth';
 
-export default function FrontPage(): JSX.Element {
+const FrontPage = (): JSX.Element => {
   const theme = useTheme();
   const {auth} = useAuth();
   const courses = useGetAllCourses({
@@ -90,4 +90,6 @@ export default function FrontPage(): JSX.Element {
       )}
     </>
   );
-}
+};
+
+export default FrontPage;

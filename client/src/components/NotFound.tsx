@@ -6,7 +6,7 @@ import {Box, Typography} from '@mui/material';
 import {JSX} from 'react';
 import {Link} from 'react-router-dom';
 
-export default function NotFound(): JSX.Element {
+const NotFound = (): JSX.Element => {
   return (
     <Box
       sx={{
@@ -25,4 +25,6 @@ export default function NotFound(): JSX.Element {
       <Link to="/">Go back to main page</Link>
     </Box>
   );
-}
+};
+
+export default NotFound;

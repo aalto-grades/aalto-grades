@@ -9,7 +9,7 @@ import {Outlet} from 'react-router-dom';
 import Footer from './Footer';
 import Header from './Header';
 
-export default function SectionTitle(): JSX.Element {
+const SectionTitle = (): JSX.Element => {
   const theme = useTheme();
 
   return (
@@ -59,4 +59,6 @@ export default function SectionTitle(): JSX.Element {
       </div>
     </>
   );
-}
+};
+
+export default SectionTitle;

@@ -23,7 +23,7 @@ const headCells: HeadCellData[] = [
   {id: 'del', label: ''},
 ];
 
-export default function UsersTable(): JSX.Element {
+const UsersTable = (): JSX.Element => {
   const deleteUser = useDeleteUser();
   const users = useGetIdpUsers();
   const [toBeDeleted, setToBeDeleted] = useState<number | null>(null);
@@ -79,4 +79,6 @@ export default function UsersTable(): JSX.Element {
       </Table>
     </>
   );
-}
+};
+
+export default UsersTable;

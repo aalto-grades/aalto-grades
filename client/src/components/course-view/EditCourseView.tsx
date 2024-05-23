@@ -173,7 +173,7 @@ const FormLanguagesField = ({
   </>
 );
 
-export default function EditCourseView(): JSX.Element {
+const EditCourseView = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const editCourse = useEditCourse();
   const course = useGetCourse(courseId);
@@ -584,4 +584,6 @@ export default function EditCourseView(): JSX.Element {
       </Formik>
     </>
   );
-}
+};
+
+export default EditCourseView;

@@ -20,7 +20,7 @@ import ExternalAuth from './ExternalAuth';
 import {useLogIn} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 
-export default function Login(): JSX.Element {
+const Login = (): JSX.Element => {
   const navigate = useNavigate();
   const {setAuth} = useAuth();
 
@@ -131,4 +131,5 @@ export default function Login(): JSX.Element {
       </Box>
     </Grid>
   );
-}
+};
+export default Login;

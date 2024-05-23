@@ -30,7 +30,7 @@ const AuthContext: Context<AuthContextType> = createContext<AuthContextType>({
   setIsAssistant: () => console.error('Called empty setAssistant()'),
 });
 
-export function AuthProvider(params: {children: JSX.Element}): JSX.Element {
+export const AuthProvider = (params: {children: JSX.Element}): JSX.Element => {
   const [auth, setAuth]: State<LoginResult | null> =
     useState<LoginResult | null>(null);
   const [isTeacherInCharge, setIsTeacherInCharge]: State<boolean> =
@@ -51,6 +51,6 @@ export function AuthProvider(params: {children: JSX.Element}): JSX.Element {
       {params.children}
     </AuthContext.Provider>
   );
-}
+};
 
 export default AuthContext;
