@@ -36,7 +36,7 @@ import PredictedGradeCell from '../components/course-results-view/PredictedGrade
 import UserGraphDialog from '../components/course-results-view/UserGraphDialog';
 import PrettyChip from '../components/shared/PrettyChip';
 import {useGetAllAssessmentModels, useGetAttainments} from '../hooks/useApi';
-import {findLatestFinalGrade} from '../utils';
+import {findBestFinalGrade} from '../utils';
 import {groupByLatestBestGrade, predictGrades} from '../utils/table';
 
 // Define the shape of the context
@@ -411,10 +411,10 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       row => {
         // ATTENTION this function needs to have the same parameters of the one inside the grade cell
         // Clearly can be done in a better way
-        const bestGrade = findLatestFinalGrade(row.finalGrades ?? []);
-        if (!bestGrade) return '-';
-        if (bestGrade.sisuExportDate) return '✅';
-        if (findPreviouslyExportedToSisu(bestGrade, row)) return '⚠️';
+        const bestFinalGrade = findBestFinalGrade(row.finalGrades ?? []);
+        if (!bestFinalGrade) return '-';
+        if (bestFinalGrade.sisuExportDate) return '✅';
+        if (findPreviouslyExportedToSisu(bestFinalGrade, row)) return '⚠️';
         return '-';
       },
 
