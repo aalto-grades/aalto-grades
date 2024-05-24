@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
-import {Transaction} from 'sequelize';
+import {Transaction, UniqueConstraintError} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
@@ -65,7 +65,7 @@ export const getAllCourses = async (
 /**
  * Responds with number
  *
- * @throws ApiError(404|422)
+ * @throws ApiError(404|409|422)
  */
 export const addCourse = async (
   req: TypedRequestBody<typeof NewCourseDataSchema>,
@@ -77,16 +77,27 @@ export const addCourse = async (
   validateRoleUniqueness(teachers, assistants);
 
   const course = await sequelize.transaction(async (t): Promise<Course> => {
-    const newCourse = await Course.create(
-      {
+    const [newCourse, created] = await Course.findOrCreate({
+      where: {
+        courseCode: req.body.courseCode,
+      },
+      defaults: {
         courseCode: req.body.courseCode,
         minCredits: req.body.minCredits,
         maxCredits: req.body.maxCredits,
         gradingScale: req.body.gradingScale,
         languageOfInstruction: req.body.languageOfInstruction,
       },
-      {transaction: t}
-    );
+      transaction: t,
+    });
+
+    if (!created) {
+      await t.rollback();
+      throw new ApiError(
+        `Course with course code ${req.body.courseCode} already exists`,
+        HttpCode.Conflict
+      );
+    }
 
     await CourseTranslation.bulkCreate(
       [
@@ -139,7 +150,7 @@ export const addCourse = async (
   res.status(HttpCode.Created).json(course.id);
 };
 
-/** @throws ApiError(400|404|422) */
+/** @throws ApiError(400|404|409|422) */
 export const editCourse = async (
   req: TypedRequestBody<typeof EditCourseDataSchema>,
   res: Response
@@ -189,19 +200,32 @@ export const editCourse = async (
     assistants !== undefined ? await validateEmailList(assistants) : null;
 
   await sequelize.transaction(async (t: Transaction): Promise<void> => {
-    await Course.update(
-      {
-        courseCode: courseCode,
-        minCredits: minCredits,
-        maxCredits: maxCredits,
-        gradingScale: gradingScale,
-        languageOfInstruction: languageOfInstruction,
-      },
-      {
-        where: {id: course.id},
-        transaction: t,
+    try {
+      await Course.update(
+        {
+          courseCode: courseCode,
+          minCredits: minCredits,
+          maxCredits: maxCredits,
+          gradingScale: gradingScale,
+          languageOfInstruction: languageOfInstruction,
+        },
+        {
+          where: {id: course.id},
+          transaction: t,
+        }
+      );
+    } catch (e) {
+      await t.rollback();
+      // Duplicate name error
+      if (e instanceof UniqueConstraintError) {
+        throw new ApiError(
+          `Course with course code ${courseCode} already exists`,
+          HttpCode.Conflict
+        );
       }
-    );
+      // Other error
+      throw e;
+    }
 
     const updateTranslation = async (
       language: Language,

@@ -40,7 +40,7 @@ export const getAttainments = async (
 /**
  * Responds with number
  *
- * @throws ApiError(400|404)
+ * @throws ApiError(400|404|409)
  */
 export const addAttainment = async (
   req: TypedRequestBody<typeof NewAttainmentDataSchema>,
