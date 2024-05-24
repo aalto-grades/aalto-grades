@@ -352,12 +352,15 @@ export const getSisuFormattedGradingCSV = async (
       newGrade: FinalGrade,
       oldGrade: FinalGrade
     ): boolean => {
+      // Prefer manual final grades
       const newIsManual = newGrade.assessmentModelId === null;
       const oldIsManual = oldGrade.assessmentModelId === null;
-
       if (newIsManual && !oldIsManual) return true;
       if (oldIsManual && !newIsManual) return false;
+
+      if (newGrade.grade > oldGrade.grade) return true;
       return (
+        newGrade.grade === oldGrade.grade &&
         new Date(newGrade.date).getTime() >= new Date(oldGrade.date).getTime()
       );
     };
@@ -367,6 +370,7 @@ export const getSisuFormattedGradingCSV = async (
       if (!gradeIsBetter(finalGrade, existingResult)) continue;
 
       existingResult.date = finalGrade.date;
+      existingResult.grade = finalGrade.grade;
       existingResult.assessmentModelId = finalGrade.assessmentModelId;
 
       // Set existing course result grade
@@ -374,6 +378,7 @@ export const getSisuFormattedGradingCSV = async (
         value => value.studentNumber === finalGrade.User?.studentNumber
       );
       if (existingCourseResult === undefined) {
+        // Should pretty much never happen
         logger.error("Couldn't find duplicate final grade again");
         throw new ApiError(
           "Couldn't find duplicate final grade again",

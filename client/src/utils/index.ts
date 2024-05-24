@@ -91,10 +91,10 @@ type BestFinalGradeData = {
   assessmentModelId: number | null;
 };
 /**
- * Finds the latest final grade from a list of final grades preferring manual
+ * Finds the best final grade from a list of final grades preferring manual
  * ones.
  */
-export const findLatestFinalGrade = <T extends BestFinalGradeData>(
+export const findBestFinalGrade = <T extends BestFinalGradeData>(
   finalGrades: readonly T[]
 ): T | null => {
   let bestSoFar: T | null = null;
@@ -114,7 +114,12 @@ export const findLatestFinalGrade = <T extends BestFinalGradeData>(
       continue;
     }
 
-    if (finalGrade.date >= bestSoFar.date) bestSoFar = finalGrade;
+    if (finalGrade.grade > bestSoFar.grade) bestSoFar = finalGrade;
+    else if (
+      finalGrade.grade === bestSoFar.grade &&
+      finalGrade.date >= bestSoFar.date
+    )
+      bestSoFar = finalGrade;
   }
 
   return bestSoFar;
