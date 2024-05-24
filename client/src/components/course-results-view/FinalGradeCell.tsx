@@ -7,7 +7,7 @@ import {Box, IconButton, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import {JSX, useState} from 'react';
 
-import {FinalGradeData} from '@/common/types';
+import {FinalGradeData, GradingScale} from '@/common/types';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
 import {findBestFinalGrade} from '../../utils';
 
@@ -15,11 +15,13 @@ type FinalGradeCellProps = {
   userId: number;
   studentNumber: string;
   finalGrades: FinalGradeData[];
+  gradingScale: GradingScale;
 };
 const FinalGradeCell = ({
   userId,
   studentNumber,
   finalGrades,
+  gradingScale,
 }: FinalGradeCellProps): JSX.Element => {
   const theme = useTheme();
 
@@ -27,6 +29,14 @@ const FinalGradeCell = ({
   const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
 
   const bestFinalGrade = findBestFinalGrade(finalGrades);
+
+  const getGradeString = (): string => {
+    if (bestFinalGrade?.grade === undefined) return '-';
+    // TODO: Handle GradingScale.SecondNationalLanguage
+    if (gradingScale === GradingScale.Numerical)
+      return bestFinalGrade.grade.toString();
+    return bestFinalGrade.grade === 0 ? 'Fail' : 'Pass';
+  };
 
   return (
     <Box
@@ -47,7 +57,7 @@ const FinalGradeCell = ({
       }}
       // align="center"
     >
-      <span>{bestFinalGrade?.grade ?? '-'}</span>
+      <span>{getGradeString()}</span>
       {/* If there are multiple final grades "show more" icon*/}
       {(finalGrades.length > 1 || hover) && (
         <>
