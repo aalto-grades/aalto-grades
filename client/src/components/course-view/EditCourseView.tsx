@@ -40,6 +40,7 @@ import {
   GradingScale,
   Language,
 } from '@/common/types';
+import {useGetFinalGrades} from '../../hooks/api/finalGrade';
 import {useEditCourse, useGetCourse} from '../../hooks/useApi';
 import {sisuLanguageOptions} from '../../utils';
 import {convertToClientGradingScale} from '../../utils/textFormat';
@@ -115,6 +116,7 @@ const FormField = ({
   select,
   type,
   children,
+  disabled,
 }: {
   form: FormikProps<FormData>;
   value: keyof FormData;
@@ -122,6 +124,7 @@ const FormField = ({
   helperText: string;
   select?: boolean;
   type?: HTMLInputTypeAttribute;
+  disabled?: boolean;
 } & PropsWithChildren): JSX.Element => (
   <TextField
     id={value}
@@ -129,7 +132,7 @@ const FormField = ({
     type={type ?? 'text'}
     fullWidth
     value={form.values[value]}
-    disabled={form.isSubmitting}
+    disabled={form.isSubmitting || disabled}
     label={label}
     InputLabelProps={{shrink: true}}
     margin="normal"
@@ -175,8 +178,10 @@ const FormLanguagesField = ({
 
 const EditCourseView = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const editCourse = useEditCourse();
+
   const course = useGetCourse(courseId);
+  const editCourse = useEditCourse();
+  const finalGrades = useGetFinalGrades(courseId);
 
   const [initTeachersInCharge, setInitTeachersInCharge] = useState<string[]>(
     []
@@ -310,7 +315,8 @@ const EditCourseView = (): JSX.Element => {
     );
   };
 
-  if (!initialValues) return <Typography>Loading</Typography>;
+  if (!initialValues || finalGrades.data === undefined)
+    return <Typography>Loading</Typography>;
 
   return (
     <>
@@ -375,6 +381,7 @@ const EditCourseView = (): JSX.Element => {
                   <FormField
                     form={form}
                     value="gradingScale"
+                    disabled={finalGrades.data.length > 0}
                     label="Grading Scale*"
                     helperText="Grading scale of the course, e.g., 0-5 or pass/fail."
                     select
