@@ -17,14 +17,19 @@ import {
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
+import {z} from 'zod';
 
-import {StudentRow, SystemRole} from '@/common/types';
+import {GradingScale, StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateGraph} from '@/common/util/calculateGraph';
 import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
 import SisuDownloadDialog from './SisuDownloadDialog';
 import {useTableContext} from '../../context/useTableContext';
 import {useAddFinalGrades} from '../../hooks/api/finalGrade';
-import {useGetAllAssessmentModels, useGetGrades} from '../../hooks/useApi';
+import {
+  useGetAllAssessmentModels,
+  useGetCourse,
+  useGetGrades,
+} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import {GradeSelectOption, findBestGrade} from '../../utils';
 import {findLatestGrade} from '../../utils/table';
@@ -59,6 +64,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   const allAssessmentModels = useGetAllAssessmentModels(courseId);
   const addFinalGrades = useAddFinalGrades(courseId);
   const getGrades = useGetGrades(courseId);
+  const course = useGetCourse(courseId);
 
   const [showCalculateDialog, setShowCalculateDialog] =
     useState<boolean>(false);
@@ -141,7 +147,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
     const model = assessmentModels?.find(
       assessmentModel => assessmentModel.id === assessmentModelId
     );
-    if (model === undefined) return false;
+    if (model === undefined || course.data === undefined) return false;
 
     enqueueSnackbar('Calculating final grades...', {variant: 'info'});
 
@@ -155,6 +161,19 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         })),
       }))
     );
+    for (const grade of Object.values(finalGrades)) {
+      // TODO: Handle GradingScale.SecondNationalLanguage
+      const maxGrade =
+        course.data.gradingScale === GradingScale.PassFail ? 1 : 5;
+      const Schema = z.number().int().min(0).max(maxGrade);
+      const result = Schema.safeParse(grade.finalGrade);
+      if (!result.success) {
+        enqueueSnackbar(`Invalid final grade ${grade.finalGrade}`, {
+          variant: 'error',
+        });
+        return false;
+      }
+    }
     await addFinalGrades.mutateAsync(
       selectedRows.map(selectedRow => ({
         userId: selectedRow.user.id,
