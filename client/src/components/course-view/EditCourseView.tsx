@@ -250,7 +250,7 @@ const EditCourseView = (): JSX.Element => {
       courseCode: values.courseCode,
       minCredits: values.minCredits,
       maxCredits: values.maxCredits,
-      gradingScale: GradingScale.Numerical,
+      gradingScale: values.gradingScale,
       languageOfInstruction: values.languageOfInstruction,
       department: {
         fi: values.departmentFi,

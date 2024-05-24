@@ -191,11 +191,12 @@ export const editCourse = async (
   await sequelize.transaction(async (t: Transaction): Promise<void> => {
     await Course.update(
       {
-        courseCode: courseCode,
-        minCredits: minCredits,
-        maxCredits: maxCredits,
-        gradingScale: gradingScale,
-        languageOfInstruction: languageOfInstruction,
+        courseCode: courseCode ?? course.courseCode,
+        minCredits: minCredits ?? course.minCredits,
+        maxCredits: maxCredits ?? course.maxCredits,
+        gradingScale: gradingScale ?? course.gradingScale,
+        languageOfInstruction:
+          languageOfInstruction ?? course.languageOfInstruction,
       },
       {
         where: {id: course.id},
