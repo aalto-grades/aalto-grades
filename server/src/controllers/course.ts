@@ -13,6 +13,7 @@ import {
   HttpCode,
   Language,
   NewCourseDataSchema,
+  SystemRole,
 } from '@/common/types';
 import {
   findAndValidateCourseId,
@@ -27,7 +28,7 @@ import Course from '../database/models/course';
 import CourseRole from '../database/models/courseRole';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
-import {ApiError, CourseFull} from '../types';
+import {ApiError, CourseFull, JwtClaims} from '../types';
 
 /**
  * Responds with CourseData
@@ -154,8 +155,9 @@ export const addCourse = async (
 export const editCourse = async (
   req: TypedRequestBody<typeof EditCourseDataSchema>,
   res: Response
-): Promise<void> => {
+): Promise<Response | undefined> => {
   const course = await findAndValidateCourseId(req.params.courseId);
+  const user = req.user as JwtClaims;
 
   const {
     courseCode,
@@ -168,6 +170,18 @@ export const editCourse = async (
     name,
     assistants,
   } = req.body;
+
+  const newTeachers =
+    teachersInCharge !== undefined
+      ? await validateEmailList(teachersInCharge)
+      : null;
+  const newAssistants =
+    assistants !== undefined ? await validateEmailList(assistants) : null;
+
+  if (user.role !== SystemRole.Admin) {
+    await CourseRole.updateCourseRoles(null, newAssistants, course.id);
+    return res.sendStatus(HttpCode.Ok);
+  }
 
   if (
     minCredits !== undefined &&
@@ -190,14 +204,6 @@ export const editCourse = async (
       HttpCode.BadRequest
     );
   }
-
-  const newTeachers =
-    teachersInCharge !== undefined
-      ? await validateEmailList(teachersInCharge)
-      : null;
-
-  const newAssistants: User[] | null =
-    assistants !== undefined ? await validateEmailList(assistants) : null;
 
   await sequelize.transaction(async (t: Transaction): Promise<void> => {
     try {
