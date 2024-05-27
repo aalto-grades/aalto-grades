@@ -211,6 +211,15 @@ describe('Test POST /v1/courses - create new course', () => {
     await responseTests.testNotFound(url, cookies.adminCookie).post(testData);
   });
 
+  it('should respond with 409 when course code exists', async () => {
+    await createData.createCourse({courseData: {courseCode: 'CS-A9673'}});
+
+    const url = '/v1/courses/';
+    const testData = createCourseData();
+    testData.courseCode = 'CS-A9673';
+    await responseTests.testConflict(url, cookies.adminCookie).post(testData);
+  });
+
   it('should respond with 422 when course has duplicate roles', async () => {
     const courseData = createCourseData();
     const url = '/v1/courses';
@@ -489,7 +498,15 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     const testData: EditCourseData = {
       teachersInCharge: ['teacher@aalto.fi', 'teacher1000@aalto.fi'],
     };
-    await responseTests.testNotFound(url, cookies.adminCookie).post(testData);
+    await responseTests.testNotFound(url, cookies.adminCookie).put(testData);
+  });
+
+  it('should respond with 409 when course code exists', async () => {
+    await createData.createCourse({courseData: {courseCode: 'CS-A7407'}});
+
+    const url = `/v1/courses/${courseId}`;
+    const testData: EditCourseData = {courseCode: 'CS-A7407'};
+    await responseTests.testConflict(url, cookies.adminCookie).put(testData);
   });
 
   it('should respond with 422 when course has duplicate roles', async () => {
