@@ -171,6 +171,13 @@ export const editCourse = async (
     assistants,
   } = req.body;
 
+  // Get old and new teachers & assistants
+  const oldTeachers = await CourseRole.findAll({
+    where: {courseId: course.id, role: CourseRoleType.Teacher},
+  });
+  const oldAssistants = await CourseRole.findAll({
+    where: {courseId: course.id, role: CourseRoleType.Assistant},
+  });
   const newTeachers =
     teachersInCharge !== undefined
       ? await validateEmailList(teachersInCharge)
@@ -179,6 +186,7 @@ export const editCourse = async (
     assistants !== undefined ? await validateEmailList(assistants) : null;
 
   if (user.role !== SystemRole.Admin) {
+    validateRoleUniqueness(oldTeachers, newAssistants ?? oldAssistants);
     await CourseRole.updateCourseRoles(null, newAssistants, course.id);
     return res.sendStatus(HttpCode.Ok);
   }
@@ -255,9 +263,10 @@ export const editCourse = async (
   });
 
   if (newTeachers !== null || newAssistants !== null) {
-    if (newTeachers !== null && newAssistants !== null)
-      validateRoleUniqueness(newTeachers, newAssistants);
-
+    validateRoleUniqueness(
+      newTeachers ?? oldTeachers,
+      newAssistants ?? oldAssistants
+    );
     await CourseRole.updateCourseRoles(newTeachers, newAssistants, course.id);
   }
 

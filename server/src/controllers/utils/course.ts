@@ -5,6 +5,7 @@
 import {CourseData, CourseRoleType, HttpCode} from '@/common/types';
 import logger from '../../configs/winston';
 import Course from '../../database/models/course';
+import CourseRole from '../../database/models/courseRole';
 import CourseTranslation from '../../database/models/courseTranslation';
 import User from '../../database/models/user';
 import {ApiError, CourseFull, stringToIdSchema} from '../../types';
@@ -163,12 +164,16 @@ export const validateEmailList = async (
  * @throws ApiError(422) if duplicates found
  */
 export const validateRoleUniqueness = (
-  teachers: User[],
-  assistants: User[]
+  teachers: User[] | CourseRole[],
+  assistants: User[] | CourseRole[]
 ): void => {
-  const assistantIds = new Set<number>(assistants.map(teacher => teacher.id));
+  const assistantIds = new Set<number>(
+    assistants.map(assistant =>
+      'id' in assistant ? assistant.id : assistant.userId
+    )
+  );
   for (const teacher of teachers) {
-    if (assistantIds.has(teacher.id)) {
+    if (assistantIds.has('id' in teacher ? teacher.id : teacher.userId)) {
       throw new ApiError(
         'Course cannot contain same user as both a teacher and assistant',
         HttpCode.UnprocessableEntity
