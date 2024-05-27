@@ -7,6 +7,7 @@ import {IconButton, Tooltip} from '@mui/material';
 import {JSX, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
+import {GradingScale} from '@/common/types';
 import {GroupedStudentRow} from '../../context/GradesTableProvider';
 import {useGetAllAssessmentModels} from '../../hooks/useApi';
 
@@ -14,15 +15,24 @@ type PropsType = {
   row: GroupedStudentRow;
   assessmentModelIds: number[] | undefined;
   onClick: () => void;
+  gradingScale: GradingScale;
 };
 const PredictedGradeCell = ({
   row,
   assessmentModelIds,
   onClick,
+  gradingScale,
 }: PropsType): JSX.Element => {
   const [hover, setHover] = useState<boolean>(false);
   const {courseId} = useParams() as {courseId: string};
   const assessmentModels = useGetAllAssessmentModels(courseId);
+
+  const getGradeString = (grade: number | undefined): string => {
+    if (grade === undefined) return '-';
+    // TODO: Handle GradingScale.SecondNationalLanguage
+    if (gradingScale === GradingScale.Numerical) return grade.toString();
+    return grade === 0 ? 'Fail' : 'Pass';
+  };
 
   return (
     <div
@@ -49,8 +59,10 @@ const PredictedGradeCell = ({
       >
         <p style={{margin: 0, display: 'inline'}}>
           {assessmentModelIds
-            ?.map(modelId => row.predictedFinalGrades?.[modelId]?.finalGrade)
-            .join('/') || 'N/A'}
+            ?.map(modelId =>
+              getGradeString(row.predictedFinalGrades?.[modelId]?.finalGrade)
+            )
+            .join(' / ') || 'N/A'}
         </p>
       </Tooltip>
       {assessmentModelIds !== undefined &&

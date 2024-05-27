@@ -204,6 +204,8 @@ definitions:
         $ref: '#/components/responses/Forbidden'
       404:
         $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
       422:
         description: Duplicate emails found.
         content:
@@ -268,6 +270,8 @@ definitions:
         $ref: '#/components/responses/AuthorizationError'
       404:
         $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
       422:
         description: Duplicate emails found.
         content:
