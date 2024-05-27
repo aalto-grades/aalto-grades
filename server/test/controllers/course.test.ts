@@ -325,8 +325,10 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     },
   };
 
-  const findUsers = (emails: string[] | undefined): TeacherData[] => {
-    if (emails === undefined) return [];
+  const findUsers = (
+    emails: string[] | undefined
+  ): TeacherData[] | undefined => {
+    if (emails === undefined) return undefined;
     const users = [];
     for (const email of emails) {
       let user = teachers.find(teacher => teacher.email === email);
@@ -348,7 +350,8 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
 
   const testCourseEditSuccess = async (
     edit1: EditCourseData,
-    edit2: EditCourseData
+    edit2: EditCourseData,
+    cookie: string[] = cookies.adminCookie
   ): Promise<void> => {
     const checkCourseData = async (expected: CourseData): Promise<void> => {
       const dbCourse = parseCourseFull(await findCourseFullById(courseId));
@@ -365,23 +368,30 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       ...initState,
       ...edit1,
       id: courseId,
-      teachersInCharge: findUsers(edit1.teachersInCharge),
-      assistants: findUsers(edit1.assistants),
-    } as unknown as CourseData;
+      teachersInCharge:
+        findUsers(edit1.teachersInCharge) ?? initState.teachersInCharge,
+      assistants: findUsers(edit1.assistants) ?? initState.assistants,
+    };
 
     const courseEdit2: CourseData = {
       ...initState,
       ...edit1,
       ...edit2,
       id: courseId,
-      teachersInCharge: findUsers(edit2.teachersInCharge),
-      assistants: findUsers(edit2.assistants),
+      teachersInCharge:
+        findUsers(edit2.teachersInCharge) ??
+        findUsers(edit1.teachersInCharge) ??
+        initState.teachersInCharge,
+      assistants:
+        findUsers(edit2.assistants) ??
+        findUsers(edit1.assistants) ??
+        initState.assistants,
     } as unknown as CourseData;
 
     await request
       .put(`/v1/courses/${courseId}`)
       .send(edit1)
-      .set('Cookie', cookies.adminCookie)
+      .set('Cookie', cookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -390,7 +400,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     await request
       .put(`/v1/courses/${courseId}`)
       .send(edit2)
-      .set('Cookie', cookies.adminCookie)
+      .set('Cookie', cookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -399,6 +409,22 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
 
   it('should edit a course', async () => {
     await testCourseEditSuccess(uneditedCourseDataBase, courseDataEdits);
+  });
+
+  it('should edit a course as a teacher', async () => {
+    // Add teacher to the course first
+    await request
+      .put(`/v1/courses/${courseId}`)
+      .send({teachersInCharge: ['teacher@aalto.fi']})
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    await testCourseEditSuccess(
+      {assistants: ['assistant1@aalto.fi']},
+      {assistants: ['assistant1@aalto.fi', 'assistant2@aalto.fi']},
+      cookies.teacherCookie
+    );
   });
 
   it('should successfully add a single teacher in charge / assistant', async () => {
@@ -473,10 +499,16 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
-    const url = `/v1/courses/${-1}`;
-    const data: EditCourseData = {maxCredits: 10};
+    let url = `/v1/courses/${-1}`;
+    const data: EditCourseData = {assistants: ['assistant1@aalto.fi']};
     await responseTests.testUnauthorized(url).put(data);
 
+    url = `/v1/courses/${courseId}`;
+    await responseTests
+      .testForbidden(url, [cookies.assistantCookie, cookies.studentCookie])
+      .put(data);
+
+    url = `/v1/courses/${noRoleCourseId}`;
     await responseTests
       .testForbidden(url, [
         cookies.teacherCookie,
