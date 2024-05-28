@@ -11,7 +11,7 @@ import {
   HttpCode,
   NewFinalGradeArraySchema,
 } from '@/common/types';
-import {validateAssessmentModelBelongsToCourse} from './utils/assessmentModel';
+import {validateGradingModelBelongsToCourse} from './utils/assessmentModel';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {findAndValidateFinalGradePath} from './utils/finalGrade';
 import {validateUserAndGrader} from './utils/grades';
@@ -49,7 +49,7 @@ export const getFinalGrades = async (
       finalGradeId: finalGrade.id,
       user: user,
       courseId: finalGrade.courseId,
-      assessmentModelId: finalGrade.assessmentModelId,
+      gradingModelId: finalGrade.assessmentModelId,
       grader: grader,
       grade: finalGrade.grade,
       date: new Date(finalGrade.date),
@@ -70,10 +70,10 @@ export const addFinalGrades = async (
   const course = await findAndValidateCourseId(req.params.courseId);
 
   // Validate that grading models belong to the course
-  const assessmentModels = new Set<number>();
+  const gradingModels = new Set<number>();
   for (const finalGrade of req.body) {
-    if (finalGrade.assessmentModelId !== null)
-      assessmentModels.add(finalGrade.assessmentModelId);
+    if (finalGrade.gradingModelId !== null)
+      gradingModels.add(finalGrade.gradingModelId);
 
     // TODO: Handle GradingScale.SecondNationalLanguage
     if (course.gradingScale === GradingScale.PassFail && finalGrade.grade > 1) {
@@ -83,14 +83,14 @@ export const addFinalGrades = async (
       );
     }
   }
-  for (const modelId of assessmentModels) {
-    await validateAssessmentModelBelongsToCourse(course.id, modelId);
+  for (const modelId of gradingModels) {
+    await validateGradingModelBelongsToCourse(course.id, modelId);
   }
 
   const preparedBulkCreate: NewDbFinalGradeData[] = req.body.map(
     finalGrade => ({
       userId: finalGrade.userId,
-      assessmentModelId: finalGrade.assessmentModelId,
+      assessmentModelId: finalGrade.gradingModelId,
       courseId: course.id,
       graderId: grader.id,
       date: finalGrade.date,

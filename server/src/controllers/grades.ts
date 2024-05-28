@@ -120,7 +120,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
       finalGradeId: finalGrade.id,
       user: user,
       courseId: finalGrade.courseId,
-      assessmentModelId: finalGrade.assessmentModelId,
+      gradingModelId: finalGrade.assessmentModelId,
       grader: grader,
       grade: finalGrade.grade,
       date: new Date(finalGrade.date),

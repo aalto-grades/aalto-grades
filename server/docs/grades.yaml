@@ -275,7 +275,7 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/courses/{courseId}/assessment-models/{assessmentModelId}/grades/csv/sisu:
+/v1/courses/{courseId}/grading-models/{gradingModelId}/grades/csv/sisu:
   get:
     tags: [Grades]
     description: >

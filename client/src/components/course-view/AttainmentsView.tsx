@@ -25,7 +25,7 @@ import {
   useAddAttainment,
   useDeleteAttainment,
   useEditAttainment,
-  useGetAllAssessmentModels,
+  useGetAllGradingModels,
   useGetAttainments,
   useGetGrades,
 } from '../../hooks/useApi';
@@ -46,7 +46,7 @@ const AttainmentsView = (): JSX.Element => {
   const {auth, isTeacherInCharge} = useAuth();
 
   const grades = useGetGrades(courseId);
-  const assessmentModels = useGetAllAssessmentModels(courseId);
+  const gradingModels = useGetAllGradingModels(courseId);
   const attainments = useGetAttainments(courseId);
   const addAttainment = useAddAttainment(courseId);
   const editAttainment = useEditAttainment(courseId);
@@ -74,15 +74,15 @@ const AttainmentsView = (): JSX.Element => {
 
   const attsWithModels = useMemo(() => {
     const withModels = new Set<number>();
-    if (assessmentModels.data === undefined) return withModels;
-    for (const model of assessmentModels.data) {
+    if (gradingModels.data === undefined) return withModels;
+    for (const model of gradingModels.data) {
       for (const node of model.graphStructure.nodes) {
         if (node.type !== 'attainment') continue;
         withModels.add(parseInt(node.id.split('-')[1]));
       }
     }
     return withModels;
-  }, [assessmentModels.data]);
+  }, [gradingModels.data]);
 
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge,

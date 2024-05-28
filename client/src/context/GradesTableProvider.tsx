@@ -41,7 +41,7 @@ import PredictedGradeCell from '../components/course-results-view/PredictedGrade
 import UserGraphDialog from '../components/course-results-view/UserGraphDialog';
 import PrettyChip from '../components/shared/PrettyChip';
 import {
-  useGetAllAssessmentModels,
+  useGetAllGradingModels,
   useGetAttainments,
   useGetCourse,
 } from '../hooks/useApi';
@@ -54,8 +54,8 @@ export type TableContextProps = {
   //   setTable: Dispatch<SetStateAction<typeof table>;
   gradeSelectOption: 'best' | 'latest';
   setGradeSelectOption: Dispatch<SetStateAction<'best' | 'latest'>>;
-  selectedAssessmentModel: 'any' | number;
-  setSelectedAssessmentModel: Dispatch<SetStateAction<'any' | number>>;
+  selectedGradingModel: 'any' | number;
+  setSelectedGradingModel: Dispatch<SetStateAction<'any' | number>>;
 };
 // Create the context
 export const GradesTableContext = createContext<TableContextProps | undefined>(
@@ -117,7 +117,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
 
   const course = useGetCourse(courseId);
   const attainments = useGetAttainments(courseId);
-  const allAssessmentModels = useGetAllAssessmentModels(courseId);
+  const allGradingModels = useGetAllGradingModels(courseId);
 
   const [_isPending, startTransition] = useTransition();
   const [rowSelection, setRowSelection] = useState({});
@@ -132,27 +132,27 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   const [gradeSelectOption, setGradeSelectOption] = useState<'best' | 'latest'>(
     'best'
   );
-  const [selectedAssessmentModel, setSelectedAssessmentModel] = useState<
+  const [selectedGradingModel, setSelectedGradingModel] = useState<
     'any' | number
   >('any');
 
   // Filter out archived models
-  const assessmentModels = useMemo(
+  const gradingModels = useMemo(
     () =>
-      allAssessmentModels.data !== undefined
-        ? allAssessmentModels.data.filter(model => !model.archived)
+      allGradingModels.data !== undefined
+        ? allGradingModels.data.filter(model => !model.archived)
         : undefined,
-    [allAssessmentModels.data]
+    [allGradingModels.data]
   );
 
   // Row are always grouped, toggling grouping just add the grouping column to the table
   const groupedData = useMemo(() => {
     let predictedGrades: ReturnType<typeof predictGrades> = [];
-    if (assessmentModels) {
+    if (gradingModels) {
       startTransition(() => {
         predictedGrades = predictGrades(
           props.data,
-          assessmentModels,
+          gradingModels,
           gradeSelectOption
         );
         console.log(predictedGrades);
@@ -172,7 +172,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       })),
       gradeSelectOption
     );
-  }, [assessmentModels, props.data, gradeSelectOption]);
+  }, [gradingModels, props.data, gradeSelectOption]);
 
   // const [globalFilter, setGlobalFilter] = useState('');
 
@@ -188,18 +188,16 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   // console.log(expanded);
   // console.log(rowSelection);
 
-  const getAttainmentsForAssessmentModel = useCallback(
+  const getAttainmentsForGradingModel = useCallback(
     (modelId: number | 'any'): AttainmentData[] => {
       if (modelId === 'any') return attainments.data ?? [];
-      if (assessmentModels === undefined || attainments.data === undefined)
+      if (gradingModels === undefined || attainments.data === undefined)
         return [];
 
-      const assessmentModel = assessmentModels.find(
-        model => model.id === modelId
-      );
-      if (assessmentModel === undefined) return [];
+      const gradingModel = gradingModels.find(model => model.id === modelId);
+      if (gradingModel === undefined) return [];
 
-      const attainmentIds = assessmentModel.graphStructure.nodes
+      const attainmentIds = gradingModel.graphStructure.nodes
         .filter(node => node.id.startsWith('attainment'))
         .map(node => parseInt(node.id.split('-')[1]));
 
@@ -207,14 +205,13 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         attainmentIds.includes(attainment.id)
       );
     },
-    [assessmentModels, attainments.data]
+    [gradingModels, attainments.data]
   );
 
   // Creating Grades columns
   const gradeColumns = useMemo(() => {
-    const selectedAttainments = getAttainmentsForAssessmentModel(
-      selectedAssessmentModel
-    );
+    const selectedAttainments =
+      getAttainmentsForGradingModel(selectedGradingModel);
 
     return selectedAttainments.map(att =>
       columnHelper.accessor(
@@ -234,7 +231,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         }
       )
     );
-  }, [getAttainmentsForAssessmentModel, selectedAssessmentModel]);
+  }, [getAttainmentsForGradingModel, selectedGradingModel]);
 
   const groupingColumns =
     grouping.length > 0
@@ -375,10 +372,10 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       meta: {PrettyChipPosition: 'middle'},
       sortingFn: (a, b, columnId) => {
         const modelId =
-          selectedAssessmentModel !== 'any'
-            ? selectedAssessmentModel
-            : assessmentModels?.length === 1
-              ? assessmentModels[0].id
+          selectedGradingModel !== 'any'
+            ? selectedGradingModel
+            : gradingModels?.length === 1
+              ? gradingModels[0].id
               : 'any';
         if (modelId === 'any') return 0; // Makes no sense to sort if there is more than one model
 
@@ -402,13 +399,13 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       cell: info => (
         <PredictedGradeCell
           row={info.getValue()}
-          assessmentModelIds={
-            selectedAssessmentModel === 'any'
-              ? assessmentModels?.map(model => model.id)
-              : [selectedAssessmentModel]
+          gradingModelIds={
+            selectedGradingModel === 'any'
+              ? gradingModels?.map(model => model.id)
+              : [selectedGradingModel]
           }
           onClick={() => {
-            if (assessmentModels === undefined || assessmentModels.length === 0)
+            if (gradingModels === undefined || gradingModels.length === 0)
               return;
             setUserGraphData(info.getValue());
             setUserGraphOpen(true);
@@ -488,23 +485,23 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         table,
         gradeSelectOption,
         setGradeSelectOption,
-        selectedAssessmentModel,
-        setSelectedAssessmentModel,
+        selectedGradingModel: selectedGradingModel,
+        setSelectedGradingModel: setSelectedGradingModel,
       }}
     >
       <UserGraphDialog
         open={userGraphOpen}
         onClose={() => setUserGraphOpen(false)}
-        assessmentModels={[
-          ...(assessmentModels?.filter(
+        gradingModels={[
+          ...(gradingModels?.filter(
             model =>
-              model.id === selectedAssessmentModel ||
-              selectedAssessmentModel === 'any'
+              model.id === selectedGradingModel ||
+              selectedGradingModel === 'any'
           ) ?? []),
-          ...(assessmentModels?.filter(
+          ...(gradingModels?.filter(
             model =>
-              model.id !== selectedAssessmentModel &&
-              selectedAssessmentModel !== 'any'
+              model.id !== selectedGradingModel &&
+              selectedGradingModel !== 'any'
           ) ?? []),
         ]} // Very ugly way to sort the selected model to be the first
         row={userGraphData}

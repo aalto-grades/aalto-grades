@@ -30,7 +30,7 @@ import {
   useDeleteFinalGrade,
   useEditFinalGrade,
 } from '../../hooks/api/finalGrade';
-import {useGetAllAssessmentModels} from '../../hooks/useApi';
+import {useGetAllGradingModels} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import {findBestFinalGrade} from '../../utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
@@ -41,7 +41,7 @@ type ColTypes = {
   grader: string;
   grade: number;
   date: Date;
-  assessmentModel: string | null;
+  gradingModel: string | null;
   exportDate: Date | null;
   comment: string | null;
   selected: string;
@@ -64,7 +64,7 @@ const EditFinalGradesDialog = ({
   const {auth} = useAuth();
   const {courseId} = useParams() as {courseId: string};
 
-  const assessmentModels = useGetAllAssessmentModels(courseId);
+  const gradingModels = useGetAllGradingModels(courseId);
   const addFinalGrades = useAddFinalGrades(courseId);
   const deleteFinalGrade = useDeleteFinalGrade(courseId);
   const editFinalGrade = useEditFinalGrade(courseId);
@@ -87,7 +87,7 @@ const EditFinalGradesDialog = ({
       findBestFinalGrade(
         rows.map(row => ({
           ...row,
-          assessmentModelId: row.assessmentModel === null ? null : 0,
+          gradingModelId: row.gradingModel === null ? null : 0,
         }))
       ),
     [rows]
@@ -121,8 +121,8 @@ const EditFinalGradesDialog = ({
   useEffect(() => {
     const getModelName = (modelId: number | null): string | null => {
       if (modelId === null) return null;
-      if (assessmentModels.data === undefined) return 'Loading...';
-      const model = assessmentModels.data.find(mod => mod.id === modelId);
+      if (gradingModels.data === undefined) return 'Loading...';
+      const model = gradingModels.data.find(mod => mod.id === modelId);
       return model?.name ?? 'Not found';
     };
 
@@ -132,14 +132,14 @@ const EditFinalGradesDialog = ({
       grader: finalGrade.grader.name!,
       grade: finalGrade.grade,
       date: finalGrade.date,
-      assessmentModel: getModelName(finalGrade.assessmentModelId),
+      gradingModel: getModelName(finalGrade.gradingModelId),
       exportDate: finalGrade.sisuExportDate,
       comment: finalGrade.comment,
       selected: '',
     }));
     setRows(newRows);
     setInitRows(structuredClone(newRows));
-  }, [assessmentModels.data, finalGrades]);
+  }, [gradingModels.data, finalGrades]);
 
   if (!auth) return <>Not permitted</>; // Not needed?
 
@@ -164,7 +164,7 @@ const EditFinalGradesDialog = ({
       width: 110, // Enough width to fit the calendar icon
     },
     {
-      field: 'assessmentModel',
+      field: 'gradingModel',
       headerName: 'Grading model name',
       type: 'string',
       editable: false,
@@ -214,7 +214,7 @@ const EditFinalGradesDialog = ({
           grader: auth.name,
           grade: 0,
           date: new Date(),
-          assessmentModel: null,
+          gradingModel: null,
           exportDate: null,
           comment: '',
           selected: '',
@@ -241,7 +241,7 @@ const EditFinalGradesDialog = ({
         newGrades.push({
           grade: row.grade,
           date: row.date,
-          assessmentModelId: null,
+          gradingModelId: null,
           userId,
           comment: row.comment,
         });
@@ -319,7 +319,7 @@ const EditFinalGradesDialog = ({
                 sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
               }}
               isCellEditable={(params: GridCellParams<ColTypes>) =>
-                params.row.assessmentModel === null ||
+                params.row.gradingModel === null ||
                 params.field === 'exportDate' ||
                 params.field === 'comment'
               }

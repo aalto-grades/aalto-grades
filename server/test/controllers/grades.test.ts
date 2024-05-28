@@ -54,18 +54,19 @@ beforeAll(async () => {
   }
   studentNumbers = students.map(student => student.studentNumber);
 
-  let assessmentModelId: number;
-  [courseId, courseAttainments, assessmentModelId] =
-    await createData.createCourse({
+  let gradingModelId: number;
+  [courseId, courseAttainments, gradingModelId] = await createData.createCourse(
+    {
       courseData: {maxCredits: 5, courseCode: 'CS-A????'},
-    });
+    }
+  );
   for (const student of students) {
     // Create a worse final grade before the actual one
     if (student.finalGrade > 0) {
       await createData.createFinalGrade(
         courseId,
         student.id,
-        assessmentModelId,
+        gradingModelId,
         TEACHER_ID,
         student.finalGrade -
           Math.floor(Math.random() * (student.finalGrade + 1))
@@ -75,7 +76,7 @@ beforeAll(async () => {
     await createData.createFinalGrade(
       courseId,
       student.id,
-      assessmentModelId,
+      gradingModelId,
       TEACHER_ID,
       student.finalGrade
     );
@@ -85,7 +86,7 @@ beforeAll(async () => {
       await createData.createFinalGrade(
         courseId,
         student.id,
-        assessmentModelId,
+        gradingModelId,
         TEACHER_ID,
         student.finalGrade -
           Math.floor(Math.random() * (student.finalGrade + 1))

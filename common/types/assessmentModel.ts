@@ -7,7 +7,7 @@ import {z} from 'zod';
 import {GraphStructureSchema} from './graph';
 
 // Types
-export const AssessmentModelDataSchema = z.object({
+export const GradingModelDataSchema = z.object({
   id: z.number().int(),
   courseId: z.number().int(),
   name: z.string(),
@@ -16,28 +16,22 @@ export const AssessmentModelDataSchema = z.object({
   hasArchivedAttainments: z.boolean(),
   hasDeletedAttainments: z.boolean(),
 });
-export const NewAssessmentModelDataSchema = AssessmentModelDataSchema.omit({
+export const NewGradingModelDataSchema = GradingModelDataSchema.omit({
   id: true,
   courseId: true,
   archived: true,
   hasArchivedAttainments: true,
   hasDeletedAttainments: true,
 });
-export const EditAssessmentModelDataSchema = AssessmentModelDataSchema.omit({
+export const EditGradingModelDataSchema = GradingModelDataSchema.omit({
   id: true,
   courseId: true,
   hasArchivedAttainments: true,
   hasDeletedAttainments: true,
 }).partial();
 
-export const AssessmentModelDataArraySchema = z.array(
-  AssessmentModelDataSchema
-);
+export const GradingModelDataArraySchema = z.array(GradingModelDataSchema);
 
-export type NewAssessmentModelData = z.infer<
-  typeof NewAssessmentModelDataSchema
->;
-export type AssessmentModelData = z.infer<typeof AssessmentModelDataSchema>;
-export type EditAssessmentModelData = z.infer<
-  typeof EditAssessmentModelDataSchema
->;
+export type GradingModelData = z.infer<typeof GradingModelDataSchema>;
+export type NewGradingModelData = z.infer<typeof NewGradingModelDataSchema>;
+export type EditGradingModelData = z.infer<typeof EditGradingModelDataSchema>;

@@ -38,10 +38,10 @@ definitions:
         $ref: '#/definitions/UserData'
       courseId:
         $ref: '#/definitions/CourseId'
-      assessmentModelId:
+      gradingModelId:
         nullable: true
         allOf:
-          - $ref: '#/definitions/AssessmentModelId'
+          - $ref: '#/definitions/gradingModelId'
       grader:
         $ref: '#/definitions/UserData'
       grade:
@@ -54,7 +54,7 @@ definitions:
       - finalGradeId
       - userId
       - courseId
-      - assessmentModelId
+      - gradingModelId
       - graderId
       - grade
       - date
@@ -66,17 +66,17 @@ definitions:
     properties:
       userId:
         $ref: '#/definitions/UserId'
-      assessmentModelId:
+      gradingModelId:
         nullable: true
         allOf:
-          - $ref: '#/definitions/AssessmentModelId'
+          - $ref: '#/definitions/gradingModelId'
       grade:
         $ref: '#/definitions/FinalGrade'
       date:
         $ref: '#/definitions/FinalGradeDate'
     required:
       - userId
-      - assessmentModelId
+      - gradingModelId
       - grade
       - date
 

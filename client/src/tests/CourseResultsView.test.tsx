@@ -36,7 +36,7 @@ describe('Tests for CourseResultsView components', () => {
             <MemoryRouter initialEntries={['/1/course-results/1']}>
               <Routes>
                 <Route
-                  path=":courseId/course-results/:assessmentModelId"
+                  path=":courseId/course-results/:gradingModelId"
                   element={<CourseResultsView />}
                 />
               </Routes>

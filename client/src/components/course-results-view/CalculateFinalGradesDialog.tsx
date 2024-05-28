@@ -25,8 +25,8 @@ import 'dayjs/locale/en-gb';
 import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
-import {AssessmentModelData, StudentRow} from '@/common/types';
-import {useGetAllAssessmentModels} from '../../hooks/useApi';
+import {GradingModelData, StudentRow} from '@/common/types';
+import {useGetAllGradingModels} from '../../hooks/useApi';
 import {GradeSelectOption} from '../../utils';
 
 type PropsType = {
@@ -50,20 +50,21 @@ const CalculateFinalGradesDialog = ({
   calculateFinalGrades,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const allAssessmentModels = useGetAllAssessmentModels(courseId);
+  const allGradingModels = useGetAllGradingModels(courseId);
 
   const [dateOverride, setDateOverride] = useState<boolean>(false);
   const [gradingDate, setGradingDate] = useState<Dayjs>(dayjs());
-  const [selectedModel, setSelectedModel] =
-    useState<AssessmentModelData | null>(null);
+  const [selectedModel, setSelectedModel] = useState<GradingModelData | null>(
+    null
+  );
 
   // Filter out archived models
   const modelList = useMemo(
     () =>
-      allAssessmentModels.data !== undefined
-        ? allAssessmentModels.data.filter(model => !model.archived)
+      allGradingModels.data !== undefined
+        ? allGradingModels.data.filter(model => !model.archived)
         : [],
-    [allAssessmentModels.data]
+    [allGradingModels.data]
   );
 
   useEffect(() => {
@@ -97,7 +98,7 @@ const CalculateFinalGradesDialog = ({
     if (success) onClose();
   };
 
-  const getWarning = (model: AssessmentModelData | null): string => {
+  const getWarning = (model: GradingModelData | null): string => {
     if (model === null) return '';
     if (model.hasArchivedAttainments && model.hasDeletedAttainments)
       return 'Grading model contains deleted & archived attainments';

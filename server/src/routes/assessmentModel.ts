@@ -8,15 +8,15 @@ import {processRequestBody} from 'zod-express-middleware';
 
 import {
   CourseRoleType,
-  EditAssessmentModelDataSchema,
-  NewAssessmentModelDataSchema,
+  EditGradingModelDataSchema,
+  NewGradingModelDataSchema,
 } from '@/common/types';
 import {
-  addAssessmentModel,
-  deleteAssessmentModel,
-  editAssessmentModel,
-  getAllAssessmentModels,
-  getAssessmentModel,
+  addGradingModel,
+  deleteGradingModel,
+  editGradingModel,
+  getAllGradingModels,
+  getGradingModel,
 } from '../controllers/assessmentModel';
 import {handleInvalidRequestJson} from '../middleware';
 import {courseAuthorization} from '../middleware/authorization';
@@ -25,42 +25,42 @@ import {controllerDispatcher} from '../middleware/errorHandler';
 export const router = Router();
 
 router.get(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId',
+  '/v1/courses/:courseId/grading-models/:gradingModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]), // TODO: Allow students to view grading models?
-  controllerDispatcher(getAssessmentModel)
+  controllerDispatcher(getGradingModel)
 );
 
 router.get(
-  '/v1/courses/:courseId/assessment-models',
+  '/v1/courses/:courseId/grading-models',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
-  controllerDispatcher(getAllAssessmentModels)
+  controllerDispatcher(getAllGradingModels)
 );
 
 router.post(
-  '/v1/courses/:courseId/assessment-models',
+  '/v1/courses/:courseId/grading-models',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(NewAssessmentModelDataSchema),
-  controllerDispatcher(addAssessmentModel)
+  processRequestBody(NewGradingModelDataSchema),
+  controllerDispatcher(addGradingModel)
 );
 
 router.put(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId',
+  '/v1/courses/:courseId/grading-models/:gradingModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(EditAssessmentModelDataSchema),
-  controllerDispatcher(editAssessmentModel)
+  processRequestBody(EditGradingModelDataSchema),
+  controllerDispatcher(editGradingModel)
 );
 
 router.delete(
-  '/v1/courses/:courseId/assessment-models/:assessmentModelId',
+  '/v1/courses/:courseId/grading-models/:gradingModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
-  controllerDispatcher(deleteAssessmentModel)
+  controllerDispatcher(deleteGradingModel)
 );

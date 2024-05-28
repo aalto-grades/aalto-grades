@@ -11,7 +11,7 @@ export const FinalGradeDataSchema = z.object({
   finalGradeId: z.number().int(),
   user: UserDataSchema,
   courseId: z.number().int(),
-  assessmentModelId: z.number().int().nullable(),
+  gradingModelId: z.number().int().nullable(),
   grader: UserDataSchema,
   grade: z.number().int().min(0).max(5),
   date: DateSchema,
@@ -20,7 +20,7 @@ export const FinalGradeDataSchema = z.object({
 });
 export const NewFinalGradeSchema = z.object({
   userId: z.number().int(),
-  assessmentModelId: z.number().int().nullable(),
+  gradingModelId: z.number().int().nullable(),
   grade: z.number().int().min(0).max(5),
   date: DateSchema,
   comment: z.string().nullable(),

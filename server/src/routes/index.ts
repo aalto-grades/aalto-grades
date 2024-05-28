@@ -9,7 +9,7 @@ import swaggerJsdoc, {OAS3Options} from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
 import {router as aplusRouter} from './aplus';
-import {router as assessmentModelRouter} from './assessmentModel';
+import {router as gradingModelRouter} from './assessmentModel';
 import {router as attainmentRouter} from './attainment';
 import {router as authRouter} from './auth';
 import {router as courseRouter} from './course';
@@ -30,7 +30,7 @@ export const router: Router = Router();
 
 router.use(cookieParser());
 router.use(aplusRouter);
-router.use(assessmentModelRouter);
+router.use(gradingModelRouter);
 router.use(attainmentRouter);
 router.use(authRouter);
 router.use(courseRouter);

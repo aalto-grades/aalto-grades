@@ -9,23 +9,23 @@ import {useParams} from 'react-router-dom';
 
 import {GradingScale} from '@/common/types';
 import {GroupedStudentRow} from '../../context/GradesTableProvider';
-import {useGetAllAssessmentModels} from '../../hooks/useApi';
+import {useGetAllGradingModels} from '../../hooks/useApi';
 
 type PropsType = {
   row: GroupedStudentRow;
-  assessmentModelIds: number[] | undefined;
+  gradingModelIds: number[] | undefined;
   onClick: () => void;
   gradingScale: GradingScale;
 };
 const PredictedGradeCell = ({
   row,
-  assessmentModelIds,
+  gradingModelIds,
   onClick,
   gradingScale,
 }: PropsType): JSX.Element => {
   const [hover, setHover] = useState<boolean>(false);
   const {courseId} = useParams() as {courseId: string};
-  const assessmentModels = useGetAllAssessmentModels(courseId);
+  const gradingModels = useGetAllGradingModels(courseId);
 
   const getGradeString = (grade: number | undefined): string => {
     if (grade === undefined) return '-';
@@ -47,9 +47,9 @@ const PredictedGradeCell = ({
     >
       <Tooltip
         title={
-          assessmentModelIds !== undefined && assessmentModelIds.length > 1
-            ? `${assessmentModels.data
-                ?.filter(model => assessmentModelIds.includes(model.id))
+          gradingModelIds !== undefined && gradingModelIds.length > 1
+            ? `${gradingModels.data
+                ?.filter(model => gradingModelIds.includes(model.id))
                 .map(model => model.name)
                 .join(' / ')}`
             : undefined
@@ -58,25 +58,23 @@ const PredictedGradeCell = ({
         disableInteractive
       >
         <p style={{margin: 0, display: 'inline'}}>
-          {assessmentModelIds
+          {gradingModelIds
             ?.map(modelId =>
               getGradeString(row.predictedFinalGrades?.[modelId]?.finalGrade)
             )
             .join(' / ') || 'N/A'}
         </p>
       </Tooltip>
-      {assessmentModelIds !== undefined &&
-        assessmentModelIds.length > 0 &&
-        hover && (
-          <Tooltip title="View graph" placement="top" disableInteractive>
-            <IconButton
-              sx={{position: 'absolute', right: '0px', top: 'calc(50% - 20px)'}}
-              onClick={onClick}
-            >
-              <AccountTreeRounded color="primary" />
-            </IconButton>
-          </Tooltip>
-        )}
+      {gradingModelIds !== undefined && gradingModelIds.length > 0 && hover && (
+        <Tooltip title="View graph" placement="top" disableInteractive>
+          <IconButton
+            sx={{position: 'absolute', right: '0px', top: 'calc(50% - 20px)'}}
+            onClick={onClick}
+          >
+            <AccountTreeRounded color="primary" />
+          </IconButton>
+        </Tooltip>
+      )}
     </div>
   );
 };

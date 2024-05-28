@@ -26,7 +26,7 @@ import SisuDownloadDialog from './SisuDownloadDialog';
 import {useTableContext} from '../../context/useTableContext';
 import {useAddFinalGrades} from '../../hooks/api/finalGrade';
 import {
-  useGetAllAssessmentModels,
+  useGetAllGradingModels,
   useGetCourse,
   useGetGrades,
 } from '../../hooks/useApi';
@@ -55,13 +55,13 @@ const CourseResultsTableToolbar = (): JSX.Element => {
     table,
     gradeSelectOption,
     setGradeSelectOption,
-    selectedAssessmentModel,
-    setSelectedAssessmentModel,
+    selectedGradingModel,
+    setSelectedGradingModel,
   } = useTableContext();
   const navigate = useNavigate();
   const theme = useTheme();
 
-  const allAssessmentModels = useGetAllAssessmentModels(courseId);
+  const allGradingModels = useGetAllGradingModels(courseId);
   const addFinalGrades = useAddFinalGrades(courseId);
   const getGrades = useGetGrades(courseId);
   const course = useGetCourse(courseId);
@@ -75,12 +75,12 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
 
   // Filter out archived models
-  const assessmentModels = useMemo(
+  const gradingModels = useMemo(
     () =>
-      allAssessmentModels.data !== undefined
-        ? allAssessmentModels.data.filter(model => !model.archived)
+      allGradingModels.data !== undefined
+        ? allGradingModels.data.filter(model => !model.archived)
         : undefined,
-    [allAssessmentModels.data]
+    [allGradingModels.data]
   );
 
   const editRights = useMemo(
@@ -140,12 +140,12 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   // Triggers the calculation of final grades
   const handleCalculateFinalGrades = async (
     selectedRows: StudentRow[],
-    assessmentModelId: number,
+    gradingModelId: number,
     dateOverride: boolean,
     gradingDate: Date
   ): Promise<boolean> => {
-    const model = assessmentModels?.find(
-      assessmentModel => assessmentModel.id === assessmentModelId
+    const model = gradingModels?.find(
+      gradingModel => gradingModel.id === gradingModelId
     );
     if (model === undefined || course.data === undefined) return false;
 
@@ -177,7 +177,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
     await addFinalGrades.mutateAsync(
       selectedRows.map(selectedRow => ({
         userId: selectedRow.user.id,
-        assessmentModelId,
+        gradingModelId,
         grade: finalGrades[selectedRow.user.id].finalGrade,
         date: dateOverride ? gradingDate : findLatestGrade(selectedRow),
         comment: null,
@@ -225,23 +225,18 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         </Select>
       </FormControl>
       <FormControl>
-        <InputLabel id="select-assessment-model-option">
-          Grading Model
-        </InputLabel>
+        <InputLabel id="select-grading-model-option">Grading Model</InputLabel>
         <Select
-          labelId="select-assessment-model-option"
-          value={selectedAssessmentModel}
+          labelId="select-grading-model-option"
+          value={selectedGradingModel}
           label="Grading Model"
           onChange={e =>
-            setSelectedAssessmentModel(e.target.value as 'any' | number)
+            setSelectedGradingModel(e.target.value as 'any' | number)
           }
         >
           <MenuItem value="any">Any</MenuItem>
-          {(assessmentModels ?? []).map(model => (
-            <MenuItem
-              key={`assessment-model-select-${model.id}`}
-              value={model.id}
-            >
+          {(gradingModels ?? []).map(model => (
+            <MenuItem key={`grading-model-select-${model.id}`} value={model.id}>
               {model.name}
             </MenuItem>
           ))}

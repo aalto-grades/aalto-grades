@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AssessmentModelData} from '@/common/types';
+import {GradingModelData} from '@/common/types';
 
-export const mockAssessmentModel: AssessmentModelData = {
+export const mockGradingModel: GradingModelData = {
   id: 1,
   courseId: 1,
   name: 'Average',

@@ -13,128 +13,128 @@ import {
 } from '@tanstack/react-query';
 
 import {
-  AssessmentModelData,
-  AssessmentModelDataArraySchema,
-  AssessmentModelDataSchema,
-  EditAssessmentModelData,
+  GradingModelData,
+  GradingModelDataArraySchema,
+  GradingModelDataSchema,
+  EditGradingModelData,
   IdSchema,
-  NewAssessmentModelData,
+  NewGradingModelData,
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
 
-export const useGetAllAssessmentModels = (
+export const useGetAllGradingModels = (
   courseId: Numeric,
-  options?: Partial<UseQueryOptions<AssessmentModelData[]>>
-): UseQueryResult<AssessmentModelData[]> =>
+  options?: Partial<UseQueryOptions<GradingModelData[]>>
+): UseQueryResult<GradingModelData[]> =>
   useQuery({
-    queryKey: ['all-assessment-models', courseId],
+    queryKey: ['all-grading-models', courseId],
     queryFn: async () =>
-      AssessmentModelDataArraySchema.parse(
-        (await axios.get(`/v1/courses/${courseId}/assessment-models`)).data
+      GradingModelDataArraySchema.parse(
+        (await axios.get(`/v1/courses/${courseId}/grading-models`)).data
       ),
     ...options,
   });
 
-export const useGetAssessmentModel = (
+export const useGetGradingModel = (
   courseId: Numeric,
-  assessmentModelId: Numeric,
-  options?: Partial<UseQueryOptions<AssessmentModelData>>
-): UseQueryResult<AssessmentModelData> =>
+  gradingModelId: Numeric,
+  options?: Partial<UseQueryOptions<GradingModelData>>
+): UseQueryResult<GradingModelData> =>
   useQuery({
-    queryKey: ['assessment-model', courseId, assessmentModelId],
+    queryKey: ['grading-model', courseId, gradingModelId],
     queryFn: async () =>
-      AssessmentModelDataSchema.parse(
+      GradingModelDataSchema.parse(
         (
           await axios.get(
-            `/v1/courses/${courseId}/assessment-models/${assessmentModelId}`
+            `/v1/courses/${courseId}/grading-models/${gradingModelId}`
           )
         ).data
       ),
     ...options,
   });
 
-type AddAssessmentModelVars = {
+type AddGradingModelVars = {
   courseId: Numeric;
-  assessmentModel: NewAssessmentModelData;
+  gradingModel: NewGradingModelData;
 };
-export const useAddAssessmentModel = (
+export const useAddGradingModel = (
   options?: UseMutationOptions<number, unknown, unknown>
-): UseMutationResult<number, unknown, AddAssessmentModelVars> => {
+): UseMutationResult<number, unknown, AddGradingModelVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: AddAssessmentModelVars) =>
+    mutationFn: async (vars: AddGradingModelVars) =>
       IdSchema.parse(
         (
           await axios.post(
-            `/v1/courses/${vars.courseId}/assessment-models`,
-            vars.assessmentModel
+            `/v1/courses/${vars.courseId}/grading-models`,
+            vars.gradingModel
           )
         ).data
       ),
 
-    onSuccess: (_data: number, vars: AddAssessmentModelVars) => {
+    onSuccess: (_data: number, vars: AddGradingModelVars) => {
       queryClient.invalidateQueries({
-        queryKey: ['all-assessment-models', vars.courseId],
+        queryKey: ['all-grading-models', vars.courseId],
       });
     },
     ...options,
   });
 };
 
-type EditAssessmentModelVars = {
+type EditGradingModelVars = {
   courseId: Numeric;
-  assessmentModelId: Numeric;
-  assessmentModel: EditAssessmentModelData;
+  gradingModelId: Numeric;
+  gradingModel: EditGradingModelData;
 };
-export const useEditAssessmentModel = (
+export const useEditGradingModel = (
   options?: UseMutationOptions<unknown, unknown, unknown>
-): UseMutationResult<unknown, unknown, EditAssessmentModelVars> => {
+): UseMutationResult<unknown, unknown, EditGradingModelVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: EditAssessmentModelVars) =>
+    mutationFn: async (vars: EditGradingModelVars) =>
       await axios.put(
-        `/v1/courses/${vars.courseId}/assessment-models/${vars.assessmentModelId}`,
-        vars.assessmentModel
+        `/v1/courses/${vars.courseId}/grading-models/${vars.gradingModelId}`,
+        vars.gradingModel
       ),
 
-    onSuccess: (_data: unknown, vars: EditAssessmentModelVars) => {
+    onSuccess: (_data: unknown, vars: EditGradingModelVars) => {
       queryClient.invalidateQueries({
-        queryKey: ['assessment-model', vars.courseId, vars.assessmentModelId],
+        queryKey: ['grading-model', vars.courseId, vars.gradingModelId],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['all-assessment-models', vars.courseId],
+        queryKey: ['all-grading-models', vars.courseId],
       });
     },
     ...options,
   });
 };
 
-type DeleteAssessmentModelVars = {
+type DeleteGradingModelVars = {
   courseId: Numeric;
-  assessmentModelId: Numeric;
+  gradingModelId: Numeric;
 };
-export const useDeleteAssessmentModel = (
+export const useDeleteGradingModel = (
   options?: UseMutationOptions<unknown, unknown, unknown>
-): UseMutationResult<unknown, unknown, DeleteAssessmentModelVars> => {
+): UseMutationResult<unknown, unknown, DeleteGradingModelVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: DeleteAssessmentModelVars) =>
+    mutationFn: async (vars: DeleteGradingModelVars) =>
       await axios.delete(
-        `/v1/courses/${vars.courseId}/assessment-models/${vars.assessmentModelId}`
+        `/v1/courses/${vars.courseId}/grading-models/${vars.gradingModelId}`
       ),
 
-    onSuccess: (_data: unknown, vars: DeleteAssessmentModelVars) => {
+    onSuccess: (_data: unknown, vars: DeleteGradingModelVars) => {
       queryClient.invalidateQueries({
-        queryKey: ['assessment-model', vars.courseId],
+        queryKey: ['grading-model', vars.courseId],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['all-assessment-models', vars.courseId],
+        queryKey: ['all-grading-models', vars.courseId],
       });
     },
     ...options,

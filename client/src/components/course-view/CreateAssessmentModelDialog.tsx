@@ -19,9 +19,9 @@ import {JSX, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
 import {GraphTemplate, initGraph} from '@/common/util/initGraph';
-import {useAddAssessmentModel, useGetAttainments} from '../../hooks/useApi';
+import {useAddGradingModel, useGetAttainments} from '../../hooks/useApi';
 
-const CreateAssessmentModelDialog = ({
+const CreateGradingModelDialog = ({
   onClose,
   open,
   onSubmit,
@@ -32,17 +32,17 @@ const CreateAssessmentModelDialog = ({
 }): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const attainments = useGetAttainments(courseId);
-  const addAssessmentModel = useAddAssessmentModel();
+  const addGradingModel = useAddGradingModel();
 
   const [name, setName] = useState<string>('');
   const [template, setTemplate] = useState<GraphTemplate>('none');
 
   const handleSubmit = (): void => {
     if (attainments.data === undefined) return;
-    addAssessmentModel.mutate(
+    addGradingModel.mutate(
       {
         courseId: courseId,
-        assessmentModel: {
+        gradingModel: {
           name,
           graphStructure: initGraph(
             template,
@@ -71,13 +71,13 @@ const CreateAssessmentModelDialog = ({
           required
           fullWidth
           value={name}
-          disabled={addAssessmentModel.isPending}
+          disabled={addGradingModel.isPending}
           onChange={e => setName(e.target.value)}
         />
         <FormControl
           fullWidth
           sx={{mt: 2}}
-          disabled={addAssessmentModel.isPending}
+          disabled={addGradingModel.isPending}
         >
           <InputLabel id="select-model-template">Select template</InputLabel>
           <Select
@@ -96,7 +96,7 @@ const CreateAssessmentModelDialog = ({
         <Button
           variant="outlined"
           onClick={onClose}
-          disabled={addAssessmentModel.isPending}
+          disabled={addGradingModel.isPending}
         >
           Cancel
         </Button>
@@ -104,10 +104,10 @@ const CreateAssessmentModelDialog = ({
           onClick={handleSubmit}
           variant="contained"
           type="submit"
-          disabled={name.length === 0 || addAssessmentModel.isPending}
+          disabled={name.length === 0 || addGradingModel.isPending}
         >
           Submit
-          {addAssessmentModel.isPending && (
+          {addGradingModel.isPending && (
             <CircularProgress
               size={24}
               sx={{
@@ -125,4 +125,4 @@ const CreateAssessmentModelDialog = ({
   );
 };
 
-export default CreateAssessmentModelDialog;
+export default CreateGradingModelDialog;

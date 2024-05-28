@@ -20,9 +20,9 @@ components:
       required: true
       example: 1
       description: The ID of the course.
-    assessmentModelId:
+    gradingModelId:
       in: path
-      name: assessmentModelId
+      name: gradingModelId
       schema:
         type: integer
         format: int32

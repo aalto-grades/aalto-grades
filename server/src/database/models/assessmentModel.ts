@@ -15,9 +15,9 @@ import {GraphStructure} from '@/common/types';
 import Course from './course';
 import {sequelize} from '..';
 
-export default class AssessmentModel extends Model<
-  InferAttributes<AssessmentModel>,
-  InferCreationAttributes<AssessmentModel>
+export default class GradingModel extends Model<
+  InferAttributes<GradingModel>,
+  InferCreationAttributes<GradingModel>
 > {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
@@ -28,7 +28,7 @@ export default class AssessmentModel extends Model<
   declare updatedAt: CreationOptional<Date>;
 }
 
-AssessmentModel.init(
+GradingModel.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -65,5 +65,5 @@ AssessmentModel.init(
   }
 );
 
-Course.hasMany(AssessmentModel, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
-AssessmentModel.belongsTo(Course, {foreignKey: 'courseId'});
+Course.hasMany(GradingModel, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+GradingModel.belongsTo(Course, {foreignKey: 'courseId'});

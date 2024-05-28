@@ -16,8 +16,7 @@ import User from '../../database/models/user';
 import {ApiError, stringToIdSchema} from '../../types';
 
 /**
- * Retrieves the date of the latest grade for a user based on an assessment
- * model ID.
+ * Retrieves the date of the latest grade for a user based on a course ID.
  *
  * @throws ApiError(400) if there are no grades for the user.
  */

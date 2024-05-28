@@ -3,19 +3,19 @@
 # SPDX-License-Identifier: MIT
 ---
 definitions:
-  AssessmentModelId:
+  GradingModelId:
     type: integer
     description: Internal grading model database ID.
     format: int32
     minimum: 1
     example: 1
 
-  AssessmentModelData:
+  GradingModelData:
     type: object
     description: Grading model information.
     properties:
       id:
-        $ref: '#/definitions/AssessmentModelId'
+        $ref: '#/definitions/GradingModelId'
       courseId:
         $ref: '#/definitions/CourseId'
       name:
@@ -47,7 +47,7 @@ definitions:
       - hasArchivedAttainments
       - hasDeletedAttainments
 
-  NewAssessmentModelData:
+  NewGradingModelData:
     type: object
     description: Grading model information.
     properties:
@@ -63,7 +63,7 @@ definitions:
       - name
       - graphStructure
 
-  EditAssessmentModelData:
+  EditGradingModelData:
     type: object
     description: Grading model information.
     properties:
@@ -80,20 +80,20 @@ definitions:
         description: If grading model has been archived
         example: false
 
-/v1/courses/{courseId}/assessment-models/{assessmentModelId}:
+/v1/courses/{courseId}/grading-models/{gradingModelId}:
   get:
     tags: [Grading Model]
     description: Get information about a grading model.
     parameters:
       - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
+      - $ref: '#/components/parameters/gradingModelId'
     responses:
       200:
         description: Returns grading model with given ID.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/AssessmentModelData'
+              $ref: '#/definitions/GradingModelData'
       400:
         $ref: '#/components/responses/BadRequest'
       401:
@@ -113,12 +113,12 @@ definitions:
       Available only to admin users and teacers of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
+      - $ref: '#/components/parameters/gradingModelId'
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/EditAssessmentModelData'
+            $ref: '#/definitions/EditGradingModelData'
     responses:
       200:
         description: Grading model updated
@@ -141,7 +141,7 @@ definitions:
       Available only to admin users and teacers of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
+      - $ref: '#/components/parameters/gradingModelId'
     responses:
       200:
         description: Grading model deleted
@@ -158,7 +158,7 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/courses/{courseId}/assessment-models:
+/v1/courses/{courseId}/grading-models:
   get:
     tags: [Grading Model]
     description: >
@@ -174,7 +174,7 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/AssessmentModelData'
+                $ref: '#/definitions/GradingModelData'
       400:
         $ref: '#/components/responses/BadRequest'
       401:
@@ -196,14 +196,14 @@ definitions:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/NewAssessmentModelData'
+            $ref: '#/definitions/NewGradingModelData'
     responses:
       201:
         description: Grading model created
         content:
           application/json:
             schema:
-              $ref: '#/definitions/AssessmentModelId'
+              $ref: '#/definitions/GradingModelId'
       400:
         $ref: '#/components/responses/BadRequest'
       401:

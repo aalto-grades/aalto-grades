@@ -11,7 +11,7 @@ import {
   Model,
 } from 'sequelize';
 
-import AssessmentModel from './assessmentModel';
+import GradingModel from './assessmentModel';
 import Course from './course';
 import User from './user';
 import {sequelize} from '..';
@@ -24,7 +24,7 @@ export default class FinalGrade extends Model<
   declare userId: ForeignKey<User['id']>;
   declare courseId: ForeignKey<Course['id']>;
   declare assessmentModelId: CreationOptional<ForeignKey<
-    AssessmentModel['id']
+    GradingModel['id']
   > | null>;
   declare graderId: ForeignKey<User['id']>;
   declare grade: number;
@@ -37,7 +37,7 @@ export default class FinalGrade extends Model<
   grader?: User;
   User?: User;
   Course?: Course;
-  assessmentModel?: AssessmentModel;
+  assessmentModel?: GradingModel;
 }
 
 FinalGrade.init(
@@ -109,11 +109,11 @@ FinalGrade.belongsTo(User, {foreignKey: 'userId'});
 Course.hasMany(FinalGrade, {onDelete: 'RESTRICT', onUpdate: 'CASCADE'});
 FinalGrade.belongsTo(Course, {foreignKey: 'courseId'});
 
-AssessmentModel.hasMany(FinalGrade, {
+GradingModel.hasMany(FinalGrade, {
   onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
-FinalGrade.belongsTo(AssessmentModel, {foreignKey: 'assessmentModelId'});
+FinalGrade.belongsTo(GradingModel, {foreignKey: 'assessmentModelId'});
 
 User.hasMany(FinalGrade, {
   foreignKey: 'graderId',

@@ -16,7 +16,7 @@ import {initGraph} from '@/common/util/initGraph';
 import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';
 import {sequelize} from '../../src/database';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
-import AssessmentModel from '../../src/database/models/assessmentModel';
+import GradingModel from '../../src/database/models/assessmentModel';
 import Attainment from '../../src/database/models/attainment';
 import AttainmentGrade from '../../src/database/models/attainmentGrade';
 import Course from '../../src/database/models/course';
@@ -141,14 +141,14 @@ class CreateData {
   async createFinalGrade(
     courseId: number,
     userId: number,
-    assessmentModelId: number | null,
+    gradingModelId: number | null,
     graderId: number,
     grade?: number,
     date?: Date
   ): Promise<number> {
     const finalGrade = await FinalGrade.create({
       userId: userId,
-      assessmentModelId: assessmentModelId,
+      assessmentModelId: gradingModelId,
       courseId: courseId,
       graderId: graderId,
       date: date ?? new Date(),
@@ -159,11 +159,11 @@ class CreateData {
   }
 
   /** Creates a grading model that uses the average model */
-  async createAssessmentModel(
+  async createGradingModel(
     courseId: number,
     attainments: AttainmentData[]
   ): Promise<number> {
-    const assessmentModel = await AssessmentModel.create({
+    const gradingModel = await GradingModel.create({
       courseId,
       name: `Average model ${this.freeModelId}`,
       graphStructure: initGraph('average', attainments),
@@ -171,7 +171,7 @@ class CreateData {
 
     this.freeModelId += 1;
 
-    return assessmentModel.id;
+    return gradingModel.id;
   }
 
   private async createDbCourse(
@@ -266,14 +266,14 @@ class CreateData {
     hasStudent = true,
     courseData = null,
     createAttainments = true,
-    createAssessmentModel = true,
+    createGradingModel = true,
   }: {
     hasTeacher?: boolean;
     hasAssistant?: boolean;
     hasStudent?: boolean;
     courseData?: Partial<NewCourseData> | null;
     createAttainments?: boolean;
-    createAssessmentModel?: boolean;
+    createGradingModel?: boolean;
   }): Promise<[number, AttainmentData[], number]> {
     const courseId = await this.createDbCourse(
       hasTeacher,
@@ -285,15 +285,12 @@ class CreateData {
     let attainments: AttainmentData[] = [];
     if (createAttainments) attainments = await this.createAttainments(courseId);
 
-    let assessmentModelId = -1;
-    if (createAttainments && createAssessmentModel) {
-      assessmentModelId = await this.createAssessmentModel(
-        courseId,
-        attainments
-      );
+    let gradingModelId = -1;
+    if (createAttainments && createGradingModel) {
+      gradingModelId = await this.createGradingModel(courseId, attainments);
     }
 
-    return [courseId, attainments, assessmentModelId];
+    return [courseId, attainments, gradingModelId];
   }
 }
 

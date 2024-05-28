@@ -36,15 +36,15 @@ const nonExistentId = 1000000;
 beforeAll(async () => {
   cookies = await getCookies();
 
-  let assessmentModelId;
-  [courseId, , assessmentModelId] = await createData.createCourse({});
+  let gradingModelId;
+  [courseId, , gradingModelId] = await createData.createCourse({});
   // Create 10 final grades
   for (let i = 0; i < 10; i++) {
     const student = await createData.createUser();
     await createData.createFinalGrade(
       courseId,
       student.id,
-      assessmentModelId,
+      gradingModelId,
       TEACHER_ID
     );
     // Create multiple final grades for some students
@@ -52,7 +52,7 @@ beforeAll(async () => {
       await createData.createFinalGrade(
         courseId,
         student.id,
-        assessmentModelId,
+        gradingModelId,
         TEACHER_ID
       );
     }
@@ -167,7 +167,7 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
   };
   const getData = (student: StudentData): NewFinalGrade => ({
     userId: student.id,
-    assessmentModelId: editCourseModelId,
+    gradingModelId: editCourseModelId,
     grade: student.finalGrade,
     date: new Date(),
     comment: null,
@@ -240,7 +240,7 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
     const student = await createStudent();
     const data = {
       userId: student.id,
-      assessmentModelId: editCourseModelId,
+      gradingModelId: editCourseModelId,
       grade: student.finalGrade,
       date: new Date(),
     };
@@ -300,7 +300,7 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
     const data = [
       {
         userId: student.id,
-        assessmentModelId: otherCourseModelId,
+        gradingModelId: otherCourseModelId,
         grade: student.finalGrade,
         date: new Date(),
         comment: null,

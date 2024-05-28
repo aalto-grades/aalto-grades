@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AssessmentModelData, StudentRow} from '@/common/types';
+import {GradingModelData, StudentRow} from '@/common/types';
 import {batchCalculateGraph} from '@/common/util/calculateGraph';
 import {GradeSelectOption, findBestGrade} from '.';
 import {
@@ -60,23 +60,23 @@ export const findLatestGrade = (row: StudentRow): Date => {
  * Predicts grades based on grading models and student rows.
  *
  * @param rows - An array of student rows.
- * @param assessmentModels - An array of grading models.
+ * @param gradingModels - An array of grading models.
  * @param gradeSelectOption - The grade select option.
  * @returns
  */
 export const predictGrades = (
   rows: StudentRow[],
-  assessmentModels: AssessmentModelData[],
+  gradingModels: GradingModelData[],
   gradeSelectOption: GradeSelectOption
 ): {
-  [key: AssessmentModelData['id']]: ReturnType<typeof batchCalculateGraph>;
+  [key: GradingModelData['id']]: ReturnType<typeof batchCalculateGraph>;
 } => {
   const result: {
-    [key: AssessmentModelData['id']]: ReturnType<typeof batchCalculateGraph>;
+    [key: GradingModelData['id']]: ReturnType<typeof batchCalculateGraph>;
   } = {};
-  for (const assessmentModel of assessmentModels) {
-    result[assessmentModel.id] = batchCalculateGraph(
-      assessmentModel.graphStructure,
+  for (const gradingModel of gradingModels) {
+    result[gradingModel.id] = batchCalculateGraph(
+      gradingModel.graphStructure,
       rows.map(row => ({
         userId: row.user.id,
         attainments: row.attainments.map(att => ({
@@ -87,7 +87,7 @@ export const predictGrades = (
     );
   }
   return result;
-  // return assessmentModels.map(model =>
+  // return gradingModels.map(model =>
   //   batchCalculateGraph(
   //     model.graphStructure,
   //     rows.map(row => ({

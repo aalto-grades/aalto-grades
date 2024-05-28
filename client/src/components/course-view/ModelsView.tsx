@@ -22,19 +22,19 @@ import {JSX, useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {
-  AssessmentModelData,
+  GradingModelData,
   CourseRoleType,
   StudentRow,
   SystemRole,
 } from '@/common/types';
 import {GraphStructure} from '@/common/types/graph';
-import CreateAssessmentModelDialog from './CreateAssessmentModelDialog';
-import EditAssessmentModelDialog from './EditAssessmentModelDialog';
+import CreateGradingModelDialog from './CreateAssessmentModelDialog';
+import EditGradingModelDialog from './EditAssessmentModelDialog';
 import {useGetFinalGrades} from '../../hooks/api/finalGrade';
 import {
-  useDeleteAssessmentModel,
-  useEditAssessmentModel,
-  useGetAllAssessmentModels,
+  useDeleteGradingModel,
+  useEditGradingModel,
+  useGetAllGradingModels,
   useGetAttainments,
   useGetCourse,
   useGetGrades,
@@ -49,7 +49,7 @@ const ModelsView = (): JSX.Element => {
   const {courseId, modelId, userId} = useParams() as ParamsType;
   const navigate = useNavigate();
 
-  const allAssessmentModels = useGetAllAssessmentModels(courseId);
+  const allGradingModels = useGetAllGradingModels(courseId);
   const course = useGetCourse(courseId);
   const finalGrades = useGetFinalGrades(courseId, {
     enabled:
@@ -58,12 +58,12 @@ const ModelsView = (): JSX.Element => {
         (course.data &&
           getCourseRole(course.data, auth) === CourseRoleType.Teacher)),
   });
-  const editModel = useEditAssessmentModel();
-  const delModel = useDeleteAssessmentModel();
+  const editModel = useEditGradingModel();
+  const delModel = useDeleteGradingModel();
   const attainments = useGetAttainments(courseId);
   const grades = useGetGrades(courseId);
 
-  const [currentModel, setCurrentModel] = useState<AssessmentModelData | null>(
+  const [currentModel, setCurrentModel] = useState<GradingModelData | null>(
     null
   );
   const [currentUserRow, setCurrentUserRow] = useState<StudentRow | null>(null);
@@ -72,26 +72,26 @@ const ModelsView = (): JSX.Element => {
   const [createDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
   const [editDialogModel, setEditDialogModel] =
-    useState<AssessmentModelData | null>(null);
+    useState<GradingModelData | null>(null);
   const [graphOpen, setGraphOpen] = useState<boolean>(false);
 
   // Sort models by archived status
   const models = useMemo(
     () =>
-      allAssessmentModels.data !== undefined
-        ? allAssessmentModels.data.toSorted(
+      allGradingModels.data !== undefined
+        ? allGradingModels.data.toSorted(
             (m1, m2) => Number(m1.archived) - Number(m2.archived)
           )
         : undefined,
-    [allAssessmentModels.data]
+    [allGradingModels.data]
   );
 
   const modelsWithFinalGrades = useMemo(() => {
     const withFinalGrades = new Set<number>();
     if (finalGrades.data === undefined) return withFinalGrades;
     for (const finalGrade of finalGrades.data) {
-      if (finalGrade.assessmentModelId !== null)
-        withFinalGrades.add(finalGrade.assessmentModelId);
+      if (finalGrade.gradingModelId !== null)
+        withFinalGrades.add(finalGrade.gradingModelId);
     }
     return withFinalGrades;
   }, [finalGrades.data]);
@@ -115,7 +115,7 @@ const ModelsView = (): JSX.Element => {
   }, [courseId, loadGraphId, models, navigate]);
 
   const renameAttainments = useCallback(
-    (model: AssessmentModelData): AssessmentModelData => {
+    (model: GradingModelData): GradingModelData => {
       if (attainments.data === undefined) return model;
 
       for (const node of model.graphStructure.nodes) {
@@ -134,7 +134,7 @@ const ModelsView = (): JSX.Element => {
   );
 
   const loadGraph = useCallback(
-    (model: AssessmentModelData): void => {
+    (model: GradingModelData): void => {
       setCurrentModel(renameAttainments(structuredClone(model))); // To remove references
       setGraphOpen(true);
     },
@@ -183,17 +183,17 @@ const ModelsView = (): JSX.Element => {
   }, [courseId, currentUserRow, grades.data, modelId, navigate, userId]);
 
   const handleArchiveModel = (
-    assessmentModelId: number,
+    gradingModelId: number,
     archived: boolean
   ): void => {
     editModel.mutate({
       courseId,
-      assessmentModelId,
-      assessmentModel: {archived},
+      gradingModelId,
+      gradingModel: {archived},
     });
   };
-  const handleDelModel = (assessmentModelId: number): void => {
-    delModel.mutate({courseId, assessmentModelId});
+  const handleDelModel = (gradingModelId: number): void => {
+    delModel.mutate({courseId, gradingModelId: gradingModelId});
   };
 
   const onSave = async (graphStructure: GraphStructure): Promise<void> => {
@@ -213,8 +213,8 @@ const ModelsView = (): JSX.Element => {
     }
     await editModel.mutateAsync({
       courseId,
-      assessmentModelId: currentModel.id,
-      assessmentModel: {
+      gradingModelId: currentModel.id,
+      gradingModel: {
         name: currentModel.name,
         graphStructure: simplifiedGraphStructure,
       },
@@ -224,7 +224,7 @@ const ModelsView = (): JSX.Element => {
   if (models === undefined || attainments.data === undefined)
     return <>Loading</>;
 
-  const getWarning = (model: AssessmentModelData): string => {
+  const getWarning = (model: GradingModelData): string => {
     if (model.hasArchivedAttainments && model.hasDeletedAttainments)
       return 'Contains deleted & archived attainments';
     if (model.hasArchivedAttainments) return 'Contains archived attainments';
@@ -234,19 +234,19 @@ const ModelsView = (): JSX.Element => {
 
   return (
     <>
-      <CreateAssessmentModelDialog
+      <CreateGradingModelDialog
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
         onSubmit={id => {
-          allAssessmentModels.refetch();
+          allGradingModels.refetch();
           setLoadGraphId(id);
         }}
       />
 
-      <EditAssessmentModelDialog
+      <EditGradingModelDialog
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
-        assessmentModelId={editDialogModel?.id ?? null}
+        gradingModelId={editDialogModel?.id ?? null}
         name={editDialogModel?.name ?? null}
       />
 

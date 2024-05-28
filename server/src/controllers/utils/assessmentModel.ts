@@ -4,7 +4,7 @@
 
 import {AttainmentData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId, findCourseById} from './course';
-import AssessmentModel from '../../database/models/assessmentModel';
+import GradingModel from '../../database/models/assessmentModel';
 import Course from '../../database/models/course';
 import {ApiError, stringToIdSchema} from '../../types';
 
@@ -13,23 +13,23 @@ import {ApiError, stringToIdSchema} from '../../types';
  *
  * @throws ApiError(404) if not found.
  */
-export const findAssessmentModelById = async (
-  assessmentModelId: number
-): Promise<AssessmentModel> => {
-  const assessmentModel = await AssessmentModel.findByPk(assessmentModelId);
+export const findGradingModelById = async (
+  gradingModelId: number
+): Promise<GradingModel> => {
+  const gradingModel = await GradingModel.findByPk(gradingModelId);
 
-  if (assessmentModel === null) {
+  if (gradingModel === null) {
     throw new ApiError(
-      `grading model with ID ${assessmentModelId} not found`,
+      `grading model with ID ${gradingModelId} not found`,
       HttpCode.NotFound
     );
   }
-  return assessmentModel;
+  return gradingModel;
 };
 
 /** Checks if grading model has deleted or archived attainments. */
-export const checkAssessmentModelAttainments = (
-  assessmentModel: AssessmentModel,
+export const checkGradingModelAttainments = (
+  gradingModel: GradingModel,
   attainmentData: AttainmentData[]
 ): {hasDeletedAttainments: boolean; hasArchivedAttainments: boolean} => {
   let hasDeleted = false;
@@ -37,7 +37,7 @@ export const checkAssessmentModelAttainments = (
 
   const attainmentIds = attainmentData.map(att => att.id);
   const modelAttainmentIds = [];
-  for (const node of assessmentModel.graphStructure.nodes) {
+  for (const node of gradingModel.graphStructure.nodes) {
     if (node.type !== 'attainment') continue;
     modelAttainmentIds.push(parseInt(node.id.split('-')[1]));
   }
@@ -60,9 +60,9 @@ export const checkAssessmentModelAttainments = (
  *
  * @throws ApiError(400|404) if invalid or not found.
  */
-const findAndValidateAssessmentModelId = async (
+const findAndValidateGradingModelId = async (
   courseId: string
-): Promise<AssessmentModel> => {
+): Promise<GradingModel> => {
   const result = stringToIdSchema.safeParse(courseId);
   if (!result.success) {
     throw new ApiError(
@@ -70,7 +70,7 @@ const findAndValidateAssessmentModelId = async (
       HttpCode.BadRequest
     );
   }
-  return await findAssessmentModelById(result.data);
+  return await findGradingModelById(result.data);
 };
 
 /**
@@ -80,48 +80,47 @@ const findAndValidateAssessmentModelId = async (
  * @throws ApiError(404|409) if either not found or grading model does not
  *   belong to the course.
  */
-export const validateAssessmentModelBelongsToCourse = async (
+export const validateGradingModelBelongsToCourse = async (
   courseId: number,
-  assessmentModelId: number
-): Promise<[Course, AssessmentModel]> => {
+  gradingModelId: number
+): Promise<[Course, GradingModel]> => {
   const course = await findCourseById(courseId);
-  const assessmentModel = await findAssessmentModelById(assessmentModelId);
+  const gradingModel = await findGradingModelById(gradingModelId);
 
   // Check that grading model belongs to the course.
-  if (assessmentModel.courseId !== course.id) {
+  if (gradingModel.courseId !== course.id) {
     throw new ApiError(
-      `Grading model with ID ${assessmentModel.id} ` +
+      `Grading model with ID ${gradingModel.id} ` +
         `does not belong to the course with ID ${course.id}`,
       HttpCode.Conflict
     );
   }
 
-  return [course, assessmentModel];
+  return [course, gradingModel];
 };
 
 /**
  * Finds the course and the grading model by url param ids and also validates
  * the url params.
  *
- * @throws ApiError(400|404|409) if either invalid or not found or assessment
- *   model does not belong to the course.
+ * @throws ApiError(400|404|409) if either invalid or not found or grading model
+ *   does not belong to the course.
  */
-export const validateAssessmentModelPath = async (
+export const validateGradingModelPath = async (
   courseId: string,
-  assessmentModelId: string
-): Promise<[Course, AssessmentModel]> => {
+  gradingModelId: string
+): Promise<[Course, GradingModel]> => {
   const course = await findAndValidateCourseId(courseId);
-  const assessmentModel =
-    await findAndValidateAssessmentModelId(assessmentModelId);
+  const gradingModel = await findAndValidateGradingModelId(gradingModelId);
 
   // Check that grading model belongs to the course.
-  if (assessmentModel.courseId !== course.id) {
+  if (gradingModel.courseId !== course.id) {
     throw new ApiError(
-      `Grading model with ID ${assessmentModel.id} ` +
+      `Grading model with ID ${gradingModel.id} ` +
         `does not belong to the course with ID ${course.id}`,
       HttpCode.Conflict
     );
   }
 
-  return [course, assessmentModel];
+  return [course, gradingModel];
 };

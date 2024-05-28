@@ -79,7 +79,7 @@ export const useEditAttainment = (
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['all-assessment-models', courseId],
+        queryKey: ['all-grading-models', courseId],
       });
     },
     ...options,
@@ -102,7 +102,7 @@ export const useDeleteAttainment = (
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['all-assessment-models', courseId],
+        queryKey: ['all-grading-models', courseId],
       });
     },
     ...options,

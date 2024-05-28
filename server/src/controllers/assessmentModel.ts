@@ -7,77 +7,77 @@ import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
-  AssessmentModelData,
-  EditAssessmentModelDataSchema,
+  GradingModelData,
+  EditGradingModelDataSchema,
   HttpCode,
-  NewAssessmentModelDataSchema,
+  NewGradingModelDataSchema,
 } from '@/common/types';
 import {
-  checkAssessmentModelAttainments,
-  validateAssessmentModelPath,
+  checkGradingModelAttainments,
+  validateGradingModelPath,
 } from './utils/assessmentModel';
 import {findAttainmentsByCourseId} from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
-import AssessmentModel from '../database/models/assessmentModel';
+import GradingModel from '../database/models/assessmentModel';
 import {ApiError} from '../types';
 
 /**
- * Responds with AssessmentModelData
+ * Responds with GradingModelData
  *
  * @throws ApiError(400|404|409)
  */
-export const getAssessmentModel = async (
+export const getGradingModel = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [course, assessmentModel] = await validateAssessmentModelPath(
+  const [course, gradingModel] = await validateGradingModelPath(
     req.params.courseId,
-    req.params.assessmentModelId
+    req.params.gradingModelId
   );
   const attainmentData = await findAttainmentsByCourseId(course.id);
 
-  const assessmentModelData: AssessmentModelData = {
-    id: assessmentModel.id,
-    courseId: assessmentModel.courseId,
-    name: assessmentModel.name,
-    graphStructure: assessmentModel.graphStructure,
-    archived: assessmentModel.archived,
-    ...checkAssessmentModelAttainments(assessmentModel, attainmentData),
+  const gradingModelData: GradingModelData = {
+    id: gradingModel.id,
+    courseId: gradingModel.courseId,
+    name: gradingModel.name,
+    graphStructure: gradingModel.graphStructure,
+    archived: gradingModel.archived,
+    ...checkGradingModelAttainments(gradingModel, attainmentData),
   };
 
-  res.json(assessmentModelData);
+  res.json(gradingModelData);
 };
 
 /**
- * Responds with AssessmentModelData[]
+ * Responds with GradingModelData[]
  *
  * @throws ApiError(400|404)
  */
-export const getAllAssessmentModels = async (
+export const getAllGradingModels = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const course = await findAndValidateCourseId(req.params.courseId);
   const attainmentData = await findAttainmentsByCourseId(course.id);
 
-  const assessmentModels = await AssessmentModel.findAll({
+  const gradingModels = await GradingModel.findAll({
     where: {courseId: course.id},
   });
 
-  const assessmentModelsData: AssessmentModelData[] = [];
+  const gradingModelsData: GradingModelData[] = [];
 
-  for (const assessmentModel of assessmentModels) {
-    assessmentModelsData.push({
-      id: assessmentModel.id,
-      courseId: assessmentModel.courseId,
-      name: assessmentModel.name,
-      graphStructure: assessmentModel.graphStructure,
-      archived: assessmentModel.archived,
-      ...checkAssessmentModelAttainments(assessmentModel, attainmentData),
+  for (const gradingModel of gradingModels) {
+    gradingModelsData.push({
+      id: gradingModel.id,
+      courseId: gradingModel.courseId,
+      name: gradingModel.name,
+      graphStructure: gradingModel.graphStructure,
+      archived: gradingModel.archived,
+      ...checkGradingModelAttainments(gradingModel, attainmentData),
     });
   }
 
-  res.json(assessmentModelsData);
+  res.json(gradingModelsData);
 };
 
 /**
@@ -85,14 +85,14 @@ export const getAllAssessmentModels = async (
  *
  * @throws ApiError(400|404|409)
  */
-export const addAssessmentModel = async (
-  req: TypedRequestBody<typeof NewAssessmentModelDataSchema>,
+export const addGradingModel = async (
+  req: TypedRequestBody<typeof NewGradingModelDataSchema>,
   res: Response
 ): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
 
   // Find or create new grading model based on name and course ID.
-  const [assessmentModel, created] = await AssessmentModel.findOrCreate({
+  const [gradingModel, created] = await GradingModel.findOrCreate({
     where: {
       name: req.body.name,
       courseId: courseId,
@@ -110,25 +110,25 @@ export const addAssessmentModel = async (
     );
   }
 
-  res.status(HttpCode.Created).json(assessmentModel.id);
+  res.status(HttpCode.Created).json(gradingModel.id);
 };
 
 /** @throws ApiError(400|404|409) */
-export const editAssessmentModel = async (
-  req: TypedRequestBody<typeof EditAssessmentModelDataSchema>,
+export const editGradingModel = async (
+  req: TypedRequestBody<typeof EditGradingModelDataSchema>,
   res: Response
 ): Promise<void> => {
-  const [, assessmentModel] = await validateAssessmentModelPath(
+  const [, gradingModel] = await validateGradingModelPath(
     req.params.courseId,
-    req.params.assessmentModelId
+    req.params.gradingModelId
   );
 
   // Update grading model & catch duplicate name error.
   try {
-    await assessmentModel.update({
-      name: req.body.name ?? assessmentModel.name,
-      graphStructure: req.body.graphStructure ?? assessmentModel.graphStructure,
-      archived: req.body.archived ?? assessmentModel.archived,
+    await gradingModel.update({
+      name: req.body.name ?? gradingModel.name,
+      graphStructure: req.body.graphStructure ?? gradingModel.graphStructure,
+      archived: req.body.archived ?? gradingModel.archived,
     });
   } catch (e) {
     // Duplicate name error
@@ -147,17 +147,17 @@ export const editAssessmentModel = async (
 };
 
 /** @throws ApiError(400|404|409) */
-export const deleteAssessmentModel = async (
+export const deleteGradingModel = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [, assessmentModel] = await validateAssessmentModelPath(
+  const [, gradingModel] = await validateGradingModelPath(
     req.params.courseId,
-    req.params.assessmentModelId
+    req.params.gradingModelId
   );
 
   try {
-    await assessmentModel.destroy();
+    await gradingModel.destroy();
   } catch (e) {
     // Catch deletion of grading model with final grades
     if (
