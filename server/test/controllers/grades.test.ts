@@ -756,7 +756,7 @@ ${students[2].studentNumber},G,5,21.6.2023,en,\n`);
       .testForbidden(url, [cookies.assistantCookie, cookies.studentCookie])
       .post(data);
 
-    url = `/v1/courses/${noRoleCourseId}/assessment-models`;
+    url = `/v1/courses/${noRoleCourseId}/grading-models`;
     await responseTests
       .testForbidden(url, [
         cookies.teacherCookie,

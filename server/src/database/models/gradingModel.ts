@@ -61,7 +61,7 @@ GradingModel.init(
   },
   {
     sequelize,
-    tableName: 'assessment_model',
+    tableName: 'grading_model',
   }
 );
 

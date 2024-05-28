@@ -49,7 +49,7 @@ export const getFinalGrades = async (
       finalGradeId: finalGrade.id,
       user: user,
       courseId: finalGrade.courseId,
-      gradingModelId: finalGrade.assessmentModelId,
+      gradingModelId: finalGrade.gradingModelId,
       grader: grader,
       grade: finalGrade.grade,
       date: new Date(finalGrade.date),
@@ -101,7 +101,7 @@ export const addFinalGrades = async (
   const preparedBulkCreate: NewDbFinalGradeData[] = req.body.map(
     finalGrade => ({
       userId: finalGrade.userId,
-      assessmentModelId: finalGrade.gradingModelId,
+      gradingModelId: finalGrade.gradingModelId,
       courseId: course.id,
       graderId: grader.id,
       date: finalGrade.date,
@@ -131,7 +131,7 @@ export const editFinalGrade = async (
 
   // If final grade is not manual don't allow editing grade/date
   if (
-    finalGrade.assessmentModelId !== null &&
+    finalGrade.gradingModelId !== null &&
     ((grade !== undefined && grade !== finalGrade.grade) ||
       (date !== undefined &&
         date.getTime() !== new Date(finalGrade.date).getTime()))

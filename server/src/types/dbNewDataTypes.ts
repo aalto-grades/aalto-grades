@@ -5,7 +5,7 @@
 export type NewDbFinalGradeData = {
   userId: number;
   courseId: number;
-  assessmentModelId?: number | null;
+  gradingModelId?: number | null;
   graderId: number;
   grade: number;
   sisuExportDate?: Date | null;

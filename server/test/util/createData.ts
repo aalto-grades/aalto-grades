@@ -148,7 +148,7 @@ class CreateData {
   ): Promise<number> {
     const finalGrade = await FinalGrade.create({
       userId: userId,
-      assessmentModelId: gradingModelId,
+      gradingModelId: gradingModelId,
       courseId: courseId,
       graderId: graderId,
       date: date ?? new Date(),

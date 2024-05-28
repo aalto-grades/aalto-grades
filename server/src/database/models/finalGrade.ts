@@ -23,7 +23,7 @@ export default class FinalGrade extends Model<
   declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
   declare courseId: ForeignKey<Course['id']>;
-  declare assessmentModelId: CreationOptional<ForeignKey<
+  declare gradingModelId: CreationOptional<ForeignKey<
     GradingModel['id']
   > | null>;
   declare graderId: ForeignKey<User['id']>;
@@ -37,7 +37,7 @@ export default class FinalGrade extends Model<
   grader?: User;
   User?: User;
   Course?: Course;
-  assessmentModel?: GradingModel;
+  gradingModel?: GradingModel;
 }
 
 FinalGrade.init(
@@ -62,11 +62,11 @@ FinalGrade.init(
         key: 'id',
       },
     },
-    assessmentModelId: {
+    gradingModelId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'assessment_model',
+        model: 'grading_model',
         key: 'id',
       },
     },
@@ -113,7 +113,7 @@ GradingModel.hasMany(FinalGrade, {
   onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
-FinalGrade.belongsTo(GradingModel, {foreignKey: 'assessmentModelId'});
+FinalGrade.belongsTo(GradingModel, {foreignKey: 'gradingModelId'});
 
 User.hasMany(FinalGrade, {
   foreignKey: 'graderId',

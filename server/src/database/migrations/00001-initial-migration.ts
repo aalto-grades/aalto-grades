@@ -111,6 +111,7 @@ export default {
         {transaction}
       );
 
+      // Renamed to grading_model in the future
       await queryInterface.createTable(
         'assessment_model',
         {

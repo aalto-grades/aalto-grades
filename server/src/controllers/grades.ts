@@ -121,7 +121,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
       finalGradeId: finalGrade.id,
       user: user,
       courseId: finalGrade.courseId,
-      gradingModelId: finalGrade.assessmentModelId,
+      gradingModelId: finalGrade.gradingModelId,
       grader: grader,
       grade: finalGrade.grade,
       date: new Date(finalGrade.date),
@@ -354,8 +354,8 @@ export const getSisuFormattedGradingCSV = async (
       oldGrade: FinalGrade
     ): boolean => {
       // Prefer manual final grades
-      const newIsManual = newGrade.assessmentModelId === null;
-      const oldIsManual = oldGrade.assessmentModelId === null;
+      const newIsManual = newGrade.gradingModelId === null;
+      const oldIsManual = oldGrade.gradingModelId === null;
       if (newIsManual && !oldIsManual) return true;
       if (oldIsManual && !newIsManual) return false;
 
@@ -372,7 +372,7 @@ export const getSisuFormattedGradingCSV = async (
 
       existingResult.date = finalGrade.date;
       existingResult.grade = finalGrade.grade;
-      existingResult.assessmentModelId = finalGrade.assessmentModelId;
+      existingResult.gradingModelId = finalGrade.gradingModelId;
 
       // Set existing course result grade
       const existingCourseResult = courseResults.find(
