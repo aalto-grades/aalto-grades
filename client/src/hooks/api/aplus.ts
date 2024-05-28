@@ -51,13 +51,13 @@ export const useFetchAplusExerciseData = (
 
 export const useAddAplusGradeSources = (
   courseId: Numeric,
-  options: UseMutationOptions<void, unknown, AplusGradeSourceData[]>
+  options?: UseMutationOptions<void, unknown, AplusGradeSourceData[]>
 ): UseMutationResult<void, unknown, AplusGradeSourceData[]> => {
   // const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (gradeSources: AplusGradeSourceData[]) =>
-      await axios.post(`/v1/course/${courseId}/aplus-source`, gradeSources),
+      await axios.post(`/v1/courses/${courseId}/aplus-source`, gradeSources),
     ...options,
   });
 };

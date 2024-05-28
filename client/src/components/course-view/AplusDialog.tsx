@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '@mui/material';
 import {useState} from 'react';
+import {useParams} from 'react-router-dom';
 
 import {
   AplusCourseData,
@@ -18,7 +19,11 @@ import {
 } from '@/common/types';
 import CreateAplusAttainments from './CreateAplusAttainments';
 import SelectAplusGradeSources from './SelectAplusGradeSources';
-import {useFetchAplusCourses} from '../../hooks/useApi';
+import {
+  useAddAplusGradeSources,
+  useAddAttainment,
+  useFetchAplusCourses,
+} from '../../hooks/useApi';
 
 import Type = AplusGradeSourceType;
 
@@ -28,7 +33,10 @@ type PropsType = {
 };
 
 const AplusDialog = ({handleClose, open}: PropsType): JSX.Element => {
+  const {courseId} = useParams() as {courseId: string};
   const aplusCourses = useFetchAplusCourses();
+  const addAttainment = useAddAttainment(courseId);
+  const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
   const [step, setStep] = useState<number>(0);
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
@@ -88,6 +96,18 @@ const AplusDialog = ({handleClose, open}: PropsType): JSX.Element => {
     );
   };
 
+  const handleSubmit = async (): Promise<void> => {
+    const sources: AplusGradeSourceData[] = [];
+    for (const [attainment, source] of attainmentsWithSource) {
+      sources.push({
+        ...source,
+        attainmentId: await addAttainment.mutateAsync(attainment),
+      });
+    }
+
+    await addAplusGradeSources.mutateAsync(sources);
+  };
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>A+ Courses</DialogTitle>
@@ -129,7 +149,16 @@ const AplusDialog = ({handleClose, open}: PropsType): JSX.Element => {
             Next
           </Button>
         )}
-        {step === 2 && <Button onClick={() => handleClose()}>Submit</Button>}
+        {step === 2 && (
+          <Button
+            onClick={async () => {
+              await handleSubmit();
+              handleClose();
+            }}
+          >
+            Submit
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );
