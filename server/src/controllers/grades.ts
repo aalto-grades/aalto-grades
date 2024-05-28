@@ -10,6 +10,7 @@ import {
   EditGradeDataSchema,
   FinalGradeData,
   GradeData,
+  GradingScale,
   HttpCode,
   NewGradeArraySchema,
   SisuCsvUploadSchema,
@@ -407,10 +408,25 @@ export const getSisuFormattedGradingCSV = async (
         ? req.body.completionLanguage.toLowerCase()
         : course.languageOfInstruction.toLowerCase();
 
+      let csvGrade;
+      switch (course.gradingScale) {
+        case GradingScale.Numerical:
+          csvGrade = finalGrade.grade.toString();
+          break;
+        case GradingScale.PassFail:
+          csvGrade = finalGrade.grade === 0 ? 'fail' : 'pass';
+          break;
+        case GradingScale.SecondNationalLanguage:
+          if (finalGrade.grade === 0) csvGrade = 'Fail';
+          else if (finalGrade.grade === 1) csvGrade = 'SAT';
+          else csvGrade = 'G';
+          break;
+      }
+
       existingResults.push(finalGrade);
       courseResults.push({
         studentNumber: finalGrade.User.studentNumber,
-        grade: finalGrade.grade.toString(),
+        grade: csvGrade,
         credits: course.maxCredits,
         assessmentDate: assessmentDate,
         completionLanguage: completionLanguage,

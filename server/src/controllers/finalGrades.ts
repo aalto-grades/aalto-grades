@@ -75,8 +75,19 @@ export const addFinalGrades = async (
     if (finalGrade.assessmentModelId !== null)
       assessmentModels.add(finalGrade.assessmentModelId);
 
-    // TODO: Handle GradingScale.SecondNationalLanguage
-    if (course.gradingScale === GradingScale.PassFail && finalGrade.grade > 1) {
+    let maxGrade;
+    switch (course.gradingScale) {
+      case GradingScale.Numerical:
+        maxGrade = 5;
+        break;
+      case GradingScale.PassFail:
+        maxGrade = 1;
+        break;
+      case GradingScale.SecondNationalLanguage:
+        maxGrade = 2;
+        break;
+    }
+    if (finalGrade.grade > maxGrade) {
       throw new ApiError(
         `Invalid final grade ${finalGrade.grade}`,
         HttpCode.BadRequest
