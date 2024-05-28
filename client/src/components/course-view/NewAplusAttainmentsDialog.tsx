@@ -53,6 +53,7 @@ const NewAplusAttainmentsDialog = ({
   const handleResetAndClose = (): void => {
     setStep(0);
     setAplusCourse(null);
+    setAttainmentsWithSource([]);
     handleClose();
   };
 
