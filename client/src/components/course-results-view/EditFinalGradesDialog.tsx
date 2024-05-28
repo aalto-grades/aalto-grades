@@ -32,7 +32,7 @@ import {
 } from '../../hooks/api/finalGrade';
 import {useGetAllAssessmentModels} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {findLatestFinalGrade} from '../../utils';
+import {findBestFinalGrade} from '../../utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 type ColTypes = {
@@ -84,7 +84,7 @@ const EditFinalGradesDialog = ({
 
   const bestGrade = useMemo(
     () =>
-      findLatestFinalGrade(
+      findBestFinalGrade(
         rows.map(row => ({
           ...row,
           assessmentModelId: row.assessmentModel === null ? null : 0,

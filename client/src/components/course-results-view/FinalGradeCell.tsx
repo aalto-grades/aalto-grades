@@ -7,26 +7,36 @@ import {Box, IconButton, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import {JSX, useState} from 'react';
 
-import {FinalGradeData} from '@/common/types';
+import {FinalGradeData, GradingScale} from '@/common/types';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
-import {findLatestFinalGrade} from '../../utils';
+import {findBestFinalGrade} from '../../utils';
 
 type FinalGradeCellProps = {
   userId: number;
   studentNumber: string;
   finalGrades: FinalGradeData[];
+  gradingScale: GradingScale;
 };
 const FinalGradeCell = ({
   userId,
   studentNumber,
   finalGrades,
+  gradingScale,
 }: FinalGradeCellProps): JSX.Element => {
   const theme = useTheme();
 
   const [hover, setHover] = useState<boolean>(false);
   const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
 
-  const latestGrade = findLatestFinalGrade(finalGrades);
+  const bestFinalGrade = findBestFinalGrade(finalGrades);
+
+  const getGradeString = (): string => {
+    if (bestFinalGrade?.grade === undefined) return '-';
+    // TODO: Handle GradingScale.SecondNationalLanguage
+    if (gradingScale === GradingScale.Numerical)
+      return bestFinalGrade.grade.toString();
+    return bestFinalGrade.grade === 0 ? 'Fail' : 'Pass';
+  };
 
   return (
     <Box
@@ -47,7 +57,7 @@ const FinalGradeCell = ({
       }}
       // align="center"
     >
-      <span>{latestGrade?.grade ?? '-'}</span>
+      <span>{getGradeString()}</span>
       {/* If there are multiple final grades "show more" icon*/}
       {(finalGrades.length > 1 || hover) && (
         <>
@@ -82,10 +92,10 @@ const FinalGradeCell = ({
           title={`Final grades of ${studentNumber}`}
         />
       }
-      {latestGrade?.date && (
+      {bestFinalGrade?.date && (
         <Tooltip
           placement="top"
-          title={`Final grade obtained on ${latestGrade.date.toString()}`}
+          title={`Final grade obtained on ${bestFinalGrade.date.toString()}`}
           disableInteractive
         >
           <Box
@@ -105,7 +115,7 @@ const FinalGradeCell = ({
               },
             }}
           >
-            {latestGrade.date.toLocaleDateString()}
+            {bestFinalGrade.date.toLocaleDateString()}
           </Box>
         </Tooltip>
       )}

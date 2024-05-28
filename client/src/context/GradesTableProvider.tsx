@@ -29,14 +29,23 @@ import {
 } from 'react';
 import {useParams} from 'react-router-dom';
 
-import {AttainmentData, FinalGradeData, StudentRow} from '@/common/types';
+import {
+  AttainmentData,
+  FinalGradeData,
+  GradingScale,
+  StudentRow,
+} from '@/common/types';
 import FinalGradeCell from '../components/course-results-view/FinalGradeCell';
 import GradeCell from '../components/course-results-view/GradeCell';
 import PredictedGradeCell from '../components/course-results-view/PredictedGradeCell';
 import UserGraphDialog from '../components/course-results-view/UserGraphDialog';
 import PrettyChip from '../components/shared/PrettyChip';
-import {useGetAllAssessmentModels, useGetAttainments} from '../hooks/useApi';
-import {findLatestFinalGrade} from '../utils';
+import {
+  useGetAllAssessmentModels,
+  useGetAttainments,
+  useGetCourse,
+} from '../hooks/useApi';
+import {findBestFinalGrade} from '../utils';
 import {groupByLatestBestGrade, predictGrades} from '../utils/table';
 
 // Define the shape of the context
@@ -70,7 +79,7 @@ export type GroupedStudentRow = {
 } & ExtendedStudentRow;
 
 export type ExtendedStudentRow = StudentRow & {
-  predictedFinalGrades?: {[key: number]: {finalGrade: string}};
+  predictedFinalGrades?: {[key: number]: {finalGrade: number}};
 };
 
 /**
@@ -105,10 +114,12 @@ const columnHelper = createColumnHelper<GroupedStudentRow>();
 // Create a provider component
 export const GradesTableProvider = (props: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const allAssessmentModels = useGetAllAssessmentModels(courseId);
-  const attainments = useGetAttainments(courseId);
-  const [_isPending, startTransition] = useTransition();
 
+  const course = useGetCourse(courseId);
+  const attainments = useGetAttainments(courseId);
+  const allAssessmentModels = useGetAllAssessmentModels(courseId);
+
+  const [_isPending, startTransition] = useTransition();
   const [rowSelection, setRowSelection] = useState({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [grouping, setGrouping] = useState<GroupingState>([]);
@@ -149,18 +160,16 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     }
 
     return groupByLatestBestGrade(
-      props.data.map(row => {
-        return {
-          ...row,
-          // keep the same structure of predictedGrades but only show result for the student
-          predictedFinalGrades: Object.fromEntries(
-            Object.entries(predictedGrades).map(([key, value]) => [
-              key,
-              value[row.user.id],
-            ])
-          ) as unknown as {[key: number]: {finalGrade: string}},
-        };
-      }),
+      props.data.map(row => ({
+        ...row,
+        // keep the same structure of predictedGrades but only show result for the student
+        predictedFinalGrades: Object.fromEntries(
+          Object.entries(predictedGrades).map(([key, value]) => [
+            key,
+            value[row.user.id],
+          ])
+        ),
+      })),
       gradeSelectOption
     );
   }, [assessmentModels, props.data, gradeSelectOption]);
@@ -357,6 +366,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
           userId={row.original.user.id}
           studentNumber={row.original.user.studentNumber ?? 'N/A'}
           finalGrades={getValue()}
+          gradingScale={course.data?.gradingScale ?? GradingScale.Numerical}
         />
       ),
     }),
@@ -403,6 +413,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
             setUserGraphData(info.getValue());
             setUserGraphOpen(true);
           }}
+          gradingScale={course.data?.gradingScale ?? GradingScale.Numerical}
         />
       ),
       aggregatedCell: () => null,
@@ -411,10 +422,10 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       row => {
         // ATTENTION this function needs to have the same parameters of the one inside the grade cell
         // Clearly can be done in a better way
-        const bestGrade = findLatestFinalGrade(row.finalGrades ?? []);
-        if (!bestGrade) return '-';
-        if (bestGrade.sisuExportDate) return '✅';
-        if (findPreviouslyExportedToSisu(bestGrade, row)) return '⚠️';
+        const bestFinalGrade = findBestFinalGrade(row.finalGrades ?? []);
+        if (!bestFinalGrade) return '-';
+        if (bestFinalGrade.sisuExportDate) return '✅';
+        if (findPreviouslyExportedToSisu(bestFinalGrade, row)) return '⚠️';
         return '-';
       },
 

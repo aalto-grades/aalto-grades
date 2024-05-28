@@ -117,19 +117,12 @@ const CalculateFinalGradesDialog = ({
             ? 'Calculating final grade for 1 student'
             : `Calculating final grades for ${selectedRows.length} students`}
         </Typography>
-        <FormControl disabled fullWidth sx={{mb: 2}}>
-          <InputLabel id="select-grade-select-option">
-            Grade selection criterion
-          </InputLabel>
-          <Select
-            labelId="select-grade-select-option"
-            value={gradeSelectOption}
-            label="Grade selection criterion"
-          >
-            <MenuItem value="best">Select best grade</MenuItem>
-            <MenuItem value="latest">Select latest grade</MenuItem>
-          </Select>
-        </FormControl>
+        {gradeSelectOption === 'latest' && (
+          <Alert sx={{mb: 2}} severity="info">
+            You are using latest grades instead of the best grades to calculate
+            the final grades.
+          </Alert>
+        )}
         <FormControl sx={{display: 'block'}}>
           <InputLabel id="calculateGradesSelect">Assessment model</InputLabel>
           <Select
