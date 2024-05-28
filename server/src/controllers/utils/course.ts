@@ -169,11 +169,11 @@ export const validateRoleUniqueness = (
 ): void => {
   const assistantIds = new Set<number>(
     assistants.map(assistant =>
-      'id' in assistant ? assistant.id : assistant.userId
+      'userId' in assistant ? assistant.userId : assistant.id
     )
   );
   for (const teacher of teachers) {
-    if (assistantIds.has('id' in teacher ? teacher.id : teacher.userId)) {
+    if (assistantIds.has('userId' in teacher ? teacher.userId : teacher.id)) {
       throw new ApiError(
         'Course cannot contain same user as both a teacher and assistant',
         HttpCode.UnprocessableEntity
