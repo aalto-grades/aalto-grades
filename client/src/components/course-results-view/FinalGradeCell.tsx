@@ -10,6 +10,7 @@ import {JSX, useState} from 'react';
 import {FinalGradeData, GradingScale} from '@/common/types';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
 import {findBestFinalGrade} from '../../utils';
+import {getGradeString} from '../../utils/textFormat';
 
 type FinalGradeCellProps = {
   userId: number;
@@ -30,14 +31,6 @@ const FinalGradeCell = ({
 
   const bestFinalGrade = findBestFinalGrade(finalGrades);
 
-  const getGradeString = (): string => {
-    if (bestFinalGrade?.grade === undefined) return '-';
-    // TODO: Handle GradingScale.SecondNationalLanguage
-    if (gradingScale === GradingScale.Numerical)
-      return bestFinalGrade.grade.toString();
-    return bestFinalGrade.grade === 0 ? 'Fail' : 'Pass';
-  };
-
   return (
     <Box
       onMouseEnter={() => setHover(true)}
@@ -57,7 +50,7 @@ const FinalGradeCell = ({
       }}
       // align="center"
     >
-      <span>{getGradeString()}</span>
+      <span>{getGradeString(gradingScale, bestFinalGrade?.grade)}</span>
       {/* If there are multiple final grades "show more" icon*/}
       {(finalGrades.length > 1 || hover) && (
         <>
