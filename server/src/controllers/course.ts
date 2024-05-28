@@ -13,6 +13,7 @@ import {
   HttpCode,
   Language,
   NewCourseDataSchema,
+  SystemRole,
 } from '@/common/types';
 import {
   findAndValidateCourseId,
@@ -28,7 +29,7 @@ import CourseRole from '../database/models/courseRole';
 import CourseTranslation from '../database/models/courseTranslation';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
-import {ApiError, CourseFull} from '../types';
+import {ApiError, CourseFull, JwtClaims} from '../types';
 
 /**
  * Responds with CourseData
@@ -155,9 +156,10 @@ export const addCourse = async (
 export const editCourse = async (
   req: TypedRequestBody<typeof EditCourseDataSchema>,
   res: Response
-): Promise<void> => {
+): Promise<Response | undefined> => {
   const course = await findAndValidateCourseId(req.params.courseId);
   const finalGrade = await FinalGrade.findOne({where: {courseId: course.id}});
+  const user = req.user as JwtClaims;
 
   const {
     courseCode,
@@ -176,6 +178,26 @@ export const editCourse = async (
       'Cannot change grading scale of a course with final grades',
       HttpCode.BadRequest
     );
+  }
+
+  // Get old and new teachers & assistants
+  const oldTeachers = await CourseRole.findAll({
+    where: {courseId: course.id, role: CourseRoleType.Teacher},
+  });
+  const oldAssistants = await CourseRole.findAll({
+    where: {courseId: course.id, role: CourseRoleType.Assistant},
+  });
+  const newTeachers =
+    teachersInCharge !== undefined
+      ? await validateEmailList(teachersInCharge)
+      : null;
+  const newAssistants =
+    assistants !== undefined ? await validateEmailList(assistants) : null;
+
+  if (user.role !== SystemRole.Admin) {
+    validateRoleUniqueness(oldTeachers, newAssistants ?? oldAssistants);
+    await CourseRole.updateCourseRoles(null, newAssistants, course.id);
+    return res.sendStatus(HttpCode.Ok);
   }
 
   if (
@@ -199,14 +221,6 @@ export const editCourse = async (
       HttpCode.BadRequest
     );
   }
-
-  const newTeachers =
-    teachersInCharge !== undefined
-      ? await validateEmailList(teachersInCharge)
-      : null;
-
-  const newAssistants: User[] | null =
-    assistants !== undefined ? await validateEmailList(assistants) : null;
 
   await sequelize.transaction(async (t: Transaction): Promise<void> => {
     try {
@@ -259,9 +273,10 @@ export const editCourse = async (
   });
 
   if (newTeachers !== null || newAssistants !== null) {
-    if (newTeachers !== null && newAssistants !== null)
-      validateRoleUniqueness(newTeachers, newAssistants);
-
+    validateRoleUniqueness(
+      newTeachers ?? oldTeachers,
+      newAssistants ?? oldAssistants
+    );
     await CourseRole.updateCourseRoles(newTeachers, newAssistants, course.id);
   }
 

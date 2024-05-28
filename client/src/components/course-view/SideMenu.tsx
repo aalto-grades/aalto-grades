@@ -27,8 +27,10 @@ import {OverridableComponent} from '@mui/types';
 import {JSX} from 'react';
 import {NavLink, useNavigate, useParams} from 'react-router-dom';
 
-import {SystemRole} from '@/common/types';
+import {CourseRoleType, SystemRole} from '@/common/types';
+import {useGetCourse} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
+import {getCourseRole} from '../../utils';
 
 const SideMenuButton = ({
   text,
@@ -88,6 +90,15 @@ const SideMenu = (): JSX.Element => {
   const {courseId} = useParams();
   const {auth} = useAuth();
 
+  const course = useGetCourse(courseId as string, {
+    enabled: courseId !== undefined,
+  });
+
+  const courseRole =
+    course.data !== undefined && auth !== null
+      ? getCourseRole(course.data, auth)
+      : CourseRoleType.Student;
+
   return (
     <Box
       style={{
@@ -126,7 +137,8 @@ const SideMenu = (): JSX.Element => {
           Icon={Widgets}
           IconOutlined={WidgetsOutlined}
         />
-        {auth?.role === SystemRole.Admin && (
+        {(auth?.role === SystemRole.Admin ||
+          courseRole === CourseRoleType.Teacher) && (
           <>
             <Divider sx={{my: 2}} />
             <SideMenuButton

@@ -39,9 +39,11 @@ import {
   EditCourseData,
   GradingScale,
   Language,
+  SystemRole,
 } from '@/common/types';
 import {useGetFinalGrades} from '../../hooks/api/finalGrade';
 import {useEditCourse, useGetCourse} from '../../hooks/useApi';
+import useAuth from '../../hooks/useAuth';
 import {sisuLanguageOptions} from '../../utils';
 import {convertToClientGradingScale} from '../../utils/textFormat';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
@@ -132,7 +134,7 @@ const FormField = ({
     type={type ?? 'text'}
     fullWidth
     value={form.values[value]}
-    disabled={form.isSubmitting || disabled}
+    disabled={disabled || form.isSubmitting}
     label={label}
     InputLabelProps={{shrink: true}}
     margin="normal"
@@ -157,11 +159,13 @@ const FormLanguagesField = ({
   valueFormat,
   labelFormat,
   helperTextFormat,
+  disabled,
 }: {
   form: FormikProps<FormData>;
   valueFormat: string;
   labelFormat: string;
   helperTextFormat: string;
+  disabled?: boolean;
 }): JSX.Element => (
   <>
     {languages.map(language => (
@@ -169,6 +173,7 @@ const FormLanguagesField = ({
         key={language.value}
         form={form}
         value={valueFormat.replace('%', language.value) as keyof FormData}
+        disabled={disabled || form.isSubmitting}
         label={labelFormat.replace('%', language.name)}
         helperText={helperTextFormat.replace('%', language.name)}
       />
@@ -178,6 +183,7 @@ const FormLanguagesField = ({
 
 const EditCourseView = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
+  const {auth} = useAuth();
 
   const course = useGetCourse(courseId);
   const editCourse = useEditCourse();
@@ -349,17 +355,20 @@ const EditCourseView = (): JSX.Element => {
                   <FormField
                     form={form}
                     value="courseCode"
+                    disabled={auth?.role !== SystemRole.Admin}
                     label="Course Code*"
                     helperText="Give code for the new course."
                   />
                   <FormLanguagesField
                     form={form}
+                    disabled={auth?.role !== SystemRole.Admin}
                     valueFormat="name%"
                     labelFormat="Course Name in %*"
                     helperTextFormat="Give the name of the course in %."
                   />
                   <FormLanguagesField
                     form={form}
+                    disabled={auth?.role !== SystemRole.Admin}
                     valueFormat="department%"
                     labelFormat="Organizing department in %*"
                     helperTextFormat="Give the organizing department of the new course in %."
@@ -367,6 +376,7 @@ const EditCourseView = (): JSX.Element => {
                   <FormField
                     form={form}
                     value="minCredits"
+                    disabled={auth?.role !== SystemRole.Admin}
                     label="Minimum Course Credits (ECTS)*"
                     helperText="Input minimum credits."
                     type="number"
@@ -374,6 +384,7 @@ const EditCourseView = (): JSX.Element => {
                   <FormField
                     form={form}
                     value="maxCredits"
+                    disabled={auth?.role !== SystemRole.Admin}
                     label="Maximum Course Credits (ECTS)*"
                     helperText="Input maximum credits."
                     type="number"
@@ -381,7 +392,10 @@ const EditCourseView = (): JSX.Element => {
                   <FormField
                     form={form}
                     value="gradingScale"
-                    disabled={finalGrades.data.length > 0}
+                    disabled={
+                      auth?.role !== SystemRole.Admin &&
+                      finalGrades.data.length > 0
+                    }
                     label="Grading Scale*"
                     helperText="Grading scale of the course, e.g., 0-5 or pass/fail."
                     select
@@ -395,6 +409,7 @@ const EditCourseView = (): JSX.Element => {
                   <FormField
                     form={form}
                     value="languageOfInstruction"
+                    disabled={auth?.role !== SystemRole.Admin}
                     label="Course language*"
                     helperText="Language in which the course will be conducted."
                     select
@@ -412,16 +427,19 @@ const EditCourseView = (): JSX.Element => {
                     type="text"
                     fullWidth
                     value={form.values.teacherEmail}
-                    disabled={form.isSubmitting}
+                    disabled={
+                      auth?.role !== SystemRole.Admin || form.isSubmitting
+                    }
                     label="Teachers In Charge*"
                     margin="normal"
                     InputLabelProps={{shrink: true}}
                     helperText={
-                      form.errors.teacherEmail ?? teachersInCharge.length === 0
+                      form.errors.teacherEmail ??
+                      (teachersInCharge.length === 0
                         ? 'Input the email address of at least one teacher in charge of the course'
                         : teachersInCharge.includes(form.values.teacherEmail)
                           ? 'Email already on list.'
-                          : 'Add emails of the teachers in charge of the course.'
+                          : 'Add emails of the teachers in charge of the course.')
                     }
                     error={
                       form.touched.teacherEmail &&
@@ -433,6 +451,7 @@ const EditCourseView = (): JSX.Element => {
                     variant="outlined"
                     startIcon={<PersonAddAlt1Icon />}
                     disabled={
+                      auth?.role !== SystemRole.Admin ||
                       form.errors.teacherEmail !== undefined ||
                       form.values.teacherEmail.length === 0 ||
                       teachersInCharge.includes(form.values.teacherEmail) ||
@@ -457,14 +476,16 @@ const EditCourseView = (): JSX.Element => {
                           <ListItem
                             key={teacherEmail}
                             secondaryAction={
-                              <IconButton
-                                edge="end"
-                                disabled={form.isSubmitting}
-                                aria-label="delete"
-                                onClick={() => removeTeacher(teacherEmail)}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
+                              auth?.role === SystemRole.Admin && (
+                                <IconButton
+                                  edge="end"
+                                  disabled={form.isSubmitting}
+                                  aria-label="delete"
+                                  onClick={() => removeTeacher(teacherEmail)}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              )
                             }
                           >
                             <ListItemAvatar>
@@ -489,9 +510,9 @@ const EditCourseView = (): JSX.Element => {
                     InputLabelProps={{shrink: true}}
                     helperText={
                       form.errors.assistantEmail ??
-                      assistants.includes(form.values.assistantEmail)
+                      (assistants.includes(form.values.assistantEmail)
                         ? 'Email already on list.'
-                        : 'Add emails of the assistants of the course.'
+                        : 'Add emails of the assistants of the course.')
                     }
                     error={
                       form.touched.assistantEmail &&
