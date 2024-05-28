@@ -41,6 +41,7 @@ import {
   Language,
   SystemRole,
 } from '@/common/types';
+import {useGetFinalGrades} from '../../hooks/api/finalGrade';
 import {useEditCourse, useGetCourse} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import {sisuLanguageOptions} from '../../utils';
@@ -186,6 +187,7 @@ const EditCourseView = (): JSX.Element => {
 
   const course = useGetCourse(courseId);
   const editCourse = useEditCourse();
+  const finalGrades = useGetFinalGrades(courseId);
 
   const [initTeachersInCharge, setInitTeachersInCharge] = useState<string[]>(
     []
@@ -259,7 +261,7 @@ const EditCourseView = (): JSX.Element => {
       courseCode: values.courseCode,
       minCredits: values.minCredits,
       maxCredits: values.maxCredits,
-      gradingScale: GradingScale.Numerical,
+      gradingScale: values.gradingScale,
       languageOfInstruction: values.languageOfInstruction,
       department: {
         fi: values.departmentFi,
@@ -319,7 +321,8 @@ const EditCourseView = (): JSX.Element => {
     );
   };
 
-  if (!initialValues) return <Typography>Loading</Typography>;
+  if (!initialValues || finalGrades.data === undefined)
+    return <Typography>Loading</Typography>;
 
   return (
     <>
@@ -389,7 +392,10 @@ const EditCourseView = (): JSX.Element => {
                   <FormField
                     form={form}
                     value="gradingScale"
-                    disabled={auth?.role !== SystemRole.Admin}
+                    disabled={
+                      auth?.role !== SystemRole.Admin &&
+                      finalGrades.data.length > 0
+                    }
                     label="Grading Scale*"
                     helperText="Grading scale of the course, e.g., 0-5 or pass/fail."
                     select

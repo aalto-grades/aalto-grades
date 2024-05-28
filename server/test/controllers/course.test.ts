@@ -21,6 +21,7 @@ import {
   parseCourseFull,
 } from '../../src/controllers/utils/course';
 import {createData} from '../util/createData';
+import {TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
@@ -495,6 +496,21 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
   it('should respond with 400 if id is invalid', async () => {
     const url = `/v1/courses/${-1}`;
     const data: EditCourseData = {maxCredits: 10};
+    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+  });
+
+  it('should respond with 400 if trying to edit grading scale of a course with final grades', async () => {
+    const [tmpCourseId, , modelId] = await createData.createCourse({});
+    const student = await createData.createUser();
+    await createData.createFinalGrade(
+      tmpCourseId,
+      student.id,
+      modelId,
+      TEACHER_ID
+    );
+
+    const url = `/v1/courses/${tmpCourseId}`;
+    const data: EditCourseData = {gradingScale: GradingScale.PassFail};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 
