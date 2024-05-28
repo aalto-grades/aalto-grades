@@ -63,7 +63,7 @@ const CreateAssessmentModelDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Create Assessment Model</DialogTitle>
+      <DialogTitle>Create Grading Model</DialogTitle>
       <DialogContent>
         <TextField
           sx={{mt: 1}}

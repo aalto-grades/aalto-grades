@@ -36,7 +36,7 @@ class CreateData {
   private freeId: number = 10;
   /** Next free attainment name */
   private freeAttId: number = 10;
-  /** Next free assessment model code */
+  /** Next free grading model code */
   private freeModelId: number = 10;
   /** Next free user name */
   private freeUserId: number = 10;
@@ -158,7 +158,7 @@ class CreateData {
     return finalGrade.id;
   }
 
-  /** Creates an assessment model that uses the average model */
+  /** Creates a grading model that uses the average model */
   async createAssessmentModel(
     courseId: number,
     attainments: AttainmentData[]

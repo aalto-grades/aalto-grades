@@ -9,7 +9,7 @@ import Course from '../../database/models/course';
 import {ApiError, stringToIdSchema} from '../../types';
 
 /**
- * Finds an assessment model by id.
+ * Finds a grading model by id.
  *
  * @throws ApiError(404) if not found.
  */
@@ -20,14 +20,14 @@ export const findAssessmentModelById = async (
 
   if (assessmentModel === null) {
     throw new ApiError(
-      `assessment model with ID ${assessmentModelId} not found`,
+      `grading model with ID ${assessmentModelId} not found`,
       HttpCode.NotFound
     );
   }
   return assessmentModel;
 };
 
-/** Checks if assessment model has deleted or archived attainments. */
+/** Checks if grading model has deleted or archived attainments. */
 export const checkAssessmentModelAttainments = (
   assessmentModel: AssessmentModel,
   attainmentData: AttainmentData[]
@@ -56,7 +56,7 @@ export const checkAssessmentModelAttainments = (
 };
 
 /**
- * Finds an assessment model by url param id and also validates the url param.
+ * Finds a grading model by url param id and also validates the url param.
  *
  * @throws ApiError(400|404) if invalid or not found.
  */
@@ -66,7 +66,7 @@ const findAndValidateAssessmentModelId = async (
   const result = stringToIdSchema.safeParse(courseId);
   if (!result.success) {
     throw new ApiError(
-      `Invalid assessment model id ${courseId}`,
+      `Invalid grading model id ${courseId}`,
       HttpCode.BadRequest
     );
   }
@@ -74,10 +74,10 @@ const findAndValidateAssessmentModelId = async (
 };
 
 /**
- * Finds the course and the assessment model and validates that the model
- * belongs to the course.
+ * Finds the course and the grading model and validates that the model belongs
+ * to the course.
  *
- * @throws ApiError(404|409) if either not found or assessment model does not
+ * @throws ApiError(404|409) if either not found or grading model does not
  *   belong to the course.
  */
 export const validateAssessmentModelBelongsToCourse = async (
@@ -87,10 +87,10 @@ export const validateAssessmentModelBelongsToCourse = async (
   const course = await findCourseById(courseId);
   const assessmentModel = await findAssessmentModelById(assessmentModelId);
 
-  // Check that assessment model belongs to the course.
+  // Check that grading model belongs to the course.
   if (assessmentModel.courseId !== course.id) {
     throw new ApiError(
-      `Assessment model with ID ${assessmentModel.id} ` +
+      `Grading model with ID ${assessmentModel.id} ` +
         `does not belong to the course with ID ${course.id}`,
       HttpCode.Conflict
     );
@@ -100,7 +100,7 @@ export const validateAssessmentModelBelongsToCourse = async (
 };
 
 /**
- * Finds the course and the assessment model by url param ids and also validates
+ * Finds the course and the grading model by url param ids and also validates
  * the url params.
  *
  * @throws ApiError(400|404|409) if either invalid or not found or assessment
@@ -114,10 +114,10 @@ export const validateAssessmentModelPath = async (
   const assessmentModel =
     await findAndValidateAssessmentModelId(assessmentModelId);
 
-  // Check that assessment model belongs to the course.
+  // Check that grading model belongs to the course.
   if (assessmentModel.courseId !== course.id) {
     throw new ApiError(
-      `Assessment model with ID ${assessmentModel.id} ` +
+      `Grading model with ID ${assessmentModel.id} ` +
         `does not belong to the course with ID ${course.id}`,
       HttpCode.Conflict
     );

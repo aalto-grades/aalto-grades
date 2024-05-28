@@ -100,11 +100,11 @@ const CalculateFinalGradesDialog = ({
   const getWarning = (model: AssessmentModelData | null): string => {
     if (model === null) return '';
     if (model.hasArchivedAttainments && model.hasDeletedAttainments)
-      return 'Assessment model contains deleted & archived attainments';
+      return 'Grading model contains deleted & archived attainments';
     if (model.hasArchivedAttainments)
-      return 'Assessment model contains archived attainments';
+      return 'Grading model contains archived attainments';
     if (model.hasDeletedAttainments)
-      return 'Assessment model contains deleted attainments';
+      return 'Grading model contains deleted attainments';
     return '';
   };
 
@@ -124,7 +124,7 @@ const CalculateFinalGradesDialog = ({
           </Alert>
         )}
         <FormControl sx={{display: 'block'}}>
-          <InputLabel id="calculateGradesSelect">Assessment model</InputLabel>
+          <InputLabel id="calculateGradesSelect">Grading model</InputLabel>
           <Select
             sx={{width: '100%'}}
             labelId="calculateGradesSelect"
@@ -134,7 +134,7 @@ const CalculateFinalGradesDialog = ({
                 modelList.find(model => model.name === e.target.value)!
               );
             }}
-            label="Assessment model"
+            label="Grading model"
           >
             {modelList.map(model => (
               <MenuItem

@@ -46,13 +46,13 @@ const EditAssessmentModelDialog = ({
       assessmentModel: {name: newName},
     });
 
-    enqueueSnackbar('Assessment model saved', {variant: 'success'});
+    enqueueSnackbar('Grading model saved', {variant: 'success'});
     onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Edit Assessment Model</DialogTitle>
+      <DialogTitle>Edit Grading Model</DialogTitle>
       <DialogContent>
         <TextField
           sx={{mt: 1}}

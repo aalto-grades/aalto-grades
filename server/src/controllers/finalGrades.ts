@@ -69,7 +69,7 @@ export const addFinalGrades = async (
   const grader = req.user as JwtClaims;
   const course = await findAndValidateCourseId(req.params.courseId);
 
-  // Validate that assessment models belong to the course
+  // Validate that grading models belong to the course
   const assessmentModels = new Set<number>();
   for (const finalGrade of req.body) {
     if (finalGrade.assessmentModelId !== null)

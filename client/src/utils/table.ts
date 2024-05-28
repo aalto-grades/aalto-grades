@@ -57,10 +57,10 @@ export const findLatestGrade = (row: StudentRow): Date => {
 };
 
 /**
- * Predicts grades based on assessment models and student rows.
+ * Predicts grades based on grading models and student rows.
  *
  * @param rows - An array of student rows.
- * @param assessmentModels - An array of assessment models.
+ * @param assessmentModels - An array of grading models.
  * @param gradeSelectOption - The grade select option.
  * @returns
  */

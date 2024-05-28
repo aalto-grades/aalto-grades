@@ -86,8 +86,8 @@ const modelDoesNotExist = async (
   else expect(result).toBe(null);
 };
 
-describe('Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId - get assessment model', () => {
-  it('should get the assessment model', async () => {
+describe('Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId - get grading model', () => {
+  it('should get the grading model', async () => {
     const testCookies = [
       cookies.adminCookie,
       cookies.teacherCookie,
@@ -135,14 +135,14 @@ describe('Test GET /v1/courses/:courseId/assessment-models/:assessmentModelId - 
     await responseTests.testNotFound(url, cookies.adminCookie).get();
   });
 
-  it('should respond with 409 when assessment model does not belong to course', async () => {
+  it('should respond with 409 when grading model does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/assessment-models/${otherAssessmentModId}`;
     await responseTests.testConflict(url, cookies.adminCookie).get();
   });
 });
 
-describe('Test GET /v1/courses/:courseId/assessment-models - get all assessment models', () => {
-  it('should get the assessment models', async () => {
+describe('Test GET /v1/courses/:courseId/assessment-models - get all grading models', () => {
+  it('should get the grading models', async () => {
     const testCookies = [
       cookies.adminCookie,
       cookies.teacherCookie,
@@ -161,7 +161,7 @@ describe('Test GET /v1/courses/:courseId/assessment-models - get all assessment 
     }
   });
 
-  it('should get the assessment models when no assessment models exist', async () => {
+  it('should get the grading models when no grading models exist', async () => {
     const res = await request
       .get(`/v1/courses/${NoModelscourseId}/assessment-models`)
       .set('Cookie', cookies.adminCookie)
@@ -202,8 +202,8 @@ describe('Test GET /v1/courses/:courseId/assessment-models - get all assessment 
   });
 });
 
-describe('Test POST /v1/courses/:courseId/assessment-models - add assessment model', () => {
-  it('should add an assessment model', async () => {
+describe('Test POST /v1/courses/:courseId/assessment-models - add grading model', () => {
+  it('should add a grading model', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
 
     let i = 0;
@@ -268,15 +268,15 @@ describe('Test POST /v1/courses/:courseId/assessment-models - add assessment mod
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
-  it('should respond with 409 when course already has assessment model with same name', async () => {
+  it('should respond with 409 when course already has grading model with same name', async () => {
     const url = `/v1/courses/${courseId}/assessment-models`;
     const data = {name: 'Model 1', graphStructure: testStructure};
     await responseTests.testConflict(url, cookies.adminCookie).post(data);
   });
 });
 
-describe('Test Put /v1/courses/:courseId/assessment-models/:assessmentModId - edit an assessment model', () => {
-  it('should edit an assessment model', async () => {
+describe('Test Put /v1/courses/:courseId/assessment-models/:assessmentModId - edit a grading model', () => {
+  it('should edit a grading model', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     let i = 0;
     for (const cookie of testCookies) {
@@ -297,7 +297,7 @@ describe('Test Put /v1/courses/:courseId/assessment-models/:assessmentModId - ed
     }
   });
 
-  it('should partially edit an assessment model', async () => {
+  it('should partially edit a grading model', async () => {
     const data: EditAssessmentModelData[] = [
       {name: 'Edited 3 Addition model'},
       {graphStructure: testStructure},
@@ -365,21 +365,21 @@ describe('Test Put /v1/courses/:courseId/assessment-models/:assessmentModId - ed
     await responseTests.testNotFound(url, cookies.adminCookie).put(data);
   });
 
-  it('should respond with 409 conflict when assessment model does not belong to course', async () => {
+  it('should respond with 409 conflict when grading model does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/assessment-models/${otherAssessmentModId}`;
     const data = {name: 'Not added', graphStructure: testStructure};
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
 
-  it('should respond with 409 when course already has assessment model with same name', async () => {
+  it('should respond with 409 when course already has grading model with same name', async () => {
     const url = `/v1/courses/${courseId}/assessment-models/${assessmentModId}`;
     const data = {name: 'Model 1', graphStructure: testStructure};
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
 });
 
-describe('Test DELETE /v1/courses/:courseId/assessment-models/:assessmentModId - delete an assessment model', () => {
-  it('should delete an assessment model', async () => {
+describe('Test DELETE /v1/courses/:courseId/assessment-models/:assessmentModId - delete a grading model', () => {
+  it('should delete a grading model', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
       const modelId = await createData.createAssessmentModel(
@@ -433,12 +433,12 @@ describe('Test DELETE /v1/courses/:courseId/assessment-models/:assessmentModId -
     await responseTests.testNotFound(url, cookies.adminCookie).delete();
   });
 
-  it('should respond with 409 conflict when assessment model does not belong to course', async () => {
+  it('should respond with 409 conflict when grading model does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/assessment-models/${otherAssessmentModId}`;
     await responseTests.testConflict(url, cookies.adminCookie).delete();
   });
 
-  it('should respond with 409 conflict when trying to delete an assessment model with final grades', async () => {
+  it('should respond with 409 conflict when trying to delete a grading model with final grades', async () => {
     const modelId = await createData.createAssessmentModel(
       courseId,
       courseAttainments

@@ -226,12 +226,12 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       </FormControl>
       <FormControl>
         <InputLabel id="select-assessment-model-option">
-          Assessment Model
+          Grading Model
         </InputLabel>
         <Select
           labelId="select-assessment-model-option"
           value={selectedAssessmentModel}
-          label="Assessment Model"
+          label="Grading Model"
           onChange={e =>
             setSelectedAssessmentModel(e.target.value as 'any' | number)
           }

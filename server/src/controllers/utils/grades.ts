@@ -170,7 +170,7 @@ export const findAndValidateAttainmentGradePath = async (
   const attainment = await findAttainmentById(grade.attainmentId);
   const course = await findCourseById(attainment.courseId);
 
-  // Check that assessment model belongs to the course.
+  // Check that grading model belongs to the course.
   if (course.id !== targetCourse.id) {
     throw new ApiError(
       `Attainment grade with ID ${gradeId} ` +

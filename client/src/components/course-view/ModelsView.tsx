@@ -158,7 +158,7 @@ const ModelsView = (): JSX.Element => {
         return;
       }
     }
-    enqueueSnackbar(`Couldn't find assessment model with id ${modelId}`, {
+    enqueueSnackbar(`Couldn't find grading model with id ${modelId}`, {
       variant: 'error',
     });
     navigate(`/${courseId}/models`);
@@ -253,7 +253,7 @@ const ModelsView = (): JSX.Element => {
       <Box sx={{display: 'flex', mb: 1}}>
         {(auth?.role === SystemRole.Admin || isTeacherInCharge) &&
           !graphOpen && (
-            <Tooltip title="New assessment model" placement="top">
+            <Tooltip title="New grading model" placement="top">
               <Button
                 sx={{mt: 1}}
                 variant="outlined"
@@ -289,7 +289,7 @@ const ModelsView = (): JSX.Element => {
                 secondaryAction={
                   editRights ? (
                     <>
-                      <Tooltip placement="top" title="Rename assessment model">
+                      <Tooltip placement="top" title="Rename grading model">
                         <IconButton
                           onClick={() => {
                             setEditDialogModel(model);
@@ -303,8 +303,8 @@ const ModelsView = (): JSX.Element => {
                         placement="top"
                         title={
                           model.archived
-                            ? 'Unarchive assessment model'
-                            : 'Archive assessment model'
+                            ? 'Unarchive grading model'
+                            : 'Archive grading model'
                         }
                       >
                         <IconButton
@@ -315,7 +315,7 @@ const ModelsView = (): JSX.Element => {
                           {model.archived ? <Unarchive /> : <Archive />}
                         </IconButton>
                       </Tooltip>
-                      <Tooltip placement="top" title="Delete assessment model">
+                      <Tooltip placement="top" title="Delete grading model">
                         <IconButton
                           disabled={modelsWithFinalGrades.has(model.id)}
                           edge="end"

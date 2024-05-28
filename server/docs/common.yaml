@@ -29,7 +29,7 @@ components:
         minimum: 1
       required: true
       example: 1
-      description: The ID of the assessment model.
+      description: The ID of the grading model.
     attainmentId:
       in: path
       name: attainmentId

@@ -74,13 +74,13 @@ const UserGraphDialog = ({
         {assessmentModels !== undefined && assessmentModels.length > 0 && (
           <FormControl size="small">
             <InputLabel id="assessment-model-select-label">
-              Assessment model
+              Grading model
             </InputLabel>
             <Select
               sx={{minWidth: '150px'}}
               labelId="assessment-model-select-label"
               value={selectedModel?.id ?? assessmentModels[0].id}
-              label="Assessment model"
+              label="Grading model"
               onChange={event => {
                 setSelectedModel(
                   assessmentModels.find(

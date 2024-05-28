@@ -165,7 +165,7 @@ const EditFinalGradesDialog = ({
     },
     {
       field: 'assessmentModel',
-      headerName: 'Assessment model name',
+      headerName: 'Grading model name',
       type: 'string',
       editable: false,
     },

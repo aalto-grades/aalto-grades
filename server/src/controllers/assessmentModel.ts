@@ -91,7 +91,7 @@ export const addAssessmentModel = async (
 ): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
 
-  // Find or create new assessment model based on name and course ID.
+  // Find or create new grading model based on name and course ID.
   const [assessmentModel, created] = await AssessmentModel.findOrCreate({
     where: {
       name: req.body.name,
@@ -105,7 +105,7 @@ export const addAssessmentModel = async (
 
   if (!created) {
     throw new ApiError(
-      `Assessment model with name '${req.body.name}' already exists in course ID ${courseId}`,
+      `Grading model with name '${req.body.name}' already exists in course ID ${courseId}`,
       HttpCode.Conflict
     );
   }
@@ -123,7 +123,7 @@ export const editAssessmentModel = async (
     req.params.assessmentModelId
   );
 
-  // Update assessment model & catch duplicate name error.
+  // Update grading model & catch duplicate name error.
   try {
     await assessmentModel.update({
       name: req.body.name ?? assessmentModel.name,
@@ -134,7 +134,7 @@ export const editAssessmentModel = async (
     // Duplicate name error
     if (e instanceof UniqueConstraintError) {
       throw new ApiError(
-        'There cannot be two assessment models with the same name',
+        'There cannot be two grading models with the same name',
         HttpCode.Conflict
       );
     }
@@ -159,13 +159,13 @@ export const deleteAssessmentModel = async (
   try {
     await assessmentModel.destroy();
   } catch (e) {
-    // Catch deletion of assessment model with final grades
+    // Catch deletion of grading model with final grades
     if (
       e instanceof ForeignKeyConstraintError &&
       e.index === 'final_grade_assessment_model_id_fkey'
     ) {
       throw new ApiError(
-        'Tried to delete assessment model with final grades',
+        'Tried to delete grading model with final grades',
         HttpCode.Conflict
       );
     }

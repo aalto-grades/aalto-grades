@@ -27,7 +27,7 @@ export const router = Router();
 router.get(
   '/v1/courses/:courseId/assessment-models/:assessmentModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]), // TODO: Allow students to view assessment models?
+  courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]), // TODO: Allow students to view grading models?
   controllerDispatcher(getAssessmentModel)
 );
 

@@ -36,7 +36,7 @@ test.describe('Test Courses as Assistant', () => {
     await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
   });
 
-  test('View assessment model', async ({page}) => {
+  test('View grading model', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page.getByRole('button', {name: 'Grading Models'}).click();
 

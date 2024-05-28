@@ -21,7 +21,7 @@ export const findAttainmentById = async (id: number): Promise<Attainment> => {
   return attainment;
 };
 
-/** Finds all attainments of a specific assessment model. */
+/** Finds all attainments of a specific grading model. */
 export const findAttainmentsByCourseId = async (
   courseId: number
 ): Promise<AttainmentData[]> => {
@@ -40,7 +40,7 @@ export const findAttainmentsByCourseId = async (
 };
 
 /**
- * Finds an assessment model by url param id and also validates the url param.
+ * Finds a grading model by url param id and also validates the url param.
  *
  * @throws ApiError(400|404) if not found.
  */
@@ -69,7 +69,7 @@ export const validateAttainmentBelongsToCourse = async (
 ): Promise<void> => {
   const attainment = await findAttainmentById(attainmentId);
 
-  // Check that assessment model belongs to the course.
+  // Check that grading model belongs to the course.
   if (attainment.courseId !== courseId) {
     throw new ApiError(
       `Attainment ID ${attainment.id} ` +
@@ -80,7 +80,7 @@ export const validateAttainmentBelongsToCourse = async (
 };
 
 /**
- * Finds the course and the assessment model by url param ids and also validates
+ * Finds the course and the grading model by url param ids and also validates
  * the url params.
  *
  * @throws ApiError(400|404|409) if either not found or invald or if the
@@ -93,7 +93,7 @@ export const validateAttainmentPath = async (
   const course = await findAndValidateCourseId(courseId);
   const attainment = await findAndValidateAttainmentId(attainmentId);
 
-  // Check that assessment model belongs to the course.
+  // Check that grading model belongs to the course.
   if (attainment.courseId !== course.id) {
     throw new ApiError(
       `Attainment ID ${attainment.id} ` +

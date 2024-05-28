@@ -294,7 +294,7 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
-  it('should respond with 409 when assessment model does not belong to the course', async () => {
+  it('should respond with 409 when grading model does not belong to the course', async () => {
     const student = await createStudent();
     const [, , otherCourseModelId] = await createData.createCourse({});
     const data = [

@@ -36,7 +36,7 @@ test.describe('Test Courses as Teacher', () => {
     await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
   });
 
-  test('View assessment model', async ({page}) => {
+  test('View grading model', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page.getByRole('button', {name: 'Grading Models'}).click();
 
@@ -44,10 +44,10 @@ test.describe('Test Courses as Teacher', () => {
     await expect(page.getByTestId('rf__wrapper')).toBeVisible();
   });
 
-  test('Create assessment model', async ({page}) => {
+  test('Create grading model', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page.getByRole('button', {name: 'Grading Models'}).click();
-    await page.getByLabel('New assessment model').click();
+    await page.getByLabel('New grading model').click();
     await page.getByLabel('Name *').click();
     await page.getByLabel('Name *').fill('Test Model');
     await page.getByLabel('Select template').click();
