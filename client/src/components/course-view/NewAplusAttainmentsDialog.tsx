@@ -130,7 +130,6 @@ const NewAplusAttainmentsDialog = ({
         )}
         {step === 2 && aplusCourse && (
           <CreateAplusAttainments
-            aplusCourseId={aplusCourse.id}
             attainmentsWithSource={attainmentsWithSource}
             handleChange={handleAttainmentChange}
           />

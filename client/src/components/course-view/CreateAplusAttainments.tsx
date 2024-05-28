@@ -37,7 +37,6 @@ const AttainmentCard = ({
 };
 
 type CreateAplusAttainmentsProps = {
-  aplusCourseId: number;
   attainmentsWithSource: [
     {name: string; daysValid: number},
     AplusGradeSourceData,
@@ -49,7 +48,6 @@ type CreateAplusAttainmentsProps = {
 };
 
 const CreateAplusAttainments = ({
-  aplusCourseId,
   attainmentsWithSource,
   handleChange,
 }: CreateAplusAttainmentsProps): JSX.Element => {
