@@ -4,13 +4,10 @@
 
 import {
   Button,
-  Card,
-  CardContent,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  TextField,
 } from '@mui/material';
 import {useState} from 'react';
 
@@ -19,46 +16,11 @@ import {
   AplusGradeSourceData,
   AplusGradeSourceType,
 } from '@/common/types';
+import CreateAplusAttainments from './CreateAplusAttainments';
 import SelectAplusGradeSources from './SelectAplusGradeSources';
 import {useFetchAplusCourses} from '../../hooks/useApi';
 
 import Type = AplusGradeSourceType;
-
-type AttainmentCardProps = {
-  suggestedName: string;
-};
-
-const AttainmentCard = ({suggestedName}: AttainmentCardProps): JSX.Element => {
-  return (
-    <Card>
-      <CardContent>
-        <TextField sx={{mt: 1}} label="Name" value={suggestedName} />
-        <TextField sx={{mt: 1}} label="Days valid" type="number" value={365} />
-      </CardContent>
-    </Card>
-  );
-};
-
-type CreateAplusAttainmentsProps = {
-  aplusCourseId: number;
-  attainmentsWithSource: [
-    {name: string; daysValid: number},
-    AplusGradeSourceData,
-  ][];
-};
-
-const CreateAplusAttainments = ({
-  aplusCourseId,
-  attainmentsWithSource,
-}: CreateAplusAttainmentsProps): JSX.Element => {
-  return (
-    <>
-      {attainmentsWithSource.map(([attainment, source]) => (
-        <AttainmentCard suggestedName={attainment.name} />
-      ))}
-    </>
-  );
-};
 
 type PropsType = {
   handleClose: () => void;
@@ -106,6 +68,26 @@ const AplusDialog = ({handleClose, open}: PropsType): JSX.Element => {
     }
   };
 
+  const handleAttainmentChange = (
+    index: number,
+    attainment: {name?: string; daysValid?: number}
+  ): void => {
+    setAttainmentsWithSource(
+      attainmentsWithSource.map(([a, s], i) => {
+        if (i === index) {
+          return [
+            {
+              name: attainment.name ?? a.name,
+              daysValid: attainment.daysValid ?? a.daysValid,
+            },
+            s,
+          ];
+        }
+        return [a, s];
+      })
+    );
+  };
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>A+ Courses</DialogTitle>
@@ -132,6 +114,7 @@ const AplusDialog = ({handleClose, open}: PropsType): JSX.Element => {
           <CreateAplusAttainments
             aplusCourseId={aplusCourse.id}
             attainmentsWithSource={attainmentsWithSource}
+            handleChange={handleAttainmentChange}
           />
         )}
       </DialogContent>
@@ -146,11 +129,7 @@ const AplusDialog = ({handleClose, open}: PropsType): JSX.Element => {
             Next
           </Button>
         )}
-        {step === 2 && (
-          <Button onClick={() => handleClose()} X>
-            Submit
-          </Button>
-        )}
+        {step === 2 && <Button onClick={() => handleClose()}>Submit</Button>}
       </DialogActions>
     </Dialog>
   );
