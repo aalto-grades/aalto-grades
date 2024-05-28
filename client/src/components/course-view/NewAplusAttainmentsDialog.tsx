@@ -33,7 +33,10 @@ type PropsType = {
   open: boolean;
 };
 
-const AplusDialog = ({handleClose, open}: PropsType): JSX.Element => {
+const NewAplusAttainmentsDialog = ({
+  handleClose,
+  open,
+}: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const aplusCourses = useFetchAplusCourses();
   const addAttainment = useAddAttainment(courseId);
@@ -159,4 +162,4 @@ const AplusDialog = ({handleClose, open}: PropsType): JSX.Element => {
   );
 };
 
-export default AplusDialog;
+export default NewAplusAttainmentsDialog;
