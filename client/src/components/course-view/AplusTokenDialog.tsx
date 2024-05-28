@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+// TODO: Currently unused
+
 import {
   Button,
   Dialog,
