@@ -16,13 +16,13 @@ import {initGraph} from '@/common/util/initGraph';
 import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';
 import {sequelize} from '../../src/database';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
-import GradingModel from '../../src/database/models/assessmentModel';
 import Attainment from '../../src/database/models/attainment';
 import AttainmentGrade from '../../src/database/models/attainmentGrade';
 import Course from '../../src/database/models/course';
 import CourseRole from '../../src/database/models/courseRole';
 import CourseTranslation from '../../src/database/models/courseTranslation';
 import FinalGrade from '../../src/database/models/finalGrade';
+import GradingModel from '../../src/database/models/gradingModel';
 import User from '../../src/database/models/user';
 
 /**

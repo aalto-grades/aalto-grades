@@ -11,8 +11,8 @@ import {
   Model,
 } from 'sequelize';
 
-import GradingModel from './assessmentModel';
 import Course from './course';
+import GradingModel from './gradingModel';
 import User from './user';
 import {sequelize} from '..';
 

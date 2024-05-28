@@ -17,7 +17,7 @@ import {
   editGradingModel,
   getAllGradingModels,
   getGradingModel,
-} from '../controllers/assessmentModel';
+} from '../controllers/gradingModel';
 import {handleInvalidRequestJson} from '../middleware';
 import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';

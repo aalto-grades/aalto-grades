@@ -11,10 +11,10 @@ import {
   HttpCode,
   NewFinalGradeArraySchema,
 } from '@/common/types';
-import {validateGradingModelBelongsToCourse} from './utils/assessmentModel';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {findAndValidateFinalGradePath} from './utils/finalGrade';
 import {validateUserAndGrader} from './utils/grades';
+import {validateGradingModelBelongsToCourse} from './utils/gradingModel';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
 import {ApiError, JwtClaims, NewDbFinalGradeData} from '../types';

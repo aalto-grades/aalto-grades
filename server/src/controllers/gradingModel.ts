@@ -12,13 +12,13 @@ import {
   HttpCode,
   NewGradingModelDataSchema,
 } from '@/common/types';
+import {findAttainmentsByCourseId} from './utils/attainment';
+import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
   checkGradingModelAttainments,
   validateGradingModelPath,
-} from './utils/assessmentModel';
-import {findAttainmentsByCourseId} from './utils/attainment';
-import {findAndValidateCourseId, validateCourseId} from './utils/course';
-import GradingModel from '../database/models/assessmentModel';
+} from './utils/gradingModel';
+import GradingModel from '../database/models/gradingModel';
 import {ApiError} from '../types';
 
 /**

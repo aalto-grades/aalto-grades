@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-export * from './api/assessmentModel';
+export * from './api/gradingModel';
 export * from './api/attainment';
 export * from './api/auth';
 export * from './api/course';

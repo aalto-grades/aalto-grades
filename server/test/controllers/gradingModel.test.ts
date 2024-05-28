@@ -15,7 +15,7 @@ import {
 } from '@/common/types';
 import {initGraph} from '@/common/util/initGraph';
 import {app} from '../../src/app';
-import GradingModel from '../../src/database/models/assessmentModel';
+import GradingModel from '../../src/database/models/gradingModel';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';

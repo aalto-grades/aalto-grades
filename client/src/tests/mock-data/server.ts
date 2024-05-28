@@ -6,11 +6,11 @@ import {ResponseResolver, http} from 'msw';
 import {SetupServer, setupServer} from 'msw/node';
 import {Mock} from 'vitest';
 
-import {mockGradingModel} from './mockAssessmentModel';
 import {mockAttainments} from './mockAttainments';
 import {mockCourse} from './mockCourse';
 import {mockFinalGrades} from './mockFinalGrades';
 import {mockGrades} from './mockGrades';
+import {mockGradingModel} from './mockGradingModel';
 
 export const mockSuccess = (data: unknown): ResponseResolver => {
   return () =>

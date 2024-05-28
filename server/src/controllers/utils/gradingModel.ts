@@ -4,8 +4,8 @@
 
 import {AttainmentData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId, findCourseById} from './course';
-import GradingModel from '../../database/models/assessmentModel';
 import Course from '../../database/models/course';
+import GradingModel from '../../database/models/gradingModel';
 import {ApiError, stringToIdSchema} from '../../types';
 
 /**

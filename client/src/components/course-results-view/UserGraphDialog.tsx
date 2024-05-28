@@ -84,7 +84,7 @@ const UserGraphDialog = ({
               label="Grading model"
               onChange={event => {
                 setSelectedModel(
-                  gradingModels.find(model => model.id === event.target.value)
+                  gradingModels.find(model => model.id === event.target.value)!
                 );
               }}
             >

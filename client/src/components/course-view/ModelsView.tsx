@@ -28,8 +28,8 @@ import {
   SystemRole,
 } from '@/common/types';
 import {GraphStructure} from '@/common/types/graph';
-import CreateGradingModelDialog from './CreateAssessmentModelDialog';
-import EditGradingModelDialog from './EditAssessmentModelDialog';
+import CreateGradingModelDialog from './CreateGradingModelDialog';
+import EditGradingModelDialog from './EditGradingModelDialog';
 import {useGetFinalGrades} from '../../hooks/api/finalGrade';
 import {
   useDeleteGradingModel,
