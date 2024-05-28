@@ -162,9 +162,18 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       }))
     );
     for (const grade of Object.values(finalGrades)) {
-      // TODO: Handle GradingScale.SecondNationalLanguage
-      const maxGrade =
-        course.data.gradingScale === GradingScale.PassFail ? 1 : 5;
+      let maxGrade;
+      switch (course.data.gradingScale) {
+        case GradingScale.Numerical:
+          maxGrade = 5;
+          break;
+        case GradingScale.PassFail:
+          maxGrade = 1;
+          break;
+        case GradingScale.SecondNationalLanguage:
+          maxGrade = 2;
+          break;
+      }
       const Schema = z.number().int().min(0).max(maxGrade);
       const result = Schema.safeParse(grade.finalGrade);
       if (!result.success) {

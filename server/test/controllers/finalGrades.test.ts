@@ -29,6 +29,7 @@ let editCourseId = -1;
 let editFinalGradeId = -1;
 let editCourseModelId = -1;
 let passFailCourseId = -1;
+let secondaryLangCourseId = -1;
 let noRoleCourseId = -1;
 let noRoleFinalGradeId = -1;
 const nonExistentId = 1000000;
@@ -69,6 +70,9 @@ beforeAll(async () => {
 
   [passFailCourseId] = await createData.createCourse({
     courseData: {gradingScale: GradingScale.PassFail},
+  });
+  [secondaryLangCourseId] = await createData.createCourse({
+    courseData: {gradingScale: GradingScale.SecondNationalLanguage},
   });
 
   [noRoleCourseId] = await createData.createCourse({
@@ -263,6 +267,15 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
     data[0].grade = 2; // Make sure at least some grade is >1
 
     const url = `/v1/courses/${passFailCourseId}/final-grades`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
+  });
+
+  it('should respond with 400 if trying to add grade >2 to a secondary language course', async () => {
+    const student = await createStudent();
+    const data = [getData(student)];
+    data[0].grade = 3; // Make sure at least some grade is >2
+
+    const url = `/v1/courses/${secondaryLangCourseId}/final-grades`;
     await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
   });
 

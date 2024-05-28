@@ -12,6 +12,7 @@ import {
   NewGrade,
   StudentRowSchema,
   EditGradeData,
+  GradingScale,
 } from '@/common/types';
 import {app} from '../../src/app';
 import * as gradesUtil from '../../src/controllers/utils/grades';
@@ -652,6 +653,79 @@ ${createCSVString(selectedStudents, '21.6.2023', 'en').join(',\n')},\n`);
 ${createCSVString(students, '12.5.2023', 'ja').join(',\n')},\n`);
     expect(res.headers['content-disposition']).toBe(
       'attachment; filename="final_grades_course_CS-A????_' +
+        `${new Date().toLocaleDateString('fi-FI')}.csv"`
+    );
+  });
+
+  it('should export CSV when gradingScale is pass/fail', async () => {
+    const [passFailCourseId, , modelId] = await createData.createCourse({
+      courseData: {
+        gradingScale: GradingScale.PassFail,
+        maxCredits: 5,
+        courseCode: 'CS-A9542',
+      },
+    });
+    const studentNums = [];
+    for (let i = 0; i <= 1; i++) {
+      studentNums.push(students[i].studentNumber);
+      await createData.createFinalGrade(
+        passFailCourseId,
+        students[i].id,
+        modelId,
+        TEACHER_ID,
+        i
+      );
+    }
+    const res = await request
+      .post(`/v1/courses/${passFailCourseId}/grades/csv/sisu`)
+      .send({studentNumbers: studentNums})
+      .set('Cookie', cookies.teacherCookie)
+      .set('Accept', 'text/csv')
+      .expect(HttpCode.Ok);
+
+    expect(res.text)
+      .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+${students[0].studentNumber},fail,5,21.6.2023,en,
+${students[1].studentNumber},pass,5,21.6.2023,en,\n`);
+    expect(res.headers['content-disposition']).toBe(
+      'attachment; filename="final_grades_course_CS-A9542_' +
+        `${new Date().toLocaleDateString('fi-FI')}.csv"`
+    );
+  });
+
+  it('should export CSV when gradingScale is secondary language', async () => {
+    const [passFailCourseId, , modelId] = await createData.createCourse({
+      courseData: {
+        gradingScale: GradingScale.SecondNationalLanguage,
+        maxCredits: 5,
+        courseCode: 'CS-A8341',
+      },
+    });
+    const studentNums = [];
+    for (let i = 0; i <= 2; i++) {
+      studentNums.push(students[i].studentNumber);
+      await createData.createFinalGrade(
+        passFailCourseId,
+        students[i].id,
+        modelId,
+        TEACHER_ID,
+        i
+      );
+    }
+    const res = await request
+      .post(`/v1/courses/${passFailCourseId}/grades/csv/sisu`)
+      .send({studentNumbers: studentNums})
+      .set('Cookie', cookies.teacherCookie)
+      .set('Accept', 'text/csv')
+      .expect(HttpCode.Ok);
+
+    expect(res.text)
+      .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
+${students[0].studentNumber},Fail,5,21.6.2023,en,
+${students[1].studentNumber},SAT,5,21.6.2023,en,
+${students[2].studentNumber},G,5,21.6.2023,en,\n`);
+    expect(res.headers['content-disposition']).toBe(
+      'attachment; filename="final_grades_course_CS-A8341_' +
         `${new Date().toLocaleDateString('fi-FI')}.csv"`
     );
   });
