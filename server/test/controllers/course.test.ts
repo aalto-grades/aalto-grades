@@ -515,11 +515,10 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
-    let url = `/v1/courses/${-1}`;
+    let url = `/v1/courses/${courseId}`;
     const data: EditCourseData = {assistants: ['assistant1@aalto.fi']};
     await responseTests.testUnauthorized(url).put(data);
 
-    url = `/v1/courses/${courseId}`;
     await responseTests
       .testForbidden(url, [cookies.assistantCookie, cookies.studentCookie])
       .put(data);
