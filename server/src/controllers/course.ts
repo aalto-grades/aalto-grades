@@ -26,6 +26,7 @@ import {sequelize} from '../database';
 import Course from '../database/models/course';
 import CourseRole from '../database/models/courseRole';
 import CourseTranslation from '../database/models/courseTranslation';
+import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
 import {ApiError, CourseFull} from '../types';
 
@@ -156,6 +157,7 @@ export const editCourse = async (
   res: Response
 ): Promise<void> => {
   const course = await findAndValidateCourseId(req.params.courseId);
+  const finalGrade = await FinalGrade.findOne({where: {courseId: course.id}});
 
   const {
     courseCode,
@@ -168,6 +170,13 @@ export const editCourse = async (
     name,
     assistants,
   } = req.body;
+
+  if (finalGrade !== null && gradingScale !== course.gradingScale) {
+    throw new ApiError(
+      'Cannot change grading scale of a course with final grades',
+      HttpCode.BadRequest
+    );
+  }
 
   if (
     minCredits !== undefined &&
@@ -203,11 +212,12 @@ export const editCourse = async (
     try {
       await Course.update(
         {
-          courseCode: courseCode,
-          minCredits: minCredits,
-          maxCredits: maxCredits,
-          gradingScale: gradingScale,
-          languageOfInstruction: languageOfInstruction,
+          courseCode: courseCode ?? course.courseCode,
+          minCredits: minCredits ?? course.minCredits,
+          maxCredits: maxCredits ?? course.maxCredits,
+          gradingScale: gradingScale ?? course.gradingScale,
+          languageOfInstruction:
+            languageOfInstruction ?? course.languageOfInstruction,
         },
         {
           where: {id: course.id},
