@@ -33,6 +33,7 @@ type PropsType = {
   open: boolean;
 };
 
+// TODO: Better state handling between different stages
 const NewAplusAttainmentsDialog = ({
   handleClose,
   open,
@@ -48,6 +49,12 @@ const NewAplusAttainmentsDialog = ({
   const [attainmentsWithSource, setAttainmentsWithSource] = useState<
     [{name: string; daysValid: number}, AplusGradeSourceData][]
   >([]);
+
+  const handleResetAndClose = (): void => {
+    setStep(0);
+    setAplusCourse(null);
+    handleClose();
+  };
 
   const handleSelectionChange = (
     checked: boolean,
@@ -113,7 +120,7 @@ const NewAplusAttainmentsDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleResetAndClose}>
       <DialogTitle>A+ Courses</DialogTitle>
       <DialogContent>
         {step === 0 && aplusCourses.data && (
@@ -150,7 +157,7 @@ const NewAplusAttainmentsDialog = ({
           <Button
             onClick={async () => {
               await handleSubmit();
-              handleClose();
+              handleResetAndClose();
             }}
           >
             Submit
