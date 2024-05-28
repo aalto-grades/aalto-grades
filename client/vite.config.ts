@@ -7,7 +7,7 @@
 import react from '@vitejs/plugin-react';
 // import license from 'rollup-plugin-license';
 // import {defineConfig} from 'vitest/config';
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 
 import viteTsconfigPaths from 'vite-tsconfig-paths';
 

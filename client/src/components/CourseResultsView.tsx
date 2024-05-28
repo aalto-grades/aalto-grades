@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box} from '@mui/material';
+import {Box, Typography} from '@mui/material';
 import {JSX} from 'react';
 import {useParams} from 'react-router-dom';
 
@@ -18,6 +18,9 @@ const CourseResultsView = (): JSX.Element => {
 
   return (
     <Box textAlign="left" alignItems="left">
+      <Typography width={'fit-content'} variant="h2">
+        Grades
+      </Typography>
       {gradesQuery.data && (
         <GradesTableProvider data={gradesQuery.data}>
           <CourseResultsTableToolbar />

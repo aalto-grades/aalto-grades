@@ -236,23 +236,26 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     );
   }, [getAttainmentsForAssessmentModel, selectedAssessmentModel]);
 
+  // This columns are used to group by data that is not directly shown
+  // For example calculating the latest attainment date
+  // For example grouping by Exported to sisu has no need to create a column
   const groupingColumns =
-    grouping.length > 0
-      ? [
-          columnHelper.accessor(row => row.grouping, {
-            id: 'grouping',
-            meta: {PrettyChipPosition: 'first'},
-            header: () => {
-              return 'Latest Attainment';
-            },
-            cell: prop => prop.getValue(),
-          }),
-        ]
-      : [];
+    // TODO: SHOULD USE THE VISIBILITY API
+    [
+      columnHelper.accessor(row => row.grouping, {
+        id: 'grouping',
+        meta: {PrettyChipPosition: 'first'},
+        header: () => {
+          return 'Latest Attainment';
+        },
+        cell: prop => prop.getValue(),
+      }),
+    ].filter(column => grouping.includes(column.id ?? ''));
 
   // Creating static columns
   const staticColumns = [
     ...groupingColumns,
+    // Selection Column
     columnHelper.display({
       id: 'select',
       size: 70,
@@ -436,11 +439,12 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         aggregatedCell: () => null,
       }
     ),
-    columnHelper.group({
-      header: 'Attainments',
-      meta: {PrettyChipPosition: 'alone'},
-      columns: gradeColumns,
-    }),
+    // columnHelper.group({
+    //   header: 'Attainments',
+    //   meta: {PrettyChipPosition: 'alone'},
+    //   columns: gradeColumns,
+    // }),
+    ...gradeColumns,
   ];
 
   const table = useReactTable({

@@ -249,7 +249,9 @@ const ModelsView = (): JSX.Element => {
         assessmentModelId={editDialogModel?.id ?? null}
         name={editDialogModel?.name ?? null}
       />
-
+      <Typography width={'fit-content'} variant="h2">
+        Grading Models
+      </Typography>
       <Box sx={{display: 'flex', mb: 1}}>
         {(auth?.role === SystemRole.Admin || isTeacherInCharge) &&
           !graphOpen && (

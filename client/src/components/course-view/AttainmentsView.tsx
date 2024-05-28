@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Archive, Delete, Unarchive} from '@mui/icons-material';
-import {Box, Button} from '@mui/material';
+import {Box, Button, Typography} from '@mui/material';
 import {
   DataGrid,
   GridActionsCellItem,
@@ -275,27 +275,69 @@ const AttainmentsView = (): JSX.Element => {
           if (blocker.state === 'blocked') blocker.proceed();
         }}
       />
-      <>Attainments</>
-      <Box sx={{display: 'flex', mb: 1}}>
+      <div style={{display: 'flex'}}>
+        <Typography width={'fit-content'} variant="h2">
+          Attainments
+        </Typography>
+
+        {editRights && unsavedChanges && (
+          <Box
+            sx={{
+              marginLeft: '10px',
+              borderRadius: 4,
+              // border: '1px solid black',
+              // backgroundColor: 'lightgray',
+              alignItems: 'center',
+              textAlign: 'center',
+              // p: 1,
+            }}
+          >
+            {/* {unsavedChanges && (
+              <>
+                Unsaved Changes
+                <Button onClick={() => setUnsavedDialogOpen(true)}>
+                  Discard
+                </Button>
+                <Button
+                  onClick={handleSubmit}
+                  variant={unsavedChanges ? 'contained' : 'text'}
+                  disabled={error || editing}
+                >
+                  Save
+                </Button>
+              </>
+            )} */}
+          </Box>
+        )}
+      </div>
+      <Box sx={{display: 'flex', gap: 1, mb: 1, mt: 1}}>
         {editRights && (
-          <Button onClick={() => setAddDialogOpen(true)}>Add attainment</Button>
+          <>
+            <Button variant="outlined" onClick={() => setAddDialogOpen(true)}>
+              Add New
+            </Button>
+            <Button variant="outlined">A+ Import</Button>
+          </>
         )}
 
         {editRights && (
-          <div style={{marginLeft: '10px'}}>
+          <>
             {unsavedChanges && (
-              <Button onClick={() => setUnsavedDialogOpen(true)}>
-                Discard
-              </Button>
+              <>
+                <Button onClick={() => setUnsavedDialogOpen(true)}>
+                  Discard
+                </Button>
+
+                <Button
+                  onClick={handleSubmit}
+                  variant={unsavedChanges ? 'contained' : 'text'}
+                  disabled={error || editing}
+                >
+                  Save
+                </Button>
+              </>
             )}
-            <Button
-              onClick={handleSubmit}
-              variant={unsavedChanges ? 'contained' : 'text'}
-              disabled={error || editing}
-            >
-              Save
-            </Button>
-          </div>
+          </>
         )}
       </Box>
 

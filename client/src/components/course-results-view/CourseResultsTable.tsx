@@ -60,6 +60,7 @@ const CourseResultsTable = (): JSX.Element => {
                   display: 'flex',
                   width: '100%',
                   backgroundColor: 'white',
+                  borderBottom: '1px solid lightgray',
                 }}
               >
                 {headerGroup.headers.map(header => (

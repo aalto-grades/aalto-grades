@@ -3,14 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import {Add} from '@mui/icons-material';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ClearIcon from '@mui/icons-material/Clear';
 import {
   Box,
   Button,
-  Divider,
-  FormControl,
-  InputLabel,
+  ButtonBase,
+  Chip,
+  Menu,
   MenuItem,
-  Select,
   Tooltip,
   useTheme,
 } from '@mui/material';
@@ -31,7 +32,7 @@ import {
   useGetGrades,
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {GradeSelectOption, findBestGrade} from '../../utils';
+import {findBestGrade} from '../../utils';
 import {findLatestGrade} from '../../utils/table';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import UploadDialog from '../course-view/UploadDialog';
@@ -200,209 +201,489 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   };
 
   return (
-    <Box
-      sx={{
-        // mx: 1,
-        p: 1,
-        borderRadius: 1,
-        display: 'flex',
-        backgroundColor: theme.vars.palette.hoverGrey2,
-      }}
-    >
-      <Button
-        variant="outlined"
-        onClick={() => setUploadOpen(true)}
-        startIcon={<Add />}
-      >
-        Add Grades
-      </Button>
-      <Divider orientation="vertical" sx={{mx: 1}} flexItem />
-      <FormControl>
-        <InputLabel id="select-grade-select-option">
-          Grade selection criterion
-        </InputLabel>
-        <Select
-          labelId="select-grade-select-option"
-          value={gradeSelectOption}
-          label="Grade selection criterion"
-          onChange={e =>
-            setGradeSelectOption(e.target.value as GradeSelectOption)
-          }
-        >
-          <MenuItem value="best">Select best grade</MenuItem>
-          <MenuItem value="latest">Select latest grade</MenuItem>
-        </Select>
-      </FormControl>
-      <FormControl>
-        <InputLabel id="select-assessment-model-option">
-          Assessment Model
-        </InputLabel>
-        <Select
-          labelId="select-assessment-model-option"
-          value={selectedAssessmentModel}
-          label="Assessment Model"
-          onChange={e =>
-            setSelectedAssessmentModel(e.target.value as 'any' | number)
-          }
-        >
-          <MenuItem value="any">Any</MenuItem>
-          {(assessmentModels ?? []).map(model => (
-            <MenuItem
-              key={`assessment-model-select-${model.id}`}
-              value={model.id}
-            >
-              {model.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <Divider orientation="vertical" sx={{mx: 1}} flexItem />
-      <button
-        onClick={() =>
-          table.setGrouping(old =>
-            structuredClone(toggleString(old, 'grouping'))
-          )
-        }
-      >
-        Group by Date
-      </button>
-      <input
-        type="text"
-        value={
-          (table.getColumn('user_studentNumber')?.getFilterValue() ??
-            '') as string
-        }
-        onChange={e => {
-          table.getColumn('user_studentNumber')?.setFilterValue(e.target.value);
+    <>
+      <Box
+        sx={{
+          // mx: 1,
+          pt: 1,
+          borderRadius: 200,
+          display: 'flex',
+          // backgroundColor: theme.vars.palette.hoverGrey2,
+          // height: '45px',
         }}
-        placeholder={'Search...'}
-        className="w-36 border shadow rounded"
-      />
-      <Divider orientation="vertical" sx={{mx: 1}} flexItem />
-
-      {editRights && (
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
-          <Tooltip
-            title={
-              table.getSelectedRowModel().rows.length === 0
-                ? 'Select at least one student number for grade calculation.'
-                : 'Calculate course final grades for selected students.'
-            }
-            placement="top"
+      >
+        {table.getSelectedRowModel().rows.length === 0 ? (
+          <Button
+            variant="tonal"
+            onClick={() => setUploadOpen(true)}
+            startIcon={<Add />}
           >
-            <span>
-              <Button
-                variant="outlined"
-                onClick={() => setShowCalculateDialog(true)}
-                disabled={table.getSelectedRowModel().rows.length === 0}
-              >
-                Calculate final grades
-              </Button>
-            </span>
-          </Tooltip>
-          <Tooltip
-            title={
-              table.getSelectedRowModel().rows.length === 0
-                ? 'Select at least one student number for downloading grades.'
-                : missingFinalGrades
-                  ? 'Grades with status "PENDING" cannot be downloaded, ' +
-                    'unselect or calculate grades for these.'
-                  : 'Download final course grades as a Sisu compatible CSV file.'
-            }
-            placement="top"
+            Add Grades
+          </Button>
+        ) : (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 1,
+              backgroundColor: theme.vars.palette.primary.light,
+              // border: '1px solid black',
+              borderRadius: 200,
+            }}
           >
-            <span>
-              <Button
-                variant="outlined"
-                color={missingFinalGrades ? 'error' : 'primary'}
-                onClick={(): void => {
-                  if (!missingFinalGrades) {
-                    setShowSisuDialog(true);
-                  }
+            <div style={{alignContent: 'center'}}>
+              {table.getSelectedRowModel().rows.length} selected student
+            </div>
+            {editRights && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  gap: 1,
                 }}
-                disabled={table.getSelectedRowModel().rows.length === 0}
               >
-                Download Sisu CSV
-              </Button>
-            </span>
-          </Tooltip>
-          {/* <Button
-              variant="outlined"
-              color={props.selectedStudents.length != 0 ? 'error' : 'primary'}
-              onClick={(): void => {
-                if (props.selectedStudents.length != 0) {
-                  setShowDialog(true);
-                } else {
-                  navigate(-1);
-                }
-              }}
-            >
-              Return to course view
-            </Button> */}
-          <CalculateFinalGradesDialog
-            open={showCalculateDialog}
-            onClose={() => setShowCalculateDialog(false)}
-            selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
-            gradeSelectOption={gradeSelectOption}
-            calculateFinalGrades={handleCalculateFinalGrades}
-          />
-          <SisuDownloadDialog
-            open={showSisuDialog}
-            handleClose={() => setShowSisuDialog(false)}
-            handleExited={handleExitedSisuDialog}
-            selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
-          />
-        </Box>
-      )}
-      {/* <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-          }}
+                <Tooltip
+                  title={
+                    table.getSelectedRowModel().rows.length === 0
+                      ? 'Select at least one student number for grade calculation.'
+                      : 'Calculate course final grades for selected students.'
+                  }
+                  placement="top"
+                >
+                  <span>
+                    <Button
+                      variant={
+                        table.getSelectedRowModel().rows.length === 0
+                          ? 'outlined'
+                          : !missingFinalGrades
+                            ? 'outlined'
+                            : 'contained'
+                      }
+                      onClick={() => setShowCalculateDialog(true)}
+                      disabled={table.getSelectedRowModel().rows.length === 0}
+                    >
+                      Calculate final grades
+                    </Button>
+                  </span>
+                </Tooltip>
+                <Tooltip
+                  title={
+                    table.getSelectedRowModel().rows.length === 0
+                      ? 'Select at least one student number for downloading grades.'
+                      : missingFinalGrades
+                        ? 'Grades with status "PENDING" cannot be downloaded, ' +
+                          'unselect or calculate grades for these.'
+                        : 'Download final course grades as a Sisu compatible CSV file.'
+                  }
+                  placement="top"
+                >
+                  <span>
+                    <Button
+                      variant="contained"
+                      color={missingFinalGrades ? 'error' : 'primary'}
+                      onClick={(): void => {
+                        if (!missingFinalGrades) {
+                          setShowSisuDialog(true);
+                        }
+                      }}
+                      disabled={
+                        table.getSelectedRowModel().rows.length !== 0 &&
+                        missingFinalGrades
+                      }
+                    >
+                      Download Sisu CSV
+                    </Button>
+                  </span>
+                </Tooltip>
+              </Box>
+            )}
+          </Box>
+        )}
+      </Box>
+      <Box
+        sx={{
+          // mx: 1,
+          py: 1,
+          borderRadius: 200,
+          display: 'flex',
+          gap: 1,
+          // backgroundColor: theme.vars.palette.hoverGrey2,
+        }}
+      >
+        <Tooltip
+          title="Group rows based on other colums"
+          placement="top"
+          disableInteractive
         >
-          <TextField
-            size="small"
-            value={props.search}
-            name="search"
-            label="Search by Student Number"
-            onChange={({
-              target,
-            }: {
-              target: EventTarget & (HTMLInputElement | HTMLTextAreaElement);
-            }): void => props.setSearch(target.value)}
-            InputLabelProps={{shrink: true}}
-            margin="normal"
-          />
-          <Tooltip title="Filter" placement="top">
-            <IconButton size="large" sx={{m: 1.5, mb: 1, mr: 0}}>
-              <FilterListIcon />
-            </IconButton>
+          <GroupByButton />
+        </Tooltip>
+        {(assessmentModels?.length ?? 0) > 1 && (
+          <Tooltip
+            title="Show only course parts used in the model"
+            placement="top"
+            disableInteractive
+          >
+            <AssesmentFilterButton />
           </Tooltip>
-          <Tooltip title="Download results" placement="top">
-            <IconButton size="large" sx={{m: 1, mt: 2, ml: 0}}>
-              <DownloadIcon />
-            </IconButton>
-          </Tooltip>
-        </Box> */}
+        )}
 
+        <Chip variant="outlined" label="Filters" />
+
+        <input
+          style={{
+            borderRadius: '200px',
+            border: '0px solid black',
+            background: 'lightgrey',
+            padding: '0px 15px',
+          }}
+          type="text"
+          value={
+            (table.getColumn('user_studentNumber')?.getFilterValue() ??
+              '') as string
+          }
+          onChange={e => {
+            table
+              .getColumn('user_studentNumber')
+              ?.setFilterValue(e.target.value);
+          }}
+          placeholder={'Search...'}
+          className="w-36 border shadow rounded"
+        />
+      </Box>
+      {/* <Box
+        sx={{
+          // mx: 1,
+          p: 1,
+          borderRadius: 200,
+          display: 'flex',
+          // backgroundColor: theme.vars.palette.hoverGrey2,
+        }}
+      >
+        <FormControl>
+          <InputLabel id="select-grade-select-option">
+            Grade selection criterion
+          </InputLabel>
+          <Select
+            labelId="select-grade-select-option"
+            value={gradeSelectOption}
+            label="Grade selection criterion"
+            onChange={e =>
+              setGradeSelectOption(e.target.value as GradeSelectOption)
+            }
+          >
+            <MenuItem value="best">Select best grade</MenuItem>
+            <MenuItem value="latest">Select latest grade</MenuItem>
+          </Select>
+        </FormControl>
+      </Box> */}
       <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} />
       <UnsavedChangesDialog
         open={showDialog}
         onClose={() => setShowDialog(false)}
         handleDiscard={() => navigate(-1)}
       />
-    </Box>
+      <CalculateFinalGradesDialog
+        open={showCalculateDialog}
+        onClose={() => setShowCalculateDialog(false)}
+        selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
+        gradeSelectOption={gradeSelectOption}
+        calculateFinalGrades={handleCalculateFinalGrades}
+      />
+      <SisuDownloadDialog
+        open={showSisuDialog}
+        handleClose={() => setShowSisuDialog(false)}
+        handleExited={handleExitedSisuDialog}
+        selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
+      />
+    </>
   );
 };
 
 export default CourseResultsTableToolbar;
+
+const GroupByButton = () => {
+  const theme = useTheme();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const {table} = useTableContext();
+
+  const isActive = useMemo(
+    () => table.getState().grouping.length > 0,
+    [table.getState().grouping]
+  );
+
+  return (
+    <>
+      <span style={{display: 'flex'}}>
+        <ButtonBase
+          style={{
+            ...{
+              display: 'flex',
+              borderRadius: '8px',
+              textAlign: 'center',
+              border: '1px solid black',
+              alignContent: 'center',
+              padding: '0px 8px',
+              fontSize: '14px',
+              alignItems: 'center',
+              lineHeight: '20px',
+              cursor: 'pointer',
+              position: 'relative',
+              backgroundColor: 'transparent',
+            },
+            ...(isActive && {
+              backgroundColor: theme.vars.palette.info.light,
+              border: 'none',
+              borderRadius: '8px 0px 0px 8px',
+            }),
+          }}
+          onClick={ev => {
+            handleClick(ev);
+          }}
+        >
+          <div
+            style={{
+              alignContent: 'center',
+              padding: '0px 8px',
+              width: 'max-content',
+            }}
+          >
+            Group by {table.getState().grouping}
+          </div>
+
+          {!isActive && (
+            <ArrowDropDownIcon
+              style={{alignContent: 'center', fontSize: '18px'}}
+            />
+          )}
+        </ButtonBase>
+        {isActive && (
+          <ButtonBase
+            style={{
+              ...{
+                display: 'flex',
+                borderRadius: '0px 8px 8px 0',
+                textAlign: 'center',
+                // border: '1px solid black',
+                border: '0px 1px 1px 1px',
+                alignContent: 'center',
+                padding: '0px 8px',
+                fontSize: '14px',
+                alignItems: 'center',
+                lineHeight: '20px',
+                cursor: 'pointer',
+                position: 'relative',
+                backgroundColor: 'transparent',
+              },
+              ...(isActive && {
+                backgroundColor: theme.vars.palette.info.light,
+                border: 'none',
+              }),
+            }}
+            onClick={ev => {
+              table.setGrouping([]);
+            }}
+          >
+            <ClearIcon style={{alignContent: 'center', fontSize: '18px'}} />
+          </ButtonBase>
+        )}
+      </span>
+      <Menu
+        id="long-menu"
+        MenuListProps={{
+          'aria-labelledby': 'long-ButtonBase',
+        }}
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        style={{
+          maxHeight: '50vh',
+        }}
+      >
+        <MenuItem
+          key={'grouping'}
+          selected={table.getState().grouping[0] === 'grouping'}
+          onClick={() => {
+            table.setGrouping(old =>
+              structuredClone(toggleString(old, 'grouping'))
+            );
+            handleClose();
+          }}
+        >
+          Latest Attainment
+        </MenuItem>
+        {table.getAllFlatColumns().map(column => (
+          <MenuItem
+            key={column.id}
+            selected={table.getState().grouping.includes(column.id)}
+            onClick={() => {
+              table.setGrouping(old =>
+                structuredClone(toggleString(old, column.id))
+              );
+              handleClose();
+            }}
+          >
+            {column.id}
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
+  );
+};
+
+const AssesmentFilterButton = () => {
+  const {courseId} = useParams() as {courseId: string};
+  const theme = useTheme();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const {
+    table,
+    gradeSelectOption,
+    setGradeSelectOption,
+    selectedAssessmentModel,
+    setSelectedAssessmentModel,
+  } = useTableContext();
+
+  const allAssessmentModels = useGetAllAssessmentModels(courseId);
+
+  // Filter out archived models
+  const assessmentModels = useMemo(
+    () =>
+      allAssessmentModels.data !== undefined
+        ? allAssessmentModels.data.filter(model => !model.archived)
+        : undefined,
+    [allAssessmentModels.data]
+  );
+
+  const isActive = useMemo<boolean>(
+    () => !!selectedAssessmentModel && selectedAssessmentModel !== 'any',
+    [selectedAssessmentModel]
+  );
+
+  return (
+    <>
+      <span style={{display: 'flex'}}>
+        <ButtonBase
+          id="select-assessment-model-option"
+          style={{
+            ...{
+              display: 'flex',
+              borderRadius: '8px',
+              textAlign: 'center',
+              border: '1px solid black',
+              alignContent: 'center',
+              padding: '0px 8px',
+              fontSize: '14px',
+              alignItems: 'center',
+              lineHeight: '20px',
+              cursor: 'pointer',
+              position: 'relative',
+              backgroundColor: 'transparent',
+            },
+            ...(isActive && {
+              backgroundColor: theme.vars.palette.info.light,
+              border: 'none',
+              borderRadius: '8px 0px 0px 8px',
+            }),
+          }}
+          onClick={ev => {
+            handleClick(ev);
+          }}
+        >
+          <div
+            style={{
+              alignContent: 'center',
+              padding: '0px 8px',
+              width: 'max-content',
+            }}
+          >
+            {isActive
+              ? assessmentModels?.filter(
+                  ass => ass.id === selectedAssessmentModel
+                )[0]?.name
+              : 'Grading Model'}
+          </div>
+
+          {!isActive && (
+            <ArrowDropDownIcon
+              style={{alignContent: 'center', fontSize: '18px'}}
+            />
+          )}
+        </ButtonBase>
+        {isActive && (
+          <ButtonBase
+            style={{
+              ...{
+                display: 'flex',
+                borderRadius: '0px 8px 8px 0',
+                textAlign: 'center',
+                // border: '1px solid black',
+                border: '0px 1px 1px 1px',
+                alignContent: 'center',
+                padding: '0px 8px',
+                fontSize: '14px',
+                alignItems: 'center',
+                lineHeight: '20px',
+                cursor: 'pointer',
+                position: 'relative',
+                backgroundColor: 'transparent',
+              },
+              ...(isActive && {
+                backgroundColor: theme.vars.palette.info.light,
+                border: 'none',
+              }),
+            }}
+            onClick={ev => {
+              setSelectedAssessmentModel('any');
+            }}
+          >
+            <ClearIcon style={{alignContent: 'center', fontSize: '18px'}} />
+          </ButtonBase>
+        )}
+      </span>
+      <Menu
+        id="long-menu"
+        MenuListProps={{
+          'aria-labelledby': 'long-ButtonBase',
+        }}
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        style={{
+          maxHeight: '50vh',
+        }}
+      >
+        {(assessmentModels ?? []).map(model => (
+          <MenuItem
+            onClick={() => {
+              setSelectedAssessmentModel(model.id);
+              handleClose();
+            }}
+            key={`assessment-model-select-${model.id}`}
+            value={model.id}
+            selected={selectedAssessmentModel === model.id}
+          >
+            {model.name}
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
+  );
+};
