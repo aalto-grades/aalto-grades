@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Card, CardContent, TextField} from '@mui/material';
+import {Box, Card, CardContent, TextField} from '@mui/material';
 
 import {AplusGradeSourceData} from '@/common/types';
 
@@ -16,7 +16,7 @@ const AttainmentCard = ({
   handleChange,
 }: AttainmentCardProps): JSX.Element => {
   return (
-    <Card>
+    <Card sx={{m: 1}}>
       <CardContent>
         <TextField
           sx={{mt: 1}}
@@ -54,14 +54,14 @@ const CreateAplusAttainments = ({
   handleChange,
 }: CreateAplusAttainmentsProps): JSX.Element => {
   return (
-    <>
+    <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
       {attainmentsWithSource.map(([a, _], i) => (
         <AttainmentCard
           attainment={a}
           handleChange={attainment => handleChange(i, attainment)}
         />
       ))}
-    </>
+    </Box>
   );
 };
 

@@ -38,20 +38,27 @@ const SelectAplusGradeSources = ({
     <>
       {aplusExerciseData.data && (
         <>
-          <FormControlLabel
-            control={
-              <Checkbox
-                onChange={e =>
-                  handleChange(e.target.checked, 'A+ Course', {
-                    attainmentId: -1,
-                    aplusCourseId: aplusCourse.id,
-                    sourceType: AplusGradeSourceType.FullPoints,
-                  })
+          <Accordion defaultExpanded>
+            <AccordionSummary expandIcon={<ArrowDropDown />}>
+              Course
+            </AccordionSummary>
+            <AccordionDetails>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    onChange={e =>
+                      handleChange(e.target.checked, 'A+ Course', {
+                        attainmentId: -1,
+                        aplusCourseId: aplusCourse.id,
+                        sourceType: AplusGradeSourceType.FullPoints,
+                      })
+                    }
+                  />
                 }
+                label="Full points"
               />
-            }
-            label="Full points"
-          />
+            </AccordionDetails>
+          </Accordion>
           <Accordion>
             <AccordionSummary expandIcon={<ArrowDropDown />}>
               Modules
@@ -82,36 +89,38 @@ const SelectAplusGradeSources = ({
               </FormGroup>
             </AccordionDetails>
           </Accordion>
-          <Accordion>
-            <AccordionSummary expandIcon={<ArrowDropDown />}>
-              Difficulties
-            </AccordionSummary>
-            <AccordionDetails>
-              <FormGroup>
-                {aplusExerciseData.data.difficulties.map(difficulty => (
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        onChange={e =>
-                          handleChange(
-                            e.target.checked,
-                            `A+ Difficulty: ${difficulty}`,
-                            {
-                              attainmentId: -1,
-                              aplusCourseId: aplusCourse.id,
-                              sourceType: AplusGradeSourceType.Difficulty,
-                              difficulty: difficulty,
-                            }
-                          )
-                        }
-                      />
-                    }
-                    label={difficulty}
-                  />
-                ))}
-              </FormGroup>
-            </AccordionDetails>
-          </Accordion>
+          {aplusExerciseData.data.difficulties.length > 0 && (
+            <Accordion>
+              <AccordionSummary expandIcon={<ArrowDropDown />}>
+                Difficulties
+              </AccordionSummary>
+              <AccordionDetails>
+                <FormGroup>
+                  {aplusExerciseData.data.difficulties.map(difficulty => (
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          onChange={e =>
+                            handleChange(
+                              e.target.checked,
+                              `A+ Difficulty: ${difficulty}`,
+                              {
+                                attainmentId: -1,
+                                aplusCourseId: aplusCourse.id,
+                                sourceType: AplusGradeSourceType.Difficulty,
+                                difficulty: difficulty,
+                              }
+                            )
+                          }
+                        />
+                      }
+                      label={difficulty}
+                    />
+                  ))}
+                </FormGroup>
+              </AccordionDetails>
+            </Accordion>
+          )}
         </>
       )}
     </>

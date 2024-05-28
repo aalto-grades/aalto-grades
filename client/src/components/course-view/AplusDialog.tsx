@@ -18,6 +18,7 @@ import {
   AplusGradeSourceType,
 } from '@/common/types';
 import CreateAplusAttainments from './CreateAplusAttainments';
+import SelectAplusCourse from './SelectAplusCourse';
 import SelectAplusGradeSources from './SelectAplusGradeSources';
 import {
   useAddAplusGradeSources,
@@ -112,18 +113,12 @@ const AplusDialog = ({handleClose, open}: PropsType): JSX.Element => {
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>A+ Courses</DialogTitle>
       <DialogContent>
-        {step === 0 &&
-          aplusCourses.data &&
-          aplusCourses.data.map(course => (
-            <Button
-              onClick={() => {
-                setAplusCourse(course);
-                setStep(1);
-              }}
-            >
-              {course.name}
-            </Button>
-          ))}
+        {step === 0 && aplusCourses.data && (
+          <SelectAplusCourse
+            aplusCourses={aplusCourses.data}
+            setAplusCourse={setAplusCourse}
+          />
+        )}
         {step === 1 && aplusCourse && (
           <SelectAplusGradeSources
             aplusCourse={aplusCourse}
@@ -145,7 +140,7 @@ const AplusDialog = ({handleClose, open}: PropsType): JSX.Element => {
           </Button>
         )}
         {step <= 1 && (
-          <Button disabled={step === 0} onClick={() => setStep(step + 1)}>
+          <Button disabled={!aplusCourse} onClick={() => setStep(step + 1)}>
             Next
           </Button>
         )}
