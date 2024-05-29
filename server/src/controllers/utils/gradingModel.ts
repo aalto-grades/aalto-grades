@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData, HttpCode} from '@/common/types';
+import {CoursePartData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId, findCourseById} from './course';
 import Course from '../../database/models/course';
 import GradingModel from '../../database/models/gradingModel';
@@ -27,31 +27,32 @@ export const findGradingModelById = async (
   return gradingModel;
 };
 
-/** Checks if grading model has deleted or archived attainments. */
-export const checkGradingModelAttainments = (
+/** Checks if grading model has deleted or archived course parts. */
+export const checkGradingModelCourseParts = (
   gradingModel: GradingModel,
-  attainmentData: AttainmentData[]
-): {hasDeletedAttainments: boolean; hasArchivedAttainments: boolean} => {
+  courseParts: CoursePartData[]
+): {hasDeletedCourseParts: boolean; hasArchivedCourseParts: boolean} => {
   let hasDeleted = false;
   let hasArchived = false;
 
-  const attainmentIds = attainmentData.map(att => att.id);
-  const modelAttainmentIds = [];
+  const coursePartIds = courseParts.map(coursePart => coursePart.id);
+  const modelCoursePartIds = [];
   for (const node of gradingModel.graphStructure.nodes) {
-    if (node.type !== 'attainment') continue;
-    modelAttainmentIds.push(parseInt(node.id.split('-')[1]));
+    if (node.type !== 'coursepart') continue;
+    modelCoursePartIds.push(parseInt(node.id.split('-')[1]));
   }
 
-  for (const attId of modelAttainmentIds) {
-    if (!attainmentIds.includes(attId)) hasDeleted = true;
+  for (const coursePartId of modelCoursePartIds) {
+    if (!coursePartIds.includes(coursePartId)) hasDeleted = true;
   }
-  for (const att of attainmentData) {
-    if (modelAttainmentIds.includes(att.id) && att.archived) hasArchived = true;
+  for (const coursePart of courseParts) {
+    if (modelCoursePartIds.includes(coursePart.id) && coursePart.archived)
+      hasArchived = true;
   }
 
   return {
-    hasDeletedAttainments: hasDeleted,
-    hasArchivedAttainments: hasArchived,
+    hasDeletedCourseParts: hasDeleted,
+    hasArchivedCourseParts: hasArchived,
   };
 };
 

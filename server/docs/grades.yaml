@@ -5,13 +5,13 @@
 definitions:
   GradeId:
     type: integer
-    description: Internal attainment grade database ID.
+    description: Internal grade database ID.
     format: int32
     minimum: 0
     example: 1
   Grade:
     type: number
-    description: The numerical grade of a student for an attainment.
+    description: The numerical grade of a student for a course part.
     format: int32
     minimum: 0
     example: 5
@@ -23,7 +23,7 @@ definitions:
       assessmentDate:
         type: string
         format: date
-        description: Override existing attainment date
+        description: Override existing assessment date
         example: 2024-05-01T00:00:00.000Z
       completionLanguage:
         type: string
@@ -52,12 +52,12 @@ definitions:
         type: string
         nullable: true
         format: date
-        description: Date when attainment is exported to sisu
+        description: Date when grade was exported to sisu
         example: 2024-05-01T00:00:00.000Z
       date:
         type: string
         format: date
-        description: Date when attainment is completed (e.g., deadline or exam date)
+        description: Date when grade was graded (e.g., deadline or exam date)
         example: 2024-04-01T00:00:00.000Z
       expiryDate:
         type: string
@@ -86,14 +86,14 @@ definitions:
         type: string
         description: User's student number
         example: 1234567
-      attainmentId:
-        $ref: '#/definitions/AttainmentId'
+      coursePartId:
+        $ref: '#/definitions/CoursePartId'
       grade:
         $ref: '#/definitions/Grade'
       date:
         type: string
         format: date
-        description: Date when attainment is completed (e.g., deadline or exam date)
+        description: Date when grade was graded (e.g., deadline or exam date)
         example: 2024-04-01T00:00:00.000Z
       expiryDate:
         type: string
@@ -107,7 +107,7 @@ definitions:
         example: Good job!
     required:
       - studentNumber
-      - attainmentId
+      - coursePartId
       - grade
       - date
       - expiryDate
@@ -123,12 +123,12 @@ definitions:
         type: string
         nullable: true
         format: date
-        description: Date when attainment is exported to sisu
+        description: Date when grade was exported to sisu
         example: 2024-05-01T00:00:00.000Z
       date:
         type: string
         format: date
-        description: Date when attainment is completed (e.g., deadline or exam date)
+        description: Date when grade was graded (e.g., deadline or exam date)
         example: 2024-04-01T00:00:00.000Z
       expiryDate:
         type: string
@@ -151,15 +151,15 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/FinalGradeData'
-      attainments:
+      courseParts:
         type: array
         items:
           type: object
           properties:
-            attainmentId:
-              $ref: '#/definitions/AttainmentId'
-            attainmentName:
-              $ref: '#/definitions/AttainmentName'
+            coursePartId:
+              $ref: '#/definitions/CoursePartId'
+            coursePartName:
+              $ref: '#/definitions/CoursePartName'
             grades:
               type: array
               items:

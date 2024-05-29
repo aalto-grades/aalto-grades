@@ -8,7 +8,7 @@ import {z} from 'zod';
 
 import {
   HttpCode,
-  AttainmentData,
+  CoursePartData,
   NewGrade,
   StudentRowSchema,
   EditGradeData,
@@ -29,10 +29,10 @@ const responseTests = new ResponseTests(request);
 
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
-let courseAttainments: AttainmentData[] = [];
+let courseParts: CoursePartData[] = [];
 let editGradeId = -1;
 let noRoleCourseId = -1;
-let noRoleCourseAttainments: AttainmentData[] = [];
+let noRoleCourseParts: CoursePartData[] = [];
 let noRoleGradeId = -1;
 const nonExistentId = 1000000;
 const newStudentNumber = '867493';
@@ -56,11 +56,9 @@ beforeAll(async () => {
   studentNumbers = students.map(student => student.studentNumber);
 
   let gradingModelId: number;
-  [courseId, courseAttainments, gradingModelId] = await createData.createCourse(
-    {
-      courseData: {maxCredits: 5, courseCode: 'CS-A????'},
-    }
-  );
+  [courseId, courseParts, gradingModelId] = await createData.createCourse({
+    courseData: {maxCredits: 5, courseCode: 'CS-A????'},
+  });
   for (const student of students) {
     // Create a worse final grade before the actual one
     if (student.finalGrade > 0) {
@@ -96,18 +94,18 @@ beforeAll(async () => {
   }
   editGradeId = await createData.createGrade(
     students[0].id,
-    courseAttainments[0].id,
+    courseParts[0].id,
     TEACHER_ID
   );
 
-  [noRoleCourseId, noRoleCourseAttainments] = await createData.createCourse({
+  [noRoleCourseId, noRoleCourseParts] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
   });
   noRoleGradeId = await createData.createGrade(
     students[0].id,
-    noRoleCourseAttainments[0].id,
+    noRoleCourseParts[0].id,
     TEACHER_ID
   );
 });
@@ -178,7 +176,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     return [
       {
         studentNumber: studentNumber,
-        attainmentId: courseAttainments[0].id,
+        coursePartId: courseParts[0].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
@@ -186,7 +184,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       },
       {
         studentNumber: studentNumber,
-        attainmentId: courseAttainments[1].id,
+        coursePartId: courseParts[1].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
@@ -194,7 +192,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       },
       {
         studentNumber: studentNumber,
-        attainmentId: courseAttainments[2].id,
+        coursePartId: courseParts[2].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
@@ -254,14 +252,14 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
 
     expect(JSON.stringify(res.body)).toBe('{}');
 
-    const userAttainment = await AttainmentGrade.findOne({
+    const userCoursePart = await AttainmentGrade.findOne({
       where: {
         userId: student.id,
-        attainmentId: courseAttainments[0].id,
+        attainmentId: courseParts[0].id,
       },
     });
 
-    expect(userAttainment?.graderId).toBe(1);
+    expect(userCoursePart?.graderId).toBe(1);
   });
 
   it('grades should be in the database', async () => {
@@ -274,18 +272,18 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Created);
 
-    const attainmentGrade = await AttainmentGrade.findOne({
+    const grade = await AttainmentGrade.findOne({
       where: {
         userId: student.id,
-        attainmentId: courseAttainments[0].id,
+        attainmentId: courseParts[0].id,
       },
     });
-    expect(attainmentGrade?.grade).toEqual(data[0].grade);
-    expect(attainmentGrade?.userId).toEqual(student.id);
-    expect(attainmentGrade?.attainmentId).toEqual(courseAttainments[0].id);
+    expect(grade?.grade).toEqual(data[0].grade);
+    expect(grade?.userId).toEqual(student.id);
+    expect(grade?.attainmentId).toEqual(courseParts[0].id);
   });
 
-  it('should allow uploading multiple grades to the same attainment for a student', async () => {
+  it('should allow uploading multiple grades to the same course part for a student', async () => {
     const student = await genStudent();
 
     const upload = async (): Promise<NewGrade[]> => {
@@ -303,21 +301,21 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
 
     const data1 = await upload();
     let grades = await AttainmentGrade.findAll({
-      where: {userId: student.id, attainmentId: courseAttainments[0].id},
+      where: {userId: student.id, attainmentId: courseParts[0].id},
     });
     expect(grades.length).toEqual(1);
     expect(grades[0].grade).toEqual(data1[0].grade);
 
     const data2 = await upload();
     grades = await AttainmentGrade.findAll({
-      where: {userId: student.id, attainmentId: courseAttainments[0].id},
+      where: {userId: student.id, attainmentId: courseParts[0].id},
     });
     expect(grades.length).toEqual(2);
     expect(grades.find(val => val.grade === data1[0].grade)).toBeDefined();
     expect(grades.find(val => val.grade === data2[0].grade)).toBeDefined();
   });
 
-  it('should process big json succesfully (5 000 x 3 x 2 = 90 000 individual attainment grades)', async () => {
+  it('should process big json succesfully (5 000 x 3 x 2 = 90 000 individual grades)', async () => {
     const data: NewGrade[] = [];
     for (let i = 10000; i < 15000; i++) {
       for (let j = 0; j < 2; j++) {
@@ -375,13 +373,13 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
-  it('should respond with 409 when attainment does not belong to course', async () => {
+  it('should respond with 409 when course-part does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/grades`;
     const student = await genStudent();
     const data = [
       {
         studentNumber: student.studentNumber,
-        attainmentId: noRoleCourseAttainments[0].id,
+        coursePartId: noRoleCourseParts[0].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),
@@ -465,7 +463,7 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
     const data = {comment: 'not edited'};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
-    url = `/v1/courses/${courseId}/attainments/${-1}`;
+    url = `/v1/courses/${courseId}/course-parts/${-1}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 
@@ -506,11 +504,7 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
 describe('Test Delete/v1/courses/:courseId/grades/:gradeId - delete a grade', () => {
   const createGrade = async (): Promise<number> => {
     const user = await createData.createUser();
-    return await createData.createGrade(
-      user.id,
-      courseAttainments[0].id,
-      TEACHER_ID
-    );
+    return await createData.createGrade(user.id, courseParts[0].id, TEACHER_ID);
   };
   const gradeDoesNotExist = async (id: number): Promise<void> => {
     const result = await AttainmentGrade.findOne({where: {id: id}});

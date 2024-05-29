@@ -30,16 +30,16 @@ components:
       required: true
       example: 1
       description: The ID of the grading model.
-    attainmentId:
+    coursePartId:
       in: path
-      name: attainmentId
+      name: coursePartId
       schema:
         type: integer
         format: int32
         minimum: 1
       required: true
       example: 1
-      description: Internal attainment database ID.
+      description: Internal course part database ID.
     finalGradeId:
       in: path
       name: finalGradeId

@@ -7,7 +7,7 @@ import {z} from 'zod';
 
 import {
   GradingModelDataSchema,
-  AttainmentData,
+  CoursePartData,
   EditGradingModelData,
   GraphStructure,
   HttpCode,
@@ -27,7 +27,7 @@ const responseTests = new ResponseTests(request);
 
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
-let courseAttainments: AttainmentData[] = [];
+let courseParts: CoursePartData[] = [];
 let gradingModId = -1;
 let testStructure: GraphStructure = {} as GraphStructure;
 
@@ -41,11 +41,9 @@ const otherGradingModId = 1;
 beforeAll(async () => {
   cookies = await getCookies();
 
-  [courseId, courseAttainments, gradingModId] = await createData.createCourse(
-    {}
-  );
-  await createData.createGradingModel(courseId, courseAttainments);
-  testStructure = initGraph('addition', courseAttainments);
+  [courseId, courseParts, gradingModId] = await createData.createCourse({});
+  await createData.createGradingModel(courseId, courseParts);
+  testStructure = initGraph('addition', courseParts);
 
   [NoModelscourseId] = await createData.createCourse({
     createGradingModel: false,
@@ -385,7 +383,7 @@ describe('Test DELETE /v1/courses/:courseId/grading-models/:gradingModId - delet
     for (const cookie of testCookies) {
       const modelId = await createData.createGradingModel(
         courseId,
-        courseAttainments
+        courseParts
       );
       await checkModel(modelId, {}); // Validate that exists
 
@@ -440,10 +438,7 @@ describe('Test DELETE /v1/courses/:courseId/grading-models/:gradingModId - delet
   });
 
   it('should respond with 409 conflict when trying to delete a grading model with final grades', async () => {
-    const modelId = await createData.createGradingModel(
-      courseId,
-      courseAttainments
-    );
+    const modelId = await createData.createGradingModel(courseId, courseParts);
     const user = await createData.createUser();
     await createData.createFinalGrade(courseId, user.id, modelId, TEACHER_ID);
 

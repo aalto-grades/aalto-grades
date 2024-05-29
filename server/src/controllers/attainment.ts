@@ -7,34 +7,34 @@ import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
-  AttainmentData,
-  EditAttainmentDataSchema,
+  CoursePartData,
+  EditCoursePartDataSchema,
   HttpCode,
-  NewAttainmentDataSchema,
+  NewCoursePartDataSchema,
 } from '@/common/types';
 import {
-  findAttainmentsByCourseId,
-  validateAttainmentPath,
+  findCoursePartByCourseId,
+  validateCoursePartPath,
 } from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import Attainment from '../database/models/attainment';
 import {ApiError} from '../types';
 
 /**
- * Responds with AttainmentData[]
+ * Responds with CoursePartData[]
  *
  * @throws ApiError(400|404)
  */
-export const getAttainments = async (
+export const getCourseParts = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const course = await findAndValidateCourseId(req.params.courseId);
-  const attainmentData: AttainmentData[] = await findAttainmentsByCourseId(
+  const coursePartData: CoursePartData[] = await findCoursePartByCourseId(
     course.id
   );
 
-  res.json(attainmentData);
+  res.json(coursePartData);
 };
 
 /**
@@ -42,13 +42,13 @@ export const getAttainments = async (
  *
  * @throws ApiError(400|404|409)
  */
-export const addAttainment = async (
-  req: TypedRequestBody<typeof NewAttainmentDataSchema>,
+export const addCoursePart = async (
+  req: TypedRequestBody<typeof NewCoursePartDataSchema>,
   res: Response
 ): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
 
-  const [attainment, created] = await Attainment.findOrCreate({
+  const [coursePart, created] = await Attainment.findOrCreate({
     where: {
       name: req.body.name,
       courseId: courseId,
@@ -61,37 +61,37 @@ export const addAttainment = async (
 
   if (!created) {
     throw new ApiError(
-      'There cannot be two attainments with the same name',
+      'There cannot be two course parts with the same name',
       HttpCode.Conflict
     );
   }
 
-  res.status(HttpCode.Created).json(attainment.id);
+  res.status(HttpCode.Created).json(coursePart.id);
 };
 
 /** @throws ApiError(400|404|409) */
-export const editAttainment = async (
-  req: TypedRequestBody<typeof EditAttainmentDataSchema>,
+export const editCoursePart = async (
+  req: TypedRequestBody<typeof EditCoursePartDataSchema>,
   res: Response
 ): Promise<void> => {
-  const [, attainment] = await validateAttainmentPath(
+  const [, coursePart] = await validateCoursePartPath(
     req.params.courseId,
-    req.params.attainmentId
+    req.params.coursePartId
   );
 
   try {
-    await attainment
+    await coursePart
       .set({
-        name: req.body.name ?? attainment.name,
-        daysValid: req.body.daysValid ?? attainment.daysValid,
-        archived: req.body.archived ?? attainment.archived,
+        name: req.body.name ?? coursePart.name,
+        daysValid: req.body.daysValid ?? coursePart.daysValid,
+        archived: req.body.archived ?? coursePart.archived,
       })
       .save();
   } catch (e) {
     // Duplicate name error
     if (e instanceof UniqueConstraintError) {
       throw new ApiError(
-        'There cannot be two attainments with the same name',
+        'There cannot be two course parts with the same name',
         HttpCode.Conflict
       );
     }
@@ -104,25 +104,25 @@ export const editAttainment = async (
 };
 
 /** @throws ApiError(400|404|409) */
-export const deleteAttainment = async (
+export const deleteCoursePart = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [, attainment] = await validateAttainmentPath(
+  const [, coursePart] = await validateCoursePartPath(
     req.params.courseId,
-    req.params.attainmentId
+    req.params.coursePartId
   );
 
   try {
-    await attainment.destroy();
+    await coursePart.destroy();
   } catch (e) {
-    // Catch deletion of attainment with grades
+    // Catch deletion of course part with grades
     if (
       e instanceof ForeignKeyConstraintError &&
       e.index === 'attainment_grade_attainment_id_fkey'
     ) {
       throw new ApiError(
-        'Tried to delete attainment with grades',
+        'Tried to delete a course part with grades',
         HttpCode.Conflict
       );
     }

@@ -30,7 +30,7 @@ import {
 import {useParams} from 'react-router-dom';
 
 import {
-  AttainmentData,
+  CoursePartData,
   FinalGradeData,
   GradingScale,
   StudentRow,
@@ -42,7 +42,7 @@ import UserGraphDialog from '../components/course-results-view/UserGraphDialog';
 import PrettyChip from '../components/shared/PrettyChip';
 import {
   useGetAllGradingModels,
-  useGetAttainments,
+  useGetCourseParts,
   useGetCourse,
 } from '../hooks/useApi';
 import {findBestFinalGrade} from '../utils';
@@ -116,7 +116,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
 
   const course = useGetCourse(courseId);
-  const attainments = useGetAttainments(courseId);
+  const courseParts = useGetCourseParts(courseId);
   const allGradingModels = useGetAllGradingModels(courseId);
 
   const [_isPending, startTransition] = useTransition();
@@ -188,50 +188,50 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   // console.log(expanded);
   // console.log(rowSelection);
 
-  const getAttainmentsForGradingModel = useCallback(
-    (modelId: number | 'any'): AttainmentData[] => {
-      if (modelId === 'any') return attainments.data ?? [];
-      if (gradingModels === undefined || attainments.data === undefined)
+  const getCoursePartsForGradingModel = useCallback(
+    (modelId: number | 'any'): CoursePartData[] => {
+      if (modelId === 'any') return courseParts.data ?? [];
+      if (gradingModels === undefined || courseParts.data === undefined)
         return [];
 
       const gradingModel = gradingModels.find(model => model.id === modelId);
       if (gradingModel === undefined) return [];
 
-      const attainmentIds = gradingModel.graphStructure.nodes
-        .filter(node => node.id.startsWith('attainment'))
+      const coursePartIds = gradingModel.graphStructure.nodes
+        .filter(node => node.id.startsWith('coursepart'))
         .map(node => parseInt(node.id.split('-')[1]));
 
-      return attainments.data.filter(attainment =>
-        attainmentIds.includes(attainment.id)
+      return courseParts.data.filter(coursePart =>
+        coursePartIds.includes(coursePart.id)
       );
     },
-    [gradingModels, attainments.data]
+    [gradingModels, courseParts.data]
   );
 
   // Creating Grades columns
   const gradeColumns = useMemo(() => {
-    const selectedAttainments =
-      getAttainmentsForGradingModel(selectedGradingModel);
+    const selectedCourseParts =
+      getCoursePartsForGradingModel(selectedGradingModel);
 
-    return selectedAttainments.map(att =>
+    return selectedCourseParts.map(coursePart =>
       columnHelper.accessor(
-        row => row.attainments.find(a => a.attainmentId === att.id),
+        row => row.courseParts.find(a => a.coursePartId === coursePart.id),
         {
-          header: att.name,
+          header: coursePart.name,
           meta: {PrettyChipPosition: 'alone'},
           enableSorting: false,
           size: 120,
           cell: ({getValue, row}) => (
             <GradeCell
               studentNumber={row.original.user.studentNumber ?? 'N/A'}
-              attainmentResults={getValue()}
+              coursePartResults={getValue()}
             />
           ),
-          footer: att.name,
+          footer: coursePart.name,
         }
       )
     );
-  }, [getAttainmentsForGradingModel, selectedGradingModel]);
+  }, [getCoursePartsForGradingModel, selectedGradingModel]);
 
   const groupingColumns =
     grouping.length > 0
@@ -240,7 +240,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
             id: 'grouping',
             meta: {PrettyChipPosition: 'first'},
             header: () => {
-              return 'Latest Attainment';
+              return 'Latest Course Part';
             },
             cell: prop => prop.getValue(),
           }),
@@ -434,7 +434,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       }
     ),
     columnHelper.group({
-      header: 'Attainments',
+      header: 'Course parts',
       meta: {PrettyChipPosition: 'alone'},
       columns: gradeColumns,
     }),
@@ -461,7 +461,6 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     onGroupingChange: setGrouping,
     onExpandedChange: setExpanded,
     onSortingChange: setSorting,
-    // getSubRows: (row: StudentRow) => row.subAttainments,
     enableGrouping: true,
     enableSorting: true,
     autoResetExpanded: false,

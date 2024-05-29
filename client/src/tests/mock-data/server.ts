@@ -6,7 +6,7 @@ import {ResponseResolver, http} from 'msw';
 import {SetupServer, setupServer} from 'msw/node';
 import {Mock} from 'vitest';
 
-import {mockAttainments} from './mockAttainments';
+import {mockCourseParts} from './mockAttainments';
 import {mockCourse} from './mockCourse';
 import {mockFinalGrades} from './mockFinalGrades';
 import {mockGrades} from './mockGrades';
@@ -48,6 +48,6 @@ export const server: SetupServer = setupServer(
   http.get('/v1/courses/1/grades', mockSuccess(mockGrades)),
   http.get('/v1/courses/1/grading-models', mockSuccess([mockGradingModel])),
   http.get('/v1/courses/1/final-grades', mockSuccess(mockFinalGrades)),
-  http.get('/v1/courses/1/attainments', mockSuccess(mockAttainments)),
+  http.get('/v1/courses/1/course-parts', mockSuccess(mockCourseParts)),
   http.get('/v1/courses/1', mockSuccess(mockCourse))
 );

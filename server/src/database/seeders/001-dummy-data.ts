@@ -17,8 +17,8 @@ const courses = readSql('courses.sql');
 const courseRole = readSql('course_role.sql');
 const courseTranslation = readSql('course_translations.sql');
 const gradingModel = readSql('grading_model.sql');
-const attainment = readSql('attainment.sql');
-const attainmentGrade = readSql('attainment_grade.sql');
+const coursePart = readSql('attainment.sql');
+const grade = readSql('attainment_grade.sql');
 const finalGrade = readSql('final_grade.sql');
 
 export default {
@@ -28,8 +28,8 @@ export default {
       await queryInterface.sequelize.query(users, {transaction});
       await queryInterface.sequelize.query(courses, {transaction});
       await queryInterface.sequelize.query(gradingModel, {transaction});
-      await queryInterface.sequelize.query(attainment, {transaction});
-      await queryInterface.sequelize.query(attainmentGrade, {transaction});
+      await queryInterface.sequelize.query(coursePart, {transaction});
+      await queryInterface.sequelize.query(grade, {transaction});
       await queryInterface.sequelize.query(finalGrade, {transaction});
       await queryInterface.sequelize.query(courseTranslation, {transaction});
       await queryInterface.sequelize.query(courseRole, {transaction});

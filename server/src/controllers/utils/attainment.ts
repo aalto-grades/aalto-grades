@@ -2,40 +2,43 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AttainmentData, HttpCode} from '@/common/types';
+import {CoursePartData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
 import Attainment from '../../database/models/attainment';
 import Course from '../../database/models/course';
 import {ApiError, stringToIdSchema} from '../../types';
 
 /**
- * Finds an attainment by its ID.
+ * Finds a course part by its ID.
  *
  * @throws ApiError(404) if not found
  */
-export const findAttainmentById = async (id: number): Promise<Attainment> => {
-  const attainment = await Attainment.findByPk(id);
-  if (!attainment) {
-    throw new ApiError(`attainment with ID ${id} not found`, HttpCode.NotFound);
+export const findCoursePartById = async (id: number): Promise<Attainment> => {
+  const coursePart = await Attainment.findByPk(id);
+  if (!coursePart) {
+    throw new ApiError(
+      `Course part with ID ${id} not found`,
+      HttpCode.NotFound
+    );
   }
-  return attainment;
+  return coursePart;
 };
 
-/** Finds all attainments of a specific grading model. */
-export const findAttainmentsByCourseId = async (
+/** Finds all course parts of a specific grading model. */
+export const findCoursePartByCourseId = async (
   courseId: number
-): Promise<AttainmentData[]> => {
-  const attainments = await Attainment.findAll({
+): Promise<CoursePartData[]> => {
+  const courseParts = await Attainment.findAll({
     where: {courseId: courseId},
     order: [['id', 'ASC']],
   });
 
-  return attainments.map(attainment => ({
-    id: attainment.id,
-    courseId: attainment.courseId,
-    name: attainment.name,
-    daysValid: attainment.daysValid,
-    archived: attainment.archived,
+  return courseParts.map(coursePart => ({
+    id: coursePart.id,
+    courseId: coursePart.courseId,
+    name: coursePart.name,
+    daysValid: coursePart.daysValid,
+    archived: coursePart.archived,
   }));
 };
 
@@ -44,35 +47,35 @@ export const findAttainmentsByCourseId = async (
  *
  * @throws ApiError(400|404) if not found.
  */
-const findAndValidateAttainmentId = async (
-  attainmentId: string
+const findAndValidateCoursePartId = async (
+  coursePartId: string
 ): Promise<Attainment> => {
-  const result = stringToIdSchema.safeParse(attainmentId);
+  const result = stringToIdSchema.safeParse(coursePartId);
   if (!result.success) {
     throw new ApiError(
-      `Invalid attainment id ${attainmentId}`,
+      `Invalid course part id ${coursePartId}`,
       HttpCode.BadRequest
     );
   }
-  return await findAttainmentById(result.data);
+  return await findCoursePartById(result.data);
 };
 
 /**
- * Validates that an attainment id belongs to a course.
+ * Validates that a course part id belongs to a course.
  *
- * @throws ApiError(404|409) if attainment not found or doesn't belong to the
+ * @throws ApiError(404|409) if course part not found or doesn't belong to the
  *   course.
  */
-export const validateAttainmentBelongsToCourse = async (
+export const validateCoursePartBelongsToCourse = async (
   courseId: number,
-  attainmentId: number
+  coursePartId: number
 ): Promise<void> => {
-  const attainment = await findAttainmentById(attainmentId);
+  const coursePart = await findCoursePartById(coursePartId);
 
   // Check that grading model belongs to the course.
-  if (attainment.courseId !== courseId) {
+  if (coursePart.courseId !== courseId) {
     throw new ApiError(
-      `Attainment ID ${attainment.id} ` +
+      `Course part ID ${coursePart.id} ` +
         `does not belong to the course with ID ${courseId}`,
       HttpCode.Conflict
     );
@@ -83,24 +86,24 @@ export const validateAttainmentBelongsToCourse = async (
  * Finds the course and the grading model by url param ids and also validates
  * the url params.
  *
- * @throws ApiError(400|404|409) if either not found or invald or if the
- *   attainment does not belong to the course.
+ * @throws ApiError(400|404|409) if either not found or invald or if the course
+ *   part does not belong to the course.
  */
-export const validateAttainmentPath = async (
+export const validateCoursePartPath = async (
   courseId: string,
-  attainmentId: string
+  coursePartId: string
 ): Promise<[Course, Attainment]> => {
   const course = await findAndValidateCourseId(courseId);
-  const attainment = await findAndValidateAttainmentId(attainmentId);
+  const coursePart = await findAndValidateCoursePartId(coursePartId);
 
   // Check that grading model belongs to the course.
-  if (attainment.courseId !== course.id) {
+  if (coursePart.courseId !== course.id) {
     throw new ApiError(
-      `Attainment ID ${attainment.id} ` +
+      `Course part ID ${coursePart.id} ` +
         `does not belong to the course with ID ${course.id}`,
       HttpCode.Conflict
     );
   }
 
-  return [course, attainment];
+  return [course, coursePart];
 };

@@ -35,7 +35,7 @@ import {
   useDeleteGradingModel,
   useEditGradingModel,
   useGetAllGradingModels,
-  useGetAttainments,
+  useGetCourseParts,
   useGetCourse,
   useGetGrades,
 } from '../../hooks/useApi';
@@ -60,7 +60,7 @@ const ModelsView = (): JSX.Element => {
   });
   const editModel = useEditGradingModel();
   const delModel = useDeleteGradingModel();
-  const attainments = useGetAttainments(courseId);
+  const courseParts = useGetCourseParts(courseId);
   const grades = useGetGrades(courseId);
 
   const [currentModel, setCurrentModel] = useState<GradingModelData | null>(
@@ -114,31 +114,31 @@ const ModelsView = (): JSX.Element => {
     }
   }, [courseId, loadGraphId, models, navigate]);
 
-  const renameAttainments = useCallback(
+  const renameCourseParts = useCallback(
     (model: GradingModelData): GradingModelData => {
-      if (attainments.data === undefined) return model;
+      if (courseParts.data === undefined) return model;
 
       for (const node of model.graphStructure.nodes) {
-        if (node.type !== 'attainment') continue;
-        const attainmentId = parseInt(node.id.split('-')[1]);
+        if (node.type !== 'coursepart') continue;
+        const coursePartId = parseInt(node.id.split('-')[1]);
 
-        const attainment = attainments.data.find(
-          att => att.id === attainmentId
+        const coursePart = courseParts.data.find(
+          att => att.id === coursePartId
         );
-        if (attainment !== undefined)
-          model.graphStructure.nodeData[node.id].title = attainment.name;
+        if (coursePart !== undefined)
+          model.graphStructure.nodeData[node.id].title = coursePart.name;
       }
       return model;
     },
-    [attainments.data]
+    [courseParts.data]
   );
 
   const loadGraph = useCallback(
     (model: GradingModelData): void => {
-      setCurrentModel(renameAttainments(structuredClone(model))); // To remove references
+      setCurrentModel(renameCourseParts(structuredClone(model))); // To remove references
       setGraphOpen(true);
     },
-    [renameAttainments]
+    [renameCourseParts]
   );
 
   // Load modelId url param
@@ -221,14 +221,14 @@ const ModelsView = (): JSX.Element => {
     });
   };
 
-  if (models === undefined || attainments.data === undefined)
+  if (models === undefined || courseParts.data === undefined)
     return <>Loading</>;
 
   const getWarning = (model: GradingModelData): string => {
-    if (model.hasArchivedAttainments && model.hasDeletedAttainments)
-      return 'Contains deleted & archived attainments';
-    if (model.hasArchivedAttainments) return 'Contains archived attainments';
-    if (model.hasDeletedAttainments) return 'Contains deleted attainments';
+    if (model.hasArchivedCourseParts && model.hasDeletedCourseParts)
+      return 'Contains deleted & archived course parts';
+    if (model.hasArchivedCourseParts) return 'Contains archived course parts';
+    if (model.hasDeletedCourseParts) return 'Contains deleted course parts';
     return '';
   };
 
@@ -336,8 +336,8 @@ const ModelsView = (): JSX.Element => {
                   }}
                 >
                   <ListItemText primary={model.name} />
-                  {(model.hasArchivedAttainments ||
-                    model.hasDeletedAttainments) && (
+                  {(model.hasArchivedCourseParts ||
+                    model.hasDeletedCourseParts) && (
                     <ListItemIcon sx={{mr: 6.6}}>
                       <Tooltip title={getWarning(model)} placement="top">
                         <Warning color="warning" />
@@ -354,9 +354,9 @@ const ModelsView = (): JSX.Element => {
       {graphOpen && currentModel !== null && (
         <Graph
           initGraph={currentModel.graphStructure}
-          attainments={attainments.data}
+          courseParts={courseParts.data}
           userGrades={
-            currentUserRow === null ? null : currentUserRow.attainments
+            currentUserRow === null ? null : currentUserRow.courseParts
           }
           readOnly={!editRights}
           onSave={onSave}

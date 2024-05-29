@@ -12,14 +12,14 @@ definitions:
     example: 1
   FinalGrade:
     type: number
-    description: The numerical grade of a student for an attainment.
+    description: The numerical final grade of a student.
     format: int32
     minimum: 0
     example: 5
   FinalGradeDate:
     type: string
     format: date
-    description: Date when attainment is completed (e.g., deadline or exam date)
+    description: Date when final grade was calculated
     example: 2024-04-01T00:00:00.000Z
   SisuExportDate:
     type: string

@@ -19,7 +19,7 @@ import {useParams} from 'react-router-dom';
 import {GradingModelData} from '@/common/types';
 import {GroupedStudentRow} from '../../context/GradesTableProvider';
 import {useTableContext} from '../../context/useTableContext';
-import {useGetAttainments} from '../../hooks/useApi';
+import {useGetCourseParts} from '../../hooks/useApi';
 import Graph from '../graph/Graph';
 
 type PropsType = {
@@ -36,7 +36,7 @@ const UserGraphDialog = ({
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const {gradeSelectOption} = useTableContext();
-  const attainments = useGetAttainments(courseId);
+  const courseParts = useGetCourseParts(courseId);
 
   const [selectedModel, setSelectedModel] = useState<GradingModelData | null>(
     null
@@ -53,19 +53,19 @@ const UserGraphDialog = ({
       <DialogContent>
         {row === null ? (
           <>Data is undefined</>
-        ) : selectedModel === null || attainments.data === undefined ? (
+        ) : selectedModel === null || courseParts.data === undefined ? (
           <>Loading</>
         ) : (
           <Graph
             initGraph={selectedModel.graphStructure}
-            attainments={row.attainments.map(rowAtt => ({
-              id: rowAtt.attainmentId,
-              name: rowAtt.attainmentName,
+            courseParts={row.courseParts.map(coursePart => ({
+              id: coursePart.coursePartId,
+              name: coursePart.coursePartName,
               archived:
-                attainments.data.find(att => att.id === rowAtt.attainmentId)
+                courseParts.data.find(att => att.id === coursePart.coursePartId)
                   ?.archived ?? false,
             }))}
-            userGrades={row.attainments}
+            userGrades={row.courseParts}
             gradeSelectOption={gradeSelectOption}
             readOnly
           />

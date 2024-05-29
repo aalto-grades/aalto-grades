@@ -71,7 +71,7 @@ describe('Tests for CourseResultsView components', () => {
       expect(screen.getByText('Student Number')).toBeVisible();
       expect(screen.getByText('Final Grade')).toBeVisible();
       expect(screen.getByText('Exported to Sisu')).toBeVisible();
-      expect(screen.getByText('Attainments')).toBeVisible();
+      expect(screen.getByText('Course parts')).toBeVisible();
       expect(screen.getByText('Exercise 1')).toBeVisible();
       expect(screen.getByText('Exercise 2')).toBeVisible();
       expect(screen.getByText('Exam')).toBeVisible();

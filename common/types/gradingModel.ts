@@ -13,21 +13,21 @@ export const GradingModelDataSchema = z.object({
   name: z.string(),
   graphStructure: GraphStructureSchema,
   archived: z.boolean(),
-  hasArchivedAttainments: z.boolean(),
-  hasDeletedAttainments: z.boolean(),
+  hasArchivedCourseParts: z.boolean(),
+  hasDeletedCourseParts: z.boolean(),
 });
 export const NewGradingModelDataSchema = GradingModelDataSchema.omit({
   id: true,
   courseId: true,
   archived: true,
-  hasArchivedAttainments: true,
-  hasDeletedAttainments: true,
+  hasArchivedCourseParts: true,
+  hasDeletedCourseParts: true,
 });
 export const EditGradingModelDataSchema = GradingModelDataSchema.omit({
   id: true,
   courseId: true,
-  hasArchivedAttainments: true,
-  hasDeletedAttainments: true,
+  hasArchivedCourseParts: true,
+  hasDeletedCourseParts: true,
 }).partial();
 
 export const GradingModelDataArraySchema = z.array(GradingModelDataSchema);

@@ -12,10 +12,10 @@ export const mockGrades: StudentRow[] = [
       email: 'carolyn.janek@aalto.fi',
       studentNumber: '325235',
     },
-    attainments: [
+    courseParts: [
       {
-        attainmentId: 1,
-        attainmentName: 'Exercise 1',
+        coursePartId: 1,
+        coursePartName: 'Exercise 1',
         grades: [
           {
             gradeId: 1,
@@ -36,8 +36,8 @@ export const mockGrades: StudentRow[] = [
         ],
       },
       {
-        attainmentId: 2,
-        attainmentName: 'Exercise 2',
+        coursePartId: 2,
+        coursePartName: 'Exercise 2',
         grades: [
           {
             gradeId: 2,
@@ -58,8 +58,8 @@ export const mockGrades: StudentRow[] = [
         ],
       },
       {
-        attainmentId: 3,
-        attainmentName: 'Exam',
+        coursePartId: 3,
+        coursePartName: 'Exam',
         grades: [
           {
             gradeId: 3,
@@ -111,10 +111,10 @@ export const mockGrades: StudentRow[] = [
       email: 'vonda.morgan@aalto.fi',
       studentNumber: '826139',
     },
-    attainments: [
+    courseParts: [
       {
-        attainmentId: 1,
-        attainmentName: 'Exercise 1',
+        coursePartId: 1,
+        coursePartName: 'Exercise 1',
         grades: [
           {
             gradeId: 4,
@@ -135,8 +135,8 @@ export const mockGrades: StudentRow[] = [
         ],
       },
       {
-        attainmentId: 2,
-        attainmentName: 'Exercise 2',
+        coursePartId: 2,
+        coursePartName: 'Exercise 2',
         grades: [
           {
             gradeId: 5,
@@ -157,8 +157,8 @@ export const mockGrades: StudentRow[] = [
         ],
       },
       {
-        attainmentId: 3,
-        attainmentName: 'Exam',
+        coursePartId: 3,
+        coursePartName: 'Exam',
         grades: [
           {
             gradeId: 6,

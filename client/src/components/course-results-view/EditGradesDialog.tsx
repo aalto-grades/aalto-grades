@@ -45,7 +45,7 @@ type PropsType = {
   open: boolean;
   onClose: () => void;
   studentNumber: string;
-  attainmentId: number;
+  coursePartId: number;
   title: string;
   grades: GradeData[];
 };
@@ -53,7 +53,7 @@ const EditGradesDialog = ({
   open,
   onClose,
   studentNumber,
-  attainmentId,
+  coursePartId,
   title,
   grades,
 }: PropsType): JSX.Element => {
@@ -229,7 +229,7 @@ const EditGradesDialog = ({
       if (row.gradeId === -1) {
         newGrades.push({
           studentNumber,
-          attainmentId,
+          coursePartId: coursePartId,
           grade: row.grade,
           date: row.date,
           expiryDate: row.expiryDate,

@@ -12,10 +12,10 @@ import {
   HttpCode,
   NewGradingModelDataSchema,
 } from '@/common/types';
-import {findAttainmentsByCourseId} from './utils/attainment';
+import {findCoursePartByCourseId} from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
-  checkGradingModelAttainments,
+  checkGradingModelCourseParts,
   validateGradingModelPath,
 } from './utils/gradingModel';
 import GradingModel from '../database/models/gradingModel';
@@ -34,7 +34,7 @@ export const getGradingModel = async (
     req.params.courseId,
     req.params.gradingModelId
   );
-  const attainmentData = await findAttainmentsByCourseId(course.id);
+  const coursePartData = await findCoursePartByCourseId(course.id);
 
   const gradingModelData: GradingModelData = {
     id: gradingModel.id,
@@ -42,7 +42,7 @@ export const getGradingModel = async (
     name: gradingModel.name,
     graphStructure: gradingModel.graphStructure,
     archived: gradingModel.archived,
-    ...checkGradingModelAttainments(gradingModel, attainmentData),
+    ...checkGradingModelCourseParts(gradingModel, coursePartData),
   };
 
   res.json(gradingModelData);
@@ -58,7 +58,7 @@ export const getAllGradingModels = async (
   res: Response
 ): Promise<void> => {
   const course = await findAndValidateCourseId(req.params.courseId);
-  const attainmentData = await findAttainmentsByCourseId(course.id);
+  const coursePartData = await findCoursePartByCourseId(course.id);
 
   const gradingModels = await GradingModel.findAll({
     where: {courseId: course.id},
@@ -73,7 +73,7 @@ export const getAllGradingModels = async (
       name: gradingModel.name,
       graphStructure: gradingModel.graphStructure,
       archived: gradingModel.archived,
-      ...checkGradingModelAttainments(gradingModel, attainmentData),
+      ...checkGradingModelCourseParts(gradingModel, coursePartData),
     });
   }
 

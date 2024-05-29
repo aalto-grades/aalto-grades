@@ -8,14 +8,14 @@ import {processRequestBody} from 'zod-express-middleware';
 
 import {
   CourseRoleType,
-  EditAttainmentDataSchema,
-  NewAttainmentDataSchema,
+  EditCoursePartDataSchema,
+  NewCoursePartDataSchema,
 } from '@/common/types';
 import {
-  addAttainment,
-  deleteAttainment,
-  editAttainment,
-  getAttainments,
+  addCoursePart,
+  deleteCoursePart,
+  editCoursePart,
+  getCourseParts,
 } from '../controllers/attainment';
 import {handleInvalidRequestJson} from '../middleware';
 import {courseAuthorization} from '../middleware/authorization';
@@ -24,39 +24,39 @@ import {controllerDispatcher} from '../middleware/errorHandler';
 export const router = Router();
 
 router.get(
-  '/v1/courses/:courseId/attainments',
+  '/v1/courses/:courseId/course-parts',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([
     CourseRoleType.Teacher,
     CourseRoleType.Assistant,
     CourseRoleType.Student,
   ]),
-  controllerDispatcher(getAttainments)
+  controllerDispatcher(getCourseParts)
 );
 
 router.post(
-  '/v1/courses/:courseId/attainments',
+  '/v1/courses/:courseId/course-parts',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(NewAttainmentDataSchema),
-  controllerDispatcher(addAttainment)
+  processRequestBody(NewCoursePartDataSchema),
+  controllerDispatcher(addCoursePart)
 );
 
 router.put(
-  '/v1/courses/:courseId/attainments/:attainmentId',
+  '/v1/courses/:courseId/course-parts/:coursePartId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(EditAttainmentDataSchema),
-  controllerDispatcher(editAttainment)
+  processRequestBody(EditCoursePartDataSchema),
+  controllerDispatcher(editCoursePart)
 );
 
 router.delete(
-  '/v1/courses/:courseId/attainments/:attainmentId',
+  '/v1/courses/:courseId/course-parts/:coursePartId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
-  controllerDispatcher(deleteAttainment)
+  controllerDispatcher(deleteCoursePart)
 );

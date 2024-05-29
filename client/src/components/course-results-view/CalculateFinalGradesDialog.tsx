@@ -72,7 +72,7 @@ const CalculateFinalGradesDialog = ({
 
     let latestDate = new Date(1970, 0, 1);
     for (const row of selectedRows) {
-      for (const att of row.attainments) {
+      for (const att of row.courseParts) {
         for (const grade of att.grades) {
           if (grade.date.getTime() > latestDate.getTime())
             latestDate = grade.date;
@@ -100,12 +100,12 @@ const CalculateFinalGradesDialog = ({
 
   const getWarning = (model: GradingModelData | null): string => {
     if (model === null) return '';
-    if (model.hasArchivedAttainments && model.hasDeletedAttainments)
-      return 'Grading model contains deleted & archived attainments';
-    if (model.hasArchivedAttainments)
-      return 'Grading model contains archived attainments';
-    if (model.hasDeletedAttainments)
-      return 'Grading model contains deleted attainments';
+    if (model.hasArchivedCourseParts && model.hasDeletedCourseParts)
+      return 'Grading model contains deleted & archived course parts';
+    if (model.hasArchivedCourseParts)
+      return 'Grading model contains archived course parts';
+    if (model.hasDeletedCourseParts)
+      return 'Grading model contains deleted course parts';
     return '';
   };
 
@@ -149,8 +149,8 @@ const CalculateFinalGradesDialog = ({
         </FormControl>
         <Collapse
           in={
-            selectedModel?.hasDeletedAttainments ||
-            selectedModel?.hasArchivedAttainments
+            selectedModel?.hasDeletedCourseParts ||
+            selectedModel?.hasArchivedCourseParts
           }
         >
           <Alert sx={{mt: 1}} severity="warning">

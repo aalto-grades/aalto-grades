@@ -24,15 +24,15 @@ export const groupByLatestBestGrade = (
   const findLatestBestGradeDate = (row: StudentRow): string => {
     let newestDate = new Date('1970-01-01');
 
-    for (const att of row.attainments) {
-      const bestGrade = findBestGrade(att.grades, {
+    for (const coursePart of row.courseParts) {
+      const bestGrade = findBestGrade(coursePart.grades, {
         expiredOption: 'prefer_non_expired',
         gradeSelectOption,
       });
       const bestGradeDate =
         bestGrade === null ? new Date('1970-01-01') : new Date(bestGrade.date);
 
-      // Get best grade date for each attainment and get the newest
+      // Get best grade date for each course part and get the newest
       if (bestGradeDate > newestDate) newestDate = bestGradeDate;
     }
     return newestDate.toISOString().split('T')[0];
@@ -48,7 +48,7 @@ export const groupByLatestBestGrade = (
 
 export const findLatestGrade = (row: StudentRow): Date => {
   let latestDate = new Date(1970, 0, 1);
-  for (const att of row.attainments) {
+  for (const att of row.courseParts) {
     for (const grade of att.grades) {
       if (grade.date.getTime() > latestDate.getTime()) latestDate = grade.date;
     }
@@ -79,9 +79,10 @@ export const predictGrades = (
       gradingModel.graphStructure,
       rows.map(row => ({
         userId: row.user.id,
-        attainments: row.attainments.map(att => ({
-          attainmentId: att.attainmentId,
-          grade: findBestGrade(att.grades, {gradeSelectOption})?.grade ?? 0,
+        courseParts: row.courseParts.map(coursePart => ({
+          coursePartId: coursePart.coursePartId,
+          grade:
+            findBestGrade(coursePart.grades, {gradeSelectOption})?.grade ?? 0,
         })),
       }))
     );
@@ -92,9 +93,10 @@ export const predictGrades = (
   //     model.graphStructure,
   //     rows.map(row => ({
   //       userId: row.user.id,
-  //       attainments: row.attainments.map(att => ({
-  //         attainmentId: att.attainmentId,
-  //         grade: findBestGrade(att.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Handle grade expiration
+  //       courseParts: row.courseParts.map(coursePart => ({
+  //         coursePartId: coursePart.coursePartId,
+  //         grade:
+  //           findBestGrade(coursePart.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Handle grade expiration
   //       })),
   //     }))
   //   )

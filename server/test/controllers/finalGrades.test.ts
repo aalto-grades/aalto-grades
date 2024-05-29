@@ -94,19 +94,17 @@ afterAll(async () => {
 
 /**
  * Check that the expected number of grades exist for a user for a specific
- * attainment, including checking the numeric values of those grades.
+ * course part, including checking the numeric values of those grades.
  */
 const checkGradeAmount = async (
   student: {id: number},
   expectedGrades: number[]
 ): Promise<void> => {
-  const dbAttainmentGrades = await FinalGrade.findAll({
+  const dbFinalGrades = await FinalGrade.findAll({
     where: {userId: student.id, courseId: editCourseId},
   });
 
-  const dbGrades = dbAttainmentGrades.map(
-    attainmentGrade => attainmentGrade.grade
-  );
+  const dbGrades = dbFinalGrades.map(finalGrade => finalGrade.grade);
   expect(dbGrades).toEqual(expectedGrades);
 };
 
@@ -390,7 +388,7 @@ describe('Test PUT /v1/courses/:courseId/final-grades/:finalGradeId - edit a fin
     const data = {grade: 3};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
-    url = `/v1/courses/${editCourseId}/attainments/${-1}`;
+    url = `/v1/courses/${editCourseId}/course-parts/${-1}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 

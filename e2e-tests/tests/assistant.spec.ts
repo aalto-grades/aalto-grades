@@ -44,10 +44,10 @@ test.describe('Test Courses as Assistant', () => {
     await expect(page.getByTestId('rf__wrapper')).toBeVisible();
   });
 
-  test('View Attainments', async ({page}) => {
+  test('View Course Parts', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page
-      .getByRole('link', {name: 'Attainments'})
+      .getByRole('link', {name: 'Course Parts'})
       .getByRole('button')
       .click();
     await expect(page.getByText('Tier A')).toBeVisible();

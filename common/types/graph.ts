@@ -10,8 +10,8 @@ export type AdditionNodeValue = {
   sources: {[key: string]: {isConnected: boolean; value: number}};
   value: number;
 };
-export type AttainmentNodeValue = {
-  type: 'attainment';
+export type CoursePartNodeValue = {
+  type: 'coursepart';
   source: number;
   value: number | 'fail';
   courseFail: boolean;
@@ -62,7 +62,7 @@ export type SubstituteNodeValue = {
 
 export type NodeValue =
   | AdditionNodeValue
-  | AttainmentNodeValue
+  | CoursePartNodeValue
   | AverageNodeValue
   | GradeNodeValue
   | MaxNodeValue
@@ -79,7 +79,7 @@ export type NodeValues = {
 // Types with schemas
 const CustomNodeTypesSchema = z.enum([
   'addition',
-  'attainment',
+  'coursepart',
   'average',
   'grade',
   'max',
@@ -90,7 +90,7 @@ const CustomNodeTypesSchema = z.enum([
   'substitute',
 ]);
 const DropInNodesSchema = CustomNodeTypesSchema.exclude([
-  'attainment',
+  'coursepart',
   'grade',
 ]);
 
@@ -98,7 +98,7 @@ const AverageNodeSettingsSchema = z.object({
   weights: z.record(z.number()),
   percentageMode: z.boolean(),
 });
-const AttainmentNodeSettingsSchema = z.object({
+const CoursePartNodeSettingsSchema = z.object({
   minPoints: z.number(),
   onFailSetting: z.enum(['coursefail', 'fail']),
 });
@@ -128,7 +128,7 @@ const SubstituteNodeSettingsSchema = z.object({
 
 const NodeSettingsSchema = z.union([
   AverageNodeSettingsSchema,
-  AttainmentNodeSettingsSchema,
+  CoursePartNodeSettingsSchema,
   MaxNodeSettingsSchema,
   MinPointsNodeSettingsSchema,
   RequireNodeSettingsSchema,
@@ -175,8 +175,8 @@ export type DropInNodes = z.infer<typeof DropInNodesSchema>;
 export type CustomNodeTypes = z.infer<typeof CustomNodeTypesSchema>;
 
 export type AverageNodeSettings = z.infer<typeof AverageNodeSettingsSchema>;
-export type AttainmentNodeSettings = z.infer<
-  typeof AttainmentNodeSettingsSchema
+export type CoursePartNodeSettings = z.infer<
+  typeof CoursePartNodeSettingsSchema
 >;
 export type MaxNodeSettings = z.infer<typeof MaxNodeSettingsSchema>;
 export type MinPointsNodeSettings = z.infer<typeof MinPointsNodeSettingsSchema>;

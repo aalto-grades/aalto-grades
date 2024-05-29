@@ -19,7 +19,7 @@ import {JSX, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
 import {GraphTemplate, initGraph} from '@/common/util/initGraph';
-import {useAddGradingModel, useGetAttainments} from '../../hooks/useApi';
+import {useAddGradingModel, useGetCourseParts} from '../../hooks/useApi';
 
 const CreateGradingModelDialog = ({
   onClose,
@@ -31,14 +31,14 @@ const CreateGradingModelDialog = ({
   onSubmit: (id: number) => void;
 }): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const attainments = useGetAttainments(courseId);
+  const courseParts = useGetCourseParts(courseId);
   const addGradingModel = useAddGradingModel();
 
   const [name, setName] = useState<string>('');
   const [template, setTemplate] = useState<GraphTemplate>('none');
 
   const handleSubmit = (): void => {
-    if (attainments.data === undefined) return;
+    if (courseParts.data === undefined) return;
     addGradingModel.mutate(
       {
         courseId: courseId,
@@ -46,7 +46,7 @@ const CreateGradingModelDialog = ({
           name,
           graphStructure: initGraph(
             template,
-            attainments.data.filter(att => !att.archived)
+            courseParts.data.filter(coursePart => !coursePart.archived)
           ),
         },
       },

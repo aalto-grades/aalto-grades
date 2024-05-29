@@ -17,44 +17,44 @@ import {NodeValues} from '@/common/types/graph';
 
 const testFloat = (val: string): boolean => /^\d+(?:\.\d+?)?$/.test(val);
 
-const AttainmentValuesDialog = ({
+const CoursePartValuesDialog = ({
   nodes,
   nodeValues,
-  attainments,
+  courseParts,
   open,
   onClose,
-  handleSetAttainmentValues,
+  handleSetCoursePartValues,
 }: {
   nodes: Node[];
   nodeValues: NodeValues;
-  attainments: {id: number; name: string}[];
+  courseParts: {id: number; name: string}[];
   open: boolean;
   onClose: () => void;
-  handleSetAttainmentValues: (attainmentValues: {
+  handleSetCoursePartValues: (coursePartValues: {
     [key: number]: number;
   }) => void;
 }): JSX.Element => {
-  const attainmentNodeIds = useMemo(
+  const coursePartNodeIds = useMemo(
     () =>
       nodes
-        .filter(node => node.type === 'attainment')
+        .filter(node => node.type === 'coursepart')
         .map(node => parseInt(node.id.split('-')[1])),
     [nodes]
   );
-  const attainmentNames = useMemo(
-    () => Object.fromEntries(attainments.map(att => [att.id, att.name])),
-    [attainments]
+  const coursePartNames = useMemo(
+    () => Object.fromEntries(courseParts.map(att => [att.id, att.name])),
+    [courseParts]
   );
   const initValues = useMemo(() => {
     const newInitValues: {[key: number]: string} = {};
     for (const [nodeId, nodeValue] of Object.entries(nodeValues)) {
-      if (nodeValue.type !== 'attainment') continue;
-      const attainmentId = parseInt(nodeId.split('-')[1]);
-      if (attainmentNodeIds.includes(attainmentId))
-        newInitValues[attainmentId] = nodeValue.source.toString();
+      if (nodeValue.type !== 'coursepart') continue;
+      const coursePartId = parseInt(nodeId.split('-')[1]);
+      if (coursePartNodeIds.includes(coursePartId))
+        newInitValues[coursePartId] = nodeValue.source.toString();
     }
     return newInitValues;
-  }, [attainmentNodeIds, nodeValues]);
+  }, [coursePartNodeIds, nodeValues]);
 
   const [startValues, setStartValues] = useState<{[key: number]: string}>(
     initValues
@@ -89,7 +89,7 @@ const AttainmentValuesDialog = ({
   };
 
   const onSubmit = (): void => {
-    handleSetAttainmentValues(
+    handleSetCoursePartValues(
       Object.fromEntries(
         Object.entries(values).map(([key, value]) => [
           parseInt(key),
@@ -102,15 +102,15 @@ const AttainmentValuesDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Set Test Attainment Values</DialogTitle>
+      <DialogTitle>Set Test Course Part Values</DialogTitle>
 
       <DialogContent>
-        {attainmentNodeIds.map(attId => (
+        {coursePartNodeIds.map(attId => (
           <TextField
             sx={{mt: 2}}
             key={`attval-${attId}`}
             value={values[attId] ?? 0}
-            label={attainmentNames[attId]}
+            label={coursePartNames[attId]}
             onChange={e => onChange(attId, e)}
             error={!testFloat(values[attId])}
           />
@@ -133,4 +133,4 @@ const AttainmentValuesDialog = ({
   );
 };
 
-export default AttainmentValuesDialog;
+export default CoursePartValuesDialog;

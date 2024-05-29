@@ -155,9 +155,9 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       model.graphStructure,
       selectedRows.map(selectedRow => ({
         userId: selectedRow.user.id,
-        attainments: selectedRow.attainments.map(att => ({
-          attainmentId: att.attainmentId,
-          grade: findBestGrade(att.grades, {gradeSelectOption})!.grade, // TODO: Manage expired attainments
+        courseParts: selectedRow.courseParts.map(coursePart => ({
+          coursePartId: coursePart.coursePartId,
+          grade: findBestGrade(coursePart.grades, {gradeSelectOption})!.grade, // TODO: Manage expired course parts
         })),
       }))
     );
