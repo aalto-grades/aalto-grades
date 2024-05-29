@@ -43,15 +43,15 @@ import {
 } from '@/common/types/graph';
 import {calculateNewNodeValues, initNode} from '@/common/util/calculateGraph';
 import AdditionNode from './AdditionNode';
-import CoursePartNode from './AttainmentNode';
-import CoursePartValuesDialog from './AttainmentValuesDialog';
 import AverageNode from './AverageNode';
+import CoursePartNode from './CoursePartNode';
+import CoursePartValuesDialog from './CoursePartValuesDialog';
 import GradeNode from './GradeNode';
 import MaxNode from './MaxNode';
 import MinPointsNode from './MinPointsNode';
 import RequireNode from './RequireNode';
 import RoundNode from './RoundNode';
-import SelectCoursePartsDialog from './SelectAttainmentsDialog';
+import SelectCoursePartsDialog from './SelectCoursePartsDialog';
 import StepperNode from './StepperNode';
 import SubstituteNode from './SubstituteNode';
 import './flow.scss';
@@ -118,7 +118,8 @@ const Graph = ({
     useState<boolean>(false);
   const [coursePartValuesOpen, setCoursePartValuesOpen] =
     useState<boolean>(false);
-  const [delCourseParts, setDelCourseParts] = useState<string[]>([]); // Att nodes that the user is allowed to delete
+  // Course part nodes that the user is allowed to delete
+  const [delCourseParts, setDelCourseParts] = useState<string[]>([]);
   const [originalGraphStructure, setOriginalGraphStructure] =
     useState<GraphStructure>({nodes: [], edges: [], nodeData: {}});
 
@@ -247,8 +248,10 @@ const Graph = ({
         if (node.type !== 'coursepart') continue;
         const coursePartId = parseInt(node.id.split('-')[1]);
 
-        const coursePart = courseParts.find(att => att.id === coursePartId);
-        if (coursePart === undefined) {
+        const nodeCoursePart = courseParts.find(
+          coursePart => coursePart.id === coursePartId
+        );
+        if (nodeCoursePart === undefined) {
           setExtraNodeData(oldExtraNodeData => ({
             ...oldExtraNodeData,
             [node.id]: {
@@ -259,7 +262,7 @@ const Graph = ({
           setDelCourseParts(oldDelCourseParts =>
             oldDelCourseParts.concat(node.id)
           );
-        } else if (coursePart.archived) {
+        } else if (nodeCoursePart.archived) {
           setExtraNodeData(oldExtraNodeData => ({
             ...oldExtraNodeData,
             [node.id]: {
@@ -300,10 +303,10 @@ const Graph = ({
     let change = false;
 
     for (const coursePart of userGrades) {
-      const attId = `coursepart-${coursePart.coursePartId}`;
-      if (!(attId in newNodeValues)) continue;
+      const coursePartId = `coursepart-${coursePart.coursePartId}`;
+      if (!(coursePartId in newNodeValues)) continue;
 
-      const newValue = newNodeValues[attId] as CoursePartNodeValue;
+      const newValue = newNodeValues[coursePartId] as CoursePartNodeValue;
       const bestGrade =
         coursePart.grades.length === 0
           ? 0
@@ -420,8 +423,8 @@ const Graph = ({
     [key: number]: number;
   }): void => {
     const newNodeValues = {...nodeValues};
-    for (const [attId, value] of Object.entries(coursePartValues)) {
-      const nodeValue = newNodeValues[`coursepart-${attId}`];
+    for (const [coursePartId, value] of Object.entries(coursePartValues)) {
+      const nodeValue = newNodeValues[`coursepart-${coursePartId}`];
       if (nodeValue.type === 'coursepart') nodeValue.source = value;
     }
     setNodeValues(newNodeValues);

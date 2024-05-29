@@ -47,10 +47,10 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   useEffect(() => {
     if (coursePartData.length === dates.length) return;
     setDates(
-      coursePartData.map(att => ({
-        coursePartName: att.name,
+      coursePartData.map(coursePart => ({
+        coursePartName: coursePart.name,
         completionDate: dayjs(),
-        expirationDate: dayjs().add(att.daysValid, 'day'),
+        expirationDate: dayjs().add(coursePart.daysValid, 'day'),
       }))
     );
   }, [coursePartData, dates.length]);
@@ -64,9 +64,9 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       editable: true,
     },
     ...coursePartData.map(
-      (att): GridColDef<GradeUploadColTypes> => ({
-        field: att.name,
-        headerName: att.name,
+      (coursePart): GridColDef<GradeUploadColTypes> => ({
+        field: coursePart.name,
+        headerName: coursePart.name,
         type: 'number',
         editable: true,
       })
@@ -92,9 +92,9 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       type: 'string',
     },
     ...coursePartData.map(
-      (att): GridColDef<GradeUploadColTypes> => ({
-        field: att.name,
-        headerName: att.name,
+      (coursePart): GridColDef<GradeUploadColTypes> => ({
+        field: coursePart.name,
+        headerName: coursePart.name,
         type: 'number',
       })
     ),

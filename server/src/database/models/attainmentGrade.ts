@@ -11,7 +11,7 @@ import {
   Model,
 } from 'sequelize';
 
-import Attainment from './attainment';
+import Attainment from './coursePart';
 import User from './user';
 import {sequelize} from '..';
 

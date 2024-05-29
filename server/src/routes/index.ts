@@ -9,9 +9,9 @@ import swaggerJsdoc, {OAS3Options} from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
 import {router as aplusRouter} from './aplus';
-import {router as CoursePartRouter} from './attainment';
 import {router as authRouter} from './auth';
 import {router as courseRouter} from './course';
+import {router as CoursePartRouter} from './coursePart';
 import {router as finalGradesRouter} from './finalGrades';
 import {router as gradesRouter} from './grades';
 import {router as gradingModelRouter} from './gradingModel';

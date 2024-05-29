@@ -72,11 +72,15 @@ const SelectCoursePartsDialog = ({
       const key = parseInt(stringKey);
       if (value && !startSelected[key])
         newCourseParts.push(
-          courseParts.find(att => att.id === key) as CoursePartData
+          courseParts.find(
+            coursePart => coursePart.id === key
+          ) as CoursePartData
         );
       if (!value && startSelected[key])
         removedCourseParts.push(
-          courseParts.find(att => att.id === key) as CoursePartData
+          courseParts.find(
+            coursePart => coursePart.id === key
+          ) as CoursePartData
         );
     }
     handleCoursePartSelect(newCourseParts, removedCourseParts);

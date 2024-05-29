@@ -17,7 +17,7 @@ import {
   NewGrade,
 } from '@/common/types';
 import {fetchFromAplus, validateAplusCourseId} from './utils/aplus';
-import {validateCoursePartPath} from './utils/attainment';
+import {validateCoursePartPath} from './utils/coursePart';
 import {APLUS_API_URL} from '../configs/environment';
 import AplusGradeSource from '../database/models/aplusGradeSource';
 import {ApiError} from '../types';

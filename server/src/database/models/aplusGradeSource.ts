@@ -12,7 +12,7 @@ import {
 } from 'sequelize';
 
 import {AplusGradeSourceType} from '@/common/types';
-import Attainment from './attainment';
+import Attainment from './coursePart';
 import {sequelize} from '..';
 
 export default class AplusGradeSource extends Model<

@@ -16,7 +16,7 @@ import {
   deleteCoursePart,
   editCoursePart,
   getCourseParts,
-} from '../controllers/attainment';
+} from '../controllers/coursePart';
 import {handleInvalidRequestJson} from '../middleware';
 import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';

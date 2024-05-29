@@ -12,12 +12,12 @@ import {
   HttpCode,
   NewCoursePartDataSchema,
 } from '@/common/types';
+import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
   findCoursePartByCourseId,
   validateCoursePartPath,
-} from './utils/attainment';
-import {findAndValidateCourseId, validateCourseId} from './utils/course';
-import Attainment from '../database/models/attainment';
+} from './utils/coursePart';
+import Attainment from '../database/models/coursePart';
 import {ApiError} from '../types';
 
 /**

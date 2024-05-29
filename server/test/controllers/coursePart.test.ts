@@ -14,7 +14,7 @@ import {
   NewCoursePartData,
 } from '@/common/types';
 import {app} from '../../src/app';
-import Attainment from '../../src/database/models/attainment';
+import Attainment from '../../src/database/models/coursePart';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
@@ -177,7 +177,7 @@ describe('Test POST /v1/courses/:courseId/course-parts - add a course part', () 
 
   it('should respond with 409 if trying to create a course part with duplicate name', async () => {
     const url = `/v1/courses/${courseId}/course-parts`;
-    const data = {name: 'att-1', daysValid: 365};
+    const data = {name: 'coursepart-1', daysValid: 365};
     await responseTests.testConflict(url, cookies.adminCookie).post(data);
   });
 });
@@ -267,7 +267,7 @@ describe('Test PUT /v1/courses/:courseId/course-parts/:coursePartId - edit a cou
 
   it('should respond with 409 when trying to edit duplicate course part name', async () => {
     const url = `/v1/courses/${courseId}/course-parts/${editCoursePartId}`;
-    const data = {name: 'att-1', daysValid: 365};
+    const data = {name: 'coursepart-1', daysValid: 365};
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
 });

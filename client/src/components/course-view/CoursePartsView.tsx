@@ -20,7 +20,7 @@ import {
   NewCoursePartData,
   SystemRole,
 } from '@/common/types';
-import AddCoursePartDialog from './NewAttainmentDialog';
+import AddCoursePartDialog from './NewCoursePartDialog';
 import {
   useAddCoursePart,
   useDeleteCoursePart,
@@ -59,7 +59,7 @@ const CoursePartsView = (): JSX.Element => {
   const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false);
   const [unsavedDialogOpen, setUnsavedDialogOpen] = useState<boolean>(false);
 
-  const attsWithGrades = useMemo(() => {
+  const coursePartsWithGrades = useMemo(() => {
     const withGrades = new Set<number>();
     if (grades.data === undefined) return withGrades;
     for (const grade of grades.data) {
@@ -72,7 +72,7 @@ const CoursePartsView = (): JSX.Element => {
     return withGrades;
   }, [grades.data]);
 
-  const attsWithModels = useMemo(() => {
+  const coursePartsWithModels = useMemo(() => {
     const withModels = new Set<number>();
     if (gradingModels.data === undefined) return withModels;
     for (const model of gradingModels.data) {
@@ -170,12 +170,16 @@ const CoursePartsView = (): JSX.Element => {
     }
 
     await Promise.all([
-      ...newCourseParts.map(att => addCoursePart.mutateAsync(att)),
-      ...deletedCourseParts.map(attId => deleteCoursePart.mutateAsync(attId)),
-      ...editedCourseParts.map(att =>
+      ...newCourseParts.map(coursePart =>
+        addCoursePart.mutateAsync(coursePart)
+      ),
+      ...deletedCourseParts.map(coursePartId =>
+        deleteCoursePart.mutateAsync(coursePartId)
+      ),
+      ...editedCourseParts.map(coursePart =>
         editCoursePart.mutateAsync({
-          coursePartId: att.coursePartsId,
-          coursePart: att,
+          coursePartId: coursePart.coursePartsId,
+          coursePart: coursePart,
         })
       ),
     ]);
@@ -203,13 +207,13 @@ const CoursePartsView = (): JSX.Element => {
         />
       );
     }
-    if (!attsWithGrades.has(params.row.coursePartId)) {
+    if (!coursePartsWithGrades.has(params.row.coursePartId)) {
       elements.push(
         <GridActionsCellItem
           icon={<Delete />}
           label="Delete"
           onClick={() => {
-            if (attsWithModels.has(params.row.coursePartId)) {
+            if (coursePartsWithModels.has(params.row.coursePartId)) {
               // TODO: Show confirm
             }
             setRows(oldRows => oldRows.filter(row => row.id !== params.id));

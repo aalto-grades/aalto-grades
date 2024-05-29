@@ -4,7 +4,7 @@
 
 export * from './aplus';
 export * from './gradingModel';
-export * from './attainment';
+export * from './coursePart';
 export * from './auth';
 export * from './course';
 export * from './finalGrade';

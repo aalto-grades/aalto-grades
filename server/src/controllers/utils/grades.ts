@@ -5,12 +5,12 @@
 import {Includeable, Op} from 'sequelize';
 
 import {HttpCode} from '@/common/types';
-import {findCoursePartById} from './attainment';
 import {findAndValidateCourseId, findCourseById} from './course';
+import {findCoursePartById} from './coursePart';
 import logger from '../../configs/winston';
-import Attainment from '../../database/models/attainment';
 import AttainmentGrade from '../../database/models/attainmentGrade';
 import Course from '../../database/models/course';
+import Attainment from '../../database/models/coursePart';
 import FinalGrade from '../../database/models/finalGrade';
 import User from '../../database/models/user';
 import {ApiError, stringToIdSchema} from '../../types';

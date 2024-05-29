@@ -72,8 +72,8 @@ const CalculateFinalGradesDialog = ({
 
     let latestDate = new Date(1970, 0, 1);
     for (const row of selectedRows) {
-      for (const att of row.courseParts) {
-        for (const grade of att.grades) {
+      for (const coursePart of row.courseParts) {
+        for (const grade of coursePart.grades) {
           if (grade.date.getTime() > latestDate.getTime())
             latestDate = grade.date;
         }

@@ -18,7 +18,7 @@ import {
   CoursePartDataArraySchema,
   EditCoursePartData,
   NewCoursePartData,
-} from '@/common/types/attainment';
+} from '@/common/types/coursePart';
 import axios from './axios';
 import {Numeric} from '../../types';
 
@@ -42,9 +42,10 @@ export const useAddCoursePart = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (att: NewCoursePartData) =>
+    mutationFn: async (coursePart: NewCoursePartData) =>
       IdSchema.parse(
-        (await axios.post(`/v1/courses/${courseId}/course-parts`, att)).data
+        (await axios.post(`/v1/courses/${courseId}/course-parts`, coursePart))
+          .data
       ),
 
     onSuccess: () => {

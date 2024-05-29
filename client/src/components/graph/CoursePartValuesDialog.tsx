@@ -42,7 +42,10 @@ const CoursePartValuesDialog = ({
     [nodes]
   );
   const coursePartNames = useMemo(
-    () => Object.fromEntries(courseParts.map(att => [att.id, att.name])),
+    () =>
+      Object.fromEntries(
+        courseParts.map(coursePart => [coursePart.id, coursePart.name])
+      ),
     [courseParts]
   );
   const initValues = useMemo(() => {
@@ -105,14 +108,14 @@ const CoursePartValuesDialog = ({
       <DialogTitle>Set Test Course Part Values</DialogTitle>
 
       <DialogContent>
-        {coursePartNodeIds.map(attId => (
+        {coursePartNodeIds.map(coursePartId => (
           <TextField
             sx={{mt: 2}}
-            key={`attval-${attId}`}
-            value={values[attId] ?? 0}
-            label={coursePartNames[attId]}
-            onChange={e => onChange(attId, e)}
-            error={!testFloat(values[attId])}
+            key={`attval-${coursePartId}`}
+            value={values[coursePartId] ?? 0}
+            label={coursePartNames[coursePartId]}
+            onChange={e => onChange(coursePartId, e)}
+            error={!testFloat(values[coursePartId])}
           />
         ))}
       </DialogContent>

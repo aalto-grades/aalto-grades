@@ -122,11 +122,11 @@ const ModelsView = (): JSX.Element => {
         if (node.type !== 'coursepart') continue;
         const coursePartId = parseInt(node.id.split('-')[1]);
 
-        const coursePart = courseParts.data.find(
-          att => att.id === coursePartId
+        const nodeCoursePart = courseParts.data.find(
+          coursePart => coursePart.id === coursePartId
         );
-        if (coursePart !== undefined)
-          model.graphStructure.nodeData[node.id].title = coursePart.name;
+        if (nodeCoursePart !== undefined)
+          model.graphStructure.nodeData[node.id].title = nodeCoursePart.name;
       }
       return model;
     },

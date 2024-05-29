@@ -21,7 +21,7 @@ export default class Attainment extends Model<
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare name: string;
-  // Default value, expiry date in AttainmentGrade takes precedence
+  // Default value, expiry date in grade takes precedence
   declare daysValid: number;
   declare archived: CreationOptional<boolean>;
   declare createdAt: CreationOptional<Date>;

@@ -58,12 +58,13 @@ const UserGraphDialog = ({
         ) : (
           <Graph
             initGraph={selectedModel.graphStructure}
-            courseParts={row.courseParts.map(coursePart => ({
-              id: coursePart.coursePartId,
-              name: coursePart.coursePartName,
+            courseParts={row.courseParts.map(rowCoursePart => ({
+              id: rowCoursePart.coursePartId,
+              name: rowCoursePart.coursePartName,
               archived:
-                courseParts.data.find(att => att.id === coursePart.coursePartId)
-                  ?.archived ?? false,
+                courseParts.data.find(
+                  coursePart => coursePart.id === rowCoursePart.coursePartId
+                )?.archived ?? false,
             }))}
             userGrades={row.courseParts}
             gradeSelectOption={gradeSelectOption}

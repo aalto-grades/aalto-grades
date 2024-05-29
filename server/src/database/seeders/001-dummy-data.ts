@@ -17,7 +17,7 @@ const courses = readSql('courses.sql');
 const courseRole = readSql('course_role.sql');
 const courseTranslation = readSql('course_translations.sql');
 const gradingModel = readSql('grading_model.sql');
-const coursePart = readSql('attainment.sql');
+const coursePart = readSql('course_part.sql');
 const grade = readSql('attainment_grade.sql');
 const finalGrade = readSql('final_grade.sql');
 

@@ -6,8 +6,8 @@ import {ResponseResolver, http} from 'msw';
 import {SetupServer, setupServer} from 'msw/node';
 import {Mock} from 'vitest';
 
-import {mockCourseParts} from './mockAttainments';
 import {mockCourse} from './mockCourse';
+import {mockCourseParts} from './mockCourseParts';
 import {mockFinalGrades} from './mockFinalGrades';
 import {mockGrades} from './mockGrades';
 import {mockGradingModel} from './mockGradingModel';

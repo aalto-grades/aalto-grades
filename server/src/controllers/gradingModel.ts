@@ -12,8 +12,8 @@ import {
   HttpCode,
   NewGradingModelDataSchema,
 } from '@/common/types';
-import {findCoursePartByCourseId} from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
+import {findCoursePartByCourseId} from './utils/coursePart';
 import {
   checkGradingModelCourseParts,
   validateGradingModelPath,

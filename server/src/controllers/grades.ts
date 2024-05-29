@@ -17,8 +17,8 @@ import {
   StudentRow,
   UserData,
 } from '@/common/types';
-import {validateCoursePartBelongsToCourse} from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
+import {validateCoursePartBelongsToCourse} from './utils/coursePart';
 import {
   findAndValidateGradePath,
   getDateOfLatestGrade,
@@ -28,8 +28,8 @@ import {
 } from './utils/grades';
 import logger from '../configs/winston';
 import {sequelize} from '../database';
-import Attainment from '../database/models/attainment';
 import AttainmentGrade from '../database/models/attainmentGrade';
+import Attainment from '../database/models/coursePart';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
 import {ApiError, JwtClaims, NewDbGradeData} from '../types';
@@ -80,7 +80,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
   // User dict of unique users {userId: User, ...}
   const usersDict: {[key: string]: UserData & {studentNumber: string}} = {};
 
-  // Grades dict {userId: {attId: GradeData[], ...}, ...}
+  // Grades dict {userId: {coursePartId: GradeData[], ...}, ...}
   const userGrades: {[key: string]: {[key: string]: GradeData[]}} = {};
 
   for (const grade of grades) {
