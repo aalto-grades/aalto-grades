@@ -12,7 +12,9 @@ import {
   DialogTitle,
   Link,
   TextField,
+  Typography,
 } from '@mui/material';
+import {JSX} from 'react';
 
 type PropsType = {
   handleClose: () => void;
@@ -24,12 +26,12 @@ const AplusTokenDialog = ({handleClose, open}: PropsType): JSX.Element => {
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>A+ API token</DialogTitle>
       <DialogContent>
-        <p>
+        <Typography>
           You can find your API token by logging in to A+ and navigating to:{' '}
           <Link href="https://plus.cs.aalto.fi/accounts/accounts/">
             https://plus.cs.aalto.fi/accounts/accounts/
           </Link>
-        </p>
+        </Typography>
         <TextField sx={{mt: 1, width: 1}} label="API Token" required={true} />
       </DialogContent>
       <DialogActions>

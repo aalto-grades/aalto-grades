@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
 import {

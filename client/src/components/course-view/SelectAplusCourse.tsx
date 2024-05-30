@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Autocomplete, Box, MenuItem, Select, TextField} from '@mui/material';
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 
 import {AplusCourseData} from '@/common/types';
 
