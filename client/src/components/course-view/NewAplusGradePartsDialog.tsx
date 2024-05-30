@@ -17,12 +17,12 @@ import {
   AplusGradeSourceData,
   AplusGradeSourceType,
 } from '@/common/types';
-import CreateAplusAttainments from './CreateAplusAttainments';
+import CreateAplusCourseParts from './CreateAplusAttainments';
 import SelectAplusCourse from './SelectAplusCourse';
 import SelectAplusGradeSources from './SelectAplusGradeSources';
 import {
   useAddAplusGradeSources,
-  useAddAttainment,
+  useAddCoursePart,
   useFetchAplusCourses,
 } from '../../hooks/useApi';
 
@@ -34,13 +34,13 @@ type PropsType = {
 };
 
 // TODO: Better state handling between different stages
-const NewAplusAttainmentsDialog = ({
+const NewAplusCoursePartsDialog = ({
   handleClose,
   open,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const aplusCourses = useFetchAplusCourses();
-  const addAttainment = useAddAttainment(courseId);
+  const addAttainment = useAddCoursePart(courseId);
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
   const [step, setStep] = useState<number>(0);
@@ -113,7 +113,7 @@ const NewAplusAttainmentsDialog = ({
     for (const [attainment, source] of attainmentsWithSource) {
       sources.push({
         ...source,
-        attainmentId: await addAttainment.mutateAsync(attainment),
+        coursePartId: await addAttainment.mutateAsync(attainment),
       });
     }
 
@@ -137,8 +137,8 @@ const NewAplusAttainmentsDialog = ({
           />
         )}
         {step === 2 && aplusCourse && (
-          <CreateAplusAttainments
-            attainmentsWithSource={attainmentsWithSource}
+          <CreateAplusCourseParts
+            coursePartsWithSource={attainmentsWithSource}
             handleChange={handleAttainmentChange}
           />
         )}
@@ -169,4 +169,4 @@ const NewAplusAttainmentsDialog = ({
   );
 };
 
-export default NewAplusAttainmentsDialog;
+export default NewAplusCoursePartsDialog;

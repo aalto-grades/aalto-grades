@@ -20,7 +20,7 @@ import {
   NewCoursePartData,
   SystemRole,
 } from '@/common/types';
-import NewAplusAttainmentsDialog from './NewAplusAttainmentsDialog';
+import NewAplusCoursePartsDialog from './NewAplusGradePartsDialog';
 import AddCoursePartDialog from './NewCoursePartDialog';
 import {
   useAddCoursePart,
@@ -270,7 +270,7 @@ const CoursePartsView = (): JSX.Element => {
         open={addDialogOpen}
         onSave={handleAddCoursePart}
       />
-      <NewAplusAttainmentsDialog
+      <NewAplusCoursePartsDialog
         handleClose={() => setAplusDialogOpen(false)}
         open={aplusDialogOpen}
       />

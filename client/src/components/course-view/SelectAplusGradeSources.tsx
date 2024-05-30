@@ -49,7 +49,7 @@ const SelectAplusGradeSources = ({
               <Checkbox
                 onChange={e =>
                   handleChange(e.target.checked, 'A+ Course', {
-                    attainmentId: -1,
+                    coursePartId: -1,
                     aplusCourseId: aplusCourse.id,
                     sourceType: AplusGradeSourceType.FullPoints,
                   })
@@ -75,7 +75,7 @@ const SelectAplusGradeSources = ({
                         e.target.checked,
                         `A+ Module: ${module.name}`,
                         {
-                          attainmentId: -1,
+                          coursePartId: -1,
                           aplusCourseId: aplusCourse.id,
                           sourceType: AplusGradeSourceType.Module,
                           moduleId: module.id,
@@ -106,7 +106,7 @@ const SelectAplusGradeSources = ({
                           e.target.checked,
                           `A+ Difficulty: ${difficulty}`,
                           {
-                            attainmentId: -1,
+                            coursePartId: -1,
                             aplusCourseId: aplusCourse.id,
                             sourceType: AplusGradeSourceType.Difficulty,
                             difficulty: difficulty,
