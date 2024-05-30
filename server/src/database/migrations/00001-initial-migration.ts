@@ -144,6 +144,7 @@ export default {
         {transaction}
       );
 
+      // Renamed to course_part in the future
       await queryInterface.createTable(
         'attainment',
         {
