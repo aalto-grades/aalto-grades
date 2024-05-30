@@ -229,7 +229,7 @@ const EditGradesDialog = ({
       if (row.gradeId === -1) {
         newGrades.push({
           studentNumber,
-          coursePartId: coursePartId,
+          coursePartId,
           grade: row.grade,
           date: row.date,
           expiryDate: row.expiryDate,

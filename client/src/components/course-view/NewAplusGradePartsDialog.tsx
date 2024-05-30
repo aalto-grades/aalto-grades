@@ -17,7 +17,7 @@ import {
   AplusGradeSourceData,
   AplusGradeSourceType,
 } from '@/common/types';
-import CreateAplusCourseParts from './CreateAplusAttainments';
+import CreateAplusCourseParts from './CreateAplusCourseParts';
 import SelectAplusCourse from './SelectAplusCourse';
 import SelectAplusGradeSources from './SelectAplusGradeSources';
 import {

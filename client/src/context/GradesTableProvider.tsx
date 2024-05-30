@@ -215,7 +215,10 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
 
     return selectedCourseParts.map(coursePart =>
       columnHelper.accessor(
-        row => row.courseParts.find(a => a.coursePartId === coursePart.id),
+        row =>
+          row.courseParts.find(
+            rowCoursePart => rowCoursePart.coursePartId === coursePart.id
+          ),
         {
           header: coursePart.name,
           meta: {PrettyChipPosition: 'alone'},

@@ -10,16 +10,16 @@ export type AdditionNodeValue = {
   sources: {[key: string]: {isConnected: boolean; value: number}};
   value: number;
 };
+export type AverageNodeValue = {
+  type: 'average';
+  sources: {[key: string]: {isConnected: boolean; value: number}};
+  value: number;
+};
 export type CoursePartNodeValue = {
   type: 'coursepart';
   source: number;
   value: number | 'fail';
   courseFail: boolean;
-};
-export type AverageNodeValue = {
-  type: 'average';
-  sources: {[key: string]: {isConnected: boolean; value: number}};
-  value: number;
 };
 export type GradeNodeValue = {
   type: 'grade';
@@ -62,8 +62,8 @@ export type SubstituteNodeValue = {
 
 export type NodeValue =
   | AdditionNodeValue
-  | CoursePartNodeValue
   | AverageNodeValue
+  | CoursePartNodeValue
   | GradeNodeValue
   | MaxNodeValue
   | MinPointsNodeValue
@@ -79,8 +79,8 @@ export type NodeValues = {
 // Types with schemas
 const CustomNodeTypesSchema = z.enum([
   'addition',
-  'coursepart',
   'average',
+  'coursepart',
   'grade',
   'max',
   'minpoints',

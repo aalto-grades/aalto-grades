@@ -11,7 +11,7 @@ import swaggerUI from 'swagger-ui-express';
 import {router as aplusRouter} from './aplus';
 import {router as authRouter} from './auth';
 import {router as courseRouter} from './course';
-import {router as CoursePartRouter} from './coursePart';
+import {router as coursePartRouter} from './coursePart';
 import {router as finalGradesRouter} from './finalGrades';
 import {router as gradesRouter} from './grades';
 import {router as gradingModelRouter} from './gradingModel';
@@ -30,12 +30,12 @@ export const router: Router = Router();
 
 router.use(cookieParser());
 router.use(aplusRouter);
-router.use(gradingModelRouter);
-router.use(CoursePartRouter);
 router.use(authRouter);
+router.use(coursePartRouter);
 router.use(courseRouter);
 router.use(finalGradesRouter);
 router.use(gradesRouter);
+router.use(gradingModelRouter);
 router.use(userRouter);
 
 router.use('/api-docs', swaggerUI.serve);
