@@ -14,7 +14,7 @@ import {
   NewCoursePartData,
 } from '@/common/types';
 import {app} from '../../src/app';
-import Attainment from '../../src/database/models/coursePart';
+import CoursePart from '../../src/database/models/coursePart';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
@@ -56,7 +56,7 @@ const checkCoursePart = async (
   id: number,
   coursePart: NewCoursePartData | EditCoursePartData
 ): Promise<void> => {
-  const result = await Attainment.findOne({
+  const result = await CoursePart.findOne({
     where: {id, courseId: courseId},
   });
 
@@ -67,7 +67,7 @@ const checkCoursePart = async (
 };
 
 const coursePartDoesNotExist = async (id: number): Promise<void> => {
-  const result = await Attainment.findOne({
+  const result = await CoursePart.findOne({
     where: {id: id, courseId: courseId},
   });
   expect(result).toBeNull();

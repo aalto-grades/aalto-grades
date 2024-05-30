@@ -18,7 +18,7 @@ import {sequelize} from '../../src/database';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
 import AttainmentGrade from '../../src/database/models/attainmentGrade';
 import Course from '../../src/database/models/course';
-import Attainment from '../../src/database/models/coursePart';
+import CoursePart from '../../src/database/models/coursePart';
 import CourseRole from '../../src/database/models/courseRole';
 import CourseTranslation from '../../src/database/models/courseTranslation';
 import FinalGrade from '../../src/database/models/finalGrade';
@@ -62,7 +62,7 @@ class CreateData {
   }
 
   async createCoursePart(courseId: number): Promise<CoursePartData> {
-    const newCoursePart = await Attainment.create({
+    const newCoursePart = await CoursePart.create({
       courseId: courseId,
       name: `Round ${this.freeCoursePartId}`,
       daysValid: this.randInt(10, 365),
@@ -74,7 +74,7 @@ class CreateData {
   private async createCourseParts(courseId: number): Promise<CoursePartData[]> {
     const courseParts: CoursePartData[] = [];
     for (let i = 0; i < 4; i++) {
-      const newCoursePart = await Attainment.create({
+      const newCoursePart = await CoursePart.create({
         courseId: courseId,
         name: `Round ${i + 1}`,
         daysValid: this.randInt(10, 365),
@@ -90,14 +90,14 @@ class CreateData {
   ): Promise<[number, number, number]> {
     const fullPointsCoursePart = await this.createCoursePart(courseId);
     await AplusGradeSource.create({
-      attainmentId: fullPointsCoursePart.id,
+      coursePartId: fullPointsCoursePart.id,
       aplusCourseId: 1,
       sourceType: AplusGradeSourceType.FullPoints,
     });
 
     const moduleCoursePart = await this.createCoursePart(courseId);
     await AplusGradeSource.create({
-      attainmentId: moduleCoursePart.id,
+      coursePartId: moduleCoursePart.id,
       aplusCourseId: 1,
       sourceType: AplusGradeSourceType.Module,
       moduleId: 1,
@@ -105,7 +105,7 @@ class CreateData {
 
     const difficultyCoursePart = await this.createCoursePart(courseId);
     await AplusGradeSource.create({
-      attainmentId: difficultyCoursePart.id,
+      coursePartId: difficultyCoursePart.id,
       aplusCourseId: 1,
       sourceType: AplusGradeSourceType.Difficulty,
       difficulty: 'A',
@@ -128,7 +128,7 @@ class CreateData {
     const gradeDate = date ?? new Date();
     const attGrade = await AttainmentGrade.create({
       userId: userId,
-      attainmentId: coursePartId,
+      coursePartId: coursePartId,
       graderId: graderId,
       date: gradeDate,
       expiryDate: new Date(gradeDate.getTime() + 365 * 24 * 3600 * 1000),

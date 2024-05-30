@@ -10,7 +10,7 @@ import {findCoursePartById} from './coursePart';
 import logger from '../../configs/winston';
 import AttainmentGrade from '../../database/models/attainmentGrade';
 import Course from '../../database/models/course';
-import Attainment from '../../database/models/coursePart';
+import CoursePart from '../../database/models/coursePart';
 import FinalGrade from '../../database/models/finalGrade';
 import User from '../../database/models/user';
 import {ApiError, stringToIdSchema} from '../../types';
@@ -26,7 +26,7 @@ export const getDateOfLatestGrade = async (
 ): Promise<Date> => {
   const grades = await AttainmentGrade.findAll({
     where: {userId: userId},
-    include: [{model: Attainment, where: {courseId: courseId}}],
+    include: [{model: CoursePart, where: {courseId: courseId}}],
   });
 
   const dates = grades.map(grade => new Date(grade.date));
@@ -155,7 +155,7 @@ export const findAndValidateGradePath = async (
   const targetCourse = await findAndValidateCourseId(courseId);
   const grade = await findGradeById(result.data);
 
-  const coursePart = await findCoursePartById(grade.attainmentId);
+  const coursePart = await findCoursePartById(grade.coursePartId);
   const course = await findCourseById(coursePart.courseId);
 
   // Check that grading model belongs to the course.

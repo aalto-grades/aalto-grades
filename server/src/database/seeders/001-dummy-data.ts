@@ -46,7 +46,7 @@ export default {
       await queryInterface.bulkDelete('course_translation', {}, {transaction});
       await queryInterface.bulkDelete('final_grade', {}, {transaction});
       await queryInterface.bulkDelete('attainment_grade', {}, {transaction});
-      await queryInterface.bulkDelete('attainment', {}, {transaction});
+      await queryInterface.bulkDelete('course_part', {}, {transaction});
       await queryInterface.bulkDelete('grading_model', {}, {transaction});
       await queryInterface.bulkDelete('course', {}, {transaction});
       await queryInterface.bulkDelete('user', {}, {transaction});
@@ -67,7 +67,7 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'ALTER SEQUENCE attainment_id_seq RESTART;',
+        'ALTER SEQUENCE course_part_id_seq RESTART;',
         {transaction}
       );
 

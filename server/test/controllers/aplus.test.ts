@@ -49,7 +49,7 @@ beforeAll(async () => {
   [fullPointsCoursePartId, moduleCoursePartId, difficultyCoursePartId] =
     await createData.createAplusGradeSources(courseId);
   addGradeSourceCoursePartId = courseParts[0].id;
-  noGradeSourceCoursePartId = courseParts[3].id;
+  noGradeSourceCoursePartId = courseParts[2].id;
 
   let otherCourseParts: CoursePartData[];
   [noRoleCourseId, otherCourseParts] = await createData.createCourse({
@@ -251,7 +251,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     const sourceType = gradeSource.sourceType;
     const result = await AplusGradeSource.findOne({
       where: {
-        attainmentId: gradeSource.coursePartId,
+        coursePartId: gradeSource.coursePartId,
         aplusCourseId: gradeSource.aplusCourseId,
         sourceType: sourceType,
         moduleId:
@@ -460,7 +460,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     const urlNoCourse = `/v1/courses/${nonExistentId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`;
     await responseTests.testNotFound(urlNoCourse, cookies.adminCookie).get();
 
-    const urlNoCoursePart = `/v1/courses/${courseId}/aplus-fetch?v=[${nonExistentId}]`;
+    const urlNoCoursePart = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${nonExistentId}]`;
     await responseTests
       .testNotFound(urlNoCoursePart, cookies.adminCookie)
       .get();

@@ -29,7 +29,7 @@ import {
 import logger from '../configs/winston';
 import {sequelize} from '../database';
 import AttainmentGrade from '../database/models/attainmentGrade';
-import Attainment from '../database/models/coursePart';
+import CoursePart from '../database/models/coursePart';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
 import {ApiError, JwtClaims, NewDbGradeData} from '../types';
@@ -43,7 +43,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
 
   // Get all course parts for the course
-  const courseParts = await Attainment.findAll({
+  const courseParts = await CoursePart.findAll({
     where: {courseId: courseId},
   });
 
@@ -58,7 +58,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
       },
     ],
     where: {
-      attainmentId: {
+      coursePartId: {
         [Op.in]: courseParts.map(coursePart => coursePart.id),
       },
     },
@@ -95,10 +95,10 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
 
     const userId = grade.userId;
     if (!(userId in userGrades)) userGrades[userId] = {};
-    if (!(grade.attainmentId in userGrades[userId]))
-      userGrades[userId][grade.attainmentId] = [];
+    if (!(grade.coursePartId in userGrades[userId]))
+      userGrades[userId][grade.coursePartId] = [];
 
-    userGrades[userId][grade.attainmentId].push({
+    userGrades[userId][grade.coursePartId].push({
       gradeId: grade.id,
       grader: grader,
       grade: grade.grade,
@@ -209,7 +209,7 @@ export const addGrades = async (
   // students grades into a one array of all the grades.
   const preparedBulkCreate: NewDbGradeData[] = req.body.map(gradeEntry => ({
     userId: studentNumberToId[gradeEntry.studentNumber],
-    attainmentId: gradeEntry.coursePartId,
+    coursePartId: gradeEntry.coursePartId,
     graderId: grader.id,
     date: gradeEntry.date,
     expiryDate: gradeEntry.expiryDate,

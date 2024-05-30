@@ -17,7 +17,7 @@ import {
   findCoursePartByCourseId,
   validateCoursePartPath,
 } from './utils/coursePart';
-import Attainment from '../database/models/coursePart';
+import CoursePart from '../database/models/coursePart';
 import {ApiError} from '../types';
 
 /**
@@ -48,7 +48,7 @@ export const addCoursePart = async (
 ): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
 
-  const [coursePart, created] = await Attainment.findOrCreate({
+  const [coursePart, created] = await CoursePart.findOrCreate({
     where: {
       name: req.body.name,
       courseId: courseId,
@@ -119,7 +119,7 @@ export const deleteCoursePart = async (
     // Catch deletion of course part with grades
     if (
       e instanceof ForeignKeyConstraintError &&
-      e.index === 'attainment_grade_attainment_id_fkey'
+      e.index === 'attainment_grade_course_part_id_fkey'
     ) {
       throw new ApiError(
         'Tried to delete a course part with grades',

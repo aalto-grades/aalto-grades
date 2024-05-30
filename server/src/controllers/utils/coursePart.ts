@@ -5,7 +5,7 @@
 import {CoursePartData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
 import Course from '../../database/models/course';
-import Attainment from '../../database/models/coursePart';
+import CoursePart from '../../database/models/coursePart';
 import {ApiError, stringToIdSchema} from '../../types';
 
 /**
@@ -13,8 +13,8 @@ import {ApiError, stringToIdSchema} from '../../types';
  *
  * @throws ApiError(404) if not found
  */
-export const findCoursePartById = async (id: number): Promise<Attainment> => {
-  const coursePart = await Attainment.findByPk(id);
+export const findCoursePartById = async (id: number): Promise<CoursePart> => {
+  const coursePart = await CoursePart.findByPk(id);
   if (!coursePart) {
     throw new ApiError(
       `Course part with ID ${id} not found`,
@@ -28,7 +28,7 @@ export const findCoursePartById = async (id: number): Promise<Attainment> => {
 export const findCoursePartByCourseId = async (
   courseId: number
 ): Promise<CoursePartData[]> => {
-  const courseParts = await Attainment.findAll({
+  const courseParts = await CoursePart.findAll({
     where: {courseId: courseId},
     order: [['id', 'ASC']],
   });
@@ -49,7 +49,7 @@ export const findCoursePartByCourseId = async (
  */
 const findAndValidateCoursePartId = async (
   coursePartId: string
-): Promise<Attainment> => {
+): Promise<CoursePart> => {
   const result = stringToIdSchema.safeParse(coursePartId);
   if (!result.success) {
     throw new ApiError(
@@ -92,7 +92,7 @@ export const validateCoursePartBelongsToCourse = async (
 export const validateCoursePartPath = async (
   courseId: string,
   coursePartId: string
-): Promise<[Course, Attainment]> => {
+): Promise<[Course, CoursePart]> => {
   const course = await findAndValidateCourseId(courseId);
   const coursePart = await findAndValidateCoursePartId(coursePartId);
 

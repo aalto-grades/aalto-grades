@@ -11,7 +11,7 @@ import {
   Model,
 } from 'sequelize';
 
-import Attainment from './coursePart';
+import CoursePart from './coursePart';
 import User from './user';
 import {sequelize} from '..';
 
@@ -21,11 +21,11 @@ export default class AttainmentGrade extends Model<
 > {
   declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
-  declare attainmentId: ForeignKey<Attainment['id']>;
+  declare coursePartId: ForeignKey<CoursePart['id']>;
   declare graderId: ForeignKey<User['id']>;
   declare grade: number;
   declare sisuExportDate: CreationOptional<Date | null>;
-  // Date when attainment is completed (e.g., deadline or exam date)
+  // Date when course part is completed (e.g., deadline or exam date)
   declare date: Date | string; // Database outputs yyyy-mm-dd but inserting date is allowed
   declare expiryDate: Date | string; // Database outputs yyyy-mm-dd but inserting date is allowed
   declare comment: CreationOptional<string | null>;
@@ -33,7 +33,7 @@ export default class AttainmentGrade extends Model<
   declare updatedAt: CreationOptional<Date>;
   grader?: User;
   User?: User;
-  Attainment?: Attainment;
+  CoursePart?: CoursePart;
 }
 
 AttainmentGrade.init(
@@ -50,10 +50,10 @@ AttainmentGrade.init(
         key: 'id',
       },
     },
-    attainmentId: {
+    coursePartId: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'attainment',
+        model: 'course_part',
         key: 'id',
       },
     },
@@ -97,11 +97,11 @@ AttainmentGrade.init(
 User.hasMany(AttainmentGrade, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
 AttainmentGrade.belongsTo(User, {foreignKey: 'userId'});
 
-Attainment.hasMany(AttainmentGrade, {
+CoursePart.hasMany(AttainmentGrade, {
   onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
-AttainmentGrade.belongsTo(Attainment, {foreignKey: 'attainmentId'});
+AttainmentGrade.belongsTo(CoursePart, {foreignKey: 'coursePartId'});
 
 User.hasMany(AttainmentGrade, {
   foreignKey: 'graderId',

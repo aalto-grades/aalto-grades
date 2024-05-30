@@ -15,7 +15,7 @@ export type NewDbFinalGradeData = {
 
 export type NewDbGradeData = {
   userId: number;
-  attainmentId: number;
+  coursePartId: number;
   graderId: number;
   grade: number;
   sisuExportDate?: Date | null;

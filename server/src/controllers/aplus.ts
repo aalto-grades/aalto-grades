@@ -145,7 +145,7 @@ export const fetchAplusGrades = async (
 
     // TODO: There can be multiple sources
     const gradeSource = await AplusGradeSource.findOne({
-      where: {attainmentId: coursePart.id},
+      where: {coursePartId: coursePart.id},
     });
 
     if (!gradeSource) {

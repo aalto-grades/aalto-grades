@@ -255,7 +255,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     const userCoursePart = await AttainmentGrade.findOne({
       where: {
         userId: student.id,
-        attainmentId: courseParts[0].id,
+        coursePartId: courseParts[0].id,
       },
     });
 
@@ -275,12 +275,12 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     const grade = await AttainmentGrade.findOne({
       where: {
         userId: student.id,
-        attainmentId: courseParts[0].id,
+        coursePartId: courseParts[0].id,
       },
     });
     expect(grade?.grade).toEqual(data[0].grade);
     expect(grade?.userId).toEqual(student.id);
-    expect(grade?.attainmentId).toEqual(courseParts[0].id);
+    expect(grade?.coursePartId).toEqual(courseParts[0].id);
   });
 
   it('should allow uploading multiple grades to the same course part for a student', async () => {
@@ -301,14 +301,14 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
 
     const data1 = await upload();
     let grades = await AttainmentGrade.findAll({
-      where: {userId: student.id, attainmentId: courseParts[0].id},
+      where: {userId: student.id, coursePartId: courseParts[0].id},
     });
     expect(grades.length).toEqual(1);
     expect(grades[0].grade).toEqual(data1[0].grade);
 
     const data2 = await upload();
     grades = await AttainmentGrade.findAll({
-      where: {userId: student.id, attainmentId: courseParts[0].id},
+      where: {userId: student.id, coursePartId: courseParts[0].id},
     });
     expect(grades.length).toEqual(2);
     expect(grades.find(val => val.grade === data1[0].grade)).toBeDefined();

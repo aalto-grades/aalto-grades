@@ -2,7 +2,7 @@
 --
 -- SPDX-License-Identifier: MIT
 
-insert into public.attainment (course_id, name, days_valid, created_at, updated_at) values
+insert into public.course_part (course_id, name, days_valid, created_at, updated_at) values
 (1, 'Tier A', 365, NOW(), NOW()),
 (1, 'Tier B', 365, NOW(), NOW()),
 (1, 'Tier C', 365, NOW(), NOW()),
@@ -27,4 +27,4 @@ insert into public.attainment (course_id, name, days_valid, created_at, updated_
 (4, 'Round 3', 365, NOW(), NOW());
 
 
-SELECT setval('attainment_id_seq', COALESCE((SELECT MAX(id)+1 FROM attainment), 1), false);
+SELECT setval('course_part_id_seq', COALESCE((SELECT MAX(id)+1 FROM course_part), 1), false);
