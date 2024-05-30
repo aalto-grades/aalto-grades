@@ -48,6 +48,7 @@ export const parseAplusToken = (req: Request): string => {
 
   return authArray[1];
 };
+
 /**
  * Fetches data from A+ using the given URL.
  *
