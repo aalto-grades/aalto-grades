@@ -46,17 +46,18 @@ export const fetchAplusCourses = async (
     }[];
   }>(`${APLUS_API_URL}/users/me`, aplusToken);
 
-  // TODO: What about if the caller has no staff_courses? What does the API
-  // return?
-  const courses: AplusCourseData[] = coursesRes.data.staff_courses.map(
-    course => ({
-      id: course.id,
-      courseCode: course.code,
-      name: course.name,
-      instance: course.instance_name,
-      url: course.html_url,
-    })
-  );
+  const staffCourses = coursesRes.data.staff_courses;
+  if (staffCourses.length === 0) {
+    throw new ApiError('no staff courses found in A+', HttpCode.NotFound);
+  }
+
+  const courses: AplusCourseData[] = staffCourses.map(course => ({
+    id: course.id,
+    courseCode: course.code,
+    name: course.name,
+    instance: course.instance_name,
+    url: course.html_url,
+  }));
 
   res.json(courses);
 };
