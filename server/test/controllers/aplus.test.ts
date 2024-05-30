@@ -165,6 +165,17 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
     await responseTests.testUnauthorized(url).get();
   });
 
+  it('should respond with 404 when not found', async () => {
+    mockedAxios.get.mockResolvedValueOnce({
+      data: {
+        staff_courses: [], // eslint-disable-line camelcase
+      },
+    });
+
+    const url = '/v1/aplus/courses';
+    await responseTests.testNotFound(url, cookies.adminCookie).get();
+  });
+
   it('should respond with 502 if A+ request fails', async () => {
     mockedAxios.get.mockImplementationOnce(() => {
       throw new AxiosError();
