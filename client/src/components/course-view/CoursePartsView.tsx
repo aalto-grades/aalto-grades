@@ -20,6 +20,7 @@ import {
   NewCoursePartData,
   SystemRole,
 } from '@/common/types';
+import NewAplusAttainmentsDialog from './NewAplusAttainmentsDialog';
 import AddCoursePartDialog from './NewCoursePartDialog';
 import {
   useAddCoursePart,
@@ -57,6 +58,7 @@ const CoursePartsView = (): JSX.Element => {
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false);
+  const [aplusDialogOpen, setAplusDialogOpen] = useState<boolean>(false);
   const [unsavedDialogOpen, setUnsavedDialogOpen] = useState<boolean>(false);
 
   const coursePartsWithGrades = useMemo(() => {
@@ -268,6 +270,10 @@ const CoursePartsView = (): JSX.Element => {
         open={addDialogOpen}
         onSave={handleAddCoursePart}
       />
+      <NewAplusAttainmentsDialog
+        handleClose={() => setAplusDialogOpen(false)}
+        open={aplusDialogOpen}
+      />
       <UnsavedChangesDialog
         open={unsavedDialogOpen || blocker.state === 'blocked'}
         onClose={() => {
@@ -285,6 +291,10 @@ const CoursePartsView = (): JSX.Element => {
           <Button onClick={() => setAddDialogOpen(true)}>
             Add course part
           </Button>
+        )}
+
+        {editRights && (
+          <Button onClick={() => setAplusDialogOpen(true)}>Add from A+</Button>
         )}
 
         {editRights && (

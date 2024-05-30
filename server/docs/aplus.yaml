@@ -111,6 +111,8 @@ definitions:
                 $ref: '#/definitions/AplusCourseData'
       401:
         $ref: '#/components/responses/Unauthorized'
+      404:
+        $ref: '#/components/responses/NotFound'
       502:
         $ref: '#/components/responses/BadGateway'
     security:
