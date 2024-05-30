@@ -8,6 +8,7 @@ import {z} from 'zod';
 import {
   EditFinalGrade,
   FinalGradeDataSchema,
+  GradingScale,
   HttpCode,
   NewFinalGrade,
 } from '@/common/types';
@@ -27,6 +28,8 @@ let courseId = -1;
 let editCourseId = -1;
 let editFinalGradeId = -1;
 let editCourseModelId = -1;
+let passFailCourseId = -1;
+let secondaryLangCourseId = -1;
 let noRoleCourseId = -1;
 let noRoleFinalGradeId = -1;
 const nonExistentId = 1000000;
@@ -64,6 +67,13 @@ beforeAll(async () => {
     null,
     TEACHER_ID
   );
+
+  [passFailCourseId] = await createData.createCourse({
+    courseData: {gradingScale: GradingScale.PassFail},
+  });
+  [secondaryLangCourseId] = await createData.createCourse({
+    courseData: {gradingScale: GradingScale.SecondNationalLanguage},
+  });
 
   [noRoleCourseId] = await createData.createCourse({
     hasTeacher: false,
@@ -251,6 +261,24 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
     await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
   });
 
+  it('should respond with 400 if trying to add grade >1 to a pass/fail course', async () => {
+    const student = await createStudent();
+    const data = [getData(student)];
+    data[0].grade = 2; // Make sure at least some grade is >1
+
+    const url = `/v1/courses/${passFailCourseId}/final-grades`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
+  });
+
+  it('should respond with 400 if trying to add grade >2 to a secondary language course', async () => {
+    const student = await createStudent();
+    const data = [getData(student)];
+    data[0].grade = 3; // Make sure at least some grade is >2
+
+    const url = `/v1/courses/${secondaryLangCourseId}/final-grades`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
+  });
+
   it('should respond with 401 or 403 if not authorized', async () => {
     const student = await createStudent();
     const data = [getData(student)];
@@ -272,6 +300,13 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
       .post(data);
   });
 
+  it('should respond with 404 when not found', async () => {
+    const student = await createStudent();
+    const data = [getData(student)];
+    const url = `/v1/courses/${nonExistentId}/final-grades`;
+    await responseTests.testNotFound(url, cookies.adminCookie).post(data);
+  });
+
   it('should respond with 409 when assessment model does not belong to the course', async () => {
     const student = await createStudent();
     const [, , otherCourseModelId] = await createData.createCourse({});
@@ -287,13 +322,6 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
 
     const url = `/v1/courses/${editCourseId}/final-grades`;
     await responseTests.testConflict(url, cookies.adminCookie).post(data);
-  });
-
-  it('should respond with 404 when not found', async () => {
-    const student = await createStudent();
-    const data = [getData(student)];
-    const url = `/v1/courses/${nonExistentId}/final-grades`;
-    await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 });
 

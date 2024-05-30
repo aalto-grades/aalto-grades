@@ -21,6 +21,7 @@ export default class CourseRole extends Model<
   InferAttributes<CourseRole>,
   InferCreationAttributes<CourseRole>
 > {
+  declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
   declare courseId: ForeignKey<Course['id']>;
   declare role: CourseRoleType;
@@ -39,9 +40,13 @@ export default class CourseRole extends Model<
 
 CourseRole.init(
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     userId: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       references: {
         model: 'user',
         key: 'id',
@@ -49,7 +54,6 @@ CourseRole.init(
     },
     courseId: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       references: {
         model: 'course',
         key: 'id',

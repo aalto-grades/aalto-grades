@@ -175,11 +175,7 @@ const router = createBrowserRouter([
           {path: '/', index: true, element: <FrontPage />},
           {
             path: '/:courseId',
-            element: (
-              <>
-                <Outlet />
-              </>
-            ),
+            element: <Outlet />,
             children: [
               {
                 // Temporary default view
@@ -200,11 +196,7 @@ const router = createBrowserRouter([
               },
               {
                 path: '/:courseId/edit',
-                element: (
-                  <PrivateRoute roles={[SystemRole.Admin]}>
-                    <EditCourseView />
-                  </PrivateRoute>
-                ),
+                element: <EditCourseView />,
               },
             ],
           },

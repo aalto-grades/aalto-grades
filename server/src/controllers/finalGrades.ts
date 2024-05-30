@@ -7,11 +7,12 @@ import {TypedRequestBody} from 'zod-express-middleware';
 import {
   EditFinalGradeSchema,
   FinalGradeData,
+  GradingScale,
   HttpCode,
   NewFinalGradeArraySchema,
 } from '@/common/types';
 import {validateAssessmentModelBelongsToCourse} from './utils/assessmentModel';
-import {validateCourseId} from './utils/course';
+import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {findAndValidateFinalGradePath} from './utils/finalGrade';
 import {validateUserAndGrader} from './utils/grades';
 import FinalGrade from '../database/models/finalGrade';
@@ -66,23 +67,42 @@ export const addFinalGrades = async (
   res: Response
 ): Promise<Response> => {
   const grader = req.user as JwtClaims;
-  const courseId = await validateCourseId(req.params.courseId);
+  const course = await findAndValidateCourseId(req.params.courseId);
 
   // Validate that assessment models belong to the course
   const assessmentModels = new Set<number>();
   for (const finalGrade of req.body) {
     if (finalGrade.assessmentModelId !== null)
       assessmentModels.add(finalGrade.assessmentModelId);
+
+    let maxGrade;
+    switch (course.gradingScale) {
+      case GradingScale.Numerical:
+        maxGrade = 5;
+        break;
+      case GradingScale.PassFail:
+        maxGrade = 1;
+        break;
+      case GradingScale.SecondNationalLanguage:
+        maxGrade = 2;
+        break;
+    }
+    if (finalGrade.grade > maxGrade) {
+      throw new ApiError(
+        `Invalid final grade ${finalGrade.grade}`,
+        HttpCode.BadRequest
+      );
+    }
   }
   for (const modelId of assessmentModels) {
-    await validateAssessmentModelBelongsToCourse(courseId, modelId);
+    await validateAssessmentModelBelongsToCourse(course.id, modelId);
   }
 
   const preparedBulkCreate: NewDbFinalGradeData[] = req.body.map(
     finalGrade => ({
       userId: finalGrade.userId,
       assessmentModelId: finalGrade.assessmentModelId,
-      courseId: courseId,
+      courseId: course.id,
       graderId: grader.id,
       date: finalGrade.date,
       grade: finalGrade.grade,

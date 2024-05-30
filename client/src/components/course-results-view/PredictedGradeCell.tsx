@@ -10,6 +10,7 @@ import {useParams} from 'react-router-dom';
 import {GradingScale} from '@/common/types';
 import {GroupedStudentRow} from '../../context/GradesTableProvider';
 import {useGetAllAssessmentModels} from '../../hooks/useApi';
+import {getGradeString} from '../../utils/textFormat';
 
 type PropsType = {
   row: GroupedStudentRow;
@@ -26,13 +27,6 @@ const PredictedGradeCell = ({
   const [hover, setHover] = useState<boolean>(false);
   const {courseId} = useParams() as {courseId: string};
   const assessmentModels = useGetAllAssessmentModels(courseId);
-
-  const getGradeString = (grade: number | undefined): string => {
-    if (grade === undefined) return '-';
-    // TODO: Handle GradingScale.SecondNationalLanguage
-    if (gradingScale === GradingScale.Numerical) return grade.toString();
-    return grade === 0 ? 'Fail' : 'Pass';
-  };
 
   return (
     <div
@@ -60,7 +54,10 @@ const PredictedGradeCell = ({
         <p style={{margin: 0, display: 'inline'}}>
           {assessmentModelIds
             ?.map(modelId =>
-              getGradeString(row.predictedFinalGrades?.[modelId]?.finalGrade)
+              getGradeString(
+                gradingScale,
+                row.predictedFinalGrades?.[modelId]?.finalGrade
+              )
             )
             .join(' / ') || 'N/A'}
         </p>

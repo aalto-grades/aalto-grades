@@ -209,7 +209,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
       courseCode: values.courseCode,
       minCredits: values.minCredits,
       maxCredits: values.maxCredits,
-      gradingScale: GradingScale.Numerical,
+      gradingScale: values.gradingScale,
       languageOfInstruction: values.languageOfInstruction,
       department: {
         fi: values.departmentFi,
@@ -333,13 +333,12 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 margin="normal"
                 InputLabelProps={{shrink: true}}
                 helperText={
-                  form.errors.teacherEmail
-                    ? form.errors.teacherEmail
-                    : teachersInCharge.length === 0
-                      ? 'Input the email address of at least one teacher in charge of the course'
-                      : teachersInCharge.includes(form.values.teacherEmail)
-                        ? 'Email already on list.'
-                        : 'Add emails of the teachers in charge of the course.'
+                  form.errors.teacherEmail ??
+                  (teachersInCharge.length === 0
+                    ? 'Input the email address of at least one teacher in charge of the course'
+                    : teachersInCharge.includes(form.values.teacherEmail)
+                      ? 'Email already on list.'
+                      : 'Add emails of the teachers in charge of the course.')
                 }
                 error={
                   form.touched.teacherEmail &&
@@ -406,11 +405,12 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 margin="normal"
                 InputLabelProps={{shrink: true}}
                 helperText={
-                  form.errors.assistantEmail ?? assistants.length === 0
+                  form.errors.assistantEmail ??
+                  (assistants.length === 0
                     ? 'Input the email address of at least one assitant of the course'
                     : assistants.includes(form.values.assistantEmail)
                       ? 'Email already on list.'
-                      : 'Add emails of the teachers in charge of the course.'
+                      : 'Add emails of the teachers in charge of the course.')
                 }
                 error={
                   form.touched.assistantEmail &&
