@@ -26,6 +26,7 @@ import {ResponseTests} from '../util/responses';
 const request = supertest(app);
 const responseTests = new ResponseTests(request);
 
+const authorization = 'Aplus-Token abcdefghijklmnopqrstuvwxyzabcdefghijklmn';
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
 let addGradeSourceAttainmentId = -1;
@@ -152,6 +153,7 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
     const res = await request
       .get('/v1/aplus/courses')
       .set('Cookie', cookies.adminCookie)
+      .set('Authorization', authorization)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -173,7 +175,10 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
     });
 
     const url = '/v1/aplus/courses';
-    await responseTests.testNotFound(url, cookies.adminCookie).get();
+    await responseTests
+      .testNotFound(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
   });
 
   it('should respond with 502 if A+ request fails', async () => {
@@ -182,7 +187,10 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
     });
 
     const url = '/v1/aplus/courses';
-    await responseTests.testBadGateway(url, cookies.adminCookie).get();
+    await responseTests
+      .testBadGateway(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
   });
 });
 
@@ -210,6 +218,7 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
     const res = await request
       .get('/v1/aplus/courses/1')
       .set('Cookie', cookies.adminCookie)
+      .set('Authorization', authorization)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -219,7 +228,10 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
 
   it('should respond with 400 if validation fails (non-number A+ course ID)', async () => {
     const url = '/v1/aplus/courses/abc';
-    await responseTests.testBadRequest(url, cookies.adminCookie).get();
+    await responseTests
+      .testBadRequest(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
   });
 
   it('should respond with 401 if not logged in', async () => {
@@ -233,7 +245,10 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
     });
 
     const url = '/v1/aplus/courses/1';
-    await responseTests.testBadGateway(url, cookies.adminCookie).get();
+    await responseTests
+      .testBadGateway(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
   });
 });
 
@@ -392,6 +407,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
           `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`
         )
         .set('Cookie', cookie)
+        .set('Authorization', authorization)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -408,6 +424,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
           `/v1/courses/${courseId}/aplus-fetch?attainments=[${moduleAttainmentId}]`
         )
         .set('Cookie', cookie)
+        .set('Authorization', authorization)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -424,6 +441,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
           `/v1/courses/${courseId}/aplus-fetch?attainments=[${difficultyAttainmentId}]`
         )
         .set('Cookie', cookie)
+        .set('Authorization', authorization)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -440,6 +458,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
           `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}, ${moduleAttainmentId}, ${difficultyAttainmentId}]`
         )
         .set('Cookie', cookie)
+        .set('Authorization', authorization)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -450,7 +469,10 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
 
   it('should respond with 400 if course ID is invalid', async () => {
     const url = `/v1/courses/abc/aplus-fetch?attainments=[${fullPointsAttainmentId}]`;
-    await responseTests.testBadRequest(url, cookies.adminCookie).get();
+    await responseTests
+      .testBadRequest(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
   });
 
   it('should respond with 400 if attainments list is invalid', async () => {
@@ -467,6 +489,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     for (const query of invalid) {
       await responseTests
         .testBadRequest(url + query, cookies.adminCookie)
+        .set('Authorization', authorization)
         .get();
     }
   });
@@ -487,22 +510,30 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
 
   it('should respond with 404 when not found', async () => {
     const urlNoCourse = `/v1/courses/${nonExistentId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`;
-    await responseTests.testNotFound(urlNoCourse, cookies.adminCookie).get();
+    await responseTests
+      .testNotFound(urlNoCourse, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
 
     const urlNoAttainment = `/v1/courses/${courseId}/aplus-fetch?attainments=[${nonExistentId}]`;
     await responseTests
       .testNotFound(urlNoAttainment, cookies.adminCookie)
+      .set('Authorization', authorization)
       .get();
 
     const urlNoGradeSource = `/v1/courses/${courseId}/aplus-fetch?attainments=[${noGradeSourceAttainmentId}]`;
     await responseTests
       .testNotFound(urlNoGradeSource, cookies.adminCookie)
+      .set('Authorization', authorization)
       .get();
   });
 
   it('should respond with 409 when an attainment does not belong to the course', async () => {
     const url = `/v1/courses/${courseId}/aplus-fetch?attainments=[${differentCourseAttainmentId}]`;
-    await responseTests.testConflict(url, cookies.adminCookie).get();
+    await responseTests
+      .testConflict(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
   });
 
   it('should respond with 502 if A+ request fails', async () => {
@@ -511,6 +542,9 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     });
 
     const url = `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`;
-    await responseTests.testBadGateway(url, cookies.adminCookie).get();
+    await responseTests
+      .testBadGateway(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
   });
 });
