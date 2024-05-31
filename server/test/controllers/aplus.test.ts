@@ -27,6 +27,14 @@ const request = supertest(app);
 const responseTests = new ResponseTests(request);
 
 const authorization = 'Aplus-Token abcdefghijklmnopqrstuvwxyzabcdefghijklmn';
+const invalidAuthorization = [
+  'abcdefghijklmnopqrstuvwxyzabcdefghijklmn',
+  'Aplus-Token',
+  'Aplus-Token abcdefghijklmnopqrst',
+  'Token abcdefghijklmnopqrstuvwxyzabcdefghijklmn',
+  '',
+];
+
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
 let addGradeSourceAttainmentId = -1;
@@ -162,6 +170,17 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
     expect(result.success).toBeTruthy();
   });
 
+  it('should respond with 400 if A+ token parsing fails', async () => {
+    const url = '/v1/aplus/courses';
+    await responseTests.testBadRequest(url, cookies.adminCookie).get();
+    for (const invalid of invalidAuthorization) {
+      await responseTests
+        .testBadRequest(url, cookies.adminCookie)
+        .set('Authorization', invalid)
+        .get();
+    }
+  });
+
   it('should respond with 401 if not logged in', async () => {
     const url = '/v1/aplus/courses';
     await responseTests.testUnauthorized(url).get();
@@ -232,6 +251,17 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
       .testBadRequest(url, cookies.adminCookie)
       .set('Authorization', authorization)
       .get();
+  });
+
+  it('should respond with 400 if A+ token parsing fails', async () => {
+    const url = '/v1/aplus/courses/1';
+    await responseTests.testBadRequest(url, cookies.adminCookie).get();
+    for (const invalid of invalidAuthorization) {
+      await responseTests
+        .testBadRequest(url, cookies.adminCookie)
+        .set('Authorization', invalid)
+        .get();
+    }
   });
 
   it('should respond with 401 if not logged in', async () => {
@@ -464,6 +494,17 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
 
       const result = await NewGradeArraySchema.safeParseAsync(res.body);
       expect(result.success).toBeTruthy();
+    }
+  });
+
+  it('should respond with 400 if A+ token parsing fails', async () => {
+    const url = `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).get();
+    for (const invalid of invalidAuthorization) {
+      await responseTests
+        .testBadRequest(url, cookies.adminCookie)
+        .set('Authorization', invalid)
+        .get();
     }
   });
 
