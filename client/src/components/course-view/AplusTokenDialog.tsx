@@ -14,7 +14,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {JSX} from 'react';
+import {JSX, useState} from 'react';
 
 type PropsType = {
   handleClose: () => void;
@@ -22,6 +22,8 @@ type PropsType = {
 };
 
 const AplusTokenDialog = ({handleClose, open}: PropsType): JSX.Element => {
+  const [token, setToken] = useState<string | null>(null);
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>A+ API token</DialogTitle>
@@ -32,11 +34,24 @@ const AplusTokenDialog = ({handleClose, open}: PropsType): JSX.Element => {
             https://plus.cs.aalto.fi/accounts/accounts/
           </Link>
         </Typography>
-        <TextField sx={{mt: 1, width: 1}} label="API Token" required={true} />
+        <TextField
+          sx={{mt: 1, width: 1}}
+          label="API Token"
+          value={token}
+          onChange={e => setToken(e.target.value)}
+          required={true}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleClose}>
+        <Button
+          disabled={!token || token.length !== 40}
+          variant="contained"
+          onClick={() => {
+            if (token) localStorage.setItem('Aplus-Token', token);
+            handleClose();
+          }}
+        >
           OK
         </Button>
       </DialogActions>
