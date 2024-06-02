@@ -71,11 +71,12 @@ declare module '@tanstack/table-core' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
     PrettyChipPosition: 'first' | 'middle' | 'last' | 'alone';
+    attainment?: boolean;
   }
 }
 
 export type GroupedStudentRow = {
-  grouping: string;
+  latestBestGrade: string;
 } & ExtendedStudentRow;
 
 export type ExtendedStudentRow = StudentRow & {
@@ -221,9 +222,9 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         row => row.attainments.find(a => a.attainmentId === att.id),
         {
           header: att.name,
-          meta: {PrettyChipPosition: 'alone'},
+          meta: {PrettyChipPosition: 'alone', attainment: true},
           enableSorting: false,
-          size: 120,
+          size: 80,
           cell: ({getValue, row}) => (
             <GradeCell
               studentNumber={row.original.user.studentNumber ?? 'N/A'}
@@ -242,11 +243,11 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   const groupingColumns =
     // TODO: SHOULD USE THE VISIBILITY API
     [
-      columnHelper.accessor(row => row.grouping, {
-        id: 'grouping',
+      columnHelper.accessor(row => row.latestBestGrade, {
+        id: 'latestBestGrade',
         meta: {PrettyChipPosition: 'first'},
         header: () => {
-          return 'Latest Attainment';
+          return 'Latest Part Date';
         },
         cell: prop => prop.getValue(),
       }),
@@ -363,7 +364,9 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     // }),
     columnHelper.accessor(row => row.finalGrades ?? [], {
       header: 'Final Grade',
+      id: 'finalGrade',
       enableSorting: false,
+      getGroupingValue: row => findBestFinalGrade(row.finalGrades ?? [])?.grade,
       cell: ({getValue, row}) => (
         <FinalGradeCell
           userId={row.original.user.id}
@@ -450,6 +453,9 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   const table = useReactTable({
     data: groupedData,
     columns: [...staticColumns],
+    defaultColumn: {
+      size: 100,
+    },
     getCoreRowModel: getCoreRowModel(),
     // Selection
     onRowSelectionChange: selection => {

@@ -107,7 +107,14 @@ const theme: CssVarsTheme = extendTheme({
           },
         },
         {
-          props: {variant: 'tonal'},
+          props: {variant: 'tonal', color: 'secondary'},
+          style: ({theme}) => ({
+            backgroundColor: theme.vars.palette.secondary.light,
+            color: theme.vars.palette.secondary.main,
+          }),
+        },
+        {
+          props: {variant: 'tonal', color: 'primary'},
           style: ({theme}) => ({
             backgroundColor: theme.vars.palette.primary.light,
             color: theme.vars.palette.primary.main,
@@ -123,6 +130,13 @@ const theme: CssVarsTheme = extendTheme({
           height: '32px',
           fontSize: '14px',
           // boxSizing: 'border-box',
+        },
+      },
+    },
+    MuiListItemIcon: {
+      styleOverrides: {
+        root: {
+          minWidth: '48px',
         },
       },
     },

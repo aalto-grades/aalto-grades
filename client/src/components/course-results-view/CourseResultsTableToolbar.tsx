@@ -10,6 +10,7 @@ import {
   Button,
   ButtonBase,
   Chip,
+  Divider,
   Menu,
   MenuItem,
   Tooltip,
@@ -47,6 +48,317 @@ const toggleString = (arr: string[], str: string): string[] => {
   else arr.push(str);
 
   return arr;
+};
+const GroupByButton = () => {
+  const theme = useTheme();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const {table} = useTableContext();
+
+  const groupByElements = [
+    [
+      {
+        id: 'latestBestGrade',
+        name: 'Latest Part Date',
+        info: 'Group by the latest obtainment date of all course parts',
+      },
+      {id: 'Exported to Sisu', name: 'Exported to Sisu'},
+      {id: 'finalGrade', name: 'Final Grade'},
+    ],
+    [
+      ...table
+        .getAllColumns()
+        .filter(c => c.columnDef.meta?.attainment)
+        .map(column => ({
+          id: column.id,
+          name: column.id,
+          info: column.id,
+        })),
+    ],
+  ];
+
+  const isActive = useMemo(
+    () => table.getState().grouping.length > 0,
+    [table.getState().grouping]
+  );
+
+  return (
+    <>
+      <span style={{display: 'flex'}}>
+        <ButtonBase
+          style={{
+            ...{
+              display: 'flex',
+              borderRadius: '8px',
+              textAlign: 'center',
+              border: '1px solid black',
+              alignContent: 'center',
+              padding: '0px 8px',
+              fontSize: '14px',
+              alignItems: 'center',
+              lineHeight: '20px',
+              cursor: 'pointer',
+              position: 'relative',
+              backgroundColor: 'transparent',
+            },
+            ...(isActive && {
+              backgroundColor: theme.vars.palette.info.light,
+              border: 'none',
+              borderRadius: '8px 0px 0px 8px',
+            }),
+          }}
+          onClick={ev => {
+            handleClick(ev);
+          }}
+        >
+          <div
+            style={{
+              alignContent: 'center',
+              padding: '0px 8px',
+              width: 'max-content',
+            }}
+          >
+            Group by{' '}
+            {groupByElements
+              .flat()
+              .filter(el => table.getState().grouping.includes(el.id))
+              .map(el => el.name)
+              .join(', ')}
+          </div>
+
+          {!isActive && (
+            <ArrowDropDownIcon
+              style={{alignContent: 'center', fontSize: '18px'}}
+            />
+          )}
+        </ButtonBase>
+        {isActive && (
+          <ButtonBase
+            style={{
+              ...{
+                display: 'flex',
+                borderRadius: '0px 8px 8px 0',
+                textAlign: 'center',
+                // border: '1px solid black',
+                border: '0px 1px 1px 1px',
+                alignContent: 'center',
+                padding: '0px 8px',
+                fontSize: '14px',
+                alignItems: 'center',
+                lineHeight: '20px',
+                cursor: 'pointer',
+                position: 'relative',
+                backgroundColor: 'transparent',
+              },
+              ...(isActive && {
+                backgroundColor: theme.vars.palette.info.light,
+                border: 'none',
+              }),
+            }}
+            onClick={ev => {
+              table.setGrouping([]);
+            }}
+          >
+            <ClearIcon style={{alignContent: 'center', fontSize: '18px'}} />
+          </ButtonBase>
+        )}
+      </span>
+      <Menu
+        id="long-menu"
+        MenuListProps={{
+          'aria-labelledby': 'long-ButtonBase',
+        }}
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        style={{
+          maxHeight: '50vh',
+        }}
+      >
+        {[...groupByElements].map(groups => {
+          return [
+            ...groups.map(element => (
+              <Tooltip
+                title={element.info}
+                key={`Tooltip${element.id}`}
+                placement="top"
+                disableInteractive
+              >
+                <MenuItem
+                  key={element.id}
+                  selected={table.getState().grouping.includes(element.id)}
+                  onClick={() => {
+                    console.log(table.getAllColumns());
+                    table.setGrouping(old =>
+                      structuredClone(toggleString(old, element.id))
+                    );
+                    handleClose();
+                  }}
+                >
+                  {element.name}
+                </MenuItem>
+              </Tooltip>
+            )),
+
+            <Divider sx={{my: 0}} />,
+          ];
+        })}
+      </Menu>
+    </>
+  );
+};
+
+const AssesmentFilterButton = () => {
+  const {courseId} = useParams() as {courseId: string};
+  const theme = useTheme();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const {
+    table,
+    gradeSelectOption,
+    setGradeSelectOption,
+    selectedAssessmentModel,
+    setSelectedAssessmentModel,
+  } = useTableContext();
+
+  const allAssessmentModels = useGetAllAssessmentModels(courseId);
+
+  // Filter out archived models
+  const assessmentModels = useMemo(
+    () =>
+      allAssessmentModels.data !== undefined
+        ? allAssessmentModels.data.filter(model => !model.archived)
+        : undefined,
+    [allAssessmentModels.data]
+  );
+
+  const isActive = useMemo<boolean>(
+    () => !!selectedAssessmentModel && selectedAssessmentModel !== 'any',
+    [selectedAssessmentModel]
+  );
+
+  return (
+    <>
+      <span style={{display: 'flex'}}>
+        <ButtonBase
+          id="select-assessment-model-option"
+          style={{
+            ...{
+              display: 'flex',
+              borderRadius: '8px',
+              textAlign: 'center',
+              border: '1px solid black',
+              alignContent: 'center',
+              padding: '0px 8px',
+              fontSize: '14px',
+              alignItems: 'center',
+              lineHeight: '20px',
+              cursor: 'pointer',
+              position: 'relative',
+              backgroundColor: 'transparent',
+            },
+            ...(isActive && {
+              backgroundColor: theme.vars.palette.info.light,
+              border: 'none',
+              borderRadius: '8px 0px 0px 8px',
+            }),
+          }}
+          onClick={ev => {
+            handleClick(ev);
+          }}
+        >
+          <div
+            style={{
+              alignContent: 'center',
+              padding: '0px 8px',
+              width: 'max-content',
+            }}
+          >
+            {isActive
+              ? assessmentModels?.filter(
+                  ass => ass.id === selectedAssessmentModel
+                )[0]?.name
+              : 'Grading Model'}
+          </div>
+
+          {!isActive && (
+            <ArrowDropDownIcon
+              style={{alignContent: 'center', fontSize: '18px'}}
+            />
+          )}
+        </ButtonBase>
+        {isActive && (
+          <ButtonBase
+            style={{
+              ...{
+                display: 'flex',
+                borderRadius: '0px 8px 8px 0',
+                textAlign: 'center',
+                // border: '1px solid black',
+                border: '0px 1px 1px 1px',
+                alignContent: 'center',
+                padding: '0px 8px',
+                fontSize: '14px',
+                alignItems: 'center',
+                lineHeight: '20px',
+                cursor: 'pointer',
+                position: 'relative',
+                backgroundColor: 'transparent',
+              },
+              ...(isActive && {
+                backgroundColor: theme.vars.palette.info.light,
+                border: 'none',
+              }),
+            }}
+            onClick={ev => {
+              setSelectedAssessmentModel('any');
+            }}
+          >
+            <ClearIcon style={{alignContent: 'center', fontSize: '18px'}} />
+          </ButtonBase>
+        )}
+      </span>
+      <Menu
+        id="long-menu"
+        MenuListProps={{
+          'aria-labelledby': 'long-ButtonBase',
+        }}
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        style={{
+          maxHeight: '50vh',
+        }}
+      >
+        {(assessmentModels ?? []).map(model => (
+          <MenuItem
+            onClick={() => {
+              setSelectedAssessmentModel(model.id);
+              handleClose();
+            }}
+            key={`assessment-model-select-${model.id}`}
+            value={model.id}
+            selected={selectedAssessmentModel === model.id}
+          >
+            {model.name}
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
+  );
 };
 
 const CourseResultsTableToolbar = (): JSX.Element => {
@@ -205,10 +517,10 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       <Box
         sx={{
           // mx: 1,
-          pt: 1,
-          borderRadius: 200,
+          p: 0.5,
+          borderRadius: 3,
           display: 'flex',
-          // backgroundColor: theme.vars.palette.hoverGrey2,
+          backgroundColor: theme.vars.palette.hoverGrey2,
           // height: '45px',
         }}
       >
@@ -217,6 +529,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
             variant="tonal"
             onClick={() => setUploadOpen(true)}
             startIcon={<Add />}
+            color="primary"
           >
             Add Grades
           </Button>
@@ -227,13 +540,14 @@ const CourseResultsTableToolbar = (): JSX.Element => {
               alignItems: 'center',
               gap: 1,
               px: 1,
-              backgroundColor: theme.vars.palette.primary.light,
+              // backgroundColor: theme.vars.palette.primary.light,
               // border: '1px solid black',
               borderRadius: 200,
             }}
           >
             <div style={{alignContent: 'center'}}>
               {table.getSelectedRowModel().rows.length} selected student
+              {table.getSelectedRowModel().rows.length > 1 && 's'}
             </div>
             {editRights && (
               <Box
@@ -265,7 +579,9 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                       onClick={() => setShowCalculateDialog(true)}
                       disabled={table.getSelectedRowModel().rows.length === 0}
                     >
-                      Calculate final grades
+                      {missingFinalGrades
+                        ? 'Calculate final grades'
+                        : ' Re-Calculate final grades'}
                     </Button>
                   </span>
                 </Tooltip>
@@ -403,287 +719,3 @@ const CourseResultsTableToolbar = (): JSX.Element => {
 };
 
 export default CourseResultsTableToolbar;
-
-const GroupByButton = () => {
-  const theme = useTheme();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const {table} = useTableContext();
-
-  const isActive = useMemo(
-    () => table.getState().grouping.length > 0,
-    [table.getState().grouping]
-  );
-
-  return (
-    <>
-      <span style={{display: 'flex'}}>
-        <ButtonBase
-          style={{
-            ...{
-              display: 'flex',
-              borderRadius: '8px',
-              textAlign: 'center',
-              border: '1px solid black',
-              alignContent: 'center',
-              padding: '0px 8px',
-              fontSize: '14px',
-              alignItems: 'center',
-              lineHeight: '20px',
-              cursor: 'pointer',
-              position: 'relative',
-              backgroundColor: 'transparent',
-            },
-            ...(isActive && {
-              backgroundColor: theme.vars.palette.info.light,
-              border: 'none',
-              borderRadius: '8px 0px 0px 8px',
-            }),
-          }}
-          onClick={ev => {
-            handleClick(ev);
-          }}
-        >
-          <div
-            style={{
-              alignContent: 'center',
-              padding: '0px 8px',
-              width: 'max-content',
-            }}
-          >
-            Group by {table.getState().grouping}
-          </div>
-
-          {!isActive && (
-            <ArrowDropDownIcon
-              style={{alignContent: 'center', fontSize: '18px'}}
-            />
-          )}
-        </ButtonBase>
-        {isActive && (
-          <ButtonBase
-            style={{
-              ...{
-                display: 'flex',
-                borderRadius: '0px 8px 8px 0',
-                textAlign: 'center',
-                // border: '1px solid black',
-                border: '0px 1px 1px 1px',
-                alignContent: 'center',
-                padding: '0px 8px',
-                fontSize: '14px',
-                alignItems: 'center',
-                lineHeight: '20px',
-                cursor: 'pointer',
-                position: 'relative',
-                backgroundColor: 'transparent',
-              },
-              ...(isActive && {
-                backgroundColor: theme.vars.palette.info.light,
-                border: 'none',
-              }),
-            }}
-            onClick={ev => {
-              table.setGrouping([]);
-            }}
-          >
-            <ClearIcon style={{alignContent: 'center', fontSize: '18px'}} />
-          </ButtonBase>
-        )}
-      </span>
-      <Menu
-        id="long-menu"
-        MenuListProps={{
-          'aria-labelledby': 'long-ButtonBase',
-        }}
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        style={{
-          maxHeight: '50vh',
-        }}
-      >
-        <MenuItem
-          key={'grouping'}
-          selected={table.getState().grouping[0] === 'grouping'}
-          onClick={() => {
-            table.setGrouping(old =>
-              structuredClone(toggleString(old, 'grouping'))
-            );
-            handleClose();
-          }}
-        >
-          Latest Attainment
-        </MenuItem>
-        {table.getAllFlatColumns().map(column => (
-          <MenuItem
-            key={column.id}
-            selected={table.getState().grouping.includes(column.id)}
-            onClick={() => {
-              table.setGrouping(old =>
-                structuredClone(toggleString(old, column.id))
-              );
-              handleClose();
-            }}
-          >
-            {column.id}
-          </MenuItem>
-        ))}
-      </Menu>
-    </>
-  );
-};
-
-const AssesmentFilterButton = () => {
-  const {courseId} = useParams() as {courseId: string};
-  const theme = useTheme();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const {
-    table,
-    gradeSelectOption,
-    setGradeSelectOption,
-    selectedAssessmentModel,
-    setSelectedAssessmentModel,
-  } = useTableContext();
-
-  const allAssessmentModels = useGetAllAssessmentModels(courseId);
-
-  // Filter out archived models
-  const assessmentModels = useMemo(
-    () =>
-      allAssessmentModels.data !== undefined
-        ? allAssessmentModels.data.filter(model => !model.archived)
-        : undefined,
-    [allAssessmentModels.data]
-  );
-
-  const isActive = useMemo<boolean>(
-    () => !!selectedAssessmentModel && selectedAssessmentModel !== 'any',
-    [selectedAssessmentModel]
-  );
-
-  return (
-    <>
-      <span style={{display: 'flex'}}>
-        <ButtonBase
-          id="select-assessment-model-option"
-          style={{
-            ...{
-              display: 'flex',
-              borderRadius: '8px',
-              textAlign: 'center',
-              border: '1px solid black',
-              alignContent: 'center',
-              padding: '0px 8px',
-              fontSize: '14px',
-              alignItems: 'center',
-              lineHeight: '20px',
-              cursor: 'pointer',
-              position: 'relative',
-              backgroundColor: 'transparent',
-            },
-            ...(isActive && {
-              backgroundColor: theme.vars.palette.info.light,
-              border: 'none',
-              borderRadius: '8px 0px 0px 8px',
-            }),
-          }}
-          onClick={ev => {
-            handleClick(ev);
-          }}
-        >
-          <div
-            style={{
-              alignContent: 'center',
-              padding: '0px 8px',
-              width: 'max-content',
-            }}
-          >
-            {isActive
-              ? assessmentModels?.filter(
-                  ass => ass.id === selectedAssessmentModel
-                )[0]?.name
-              : 'Grading Model'}
-          </div>
-
-          {!isActive && (
-            <ArrowDropDownIcon
-              style={{alignContent: 'center', fontSize: '18px'}}
-            />
-          )}
-        </ButtonBase>
-        {isActive && (
-          <ButtonBase
-            style={{
-              ...{
-                display: 'flex',
-                borderRadius: '0px 8px 8px 0',
-                textAlign: 'center',
-                // border: '1px solid black',
-                border: '0px 1px 1px 1px',
-                alignContent: 'center',
-                padding: '0px 8px',
-                fontSize: '14px',
-                alignItems: 'center',
-                lineHeight: '20px',
-                cursor: 'pointer',
-                position: 'relative',
-                backgroundColor: 'transparent',
-              },
-              ...(isActive && {
-                backgroundColor: theme.vars.palette.info.light,
-                border: 'none',
-              }),
-            }}
-            onClick={ev => {
-              setSelectedAssessmentModel('any');
-            }}
-          >
-            <ClearIcon style={{alignContent: 'center', fontSize: '18px'}} />
-          </ButtonBase>
-        )}
-      </span>
-      <Menu
-        id="long-menu"
-        MenuListProps={{
-          'aria-labelledby': 'long-ButtonBase',
-        }}
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        style={{
-          maxHeight: '50vh',
-        }}
-      >
-        {(assessmentModels ?? []).map(model => (
-          <MenuItem
-            onClick={() => {
-              setSelectedAssessmentModel(model.id);
-              handleClose();
-            }}
-            key={`assessment-model-select-${model.id}`}
-            value={model.id}
-            selected={selectedAssessmentModel === model.id}
-          >
-            {model.name}
-          </MenuItem>
-        ))}
-      </Menu>
-    </>
-  );
-};

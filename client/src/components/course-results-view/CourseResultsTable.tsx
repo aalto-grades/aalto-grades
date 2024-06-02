@@ -33,7 +33,7 @@ const CourseResultsTable = (): JSX.Element => {
         style={{
           overflowY: 'auto', // our scrollable table container
           position: 'relative', // needed for sticky header
-          height: '85vh', // should be a fixed height
+          height: 'calc(100vh - 245px)', // should be a fixed height
           width: 'fit-content',
           maxWidth: '100%',
         }}

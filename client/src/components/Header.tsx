@@ -39,6 +39,7 @@ const Header = (): JSX.Element => {
             width: '184px',
             cursor: 'pointer',
             fontWeight: 'bold',
+            color: 'primary.main',
           }}
           unstable_viewTransition
         >
@@ -154,8 +155,7 @@ const Header = (): JSX.Element => {
               </span>
             </Box>
             <Typography variant="h2" sx={{mr: 1}}>
-              {' '}
-              -{' '}
+              {' - '}
             </Typography>
             <Box
               sx={{
