@@ -112,64 +112,7 @@ const SideMenu = (): JSX.Element => {
         minWidth: 'var(--side-menu-width)',
       }}
     >
-      {/* <SideMenuButton
-        text="Courses List"
-        to="/"
-        Icon={FlagCircle}
-        IconOutlined={FlagCircleOutlined}
-      />
-
-      <Divider sx={{mb: 2, mt: 1}} />
-      <Button variant="outlined" onClick={onUpload}>
-        Upload Grades
-      </Button>
-      <Divider sx={{my: 2}} /> */}
       <List>
-        {/* <NavLink
-          to={'/'}
-          style={{
-            color: 'inherit',
-            textDecoration: 'none',
-          }}
-          // onClick={() => navigate('/')}
-          unstable_viewTransition
-        >
-          {({isActive, isPending: _, isTransitioning: __}) => {
-            if (courseId === undefined) {
-              return null;
-            }
-            return (
-              <ButtonBase
-                sx={{
-                  display: 'flex',
-                  color: 'inherit',
-                  alignItems: 'center',
-                  // width: '100%',
-                  py: '0px',
-                  px: 1,
-                  borderRadius: '8px',
-                  border: '1px solid black',
-                  fontSize: '1rem',
-                  textAlign: 'left',
-                  backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
-                }}
-                // onClick={ev => {
-                //   ev.preventDefault();
-                //   document.startViewTransition(() => {
-                //     flushSync(() => {
-                //       navigate('/');
-                //     });
-                //   });
-                // }}
-              >
-                <Icon>
-                  <ArrowBack />
-                </Icon>
-                <ListItemText primary="Course List" />
-              </ButtonBase>
-            );
-          }}
-        </NavLink> */}
         <SideMenuButton
           text="Courses List"
           to={'/'}
