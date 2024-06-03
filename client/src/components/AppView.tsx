@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Container, useTheme} from '@mui/material';
+import {Box, useTheme} from '@mui/material';
 import {JSX} from 'react';
 import {Outlet} from 'react-router-dom';
 
@@ -14,8 +14,8 @@ const SectionTitle = (): JSX.Element => {
 
   return (
     <>
-      <div
-        style={{
+      <Box
+        sx={{
           minHeight: '100vh',
           height: '100vh',
           maxHeight: '100vh',
@@ -23,40 +23,38 @@ const SectionTitle = (): JSX.Element => {
 
           display: 'grid',
           gridTemplateRows: '60px calc(100vh - 110px) 50px',
-          gridTemplateColumns: '100%',
-          gridTemplateAreas: `"header" 
-          "content" 
+          gridTemplateColumns: '[content] 100%',
+          gridTemplateAreas: `"header"
+          "content"
           "footer"`,
           flexDirection: 'column',
           backgroundColor: theme.vars.palette.primary.light,
         }}
       >
-        <div style={{gridArea: 'header'}}>
-          <Header />
-        </div>
-        <div
-          style={{
-            gridArea: 'content',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: theme.vars.palette.primary.light,
+        <Box
+          sx={{
+            gridArea: 'header',
           }}
         >
-          <Container
-            sx={{textAlign: 'center', m: 0, px: 1, height: '100%'}}
-            maxWidth={false}
-            disableGutters
-          >
-            <>
-              <Outlet />
-            </>
-          </Container>
-        </div>
+          <Header />
+        </Box>
+
+        <Box
+          sx={{
+            textAlign: 'center',
+            m: 0,
+            px: 1,
+            height: '100%',
+            gridArea: 'content',
+          }}
+        >
+          <Outlet />
+        </Box>
+
         <div style={{gridArea: 'footer'}}>
           <Footer />
         </div>
-      </div>
+      </Box>
     </>
   );
 };

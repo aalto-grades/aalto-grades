@@ -42,8 +42,8 @@ import UserGraphDialog from '../components/course-results-view/UserGraphDialog';
 import PrettyChip from '../components/shared/PrettyChip';
 import {
   useGetAllGradingModels,
-  useGetCourseParts,
   useGetCourse,
+  useGetCourseParts,
 } from '../hooks/useApi';
 import {findBestFinalGrade} from '../utils/bestGrade';
 import {groupByLatestBestGrade, predictGrades} from '../utils/table';
@@ -71,11 +71,12 @@ declare module '@tanstack/table-core' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
     PrettyChipPosition: 'first' | 'middle' | 'last' | 'alone';
+    coursePart?: boolean;
   }
 }
 
 export type GroupedStudentRow = {
-  grouping: string;
+  latestBestGrade: string;
 } & ExtendedStudentRow;
 
 export type ExtendedStudentRow = StudentRow & {
@@ -221,9 +222,9 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
           ),
         {
           header: coursePart.name,
-          meta: {PrettyChipPosition: 'alone'},
+          meta: {PrettyChipPosition: 'alone', coursePart: true},
           enableSorting: false,
-          size: 120,
+          size: 80,
           cell: ({getValue, row}) => (
             <GradeCell
               studentNumber={row.original.user.studentNumber ?? 'N/A'}
@@ -236,23 +237,26 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     );
   }, [getCoursePartsForGradingModel, selectedGradingModel]);
 
+  // This columns are used to group by data that is not directly shown
+  // For example calculating the latest attainment date
+  // For example grouping by Exported to sisu has no need to create a column
   const groupingColumns =
-    grouping.length > 0
-      ? [
-          columnHelper.accessor(row => row.grouping, {
-            id: 'grouping',
-            meta: {PrettyChipPosition: 'first'},
-            header: () => {
-              return 'Latest Course Part';
-            },
-            cell: prop => prop.getValue(),
-          }),
-        ]
-      : [];
+    // TODO: SHOULD USE THE VISIBILITY API
+    [
+      columnHelper.accessor(row => row.latestBestGrade, {
+        id: 'latestBestGrade',
+        meta: {PrettyChipPosition: 'first'},
+        header: () => {
+          return 'Latest Part Date';
+        },
+        cell: prop => prop.getValue(),
+      }),
+    ].filter(column => grouping.includes(column.id ?? ''));
 
   // Creating static columns
   const staticColumns = [
     ...groupingColumns,
+    // Selection Column
     columnHelper.display({
       id: 'select',
       size: 70,
@@ -350,7 +354,9 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     }),
     columnHelper.accessor(row => row.finalGrades ?? [], {
       header: 'Final Grade',
+      id: 'finalGrade',
       enableSorting: false,
+      getGroupingValue: row => findBestFinalGrade(row.finalGrades ?? [])?.grade,
       cell: ({getValue, row}) => (
         <FinalGradeCell
           userId={row.original.user.id}
@@ -426,16 +432,20 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         aggregatedCell: () => null,
       }
     ),
-    columnHelper.group({
-      header: 'Course parts',
-      meta: {PrettyChipPosition: 'alone'},
-      columns: gradeColumns,
-    }),
+    // columnHelper.group({
+    //   header: 'Attainments',
+    //   meta: {PrettyChipPosition: 'alone'},
+    //   columns: gradeColumns,
+    // }),
+    ...gradeColumns,
   ];
 
   const table = useReactTable({
     data: groupedData,
     columns: [...staticColumns],
+    defaultColumn: {
+      size: 100,
+    },
     getCoreRowModel: getCoreRowModel(),
     // Selection
     onRowSelectionChange: selection => {

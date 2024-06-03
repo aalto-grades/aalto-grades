@@ -71,7 +71,6 @@ describe('Tests for CourseResultsView components', () => {
       expect(screen.getByText('Student Number')).toBeVisible();
       expect(screen.getByText('Final Grade')).toBeVisible();
       expect(screen.getByText('Exported to Sisu')).toBeVisible();
-      expect(screen.getByText('Course parts')).toBeVisible();
       expect(screen.getByText('Exercise 1')).toBeVisible();
       expect(screen.getByText('Exercise 2')).toBeVisible();
       expect(screen.getByText('Exam')).toBeVisible();
@@ -86,7 +85,7 @@ describe('Tests for CourseResultsView components', () => {
       await userEvent.click(checkBox);
       expect(checkBox).toBeChecked();
 
-      const uploadOption = screen.getByText('Calculate final grades');
+      const uploadOption = screen.getByTestId('calculate-final-grades');
       expect(uploadOption).toBeVisible();
       await userEvent.click(uploadOption);
 

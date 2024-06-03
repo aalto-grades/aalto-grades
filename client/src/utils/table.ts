@@ -41,7 +41,7 @@ export const groupByLatestBestGrade = (
   // Array implementation
   const result: GroupedStudentRow[] = [];
   for (const row of gradesList) {
-    result.push({...row, grouping: findLatestBestGradeDate(row)});
+    result.push({...row, latestBestGrade: findLatestBestGradeDate(row)});
   }
   return result;
 };

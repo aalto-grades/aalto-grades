@@ -2,18 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ArrowBack} from '@mui/icons-material';
-import {
-  AppBar,
-  Box,
-  ButtonBase,
-  Icon,
-  ListItemText,
-  Toolbar,
-  Typography,
-  useTheme,
-} from '@mui/material';
-import {Link, NavLink, useParams} from 'react-router-dom';
+import {AppBar, Box, Typography, useTheme} from '@mui/material';
+import {NavLink, useParams} from 'react-router-dom';
 
 import UserButton from './auth/UserButton';
 import {useGetCourse} from '../hooks/useApi';
@@ -32,23 +22,30 @@ const Header = (): JSX.Element => {
           boxShadow: 'none',
           //   color: theme.vars.palette.primary.main,
           color: 'black',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          flexDirection: 'row',
+          px: 3,
         }}
       >
-        <Toolbar>
-          <Typography
-            variant="h5"
-            component={Link}
-            to="/"
-            sx={{
-              textDecoration: 'none',
-              mr: 2,
-              width: '184px',
-              cursor: 'pointer',
-            }}
-          >
-            A! Grades
-          </Typography>
-          <Box
+        <Typography
+          variant="h2"
+          component={NavLink}
+          to="/"
+          sx={{
+            textDecoration: 'none',
+            mr: 2,
+            width: '184px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            color: 'primary.main',
+          }}
+          unstable_viewTransition
+        >
+          A! Grades
+        </Typography>
+        {/* <Box
             sx={{
               //   //   backgroundColor: theme.vars.palette.background.paper,
               //   //   backgroundColor: theme.vars.palette.background.paper,
@@ -83,7 +80,7 @@ const Header = (): JSX.Element => {
                       // width: '100%',
                       py: '0px',
                       px: 1,
-                      borderRadius: 3,
+                      borderRadius: '8px',
                       border: '1px solid black',
                       fontSize: '1rem',
                       textAlign: 'left',
@@ -106,30 +103,87 @@ const Header = (): JSX.Element => {
                 );
               }}
             </NavLink>
-          </Box>
+          </Box> */}
 
-          {course.data && (
+        {course.data && (
+          <>
             <Box
               sx={{
-                //   backgroundColor: theme.vars.palette.background.paper,
+                // backgroundColor: theme.vars.palette.background.paper,
                 backgroundColor: theme.vars.palette.background.paper,
-                px: 1.2,
-                py: 0.2,
+                px: 2,
+                py: 0,
+                mr: 1,
                 //   border: '1px solid gray',
                 width: 'fit-content',
                 borderRadius: '15px',
                 // translateY: '-50%',
                 height: '40px',
+                alignItems: 'center',
               }}
             >
               <span
-                style={{display: 'flex', alignItems: 'center', height: '100%'}}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  height: '100%',
+                }}
               >
-                <div
+                {/* <div
+                style={{
+                  padding: '0px 5px',
+                  border: '1px solid black',
+                  borderRadius: '8px',
+                  marginRight: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  viewTransitionName: `code-${course.data.id}`,
+                  minWidth: 'fit-content',
+                  maxWidth: 'fit-content',
+                }}
+              >
+                <Typography align="left">{course.data.courseCode}</Typography>
+              </div> */}
+
+                <Typography
+                  align="left"
+                  variant="body1"
+                  sx={{color: 'primary.main'}}
+                >
+                  <b>{course.data.courseCode}</b>
+                </Typography>
+              </span>
+            </Box>
+            <Typography variant="h2" sx={{mr: 1}}>
+              {' - '}
+            </Typography>
+            <Box
+              sx={{
+                // backgroundColor: theme.vars.palette.background.paper,
+                backgroundColor: theme.vars.palette.background.paper,
+                px: 2,
+                py: 0,
+                mr: 1,
+                //   border: '1px solid gray',
+                width: 'fit-content',
+                borderRadius: '15px',
+                // translateY: '-50%',
+                height: '40px',
+                alignItems: 'center',
+              }}
+            >
+              <span
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  height: '100%',
+                }}
+              >
+                {/* <div
                   style={{
                     padding: '0px 5px',
                     border: '1px solid black',
-                    borderRadius: '5px',
+                    borderRadius: '8px',
                     marginRight: '10px',
                     display: 'flex',
                     alignItems: 'center',
@@ -139,10 +193,10 @@ const Header = (): JSX.Element => {
                   }}
                 >
                   <Typography align="left">{course.data.courseCode}</Typography>
-                </div>
+                </div> */}
 
                 <Typography
-                  variant="h3"
+                  variant="h2"
                   align="left"
                   sx={{
                     viewTransitionName: `course-name-${course.data.id}`,
@@ -154,12 +208,19 @@ const Header = (): JSX.Element => {
                 >
                   {course.data.name.en}
                 </Typography>
+                {/* <Typography
+                    align="left"
+                    type="body2"
+                    sx={{color: 'primary.main', mr: 1}}
+                  >
+                    {course.data.courseCode}
+                  </Typography> */}
               </span>
             </Box>
-          )}
-          <Box sx={{flexGrow: 1}} />
-          <UserButton />
-        </Toolbar>
+          </>
+        )}
+        <Box sx={{flexGrow: 1}} />
+        <UserButton />
       </AppBar>
     </>
   );

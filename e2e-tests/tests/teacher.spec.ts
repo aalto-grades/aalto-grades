@@ -83,7 +83,7 @@ test.describe('Test Courses as Teacher', () => {
       .click();
     await expect(page.getByText('Days valid')).toBeVisible();
     await expect(page.getByText('Tier A')).toBeVisible();
-    await page.getByRole('button', {name: 'Add course part'}).click();
+    await page.getByRole('button', {name: 'Add New'}).click();
     await page.getByRole('textbox', {name: 'Name'}).fill('test Tier D');
     await page.getByRole('button', {name: 'Save'}).click();
     await page.getByRole('button', {name: 'Save'}).click();
