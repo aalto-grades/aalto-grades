@@ -331,23 +331,17 @@ const CoursePartsView = (): JSX.Element => {
           </>
         )}
 
-        {editRights && (
+        {editRights && unsavedChanges && (
           <>
-            {unsavedChanges && (
-              <>
-                <Button onClick={() => setUnsavedDialogOpen(true)}>
-                  Discard
-                </Button>
+            <Button onClick={() => setUnsavedDialogOpen(true)}>Discard</Button>
 
-                <Button
-                  onClick={handleSubmit}
-                  variant={unsavedChanges ? 'contained' : 'text'}
-                  disabled={editing}
-                >
-                  Save
-                </Button>
-              </>
-            )}
+            <Button
+              onClick={handleSubmit}
+              variant="contained"
+              disabled={editing}
+            >
+              Save
+            </Button>
           </>
         )}
       </Box>
