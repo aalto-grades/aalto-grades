@@ -578,6 +578,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                       }
                       onClick={() => setShowCalculateDialog(true)}
                       disabled={table.getSelectedRowModel().rows.length === 0}
+                      id="calculate-final-grades"
                     >
                       {missingFinalGrades
                         ? 'Calculate final grades'

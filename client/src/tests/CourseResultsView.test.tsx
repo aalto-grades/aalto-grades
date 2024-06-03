@@ -85,7 +85,7 @@ describe('Tests for CourseResultsView components', () => {
       await userEvent.click(checkBox);
       expect(checkBox).toBeChecked();
 
-      const uploadOption = screen.getByText('Calculate final grades');
+      const uploadOption = screen.getByTestId('calculate-final-grades');
       expect(uploadOption).toBeVisible();
       await userEvent.click(uploadOption);
 
