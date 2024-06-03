@@ -40,7 +40,7 @@ import {
   useGetGrades,
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {getCourseRole} from '../../utils';
+import {getCourseRole} from '../../utils/utils';
 import Graph from '../graph/Graph';
 
 type ParamsType = {courseId: string; modelId?: string; userId?: string};

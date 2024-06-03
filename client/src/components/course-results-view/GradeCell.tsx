@@ -10,7 +10,7 @@ import {JSX, useState} from 'react';
 import {CoursePartGradesData} from '@/common/types';
 import EditGradesDialog from './EditGradesDialog';
 import {useTableContext} from '../../context/useTableContext';
-import {findBestGrade, gradeIsExpired} from '../../utils';
+import {findBestGrade, gradeIsExpired} from '../../utils/bestGrade';
 
 type GradeCellProps = {
   studentNumber: string;

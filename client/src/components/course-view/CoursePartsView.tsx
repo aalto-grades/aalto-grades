@@ -56,7 +56,6 @@ const CoursePartsView = (): JSX.Element => {
   const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
   const [editing, setEditing] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
   const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false);
   const [aplusDialogOpen, setAplusDialogOpen] = useState<boolean>(false);
   const [unsavedDialogOpen, setUnsavedDialogOpen] = useState<boolean>(false);
@@ -307,7 +306,7 @@ const CoursePartsView = (): JSX.Element => {
             <Button
               onClick={handleSubmit}
               variant={unsavedChanges ? 'contained' : 'text'}
-              disabled={error || editing}
+              disabled={editing}
             >
               Save
             </Button>
@@ -325,26 +324,6 @@ const CoursePartsView = (): JSX.Element => {
           disableColumnSelector
           onRowEditStart={() => setEditing(true)}
           onRowEditStop={() => setEditing(false)}
-          processRowUpdate={updatedRow => {
-            setRows(oldRows =>
-              oldRows.map(row => (row.id === updatedRow.id ? updatedRow : row))
-            );
-            // TODO: do some validation. Code below is an example.
-            // for (const [key, val] of Object.entries(updatedRow)) {
-            //   if (key === 'id' || key === 'StudentNo') continue;
-            //   if ((val as number) < 0)
-            //     throw new Error('Value cannot be negative');
-            //   else if ((val as number) > 5000)
-            //     throw new Error('Value cannot be over 5000');
-            // }
-            // setSnackBar({message: 'Row saved!', severity: 'success'});
-            setError(false);
-            return updatedRow;
-          }}
-          onProcessRowUpdateError={(rowError: Error) => {
-            setError(true);
-            enqueueSnackbar(rowError.message, {variant: 'error'});
-          }}
         />
       </div>
     </>

@@ -19,7 +19,7 @@ import {JSX, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {z} from 'zod';
 
-import {GradingScale, StudentRow, SystemRole} from '@/common/types';
+import {StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateGraph} from '@/common/util/calculateGraph';
 import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
 import SisuDownloadDialog from './SisuDownloadDialog';
@@ -31,8 +31,9 @@ import {
   useGetGrades,
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {GradeSelectOption, findBestGrade} from '../../utils';
+import {GradeSelectOption, findBestGrade} from '../../utils/bestGrade';
 import {findLatestGrade} from '../../utils/table';
+import {getMaxFinalGrade} from '../../utils/utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import UploadDialog from '../course-view/UploadDialog';
 
@@ -162,19 +163,8 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       }))
     );
     for (const grade of Object.values(finalGrades)) {
-      let maxGrade;
-      switch (course.data.gradingScale) {
-        case GradingScale.Numerical:
-          maxGrade = 5;
-          break;
-        case GradingScale.PassFail:
-          maxGrade = 1;
-          break;
-        case GradingScale.SecondNationalLanguage:
-          maxGrade = 2;
-          break;
-      }
-      const Schema = z.number().int().min(0).max(maxGrade);
+      const maxFinalGrade = getMaxFinalGrade(course.data.gradingScale);
+      const Schema = z.number().int().min(0).max(maxFinalGrade);
       const result = Schema.safeParse(grade.finalGrade);
       if (!result.success) {
         enqueueSnackbar(`Invalid final grade ${grade.finalGrade}`, {

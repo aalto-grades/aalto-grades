@@ -62,7 +62,7 @@ import {
   NodeDataContext,
   NodeValuesContext,
 } from '../../context/GraphProvider';
-import {GradeSelectOption, findBestGrade} from '../../utils';
+import {GradeSelectOption, findBestGrade} from '../../utils/bestGrade';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 const nodeTypesMap = {

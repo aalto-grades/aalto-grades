@@ -8,7 +8,7 @@ import {JSX, useState} from 'react';
 import AddUserDialog from './AddUserDialog';
 import UsersTable from './UsersTable';
 
-// Assumes admin validation is already done TODO: maybe change in the future
+// Assumes admin validation is already done
 const UsersView = (): JSX.Element => {
   const [addOpen, setAddOpen] = useState<boolean>(false);
   return (

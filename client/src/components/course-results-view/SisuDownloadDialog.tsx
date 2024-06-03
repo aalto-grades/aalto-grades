@@ -31,7 +31,7 @@ import {useParams} from 'react-router-dom';
 
 import {FinalGradeData, Language, StudentRow} from '@/common/types';
 import {useDownloadSisuGradeCsv} from '../../hooks/useApi';
-import {sisuLanguageOptions} from '../../utils';
+import {sisuLanguageOptions} from '../../utils/utils';
 
 type DownloadOption = 'all' | 'exported' | 'unexported';
 

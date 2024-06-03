@@ -26,7 +26,7 @@ import {EditGradeData, GradeData, NewGrade} from '@/common/types';
 import {useTableContext} from '../../context/useTableContext';
 import {useAddGrades, useDeleteGrade, useEditGrade} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {findBestGrade} from '../../utils';
+import {findBestGrade} from '../../utils/bestGrade';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 type ColTypes = {
@@ -329,15 +329,10 @@ const EditGradesDialog = ({
                     row.id === updatedRow.id ? updatedRow : row
                   )
                 );
-                // // TODO: do some validation. Code below is an example.
-                // for (const [key, val] of Object.entries(updatedRow)) {
-                //   if (key === 'id' || key === 'StudentNo') continue;
-                //   if ((val as number) < 0)
-                //     throw new Error('Value cannot be negative');
-                //   else if ((val as number) > 5000)
-                //     throw new Error('Value cannot be over 5000');
-                // }
-                // enqueueSnackbar('Row saved!', {variant: 'success'});
+
+                if (updatedRow.expiryDate < updatedRow.date)
+                  throw new Error('Expiry date cannot be before date');
+
                 setError(false);
                 return updatedRow;
               }}
