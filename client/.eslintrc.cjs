@@ -17,7 +17,7 @@ module.exports = {
     'dist',
     '.eslintrc.cjs',
     'vite-env.d.ts',
-    'vite.config.ts',
+    // 'vite.config.ts',
   ],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'react-refresh'],

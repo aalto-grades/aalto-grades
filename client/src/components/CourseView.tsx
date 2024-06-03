@@ -37,17 +37,29 @@ const CourseView = (): JSX.Element => {
 
   return (
     <>
-      <Box style={{display: 'flex', height: '100%'}}>
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          gap: 2,
+        }}
+      >
         <Box
           sx={{
+            gridArea: 'side',
+
+            '--side-menu-width': '200px',
             display: courseId ? 'block' : 'none',
-            width: courseId ? '204px' : '0px',
-            minWidth: courseId ? '204px' : '0px',
+            width: courseId ? 'var(--side-menu-width)' : '0px',
+            minWidth: courseId ? 'var(--side-menu-width)' : '0px',
             // transition: 'all 0.3s',
             overflow: 'clip',
             viewTransitionName: 'side-menu',
-            mr: 2,
+            // mr: 2,
             boxSizing: 'border-box',
+            '& *': {
+              '--side-menu-width': '200px',
+            },
           }}
         >
           <SideMenu />
@@ -55,11 +67,15 @@ const CourseView = (): JSX.Element => {
 
         <Box
           sx={{
+            // gridArea: courseId ? 'inherith' : 'content',
+
             width: '100%',
             overflow: 'auto',
             backgroundColor: theme.vars.palette.background.paper,
             borderRadius: '15px',
-            padding: 2,
+            // padding: 3,
+            px: 2,
+            pt: 1,
             viewTransitionName: 'content',
           }}
         >
