@@ -25,8 +25,8 @@ import 'dayjs/locale/en-gb';
 import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
-import {AssessmentModelData, StudentRow} from '@/common/types';
-import {useGetAllAssessmentModels} from '../../hooks/useApi';
+import {GradingModelData, StudentRow} from '@/common/types';
+import {useGetAllGradingModels} from '../../hooks/useApi';
 import {GradeSelectOption} from '../../utils';
 
 type PropsType = {
@@ -50,20 +50,21 @@ const CalculateFinalGradesDialog = ({
   calculateFinalGrades,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const allAssessmentModels = useGetAllAssessmentModels(courseId);
+  const allGradingModels = useGetAllGradingModels(courseId);
 
   const [dateOverride, setDateOverride] = useState<boolean>(false);
   const [gradingDate, setGradingDate] = useState<Dayjs>(dayjs());
-  const [selectedModel, setSelectedModel] =
-    useState<AssessmentModelData | null>(null);
+  const [selectedModel, setSelectedModel] = useState<GradingModelData | null>(
+    null
+  );
 
   // Filter out archived models
   const modelList = useMemo(
     () =>
-      allAssessmentModels.data !== undefined
-        ? allAssessmentModels.data.filter(model => !model.archived)
+      allGradingModels.data !== undefined
+        ? allGradingModels.data.filter(model => !model.archived)
         : [],
-    [allAssessmentModels.data]
+    [allGradingModels.data]
   );
 
   useEffect(() => {
@@ -71,8 +72,8 @@ const CalculateFinalGradesDialog = ({
 
     let latestDate = new Date(1970, 0, 1);
     for (const row of selectedRows) {
-      for (const att of row.attainments) {
-        for (const grade of att.grades) {
+      for (const coursePart of row.courseParts) {
+        for (const grade of coursePart.grades) {
           if (grade.date.getTime() > latestDate.getTime())
             latestDate = grade.date;
         }
@@ -97,14 +98,14 @@ const CalculateFinalGradesDialog = ({
     if (success) onClose();
   };
 
-  const getWarning = (model: AssessmentModelData | null): string => {
+  const getWarning = (model: GradingModelData | null): string => {
     if (model === null) return '';
-    if (model.hasArchivedAttainments && model.hasDeletedAttainments)
-      return 'Assessment model contains deleted & archived attainments';
-    if (model.hasArchivedAttainments)
-      return 'Assessment model contains archived attainments';
-    if (model.hasDeletedAttainments)
-      return 'Assessment model contains deleted attainments';
+    if (model.hasArchivedCourseParts && model.hasDeletedCourseParts)
+      return 'Grading model contains deleted & archived course parts';
+    if (model.hasArchivedCourseParts)
+      return 'Grading model contains archived course parts';
+    if (model.hasDeletedCourseParts)
+      return 'Grading model contains deleted course parts';
     return '';
   };
 
@@ -124,7 +125,7 @@ const CalculateFinalGradesDialog = ({
           </Alert>
         )}
         <FormControl sx={{display: 'block'}}>
-          <InputLabel id="calculateGradesSelect">Assessment model</InputLabel>
+          <InputLabel id="calculateGradesSelect">Grading model</InputLabel>
           <Select
             sx={{width: '100%'}}
             labelId="calculateGradesSelect"
@@ -134,7 +135,7 @@ const CalculateFinalGradesDialog = ({
                 modelList.find(model => model.name === e.target.value)!
               );
             }}
-            label="Assessment model"
+            label="Grading model"
           >
             {modelList.map(model => (
               <MenuItem
@@ -148,8 +149,8 @@ const CalculateFinalGradesDialog = ({
         </FormControl>
         <Collapse
           in={
-            selectedModel?.hasDeletedAttainments ||
-            selectedModel?.hasArchivedAttainments
+            selectedModel?.hasDeletedCourseParts ||
+            selectedModel?.hasArchivedCourseParts
           }
         >
           <Alert sx={{mt: 1}} severity="warning">

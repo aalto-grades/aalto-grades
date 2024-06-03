@@ -34,7 +34,7 @@ import {
 import {GradeUploadColTypes} from './UploadDialog';
 
 type DateType = {
-  attainmentName: string;
+  coursePartName: string;
   completionDate: Dayjs;
   expirationDate: Dayjs;
 };
@@ -84,14 +84,14 @@ const UploadDialogConfirm = ({
 
   const handleCompletionDateChange = (
     newCompletionDate: Dayjs | null,
-    attainmentName: string
+    coursePartName: string
   ): void => {
     if (newCompletionDate === null) return;
 
     // Move expiration date the same amount as the new date
     setDates(oldDates =>
       oldDates.map(oldDate =>
-        oldDate.attainmentName === attainmentName
+        oldDate.coursePartName === coursePartName
           ? {
               ...oldDate,
               completionDate: newCompletionDate,
@@ -118,7 +118,7 @@ const UploadDialogConfirm = ({
           <AccordionDetails>
             {dates.length > nonEmptyCols.length && (
               <Alert severity="info" sx={{mb: 1}}>
-                Some attainments are hidden due to not having any data
+                Some course parts are hidden due to not having any data
               </Alert>
             )}
             <LocalizationProvider
@@ -129,7 +129,7 @@ const UploadDialogConfirm = ({
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Attainment</TableCell>
+                      <TableCell>Course part</TableCell>
                       <TableCell>Completion date</TableCell>
                       <TableCell>Expiration date</TableCell>
                     </TableRow>
@@ -137,11 +137,11 @@ const UploadDialogConfirm = ({
                   <TableBody>
                     {dates
                       .filter(date =>
-                        nonEmptyCols.includes(date.attainmentName)
+                        nonEmptyCols.includes(date.coursePartName)
                       )
                       .map(date => (
-                        <TableRow key={`dateRow-${date.attainmentName}`}>
-                          <TableCell>{date.attainmentName}</TableCell>
+                        <TableRow key={`dateRow-${date.coursePartName}`}>
+                          <TableCell>{date.coursePartName}</TableCell>
                           <TableCell>
                             <DatePicker
                               slotProps={{textField: {size: 'small'}}}
@@ -149,7 +149,7 @@ const UploadDialogConfirm = ({
                               onChange={value =>
                                 handleCompletionDateChange(
                                   value,
-                                  date.attainmentName
+                                  date.coursePartName
                                 )
                               }
                             />
@@ -171,8 +171,8 @@ const UploadDialogConfirm = ({
                               onChange={e =>
                                 setDates(oldDates =>
                                   oldDates.map(oldDate =>
-                                    oldDate.attainmentName ===
-                                      date.attainmentName && e !== null
+                                    oldDate.coursePartName ===
+                                      date.coursePartName && e !== null
                                       ? {...oldDate, expirationDate: e}
                                       : oldDate
                                   )

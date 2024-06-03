@@ -14,7 +14,7 @@ export const mockFinalGrades: FinalGradeData[] = [
       studentNumber: '325235',
     },
     courseId: 1,
-    assessmentModelId: 1,
+    gradingModelId: 1,
     grader: {
       id: 2,
       name: 'Timmy Teacher',
@@ -35,7 +35,7 @@ export const mockFinalGrades: FinalGradeData[] = [
       studentNumber: '826139',
     },
     courseId: 1,
-    assessmentModelId: 1,
+    gradingModelId: 1,
     grader: {
       id: 2,
       name: 'Timmy Teacher',

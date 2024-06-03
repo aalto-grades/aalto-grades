@@ -16,9 +16,9 @@ const users = readSql('users.sql');
 const courses = readSql('courses.sql');
 const courseRole = readSql('course_role.sql');
 const courseTranslation = readSql('course_translations.sql');
-const assessmentModel = readSql('assessment_model.sql');
-const attainment = readSql('attainment.sql');
-const attainmentGrade = readSql('attainment_grade.sql');
+const gradingModel = readSql('grading_model.sql');
+const coursePart = readSql('course_part.sql');
+const grade = readSql('attainment_grade.sql');
 const finalGrade = readSql('final_grade.sql');
 
 export default {
@@ -27,9 +27,9 @@ export default {
     try {
       await queryInterface.sequelize.query(users, {transaction});
       await queryInterface.sequelize.query(courses, {transaction});
-      await queryInterface.sequelize.query(assessmentModel, {transaction});
-      await queryInterface.sequelize.query(attainment, {transaction});
-      await queryInterface.sequelize.query(attainmentGrade, {transaction});
+      await queryInterface.sequelize.query(gradingModel, {transaction});
+      await queryInterface.sequelize.query(coursePart, {transaction});
+      await queryInterface.sequelize.query(grade, {transaction});
       await queryInterface.sequelize.query(finalGrade, {transaction});
       await queryInterface.sequelize.query(courseTranslation, {transaction});
       await queryInterface.sequelize.query(courseRole, {transaction});
@@ -46,8 +46,8 @@ export default {
       await queryInterface.bulkDelete('course_translation', {}, {transaction});
       await queryInterface.bulkDelete('final_grade', {}, {transaction});
       await queryInterface.bulkDelete('attainment_grade', {}, {transaction});
-      await queryInterface.bulkDelete('attainment', {}, {transaction});
-      await queryInterface.bulkDelete('assessment_model', {}, {transaction});
+      await queryInterface.bulkDelete('course_part', {}, {transaction});
+      await queryInterface.bulkDelete('grading_model', {}, {transaction});
       await queryInterface.bulkDelete('course', {}, {transaction});
       await queryInterface.bulkDelete('user', {}, {transaction});
 
@@ -62,12 +62,12 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'ALTER SEQUENCE assessment_model_id_seq RESTART;',
+        'ALTER SEQUENCE grading_model_id_seq RESTART;',
         {transaction}
       );
 
       await queryInterface.sequelize.query(
-        'ALTER SEQUENCE attainment_id_seq RESTART;',
+        'ALTER SEQUENCE course_part_id_seq RESTART;',
         {transaction}
       );
 

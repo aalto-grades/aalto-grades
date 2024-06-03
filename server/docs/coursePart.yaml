@@ -3,28 +3,28 @@
 # SPDX-License-Identifier: MIT
 ---
 definitions:
-  AttainmentId:
+  CoursePartId:
     type: integer
-    description: Internal attainment database ID.
+    description: Internal course part database ID.
     format: int32
     minimum: 1
     example: 1
 
-  AttainmentName:
+  CoursePartName:
     type: string
-    decription: Name of the attainment.
+    decription: Name of the course part.
     example: Exam
 
-  Attainment:
-    description: Course attainment information.
+  CoursePart:
+    description: Course part information.
     type: object
     properties:
       id:
-        $ref: '#/definitions/AttainmentId'
+        $ref: '#/definitions/CoursePartId'
       courseId:
         $ref: '#/definitions/CourseId'
       name:
-        $ref: '#/definitions/AttainmentName'
+        $ref: '#/definitions/CoursePartName'
       daysValid:
         type: number
         decription: Number of days valid.
@@ -32,7 +32,7 @@ definitions:
         example: 365
       archived:
         type: boolean
-        description: If attainment has been archived
+        description: If course part has been archived
         example: false
     required:
       - id
@@ -41,12 +41,12 @@ definitions:
       - daysValid
       - archived
 
-  NewAttainment:
-    description: Course attainment information.
+  NewCoursePart:
+    description: Course part information.
     type: object
     properties:
       name:
-        $ref: '#/definitions/AttainmentName'
+        $ref: '#/definitions/CoursePartName'
       daysValid:
         type: number
         decription: Number of days valid.
@@ -56,12 +56,12 @@ definitions:
       - name
       - daysValid
 
-  EditAttainment:
-    description: Course attainment information.
+  EditCoursePart:
+    description: Course part information.
     type: object
     properties:
       name:
-        $ref: '#/definitions/AttainmentName'
+        $ref: '#/definitions/CoursePartName'
       daysValid:
         type: number
         decription: Number of days valid.
@@ -69,24 +69,24 @@ definitions:
         example: 365
       archived:
         type: boolean
-        description: If attainment has been archived
+        description: If course part has been archived
         example: false
 
-/v1/courses/{courseId}/attainments:
+/v1/courses/{courseId}/parts:
   get:
-    tags: [Attainment]
-    description: Get all the attainments of a course.
+    tags: [Course Part]
+    description: Get all the course parts of a course.
     parameters:
       - $ref: '#/components/parameters/courseId'
     responses:
       200:
-        description: Returns all attainments of the course.
+        description: Returns all course parts of the course.
         content:
           application/json:
             schema:
               type: array
               items:
-                $ref: '#/definitions/Attainment'
+                $ref: '#/definitions/CoursePart'
       400:
         $ref: '#/components/responses/BadRequest'
       401:
@@ -98,9 +98,9 @@ definitions:
     security:
       - cookieAuth: []
   post:
-    tags: [Attainment]
+    tags: [Course Part]
     description: >
-      Add an attainment to the course.
+      Add a course part to the course.
       Available only to admin users and teachers in charge of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
@@ -108,14 +108,14 @@ definitions:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/NewAttainment'
+            $ref: '#/definitions/NewCoursePart'
     responses:
       201:
-        description: Attainment created.
+        description: Course part created.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/AttainmentId'
+              $ref: '#/definitions/CoursePartId'
       400:
         $ref: '#/components/responses/BadRequest'
       401:
@@ -129,23 +129,23 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/courses/{courseId}/attainments/{attainmentId}:
+/v1/courses/{courseId}/parts/{coursePartId}:
   put:
-    tags: [Attainment]
+    tags: [Course Part]
     description: >
-      Edit specified attainment.
+      Edit specified course part.
       Available only to admin users and teachers in charge of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/attainmentId'
+      - $ref: '#/components/parameters/coursePartId'
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/EditAttainment'
+            $ref: '#/definitions/EditCoursePart'
     responses:
       200:
-        description: Attainment updated.
+        description: CoursePart updated.
       400:
         $ref: '#/components/responses/BadRequest'
       401:
@@ -159,16 +159,16 @@ definitions:
     security:
       - cookieAuth: []
   delete:
-    tags: [Attainment]
+    tags: [Course Part]
     description: >
-      Delete specified attainment.
+      Delete specified course part.
       Available only to admin users and teachers in charge of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/attainmentId'
+      - $ref: '#/components/parameters/coursePartId'
     responses:
       200:
-        description: Attainment deleted.
+        description: CoursePart deleted.
       400:
         $ref: '#/components/responses/BadRequest'
       401:

@@ -111,6 +111,7 @@ export default {
         {transaction}
       );
 
+      // Renamed to grading_model in the future
       await queryInterface.createTable(
         'assessment_model',
         {
@@ -143,6 +144,7 @@ export default {
         {transaction}
       );
 
+      // Renamed to course_part in the future
       await queryInterface.createTable(
         'attainment',
         {

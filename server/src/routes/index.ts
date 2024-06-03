@@ -9,12 +9,12 @@ import swaggerJsdoc, {OAS3Options} from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
 import {router as aplusRouter} from './aplus';
-import {router as assessmentModelRouter} from './assessmentModel';
-import {router as attainmentRouter} from './attainment';
 import {router as authRouter} from './auth';
 import {router as courseRouter} from './course';
+import {router as coursePartRouter} from './coursePart';
 import {router as finalGradesRouter} from './finalGrades';
 import {router as gradesRouter} from './grades';
+import {router as gradingModelRouter} from './gradingModel';
 import {router as userRouter} from './user';
 import {FRONTEND_ORIGIN} from '../configs/environment';
 import {definition} from '../configs/swagger';
@@ -30,12 +30,12 @@ export const router: Router = Router();
 
 router.use(cookieParser());
 router.use(aplusRouter);
-router.use(assessmentModelRouter);
-router.use(attainmentRouter);
 router.use(authRouter);
+router.use(coursePartRouter);
 router.use(courseRouter);
 router.use(finalGradesRouter);
 router.use(gradesRouter);
+router.use(gradingModelRouter);
 router.use(userRouter);
 
 router.use('/api-docs', swaggerUI.serve);

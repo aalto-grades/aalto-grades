@@ -3,24 +3,24 @@
 # SPDX-License-Identifier: MIT
 ---
 definitions:
-  AssessmentModelId:
+  GradingModelId:
     type: integer
-    description: Internal assessment model database ID.
+    description: Internal grading model database ID.
     format: int32
     minimum: 1
     example: 1
 
-  AssessmentModelData:
+  GradingModelData:
     type: object
-    description: Assessment model information.
+    description: Grading model information.
     properties:
       id:
-        $ref: '#/definitions/AssessmentModelId'
+        $ref: '#/definitions/GradingModelId'
       courseId:
         $ref: '#/definitions/CourseId'
       name:
         type: string
-        decription: Name of the assessment model.
+        decription: Name of the grading model.
         example: Main model
       graphStructure:
         type: object
@@ -28,15 +28,15 @@ definitions:
         example: {'nodes': [], 'edges': [], 'nodeData': {}}
       archived:
         type: boolean
-        description: If assessment model has been archived
+        description: If grading model has been archived
         example: false
-      hasArchivedAttainments:
+      hasArchivedCourseParts:
         type: boolean
-        description: If assessment model has archived attainments
+        description: If grading model has archived course parts
         example: false
-      hasDeletedAttainments:
+      hasDeletedCourseParts:
         type: boolean
-        description: If assessment model has deleted attainments
+        description: If grading model has deleted course parts
         example: false
     required:
       - id
@@ -44,16 +44,16 @@ definitions:
       - name
       - graphStructure
       - archived
-      - hasArchivedAttainments
-      - hasDeletedAttainments
+      - hasArchivedCourseParts
+      - hasDeletedCourseParts
 
-  NewAssessmentModelData:
+  NewGradingModelData:
     type: object
-    description: Assessment model information.
+    description: Grading model information.
     properties:
       name:
         type: string
-        decription: Name of the assessment model.
+        decription: Name of the grading model.
         example: Main model
       graphStructure:
         type: object
@@ -63,13 +63,13 @@ definitions:
       - name
       - graphStructure
 
-  EditAssessmentModelData:
+  EditGradingModelData:
     type: object
-    description: Assessment model information.
+    description: Grading model information.
     properties:
       name:
         type: string
-        decription: Name of the assessment model.
+        decription: Name of the grading model.
         example: Main model
       graphStructure:
         type: object
@@ -77,23 +77,23 @@ definitions:
         example: {'nodes': [], 'edges': [], 'nodeData': {}}
       archived:
         type: boolean
-        description: If assessment model has been archived
+        description: If grading model has been archived
         example: false
 
-/v1/courses/{courseId}/assessment-models/{assessmentModelId}:
+/v1/courses/{courseId}/grading-models/{gradingModelId}:
   get:
-    tags: [Assessment Model]
-    description: Get information about an assessment model.
+    tags: [Grading Model]
+    description: Get information about a grading model.
     parameters:
       - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
+      - $ref: '#/components/parameters/gradingModelId'
     responses:
       200:
-        description: Returns assessment model with given ID.
+        description: Returns grading model with given ID.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/AssessmentModelData'
+              $ref: '#/definitions/GradingModelData'
       400:
         $ref: '#/components/responses/BadRequest'
       401:
@@ -107,21 +107,21 @@ definitions:
     security:
       - cookieAuth: []
   put:
-    tags: [Assessment Model]
+    tags: [Grading Model]
     description: >
-      Edit specified attainment model.
+      Edit specified grading model.
       Available only to admin users and teacers of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
+      - $ref: '#/components/parameters/gradingModelId'
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/EditAssessmentModelData'
+            $ref: '#/definitions/EditGradingModelData'
     responses:
       200:
-        description: Assessment model updated
+        description: Grading model updated
       400:
         $ref: '#/components/responses/BadRequest'
       401:
@@ -135,16 +135,16 @@ definitions:
     security:
       - cookieAuth: []
   delete:
-    tags: [Assessment Model]
+    tags: [Grading Model]
     description: >
-      Deletes specified attainment model.
+      Deletes specified grading model.
       Available only to admin users and teacers of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/assessmentModelId'
+      - $ref: '#/components/parameters/gradingModelId'
     responses:
       200:
-        description: Assessment model deleted
+        description: Grading model deleted
       400:
         $ref: '#/components/responses/BadRequest'
       401:
@@ -158,23 +158,23 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/courses/{courseId}/assessment-models:
+/v1/courses/{courseId}/grading-models:
   get:
-    tags: [Assessment Model]
+    tags: [Grading Model]
     description: >
-      Get all the assessment models of a course.
+      Get all the grading models of a course.
       Available only to admin users and teacers and assistants of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
     responses:
       200:
-        description: Returns all assessment models of the course
+        description: Returns all grading models of the course
         content:
           application/json:
             schema:
               type: array
               items:
-                $ref: '#/definitions/AssessmentModelData'
+                $ref: '#/definitions/GradingModelData'
       400:
         $ref: '#/components/responses/BadRequest'
       401:
@@ -186,9 +186,9 @@ definitions:
     security:
       - cookieAuth: []
   post:
-    tags: [Assessment Model]
+    tags: [Grading Model]
     description: >
-      Add an attainment model to a course.
+      Add a grading model to a course.
       Available only to admin users and teacers of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
@@ -196,14 +196,14 @@ definitions:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/NewAssessmentModelData'
+            $ref: '#/definitions/NewGradingModelData'
     responses:
       201:
-        description: Assessment model created
+        description: Grading model created
         content:
           application/json:
             schema:
-              $ref: '#/definitions/AssessmentModelId'
+              $ref: '#/definitions/GradingModelId'
       400:
         $ref: '#/components/responses/BadRequest'
       401:

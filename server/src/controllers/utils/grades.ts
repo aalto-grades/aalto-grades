@@ -5,19 +5,18 @@
 import {Includeable, Op} from 'sequelize';
 
 import {HttpCode} from '@/common/types';
-import {findAttainmentById} from './attainment';
 import {findAndValidateCourseId, findCourseById} from './course';
+import {findCoursePartById} from './coursePart';
 import logger from '../../configs/winston';
-import Attainment from '../../database/models/attainment';
 import AttainmentGrade from '../../database/models/attainmentGrade';
 import Course from '../../database/models/course';
+import CoursePart from '../../database/models/coursePart';
 import FinalGrade from '../../database/models/finalGrade';
 import User from '../../database/models/user';
 import {ApiError, stringToIdSchema} from '../../types';
 
 /**
- * Retrieves the date of the latest grade for a user based on an assessment
- * model ID.
+ * Retrieves the date of the latest grade for a user based on a course ID.
  *
  * @throws ApiError(400) if there are no grades for the user.
  */
@@ -27,12 +26,7 @@ export const getDateOfLatestGrade = async (
 ): Promise<Date> => {
   const grades = await AttainmentGrade.findAll({
     where: {userId: userId},
-    include: [
-      {
-        model: Attainment,
-        where: {courseId: courseId},
-      },
-    ],
+    include: [{model: CoursePart, where: {courseId: courseId}}],
   });
 
   const dates = grades.map(grade => new Date(grade.date));
@@ -133,30 +127,24 @@ export const getFinalGradesFor = async (
 };
 
 /**
- * Finds an attainment grade by its ID.
+ * Finds a grade by its ID.
  *
  * @throws ApiError(404) if not found.
  */
-export const findAttainmentGradeById = async (
-  id: number
-): Promise<AttainmentGrade> => {
-  const attainment = await AttainmentGrade.findByPk(id);
-  if (attainment === null) {
-    throw new ApiError(
-      `Attainment grade with ID ${id} not found`,
-      HttpCode.NotFound
-    );
+export const findGradeById = async (id: number): Promise<AttainmentGrade> => {
+  const grade = await AttainmentGrade.findByPk(id);
+  if (grade === null) {
+    throw new ApiError(`Grade with ID ${id} not found`, HttpCode.NotFound);
   }
-  return attainment;
+  return grade;
 };
 
 /**
- * Finds an attainment grade by id and also validates that it belongs to the
- * correct course.
+ * Finds a grade by id and also validates that it belongs to the correct course.
  *
  * @throws ApiError(400|404|409) if invalid ids, not found, or didn't match.
  */
-export const findAndValidateAttainmentGradePath = async (
+export const findAndValidateGradePath = async (
   courseId: string,
   gradeId: string
 ): Promise<[Course, AttainmentGrade]> => {
@@ -165,15 +153,15 @@ export const findAndValidateAttainmentGradePath = async (
     throw new ApiError(`Invalid grade ID ${gradeId}`, HttpCode.BadRequest);
   }
   const targetCourse = await findAndValidateCourseId(courseId);
-  const grade = await findAttainmentGradeById(result.data);
+  const grade = await findGradeById(result.data);
 
-  const attainment = await findAttainmentById(grade.attainmentId);
-  const course = await findCourseById(attainment.courseId);
+  const coursePart = await findCoursePartById(grade.coursePartId);
+  const course = await findCourseById(coursePart.courseId);
 
-  // Check that assessment model belongs to the course.
+  // Check that grading model belongs to the course.
   if (course.id !== targetCourse.id) {
     throw new ApiError(
-      `Attainment grade with ID ${gradeId} ` +
+      `Grade with ID ${gradeId} ` +
         `does not belong to the course with ID ${courseId}`,
       HttpCode.Conflict
     );

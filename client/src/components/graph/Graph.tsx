@@ -30,9 +30,9 @@ import {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import {AttainmentData, AttainmentGradesData} from '@/common/types';
+import {CoursePartData, CoursePartGradesData} from '@/common/types';
 import {
-  AttainmentNodeValue,
+  CoursePartNodeValue,
   CustomNodeTypes,
   DropInNodes,
   FullNodeData,
@@ -43,15 +43,15 @@ import {
 } from '@/common/types/graph';
 import {calculateNewNodeValues, initNode} from '@/common/util/calculateGraph';
 import AdditionNode from './AdditionNode';
-import AttanmentNode from './AttainmentNode';
-import AttainmentValuesDialog from './AttainmentValuesDialog';
 import AverageNode from './AverageNode';
+import CoursePartNode from './CoursePartNode';
+import CoursePartValuesDialog from './CoursePartValuesDialog';
 import GradeNode from './GradeNode';
 import MaxNode from './MaxNode';
 import MinPointsNode from './MinPointsNode';
 import RequireNode from './RequireNode';
 import RoundNode from './RoundNode';
-import SelectAttainmentsDialog from './SelectAttainmentsDialog';
+import SelectCoursePartsDialog from './SelectCoursePartsDialog';
 import StepperNode from './StepperNode';
 import SubstituteNode from './SubstituteNode';
 import './flow.scss';
@@ -67,7 +67,7 @@ import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 const nodeTypesMap = {
   addition: AdditionNode,
-  attainment: AttanmentNode,
+  coursepart: CoursePartNode,
   average: AverageNode,
   grade: GradeNode,
   max: MaxNode,
@@ -80,15 +80,15 @@ const nodeTypesMap = {
 
 type GraphProps = {
   initGraph: GraphStructure;
-  attainments: {id: number; name: string; archived: boolean}[];
-  userGrades: AttainmentGradesData[] | null;
+  courseParts: {id: number; name: string; archived: boolean}[];
+  userGrades: CoursePartGradesData[] | null;
   gradeSelectOption?: GradeSelectOption;
   onSave?: (graphStructure: GraphStructure) => Promise<void>;
   readOnly?: boolean;
 };
 const Graph = ({
   initGraph,
-  attainments,
+  courseParts,
   userGrades,
   gradeSelectOption,
   onSave,
@@ -114,11 +114,12 @@ const Graph = ({
   );
 
   const [unsaved, setUnsaved] = useState<boolean>(false);
-  const [attainmentsSelectOpen, setAttainmentsSelectOpen] =
+  const [coursePartsSelectOpen, setCoursePartsSelectOpen] =
     useState<boolean>(false);
-  const [attainmentValuesOpen, setAttainmentValuesOpen] =
+  const [coursePartValuesOpen, setCoursePartValuesOpen] =
     useState<boolean>(false);
-  const [delAttainments, setDelAttainments] = useState<string[]>([]); // Att nodes that the user is allowed to delete
+  // Course part nodes that the user is allowed to delete
+  const [delCourseParts, setDelCourseParts] = useState<string[]>([]);
   const [originalGraphStructure, setOriginalGraphStructure] =
     useState<GraphStructure>({nodes: [], edges: [], nodeData: {}});
 
@@ -242,33 +243,35 @@ const Graph = ({
 
     // Timeout to prevent nodes updating with missing data
     setTimeout(() => {
-      // Check for deleted & archived attainments (edit extra data)
+      // Check for deleted & archived course parts (edit extra data)
       for (const node of initGraph.nodes) {
-        if (node.type !== 'attainment') continue;
-        const attainmentId = parseInt(node.id.split('-')[1]);
+        if (node.type !== 'coursepart') continue;
+        const coursePartId = parseInt(node.id.split('-')[1]);
 
-        const attainment = attainments.find(att => att.id === attainmentId);
-        if (attainment === undefined) {
+        const nodeCoursePart = courseParts.find(
+          coursePart => coursePart.id === coursePartId
+        );
+        if (nodeCoursePart === undefined) {
           setExtraNodeData(oldExtraNodeData => ({
             ...oldExtraNodeData,
             [node.id]: {
               ...oldExtraNodeData[node.id],
-              warning: 'Attainment has been deleted',
+              warning: 'Course part has been deleted',
             },
           }));
-          setDelAttainments(oldDelAttainments =>
-            oldDelAttainments.concat(node.id)
+          setDelCourseParts(oldDelCourseParts =>
+            oldDelCourseParts.concat(node.id)
           );
-        } else if (attainment.archived) {
+        } else if (nodeCoursePart.archived) {
           setExtraNodeData(oldExtraNodeData => ({
             ...oldExtraNodeData,
             [node.id]: {
               ...oldExtraNodeData[node.id],
-              warning: 'Attainment is archived',
+              warning: 'Course part is archived',
             },
           }));
-          setDelAttainments(oldArchivedAttainments =>
-            oldArchivedAttainments.concat(node.id)
+          setDelCourseParts(oldArchivedCourseParts =>
+            oldArchivedCourseParts.concat(node.id)
           );
         }
       }
@@ -299,15 +302,15 @@ const Graph = ({
     const newNodeValues = {...nodeValues};
     let change = false;
 
-    for (const attainment of userGrades) {
-      const attId = `attainment-${attainment.attainmentId}`;
-      if (!(attId in newNodeValues)) continue;
+    for (const coursePart of userGrades) {
+      const coursePartId = `coursepart-${coursePart.coursePartId}`;
+      if (!(coursePartId in newNodeValues)) continue;
 
-      const newValue = newNodeValues[attId] as AttainmentNodeValue;
+      const newValue = newNodeValues[coursePartId] as CoursePartNodeValue;
       const bestGrade =
-        attainment.grades.length === 0
+        coursePart.grades.length === 0
           ? 0
-          : findBestGrade(attainment.grades, {gradeSelectOption})!.grade;
+          : findBestGrade(coursePart.grades, {gradeSelectOption})!.grade;
       if (newValue.value !== bestGrade) {
         newValue.source = bestGrade;
         change = true;
@@ -373,34 +376,34 @@ const Graph = ({
     setNodes(await formatGraph(nodes, edges, nodeValues));
   };
 
-  const handleAttainmentSelect = (
-    newAttainments: AttainmentData[],
-    removedAttainments: AttainmentData[]
+  const handleCoursePartSelect = (
+    newCourseParts: CoursePartData[],
+    removedCourseParts: CoursePartData[]
   ): void => {
-    setAttainmentsSelectOpen(false);
+    setCoursePartsSelectOpen(false);
 
     let newNodes = [...nodes];
     let newEdges = [...edges];
     const newNodeValues = {...nodeValues};
     const newNodeData = {...nodeData};
 
-    for (const attainment of newAttainments) {
+    for (const coursePart of newCourseParts) {
       newNodes.push({
-        id: `attainment-${attainment.id}`,
-        type: 'attainment',
+        id: `coursepart-${coursePart.id}`,
+        type: 'coursepart',
         position: {x: 0, y: 100 * newNodes.length},
         data: {},
       });
-      newNodeData[`attainment-${attainment.id}`] = {
-        title: attainment.name,
+      newNodeData[`coursepart-${coursePart.id}`] = {
+        title: coursePart.name,
         settings: {minPoints: 0, onFailSetting: 'coursefail'},
       };
-      newNodeValues[`attainment-${attainment.id}`] =
-        initNode('attainment').value;
+      newNodeValues[`coursepart-${coursePart.id}`] =
+        initNode('coursepart').value;
     }
 
-    for (const attainment of removedAttainments) {
-      const nodeId = `attainment-${attainment.id}`;
+    for (const coursePart of removedCourseParts) {
+      const nodeId = `coursepart-${coursePart.id}`;
       newNodes = newNodes.filter(nnode => nnode.id !== nodeId);
       newEdges = newEdges.filter(edge => edge.source !== nodeId);
     }
@@ -409,20 +412,20 @@ const Graph = ({
     setEdges(newEdges);
     setNodeData(newNodeData);
     setNodeValues(newNodeValues);
-    if (newAttainments.length > 0) {
+    if (newCourseParts.length > 0) {
       setTimeout(() => {
         reactFlowInstance?.fitView();
       }, 0);
     }
   };
 
-  const handleSetAttainmentValues = (attainmentValues: {
+  const handleSetCoursePartValues = (coursePartValues: {
     [key: number]: number;
   }): void => {
     const newNodeValues = {...nodeValues};
-    for (const [attId, value] of Object.entries(attainmentValues)) {
-      const nodeValue = newNodeValues[`attainment-${attId}`];
-      if (nodeValue.type === 'attainment') nodeValue.source = value;
+    for (const [coursePartId, value] of Object.entries(coursePartValues)) {
+      const nodeValue = newNodeValues[`coursepart-${coursePartId}`];
+      if (nodeValue.type === 'coursepart') nodeValue.source = value;
     }
     setNodeValues(newNodeValues);
   };
@@ -516,20 +519,20 @@ const Graph = ({
         handleDiscard={blocker.proceed ?? (() => {})}
         dontCloseOnDiscard
       />
-      <SelectAttainmentsDialog
+      <SelectCoursePartsDialog
         nodes={nodes}
-        attainments={attainments}
-        open={attainmentsSelectOpen}
-        handleAttainmentSelect={handleAttainmentSelect}
-        onClose={() => setAttainmentsSelectOpen(false)}
+        courseParts={courseParts}
+        open={coursePartsSelectOpen}
+        handleCoursePartSelect={handleCoursePartSelect}
+        onClose={() => setCoursePartsSelectOpen(false)}
       />
-      <AttainmentValuesDialog
+      <CoursePartValuesDialog
         nodes={nodes}
         nodeValues={nodeValues}
-        attainments={attainments}
-        open={attainmentValuesOpen}
-        onClose={() => setAttainmentValuesOpen(false)}
-        handleSetAttainmentValues={handleSetAttainmentValues}
+        courseParts={courseParts}
+        open={coursePartValuesOpen}
+        onClose={() => setCoursePartValuesOpen(false)}
+        handleSetCoursePartValues={handleSetCoursePartValues}
       />
       <NodeValuesContext.Provider value={{nodeValues}}>
         <ExtraNodeDataContext.Provider value={{extraNodeData}}>
@@ -545,8 +548,8 @@ const Graph = ({
                     changes.filter(
                       change =>
                         change.type !== 'remove' ||
-                        delAttainments.includes(change.id) ||
-                        (nodeMap[change.id].type !== 'attainment' &&
+                        delCourseParts.includes(change.id) ||
+                        (nodeMap[change.id].type !== 'coursepart' &&
                           nodeMap[change.id].type !== 'grade')
                     )
                   )
@@ -637,13 +640,13 @@ const Graph = ({
                 <Divider sx={{my: 1}} />
                 <div style={{float: 'left'}}>
                   <Button
-                    onClick={() => setAttainmentsSelectOpen(true)}
+                    onClick={() => setCoursePartsSelectOpen(true)}
                     variant="outlined"
                   >
-                    Select Attainments
+                    Select Course Parts
                   </Button>
                   <Button
-                    onClick={() => setAttainmentValuesOpen(true)}
+                    onClick={() => setCoursePartValuesOpen(true)}
                     variant="outlined"
                     sx={{ml: 1}}
                   >

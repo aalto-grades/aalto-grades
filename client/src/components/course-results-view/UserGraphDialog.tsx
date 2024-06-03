@@ -16,35 +16,36 @@ import {
 import {JSX, useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
-import {AssessmentModelData} from '@/common/types';
+import {GradingModelData} from '@/common/types';
 import {GroupedStudentRow} from '../../context/GradesTableProvider';
 import {useTableContext} from '../../context/useTableContext';
-import {useGetAttainments} from '../../hooks/useApi';
+import {useGetCourseParts} from '../../hooks/useApi';
 import Graph from '../graph/Graph';
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
-  assessmentModels: AssessmentModelData[] | undefined;
+  gradingModels: GradingModelData[] | undefined;
   row: GroupedStudentRow | null;
 };
 const UserGraphDialog = ({
   open,
   onClose,
-  assessmentModels,
+  gradingModels,
   row,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const {gradeSelectOption} = useTableContext();
-  const attainments = useGetAttainments(courseId);
+  const courseParts = useGetCourseParts(courseId);
 
-  const [selectedModel, setSelectedModel] =
-    useState<AssessmentModelData | null>(null);
+  const [selectedModel, setSelectedModel] = useState<GradingModelData | null>(
+    null
+  );
 
   useEffect(() => {
-    if (assessmentModels !== undefined && assessmentModels.length > 0)
-      setSelectedModel(assessmentModels[0]);
-  }, [assessmentModels]);
+    if (gradingModels !== undefined && gradingModels.length > 0)
+      setSelectedModel(gradingModels[0]);
+  }, [gradingModels]);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
@@ -52,44 +53,43 @@ const UserGraphDialog = ({
       <DialogContent>
         {row === null ? (
           <>Data is undefined</>
-        ) : selectedModel === null || attainments.data === undefined ? (
+        ) : selectedModel === null || courseParts.data === undefined ? (
           <>Loading</>
         ) : (
           <Graph
             initGraph={selectedModel.graphStructure}
-            attainments={row.attainments.map(rowAtt => ({
-              id: rowAtt.attainmentId,
-              name: rowAtt.attainmentName,
+            courseParts={row.courseParts.map(rowCoursePart => ({
+              id: rowCoursePart.coursePartId,
+              name: rowCoursePart.coursePartName,
               archived:
-                attainments.data.find(att => att.id === rowAtt.attainmentId)
-                  ?.archived ?? false,
+                courseParts.data.find(
+                  coursePart => coursePart.id === rowCoursePart.coursePartId
+                )?.archived ?? false,
             }))}
-            userGrades={row.attainments}
+            userGrades={row.courseParts}
             gradeSelectOption={gradeSelectOption}
             readOnly
           />
         )}
       </DialogContent>
       <DialogActions>
-        {assessmentModels !== undefined && assessmentModels.length > 0 && (
+        {gradingModels !== undefined && gradingModels.length > 0 && (
           <FormControl size="small">
-            <InputLabel id="assessment-model-select-label">
-              Assessment model
+            <InputLabel id="grading-model-select-label">
+              Grading model
             </InputLabel>
             <Select
               sx={{minWidth: '150px'}}
-              labelId="assessment-model-select-label"
-              value={selectedModel?.id ?? assessmentModels[0].id}
-              label="Assessment model"
+              labelId="grading-model-select-label"
+              value={selectedModel?.id ?? gradingModels[0].id}
+              label="Grading model"
               onChange={event => {
                 setSelectedModel(
-                  assessmentModels.find(
-                    model => model.id === event.target.value
-                  )!
+                  gradingModels.find(model => model.id === event.target.value)!
                 );
               }}
             >
-              {assessmentModels.map(model => (
+              {gradingModels.map(model => (
                 <MenuItem key={model.id} value={model.id}>
                   {model.name}
                 </MenuItem>

@@ -134,8 +134,8 @@ const SideMenu = (): JSX.Element => {
           IconOutlined={AccountTreeOutlined}
         />
         <SideMenuButton
-          text="Attainments"
-          to={`/${courseId}/attainments`}
+          text="Course parts"
+          to={`/${courseId}/course-parts`}
           Icon={Widgets}
           IconOutlined={WidgetsOutlined}
         />

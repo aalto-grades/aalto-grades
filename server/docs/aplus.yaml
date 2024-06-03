@@ -78,10 +78,10 @@ definitions:
 
   NewAplusGradeSourceData:
     type: object
-    description: Information to add a new A+ grade source to an attainment.
+    description: Information to add a new A+ grade source to a course part.
     properties:
-      attainmentId:
-        $ref: '#/definitions/AttainmentId'
+      coursePartId:
+        $ref: '#/definitions/CoursePartId'
       aplusCourseId:
         $ref: '#/definitions/AplusCourseId'
       sourceType:
@@ -91,7 +91,7 @@ definitions:
       difficulty:
         $ref: '#/definitions/AplusDifficulty'
     required:
-      - attainmentId
+      - coursePartId
       - aplusCourseId
       - sourceType
 
@@ -147,7 +147,7 @@ definitions:
 /v1/courses/{courseId}/aplus-source:
   post:
     tags: [A+]
-    description: Add A+ grade sources to attainments.
+    description: Add A+ grade sources to course parts.
     parameters:
       - $ref: '#/components/parameters/courseId'
     requestBody:
@@ -176,17 +176,17 @@ definitions:
 /v1/courses/{courseId}/aplus-fetch:
   get:
     tags: [A+]
-    description: Fetch grades from A+ for the given attainments.
+    description: Fetch grades from A+ for the given course parts.
     parameters:
       - $ref: '#/components/parameters/courseId'
       - in: query
-        name: attainments
+        name: course parts
         schema:
           type: array
-          description: List of attainment IDs.
+          description: List of course part IDs.
           example: [1, 2, 3]
           items:
-            $ref: '#/definitions/AttainmentId'
+            $ref: '#/definitions/CoursePartId'
     responses:
       200:
         description: >
