@@ -362,6 +362,12 @@ const CoursePartsView = (): JSX.Element => {
           disableColumnSelector
           onRowEditStart={() => setEditing(true)}
           onRowEditStop={() => setEditing(false)}
+          processRowUpdate={updatedRow => {
+            setRows(oldRows =>
+              oldRows.map(row => (row.id === updatedRow.id ? updatedRow : row))
+            );
+            return updatedRow;
+          }}
         />
       </div>
     </>
