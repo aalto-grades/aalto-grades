@@ -74,7 +74,7 @@ const GroupByButton = () => {
     [
       ...table
         .getAllColumns()
-        .filter(c => c.columnDef.meta?.attainment)
+        .filter(c => c.columnDef.meta?.coursePart)
         .map(column => ({
           id: column.id,
           name: column.id,
@@ -230,11 +230,11 @@ const AssesmentFilterButton = () => {
     table,
     gradeSelectOption,
     setGradeSelectOption,
-    selectedAssessmentModel,
-    setSelectedAssessmentModel,
+    selectedGradingModel,
+    setSelectedGradingModel,
   } = useTableContext();
 
-  const allAssessmentModels = useGetAllAssessmentModels(courseId);
+  const allAssessmentModels = useGetAllGradingModels(courseId);
 
   // Filter out archived models
   const assessmentModels = useMemo(
@@ -246,8 +246,8 @@ const AssesmentFilterButton = () => {
   );
 
   const isActive = useMemo<boolean>(
-    () => !!selectedAssessmentModel && selectedAssessmentModel !== 'any',
-    [selectedAssessmentModel]
+    () => !!selectedGradingModel && selectedGradingModel !== 'any',
+    [selectedGradingModel]
   );
 
   return (
@@ -289,7 +289,7 @@ const AssesmentFilterButton = () => {
           >
             {isActive
               ? assessmentModels?.filter(
-                  ass => ass.id === selectedAssessmentModel
+                  ass => ass.id === selectedGradingModel
                 )[0]?.name
               : 'Grading Model'}
           </div>
@@ -324,7 +324,7 @@ const AssesmentFilterButton = () => {
               }),
             }}
             onClick={ev => {
-              setSelectedAssessmentModel('any');
+              setSelectedGradingModel('any');
             }}
           >
             <ClearIcon style={{alignContent: 'center', fontSize: '18px'}} />
@@ -346,12 +346,12 @@ const AssesmentFilterButton = () => {
         {(assessmentModels ?? []).map(model => (
           <MenuItem
             onClick={() => {
-              setSelectedAssessmentModel(model.id);
+              setSelectedGradingModel(model.id);
               handleClose();
             }}
             key={`assessment-model-select-${model.id}`}
             value={model.id}
-            selected={selectedAssessmentModel === model.id}
+            selected={selectedGradingModel === model.id}
           >
             {model.name}
           </MenuItem>
@@ -637,7 +637,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         >
           <GroupByButton />
         </Tooltip>
-        {(assessmentModels?.length ?? 0) > 1 && (
+        {(gradingModels?.length ?? 0) > 1 && (
           <Tooltip
             title="Show only course parts used in the model"
             placement="top"

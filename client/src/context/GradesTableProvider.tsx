@@ -71,7 +71,7 @@ declare module '@tanstack/table-core' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
     PrettyChipPosition: 'first' | 'middle' | 'last' | 'alone';
-    attainment?: boolean;
+    coursePart?: boolean;
   }
 }
 
@@ -221,8 +221,8 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
             rowCoursePart => rowCoursePart.coursePartId === coursePart.id
           ),
         {
-          header: att.name,
-          meta: {PrettyChipPosition: 'alone', attainment: true},
+          header: coursePart.name,
+          meta: {PrettyChipPosition: 'alone', coursePart: true},
           enableSorting: false,
           size: 80,
           cell: ({getValue, row}) => (
