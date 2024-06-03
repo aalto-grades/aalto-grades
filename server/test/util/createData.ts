@@ -4,7 +4,7 @@
 
 import {
   AplusGradeSourceType,
-  AttainmentData,
+  CoursePartData,
   CourseRoleType,
   GradingScale,
   Language,
@@ -16,13 +16,13 @@ import {initGraph} from '@/common/util/initGraph';
 import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';
 import {sequelize} from '../../src/database';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
-import AssessmentModel from '../../src/database/models/assessmentModel';
-import Attainment from '../../src/database/models/attainment';
 import AttainmentGrade from '../../src/database/models/attainmentGrade';
 import Course from '../../src/database/models/course';
+import CoursePart from '../../src/database/models/coursePart';
 import CourseRole from '../../src/database/models/courseRole';
 import CourseTranslation from '../../src/database/models/courseTranslation';
 import FinalGrade from '../../src/database/models/finalGrade';
+import GradingModel from '../../src/database/models/gradingModel';
 import User from '../../src/database/models/user';
 
 /**
@@ -34,9 +34,9 @@ import User from '../../src/database/models/user';
 class CreateData {
   /** Next free course code */
   private freeId: number = 10;
-  /** Next free attainment name */
-  private freeAttId: number = 10;
-  /** Next free assessment model code */
+  /** Next free course part name */
+  private freeCoursePartId: number = 10;
+  /** Next free grading model code */
   private freeModelId: number = 10;
   /** Next free user name */
   private freeUserId: number = 10;
@@ -61,66 +61,66 @@ class CreateData {
     };
   }
 
-  async createAttainment(courseId: number): Promise<AttainmentData> {
-    const newAttainment = await Attainment.create({
+  async createCoursePart(courseId: number): Promise<CoursePartData> {
+    const newCoursePart = await CoursePart.create({
       courseId: courseId,
-      name: `Round ${this.freeAttId}`,
+      name: `Round ${this.freeCoursePartId}`,
       daysValid: this.randInt(10, 365),
     });
-    this.freeAttId += 1;
-    return newAttainment;
+    this.freeCoursePartId += 1;
+    return newCoursePart;
   }
 
-  private async createAttainments(courseId: number): Promise<AttainmentData[]> {
-    const attainments: AttainmentData[] = [];
+  private async createCourseParts(courseId: number): Promise<CoursePartData[]> {
+    const courseParts: CoursePartData[] = [];
     for (let i = 0; i < 4; i++) {
-      const newAttainment = await Attainment.create({
+      const newCoursePart = await CoursePart.create({
         courseId: courseId,
         name: `Round ${i + 1}`,
         daysValid: this.randInt(10, 365),
       });
 
-      attainments.push(newAttainment);
+      courseParts.push(newCoursePart);
     }
-    return attainments;
+    return courseParts;
   }
 
   async createAplusGradeSources(
     courseId: number
   ): Promise<[number, number, number]> {
-    const fullPointsAttainment = await this.createAttainment(courseId);
+    const fullPointsCoursePart = await this.createCoursePart(courseId);
     await AplusGradeSource.create({
-      attainmentId: fullPointsAttainment.id,
+      coursePartId: fullPointsCoursePart.id,
       aplusCourseId: 1,
       sourceType: AplusGradeSourceType.FullPoints,
     });
 
-    const moduleAttainment = await this.createAttainment(courseId);
+    const moduleCoursePart = await this.createCoursePart(courseId);
     await AplusGradeSource.create({
-      attainmentId: moduleAttainment.id,
+      coursePartId: moduleCoursePart.id,
       aplusCourseId: 1,
       sourceType: AplusGradeSourceType.Module,
       moduleId: 1,
     });
 
-    const difficultyAttainment = await this.createAttainment(courseId);
+    const difficultyCoursePart = await this.createCoursePart(courseId);
     await AplusGradeSource.create({
-      attainmentId: difficultyAttainment.id,
+      coursePartId: difficultyCoursePart.id,
       aplusCourseId: 1,
       sourceType: AplusGradeSourceType.Difficulty,
       difficulty: 'A',
     });
 
     return [
-      fullPointsAttainment.id,
-      moduleAttainment.id,
-      difficultyAttainment.id,
+      fullPointsCoursePart.id,
+      moduleCoursePart.id,
+      difficultyCoursePart.id,
     ];
   }
 
   async createGrade(
     userId: number,
-    attainmentId: number,
+    coursePartId: number,
     graderId: number,
     grade?: number,
     date?: Date
@@ -128,7 +128,7 @@ class CreateData {
     const gradeDate = date ?? new Date();
     const attGrade = await AttainmentGrade.create({
       userId: userId,
-      attainmentId: attainmentId,
+      coursePartId: coursePartId,
       graderId: graderId,
       date: gradeDate,
       expiryDate: new Date(gradeDate.getTime() + 365 * 24 * 3600 * 1000),
@@ -141,14 +141,14 @@ class CreateData {
   async createFinalGrade(
     courseId: number,
     userId: number,
-    assessmentModelId: number | null,
+    gradingModelId: number | null,
     graderId: number,
     grade?: number,
     date?: Date
   ): Promise<number> {
     const finalGrade = await FinalGrade.create({
       userId: userId,
-      assessmentModelId: assessmentModelId,
+      gradingModelId: gradingModelId,
       courseId: courseId,
       graderId: graderId,
       date: date ?? new Date(),
@@ -158,20 +158,20 @@ class CreateData {
     return finalGrade.id;
   }
 
-  /** Creates an assessment model that uses the average model */
-  async createAssessmentModel(
+  /** Creates a grading model that uses the average model */
+  async createGradingModel(
     courseId: number,
-    attainments: AttainmentData[]
+    courseParts: CoursePartData[]
   ): Promise<number> {
-    const assessmentModel = await AssessmentModel.create({
+    const gradingModel = await GradingModel.create({
       courseId,
       name: `Average model ${this.freeModelId}`,
-      graphStructure: initGraph('average', attainments),
+      graphStructure: initGraph('average', courseParts),
     });
 
     this.freeModelId += 1;
 
-    return assessmentModel.id;
+    return gradingModel.id;
   }
 
   private async createDbCourse(
@@ -265,16 +265,16 @@ class CreateData {
     hasAssistant = true,
     hasStudent = true,
     courseData = null,
-    createAttainments = true,
-    createAssessmentModel = true,
+    createCourseParts = true,
+    createGradingModel = true,
   }: {
     hasTeacher?: boolean;
     hasAssistant?: boolean;
     hasStudent?: boolean;
     courseData?: Partial<NewCourseData> | null;
-    createAttainments?: boolean;
-    createAssessmentModel?: boolean;
-  }): Promise<[number, AttainmentData[], number]> {
+    createCourseParts?: boolean;
+    createGradingModel?: boolean;
+  }): Promise<[number, CoursePartData[], number]> {
     const courseId = await this.createDbCourse(
       hasTeacher,
       hasAssistant,
@@ -282,18 +282,15 @@ class CreateData {
       courseData
     );
 
-    let attainments: AttainmentData[] = [];
-    if (createAttainments) attainments = await this.createAttainments(courseId);
+    let courseParts: CoursePartData[] = [];
+    if (createCourseParts) courseParts = await this.createCourseParts(courseId);
 
-    let assessmentModelId = -1;
-    if (createAttainments && createAssessmentModel) {
-      assessmentModelId = await this.createAssessmentModel(
-        courseId,
-        attainments
-      );
+    let gradingModelId = -1;
+    if (createCourseParts && createGradingModel) {
+      gradingModelId = await this.createGradingModel(courseId, courseParts);
     }
 
-    return [courseId, attainments, assessmentModelId];
+    return [courseId, courseParts, gradingModelId];
   }
 }
 

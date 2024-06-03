@@ -35,7 +35,7 @@ export const AplusExerciseDataSchema = z.object({
 
 const GradeSourceBase = z
   .object({
-    attainmentId: IdSchema,
+    coursePartId: IdSchema,
     aplusCourseId: z.number().int(),
   })
   .strict();

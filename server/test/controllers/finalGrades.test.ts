@@ -37,15 +37,15 @@ const nonExistentId = 1000000;
 beforeAll(async () => {
   cookies = await getCookies();
 
-  let assessmentModelId;
-  [courseId, , assessmentModelId] = await createData.createCourse({});
+  let gradingModelId;
+  [courseId, , gradingModelId] = await createData.createCourse({});
   // Create 10 final grades
   for (let i = 0; i < 10; i++) {
     const student = await createData.createUser();
     await createData.createFinalGrade(
       courseId,
       student.id,
-      assessmentModelId,
+      gradingModelId,
       TEACHER_ID
     );
     // Create multiple final grades for some students
@@ -53,7 +53,7 @@ beforeAll(async () => {
       await createData.createFinalGrade(
         courseId,
         student.id,
-        assessmentModelId,
+        gradingModelId,
         TEACHER_ID
       );
     }
@@ -94,19 +94,17 @@ afterAll(async () => {
 
 /**
  * Check that the expected number of grades exist for a user for a specific
- * attainment, including checking the numeric values of those grades.
+ * course part, including checking the numeric values of those grades.
  */
 const checkGradeAmount = async (
   student: {id: number},
   expectedGrades: number[]
 ): Promise<void> => {
-  const dbAttainmentGrades = await FinalGrade.findAll({
+  const dbFinalGrades = await FinalGrade.findAll({
     where: {userId: student.id, courseId: editCourseId},
   });
 
-  const dbGrades = dbAttainmentGrades.map(
-    attainmentGrade => attainmentGrade.grade
-  );
+  const dbGrades = dbFinalGrades.map(finalGrade => finalGrade.grade);
   expect(dbGrades).toEqual(expectedGrades);
 };
 
@@ -171,7 +169,7 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
   };
   const getData = (student: StudentData): NewFinalGrade => ({
     userId: student.id,
-    assessmentModelId: editCourseModelId,
+    gradingModelId: editCourseModelId,
     grade: student.finalGrade,
     date: new Date(),
     comment: null,
@@ -244,7 +242,7 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
     const student = await createStudent();
     const data = {
       userId: student.id,
-      assessmentModelId: editCourseModelId,
+      gradingModelId: editCourseModelId,
       grade: student.finalGrade,
       date: new Date(),
     };
@@ -307,13 +305,13 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
-  it('should respond with 409 when assessment model does not belong to the course', async () => {
+  it('should respond with 409 when grading model does not belong to the course', async () => {
     const student = await createStudent();
     const [, , otherCourseModelId] = await createData.createCourse({});
     const data = [
       {
         userId: student.id,
-        assessmentModelId: otherCourseModelId,
+        gradingModelId: otherCourseModelId,
         grade: student.finalGrade,
         date: new Date(),
         comment: null,
@@ -390,7 +388,7 @@ describe('Test PUT /v1/courses/:courseId/final-grades/:finalGradeId - edit a fin
     const data = {grade: 3};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
-    url = `/v1/courses/${editCourseId}/attainments/${-1}`;
+    url = `/v1/courses/${editCourseId}/parts/${-1}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 

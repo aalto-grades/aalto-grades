@@ -124,7 +124,7 @@ const UploadDialogUpload = ({
           else csvKeyMap[key] = matchingField;
         }
 
-        /** Load data using csv key to attainment key map */
+        /** Load data using csv key to course part key map */
         const getData = (keyMap: {
           [key: string]: string;
         }): GridRowModel<GradeUploadColTypes>[] => {

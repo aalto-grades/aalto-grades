@@ -17,8 +17,8 @@ const randomDate = (start: Date, end: Date): Date =>
   new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 
 beforeAll(async () => {
-  let attainments;
-  [courseId, attainments] = await createData.createCourse({});
+  let courseParts;
+  [courseId, courseParts] = await createData.createCourse({});
 
   const now = new Date();
 
@@ -42,10 +42,10 @@ beforeAll(async () => {
 
     // Create the grades
     for (const gradeDate of gradeDates) {
-      const attainmentIndex = Math.floor(Math.random() * attainments.length);
+      const coursePartIndex = Math.floor(Math.random() * courseParts.length);
       await createData.createGrade(
         newUserId,
-        attainments[attainmentIndex].id,
+        courseParts[coursePartIndex].id,
         TEACHER_ID,
         Math.floor(Math.random() * 30),
         gradeDate

@@ -22,20 +22,20 @@ import {JSX, useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {
-  AssessmentModelData,
+  GradingModelData,
   CourseRoleType,
   StudentRow,
   SystemRole,
 } from '@/common/types';
 import {GraphStructure} from '@/common/types/graph';
-import CreateAssessmentModelDialog from './CreateAssessmentModelDialog';
-import EditAssessmentModelDialog from './EditAssessmentModelDialog';
+import CreateGradingModelDialog from './CreateGradingModelDialog';
+import EditGradingModelDialog from './EditGradingModelDialog';
 import {useGetFinalGrades} from '../../hooks/api/finalGrade';
 import {
-  useDeleteAssessmentModel,
-  useEditAssessmentModel,
-  useGetAllAssessmentModels,
-  useGetAttainments,
+  useDeleteGradingModel,
+  useEditGradingModel,
+  useGetAllGradingModels,
+  useGetCourseParts,
   useGetCourse,
   useGetGrades,
 } from '../../hooks/useApi';
@@ -49,7 +49,7 @@ const ModelsView = (): JSX.Element => {
   const {courseId, modelId, userId} = useParams() as ParamsType;
   const navigate = useNavigate();
 
-  const allAssessmentModels = useGetAllAssessmentModels(courseId);
+  const allGradingModels = useGetAllGradingModels(courseId);
   const course = useGetCourse(courseId);
   const finalGrades = useGetFinalGrades(courseId, {
     enabled:
@@ -58,12 +58,12 @@ const ModelsView = (): JSX.Element => {
         (course.data &&
           getCourseRole(course.data, auth) === CourseRoleType.Teacher)),
   });
-  const editModel = useEditAssessmentModel();
-  const delModel = useDeleteAssessmentModel();
-  const attainments = useGetAttainments(courseId);
+  const editModel = useEditGradingModel();
+  const delModel = useDeleteGradingModel();
+  const courseParts = useGetCourseParts(courseId);
   const grades = useGetGrades(courseId);
 
-  const [currentModel, setCurrentModel] = useState<AssessmentModelData | null>(
+  const [currentModel, setCurrentModel] = useState<GradingModelData | null>(
     null
   );
   const [currentUserRow, setCurrentUserRow] = useState<StudentRow | null>(null);
@@ -72,26 +72,26 @@ const ModelsView = (): JSX.Element => {
   const [createDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
   const [editDialogModel, setEditDialogModel] =
-    useState<AssessmentModelData | null>(null);
+    useState<GradingModelData | null>(null);
   const [graphOpen, setGraphOpen] = useState<boolean>(false);
 
   // Sort models by archived status
   const models = useMemo(
     () =>
-      allAssessmentModels.data !== undefined
-        ? allAssessmentModels.data.toSorted(
+      allGradingModels.data !== undefined
+        ? allGradingModels.data.toSorted(
             (m1, m2) => Number(m1.archived) - Number(m2.archived)
           )
         : undefined,
-    [allAssessmentModels.data]
+    [allGradingModels.data]
   );
 
   const modelsWithFinalGrades = useMemo(() => {
     const withFinalGrades = new Set<number>();
     if (finalGrades.data === undefined) return withFinalGrades;
     for (const finalGrade of finalGrades.data) {
-      if (finalGrade.assessmentModelId !== null)
-        withFinalGrades.add(finalGrade.assessmentModelId);
+      if (finalGrade.gradingModelId !== null)
+        withFinalGrades.add(finalGrade.gradingModelId);
     }
     return withFinalGrades;
   }, [finalGrades.data]);
@@ -114,31 +114,31 @@ const ModelsView = (): JSX.Element => {
     }
   }, [courseId, loadGraphId, models, navigate]);
 
-  const renameAttainments = useCallback(
-    (model: AssessmentModelData): AssessmentModelData => {
-      if (attainments.data === undefined) return model;
+  const renameCourseParts = useCallback(
+    (model: GradingModelData): GradingModelData => {
+      if (courseParts.data === undefined) return model;
 
       for (const node of model.graphStructure.nodes) {
-        if (node.type !== 'attainment') continue;
-        const attainmentId = parseInt(node.id.split('-')[1]);
+        if (node.type !== 'coursepart') continue;
+        const coursePartId = parseInt(node.id.split('-')[1]);
 
-        const attainment = attainments.data.find(
-          att => att.id === attainmentId
+        const nodeCoursePart = courseParts.data.find(
+          coursePart => coursePart.id === coursePartId
         );
-        if (attainment !== undefined)
-          model.graphStructure.nodeData[node.id].title = attainment.name;
+        if (nodeCoursePart !== undefined)
+          model.graphStructure.nodeData[node.id].title = nodeCoursePart.name;
       }
       return model;
     },
-    [attainments.data]
+    [courseParts.data]
   );
 
   const loadGraph = useCallback(
-    (model: AssessmentModelData): void => {
-      setCurrentModel(renameAttainments(structuredClone(model))); // To remove references
+    (model: GradingModelData): void => {
+      setCurrentModel(renameCourseParts(structuredClone(model))); // To remove references
       setGraphOpen(true);
     },
-    [renameAttainments]
+    [renameCourseParts]
   );
 
   // Load modelId url param
@@ -158,7 +158,7 @@ const ModelsView = (): JSX.Element => {
         return;
       }
     }
-    enqueueSnackbar(`Couldn't find assessment model with id ${modelId}`, {
+    enqueueSnackbar(`Couldn't find grading model with id ${modelId}`, {
       variant: 'error',
     });
     navigate(`/${courseId}/models`);
@@ -183,17 +183,17 @@ const ModelsView = (): JSX.Element => {
   }, [courseId, currentUserRow, grades.data, modelId, navigate, userId]);
 
   const handleArchiveModel = (
-    assessmentModelId: number,
+    gradingModelId: number,
     archived: boolean
   ): void => {
     editModel.mutate({
       courseId,
-      assessmentModelId,
-      assessmentModel: {archived},
+      gradingModelId,
+      gradingModel: {archived},
     });
   };
-  const handleDelModel = (assessmentModelId: number): void => {
-    delModel.mutate({courseId, assessmentModelId});
+  const handleDelModel = (gradingModelId: number): void => {
+    delModel.mutate({courseId, gradingModelId: gradingModelId});
   };
 
   const onSave = async (graphStructure: GraphStructure): Promise<void> => {
@@ -213,47 +213,47 @@ const ModelsView = (): JSX.Element => {
     }
     await editModel.mutateAsync({
       courseId,
-      assessmentModelId: currentModel.id,
-      assessmentModel: {
+      gradingModelId: currentModel.id,
+      gradingModel: {
         name: currentModel.name,
         graphStructure: simplifiedGraphStructure,
       },
     });
   };
 
-  if (models === undefined || attainments.data === undefined)
+  if (models === undefined || courseParts.data === undefined)
     return <>Loading</>;
 
-  const getWarning = (model: AssessmentModelData): string => {
-    if (model.hasArchivedAttainments && model.hasDeletedAttainments)
-      return 'Contains deleted & archived attainments';
-    if (model.hasArchivedAttainments) return 'Contains archived attainments';
-    if (model.hasDeletedAttainments) return 'Contains deleted attainments';
+  const getWarning = (model: GradingModelData): string => {
+    if (model.hasArchivedCourseParts && model.hasDeletedCourseParts)
+      return 'Contains deleted & archived course parts';
+    if (model.hasArchivedCourseParts) return 'Contains archived course parts';
+    if (model.hasDeletedCourseParts) return 'Contains deleted course parts';
     return '';
   };
 
   return (
     <>
-      <CreateAssessmentModelDialog
+      <CreateGradingModelDialog
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
         onSubmit={id => {
-          allAssessmentModels.refetch();
+          allGradingModels.refetch();
           setLoadGraphId(id);
         }}
       />
 
-      <EditAssessmentModelDialog
+      <EditGradingModelDialog
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
-        assessmentModelId={editDialogModel?.id ?? null}
+        gradingModelId={editDialogModel?.id ?? null}
         name={editDialogModel?.name ?? null}
       />
 
       <Box sx={{display: 'flex', mb: 1}}>
         {(auth?.role === SystemRole.Admin || isTeacherInCharge) &&
           !graphOpen && (
-            <Tooltip title="New assessment model" placement="top">
+            <Tooltip title="New grading model" placement="top">
               <Button
                 sx={{mt: 1}}
                 variant="outlined"
@@ -289,7 +289,7 @@ const ModelsView = (): JSX.Element => {
                 secondaryAction={
                   editRights ? (
                     <>
-                      <Tooltip placement="top" title="Rename assessment model">
+                      <Tooltip placement="top" title="Rename grading model">
                         <IconButton
                           onClick={() => {
                             setEditDialogModel(model);
@@ -303,8 +303,8 @@ const ModelsView = (): JSX.Element => {
                         placement="top"
                         title={
                           model.archived
-                            ? 'Unarchive assessment model'
-                            : 'Archive assessment model'
+                            ? 'Unarchive grading model'
+                            : 'Archive grading model'
                         }
                       >
                         <IconButton
@@ -315,7 +315,7 @@ const ModelsView = (): JSX.Element => {
                           {model.archived ? <Unarchive /> : <Archive />}
                         </IconButton>
                       </Tooltip>
-                      <Tooltip placement="top" title="Delete assessment model">
+                      <Tooltip placement="top" title="Delete grading model">
                         <IconButton
                           disabled={modelsWithFinalGrades.has(model.id)}
                           edge="end"
@@ -336,8 +336,8 @@ const ModelsView = (): JSX.Element => {
                   }}
                 >
                   <ListItemText primary={model.name} />
-                  {(model.hasArchivedAttainments ||
-                    model.hasDeletedAttainments) && (
+                  {(model.hasArchivedCourseParts ||
+                    model.hasDeletedCourseParts) && (
                     <ListItemIcon sx={{mr: 6.6}}>
                       <Tooltip title={getWarning(model)} placement="top">
                         <Warning color="warning" />
@@ -354,9 +354,9 @@ const ModelsView = (): JSX.Element => {
       {graphOpen && currentModel !== null && (
         <Graph
           initGraph={currentModel.graphStructure}
-          attainments={attainments.data}
+          courseParts={courseParts.data}
           userGrades={
-            currentUserRow === null ? null : currentUserRow.attainments
+            currentUserRow === null ? null : currentUserRow.courseParts
           }
           readOnly={!editRights}
           onSave={onSave}

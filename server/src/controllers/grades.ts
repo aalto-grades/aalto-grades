@@ -17,10 +17,10 @@ import {
   StudentRow,
   UserData,
 } from '@/common/types';
-import {validateAttainmentBelongsToCourse} from './utils/attainment';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
+import {validateCoursePartBelongsToCourse} from './utils/coursePart';
 import {
-  findAndValidateAttainmentGradePath,
+  findAndValidateGradePath,
   getDateOfLatestGrade,
   getFinalGradesFor,
   studentNumbersExist,
@@ -28,8 +28,8 @@ import {
 } from './utils/grades';
 import logger from '../configs/winston';
 import {sequelize} from '../database';
-import Attainment from '../database/models/attainment';
 import AttainmentGrade from '../database/models/attainmentGrade';
+import CoursePart from '../database/models/coursePart';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
 import {ApiError, JwtClaims, NewDbGradeData} from '../types';
@@ -42,12 +42,12 @@ import {ApiError, JwtClaims, NewDbGradeData} from '../types';
 export const getGrades = async (req: Request, res: Response): Promise<void> => {
   const courseId = await validateCourseId(req.params.courseId);
 
-  // Get all attainments for the course
-  const attainments = await Attainment.findAll({
+  // Get all course parts for the course
+  const courseParts = await CoursePart.findAll({
     where: {courseId: courseId},
   });
 
-  // Get grades of all attainments
+  // Get grades of all course parts
   const grades = await AttainmentGrade.findAll({
     include: [
       {model: User, attributes: ['id', 'name', 'email', 'studentNumber']},
@@ -58,8 +58,8 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
       },
     ],
     where: {
-      attainmentId: {
-        [Op.in]: attainments.map(attainment => attainment.id),
+      coursePartId: {
+        [Op.in]: courseParts.map(coursePart => coursePart.id),
       },
     },
   });
@@ -80,7 +80,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
   // User dict of unique users {userId: User, ...}
   const usersDict: {[key: string]: UserData & {studentNumber: string}} = {};
 
-  // Grades dict {userId: {attId: GradeData[], ...}, ...}
+  // Grades dict {userId: {coursePartId: GradeData[], ...}, ...}
   const userGrades: {[key: string]: {[key: string]: GradeData[]}} = {};
 
   for (const grade of grades) {
@@ -95,10 +95,10 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
 
     const userId = grade.userId;
     if (!(userId in userGrades)) userGrades[userId] = {};
-    if (!(grade.attainmentId in userGrades[userId]))
-      userGrades[userId][grade.attainmentId] = [];
+    if (!(grade.coursePartId in userGrades[userId]))
+      userGrades[userId][grade.coursePartId] = [];
 
-    userGrades[userId][grade.attainmentId].push({
+    userGrades[userId][grade.coursePartId].push({
       gradeId: grade.id,
       grader: grader,
       grade: grade.grade,
@@ -121,7 +121,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
       finalGradeId: finalGrade.id,
       user: user,
       courseId: finalGrade.courseId,
-      assessmentModelId: finalGrade.assessmentModelId,
+      gradingModelId: finalGrade.gradingModelId,
       grader: grader,
       grade: finalGrade.grade,
       date: new Date(finalGrade.date),
@@ -134,11 +134,11 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
     (userId): StudentRow => ({
       user: usersDict[userId],
       finalGrades: finalGradesDict[userId],
-      attainments: attainments.map(attainment => ({
-        attainmentId: attainment.id,
-        attainmentName: attainment.name,
+      courseParts: courseParts.map(coursePart => ({
+        coursePartId: coursePart.id,
+        coursePartName: coursePart.name,
         grades:
-          (userGrades[userId][attainment.id] as GradeData[] | undefined) ?? [],
+          (userGrades[userId][coursePart.id] as GradeData[] | undefined) ?? [],
       })),
     })
   );
@@ -154,11 +154,11 @@ export const addGrades = async (
   const grader = req.user as JwtClaims;
   const courseId = await validateCourseId(req.params.courseId);
 
-  // Validate that attainments belong to correct course
-  const attainmentIds = new Set<number>();
-  for (const grade of req.body) attainmentIds.add(grade.attainmentId);
-  for (const gradeId of attainmentIds) {
-    await validateAttainmentBelongsToCourse(courseId, gradeId);
+  // Validate that course parts belong to correct course
+  const coursePartIds = new Set<number>();
+  for (const grade of req.body) coursePartIds.add(grade.coursePartId);
+  for (const gradeId of coursePartIds) {
+    await validateCoursePartBelongsToCourse(courseId, gradeId);
   }
 
   // Check all users (students) exists in db, create new users if needed.
@@ -205,11 +205,11 @@ export const addGrades = async (
     students.map(student => [student.studentNumber, student.id])
   );
 
-  // Use studentsWithId to update attainments by flatmapping each
+  // Use studentsWithId to update course parts by flatmapping each
   // students grades into a one array of all the grades.
   const preparedBulkCreate: NewDbGradeData[] = req.body.map(gradeEntry => ({
     userId: studentNumberToId[gradeEntry.studentNumber],
-    attainmentId: gradeEntry.attainmentId,
+    coursePartId: gradeEntry.coursePartId,
     graderId: grader.id,
     date: gradeEntry.date,
     expiryDate: gradeEntry.expiryDate,
@@ -219,7 +219,7 @@ export const addGrades = async (
   // TODO: Optimize if datasets are big.
   await AttainmentGrade.bulkCreate(preparedBulkCreate);
 
-  // After this point all the students' attainment grades have been created
+  // After this point all the students' grades have been created
   return res.sendStatus(HttpCode.Created);
 };
 
@@ -229,7 +229,7 @@ export const editGrade = async (
   res: Response
 ): Promise<void> => {
   const grader = req.user as JwtClaims;
-  const [, gradeData] = await findAndValidateAttainmentGradePath(
+  const [, gradeData] = await findAndValidateGradePath(
     req.params.courseId,
     req.params.gradeId
   );
@@ -276,7 +276,7 @@ export const deleteGrade = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const [, grade] = await findAndValidateAttainmentGradePath(
+  const [, grade] = await findAndValidateGradePath(
     req.params.courseId,
     req.params.gradeId
   );
@@ -354,8 +354,8 @@ export const getSisuFormattedGradingCSV = async (
       oldGrade: FinalGrade
     ): boolean => {
       // Prefer manual final grades
-      const newIsManual = newGrade.assessmentModelId === null;
-      const oldIsManual = oldGrade.assessmentModelId === null;
+      const newIsManual = newGrade.gradingModelId === null;
+      const oldIsManual = oldGrade.gradingModelId === null;
       if (newIsManual && !oldIsManual) return true;
       if (oldIsManual && !newIsManual) return false;
 
@@ -372,7 +372,7 @@ export const getSisuFormattedGradingCSV = async (
 
       existingResult.date = finalGrade.date;
       existingResult.grade = finalGrade.grade;
-      existingResult.assessmentModelId = finalGrade.assessmentModelId;
+      existingResult.gradingModelId = finalGrade.gradingModelId;
 
       // Set existing course result grade
       const existingCourseResult = courseResults.find(
@@ -397,7 +397,7 @@ export const getSisuFormattedGradingCSV = async (
       exportedToSisu.push({gradeId: finalGrade.id, userId: finalGrade.userId});
 
       // Assessment date must be in form dd.mm.yyyy.
-      // HERE we want to find the latest completed attainment grade for student
+      // HERE we want to find the latest completed grade for student
       const assessmentDate = (
         req.body.assessmentDate
           ? req.body.assessmentDate

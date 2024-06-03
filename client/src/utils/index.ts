@@ -88,7 +88,7 @@ export const findBestGrade = <T extends BaseType>(
 type BestFinalGradeData = {
   grade: number;
   date: Date;
-  assessmentModelId: number | null;
+  gradingModelId: number | null;
 };
 /**
  * Finds the best final grade from a list of final grades preferring manual
@@ -104,8 +104,8 @@ export const findBestFinalGrade = <T extends BestFinalGradeData>(
       continue;
     }
 
-    const newIsManual = finalGrade.assessmentModelId === null;
-    const oldIsManual = bestSoFar.assessmentModelId === null;
+    const newIsManual = finalGrade.gradingModelId === null;
+    const oldIsManual = bestSoFar.gradingModelId === null;
     // Prefer manual
     if (newIsManual && !oldIsManual) {
       bestSoFar = finalGrade;

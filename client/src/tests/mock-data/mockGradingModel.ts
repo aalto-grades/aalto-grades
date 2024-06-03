@@ -2,35 +2,35 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AssessmentModelData} from '@/common/types';
+import {GradingModelData} from '@/common/types';
 
-export const mockAssessmentModel: AssessmentModelData = {
+export const mockGradingModel: GradingModelData = {
   id: 1,
   courseId: 1,
   name: 'Average',
   archived: false,
-  hasArchivedAttainments: false,
-  hasDeletedAttainments: false,
+  hasArchivedCourseParts: false,
+  hasDeletedCourseParts: false,
   graphStructure: {
     nodes: [
       {id: 'final-grade', position: {x: 1201, y: 218}, data: {}, type: 'grade'},
       {
-        id: 'attainment-1',
+        id: 'coursepart-1',
         position: {x: 12, y: 12},
         data: {},
-        type: 'attainment',
+        type: 'coursepart',
       },
       {
-        id: 'attainment-2',
+        id: 'coursepart-2',
         position: {x: 12, y: 194},
         data: {},
-        type: 'attainment',
+        type: 'coursepart',
       },
       {
-        id: 'attainment-3',
+        id: 'coursepart-3',
         position: {x: 12, y: 376},
         data: {},
-        type: 'attainment',
+        type: 'coursepart',
       },
       {
         id: 'dnd-average-dndnode-0',
@@ -47,24 +47,24 @@ export const mockAssessmentModel: AssessmentModelData = {
     ],
     edges: [
       {
-        id: 'reactflow__edge-attainment-1attainment-1-source-dnd-average-dndnode-0dnd-average-dndnode-0-0',
-        source: 'attainment-1',
+        id: 'reactflow__edge-coursepart-1coursepart-1-source-dnd-average-dndnode-0dnd-average-dndnode-0-0',
+        source: 'coursepart-1',
         target: 'dnd-average-dndnode-0',
-        sourceHandle: 'attainment-1-source',
+        sourceHandle: 'coursepart-1-source',
         targetHandle: 'dnd-average-dndnode-0-0',
       },
       {
-        id: 'reactflow__edge-attainment-2attainment-2-source-dnd-average-dndnode-0dnd-average-dndnode-0-1',
-        source: 'attainment-2',
+        id: 'reactflow__edge-coursepart-2coursepart-2-source-dnd-average-dndnode-0dnd-average-dndnode-0-1',
+        source: 'coursepart-2',
         target: 'dnd-average-dndnode-0',
-        sourceHandle: 'attainment-2-source',
+        sourceHandle: 'coursepart-2-source',
         targetHandle: 'dnd-average-dndnode-0-1',
       },
       {
-        id: 'reactflow__edge-attainment-3attainment-3-source-dnd-average-dndnode-0dnd-average-dndnode-0-2',
-        source: 'attainment-3',
+        id: 'reactflow__edge-coursepart-3coursepart-3-source-dnd-average-dndnode-0dnd-average-dndnode-0-2',
+        source: 'coursepart-3',
         target: 'dnd-average-dndnode-0',
-        sourceHandle: 'attainment-3-source',
+        sourceHandle: 'coursepart-3-source',
         targetHandle: 'dnd-average-dndnode-0-2',
       },
       {
@@ -84,15 +84,15 @@ export const mockAssessmentModel: AssessmentModelData = {
     ],
     nodeData: {
       'final-grade': {title: 'Final Grade'},
-      'attainment-1': {
+      'coursepart-1': {
         title: 'Exercise 1',
         settings: {minPoints: 1, onFailSetting: 'coursefail'},
       },
-      'attainment-2': {
+      'coursepart-2': {
         title: 'Exercise 2',
         settings: {minPoints: 1, onFailSetting: 'coursefail'},
       },
-      'attainment-3': {
+      'coursepart-3': {
         title: 'Exam',
         settings: {minPoints: 5, onFailSetting: 'coursefail'},
       },

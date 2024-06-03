@@ -14,14 +14,14 @@ import {ApiError, stringToIdSchema} from '../../types';
  * @throws ApiError(404) if not found.
  */
 export const findFinalGradeById = async (id: number): Promise<FinalGrade> => {
-  const attainment = await FinalGrade.findByPk(id);
-  if (attainment === null) {
+  const finalGrade = await FinalGrade.findByPk(id);
+  if (finalGrade === null) {
     throw new ApiError(
       `Final grade with ID ${id} not found`,
       HttpCode.NotFound
     );
   }
-  return attainment;
+  return finalGrade;
 };
 
 /**
