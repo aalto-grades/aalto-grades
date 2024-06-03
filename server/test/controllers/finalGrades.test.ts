@@ -388,7 +388,7 @@ describe('Test PUT /v1/courses/:courseId/final-grades/:finalGradeId - edit a fin
     const data = {grade: 3};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
-    url = `/v1/courses/${editCourseId}/course-parts/${-1}`;
+    url = `/v1/courses/${editCourseId}/parts/${-1}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 

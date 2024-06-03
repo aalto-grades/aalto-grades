@@ -72,9 +72,9 @@ definitions:
         description: If course part has been archived
         example: false
 
-/v1/courses/{courseId}/course-parts:
+/v1/courses/{courseId}/parts:
   get:
-    tags: [CoursePart]
+    tags: [Course Part]
     description: Get all the course parts of a course.
     parameters:
       - $ref: '#/components/parameters/courseId'
@@ -98,7 +98,7 @@ definitions:
     security:
       - cookieAuth: []
   post:
-    tags: [CoursePart]
+    tags: [Course Part]
     description: >
       Add a course part to the course.
       Available only to admin users and teachers in charge of the course.
@@ -111,7 +111,7 @@ definitions:
             $ref: '#/definitions/NewCoursePart'
     responses:
       201:
-        description: CoursePart created.
+        description: Course part created.
         content:
           application/json:
             schema:
@@ -129,9 +129,9 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/courses/{courseId}/course-part/{coursePartId}:
+/v1/courses/{courseId}/parts/{coursePartId}:
   put:
-    tags: [CoursePart]
+    tags: [Course Part]
     description: >
       Edit specified course part.
       Available only to admin users and teachers in charge of the course.
@@ -159,7 +159,7 @@ definitions:
     security:
       - cookieAuth: []
   delete:
-    tags: [CoursePart]
+    tags: [Course Part]
     description: >
       Delete specified course part.
       Available only to admin users and teachers in charge of the course.

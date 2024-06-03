@@ -19,7 +19,7 @@ definitions:
   FinalGradeDate:
     type: string
     format: date
-    description: Date when final grade was calculated
+    description: Date when the student "completed the course"
     example: 2024-04-01T00:00:00.000Z
   SisuExportDate:
     type: string
@@ -93,7 +93,7 @@ definitions:
 
 /v1/courses/{courseId}/final-grades:
   get:
-    tags: [FinalGrades]
+    tags: [Final Grades]
     description: >
       Get the final grades of all students.
       Available only to admin users and teachers in charge of the course.
@@ -119,7 +119,7 @@ definitions:
     security:
       - cookieAuth: []
   post:
-    tags: [FinalGrades]
+    tags: [Final Grades]
     description: >
       Add new final grades to the course.
       Available only to admin users and teachers in charge of the course.
@@ -150,7 +150,7 @@ definitions:
 
 /v1/courses/{courseId}/final-grades/{finalGradeId}:
   put:
-    tags: [FinalGrades]
+    tags: [Final Grades]
     description: >
       Edit a final grade.
       Available only to admin users and teachers in charge of the course.
@@ -178,7 +178,7 @@ definitions:
     security:
       - cookieAuth: []
   delete:
-    tags: [FinalGrades]
+    tags: [Final Grades]
     description: >
       Delete a final grade.
       Available only to admin users and teachers in charge of the course.

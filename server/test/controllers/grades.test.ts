@@ -463,7 +463,7 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
     const data = {comment: 'not edited'};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
-    url = `/v1/courses/${courseId}/course-parts/${-1}`;
+    url = `/v1/courses/${courseId}/parts/${-1}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 

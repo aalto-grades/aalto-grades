@@ -24,7 +24,7 @@ import {controllerDispatcher} from '../middleware/errorHandler';
 export const router = Router();
 
 router.get(
-  '/v1/courses/:courseId/course-parts',
+  '/v1/courses/:courseId/parts',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([
     CourseRoleType.Teacher,
@@ -35,7 +35,7 @@ router.get(
 );
 
 router.post(
-  '/v1/courses/:courseId/course-parts',
+  '/v1/courses/:courseId/parts',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
@@ -45,7 +45,7 @@ router.post(
 );
 
 router.put(
-  '/v1/courses/:courseId/course-parts/:coursePartId',
+  '/v1/courses/:courseId/parts/:coursePartId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
@@ -55,7 +55,7 @@ router.put(
 );
 
 router.delete(
-  '/v1/courses/:courseId/course-parts/:coursePartId',
+  '/v1/courses/:courseId/parts/:coursePartId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   controllerDispatcher(deleteCoursePart)

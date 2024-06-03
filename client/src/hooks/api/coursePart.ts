@@ -30,7 +30,7 @@ export const useGetCourseParts = (
     queryKey: ['course-parts', courseId],
     queryFn: async () =>
       CoursePartDataArraySchema.parse(
-        (await axios.get(`/v1/courses/${courseId}/course-parts`)).data
+        (await axios.get(`/v1/courses/${courseId}/parts`)).data
       ),
     ...options,
   });
@@ -44,8 +44,7 @@ export const useAddCoursePart = (
   return useMutation({
     mutationFn: async (coursePart: NewCoursePartData) =>
       IdSchema.parse(
-        (await axios.post(`/v1/courses/${courseId}/course-parts`, coursePart))
-          .data
+        (await axios.post(`/v1/courses/${courseId}/parts`, coursePart)).data
       ),
 
     onSuccess: () => {
@@ -70,7 +69,7 @@ export const useEditCoursePart = (
   return useMutation({
     mutationFn: async (vars: EditCoursePartVars) =>
       await axios.put(
-        `/v1/courses/${courseId}/course-parts/${vars.coursePartId}`,
+        `/v1/courses/${courseId}/parts/${vars.coursePartId}`,
         vars.coursePart
       ),
 
@@ -95,9 +94,7 @@ export const useDeleteCoursePart = (
 
   return useMutation({
     mutationFn: async (coursePartId: Numeric) =>
-      await axios.delete(
-        `/v1/courses/${courseId}/course-parts/${coursePartId}`
-      ),
+      await axios.delete(`/v1/courses/${courseId}/parts/${coursePartId}`),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
