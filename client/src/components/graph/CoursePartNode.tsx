@@ -16,7 +16,7 @@ type OnFailSetting = 'coursefail' | 'fail';
 type LocalSettings = {onFailSetting: OnFailSetting; minPoints: string};
 const initialSettings: LocalSettings = {
   onFailSetting: 'coursefail',
-  minPoints: '0',
+  minPoints: '',
 };
 
 const CoursePartNode = (props: NodeProps): JSX.Element => {
@@ -34,7 +34,11 @@ const CoursePartNode = (props: NodeProps): JSX.Element => {
 
   useEffect(() => {
     if (init) return;
-    setLocalSettings({...settings, minPoints: settings.minPoints.toString()});
+    setLocalSettings({
+      ...settings,
+      minPoints:
+        settings.minPoints !== null ? settings.minPoints.toString() : '',
+    });
     setError(false);
     setInit(true);
   }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -61,7 +65,10 @@ const CoursePartNode = (props: NodeProps): JSX.Element => {
     const newLocalSettings = {...localSettings, minPoints: event.target.value};
     setLocalSettings(newLocalSettings);
 
-    if (!/^\d+(?:\.\d+?)?$/.test(newLocalSettings.minPoints)) {
+    if (
+      newLocalSettings.minPoints !== '' &&
+      !/^\d+(?:\.\d+?)?$/.test(newLocalSettings.minPoints)
+    ) {
       setError(true);
       return;
     }
@@ -69,7 +76,10 @@ const CoursePartNode = (props: NodeProps): JSX.Element => {
 
     setNodeSettings(id, {
       ...newLocalSettings,
-      minPoints: parseFloat(newLocalSettings.minPoints),
+      minPoints:
+        newLocalSettings.minPoints === ''
+          ? null
+          : parseFloat(newLocalSettings.minPoints),
     });
   };
 
@@ -84,7 +94,7 @@ const CoursePartNode = (props: NodeProps): JSX.Element => {
           value={localSettings.minPoints}
         />
       </div>
-      {settings.minPoints > 0 && (
+      {settings.minPoints !== null && (
         <div style={{textAlign: 'left'}}>
           <label>On fail: </label>
           <select
