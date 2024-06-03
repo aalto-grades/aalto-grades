@@ -221,15 +221,15 @@ const AssesmentFilterButton = (): JSX.Element => {
 
   const {selectedGradingModel, setSelectedGradingModel} = useTableContext();
 
-  const allAssessmentModels = useGetAllGradingModels(courseId);
+  const allGradingModels = useGetAllGradingModels(courseId);
 
   // Filter out archived models
-  const assessmentModels = useMemo(
+  const gradingModels = useMemo(
     () =>
-      allAssessmentModels.data !== undefined
-        ? allAssessmentModels.data.filter(model => !model.archived)
+      allGradingModels.data !== undefined
+        ? allGradingModels.data.filter(model => !model.archived)
         : undefined,
-    [allAssessmentModels.data]
+    [allGradingModels.data]
   );
 
   const isActive = useMemo<boolean>(
@@ -241,7 +241,7 @@ const AssesmentFilterButton = (): JSX.Element => {
     <>
       <span style={{display: 'flex'}}>
         <ButtonBase
-          id="select-assessment-model-option"
+          id="select-grading-model-option"
           style={{
             ...{
               display: 'flex',
@@ -273,9 +273,8 @@ const AssesmentFilterButton = (): JSX.Element => {
             }}
           >
             {isActive
-              ? assessmentModels?.filter(
-                  ass => ass.id === selectedGradingModel
-                )[0]?.name
+              ? gradingModels?.filter(ass => ass.id === selectedGradingModel)[0]
+                  ?.name
               : 'Grading Model'}
           </div>
 
@@ -328,13 +327,13 @@ const AssesmentFilterButton = (): JSX.Element => {
           maxHeight: '50vh',
         }}
       >
-        {(assessmentModels ?? []).map(model => (
+        {(gradingModels ?? []).map(model => (
           <MenuItem
             onClick={() => {
               setSelectedGradingModel(model.id);
               handleClose();
             }}
-            key={`assessment-model-select-${model.id}`}
+            key={`grading-model-select-${model.id}`}
             value={model.id}
             selected={selectedGradingModel === model.id}
           >

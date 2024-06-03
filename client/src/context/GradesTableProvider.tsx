@@ -433,7 +433,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       }
     ),
     // columnHelper.group({
-    //   header: 'Attainments',
+    //   header: 'Course Parts',
     //   meta: {PrettyChipPosition: 'alone'},
     //   columns: gradeColumns,
     // }),
