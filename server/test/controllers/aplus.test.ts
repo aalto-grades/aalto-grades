@@ -480,7 +480,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
   });
 
   it('should respond with 400 if A+ token parsing fails', async () => {
-    const url = `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsCoursePartId}]`;
+    const url = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`;
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
     for (const invalid of invalidAuthorization) {
       await responseTests
