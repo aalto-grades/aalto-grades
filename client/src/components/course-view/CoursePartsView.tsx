@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Archive, Delete, Unarchive} from '@mui/icons-material';
-import {Box, Button} from '@mui/material';
+import {Box, Button, Typography} from '@mui/material';
 import {
   DataGrid,
   GridActionsCellItem,
@@ -16,18 +16,18 @@ import {JSX, useEffect, useMemo, useState} from 'react';
 import {useBlocker, useParams} from 'react-router-dom';
 
 import {
-  EditAttainmentData,
-  NewAttainmentData,
+  EditCoursePartData,
+  NewCoursePartData,
   SystemRole,
 } from '@/common/types';
-import NewAplusAttainmentsDialog from './NewAplusAttainmentsDialog';
-import NewAttainmentDialog from './NewAttainmentDialog';
+import NewAplusCoursePartsDialog from './NewAplusGradePartsDialog';
+import AddCoursePartDialog from './NewCoursePartDialog';
 import {
-  useAddAttainment,
-  useDeleteAttainment,
-  useEditAttainment,
-  useGetAllAssessmentModels,
-  useGetAttainments,
+  useAddCoursePart,
+  useDeleteCoursePart,
+  useEditCoursePart,
+  useGetAllGradingModels,
+  useGetCourseParts,
   useGetGrades,
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
@@ -35,23 +35,23 @@ import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 type ColTypes = {
   id: number;
-  attainmentId: number;
+  coursePartId: number;
   name: string;
   daysValid: number;
   validUntil: Date | null;
   archived: boolean;
 };
 
-const AttainmentsView = (): JSX.Element => {
+const CoursePartsView = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
 
   const grades = useGetGrades(courseId);
-  const assessmentModels = useGetAllAssessmentModels(courseId);
-  const attainments = useGetAttainments(courseId);
-  const addAttainment = useAddAttainment(courseId);
-  const editAttainment = useEditAttainment(courseId);
-  const deleteAttainment = useDeleteAttainment(courseId);
+  const gradingModels = useGetAllGradingModels(courseId);
+  const courseParts = useGetCourseParts(courseId);
+  const addCoursePart = useAddCoursePart(courseId);
+  const editCoursePart = useEditCoursePart(courseId);
+  const deleteCoursePart = useDeleteCoursePart(courseId);
 
   const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
@@ -61,30 +61,30 @@ const AttainmentsView = (): JSX.Element => {
   const [aplusDialogOpen, setAplusDialogOpen] = useState<boolean>(false);
   const [unsavedDialogOpen, setUnsavedDialogOpen] = useState<boolean>(false);
 
-  const attsWithGrades = useMemo(() => {
+  const coursePartsWithGrades = useMemo(() => {
     const withGrades = new Set<number>();
     if (grades.data === undefined) return withGrades;
     for (const grade of grades.data) {
-      for (const att of grade.attainments) {
-        if (att.grades.length > 0) {
-          withGrades.add(att.attainmentId);
+      for (const coursePart of grade.courseParts) {
+        if (coursePart.grades.length > 0) {
+          withGrades.add(coursePart.coursePartId);
         }
       }
     }
     return withGrades;
   }, [grades.data]);
 
-  const attsWithModels = useMemo(() => {
+  const coursePartsWithModels = useMemo(() => {
     const withModels = new Set<number>();
-    if (assessmentModels.data === undefined) return withModels;
-    for (const model of assessmentModels.data) {
+    if (gradingModels.data === undefined) return withModels;
+    for (const model of gradingModels.data) {
       for (const node of model.graphStructure.nodes) {
-        if (node.type !== 'attainment') continue;
+        if (node.type !== 'coursepart') continue;
         withModels.add(parseInt(node.id.split('-')[1]));
       }
     }
     return withModels;
-  }, [assessmentModels.data]);
+  }, [gradingModels.data]);
 
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge,
@@ -102,19 +102,19 @@ const AttainmentsView = (): JSX.Element => {
   );
 
   useEffect(() => {
-    if (attainments.data === undefined) return;
-    const newRows = attainments.data.map(att => ({
-      id: att.id,
-      attainmentId: att.id,
-      name: att.name,
-      daysValid: att.daysValid,
+    if (courseParts.data === undefined) return;
+    const newRows = courseParts.data.map(coursePart => ({
+      id: coursePart.id,
+      coursePartId: coursePart.id,
+      name: coursePart.name,
+      daysValid: coursePart.daysValid,
       validUntil: null,
-      archived: att.archived,
+      archived: coursePart.archived,
     }));
     if (JSON.stringify(newRows) === JSON.stringify(rows)) return;
     setRows(newRows);
     setInitRows(structuredClone(newRows));
-  }, [attainments.data]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [courseParts.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Warning if leaving with unsaved
   useEffect(() => {
@@ -128,13 +128,13 @@ const AttainmentsView = (): JSX.Element => {
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [unsavedChanges]);
 
-  const handleAddAttainment = (name: string, daysValid: number): void => {
+  const handleAddCoursePart = (name: string, daysValid: number): void => {
     setRows(oldRows => {
       const freeId =
         oldRows.reduce((mxVal, row) => Math.max(mxVal, row.id), 0) + 1;
       return oldRows.concat({
         id: freeId,
-        attainmentId: -1,
+        coursePartId: -1,
         name,
         daysValid,
         validUntil: null,
@@ -144,20 +144,20 @@ const AttainmentsView = (): JSX.Element => {
   };
 
   const handleSubmit = async (): Promise<void> => {
-    const newAttainments: NewAttainmentData[] = [];
-    const deletedAttainments: number[] = [];
-    const editedAttainments: ({attainmentId: number} & EditAttainmentData)[] =
+    const newCourseParts: NewCoursePartData[] = [];
+    const deletedCourseParts: number[] = [];
+    const editedCourseParts: ({coursePartsId: number} & EditCoursePartData)[] =
       [];
 
     for (const row of rows) {
-      if (row.attainmentId === -1) {
-        newAttainments.push({
+      if (row.coursePartId === -1) {
+        newCourseParts.push({
           name: row.name,
           daysValid: row.daysValid,
         });
       } else {
-        editedAttainments.push({
-          attainmentId: row.attainmentId,
+        editedCourseParts.push({
+          coursePartsId: row.coursePartId,
           name: row.name,
           daysValid: row.daysValid,
           archived: row.archived,
@@ -165,30 +165,34 @@ const AttainmentsView = (): JSX.Element => {
       }
     }
 
-    const newAttIds = rows.map(row => row.attainmentId);
+    const newAttIds = rows.map(row => row.coursePartId);
     for (const initRow of initRows) {
-      if (!newAttIds.includes(initRow.attainmentId))
-        deletedAttainments.push(initRow.attainmentId);
+      if (!newAttIds.includes(initRow.coursePartId))
+        deletedCourseParts.push(initRow.coursePartId);
     }
 
     await Promise.all([
-      ...newAttainments.map(att => addAttainment.mutateAsync(att)),
-      ...deletedAttainments.map(attId => deleteAttainment.mutateAsync(attId)),
-      ...editedAttainments.map(att =>
-        editAttainment.mutateAsync({
-          attainmentId: att.attainmentId,
-          attainment: att,
+      ...newCourseParts.map(coursePart =>
+        addCoursePart.mutateAsync(coursePart)
+      ),
+      ...deletedCourseParts.map(coursePartId =>
+        deleteCoursePart.mutateAsync(coursePartId)
+      ),
+      ...editedCourseParts.map(coursePart =>
+        editCoursePart.mutateAsync({
+          coursePartId: coursePart.coursePartsId,
+          coursePart: coursePart,
         })
       ),
     ]);
 
-    enqueueSnackbar('Attainments saved successfully', {variant: 'success'});
+    enqueueSnackbar('Course parts saved successfully', {variant: 'success'});
     setInitRows(structuredClone(rows));
   };
 
   const getActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
     const elements = [];
-    if (params.row.attainmentId !== -1) {
+    if (params.row.coursePartId !== -1) {
       elements.push(
         <GridActionsCellItem
           icon={params.row.archived ? <Unarchive /> : <Archive />}
@@ -205,13 +209,13 @@ const AttainmentsView = (): JSX.Element => {
         />
       );
     }
-    if (!attsWithGrades.has(params.row.attainmentId)) {
+    if (!coursePartsWithGrades.has(params.row.coursePartId)) {
       elements.push(
         <GridActionsCellItem
           icon={<Delete />}
           label="Delete"
           onClick={() => {
-            if (attsWithModels.has(params.row.attainmentId)) {
+            if (coursePartsWithModels.has(params.row.coursePartId)) {
               // TODO: Show confirm
             }
             setRows(oldRows => oldRows.filter(row => row.id !== params.id));
@@ -261,12 +265,12 @@ const AttainmentsView = (): JSX.Element => {
 
   return (
     <>
-      <NewAttainmentDialog
+      <AddCoursePartDialog
         handleClose={() => setAddDialogOpen(false)}
         open={addDialogOpen}
-        onSave={handleAddAttainment}
+        onSave={handleAddCoursePart}
       />
-      <NewAplusAttainmentsDialog
+      <NewAplusCoursePartsDialog
         handleClose={() => setAplusDialogOpen(false)}
         open={aplusDialogOpen}
       />
@@ -281,31 +285,71 @@ const AttainmentsView = (): JSX.Element => {
           if (blocker.state === 'blocked') blocker.proceed();
         }}
       />
-      <>Attainments</>
-      <Box sx={{display: 'flex', mb: 1}}>
-        {editRights && (
-          <Button onClick={() => setAddDialogOpen(true)}>Add attainment</Button>
-        )}
+      <div style={{display: 'flex'}}>
+        <Typography width={'fit-content'} variant="h2">
+          Course Part
+        </Typography>
 
-        {editRights && (
-          <Button onClick={() => setAplusDialogOpen(true)}>Add from A+</Button>
+        {editRights && unsavedChanges && (
+          <Box
+            sx={{
+              marginLeft: '10px',
+              borderRadius: 4,
+              // border: '1px solid black',
+              // backgroundColor: 'lightgray',
+              alignItems: 'center',
+              textAlign: 'center',
+              // p: 1,
+            }}
+          >
+            {/* {unsavedChanges && (
+              <>
+                Unsaved Changes
+                <Button onClick={() => setUnsavedDialogOpen(true)}>
+                  Discard
+                </Button>
+                <Button
+                  onClick={handleSubmit}
+                  variant={unsavedChanges ? 'contained' : 'text'}
+                  disabled={error || editing}
+                >
+                  Save
+                </Button>
+              </>
+            )} */}
+          </Box>
         )}
-
+      </div>
+      <Box sx={{display: 'flex', gap: 1, mb: 1, mt: 1}}>
         {editRights && (
-          <div style={{marginLeft: '10px'}}>
-            {unsavedChanges && (
-              <Button onClick={() => setUnsavedDialogOpen(true)}>
-                Discard
-              </Button>
-            )}
-            <Button
-              onClick={handleSubmit}
-              variant={unsavedChanges ? 'contained' : 'text'}
-              disabled={error || editing}
-            >
-              Save
+          <>
+            <Button variant="outlined" onClick={() => setAddDialogOpen(true)}>
+              Add New
             </Button>
-          </div>
+            <Button onClick={() => setAplusDialogOpen(true)}>
+              Add from A+
+            </Button>
+          </>
+        )}
+
+        {editRights && (
+          <>
+            {unsavedChanges && (
+              <>
+                <Button onClick={() => setUnsavedDialogOpen(true)}>
+                  Discard
+                </Button>
+
+                <Button
+                  onClick={handleSubmit}
+                  variant={unsavedChanges ? 'contained' : 'text'}
+                  disabled={error || editing}
+                >
+                  Save
+                </Button>
+              </>
+            )}
+          </>
         )}
       </Box>
 
@@ -345,4 +389,4 @@ const AttainmentsView = (): JSX.Element => {
   );
 };
 
-export default AttainmentsView;
+export default CoursePartsView;

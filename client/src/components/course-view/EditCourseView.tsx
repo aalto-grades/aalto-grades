@@ -29,6 +29,7 @@ import {
   JSX,
   PropsWithChildren,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import {useBlocker, useParams} from 'react-router-dom';
@@ -200,6 +201,8 @@ const EditCourseView = (): JSX.Element => {
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
   const [unsavedDialogOpen, setUnsavedDialogOpen] = useState<boolean>(false);
 
+  const formRef = useRef<FormikProps<FormData>>(null);
+
   const blocker = useBlocker(
     ({currentLocation, nextLocation}) =>
       unsavedChanges && currentLocation.pathname !== nextLocation.pathname
@@ -326,10 +329,52 @@ const EditCourseView = (): JSX.Element => {
 
   return (
     <>
+      <Typography width={'fit-content'} variant="h2">
+        Edit Course
+      </Typography>
+      {/* <Button
+        id="ag_create_course_btn"
+        variant={'contained'}
+        type="submit"
+        onclick={() => {
+          if (formRef.current) {
+            formRef.current.handleSubmit();
+          }
+        }}
+        disabled={formRef.current?.isSubmitting}
+        sx={{float: 'right'}}
+      >
+        Save
+        {formRef.current?.isSubmitting && (
+          <CircularProgress
+            size={24}
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              marginTop: '-12px',
+              marginLeft: '-12px',
+            }}
+          />
+        )}
+      </Button>
+      {changed(formRef.current?.values) && (
+        <Button
+          variant="outlined"
+          // disabled={form.isSubmitting}
+          sx={{float: 'right', mr: 2}}
+          color="error"
+          onClick={() => setUnsavedDialogOpen(true)}
+        >
+          Discard changes
+        </Button>
+      )} */}
+
       <Formik
         initialValues={initialValues}
         validate={validateForm}
         onSubmit={handleSubmit}
+        innerRef={formRef}
       >
         {form => (
           <>
@@ -350,8 +395,8 @@ const EditCourseView = (): JSX.Element => {
               }}
             />
             <Form>
-              <Grid container justifyContent="space-around">
-                <Grid item xs={5.5}>
+              <Grid container justifyContent="flex-start" gap={5}>
+                <Grid md={5}>
                   <FormField
                     form={form}
                     value="courseCode"
@@ -421,7 +466,7 @@ const EditCourseView = (): JSX.Element => {
                     ))}
                   </FormField>
                 </Grid>
-                <Grid item xs={5.5}>
+                <Grid md={5}>
                   <TextField
                     id="teacherEmail"
                     type="text"

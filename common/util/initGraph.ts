@@ -4,7 +4,7 @@
 
 import {Edge, Node} from 'reactflow';
 
-import {AttainmentData, FullNodeData, GraphStructure, NodeData} from '../types';
+import {CoursePartData, FullNodeData, GraphStructure, NodeData} from '../types';
 
 export type GraphTemplate = 'none' | 'addition' | 'average';
 
@@ -27,7 +27,7 @@ const createEdge = (
 
 export const initGraph = (
   template: GraphTemplate,
-  attainments: AttainmentData[]
+  courseParts: CoursePartData[]
 ): GraphStructure => {
   const nodes: Node[] = [
     {
@@ -36,9 +36,9 @@ export const initGraph = (
       position: {x: 1116, y: 0},
       data: {},
     },
-    ...attainments.map((attainment, index) => ({
-      id: `attainment-${attainment.id}`,
-      type: 'attainment',
+    ...courseParts.map((coursePart, index) => ({
+      id: `coursepart-${coursePart.id}`,
+      type: 'coursepart',
 
       position: {x: 12, y: 173 * index},
       data: {},
@@ -47,9 +47,9 @@ export const initGraph = (
   const edges: Edge[] = [];
   const nodeData: FullNodeData = {
     'final-grade': {title: 'Final Grade'},
-    ...attainments.reduce((map: {[key: string]: NodeData}, attainment) => {
-      map[`attainment-${attainment.id}`] = {
-        title: attainment.name,
+    ...courseParts.reduce((map: {[key: string]: NodeData}, coursePart) => {
+      map[`coursepart-${coursePart.id}`] = {
+        title: coursePart.name,
         settings: {onFailSetting: 'coursefail', minPoints: 0},
       };
       return map;
@@ -67,9 +67,9 @@ export const initGraph = (
       position: {x: 437, y: 0},
       data: {},
     });
-    for (let i = 0; i < attainments.length; i++) {
-      const attainmentNodeId = `attainment-${attainments[i].id}`;
-      edges.push(createEdge(attainmentNodeId, middleNodeId, undefined, i));
+    for (let i = 0; i < courseParts.length; i++) {
+      const coursePartNodeId = `coursepart-${courseParts[i].id}`;
+      edges.push(createEdge(coursePartNodeId, middleNodeId, undefined, i));
     }
     nodeData[middleNodeId] =
       template === 'addition'
@@ -78,9 +78,9 @@ export const initGraph = (
             title: 'Average',
             settings: {
               weights: Object.fromEntries(
-                attainments.map((_, i) => [
+                courseParts.map((_, i) => [
                   `average-${i}`,
-                  Math.round((100 / attainments.length) * 10) / 10,
+                  Math.round((100 / courseParts.length) * 10) / 10,
                 ])
               ),
               percentageMode: true,
@@ -106,7 +106,7 @@ export const initGraph = (
             : Array.from(
                 {length: 5},
                 (_, i) =>
-                  Math.round((((i + 1) * 10 * attainments.length) / 6) * 10) /
+                  Math.round((((i + 1) * 10 * courseParts.length) / 6) * 10) /
                   10
               ),
       },

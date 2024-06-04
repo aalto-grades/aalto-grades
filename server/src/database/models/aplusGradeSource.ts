@@ -12,7 +12,7 @@ import {
 } from 'sequelize';
 
 import {AplusGradeSourceType} from '@/common/types';
-import Attainment from './attainment';
+import CoursePart from './coursePart';
 import {sequelize} from '..';
 
 export default class AplusGradeSource extends Model<
@@ -20,7 +20,7 @@ export default class AplusGradeSource extends Model<
   InferCreationAttributes<AplusGradeSource>
 > {
   declare id: CreationOptional<number>;
-  declare attainmentId: ForeignKey<Attainment['id']>;
+  declare coursePartId: ForeignKey<CoursePart['id']>;
   declare aplusCourseId: number;
   declare sourceType: AplusGradeSourceType;
   declare moduleId: CreationOptional<number | null>;
@@ -36,11 +36,11 @@ AplusGradeSource.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    attainmentId: {
+    coursePartId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'attainment',
+        model: 'course_part',
         key: 'id',
       },
     },
@@ -69,8 +69,8 @@ AplusGradeSource.init(
   }
 );
 
-Attainment.hasMany(AplusGradeSource, {
+CoursePart.hasMany(AplusGradeSource, {
   onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
-AplusGradeSource.belongsTo(Attainment, {foreignKey: 'attainmentId'});
+AplusGradeSource.belongsTo(CoursePart, {foreignKey: 'coursePartId'});

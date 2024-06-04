@@ -26,7 +26,7 @@ import FrontPage from './components/FrontPage';
 import NotFound from './components/NotFound';
 import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
-import AttainmentsView from './components/course-view/AttainmentsView';
+import CoursePartsView from './components/course-view/CoursePartsView';
 import EditCourseView from './components/course-view/EditCourseView';
 import ModelsView from './components/course-view/ModelsView';
 import NotistackWrapper from './context/NotistackProvider';
@@ -50,6 +50,13 @@ declare module '@mui/material/styles' {
 
   interface TypographyVariantsOptions {
     textInput?: CSSProperties;
+  }
+}
+
+declare module '@mui/material/Button' {
+  export interface ButtonPropsVariantOverrides {
+    elevated: true;
+    tonal: true;
   }
 }
 
@@ -84,6 +91,56 @@ const theme: CssVarsTheme = extendTheme({
       },
     },
   },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          borderRadius: '8px',
+        },
+      },
+      variants: [
+        {
+          props: {variant: 'elevated'},
+          style: {
+            boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+          },
+        },
+        {
+          props: {variant: 'tonal', color: 'secondary'},
+          style: ({theme}) => ({
+            backgroundColor: theme.vars.palette.secondary.light,
+            color: theme.vars.palette.secondary.main,
+          }),
+        },
+        {
+          props: {variant: 'tonal', color: 'primary'},
+          style: ({theme}) => ({
+            backgroundColor: theme.vars.palette.primary.light,
+            color: theme.vars.palette.primary.main,
+          }),
+        },
+      ],
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: '8px',
+          borderColor: 'black',
+          height: '32px',
+          fontSize: '14px',
+          // boxSizing: 'border-box',
+        },
+      },
+    },
+    MuiListItemIcon: {
+      styleOverrides: {
+        root: {
+          minWidth: '48px',
+        },
+      },
+    },
+  },
   typography: {
     h1: {
       fontSize: '48px',
@@ -91,12 +148,13 @@ const theme: CssVarsTheme = extendTheme({
       fontWeight: '400',
     },
     h2: {
-      fontSize: '34px',
+      fontSize: '28px',
       fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       fontWeight: '400',
+      // lineHeight: '1.2',
     },
     h3: {
-      fontSize: '20px',
+      fontSize: '24px',
       fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       fontWeight: '400',
     },
@@ -191,8 +249,8 @@ const router = createBrowserRouter([
                 element: <ModelsView />,
               },
               {
-                path: '/:courseId/attainments',
-                element: <AttainmentsView />,
+                path: '/:courseId/course-parts',
+                element: <CoursePartsView />,
               },
               {
                 path: '/:courseId/edit',

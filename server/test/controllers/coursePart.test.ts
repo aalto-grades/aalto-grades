@@ -6,15 +6,15 @@ import supertest from 'supertest';
 import {z} from 'zod';
 
 import {
-  AttainmentData,
-  AttainmentDataSchema,
-  EditAttainmentData,
+  CoursePartData,
+  CoursePartDataSchema,
+  EditCoursePartData,
   HttpCode,
   IdSchema,
-  NewAttainmentData,
+  NewCoursePartData,
 } from '@/common/types';
 import {app} from '../../src/app';
-import Attainment from '../../src/database/models/attainment';
+import CoursePart from '../../src/database/models/coursePart';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
@@ -26,55 +26,55 @@ const responseTests = new ResponseTests(request);
 
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
-let editAttainmentId = -1;
+let editCoursePartId = -1;
 
 let noRoleCourseId = -1;
-let noRoleAttainmentId = 26;
+let noRoleCoursePartId = 26;
 
 const nonExistentId = 1000000;
 
 beforeAll(async () => {
   cookies = await getCookies();
 
-  let courseAttainments: AttainmentData[] = [];
-  [courseId, courseAttainments] = await createData.createCourse({});
-  editAttainmentId = courseAttainments[0].id;
+  let courseParts: CoursePartData[] = [];
+  [courseId, courseParts] = await createData.createCourse({});
+  editCoursePartId = courseParts[0].id;
 
-  [noRoleCourseId, courseAttainments] = await createData.createCourse({
+  [noRoleCourseId, courseParts] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
   });
-  noRoleAttainmentId = courseAttainments[0].id;
+  noRoleCoursePartId = courseParts[0].id;
 });
 
 afterAll(async () => {
   await resetDb();
 });
 
-const checkAttainment = async (
+const checkCoursePart = async (
   id: number,
-  attainment: NewAttainmentData | EditAttainmentData
+  coursePart: NewCoursePartData | EditCoursePartData
 ): Promise<void> => {
-  const result = await Attainment.findOne({
+  const result = await CoursePart.findOne({
     where: {id, courseId: courseId},
   });
 
   expect(result).not.toBe(null);
-  if (attainment.name !== undefined) expect(result?.name).toBe(attainment.name);
-  if (attainment.daysValid !== undefined)
-    expect(result?.daysValid).toBe(attainment.daysValid);
+  if (coursePart.name !== undefined) expect(result?.name).toBe(coursePart.name);
+  if (coursePart.daysValid !== undefined)
+    expect(result?.daysValid).toBe(coursePart.daysValid);
 };
 
-const attainmentDoesNotExist = async (id: number): Promise<void> => {
-  const result = await Attainment.findOne({
+const coursePartDoesNotExist = async (id: number): Promise<void> => {
+  const result = await CoursePart.findOne({
     where: {id: id, courseId: courseId},
   });
   expect(result).toBeNull();
 };
 
-describe('Test GET /v1/courses/:courseId/attainments - get all attainments', () => {
-  it('should get the attainments', async () => {
+describe('Test GET /v1/courses/:courseId/parts - get all course parts', () => {
+  it('should get the course parts', async () => {
     const testCookies = [
       cookies.adminCookie,
       cookies.teacherCookie,
@@ -83,28 +83,28 @@ describe('Test GET /v1/courses/:courseId/attainments - get all attainments', () 
     ];
     for (const cookie of testCookies) {
       const res = await request
-        .get(`/v1/courses/${courseId}/attainments`)
+        .get(`/v1/courses/${courseId}/parts`)
         .set('Cookie', cookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = z.array(AttainmentDataSchema.strict()).nonempty();
+      const Schema = z.array(CoursePartDataSchema.strict()).nonempty();
       const result = await Schema.safeParseAsync(res.body);
       expect(result.success).toBeTruthy();
     }
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    const url = `/v1/courses/${'bad'}/attainments`;
+    const url = `/v1/courses/${'bad'}/parts`;
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
-    const url = `/v1/courses/${courseId}/attainments`;
+    const url = `/v1/courses/${courseId}/parts`;
     await responseTests.testUnauthorized(url).get();
 
     await responseTests
-      .testForbidden(`/v1/courses/${noRoleCourseId}/attainments`, [
+      .testForbidden(`/v1/courses/${noRoleCourseId}/parts`, [
         cookies.teacherCookie,
         cookies.assistantCookie,
         cookies.studentCookie,
@@ -113,45 +113,45 @@ describe('Test GET /v1/courses/:courseId/attainments - get all attainments', () 
   });
 
   it('should respond with 404 when not found', async () => {
-    const url = `/v1/courses/${nonExistentId}/attainments`;
+    const url = `/v1/courses/${nonExistentId}/parts`;
     await responseTests.testNotFound(url, cookies.adminCookie).get();
   });
 });
 
-describe('Test POST /v1/courses/:courseId/attainments - add an attainment', () => {
-  it('should add an attainment', async () => {
+describe('Test POST /v1/courses/:courseId/parts - add a course part', () => {
+  it('should add a course part', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     let i = 0;
 
     for (const cookie of testCookies) {
-      const attainment = {name: `att-${++i}`, daysValid: 350};
+      const coursePart = {name: `coursepart-${++i}`, daysValid: 350};
       const res = await request
-        .post(`/v1/courses/${courseId}/attainments`)
-        .send(attainment)
+        .post(`/v1/courses/${courseId}/parts`)
+        .send(coursePart)
         .set('Cookie', cookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Created);
 
       const result = await IdSchema.safeParseAsync(res.body);
       expect(result.success).toBeTruthy();
-      if (result.success) await checkAttainment(result.data, attainment);
+      if (result.success) await checkCoursePart(result.data, coursePart);
     }
   });
 
   it('should respond with 400 if validation fails', async () => {
-    const url = `/v1/courses/${courseId}/attainments`;
+    const url = `/v1/courses/${courseId}/parts`;
     const data = {name: 'not added', daysValid: -1};
     await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    const url = `/v1/courses/${'bad'}/attainments`;
+    const url = `/v1/courses/${'bad'}/parts`;
     const data = {name: 'not added', daysValid: 365};
     await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
-    let url = `/v1/courses/${courseId}/attainments`;
+    let url = `/v1/courses/${courseId}/parts`;
     const data = {name: 'not added', daysValid: 365};
     await responseTests.testUnauthorized(url).post(data);
 
@@ -159,7 +159,7 @@ describe('Test POST /v1/courses/:courseId/attainments - add an attainment', () =
       .testForbidden(url, [cookies.assistantCookie, cookies.studentCookie])
       .post(data);
 
-    url = `/v1/courses/${noRoleCourseId}/attainments`;
+    url = `/v1/courses/${noRoleCourseId}/parts`;
     await responseTests
       .testForbidden(url, [
         cookies.teacherCookie,
@@ -170,41 +170,41 @@ describe('Test POST /v1/courses/:courseId/attainments - add an attainment', () =
   });
 
   it('should respond with 404 if not found', async () => {
-    const url = `/v1/courses/${nonExistentId}/attainments`;
+    const url = `/v1/courses/${nonExistentId}/parts`;
     const data = {name: 'not added', daysValid: 365};
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
-  it('should respond with 409 if trying to create an attainment with duplicate name', async () => {
-    const url = `/v1/courses/${courseId}/attainments`;
-    const data = {name: 'att-1', daysValid: 365};
+  it('should respond with 409 if trying to create a course part with duplicate name', async () => {
+    const url = `/v1/courses/${courseId}/parts`;
+    const data = {name: 'coursepart-1', daysValid: 365};
     await responseTests.testConflict(url, cookies.adminCookie).post(data);
   });
 });
 
-describe('Test PUT /v1/courses/:courseId/attainments/:attainmentId - edit an attainment', () => {
-  it('should edit an attainment', async () => {
+describe('Test PUT /v1/courses/:courseId/parts/:coursePartId - edit a course part', () => {
+  it('should edit a course part', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     let i = 0;
 
     for (const cookie of testCookies) {
-      const attainment = {name: `edit${++i}`, daysValid: 100};
+      const coursePart = {name: `edit${++i}`, daysValid: 100};
       const res = await request
-        .put(`/v1/courses/${courseId}/attainments/${editAttainmentId}`)
-        .send(attainment)
+        .put(`/v1/courses/${courseId}/parts/${editCoursePartId}`)
+        .send(coursePart)
         .set('Cookie', cookie)
         .expect(HttpCode.Ok);
 
       expect(JSON.stringify(res.body)).toBe('{}');
-      await checkAttainment(editAttainmentId, attainment);
+      await checkCoursePart(editCoursePartId, coursePart);
     }
   });
 
-  it('should partially edit an attainment', async () => {
-    const data: EditAttainmentData[] = [{name: 'edit1 new'}, {daysValid: 80}];
+  it('should partially edit a course part', async () => {
+    const data: EditCoursePartData[] = [{name: 'edit1 new'}, {daysValid: 80}];
     for (const editData of data) {
       const res = await request
-        .put(`/v1/courses/${courseId}/attainments/${editAttainmentId}`)
+        .put(`/v1/courses/${courseId}/parts/${editCoursePartId}`)
         .send(editData)
         .set('Content-Type', 'application/json')
         .set('Cookie', cookies.teacherCookie)
@@ -212,27 +212,27 @@ describe('Test PUT /v1/courses/:courseId/attainments/:attainmentId - edit an att
         .expect(HttpCode.Ok);
 
       expect(JSON.stringify(res.body)).toBe('{}');
-      await checkAttainment(editAttainmentId, editData);
+      await checkCoursePart(editCoursePartId, editData);
     }
   });
 
   it('should respond with 400 if validation fails', async () => {
-    const url = `/v1/courses/${courseId}/attainments/${editAttainmentId}`;
+    const url = `/v1/courses/${courseId}/parts/${editCoursePartId}`;
     const data = {name: 'not edited', daysValid: -1};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${'bad'}/attainments/${editAttainmentId}`;
+    let url = `/v1/courses/${'bad'}/parts/${editCoursePartId}`;
     const data = {name: 'not edited', daysValid: 365};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
-    url = `/v1/courses/${courseId}/attainments/${-1}`;
+    url = `/v1/courses/${courseId}/parts/${-1}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
-    let url = `/v1/courses/${courseId}/attainments/${editAttainmentId}`;
+    let url = `/v1/courses/${courseId}/parts/${editCoursePartId}`;
     const data = {name: 'not edited', daysValid: 365};
     await responseTests.testUnauthorized(url).put(data);
 
@@ -240,7 +240,7 @@ describe('Test PUT /v1/courses/:courseId/attainments/:attainmentId - edit an att
       .testForbidden(url, [cookies.assistantCookie, cookies.studentCookie])
       .put(data);
 
-    url = `/v1/courses/${noRoleCourseId}/attainments/${noRoleAttainmentId}`;
+    url = `/v1/courses/${noRoleCourseId}/parts/${noRoleCoursePartId}`;
     await responseTests
       .testForbidden(url, [
         cookies.teacherCookie,
@@ -251,61 +251,61 @@ describe('Test PUT /v1/courses/:courseId/attainments/:attainmentId - edit an att
   });
 
   it('should respond with 404 if not found', async () => {
-    let url = `/v1/courses/${nonExistentId}/attainments/${editAttainmentId}`;
+    let url = `/v1/courses/${nonExistentId}/parts/${editCoursePartId}`;
     const data = {name: 'not edited', daysValid: 365};
     await responseTests.testNotFound(url, cookies.adminCookie).put(data);
 
-    url = `/v1/courses/${courseId}/attainments/${nonExistentId}`;
+    url = `/v1/courses/${courseId}/parts/${nonExistentId}`;
     await responseTests.testNotFound(url, cookies.adminCookie).put(data);
   });
 
-  it('should respond with 409 when attainment does not belong to course', async () => {
-    const url = `/v1/courses/${courseId}/attainments/${noRoleAttainmentId}`;
+  it('should respond with 409 when course part does not belong to course', async () => {
+    const url = `/v1/courses/${courseId}/parts/${noRoleCoursePartId}`;
     const data = {name: 'not edited', daysValid: 365};
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
 
-  it('should respond with 409 when trying to edit duplicate attainment name', async () => {
-    const url = `/v1/courses/${courseId}/attainments/${editAttainmentId}`;
-    const data = {name: 'att-1', daysValid: 365};
+  it('should respond with 409 when trying to edit duplicate course part name', async () => {
+    const url = `/v1/courses/${courseId}/parts/${editCoursePartId}`;
+    const data = {name: 'coursepart-1', daysValid: 365};
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
 });
 
-describe('Test Delete /v1/courses/:courseId/attainments/:attainmentId - delete an attainment', () => {
-  it('should delete an attainment', async () => {
+describe('Test Delete /v1/courses/:courseId/parts/:coursePartId - delete a course part', () => {
+  it('should delete a course part', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
-      const attainment = await createData.createAttainment(courseId);
-      await checkAttainment(attainment.id, {}); // Validate that exists
+      const coursePart = await createData.createCoursePart(courseId);
+      await checkCoursePart(coursePart.id, {}); // Validate that exists
 
       const res = await request
-        .delete(`/v1/courses/${courseId}/attainments/${attainment.id}`)
+        .delete(`/v1/courses/${courseId}/parts/${coursePart.id}`)
         .set('Cookie', cookie)
         .expect(HttpCode.Ok);
 
       expect(JSON.stringify(res.body)).toBe('{}');
-      await attainmentDoesNotExist(attainment.id);
+      await coursePartDoesNotExist(coursePart.id);
     }
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${'bad'}/attainments/${editAttainmentId}`;
+    let url = `/v1/courses/${'bad'}/parts/${editCoursePartId}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).delete();
 
-    url = `/v1/courses/${courseId}/attainments/${-1}`;
+    url = `/v1/courses/${courseId}/parts/${-1}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).delete();
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
-    let url = `/v1/courses/${courseId}/attainments/${editAttainmentId}`;
+    let url = `/v1/courses/${courseId}/parts/${editCoursePartId}`;
     await responseTests.testUnauthorized(url).delete();
 
     await responseTests
       .testForbidden(url, [cookies.assistantCookie, cookies.studentCookie])
       .delete();
 
-    url = `/v1/courses/${noRoleCourseId}/attainments/${noRoleAttainmentId}`;
+    url = `/v1/courses/${noRoleCourseId}/parts/${noRoleCoursePartId}`;
     await responseTests
       .testForbidden(url, [
         cookies.teacherCookie,
@@ -316,25 +316,25 @@ describe('Test Delete /v1/courses/:courseId/attainments/:attainmentId - delete a
   });
 
   it('should respond with 404 if not found', async () => {
-    let url = `/v1/courses/${nonExistentId}/attainments/${editAttainmentId}`;
+    let url = `/v1/courses/${nonExistentId}/parts/${editCoursePartId}`;
     await responseTests.testNotFound(url, cookies.adminCookie).delete();
 
-    url = `/v1/courses/${courseId}/attainments/${nonExistentId}`;
+    url = `/v1/courses/${courseId}/parts/${nonExistentId}`;
     await responseTests.testNotFound(url, cookies.adminCookie).delete();
   });
 
-  it('should respond with 409 when attainment does not belong to course', async () => {
-    const url = `/v1/courses/${courseId}/attainments/${noRoleAttainmentId}`;
+  it('should respond with 409 when course part does not belong to course', async () => {
+    const url = `/v1/courses/${courseId}/parts/${noRoleCoursePartId}`;
     await responseTests.testConflict(url, cookies.adminCookie).delete();
   });
 
-  it('should respond with 409 if trying to delete attainment with grades', async () => {
-    const attainment = await createData.createAttainment(courseId);
-    await checkAttainment(attainment.id, {}); // Validate that exists
+  it('should respond with 409 if trying to delete a course part with grades', async () => {
+    const coursePart = await createData.createCoursePart(courseId);
+    await checkCoursePart(coursePart.id, {}); // Validate that exists
     const user = await createData.createUser();
-    await createData.createGrade(user.id, attainment.id, TEACHER_ID);
+    await createData.createGrade(user.id, coursePart.id, TEACHER_ID);
 
-    const url = `/v1/courses/${courseId}/attainments/${attainment.id}`;
+    const url = `/v1/courses/${courseId}/parts/${coursePart.id}`;
     await responseTests.testConflict(url, cookies.adminCookie).delete();
   });
 });

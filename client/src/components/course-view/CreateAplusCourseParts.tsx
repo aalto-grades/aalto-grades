@@ -7,37 +7,37 @@ import {JSX} from 'react';
 
 import {AplusGradeSourceData} from '@/common/types';
 
-type CreateAplusAttainmentsProps = {
-  attainmentsWithSource: [
+type CreateAplusCoursePartsProps = {
+  coursePartsWithSource: [
     {name: string; daysValid: number},
     AplusGradeSourceData,
   ][];
   handleChange: (
     index: number,
-    attainment: {name?: string; daysValid?: number}
+    coursePart: {name?: string; daysValid?: number}
   ) => void;
 };
 
-const CreateAplusAttainments = ({
-  attainmentsWithSource,
+const CreateAplusCourseParts = ({
+  coursePartsWithSource,
   handleChange,
-}: CreateAplusAttainmentsProps): JSX.Element => {
+}: CreateAplusCoursePartsProps): JSX.Element => {
   return (
     <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
-      {attainmentsWithSource.map(([attainment, _], index) => (
+      {coursePartsWithSource.map(([coursePart, _], index) => (
         <Card sx={{m: 1}}>
           <CardContent>
             <TextField
               sx={{mt: 1}}
               label="Name"
-              value={attainment.name}
+              value={coursePart.name}
               onChange={e => handleChange(index, {name: e.target.value})}
             />
             <TextField
               sx={{mt: 1}}
               label="Days valid"
               type="number"
-              value={attainment.daysValid}
+              value={coursePart.daysValid}
               onChange={e =>
                 handleChange(index, {daysValid: Number(e.target.value)})
               }
@@ -49,4 +49,4 @@ const CreateAplusAttainments = ({
   );
 };
 
-export default CreateAplusAttainments;
+export default CreateAplusCourseParts;

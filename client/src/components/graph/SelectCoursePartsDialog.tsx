@@ -15,30 +15,30 @@ import {
 import {JSX, useEffect, useState} from 'react';
 import {Node} from 'reactflow';
 
-import {AttainmentData} from '@/common/types';
+import {CoursePartData} from '@/common/types';
 
-const SelectAttainmentsDialog = ({
+const SelectCoursePartsDialog = ({
   nodes,
-  attainments,
+  courseParts,
   open,
   onClose,
-  handleAttainmentSelect,
+  handleCoursePartSelect,
 }: {
   nodes: Node[];
-  attainments: {id: number; name: string}[];
+  courseParts: {id: number; name: string}[];
   open: boolean;
   onClose: () => void;
-  handleAttainmentSelect: (
-    newAttainments: AttainmentData[],
-    removedAttainments: AttainmentData[]
+  handleCoursePartSelect: (
+    newCourseParts: CoursePartData[],
+    removedCourseParts: CoursePartData[]
   ) => void;
 }): JSX.Element => {
-  const attainmentNodeIds: number[] = nodes
-    .filter(node => node.type === 'attainment')
+  const coursePartNodeIds: number[] = nodes
+    .filter(node => node.type === 'coursepart')
     .map(node => parseInt(node.id.split('-')[1]));
 
   const initSelected: {[key: number]: boolean} = {};
-  for (const attainment of attainments) initSelected[attainment.id] = false;
+  for (const coursePart of courseParts) initSelected[coursePart.id] = false;
   const [startSelected, setStartSelected] = useState<{[key: number]: boolean}>(
     initSelected
   );
@@ -49,8 +49,8 @@ const SelectAttainmentsDialog = ({
   useEffect(() => {
     if (!open) return;
     const newSelected: {[key: number]: boolean} = {};
-    for (const attainment of attainments) {
-      newSelected[attainment.id] = attainmentNodeIds.includes(attainment.id);
+    for (const coursePart of courseParts) {
+      newSelected[coursePart.id] = coursePartNodeIds.includes(coursePart.id);
     }
     if (JSON.stringify(newSelected) === JSON.stringify(startSelected)) return;
 
@@ -66,39 +66,43 @@ const SelectAttainmentsDialog = ({
   };
 
   const onSubmit = (): void => {
-    const newAttainments: AttainmentData[] = [];
-    const removedAttainments: AttainmentData[] = [];
+    const newCourseParts: CoursePartData[] = [];
+    const removedCourseParts: CoursePartData[] = [];
     for (const [stringKey, value] of Object.entries(selected)) {
       const key = parseInt(stringKey);
       if (value && !startSelected[key])
-        newAttainments.push(
-          attainments.find(att => att.id === key) as AttainmentData
+        newCourseParts.push(
+          courseParts.find(
+            coursePart => coursePart.id === key
+          ) as CoursePartData
         );
       if (!value && startSelected[key])
-        removedAttainments.push(
-          attainments.find(att => att.id === key) as AttainmentData
+        removedCourseParts.push(
+          courseParts.find(
+            coursePart => coursePart.id === key
+          ) as CoursePartData
         );
     }
-    handleAttainmentSelect(newAttainments, removedAttainments);
+    handleCoursePartSelect(newCourseParts, removedCourseParts);
     onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Select Attainments</DialogTitle>
+      <DialogTitle>Select Course Parts</DialogTitle>
 
       <DialogContent>
         <FormGroup>
-          {attainments.map(attainment => (
+          {courseParts.map(coursePart => (
             <FormControlLabel
-              key={attainment.id}
+              key={coursePart.id}
               control={
                 <Checkbox
-                  checked={selected[attainment.id]}
-                  onChange={() => onSelect(attainment.id)}
+                  checked={selected[coursePart.id]}
+                  onChange={() => onSelect(coursePart.id)}
                 />
               }
-              label={attainment.name}
+              label={coursePart.name}
             />
           ))}
         </FormGroup>
@@ -120,4 +124,4 @@ const SelectAttainmentsDialog = ({
   );
 };
 
-export default SelectAttainmentsDialog;
+export default SelectCoursePartsDialog;

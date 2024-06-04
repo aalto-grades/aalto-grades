@@ -5,7 +5,7 @@
 import {Edge, Node} from 'reactflow';
 
 import {
-  AttainmentNodeSettings,
+  CoursePartNodeSettings,
   AverageNodeSettings,
   CustomNodeTypes,
   FullNodeData,
@@ -50,11 +50,11 @@ export const initNode = (
         value: {type, sources, value: 0},
         data: {title: 'Addition'},
       };
-    case 'attainment':
+    case 'coursepart':
       return {
         value: {type, source: 0, value: 0, courseFail: false},
         data: {
-          title: 'Attainment',
+          title: 'Course Part',
           settings: {onFailSetting: 'coursefail', minPoints: 0},
         },
       };
@@ -129,8 +129,8 @@ const calculateNodeValue = (
       nodeValue.value = sum;
       break;
     }
-    case 'attainment': {
-      const settings = nodeData[nodeId].settings as AttainmentNodeSettings;
+    case 'coursepart': {
+      const settings = nodeData[nodeId].settings as CoursePartNodeSettings;
       nodeValue.value = nodeValue.source;
       nodeValue.courseFail = false;
       if (nodeValue.source < settings.minPoints) {
@@ -322,7 +322,7 @@ export const calculateNewNodeValues = (
       nodeValue.values = {};
     else nodeValue.value = 0;
     switch (nodeValue.type) {
-      case 'attainment':
+      case 'coursepart':
         break;
       case 'grade':
       case 'minpoints':
@@ -376,7 +376,7 @@ export const calculateNewNodeValues = (
       }
       const nodeValue = newNodeValues[edge.target];
       switch (nodeValue.type) {
-        case 'attainment':
+        case 'coursepart':
           throw new Error('Should not happen');
         case 'minpoints':
         case 'grade':
@@ -422,7 +422,7 @@ export const batchCalculateGraph = (
   graphStructure: GraphStructure,
   studentData: {
     userId: number;
-    attainments: {attainmentId: number; grade: number}[];
+    courseParts: {coursePartId: number; grade: number}[];
   }[]
 ): {[key: number]: {finalGrade: number}} => {
   const {nodes, edges, nodeData} = graphStructure;
@@ -448,12 +448,12 @@ export const batchCalculateGraph = (
       const nodeType = node.type as CustomNodeTypes;
       nodeValues[student.userId][node.id] = initNode(nodeType).value;
       const nodeValue = nodeValues[student.userId][node.id];
-      if (nodeValue.type !== 'attainment') continue;
+      if (nodeValue.type !== 'coursepart') continue;
 
-      // Find matching attainment from student data
-      for (const attainment of student.attainments) {
-        if (node.id === `attainment-${attainment.attainmentId}`)
-          nodeValue.source = attainment.grade;
+      // Find matching course part from student data
+      for (const coursePart of student.courseParts) {
+        if (node.id === `coursepart-${coursePart.coursePartId}`)
+          nodeValue.source = coursePart.grade;
       }
     }
   }
@@ -504,7 +504,7 @@ export const batchCalculateGraph = (
 
         const nodeValue = nodeValues[student.userId][edge.target];
         switch (nodeValue.type) {
-          case 'attainment':
+          case 'coursepart':
             throw new Error('Should not happen');
           case 'minpoints':
           case 'grade':

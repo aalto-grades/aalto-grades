@@ -7,7 +7,7 @@ import supertest from 'supertest';
 import {z} from 'zod';
 
 import {
-  AttainmentData,
+  CoursePartData,
   AplusCourseDataSchema,
   AplusExerciseDataSchema,
   AplusGradeSourceData,
@@ -37,13 +37,13 @@ const invalidAuthorization = [
 
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
-let addGradeSourceAttainmentId = -1;
-let noGradeSourceAttainmentId = -1;
-let fullPointsAttainmentId = -1;
-let moduleAttainmentId = -1;
-let difficultyAttainmentId = -1;
+let addGradeSourceCoursePartId = -1;
+let noGradeSourceCoursePartId = -1;
+let fullPointsCoursePartId = -1;
+let moduleCoursePartId = -1;
+let difficultyCoursePartId = -1;
 let noRoleCourseId = -1;
-let differentCourseAttainmentId = -1;
+let differentCoursePartId = -1;
 
 const nonExistentId = 1000000;
 
@@ -53,20 +53,20 @@ const mockedAxios = axios as jest.Mocked<AxiosStatic>;
 beforeAll(async () => {
   cookies = await getCookies();
 
-  let attainments: AttainmentData[];
-  [courseId, attainments] = await createData.createCourse({});
-  [fullPointsAttainmentId, moduleAttainmentId, difficultyAttainmentId] =
+  let courseParts: CoursePartData[];
+  [courseId, courseParts] = await createData.createCourse({});
+  [fullPointsCoursePartId, moduleCoursePartId, difficultyCoursePartId] =
     await createData.createAplusGradeSources(courseId);
-  addGradeSourceAttainmentId = attainments[0].id;
-  noGradeSourceAttainmentId = attainments[3].id;
+  addGradeSourceCoursePartId = courseParts[0].id;
+  noGradeSourceCoursePartId = courseParts[2].id;
 
-  let otherAttainments: AttainmentData[];
-  [noRoleCourseId, otherAttainments] = await createData.createCourse({
+  let otherCourseParts: CoursePartData[];
+  [noRoleCourseId, otherCourseParts] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
   });
-  differentCourseAttainmentId = otherAttainments[0].id;
+  differentCoursePartId = otherCourseParts[0].id;
 
   // eslint-disable-next-line @typescript-eslint/require-await
   mockedAxios.get.mockImplementation(async url => {
@@ -78,9 +78,7 @@ beforeAll(async () => {
     switch (url) {
       case urlPoints:
         return {
-          data: {
-            results: [{points: urlA}, {points: urlB}],
-          },
+          data: {results: [{points: urlA}, {points: urlB}]},
         };
 
       case urlA:
@@ -88,18 +86,10 @@ beforeAll(async () => {
           data: {
             student_id: '123456',
             points: 50,
-            points_by_difficulty: {
-              A: 30,
-            },
+            points_by_difficulty: {A: 30},
             modules: [
-              {
-                id: 1,
-                points: 10,
-              },
-              {
-                id: 2,
-                points: 40,
-              },
+              {id: 1, points: 10},
+              {id: 2, points: 40},
             ],
           },
         };
@@ -109,18 +99,10 @@ beforeAll(async () => {
           data: {
             student_id: '654321',
             points: 40,
-            points_by_difficulty: {
-              A: 25,
-            },
+            points_by_difficulty: {A: 25},
             modules: [
-              {
-                id: 1,
-                points: 7,
-              },
-              {
-                id: 2,
-                points: 33,
-              },
+              {id: 1, points: 7},
+              {id: 2, points: 33},
             ],
           },
         };
@@ -284,7 +266,7 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
 
 describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', () => {
   type AplusGradeSourceAny = {
-    attainmentId: number;
+    coursePartId: number;
     aplusCourseId: number;
     sourceType: AplusGradeSourceType;
     moduleId?: number;
@@ -296,10 +278,10 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     {
       withModuleId = false,
       withDifficulty = false,
-      attainmentId = addGradeSourceAttainmentId,
+      coursePartId = addGradeSourceCoursePartId,
     }
   ): AplusGradeSourceAny => ({
-    attainmentId: attainmentId,
+    coursePartId,
     aplusCourseId: 1,
     sourceType: sourceType,
     moduleId: withModuleId ? 1 : undefined,
@@ -325,7 +307,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     const sourceType = gradeSource.sourceType;
     const result = await AplusGradeSource.findOne({
       where: {
-        attainmentId: gradeSource.attainmentId,
+        coursePartId: gradeSource.coursePartId,
         aplusCourseId: gradeSource.aplusCourseId,
         sourceType: sourceType,
         moduleId:
@@ -413,16 +395,16 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     const url = `/v1/courses/${courseId}/aplus-source`;
     await responseTests.testNotFound(url, cookies.adminCookie).post([
       getGradeSource(AplusGradeSourceType.FullPoints, {
-        attainmentId: nonExistentId,
+        coursePartId: nonExistentId,
       }),
     ]);
   });
 
-  it('should respond with 409 when an attainment does not belong to the course', async () => {
+  it('should respond with 409 when course part does not belong to the course', async () => {
     const url = `/v1/courses/${courseId}/aplus-source`;
     await responseTests.testConflict(url, cookies.adminCookie).post([
       getGradeSource(AplusGradeSourceType.FullPoints, {
-        attainmentId: differentCourseAttainmentId,
+        coursePartId: differentCoursePartId,
       }),
     ]);
   });
@@ -434,7 +416,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     for (const cookie of testCookies) {
       const res = await request
         .get(
-          `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`
+          `/v1/courses/${courseId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`
         )
         .set('Cookie', cookie)
         .set('Authorization', authorization)
@@ -451,7 +433,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     for (const cookie of testCookies) {
       const res = await request
         .get(
-          `/v1/courses/${courseId}/aplus-fetch?attainments=[${moduleAttainmentId}]`
+          `/v1/courses/${courseId}/aplus-fetch?course-parts=[${moduleCoursePartId}]`
         )
         .set('Cookie', cookie)
         .set('Authorization', authorization)
@@ -468,7 +450,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     for (const cookie of testCookies) {
       const res = await request
         .get(
-          `/v1/courses/${courseId}/aplus-fetch?attainments=[${difficultyAttainmentId}]`
+          `/v1/courses/${courseId}/aplus-fetch?course-parts=[${difficultyCoursePartId}]`
         )
         .set('Cookie', cookie)
         .set('Authorization', authorization)
@@ -480,12 +462,12 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     }
   });
 
-  it('should fetch grades for multiple attainments', async () => {
+  it('should fetch grades for multiple course parts', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
       const res = await request
         .get(
-          `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}, ${moduleAttainmentId}, ${difficultyAttainmentId}]`
+          `/v1/courses/${courseId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}, ${moduleCoursePartId}, ${difficultyCoursePartId}]`
         )
         .set('Cookie', cookie)
         .set('Authorization', authorization)
@@ -498,7 +480,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
   });
 
   it('should respond with 400 if A+ token parsing fails', async () => {
-    const url = `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`;
+    const url = `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsCoursePartId}]`;
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
     for (const invalid of invalidAuthorization) {
       await responseTests
@@ -509,21 +491,21 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
   });
 
   it('should respond with 400 if course ID is invalid', async () => {
-    const url = `/v1/courses/abc/aplus-fetch?attainments=[${fullPointsAttainmentId}]`;
+    const url = `/v1/courses/abc/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`;
     await responseTests
       .testBadRequest(url, cookies.adminCookie)
       .set('Authorization', authorization)
       .get();
   });
 
-  it('should respond with 400 if attainments list is invalid', async () => {
+  it('should respond with 400 if course part list is invalid', async () => {
     const url = '/v1/courses/{courseId}/aplus-fetch';
     const invalid = [
-      '?attainments=["abc"]',
-      '?attainments=[abc]',
-      '?attainments=5',
-      '?attainments=["5"]',
-      '?attainments',
+      '?course-parts=["abc"]',
+      '?course-parts=[abc]',
+      '?course-parts=5',
+      '?course-parts=["5"]',
+      '?course-parts',
       '?',
       '',
     ];
@@ -550,27 +532,27 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
   });
 
   it('should respond with 404 when not found', async () => {
-    const urlNoCourse = `/v1/courses/${nonExistentId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`;
+    const urlNoCourse = `/v1/courses/${nonExistentId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`;
     await responseTests
       .testNotFound(urlNoCourse, cookies.adminCookie)
       .set('Authorization', authorization)
       .get();
 
-    const urlNoAttainment = `/v1/courses/${courseId}/aplus-fetch?attainments=[${nonExistentId}]`;
+    const urlNoCoursePart = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${nonExistentId}]`;
     await responseTests
-      .testNotFound(urlNoAttainment, cookies.adminCookie)
+      .testNotFound(urlNoCoursePart, cookies.adminCookie)
       .set('Authorization', authorization)
       .get();
 
-    const urlNoGradeSource = `/v1/courses/${courseId}/aplus-fetch?attainments=[${noGradeSourceAttainmentId}]`;
+    const urlNoGradeSource = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${noGradeSourceCoursePartId}]`;
     await responseTests
       .testNotFound(urlNoGradeSource, cookies.adminCookie)
       .set('Authorization', authorization)
       .get();
   });
 
-  it('should respond with 409 when an attainment does not belong to the course', async () => {
-    const url = `/v1/courses/${courseId}/aplus-fetch?attainments=[${differentCourseAttainmentId}]`;
+  it('should respond with 409 when course part does not belong to the course', async () => {
+    const url = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${differentCoursePartId}]`;
     await responseTests
       .testConflict(url, cookies.adminCookie)
       .set('Authorization', authorization)
@@ -582,7 +564,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
       throw new AxiosError();
     });
 
-    const url = `/v1/courses/${courseId}/aplus-fetch?attainments=[${fullPointsAttainmentId}]`;
+    const url = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`;
     await responseTests
       .testBadGateway(url, cookies.adminCookie)
       .set('Authorization', authorization)

@@ -6,8 +6,8 @@ import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
 import {Handle, NodeProps, Position} from 'reactflow';
 
 import {
-  AttainmentNodeSettings,
-  AttainmentNodeValue,
+  CoursePartNodeSettings,
+  CoursePartNodeValue,
 } from '@/common/types/graph';
 import BaseNode from './BaseNode';
 import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
@@ -19,7 +19,7 @@ const initialSettings: LocalSettings = {
   minPoints: '0',
 };
 
-const AttanmentNode = (props: NodeProps): JSX.Element => {
+const CoursePartNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;
 
   const {nodeValues} = useContext(NodeValuesContext);
@@ -29,8 +29,8 @@ const AttanmentNode = (props: NodeProps): JSX.Element => {
   const [error, setError] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
 
-  const nodeValue = nodeValues[id] as AttainmentNodeValue;
-  const settings = nodeData[id].settings as AttainmentNodeSettings;
+  const nodeValue = nodeValues[id] as CoursePartNodeValue;
+  const settings = nodeData[id].settings as CoursePartNodeSettings;
 
   useEffect(() => {
     if (init) return;
@@ -114,4 +114,4 @@ const AttanmentNode = (props: NodeProps): JSX.Element => {
   );
 };
 
-export default AttanmentNode;
+export default CoursePartNode;

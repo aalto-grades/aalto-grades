@@ -40,7 +40,7 @@ export default {
         transaction,
       });
 
-      // Convert assessment model id from cascade to restrict
+      // Convert grading model id from cascade to restrict
       // Remove the old constraint
       await queryInterface.removeConstraint(
         'final_grade',
@@ -95,7 +95,7 @@ export default {
         transaction,
       });
 
-      // Undo convert assessment model id from cascade to restrict
+      // Undo convert grading model id from cascade to restrict
       // Remove the new constraint
       await queryInterface.removeConstraint(
         'final_grade',

@@ -15,22 +15,22 @@ import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
-import {useEditAssessmentModel} from '../../hooks/useApi';
+import {useEditGradingModel} from '../../hooks/useApi';
 
 type PropsType = {
-  assessmentModelId: number | null;
+  gradingModelId: number | null;
   name: string | null;
   onClose: () => void;
   open: boolean;
 };
-const EditAssessmentModelDialog = ({
-  assessmentModelId,
+const EditGradingModelDialog = ({
+  gradingModelId,
   name,
   onClose,
   open,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const editAssessmentModel = useEditAssessmentModel();
+  const editGradingModel = useEditGradingModel();
 
   const [newName, setNewName] = useState<string>('');
 
@@ -39,20 +39,20 @@ const EditAssessmentModelDialog = ({
   }, [name]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async (): Promise<void> => {
-    if (assessmentModelId === null) return;
-    await editAssessmentModel.mutateAsync({
+    if (gradingModelId === null) return;
+    await editGradingModel.mutateAsync({
       courseId,
-      assessmentModelId,
-      assessmentModel: {name: newName},
+      gradingModelId: gradingModelId,
+      gradingModel: {name: newName},
     });
 
-    enqueueSnackbar('Assessment model saved', {variant: 'success'});
+    enqueueSnackbar('Grading model saved', {variant: 'success'});
     onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Edit Assessment Model</DialogTitle>
+      <DialogTitle>Edit Grading Model</DialogTitle>
       <DialogContent>
         <TextField
           sx={{mt: 1}}
@@ -60,7 +60,7 @@ const EditAssessmentModelDialog = ({
           required
           fullWidth
           value={newName}
-          disabled={editAssessmentModel.isPending}
+          disabled={editGradingModel.isPending}
           onChange={e => setNewName(e.target.value)}
         />
       </DialogContent>
@@ -68,7 +68,7 @@ const EditAssessmentModelDialog = ({
         <Button
           variant="outlined"
           onClick={onClose}
-          disabled={editAssessmentModel.isPending}
+          disabled={editGradingModel.isPending}
         >
           Cancel
         </Button>
@@ -76,10 +76,10 @@ const EditAssessmentModelDialog = ({
           onClick={handleSave}
           variant="contained"
           type="submit"
-          disabled={newName.length === 0 || editAssessmentModel.isPending}
+          disabled={newName.length === 0 || editGradingModel.isPending}
         >
           Save
-          {editAssessmentModel.isPending && (
+          {editGradingModel.isPending && (
             <CircularProgress
               size={24}
               sx={{
@@ -97,4 +97,4 @@ const EditAssessmentModelDialog = ({
   );
 };
 
-export default EditAssessmentModelDialog;
+export default EditGradingModelDialog;

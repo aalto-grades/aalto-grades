@@ -7,18 +7,18 @@ import {Box, IconButton, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import {JSX, useState} from 'react';
 
-import {AttainmentGradesData} from '@/common/types';
+import {CoursePartGradesData} from '@/common/types';
 import EditGradesDialog from './EditGradesDialog';
 import {useTableContext} from '../../context/useTableContext';
 import {findBestGrade, gradeIsExpired} from '../../utils';
 
 type GradeCellProps = {
   studentNumber: string;
-  attainmentResults?: AttainmentGradesData;
+  coursePartResults?: CoursePartGradesData;
 };
 const GradeCell = ({
   studentNumber,
-  attainmentResults,
+  coursePartResults,
 }: GradeCellProps): JSX.Element => {
   const {gradeSelectOption} = useTableContext();
   const theme = useTheme();
@@ -26,7 +26,7 @@ const GradeCell = ({
   const [hover, setHover] = useState<boolean>(false);
   const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
 
-  const bestGrade = findBestGrade(attainmentResults?.grades ?? [], {
+  const bestGrade = findBestGrade(coursePartResults?.grades ?? [], {
     expiredOption: 'prefer_non_expired',
     gradeSelectOption,
   });
@@ -60,12 +60,12 @@ const GradeCell = ({
     >
       <span>{bestGrade?.grade ?? '-'}</span>
       {/* If there are multiple grades "show more" icon*/}
-      {attainmentResults && (attainmentResults.grades.length > 1 || hover) && (
+      {coursePartResults && (coursePartResults.grades.length > 1 || hover) && (
         <>
           <Tooltip
             placement="top"
             title={
-              attainmentResults.grades.length <= 1
+              coursePartResults.grades.length <= 1
                 ? 'Edit grades'
                 : 'Multiple grades, click to show'
             }
@@ -84,14 +84,14 @@ const GradeCell = ({
           </Tooltip>
         </>
       )}
-      {attainmentResults && (
+      {coursePartResults && (
         <EditGradesDialog
           open={gradeDialogOpen}
           onClose={() => setGradeDialogOpen(false)}
           studentNumber={studentNumber}
-          attainmentId={attainmentResults.attainmentId}
-          title={`Grades of ${studentNumber} for ${attainmentResults.attainmentName}`}
-          grades={attainmentResults.grades}
+          coursePartId={coursePartResults.coursePartId}
+          title={`Grades of ${studentNumber} for ${coursePartResults.coursePartName}`}
+          grades={coursePartResults.grades}
         />
       )}
       {/* If grade is expired, show warning icon */}

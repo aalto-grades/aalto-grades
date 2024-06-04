@@ -94,7 +94,7 @@ export const formatGraph = async (
     },
     children: nodesForElk.map(node => {
       const nodeValue = nodeValues[node.id];
-      if (nodeValue.type === 'attainment') {
+      if (nodeValue.type === 'coursepart') {
         return {
           ...node,
           ports: [{id: `${node.id}-source`, properties: {side: 'EAST'}}],

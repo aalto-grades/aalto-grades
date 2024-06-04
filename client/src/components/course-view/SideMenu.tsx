@@ -5,10 +5,12 @@
 import {
   AccountTree,
   AccountTreeOutlined,
+  ArrowBack,
   Edit,
   EditOutlined,
   FlagCircle,
   FlagCircleOutlined,
+  HomeMaxRounded,
   Widgets,
   WidgetsOutlined,
 } from '@mui/icons-material';
@@ -37,6 +39,7 @@ const SideMenuButton = ({
   to,
   Icon,
   IconOutlined,
+  unstable_viewTransition,
 }: {
   text: string;
   to: string;
@@ -44,6 +47,7 @@ const SideMenuButton = ({
   IconOutlined: OverridableComponent<SvgIconTypeMap> & {
     muiName: string;
   };
+  unstable_viewTransition?: boolean;
 }): JSX.Element => {
   const navigate = useNavigate();
 
@@ -56,18 +60,20 @@ const SideMenuButton = ({
           width: '100%',
           textDecoration: 'none',
         }}
+        unstable_viewTransition={unstable_viewTransition}
       >
         {({isActive, isPending, isTransitioning}) => (
           <ListItemButton
             sx={{
               color: 'inherit',
               width: '100%',
-              borderRadius: 100,
+              borderRadius: 3,
               fontSize: '1rem',
               textAlign: 'left',
               backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
+              transition: 'border-radius 1s',
             }}
-            onClick={() => navigate(to)}
+            // onClick={() => navigate(to)}
           >
             <ListItemIcon>
               {isPending || isTransitioning ? (
@@ -102,23 +108,19 @@ const SideMenu = (): JSX.Element => {
   return (
     <Box
       style={{
-        width: '204px',
-        minWidth: '204px',
+        width: 'var(--side-menu-width)',
+        minWidth: 'var(--side-menu-width)',
       }}
     >
-      {/* <SideMenuButton
-        text="Courses List"
-        to="/"
-        Icon={FlagCircle}
-        IconOutlined={FlagCircleOutlined}
-      />
-
-      <Divider sx={{mb: 2, mt: 1}} />
-      <Button variant="outlined" onClick={onUpload}>
-        Upload Grades
-      </Button>
-      <Divider sx={{my: 2}} /> */}
       <List>
+        <SideMenuButton
+          text="Courses List"
+          to={'/'}
+          Icon={HomeMaxRounded}
+          IconOutlined={ArrowBack}
+          unstable_viewTransition
+        />
+        <Divider sx={{my: 2}} />
         <SideMenuButton
           text="Grades"
           to={`/${courseId}/course-results`}
@@ -132,8 +134,8 @@ const SideMenu = (): JSX.Element => {
           IconOutlined={AccountTreeOutlined}
         />
         <SideMenuButton
-          text="Attainments"
-          to={`/${courseId}/attainments`}
+          text="Course parts"
+          to={`/${courseId}/course-parts`}
           Icon={Widgets}
           IconOutlined={WidgetsOutlined}
         />

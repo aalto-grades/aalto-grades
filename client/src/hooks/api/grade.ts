@@ -95,7 +95,7 @@ export const useDeleteGrade = (
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['attainments', courseId],
+        queryKey: ['course-parts', courseId],
       });
     },
     ...options,

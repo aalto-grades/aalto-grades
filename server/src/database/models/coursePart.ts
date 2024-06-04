@@ -14,21 +14,21 @@ import {
 import Course from './course';
 import {sequelize} from '..';
 
-export default class Attainment extends Model<
-  InferAttributes<Attainment>,
-  InferCreationAttributes<Attainment>
+export default class CoursePart extends Model<
+  InferAttributes<CoursePart>,
+  InferCreationAttributes<CoursePart>
 > {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare name: string;
-  // Default value, expiry date in AttainmentGrade takes precedence
+  // Default value, expiry date in grade takes precedence
   declare daysValid: number;
   declare archived: CreationOptional<boolean>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-Attainment.init(
+CoursePart.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -62,9 +62,9 @@ Attainment.init(
   },
   {
     sequelize,
-    tableName: 'attainment',
+    tableName: 'course_part',
   }
 );
 
-Course.hasMany(Attainment, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
-Attainment.belongsTo(Course, {foreignKey: 'courseId'});
+Course.hasMany(CoursePart, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+CoursePart.belongsTo(Course, {foreignKey: 'courseId'});

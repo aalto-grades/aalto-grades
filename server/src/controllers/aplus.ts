@@ -21,7 +21,7 @@ import {
   parseAplusToken,
   validateAplusCourseId,
 } from './utils/aplus';
-import {validateAttainmentPath} from './utils/attainment';
+import {validateCoursePartPath} from './utils/coursePart';
 import {APLUS_API_URL} from '../configs/environment';
 import AplusGradeSource from '../database/models/aplusGradeSource';
 import {ApiError} from '../types';
@@ -115,9 +115,9 @@ export const addAplusGradeSources = async (
 ): Promise<void> => {
   const newGradeSources: NewAplusGradeSourceData[] = req.body;
   for (const newGradeSource of newGradeSources) {
-    await validateAttainmentPath(
+    await validateCoursePartPath(
       req.params.courseId,
-      String(newGradeSource.attainmentId)
+      String(newGradeSource.coursePartId)
     );
   }
 
@@ -136,11 +136,12 @@ export const fetchAplusGrades = async (
   res: Response
 ): Promise<void> => {
   const aplusToken = parseAplusToken(req);
-  let attainmentIds: number[] = [];
+  let coursePartIds: number[] = [];
+
   try {
-    attainmentIds = z
+    coursePartIds = z
       .array(IdSchema)
-      .parse(JSON.parse(String(req.query.attainments)));
+      .parse(JSON.parse(String(req.query['course-parts'])));
   } catch (e) {
     if (e instanceof Error) {
       throw new ApiError(e.message, HttpCode.BadRequest);
@@ -148,25 +149,25 @@ export const fetchAplusGrades = async (
   }
 
   const newGrades: NewGrade[] = [];
-  for (const attainmentId of attainmentIds) {
-    const [, attainment] = await validateAttainmentPath(
+  for (const coursePartId of coursePartIds) {
+    const [, coursePart] = await validateCoursePartPath(
       req.params.courseId,
-      String(attainmentId)
+      String(coursePartId)
     );
 
     // TODO: There can be multiple sources
     const gradeSource = await AplusGradeSource.findOne({
-      where: {attainmentId: attainment.id},
+      where: {coursePartId: coursePart.id},
     });
 
     if (!gradeSource) {
       throw new ApiError(
-        `attainment with ID ${attainment.id} has no A+ grade sources`,
+        `Course part with ID ${coursePart.id} has no A+ grade sources`,
         HttpCode.NotFound
       );
     }
 
-    // We cannot fetch the student list outside this loop because attainment
+    // We cannot fetch the student list outside this loop because course part
     // grade sources may point to different A+ courses
     const allPointsRes = await fetchFromAplus<{
       results: {
@@ -241,11 +242,11 @@ export const fetchAplusGrades = async (
       // Related: https://github.com/apluslms/a-plus/issues/1361
       const date = new Date();
       const expiryDate = new Date(date);
-      expiryDate.setDate(date.getDate() + attainment.daysValid);
+      expiryDate.setDate(date.getDate() + coursePart.daysValid);
 
       newGrades.push({
         studentNumber: pointsRes.data.student_id,
-        attainmentId: attainment.id,
+        coursePartId: coursePart.id,
         grade: grade,
         date: date,
         expiryDate: expiryDate,

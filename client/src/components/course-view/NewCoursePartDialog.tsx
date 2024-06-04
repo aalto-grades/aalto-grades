@@ -18,29 +18,29 @@ type PropsType = {
   onSave: (name: string, daysValid: number) => void;
 };
 
-const AddAttainmentDialog = ({
+const AddCoursePartDialog = ({
   handleClose,
   open,
   onSave,
 }: PropsType): JSX.Element => {
-  const [attainment, setAttainment] = useState({name: '', daysValid: 365});
+  const [coursePart, setCoursePart] = useState({name: '', daysValid: 365});
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   const handleSave = (): void => {
-    onSave(attainment.name, attainment.daysValid);
-    setAttainment({name: '', daysValid: 365});
+    onSave(coursePart.name, coursePart.daysValid);
+    setCoursePart({name: '', daysValid: 365});
     handleClose();
   };
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Create new attainment</DialogTitle>
+      <DialogTitle>Create new course part</DialogTitle>
       <DialogContent>
         <TextField
           sx={{mt: 1}}
           label="Name"
-          value={attainment.name}
-          onChange={e => setAttainment({...attainment, name: e.target.value})}
+          value={coursePart.name}
+          onChange={e => setCoursePart({...coursePart, name: e.target.value})}
           required
           error={nameInputRef.current?.validity.valueMissing}
           inputRef={nameInputRef}
@@ -50,10 +50,10 @@ const AddAttainmentDialog = ({
           sx={{mt: 1}}
           label="Days valid"
           type="number"
-          value={attainment.daysValid}
+          value={coursePart.daysValid}
           onChange={e =>
-            setAttainment({
-              ...attainment,
+            setCoursePart({
+              ...coursePart,
               daysValid: Number(e.target.value),
             })
           }
@@ -62,7 +62,7 @@ const AddAttainmentDialog = ({
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
         <Button
-          disabled={!attainment.name}
+          disabled={!coursePart.name}
           variant="contained"
           onClick={handleSave}
         >
@@ -73,4 +73,4 @@ const AddAttainmentDialog = ({
   );
 };
 
-export default AddAttainmentDialog;
+export default AddCoursePartDialog;

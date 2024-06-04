@@ -7,16 +7,12 @@ SPDX-License-Identifier: MIT
 # Aalto Grades
 
 Aalto Grades is a grade/point management system for storing the grades of
-students to assigned tasks (attainments) during courses and using these grades
+students to assigned tasks (course parts) during courses and using these grades
 to calculate their final course grades which can be exported to an external
 system for tracking course completion.
 
-Attainments can be arbitrarily defined by a teacher and may typically include,
-for example, an exam, a set of exercises, or a course project. Attainments are
-stored in a tree structure, so each attainment may contain any number of
-children. For example, an attainment called "A+ exercises" may include the
-subattainment "Round 1," which in turn may have the subattainments
-"Round 1 exercise 1" and "Round 1 exercise 2."
+Course parts can be arbitrarily defined by a teacher and may typically include,
+for example, an exam, a set of exercises, or a course project.
 
 ## Getting started
 
@@ -43,9 +39,10 @@ Many GNU/Linux and BSD distributions contain packages for `docker` and
 `docker-compose`. You may need to configure Docker to use the remote registry
 `https://registry.hub.docker.com` before being able to run Aalto Grades, if it
 is not already preconfigured. Note that the registry and its containers can
-include *proprietary software*, so use it at your own discretion.
+include _proprietary software_, so use it at your own discretion.
 
 Windows and macOS users may install Docker and Docker Compose from:
+
 - https://www.docker.com/
 - https://docs.docker.com/compose/install/
 
@@ -77,10 +74,12 @@ user accounts for this purpose. There are two such accounts, an admin account
 and a teacher account.
 
 Admin user credentials:
+
 - Email: `admin@aalto.fi`
 - Password: `password`
 
 Teacher user credentials:
+
 - Email: `teacher@aalto.fi`
 - Password: `password`
 

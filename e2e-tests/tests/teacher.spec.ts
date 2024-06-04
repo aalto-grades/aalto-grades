@@ -36,7 +36,7 @@ test.describe('Test Courses as Teacher', () => {
     await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
   });
 
-  test('View assessment model', async ({page}) => {
+  test('View grading model', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page.getByRole('button', {name: 'Grading Models'}).click();
 
@@ -44,10 +44,10 @@ test.describe('Test Courses as Teacher', () => {
     await expect(page.getByTestId('rf__wrapper')).toBeVisible();
   });
 
-  test('Create assessment model', async ({page}) => {
+  test('Create grading model', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page.getByRole('button', {name: 'Grading Models'}).click();
-    await page.getByLabel('New assessment model').click();
+    await page.getByLabel('New grading model').click();
     await page.getByLabel('Name *').click();
     await page.getByLabel('Name *').fill('Test Model');
     await page.getByLabel('Select template').click();
@@ -65,25 +65,25 @@ test.describe('Test Courses as Teacher', () => {
     await expect(page.getByRole('button', {name: 'Test Model'})).toBeVisible();
   });
 
-  test('View Attainments', async ({page}) => {
+  test('View Course Parts', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page
-      .getByRole('link', {name: 'Attainments'})
+      .getByRole('link', {name: 'Course Parts'})
       .getByRole('button')
       .click();
     await expect(page.getByText('Days valid')).toBeVisible();
     await expect(page.getByText('Tier A')).toBeVisible();
   });
 
-  test('Add Attainment', async ({page}) => {
+  test('Add Course Part', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page
-      .getByRole('link', {name: 'Attainments'})
+      .getByRole('link', {name: 'Course Parts'})
       .getByRole('button')
       .click();
     await expect(page.getByText('Days valid')).toBeVisible();
     await expect(page.getByText('Tier A')).toBeVisible();
-    await page.getByRole('button', {name: 'Add attainment'}).click();
+    await page.getByRole('button', {name: 'Add New'}).click();
     await page.getByRole('textbox', {name: 'Name'}).fill('test Tier D');
     await page.getByRole('button', {name: 'Save'}).click();
     await page.getByRole('button', {name: 'Save'}).click();
