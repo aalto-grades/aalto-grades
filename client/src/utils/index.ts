@@ -181,3 +181,9 @@ export const sisuLanguageOptions: LanguageOption[] = [
     language: 'Russian',
   },
 ];
+
+export const setAplusToken = (token: string): void =>
+  localStorage.setItem('Aplus-Token', token);
+
+export const getAplusToken = (): string | null =>
+  localStorage.getItem('Aplus-Token');

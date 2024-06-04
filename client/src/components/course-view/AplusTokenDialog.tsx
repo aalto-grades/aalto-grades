@@ -16,12 +16,19 @@ import {
 } from '@mui/material';
 import {JSX, useState} from 'react';
 
+import {setAplusToken} from '../../utils';
+
 type PropsType = {
   handleClose: () => void;
+  handleSubmit: () => void;
   open: boolean;
 };
 
-const AplusTokenDialog = ({handleClose, open}: PropsType): JSX.Element => {
+const AplusTokenDialog = ({
+  handleClose,
+  handleSubmit,
+  open,
+}: PropsType): JSX.Element => {
   const [token, setToken] = useState<string | null>(null);
 
   return (
@@ -48,8 +55,8 @@ const AplusTokenDialog = ({handleClose, open}: PropsType): JSX.Element => {
           disabled={!token || token.length !== 40}
           variant="contained"
           onClick={() => {
-            if (token) localStorage.setItem('Aplus-Token', token);
-            handleClose();
+            if (token) setAplusToken(token);
+            handleSubmit();
           }}
         >
           OK

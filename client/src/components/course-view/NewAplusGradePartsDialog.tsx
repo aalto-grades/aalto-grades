@@ -17,6 +17,7 @@ import {
   AplusGradeSourceData,
   AplusGradeSourceType,
 } from '@/common/types';
+import AplusTokenDialog from './AplusTokenDialog';
 import CreateAplusCourseParts from './CreateAplusCourseParts';
 import SelectAplusCourse from './SelectAplusCourse';
 import SelectAplusGradeSources from './SelectAplusGradeSources';
@@ -25,6 +26,7 @@ import {
   useAddCoursePart,
   useFetchAplusCourses,
 } from '../../hooks/useApi';
+import {getAplusToken} from '../../utils';
 
 import Type = AplusGradeSourceType;
 
@@ -39,10 +41,12 @@ const NewAplusCoursePartsDialog = ({
   open,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const aplusCourses = useFetchAplusCourses();
+  const aplusCourses = useFetchAplusCourses({enabled: !!getAplusToken()});
   const addAttainment = useAddCoursePart(courseId);
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
+  const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
+    useState<boolean>(!getAplusToken());
   const [step, setStep] = useState<number>(0);
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
@@ -121,51 +125,58 @@ const NewAplusCoursePartsDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleResetAndClose}>
-      <DialogTitle>A+ Courses</DialogTitle>
-      <DialogContent>
-        {step === 0 && aplusCourses.data && (
-          <SelectAplusCourse
-            aplusCourses={aplusCourses.data}
-            setAplusCourse={setAplusCourse}
-          />
-        )}
-        {step === 1 && aplusCourse && (
-          <SelectAplusGradeSources
-            aplusCourse={aplusCourse}
-            handleChange={handleSelectionChange}
-          />
-        )}
-        {step === 2 && aplusCourse && (
-          <CreateAplusCourseParts
-            coursePartsWithSource={attainmentsWithSource}
-            handleChange={handleAttainmentChange}
-          />
-        )}
-      </DialogContent>
-      <DialogActions>
-        {step > 0 && (
-          <Button onClick={() => setStep(step - 1)} sx={{mr: 'auto'}}>
-            Back
-          </Button>
-        )}
-        {step <= 1 && (
-          <Button disabled={!aplusCourse} onClick={() => setStep(step + 1)}>
-            Next
-          </Button>
-        )}
-        {step === 2 && (
-          <Button
-            onClick={async () => {
-              await handleSubmit();
-              handleResetAndClose();
-            }}
-          >
-            Submit
-          </Button>
-        )}
-      </DialogActions>
-    </Dialog>
+    <>
+      <Dialog open={open} onClose={handleResetAndClose}>
+        <DialogTitle>A+ Courses</DialogTitle>
+        <DialogContent>
+          {step === 0 && aplusCourses.data && (
+            <SelectAplusCourse
+              aplusCourses={aplusCourses.data}
+              setAplusCourse={setAplusCourse}
+            />
+          )}
+          {step === 1 && aplusCourse && (
+            <SelectAplusGradeSources
+              aplusCourse={aplusCourse}
+              handleChange={handleSelectionChange}
+            />
+          )}
+          {step === 2 && aplusCourse && (
+            <CreateAplusCourseParts
+              coursePartsWithSource={attainmentsWithSource}
+              handleChange={handleAttainmentChange}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          {step > 0 && (
+            <Button onClick={() => setStep(step - 1)} sx={{mr: 'auto'}}>
+              Back
+            </Button>
+          )}
+          {step <= 1 && (
+            <Button disabled={!aplusCourse} onClick={() => setStep(step + 1)}>
+              Next
+            </Button>
+          )}
+          {step === 2 && (
+            <Button
+              onClick={async () => {
+                await handleSubmit();
+                handleResetAndClose();
+              }}
+            >
+              Submit
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
+      <AplusTokenDialog
+        handleClose={handleClose}
+        handleSubmit={() => setAplusTokenDialogOpen(false)}
+        open={aplusTokenDialogOpen && open}
+      />
+    </>
   );
 };
 

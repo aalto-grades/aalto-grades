@@ -23,10 +23,11 @@ import {
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
+import {getAplusToken} from '../../utils';
 
 const getConfig = (): AxiosRequestConfig => ({
   headers: {
-    Authorization: `Aplus-Token ${localStorage.getItem('Aplus-Token')}`,
+    Authorization: `Aplus-Token ${getAplusToken()}`,
   },
 });
 

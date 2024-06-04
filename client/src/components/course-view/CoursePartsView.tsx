@@ -326,8 +326,8 @@ const CoursePartsView = (): JSX.Element => {
             <Button variant="outlined" onClick={() => setAddDialogOpen(true)}>
               Add New
             </Button>
-            <Button onClick={() => setAplusDialogOpen(true)}>
-              Add from A+
+            <Button variant="outlined" onClick={() => setAplusDialogOpen(true)}>
+              Add From A+
             </Button>
           </>
         )}
