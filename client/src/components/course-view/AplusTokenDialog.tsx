@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import {JSX, useState} from 'react';
 
-import {setAplusToken} from '../../utils';
+import {setAplusToken} from '../../utils/utils';
 
 type PropsType = {
   handleClose: () => void;
