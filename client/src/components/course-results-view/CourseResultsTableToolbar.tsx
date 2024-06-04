@@ -176,7 +176,7 @@ const GroupByButton = (): JSX.Element => {
           maxHeight: '50vh',
         }}
       >
-        {[...groupByElements].map(groups => [
+        {groupByElements.map((groups, i) => [
           ...groups.map(element => (
             <Tooltip
               title={element.info}
@@ -200,7 +200,10 @@ const GroupByButton = (): JSX.Element => {
             </Tooltip>
           )),
 
-          <Divider sx={{my: 0}} />,
+          // Only add divider between elements
+          ...[
+            i !== groupByElements.length - 1 ? [<Divider sx={{my: 0}} />] : [],
+          ],
         ])}
       </Menu>
     </>
