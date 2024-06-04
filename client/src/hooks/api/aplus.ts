@@ -23,7 +23,7 @@ import {
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
-import {getAplusToken} from '../../utils';
+import {getAplusToken} from '../../utils/utils';
 
 const getConfig = (): AxiosRequestConfig => ({
   headers: {
