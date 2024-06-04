@@ -26,7 +26,7 @@ import {
   useAddCoursePart,
   useFetchAplusCourses,
 } from '../../hooks/useApi';
-import {getAplusToken} from '../../utils';
+import {getAplusToken} from '../../utils/utils';
 
 import Type = AplusGradeSourceType;
 
@@ -42,7 +42,7 @@ const NewAplusCoursePartsDialog = ({
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const aplusCourses = useFetchAplusCourses({enabled: !!getAplusToken()});
-  const addAttainment = useAddCoursePart(courseId);
+  const addCoursePart = useAddCoursePart(courseId);
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
   const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
@@ -50,14 +50,14 @@ const NewAplusCoursePartsDialog = ({
   const [step, setStep] = useState<number>(0);
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
-  const [attainmentsWithSource, setAttainmentsWithSource] = useState<
+  const [CoursePartsWithSource, setCoursePartsWithSource] = useState<
     [{name: string; daysValid: number}, AplusGradeSourceData][]
   >([]);
 
   const handleResetAndClose = (): void => {
     setStep(0);
     setAplusCourse(null);
-    setAttainmentsWithSource([]);
+    setCoursePartsWithSource([]);
     handleClose();
   };
 
@@ -67,13 +67,13 @@ const NewAplusCoursePartsDialog = ({
     source: AplusGradeSourceData
   ): void => {
     if (checked) {
-      setAttainmentsWithSource([
-        ...attainmentsWithSource,
+      setCoursePartsWithSource([
+        ...CoursePartsWithSource,
         [{name: name, daysValid: 365}, source],
       ]);
     } else {
-      setAttainmentsWithSource(
-        attainmentsWithSource.filter(([_, s]) => {
+      setCoursePartsWithSource(
+        CoursePartsWithSource.filter(([_, s]) => {
           if (s.sourceType === Type.Module && source.sourceType === Type.Module)
             return s.moduleId !== source.moduleId;
 
@@ -92,17 +92,17 @@ const NewAplusCoursePartsDialog = ({
     }
   };
 
-  const handleAttainmentChange = (
+  const handleCoursePartChange = (
     index: number,
-    attainment: {name?: string; daysValid?: number}
+    coursePart: {name?: string; daysValid?: number}
   ): void => {
-    setAttainmentsWithSource(
-      attainmentsWithSource.map(([a, s], i) => {
+    setCoursePartsWithSource(
+      CoursePartsWithSource.map(([a, s], i) => {
         if (i === index) {
           return [
             {
-              name: attainment.name ?? a.name,
-              daysValid: attainment.daysValid ?? a.daysValid,
+              name: coursePart.name ?? a.name,
+              daysValid: coursePart.daysValid ?? a.daysValid,
             },
             s,
           ];
@@ -114,10 +114,10 @@ const NewAplusCoursePartsDialog = ({
 
   const handleSubmit = async (): Promise<void> => {
     const sources: AplusGradeSourceData[] = [];
-    for (const [attainment, source] of attainmentsWithSource) {
+    for (const [coursePart, source] of CoursePartsWithSource) {
       sources.push({
         ...source,
-        coursePartId: await addAttainment.mutateAsync(attainment),
+        coursePartId: await addCoursePart.mutateAsync(coursePart),
       });
     }
 
@@ -143,8 +143,8 @@ const NewAplusCoursePartsDialog = ({
           )}
           {step === 2 && aplusCourse && (
             <CreateAplusCourseParts
-              coursePartsWithSource={attainmentsWithSource}
-              handleChange={handleAttainmentChange}
+              coursePartsWithSource={CoursePartsWithSource}
+              handleChange={handleCoursePartChange}
             />
           )}
         </DialogContent>

@@ -24,15 +24,21 @@ import {JSX, useEffect, useMemo, useState} from 'react';
 import {useBlocker, useParams} from 'react-router-dom';
 import {z} from 'zod';
 
-import {EditFinalGrade, FinalGradeData, NewFinalGrade} from '@/common/types';
+import {
+  EditFinalGrade,
+  FinalGradeData,
+  GradingScale,
+  NewFinalGrade,
+} from '@/common/types';
 import {
   useAddFinalGrades,
   useDeleteFinalGrade,
   useEditFinalGrade,
 } from '../../hooks/api/finalGrade';
-import {useGetAllGradingModels} from '../../hooks/useApi';
+import {useGetAllGradingModels, useGetCourse} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {findBestFinalGrade} from '../../utils';
+import {findBestFinalGrade} from '../../utils/bestGrade';
+import {getMaxFinalGrade} from '../../utils/utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 type ColTypes = {
@@ -64,6 +70,7 @@ const EditFinalGradesDialog = ({
   const {auth} = useAuth();
   const {courseId} = useParams() as {courseId: string};
 
+  const course = useGetCourse(courseId);
   const gradingModels = useGetAllGradingModels(courseId);
   const addFinalGrades = useAddFinalGrades(courseId);
   const deleteFinalGrade = useDeleteFinalGrade(courseId);
@@ -331,16 +338,16 @@ const EditFinalGradesDialog = ({
                     row.id === updatedRow.id ? updatedRow : row
                   )
                 );
-                // // TODO: do some validation. Code below is an example.
-                for (const [key, val] of Object.entries(updatedRow)) {
-                  if (key === 'grade') {
-                    const GradeSchema = z.number().int().min(0).max(5);
-                    const result = GradeSchema.safeParse(val);
-                    if (!result.success)
-                      throw new Error(result.error.errors[0].message);
-                  }
-                }
-                // enqueueSnackbar('Row saved!', {variant: 'success'});
+
+                // Validate final grade
+                const maxFinalGrade = getMaxFinalGrade(
+                  course.data?.gradingScale ?? GradingScale.Numerical
+                );
+                const GradeSchema = z.number().int().min(0).max(maxFinalGrade);
+                const result = GradeSchema.safeParse(updatedRow.grade);
+                if (!result.success)
+                  throw new Error(result.error.errors[0].message);
+
                 setError(false);
                 return updatedRow;
               }}

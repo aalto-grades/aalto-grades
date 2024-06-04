@@ -4,7 +4,7 @@
 
 import {GradingModelData, StudentRow} from '@/common/types';
 import {batchCalculateGraph} from '@/common/util/calculateGraph';
-import {GradeSelectOption, findBestGrade} from '.';
+import {GradeSelectOption, findBestGrade} from './bestGrade';
 import {
   ExtendedStudentRow,
   GroupedStudentRow,
@@ -82,23 +82,10 @@ export const predictGrades = (
         courseParts: row.courseParts.map(coursePart => ({
           coursePartId: coursePart.coursePartId,
           grade:
-            findBestGrade(coursePart.grades, {gradeSelectOption})?.grade ?? 0,
+            findBestGrade(coursePart.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Handle grade expiration
         })),
       }))
     );
   }
   return result;
-  // return gradingModels.map(model =>
-  //   batchCalculateGraph(
-  //     model.graphStructure,
-  //     rows.map(row => ({
-  //       userId: row.user.id,
-  //       courseParts: row.courseParts.map(coursePart => ({
-  //         coursePartId: coursePart.coursePartId,
-  //         grade:
-  //           findBestGrade(coursePart.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Handle grade expiration
-  //       })),
-  //     }))
-  //   )
-  // );
 };

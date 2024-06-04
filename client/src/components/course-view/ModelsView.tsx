@@ -40,7 +40,7 @@ import {
   useGetGrades,
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {getCourseRole} from '../../utils';
+import {getCourseRole} from '../../utils/utils';
 import Graph from '../graph/Graph';
 
 type ParamsType = {courseId: string; modelId?: string; userId?: string};
@@ -318,13 +318,16 @@ const ModelsView = (): JSX.Element => {
                         </IconButton>
                       </Tooltip>
                       <Tooltip placement="top" title="Delete grading model">
-                        <IconButton
-                          disabled={modelsWithFinalGrades.has(model.id)}
-                          edge="end"
-                          onClick={() => handleDelModel(model.id)}
-                        >
-                          <Delete />
-                        </IconButton>
+                        {/* The span is necessary because tooltips don't like disabled buttons*/}
+                        <span>
+                          <IconButton
+                            disabled={modelsWithFinalGrades.has(model.id)}
+                            edge="end"
+                            onClick={() => handleDelModel(model.id)}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </span>
                       </Tooltip>
                     </>
                   ) : null

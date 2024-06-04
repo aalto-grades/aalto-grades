@@ -17,10 +17,11 @@ export enum HttpCode {
   BadGateway = 502,
 }
 
+/** Needs to be converted into lowercase for sisu csv */
 export enum Language {
-  English = 'EN',
   Finnish = 'FI',
   Swedish = 'SV',
+  English = 'EN',
   Spanish = 'ES',
   Japanese = 'JA',
   Chinese = 'ZH',

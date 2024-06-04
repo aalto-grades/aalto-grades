@@ -133,7 +133,10 @@ const calculateNodeValue = (
       const settings = nodeData[nodeId].settings as CoursePartNodeSettings;
       nodeValue.value = nodeValue.source;
       nodeValue.courseFail = false;
-      if (nodeValue.source < settings.minPoints) {
+      if (
+        settings.minPoints !== null &&
+        nodeValue.source < settings.minPoints
+      ) {
         switch (settings.onFailSetting) {
           case 'coursefail':
             nodeValue.courseFail = true;

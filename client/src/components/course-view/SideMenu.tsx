@@ -27,12 +27,12 @@ import {
 } from '@mui/material';
 import {OverridableComponent} from '@mui/types';
 import {JSX} from 'react';
-import {NavLink, useNavigate, useParams} from 'react-router-dom';
+import {NavLink, useParams} from 'react-router-dom';
 
 import {CourseRoleType, SystemRole} from '@/common/types';
 import {useGetCourse} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {getCourseRole} from '../../utils';
+import {getCourseRole} from '../../utils/utils';
 
 const SideMenuButton = ({
   text,
@@ -48,49 +48,45 @@ const SideMenuButton = ({
     muiName: string;
   };
   unstable_viewTransition?: boolean;
-}): JSX.Element => {
-  const navigate = useNavigate();
-
-  return (
-    <ListItem disablePadding>
-      <NavLink
-        to={to}
-        style={{
-          color: 'inherit',
-          width: '100%',
-          textDecoration: 'none',
-        }}
-        unstable_viewTransition={unstable_viewTransition}
-      >
-        {({isActive, isPending, isTransitioning}) => (
-          <ListItemButton
-            sx={{
-              color: 'inherit',
-              width: '100%',
-              borderRadius: 3,
-              fontSize: '1rem',
-              textAlign: 'left',
-              backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
-              transition: 'border-radius 1s',
-            }}
-            // onClick={() => navigate(to)}
-          >
-            <ListItemIcon>
-              {isPending || isTransitioning ? (
-                <CircularProgress />
-              ) : isActive ? (
-                <Icon />
-              ) : (
-                <IconOutlined />
-              )}
-            </ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItemButton>
-        )}
-      </NavLink>
-    </ListItem>
-  );
-};
+}): JSX.Element => (
+  <ListItem disablePadding>
+    <NavLink
+      to={to}
+      style={{
+        color: 'inherit',
+        width: '100%',
+        textDecoration: 'none',
+      }}
+      unstable_viewTransition={unstable_viewTransition}
+    >
+      {({isActive, isPending, isTransitioning}) => (
+        <ListItemButton
+          sx={{
+            color: 'inherit',
+            width: '100%',
+            borderRadius: 3,
+            fontSize: '1rem',
+            textAlign: 'left',
+            backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
+            transition: 'border-radius 1s',
+          }}
+          // onClick={() => navigate(to)}
+        >
+          <ListItemIcon>
+            {isPending || isTransitioning ? (
+              <CircularProgress />
+            ) : isActive ? (
+              <Icon />
+            ) : (
+              <IconOutlined />
+            )}
+          </ListItemIcon>
+          <ListItemText primary={text} />
+        </ListItemButton>
+      )}
+    </NavLink>
+  </ListItem>
+);
 
 const SideMenu = (): JSX.Element => {
   const {courseId} = useParams();

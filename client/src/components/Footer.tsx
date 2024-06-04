@@ -48,7 +48,7 @@ const Footer = (): JSX.Element => {
       </Tooltip>
       <Tooltip title="Feedback form opens in a new tab">
         <Link
-          href="https://link.webropolsurveys.com"
+          href="https://link.webropolsurveys.com/S/E358C6E5E7690C72"
           rel="noreferrer"
           target="_blank"
           underline="none"

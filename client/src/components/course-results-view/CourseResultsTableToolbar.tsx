@@ -21,7 +21,7 @@ import {JSX, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {z} from 'zod';
 
-import {GradingScale, StudentRow, SystemRole} from '@/common/types';
+import {StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateGraph} from '@/common/util/calculateGraph';
 import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
 import SisuDownloadDialog from './SisuDownloadDialog';
@@ -33,8 +33,9 @@ import {
   useGetGrades,
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {findBestGrade} from '../../utils';
+import {findBestGrade} from '../../utils/bestGrade';
 import {findLatestGrade} from '../../utils/table';
+import {getMaxFinalGrade} from '../../utils/utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import UploadDialog from '../course-view/UploadDialog';
 
@@ -49,14 +50,14 @@ const toggleString = (arr: string[], str: string): string[] => {
 
   return arr;
 };
-const GroupByButton = () => {
+const GroupByButton = (): JSX.Element => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>): void => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
+  const handleClose = (): void => {
     setAnchorEl(null);
   };
   const {table} = useTableContext();
@@ -83,10 +84,8 @@ const GroupByButton = () => {
     ],
   ];
 
-  const isActive = useMemo(
-    () => table.getState().grouping.length > 0,
-    [table.getState().grouping]
-  );
+  const tableGrouping = table.getState().grouping;
+  const isActive = useMemo(() => tableGrouping.length > 0, [tableGrouping]);
 
   return (
     <>
@@ -113,9 +112,7 @@ const GroupByButton = () => {
               borderRadius: '8px 0px 0px 8px',
             }),
           }}
-          onClick={ev => {
-            handleClick(ev);
-          }}
+          onClick={handleClick}
         >
           <div
             style={{
@@ -156,14 +153,12 @@ const GroupByButton = () => {
                 position: 'relative',
                 backgroundColor: 'transparent',
               },
-              ...(isActive && {
-                backgroundColor: theme.vars.palette.info.light,
-                border: 'none',
-              }),
+              // ...(isActive && {
+              backgroundColor: theme.vars.palette.info.light,
+              border: 'none',
+              // }),
             }}
-            onClick={ev => {
-              table.setGrouping([]);
-            }}
+            onClick={() => table.setGrouping([])}
           >
             <ClearIcon style={{alignContent: 'center', fontSize: '18px'}} />
           </ButtonBase>
@@ -181,68 +176,63 @@ const GroupByButton = () => {
           maxHeight: '50vh',
         }}
       >
-        {[...groupByElements].map(groups => {
-          return [
-            ...groups.map(element => (
-              <Tooltip
-                title={element.info}
-                key={`Tooltip${element.id}`}
-                placement="top"
-                disableInteractive
+        {groupByElements.map((groups, i) => [
+          ...groups.map(element => (
+            <Tooltip
+              title={element.info}
+              key={`Tooltip${element.id}`}
+              placement="top"
+              disableInteractive
+            >
+              <MenuItem
+                key={element.id}
+                selected={table.getState().grouping.includes(element.id)}
+                onClick={() => {
+                  console.log(table.getAllColumns());
+                  table.setGrouping(old =>
+                    structuredClone(toggleString(old, element.id))
+                  );
+                  handleClose();
+                }}
               >
-                <MenuItem
-                  key={element.id}
-                  selected={table.getState().grouping.includes(element.id)}
-                  onClick={() => {
-                    console.log(table.getAllColumns());
-                    table.setGrouping(old =>
-                      structuredClone(toggleString(old, element.id))
-                    );
-                    handleClose();
-                  }}
-                >
-                  {element.name}
-                </MenuItem>
-              </Tooltip>
-            )),
+                {element.name}
+              </MenuItem>
+            </Tooltip>
+          )),
 
-            <Divider sx={{my: 0}} />,
-          ];
-        })}
+          // Only add divider between elements
+          ...[
+            i !== groupByElements.length - 1 ? [<Divider sx={{my: 0}} />] : [],
+          ],
+        ])}
       </Menu>
     </>
   );
 };
 
-const AssesmentFilterButton = () => {
+const AssesmentFilterButton = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>): void => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
+  const handleClose = (): void => {
     setAnchorEl(null);
   };
 
-  const {
-    table,
-    gradeSelectOption,
-    setGradeSelectOption,
-    selectedGradingModel,
-    setSelectedGradingModel,
-  } = useTableContext();
+  const {selectedGradingModel, setSelectedGradingModel} = useTableContext();
 
-  const allAssessmentModels = useGetAllGradingModels(courseId);
+  const allGradingModels = useGetAllGradingModels(courseId);
 
   // Filter out archived models
-  const assessmentModels = useMemo(
+  const gradingModels = useMemo(
     () =>
-      allAssessmentModels.data !== undefined
-        ? allAssessmentModels.data.filter(model => !model.archived)
+      allGradingModels.data !== undefined
+        ? allGradingModels.data.filter(model => !model.archived)
         : undefined,
-    [allAssessmentModels.data]
+    [allGradingModels.data]
   );
 
   const isActive = useMemo<boolean>(
@@ -254,7 +244,7 @@ const AssesmentFilterButton = () => {
     <>
       <span style={{display: 'flex'}}>
         <ButtonBase
-          id="select-assessment-model-option"
+          id="select-grading-model-option"
           style={{
             ...{
               display: 'flex',
@@ -276,9 +266,7 @@ const AssesmentFilterButton = () => {
               borderRadius: '8px 0px 0px 8px',
             }),
           }}
-          onClick={ev => {
-            handleClick(ev);
-          }}
+          onClick={handleClick}
         >
           <div
             style={{
@@ -288,9 +276,8 @@ const AssesmentFilterButton = () => {
             }}
           >
             {isActive
-              ? assessmentModels?.filter(
-                  ass => ass.id === selectedGradingModel
-                )[0]?.name
+              ? gradingModels?.filter(ass => ass.id === selectedGradingModel)[0]
+                  ?.name
               : 'Grading Model'}
           </div>
 
@@ -318,12 +305,12 @@ const AssesmentFilterButton = () => {
                 position: 'relative',
                 backgroundColor: 'transparent',
               },
-              ...(isActive && {
-                backgroundColor: theme.vars.palette.info.light,
-                border: 'none',
-              }),
+              // ...(isActive && {
+              backgroundColor: theme.vars.palette.info.light,
+              border: 'none',
+              // }),
             }}
-            onClick={ev => {
+            onClick={() => {
               setSelectedGradingModel('any');
             }}
           >
@@ -343,13 +330,13 @@ const AssesmentFilterButton = () => {
           maxHeight: '50vh',
         }}
       >
-        {(assessmentModels ?? []).map(model => (
+        {(gradingModels ?? []).map(model => (
           <MenuItem
             onClick={() => {
               setSelectedGradingModel(model.id);
               handleClose();
             }}
-            key={`assessment-model-select-${model.id}`}
+            key={`grading-model-select-${model.id}`}
             value={model.id}
             selected={selectedGradingModel === model.id}
           >
@@ -364,13 +351,7 @@ const AssesmentFilterButton = () => {
 const CourseResultsTableToolbar = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
-  const {
-    table,
-    gradeSelectOption,
-    setGradeSelectOption,
-    selectedGradingModel,
-    setSelectedGradingModel,
-  } = useTableContext();
+  const {table, gradeSelectOption} = useTableContext();
   const navigate = useNavigate();
   const theme = useTheme();
 
@@ -475,19 +456,8 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       }))
     );
     for (const grade of Object.values(finalGrades)) {
-      let maxGrade;
-      switch (course.data.gradingScale) {
-        case GradingScale.Numerical:
-          maxGrade = 5;
-          break;
-        case GradingScale.PassFail:
-          maxGrade = 1;
-          break;
-        case GradingScale.SecondNationalLanguage:
-          maxGrade = 2;
-          break;
-      }
-      const Schema = z.number().int().min(0).max(maxGrade);
+      const maxFinalGrade = getMaxFinalGrade(course.data.gradingScale);
+      const Schema = z.number().int().min(0).max(maxFinalGrade);
       const result = Schema.safeParse(grade.finalGrade);
       if (!result.success) {
         enqueueSnackbar(`Invalid final grade ${grade.finalGrade}`, {

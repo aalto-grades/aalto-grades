@@ -50,7 +50,7 @@ export const initGraph = (
     ...courseParts.reduce((map: {[key: string]: NodeData}, coursePart) => {
       map[`coursepart-${coursePart.id}`] = {
         title: coursePart.name,
-        settings: {onFailSetting: 'coursefail', minPoints: 0},
+        settings: {onFailSetting: 'coursefail', minPoints: null},
       };
       return map;
     }, {}),

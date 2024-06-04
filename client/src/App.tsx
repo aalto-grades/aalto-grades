@@ -60,7 +60,7 @@ declare module '@mui/material/Button' {
   }
 }
 
-const theme: CssVarsTheme = extendTheme({
+const muiTheme: CssVarsTheme = extendTheme({
   colorSchemes: {
     light: {
       palette: {
@@ -204,7 +204,7 @@ const Root = (): JSX.Element => {
     },
   });
   return (
-    <CssVarsProvider theme={theme}>
+    <CssVarsProvider theme={muiTheme}>
       <NotistackWrapper />
       <QueryClientProvider client={queryClient}>
         <AppView />
