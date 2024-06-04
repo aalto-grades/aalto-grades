@@ -99,7 +99,7 @@ const AverageNodeSettingsSchema = z.object({
   percentageMode: z.boolean(),
 });
 const CoursePartNodeSettingsSchema = z.object({
-  minPoints: z.number(),
+  minPoints: z.union([z.number(), z.null()]),
   onFailSetting: z.enum(['coursefail', 'fail']),
 });
 const MaxNodeSettingsSchema = z.object({

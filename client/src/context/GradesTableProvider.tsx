@@ -45,7 +45,7 @@ import {
   useGetCourse,
   useGetCourseParts,
 } from '../hooks/useApi';
-import {findBestFinalGrade} from '../utils';
+import {findBestFinalGrade} from '../utils/bestGrade';
 import {groupByLatestBestGrade, predictGrades} from '../utils/table';
 
 // Define the shape of the context
@@ -351,17 +351,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     columnHelper.accessor('user.studentNumber', {
       header: 'Student Number',
       meta: {PrettyChipPosition: 'first'},
-      // cell: ({row, getValue}) => {
-      //   // TODO: Remove link
-      //   return getValue();
-      // },
     }),
-    // columnHelper.accessor('credits', {
-    //   header: 'Credits',
-    //   enableSorting: false,
-    //   cell: info => info.getValue(),
-    //   aggregatedCell: () => null,
-    // }),
     columnHelper.accessor(row => row.finalGrades ?? [], {
       header: 'Final Grade',
       id: 'finalGrade',
@@ -443,7 +433,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       }
     ),
     // columnHelper.group({
-    //   header: 'Attainments',
+    //   header: 'Course Parts',
     //   meta: {PrettyChipPosition: 'alone'},
     //   columns: gradeColumns,
     // }),

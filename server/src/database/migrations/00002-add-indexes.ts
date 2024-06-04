@@ -13,7 +13,7 @@ export default {
     const transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.addIndex('course', ['course_code'], {
-        unique: false, // TODO: should this be unique?
+        unique: false,
         transaction,
       });
 

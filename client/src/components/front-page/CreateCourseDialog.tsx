@@ -36,8 +36,8 @@ import {
   NewCourseData,
 } from '@/common/types';
 import {useAddCourse} from '../../hooks/useApi';
-import {sisuLanguageOptions} from '../../utils';
 import {convertToClientGradingScale} from '../../utils/textFormat';
+import {sisuLanguageOptions} from '../../utils/utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 const ValidationSchema = z

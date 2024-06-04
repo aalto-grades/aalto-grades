@@ -45,8 +45,8 @@ import {
 import {useGetFinalGrades} from '../../hooks/api/finalGrade';
 import {useEditCourse, useGetCourse} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {sisuLanguageOptions} from '../../utils';
 import {convertToClientGradingScale} from '../../utils/textFormat';
+import {sisuLanguageOptions} from '../../utils/utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 const ValidationSchema = z

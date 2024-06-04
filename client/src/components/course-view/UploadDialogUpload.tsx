@@ -25,7 +25,7 @@ import {
   GridToolbarContainer,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
-import {parse, unparse} from 'papaparse';
+import {ParseResult, parse, unparse} from 'papaparse';
 import {Dispatch, JSX, SetStateAction, useEffect, useState} from 'react';
 
 import {GradeUploadColTypes} from './UploadDialog';
@@ -103,19 +103,58 @@ const UploadDialogUpload = ({
     document.body.removeChild(linkElement);
   };
 
+  /** Read data using csv key to course part key map */
+  const readCSVData = (
+    csvRows: (string | number)[][],
+    csvKeys: string[],
+    keyMap: {[key: string]: string}
+  ): GridRowModel<GradeUploadColTypes>[] => {
+    const newRows = [];
+    let missingData = false;
+    for (let rowI = 0; rowI < csvRows.length; rowI++) {
+      const csvRow = csvRows[rowI];
+      if (rowI === 0 || csvRow.length === 0) continue;
+
+      const rowData = {id: rowI} as GradeUploadColTypes;
+      for (let i = 0; i < csvRow.length; i++) {
+        const columnKey = keyMap[csvKeys[i]];
+        if (columnKey === 'Ignore Column') continue;
+        if (columnKey === 'studentNo') {
+          rowData.studentNo = csvRow[i].toString();
+          continue;
+        }
+        const value = csvRow[i];
+        if (typeof value === 'number') {
+          rowData[columnKey] = value;
+        } else {
+          // Missing data
+          missingData = true;
+          rowData[columnKey] = null;
+        }
+      }
+      newRows.push(rowData);
+    }
+    if (missingData) {
+      enqueueSnackbar('Some students have missing grades', {
+        variant: 'warning',
+      });
+    }
+    return newRows;
+  };
+
   const loadCsv = (csvData: string | File): void => {
     parse(csvData, {
       dynamicTyping: true,
       skipEmptyLines: true,
-      complete: (csvRows: {data: (string | number)[][]}) => {
+      complete: (csvRows: ParseResult<(string | number)[]>) => {
         const fields = columns.map(col => col.field);
-        const resultKeys = csvRows.data[0].map(value => value.toString());
+        const csvKeys = csvRows.data[0].map(value => value.toString());
 
         // Find matching keys
         let mismatches = false;
         let studentNoFound = false;
         const csvKeyMap: {[key: string]: string} = {};
-        for (const key of resultKeys) {
+        for (const key of csvKeys) {
           if (key.toLowerCase() === 'studentno') studentNoFound = true;
           const matchingField = fields.find(
             field => field.toLowerCase() === key.toLowerCase()
@@ -124,47 +163,20 @@ const UploadDialogUpload = ({
           else csvKeyMap[key] = matchingField;
         }
 
-        /** Load data using csv key to course part key map */
-        const getData = (keyMap: {
-          [key: string]: string;
-        }): GridRowModel<GradeUploadColTypes>[] => {
-          const newRows = [];
-          for (let rowI = 0; rowI < csvRows.data.length; rowI++) {
-            if (rowI === 0 || csvRows.data[rowI].length === 0) continue;
-
-            const rowData: GradeUploadColTypes = {
-              id: rowI,
-            } as GradeUploadColTypes;
-            for (let i = 0; i < csvRows.data[rowI].length; i++) {
-              if (keyMap[resultKeys[i]] === 'Ignore Column') continue;
-              if (keyMap[resultKeys[i]] === 'studentNo') {
-                rowData.studentNo = csvRows.data[rowI][i].toString();
-              } else {
-                const value = csvRows.data[rowI][i];
-                if (typeof value === 'number')
-                  rowData[keyMap[resultKeys[i]]] = value;
-                else rowData[keyMap[resultKeys[i]]] = null; // TODO: Show warning?
-              }
-            }
-            newRows.push(rowData);
-          }
-          return newRows;
-        };
-
         if (mismatches || !studentNoFound) {
           setMismatchDialogOpen(true);
           setMismatchData({
             fields: fields.filter(field => field !== 'actions'),
-            keys: resultKeys,
+            keys: csvKeys,
             onImport: (keyMap: {[key: string]: string}) => {
               setMismatchDialogOpen(false);
-              setRows(getData(keyMap));
+              setRows(readCSVData(csvRows.data, csvKeys, keyMap));
               setEditText(true);
               setExpanded('edit');
             },
           });
         } else {
-          setRows(getData(csvKeyMap));
+          setRows(readCSVData(csvRows.data, csvKeys, csvKeyMap));
           setEditText(true);
           setExpanded('edit');
         }
@@ -293,15 +305,10 @@ const UploadDialogUpload = ({
                       row.id === updatedRow.id ? updatedRow : row
                     )
                   );
-                  // TODO: do some validation. Code below is an example.
-                  // for (const [key, val] of Object.entries(updatedRow)) {
-                  //   if (key === 'id' || key === 'StudentNo') continue;
-                  //   if ((val as number) < 0)
-                  //     throw new Error('Value cannot be negative');
-                  //   else if ((val as number) > 5000)
-                  //     throw new Error('Value cannot be over 5000');
-                  // }
-                  // setSnackBar({message: 'Row saved!', severity: 'success'});
+
+                  if (updatedRow.studentNo === '')
+                    throw new Error('Student number cannot be empty');
+
                   setError(false);
                   return updatedRow;
                 }}

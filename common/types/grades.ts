@@ -59,7 +59,7 @@ export const StudentRowSchema = z.object({
 export const StudentRowArraySchema = z.array(StudentRowSchema);
 export const SisuCsvUploadSchema = z.object({
   assessmentDate: DateSchema.optional(), // Assessment date override
-  completionLanguage: LanguageSchema.optional(), // Defaults to course language TODO: confirm that the Language enum is valid for SISU
+  completionLanguage: LanguageSchema.optional(), // Defaults to course language
   studentNumbers: z.array(z.string()).nonempty(),
 });
 

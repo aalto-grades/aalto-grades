@@ -17,7 +17,7 @@ import {useNavigate} from 'react-router-dom';
 import {CourseData, CourseRoleType, SystemRole} from '@/common/types';
 import useAuth from '../../hooks/useAuth';
 import {HeadCellData} from '../../types';
-import {getCourseRole} from '../../utils';
+import {getCourseRole} from '../../utils/utils';
 
 const headCells: HeadCellData[] = [
   {id: 'code', label: 'Code'},
