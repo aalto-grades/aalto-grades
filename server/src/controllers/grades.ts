@@ -7,6 +7,7 @@ import {Op} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
+  CourseRoleType,
   EditGradeDataSchema,
   FinalGradeData,
   GradeData,
@@ -30,6 +31,7 @@ import logger from '../configs/winston';
 import {sequelize} from '../database';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import CoursePart from '../database/models/coursePart';
+import CourseRole from '../database/models/courseRole';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
 import {ApiError, JwtClaims, NewDbGradeData} from '../types';
@@ -218,6 +220,15 @@ export const addGrades = async (
 
   // TODO: Optimize if datasets are big.
   await AttainmentGrade.bulkCreate(preparedBulkCreate);
+
+  // Create student roles for all the students (TODO: Remove role if grades are removed?)
+  await CourseRole.bulkCreate(
+    students.map(student => ({
+      courseId: courseId,
+      userId: student.id,
+      role: CourseRoleType.Student,
+    }))
+  );
 
   // After this point all the students' grades have been created
   return res.sendStatus(HttpCode.Created);
