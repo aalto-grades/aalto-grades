@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode, SystemRole} from '@/common/types';
+import {HttpCode} from '@/common/types';
 import CourseRole from '../../database/models/courseRole';
 import User from '../../database/models/user';
 import {ApiError, JwtClaims, stringToIdSchema} from '../../types';
@@ -68,17 +68,4 @@ export const getUserCourseRole = async (
   }
 
   return courseRole;
-};
-
-/**
- * Checks if the user making the request is an admin or the owner of the data
- * being accessed.
- *
- * @throws ApiError(403) if the user id is invalid or the user does not have
- *   correct permissions.
- */
-export const isAdminOrOwner = (userToken: JwtClaims, userId: number): void => {
-  if (userId !== userToken.id && userToken.role !== SystemRole.Admin) {
-    throw new ApiError("Cannot access user's data", HttpCode.Forbidden);
-  }
 };

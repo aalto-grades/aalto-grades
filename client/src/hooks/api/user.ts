@@ -19,21 +19,16 @@ import {
   NewIdpUser,
 } from '@/common/types';
 import axios from './axios';
-import {Numeric} from '../../types';
 
-export const useGetCoursesOfUser = (
-  userId: Numeric,
+export const useGetOwnCourses = (
   options?: Partial<UseQueryOptions<CourseData[]>>
-): UseQueryResult<CourseData[]> => {
-  return useQuery({
-    queryKey: ['courses-of-user', userId],
+): UseQueryResult<CourseData[]> =>
+  useQuery({
+    queryKey: ['own-courses'],
     queryFn: async () =>
-      CourseDataArraySchema.parse(
-        (await axios.get(`/v1/user/${userId}/courses`)).data
-      ),
+      CourseDataArraySchema.parse((await axios.get('/v1/user/courses')).data),
     ...options,
   });
-};
 
 export const useAddUser = (
   options?: UseMutationOptions<unknown, unknown, NewIdpUser>

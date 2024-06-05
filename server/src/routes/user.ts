@@ -10,20 +10,19 @@ import {NewIdpUserSchema, SystemRole} from '@/common/types';
 import {
   addIdpUser,
   deleteIdpUser,
-  getCoursesOfUser,
+  getOwnCourses,
   getIdpUsers,
 } from '../controllers/user';
 import {handleInvalidRequestJson} from '../middleware';
-import {adminOrOwner, authorization} from '../middleware/authorization';
+import {authorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
 
 router.get(
-  '/v1/user/:userId/courses',
+  '/v1/user/courses',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  adminOrOwner(),
-  controllerDispatcher(getCoursesOfUser)
+  controllerDispatcher(getOwnCourses)
 );
 
 router.get(

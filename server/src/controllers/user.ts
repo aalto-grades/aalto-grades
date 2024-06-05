@@ -13,22 +13,18 @@ import {
   SystemRole,
 } from '@/common/types';
 import {parseCourseFull} from './utils/course';
-import {findAndValidateUserId, validateUserId} from './utils/user';
+import {findAndValidateUserId} from './utils/user';
 import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
-import {ApiError, CourseFull} from '../types';
+import {ApiError, CourseFull, JwtClaims} from '../types';
 
-/**
- * Responds with CourseData[]
- *
- * @throws ApiError(400|404)
- */
-export const getCoursesOfUser = async (
+/** Responds with CourseData[] */
+export const getOwnCourses = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const userId = await validateUserId(req.params.userId);
+  const user = req.user as JwtClaims;
 
   const courses: CourseFull[] = (await Course.findAll({
     include: [
@@ -36,7 +32,7 @@ export const getCoursesOfUser = async (
       {
         model: User,
         as: 'Users',
-        where: {id: userId},
+        where: {id: user.id},
       },
     ],
   })) as CourseFull[];
