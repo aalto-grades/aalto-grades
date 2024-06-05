@@ -17,7 +17,7 @@ import {
   useTheme,
 } from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useEffect, useMemo, useState} from 'react';
+import {JSX, forwardRef, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {z} from 'zod';
 
@@ -50,7 +50,7 @@ const toggleString = (arr: string[], str: string): string[] => {
 
   return arr;
 };
-const GroupByButton = (): JSX.Element => {
+const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -61,7 +61,6 @@ const GroupByButton = (): JSX.Element => {
     setAnchorEl(null);
   };
   const {table} = useTableContext();
-
   const groupByElements = [
     [
       {
@@ -89,7 +88,7 @@ const GroupByButton = (): JSX.Element => {
 
   return (
     <>
-      <span style={{display: 'flex'}}>
+      <span {...props} style={{display: 'flex'}} ref={ref}>
         <ButtonBase
           style={{
             ...{
@@ -135,6 +134,7 @@ const GroupByButton = (): JSX.Element => {
             />
           )}
         </ButtonBase>
+
         {isActive && (
           <ButtonBase
             style={{
@@ -208,94 +208,50 @@ const GroupByButton = (): JSX.Element => {
       </Menu>
     </>
   );
-};
+});
 
-const AssesmentFilterButton = (): JSX.Element => {
-  const {courseId} = useParams() as {courseId: string};
-  const theme = useTheme();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>): void => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = (): void => {
-    setAnchorEl(null);
-  };
+const AssesmentFilterButton = forwardRef<HTMLSpanElement>(
+  (props, ref): JSX.Element => {
+    const {courseId} = useParams() as {courseId: string};
+    const theme = useTheme();
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event: React.MouseEvent<HTMLElement>): void => {
+      setAnchorEl(event.currentTarget);
+    };
+    const handleClose = (): void => {
+      setAnchorEl(null);
+    };
 
-  const {selectedGradingModel, setSelectedGradingModel} = useTableContext();
+    const {selectedGradingModel, setSelectedGradingModel} = useTableContext();
 
-  const allGradingModels = useGetAllGradingModels(courseId);
+    const allGradingModels = useGetAllGradingModels(courseId);
 
-  // Filter out archived models
-  const gradingModels = useMemo(
-    () =>
-      allGradingModels.data !== undefined
-        ? allGradingModels.data.filter(model => !model.archived)
-        : undefined,
-    [allGradingModels.data]
-  );
+    // Filter out archived models
+    const gradingModels = useMemo(
+      () =>
+        allGradingModels.data !== undefined
+          ? allGradingModels.data.filter(model => !model.archived)
+          : undefined,
+      [allGradingModels.data]
+    );
 
-  const isActive = useMemo<boolean>(
-    () => !!selectedGradingModel && selectedGradingModel !== 'any',
-    [selectedGradingModel]
-  );
+    const isActive = useMemo<boolean>(
+      () => !!selectedGradingModel && selectedGradingModel !== 'any',
+      [selectedGradingModel]
+    );
 
-  return (
-    <>
-      <span style={{display: 'flex'}}>
-        <ButtonBase
-          id="select-grading-model-option"
-          style={{
-            ...{
-              display: 'flex',
-              borderRadius: '8px',
-              textAlign: 'center',
-              border: '1px solid black',
-              alignContent: 'center',
-              padding: '0px 8px',
-              fontSize: '14px',
-              alignItems: 'center',
-              lineHeight: '20px',
-              cursor: 'pointer',
-              position: 'relative',
-              backgroundColor: 'transparent',
-            },
-            ...(isActive && {
-              backgroundColor: theme.vars.palette.info.light,
-              border: 'none',
-              borderRadius: '8px 0px 0px 8px',
-            }),
-          }}
-          onClick={handleClick}
-        >
-          <div
-            style={{
-              alignContent: 'center',
-              padding: '0px 8px',
-              width: 'max-content',
-            }}
-          >
-            {isActive
-              ? gradingModels?.filter(ass => ass.id === selectedGradingModel)[0]
-                  ?.name
-              : 'Grading Model'}
-          </div>
-
-          {!isActive && (
-            <ArrowDropDownIcon
-              style={{alignContent: 'center', fontSize: '18px'}}
-            />
-          )}
-        </ButtonBase>
-        {isActive && (
+    return (
+      <>
+        <span {...props} style={{display: 'flex'}} ref={ref}>
           <ButtonBase
+            id="select-grading-model-option"
             style={{
               ...{
                 display: 'flex',
-                borderRadius: '0px 8px 8px 0',
+                borderRadius: '8px',
                 textAlign: 'center',
-                // border: '1px solid black',
-                border: '0px 1px 1px 1px',
+                border: '1px solid black',
                 alignContent: 'center',
                 padding: '0px 8px',
                 fontSize: '14px',
@@ -305,48 +261,95 @@ const AssesmentFilterButton = (): JSX.Element => {
                 position: 'relative',
                 backgroundColor: 'transparent',
               },
-              // ...(isActive && {
-              backgroundColor: theme.vars.palette.info.light,
-              border: 'none',
-              // }),
+              ...(isActive && {
+                backgroundColor: theme.vars.palette.info.light,
+                border: 'none',
+                borderRadius: '8px 0px 0px 8px',
+              }),
             }}
-            onClick={() => {
-              setSelectedGradingModel('any');
-            }}
+            onClick={handleClick}
           >
-            <ClearIcon style={{alignContent: 'center', fontSize: '18px'}} />
+            <div
+              style={{
+                alignContent: 'center',
+                padding: '0px 8px',
+                width: 'max-content',
+              }}
+            >
+              {isActive
+                ? gradingModels?.filter(
+                    ass => ass.id === selectedGradingModel
+                  )[0]?.name
+                : 'Grading Model'}
+            </div>
+
+            {!isActive && (
+              <ArrowDropDownIcon
+                style={{alignContent: 'center', fontSize: '18px'}}
+              />
+            )}
           </ButtonBase>
-        )}
-      </span>
-      <Menu
-        id="long-menu"
-        MenuListProps={{
-          'aria-labelledby': 'long-ButtonBase',
-        }}
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        style={{
-          maxHeight: '50vh',
-        }}
-      >
-        {(gradingModels ?? []).map(model => (
-          <MenuItem
-            onClick={() => {
-              setSelectedGradingModel(model.id);
-              handleClose();
-            }}
-            key={`grading-model-select-${model.id}`}
-            value={model.id}
-            selected={selectedGradingModel === model.id}
-          >
-            {model.name}
-          </MenuItem>
-        ))}
-      </Menu>
-    </>
-  );
-};
+          {isActive && (
+            <ButtonBase
+              style={{
+                ...{
+                  display: 'flex',
+                  borderRadius: '0px 8px 8px 0',
+                  textAlign: 'center',
+                  // border: '1px solid black',
+                  border: '0px 1px 1px 1px',
+                  alignContent: 'center',
+                  padding: '0px 8px',
+                  fontSize: '14px',
+                  alignItems: 'center',
+                  lineHeight: '20px',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  backgroundColor: 'transparent',
+                },
+                // ...(isActive && {
+                backgroundColor: theme.vars.palette.info.light,
+                border: 'none',
+                // }),
+              }}
+              onClick={() => {
+                setSelectedGradingModel('any');
+              }}
+            >
+              <ClearIcon style={{alignContent: 'center', fontSize: '18px'}} />
+            </ButtonBase>
+          )}
+        </span>
+        <Menu
+          id="long-menu"
+          MenuListProps={{
+            'aria-labelledby': 'long-ButtonBase',
+          }}
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          style={{
+            maxHeight: '50vh',
+          }}
+        >
+          {(gradingModels ?? []).map(model => (
+            <MenuItem
+              onClick={() => {
+                setSelectedGradingModel(model.id);
+                handleClose();
+              }}
+              key={`grading-model-select-${model.id}`}
+              value={model.id}
+              selected={selectedGradingModel === model.id}
+            >
+              {model.name}
+            </MenuItem>
+          ))}
+        </Menu>
+      </>
+    );
+  }
+);
 
 const CourseResultsTableToolbar = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
@@ -537,24 +540,22 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                   }
                   placement="top"
                 >
-                  <span>
-                    <Button
-                      variant={
-                        table.getSelectedRowModel().rows.length === 0
+                  <Button
+                    variant={
+                      table.getSelectedRowModel().rows.length === 0
+                        ? 'outlined'
+                        : !missingFinalGrades
                           ? 'outlined'
-                          : !missingFinalGrades
-                            ? 'outlined'
-                            : 'contained'
-                      }
-                      onClick={() => setShowCalculateDialog(true)}
-                      disabled={table.getSelectedRowModel().rows.length === 0}
-                      id="calculate-final-grades"
-                    >
-                      {missingFinalGrades
-                        ? 'Calculate final grades'
-                        : ' Re-Calculate final grades'}
-                    </Button>
-                  </span>
+                          : 'contained'
+                    }
+                    onClick={() => setShowCalculateDialog(true)}
+                    disabled={table.getSelectedRowModel().rows.length === 0}
+                    id="calculate-final-grades"
+                  >
+                    {missingFinalGrades
+                      ? 'Calculate final grades'
+                      : ' Re-Calculate final grades'}
+                  </Button>
                 </Tooltip>
                 <Tooltip
                   title={
@@ -567,23 +568,21 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                   }
                   placement="top"
                 >
-                  <span>
-                    <Button
-                      variant="contained"
-                      color={missingFinalGrades ? 'error' : 'primary'}
-                      onClick={(): void => {
-                        if (!missingFinalGrades) {
-                          setShowSisuDialog(true);
-                        }
-                      }}
-                      disabled={
-                        table.getSelectedRowModel().rows.length !== 0 &&
-                        missingFinalGrades
+                  <Button
+                    variant="contained"
+                    color={missingFinalGrades ? 'error' : 'primary'}
+                    onClick={(): void => {
+                      if (!missingFinalGrades) {
+                        setShowSisuDialog(true);
                       }
-                    >
-                      Download Sisu CSV
-                    </Button>
-                  </span>
+                    }}
+                    disabled={
+                      table.getSelectedRowModel().rows.length !== 0 &&
+                      missingFinalGrades
+                    }
+                  >
+                    Download Sisu CSV
+                  </Button>
                 </Tooltip>
               </Box>
             )}
