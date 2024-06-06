@@ -13,6 +13,7 @@ import {
   getOwnCourses,
   getIdpUsers,
   getGradesOfUser,
+  getStudents,
 } from '../controllers/user';
 import {handleInvalidRequestJson} from '../middleware';
 import {authorization} from '../middleware/authorization';
@@ -30,6 +31,12 @@ router.get(
   '/v1/user/:userId/grades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   controllerDispatcher(getGradesOfUser)
+);
+
+router.get(
+  '/v1/students',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  controllerDispatcher(getStudents)
 );
 
 router.get(

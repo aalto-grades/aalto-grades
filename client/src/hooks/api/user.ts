@@ -19,6 +19,8 @@ import {
   CourseWithFinalGradesArraySchema,
   IdpUsersSchema,
   NewIdpUser,
+  UserData,
+  UserDataArraySchema,
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
@@ -43,6 +45,16 @@ export const useGetGradesOfStudent = (
       CourseWithFinalGradesArraySchema.parse(
         (await axios.get(`/v1/user/${userId}/grades`)).data
       ),
+    ...options,
+  });
+
+export const useGetStudents = (
+  options?: Partial<UseQueryOptions<UserData[]>>
+): UseQueryResult<UserData[]> =>
+  useQuery({
+    queryKey: ['students'],
+    queryFn: async () =>
+      UserDataArraySchema.parse((await axios.get('/v1/students')).data),
     ...options,
   });
 

@@ -232,7 +232,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/students/:userId',
+        path: '/students/:userId?',
         element: (
           <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]}>
             <StudentsView />

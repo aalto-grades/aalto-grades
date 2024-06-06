@@ -9,11 +9,12 @@ import {TypedRequestBody} from 'zod-express-middleware';
 import {
   CourseData,
   CourseRoleType,
-  FinalGradeData,
+  CourseWithFinalGrades,
   HttpCode,
   IdpUsers,
   NewIdpUserSchema,
   SystemRole,
+  UserData,
 } from '@/common/types';
 import {parseCourseFull} from './utils/course';
 import {validateUserAndGrader} from './utils/grades';
@@ -52,7 +53,7 @@ export const getOwnCourses = async (
 };
 
 /**
- * Responds with null
+ * Responds with CourseWithFinalGrades[]
  *
  * @throws ApiError(400|404)
  */
@@ -61,9 +62,9 @@ export const getGradesOfUser = async (
   res: Response
 ): Promise<void> => {
   const userId = await validateUserId(req.params.userId);
-  const user = req.user as JwtClaims;
+  const requester = req.user as JwtClaims;
 
-  if (userId !== user.id && user.role !== SystemRole.Admin) {
+  if (userId !== requester.id && requester.role !== SystemRole.Admin) {
     throw new ApiError("Cannot access user's data", HttpCode.Forbidden);
   }
 
@@ -99,7 +100,7 @@ export const getGradesOfUser = async (
         where: {
           [Op.or]: [
             {
-              userId: user.id,
+              userId: requester.id,
               role: {
                 [Op.in]: [CourseRoleType.Teacher, CourseRoleType.Assistant],
               },
@@ -115,12 +116,11 @@ export const getGradesOfUser = async (
     ],
   })) as DBData[];
 
-  type DataType = CourseData & {finalGrades: FinalGradeData[]};
-  const userGrades: DataType[] = [];
+  const userGrades: CourseWithFinalGrades[] = [];
   for (const course of courses) {
     // Validate that the user and the requester exist in the course roles
     const roleUsers = new Set(course.CourseRoles.map(role => role.userId));
-    if (!roleUsers.has(userId) || !roleUsers.has(user.id)) continue;
+    if (!roleUsers.has(userId) || !roleUsers.has(requester.id)) continue;
 
     userGrades.push({
       ...parseCourseFull(course),
@@ -142,6 +142,74 @@ export const getGradesOfUser = async (
   }
 
   res.json(userGrades);
+};
+
+/** Responds with User[] */
+export const getStudents = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const requester = req.user as JwtClaims;
+
+  type DBData = Course & {
+    Users: (User & {CourseRole: CourseRole})[];
+    CourseRoles: CourseRole[];
+  };
+  let courses: DBData[];
+  if (requester.role !== SystemRole.Admin) {
+    courses = (await Course.findAll({
+      include: [
+        {model: CourseTranslation},
+        {model: User, through: {attributes: ['role']}},
+        // Filter by user being in course and requester having assistant or teacher role
+        {
+          model: CourseRole,
+          where: {
+            userId: requester.id,
+            role: {
+              [Op.in]: [CourseRoleType.Teacher, CourseRoleType.Assistant],
+            },
+          },
+          attributes: ['userId'], // remove data
+        },
+      ],
+    })) as DBData[];
+  } else {
+    courses = (await Course.findAll({
+      include: [
+        {model: CourseTranslation},
+        {model: User, through: {attributes: ['role']}},
+      ],
+    })) as DBData[];
+  }
+
+  const users = new Map<number, UserData>();
+  for (const course of courses) {
+    const isTeacher =
+      requester.role === SystemRole.Admin ||
+      course.CourseRoles[0].role === CourseRoleType.Teacher;
+
+    for (const user of course.Users) {
+      if (user.CourseRole.role !== CourseRoleType.Student) continue;
+      if (isTeacher) {
+        users.set(user.id, {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          studentNumber: user.studentNumber,
+        });
+      } else if (!users.has(user.id)) {
+        // Assistants shouldn't see names and emails
+        users.set(user.id, {
+          id: user.id,
+          name: null,
+          email: null,
+          studentNumber: user.studentNumber,
+        });
+      }
+    }
+  }
+  res.json(Array.from(users.values()));
 };
 
 /** Responds with IdpUsers */
