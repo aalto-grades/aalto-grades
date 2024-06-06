@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import {JSX, useState} from 'react';
+import {JSX, useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
 import {
@@ -46,13 +46,17 @@ const NewAplusCoursePartsDialog = ({
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
   const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
-    useState<boolean>(!getAplusToken());
+    useState<boolean>(false);
   const [step, setStep] = useState<number>(0);
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
   const [CoursePartsWithSource, setCoursePartsWithSource] = useState<
     [{name: string; daysValid: number}, AplusGradeSourceData][]
   >([]);
+
+  useEffect(() => {
+    setAplusTokenDialogOpen(!getAplusToken());
+  }, [open]);
 
   const handleResetAndClose = (): void => {
     setStep(0);
