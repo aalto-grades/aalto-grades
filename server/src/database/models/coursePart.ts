@@ -11,6 +11,7 @@ import {
   Model,
 } from 'sequelize';
 
+import AplusGradeSource from './aplusGradeSource';
 import Course from './course';
 import {sequelize} from '..';
 
@@ -26,6 +27,7 @@ export default class CoursePart extends Model<
   declare archived: CreationOptional<boolean>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+  declare AplusGradeSources?: AplusGradeSource[];
 }
 
 CoursePart.init(

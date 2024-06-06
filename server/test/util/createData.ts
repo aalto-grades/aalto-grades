@@ -68,7 +68,10 @@ class CreateData {
       daysValid: this.randInt(10, 365),
     });
     this.freeCoursePartId += 1;
-    return newCoursePart;
+    return {
+      ...newCoursePart,
+      aplusGradeSources: [],
+    };
   }
 
   private async createCourseParts(courseId: number): Promise<CoursePartData[]> {
@@ -80,7 +83,10 @@ class CreateData {
         daysValid: this.randInt(10, 365),
       });
 
-      courseParts.push(newCoursePart);
+      courseParts.push({
+        ...newCoursePart,
+        aplusGradeSources: [],
+      });
     }
     return courseParts;
   }

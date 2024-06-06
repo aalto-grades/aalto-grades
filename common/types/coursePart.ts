@@ -4,21 +4,26 @@
 
 import {z} from 'zod';
 
+import {AplusGradeSourceDataSchema} from './aplus';
+
 export const CoursePartDataSchema = z.object({
   id: z.number().int(),
   courseId: z.number().int(),
   name: z.string().min(1),
   daysValid: z.number().int().nonnegative(),
   archived: z.boolean(),
+  aplusGradeSources: z.array(AplusGradeSourceDataSchema),
 });
 export const NewCoursePartDataSchema = CoursePartDataSchema.omit({
   id: true,
   courseId: true,
   archived: true,
+  aplusGradeSources: true,
 });
 export const EditCoursePartDataSchema = CoursePartDataSchema.omit({
   id: true,
   courseId: true,
+  aplusGradeSources: true,
 }).partial();
 
 export const CoursePartDataArraySchema = z.array(CoursePartDataSchema);
