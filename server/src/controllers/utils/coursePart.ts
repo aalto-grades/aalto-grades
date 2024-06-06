@@ -29,34 +29,31 @@ export const findCoursePartById = async (id: number): Promise<CoursePart> => {
 export const findCoursePartByCourseId = async (
   courseId: number
 ): Promise<CoursePartData[]> => {
-  const courseParts = await CoursePart.findAll({
+  const courseParts = (await CoursePart.findAll({
     where: {courseId: courseId},
     include: AplusGradeSource,
     order: [['id', 'ASC']],
-  });
+  })) as (CoursePart & {
+    AplusGradeSources: AplusGradeSource[];
+  })[];
 
-  return courseParts.map(coursePart => {
-    const gradeSources = coursePart.AplusGradeSources;
-    return {
-      id: coursePart.id,
-      courseId: coursePart.courseId,
-      name: coursePart.name,
-      daysValid: coursePart.daysValid,
-      archived: coursePart.archived,
-      aplusGradeSources: gradeSources
-        ? gradeSources.map(
-            gradeSource =>
-              ({
-                coursePartId: coursePart.id, // TODO: Redundant
-                aplusCourseId: gradeSource.aplusCourseId,
-                sourceType: gradeSource.sourceType,
-                moduleId: gradeSource.moduleId ?? undefined,
-                difficulty: gradeSource.difficulty ?? undefined,
-              }) as AplusGradeSourceData
-          )
-        : [],
-    };
-  });
+  return courseParts.map(coursePart => ({
+    id: coursePart.id,
+    courseId: coursePart.courseId,
+    name: coursePart.name,
+    daysValid: coursePart.daysValid,
+    archived: coursePart.archived,
+    aplusGradeSources: coursePart.AplusGradeSources.map(
+      gradeSource =>
+        ({
+          coursePartId: coursePart.id, // TODO: Redundant
+          aplusCourseId: gradeSource.aplusCourseId,
+          sourceType: gradeSource.sourceType,
+          moduleId: gradeSource.moduleId ?? undefined,
+          difficulty: gradeSource.difficulty ?? undefined,
+        }) as AplusGradeSourceData
+    ),
+  }));
 };
 
 /**
