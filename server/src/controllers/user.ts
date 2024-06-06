@@ -67,7 +67,10 @@ export const getGradesOfUser = async (
     throw new ApiError("Cannot access user's data", HttpCode.Forbidden);
   }
 
-  type DBData = CourseFull & {FinalGrades: FinalGrade[]};
+  type DBData = CourseFull & {
+    FinalGrades: FinalGrade[];
+    CourseRoles: CourseRole[];
+  };
   const courses: DBData[] = (await Course.findAll({
     include: [
       {model: CourseTranslation},
@@ -107,15 +110,19 @@ export const getGradesOfUser = async (
             },
           ],
         },
-        attributes: ['role'], // remove data
+        attributes: ['userId'], // remove data
       },
     ],
   })) as DBData[];
-  // TODO: Filter by having both roles in courserole & edit DBData type to include both
 
   type DataType = CourseData & {finalGrades: FinalGradeData[]};
   const userGrades: DataType[] = [];
   for (const course of courses) {
+    // Validate that the user and the requester exist in the course roles
+    const roleUsers = new Set(course.CourseRoles.map(role => role.userId));
+    console.log(roleUsers);
+    if (!roleUsers.has(userId) || !roleUsers.has(user.id)) continue;
+
     userGrades.push({
       ...parseCourseFull(course),
       finalGrades: course.FinalGrades.map(finalGrade => {
