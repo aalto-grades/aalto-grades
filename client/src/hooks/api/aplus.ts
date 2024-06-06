@@ -25,7 +25,7 @@ import axios from './axios';
 import {Numeric} from '../../types';
 import {getAplusToken} from '../../utils/utils';
 
-const getConfig = (): AxiosRequestConfig => ({
+const getHeaders = (): AxiosRequestConfig => ({
   headers: {
     Authorization: `Aplus-Token ${getAplusToken()}`,
   },
@@ -38,7 +38,7 @@ export const useFetchAplusCourses = (
     queryKey: ['a+-courses'],
     queryFn: async () =>
       AplusCourseDataArraySchema.parse(
-        (await axios.get('/v1/aplus/courses', getConfig())).data
+        (await axios.get('/v1/aplus/courses', getHeaders())).data
       ),
     ...options,
   });
@@ -51,7 +51,7 @@ export const useFetchAplusExerciseData = (
     queryKey: ['a+-exercises', aplusCourseId],
     queryFn: async () =>
       AplusExerciseDataSchema.parse(
-        (await axios.get(`/v1/aplus/courses/${aplusCourseId}`, getConfig()))
+        (await axios.get(`/v1/aplus/courses/${aplusCourseId}`, getHeaders()))
           .data
       ),
     ...options,
@@ -75,7 +75,7 @@ export const useFetchAplusGrades = (
     queryKey: ['a+-grades', courseId],
     queryFn: async () =>
       NewGradeArraySchema.parse(
-        (await axios.get(`/v1/courses/${courseId}/aplus-fetch`, getConfig()))
+        (await axios.get(`/v1/courses/${courseId}/aplus-fetch`, getHeaders()))
           .data
       ),
     ...options,
