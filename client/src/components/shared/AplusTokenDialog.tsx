@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import {JSX, useState} from 'react';
 
-import {setAplusToken} from '../../utils/utils';
+import {getAplusToken, setAplusToken} from '../../utils/utils';
 
 type PropsType = {
   handleClose: () => void;
@@ -29,7 +29,7 @@ const AplusTokenDialog = ({
   handleSubmit,
   open,
 }: PropsType): JSX.Element => {
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(getAplusToken());
 
   return (
     <Dialog open={open} onClose={handleClose}>

@@ -17,7 +17,6 @@ import {
   AplusGradeSourceData,
   AplusGradeSourceType,
 } from '@/common/types';
-import AplusTokenDialog from './AplusTokenDialog';
 import CreateAplusCourseParts from './CreateAplusCourseParts';
 import SelectAplusCourse from './SelectAplusCourse';
 import SelectAplusGradeSources from './SelectAplusGradeSources';
@@ -27,6 +26,7 @@ import {
   useFetchAplusCourses,
 } from '../../hooks/useApi';
 import {getAplusToken} from '../../utils/utils';
+import AplusTokenDialog from '../shared/AplusTokenDialog';
 
 import Type = AplusGradeSourceType;
 
