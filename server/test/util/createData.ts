@@ -69,7 +69,11 @@ class CreateData {
     });
     this.freeCoursePartId += 1;
     return {
-      ...newCoursePart,
+      id: newCoursePart.id,
+      courseId: newCoursePart.courseId,
+      name: newCoursePart.name,
+      daysValid: newCoursePart.daysValid,
+      archived: newCoursePart.archived,
       aplusGradeSources: [],
     };
   }
@@ -84,7 +88,11 @@ class CreateData {
       });
 
       courseParts.push({
-        ...newCoursePart,
+        id: newCoursePart.id,
+        courseId: newCoursePart.courseId,
+        name: newCoursePart.name,
+        daysValid: newCoursePart.daysValid,
+        archived: newCoursePart.archived,
         aplusGradeSources: [],
       });
     }
