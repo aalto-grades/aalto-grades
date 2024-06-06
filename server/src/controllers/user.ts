@@ -120,7 +120,6 @@ export const getGradesOfUser = async (
   for (const course of courses) {
     // Validate that the user and the requester exist in the course roles
     const roleUsers = new Set(course.CourseRoles.map(role => role.userId));
-    console.log(roleUsers);
     if (!roleUsers.has(userId) || !roleUsers.has(user.id)) continue;
 
     userGrades.push({

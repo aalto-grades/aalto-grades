@@ -222,10 +222,25 @@ export const addGrades = async (
   await AttainmentGrade.bulkCreate(preparedBulkCreate);
 
   // Create student roles for all the students (TODO: Remove role if grades are removed?)
-  await CourseRole.bulkCreate(
-    students.map(student => ({
+  const dbCourseRoles = await CourseRole.findAll({
+    attributes: ['userId'],
+    where: {
       courseId: courseId,
-      userId: student.id,
+      userId: {[Op.in]: students.map(student => student.id)},
+      role: CourseRoleType.Student,
+    },
+  });
+  const studentsWithRoles = new Set(dbCourseRoles.map(role => role.userId));
+  const studentUserIds = Array.from(
+    new Set(students.map(student => student.id))
+  );
+  const missingRoles = studentUserIds.filter(
+    userId => !studentsWithRoles.has(userId)
+  );
+  await CourseRole.bulkCreate(
+    missingRoles.map(userId => ({
+      courseId: courseId,
+      userId: userId,
       role: CourseRoleType.Student,
     }))
   );
