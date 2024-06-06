@@ -37,7 +37,10 @@ const AplusTokenDialog = ({
       <DialogContent>
         <Typography>
           You can find your API token by logging in to A+ and navigating to:{' '}
-          <Link href="https://plus.cs.aalto.fi/accounts/accounts/">
+          <Link
+            href="https://plus.cs.aalto.fi/accounts/accounts/"
+            target="_blank"
+          >
             https://plus.cs.aalto.fi/accounts/accounts/
           </Link>
         </Typography>
