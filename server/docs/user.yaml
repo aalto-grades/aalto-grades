@@ -126,7 +126,8 @@ definitions:
     tags: [User]
     description: >
       Get all students from the courses the requester has a teacher or assistant role in.
-      If the requester has an assistant role the names and emails of the students will be set to null.
+      If the requester has an assistant role the names and emails
+      of the students will be set to null.
     responses:
       200:
         description: All students from the courses the requester has a teacher or assistant role in.
