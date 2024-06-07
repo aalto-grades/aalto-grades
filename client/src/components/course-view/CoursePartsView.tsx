@@ -23,6 +23,7 @@ import {
 } from '@/common/types';
 import NewAplusCoursePartsDialog from './NewAplusGradePartsDialog';
 import AddCoursePartDialog from './NewCoursePartDialog';
+import ViewAplusGradeSourcesDialog from './ViewAplusGradeSourcesDialog';
 import {
   useAddCoursePart,
   useDeleteCoursePart,
@@ -60,6 +61,11 @@ const CoursePartsView = (): JSX.Element => {
   const [editing, setEditing] = useState<boolean>(false);
   const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false);
   const [aplusDialogOpen, setAplusDialogOpen] = useState<boolean>(false);
+  const [viewAplusSourcesOpen, setViewAplusSourcesOpen] =
+    useState<boolean>(false);
+  const [aplusGradeSources, setAplusGradeSources] = useState<
+    AplusGradeSourceData[]
+  >([]);
   const [unsavedDialogOpen, setUnsavedDialogOpen] = useState<boolean>(false);
 
   const coursePartsWithGrades = useMemo(() => {
@@ -200,13 +206,20 @@ const CoursePartsView = (): JSX.Element => {
       <GridActionsCellItem
         icon={<AddCircle />}
         label="AddCircle"
-        onClick={() => {}}
+        onClick={() => window.alert('Not implemented!')}
       />
     );
 
     if (params.row.aplusGradeSources.length > 0) {
       elements.push(
-        <GridActionsCellItem icon={<More />} label="More" onClick={() => {}} />
+        <GridActionsCellItem
+          icon={<More />}
+          label="More"
+          onClick={() => {
+            setAplusGradeSources(params.row.aplusGradeSources);
+            setViewAplusSourcesOpen(true);
+          }}
+        />
       );
     }
 
@@ -302,6 +315,11 @@ const CoursePartsView = (): JSX.Element => {
       <NewAplusCoursePartsDialog
         handleClose={() => setAplusDialogOpen(false)}
         open={aplusDialogOpen}
+      />
+      <ViewAplusGradeSourcesDialog
+        handleClose={() => setViewAplusSourcesOpen(false)}
+        open={viewAplusSourcesOpen}
+        aplusGradeSources={aplusGradeSources}
       />
       <UnsavedChangesDialog
         open={unsavedDialogOpen || blocker.state === 'blocked'}
