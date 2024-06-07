@@ -2,18 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
-import {Badge, Icon, IconButton} from '@mui/material';
-import {flexRender} from '@tanstack/react-table';
-import {useVirtualizer} from '@tanstack/react-virtual';
-import {JSX, useRef} from 'react';
+import { ArrowUpward, ExpandLess, ExpandMore, Sort } from '@mui/icons-material';
+import { Badge, Icon, IconButton } from '@mui/material';
+import { flexRender } from '@tanstack/react-table';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { JSX, useRef } from 'react';
 
-import {useTableContext} from '../../context/useTableContext';
+import { useTableContext } from '../../context/useTableContext';
 import PrettyChip from '../shared/PrettyChip';
 
 // TODO: Better column definitions
 // TODO: Better typing and freeze how to access data
 const CourseResultsTable = (): JSX.Element => {
+  "use no memo";
   const {table} = useTableContext();
   const {rows} = table.getRowModel();
 

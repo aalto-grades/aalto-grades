@@ -11,6 +11,7 @@ module.exports = {
     'plugin:react-hooks/recommended',
     '../node_modules/gts',
     '../.eslintrc.json',
+    'eslint-plugin-react-compiler',
   ],
   ignorePatterns: [
     'node_modules',
@@ -27,6 +28,7 @@ module.exports = {
     },
   },
   rules: {
+    'react-compiler/react-compiler': "error",
     camelcase: ['warn', {allow: ['required_error', 'unstable_viewTransition']}],
     'react-refresh/only-export-components': [
       'warn',

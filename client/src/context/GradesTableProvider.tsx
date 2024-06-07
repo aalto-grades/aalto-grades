@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Badge, Checkbox} from '@mui/material';
+import { Badge, Checkbox } from '@mui/material';
 import {
   ExpandedState,
   GroupingState,
@@ -27,7 +27,7 @@ import {
   useState,
   useTransition,
 } from 'react';
-import {useParams} from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import {
   CoursePartData,
@@ -45,8 +45,8 @@ import {
   useGetCourse,
   useGetCourseParts,
 } from '../hooks/useApi';
-import {findBestFinalGrade} from '../utils/bestGrade';
-import {groupByLatestBestGrade, predictGrades} from '../utils/table';
+import { findBestFinalGrade } from '../utils/bestGrade';
+import { groupByLatestBestGrade, predictGrades } from '../utils/table';
 
 // Define the shape of the context
 export type TableContextProps = {
@@ -150,14 +150,12 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   const groupedData = useMemo(() => {
     let predictedGrades: ReturnType<typeof predictGrades> = [];
     if (gradingModels) {
-      startTransition(() => {
         predictedGrades = predictGrades(
           props.data,
           gradingModels,
           gradeSelectOption
         );
         console.log(predictedGrades);
-      });
     }
 
     return groupByLatestBestGrade(
@@ -482,7 +480,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     // debugAll: true,
   });
   return (
-    <GradesTableContext.Provider
+    <GradesTableContext
       value={{
         table,
         gradeSelectOption,
@@ -509,6 +507,6 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         row={userGraphData}
       />
       {props.children}
-    </GradesTableContext.Provider>
+    </GradesTableContext>
   );
 };

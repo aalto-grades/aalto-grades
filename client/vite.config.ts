@@ -9,13 +9,20 @@ import react from '@vitejs/plugin-react';
 // import {defineConfig} from 'vitest/config';
 import {defineConfig} from 'vite';
 import viteTsconfigPaths from 'vite-tsconfig-paths';
+const ReactCompilerConfig = {
+  /* ... */
+};
 
 // export default defineConfig(({mode}) => {
 export default defineConfig({
   // depending on your application, base can also be "/"
   base: '/',
   plugins: [
-    react(),
+    react({
+      babel: {
+        plugins: [['babel-plugin-react-compiler', ReactCompilerConfig]],
+      },
+    }),
     viteTsconfigPaths(),
     // license({
     //   thirdParty: {
