@@ -9,7 +9,7 @@ import {SystemRole} from '@/common/types';
 import CourseTable from './front-page/CourseTable';
 import CreateCourseDialog from './front-page/CreateCourseDialog';
 import UsersView from './front-page/users-view/UsersView';
-import {useGetAllCourses, useGetCoursesOfUser} from '../hooks/useApi';
+import {useGetAllCourses, useGetOwnCourses} from '../hooks/useApi';
 import useAuth from '../hooks/useAuth';
 
 const FrontPage = (): JSX.Element => {
@@ -18,7 +18,7 @@ const FrontPage = (): JSX.Element => {
   const courses = useGetAllCourses({
     enabled: auth !== null && auth.role === SystemRole.Admin,
   });
-  const coursesOfUser = useGetCoursesOfUser(auth!.id);
+  const coursesOfUser = useGetOwnCourses();
   const [createDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
 
   return (

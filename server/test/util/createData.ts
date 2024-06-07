@@ -174,6 +174,14 @@ class CreateData {
     return gradingModel.id;
   }
 
+  async createRole(
+    courseId: number,
+    userId: number,
+    role: CourseRoleType
+  ): Promise<void> {
+    await CourseRole.create({courseId, userId, role});
+  }
+
   private async createDbCourse(
     hasTeacher: boolean,
     hasAssistant: boolean,

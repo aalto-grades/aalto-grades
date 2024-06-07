@@ -4,6 +4,7 @@
 
 import {z} from 'zod';
 
+import {FinalGradeDataArraySchema} from './finalGrade';
 import {LanguageSchema, LocalizedStringSchema} from './general';
 import {TeacherDataSchema} from './user';
 
@@ -57,8 +58,16 @@ export const EditCourseDataSchema = BaseCourseDataSchema.omit({id: true})
     {path: ['maxCredits']}
   );
 
+export const CourseWithFinalGradesSchema = BaseCourseDataSchema.extend({
+  finalGrades: FinalGradeDataArraySchema,
+}).refine(val => val.maxCredits >= val.minCredits);
+
 export const CourseDataArraySchema = z.array(CourseDataSchema);
+export const CourseWithFinalGradesArraySchema = z.array(
+  CourseWithFinalGradesSchema
+);
 
 export type CourseData = z.infer<typeof CourseDataSchema>;
 export type NewCourseData = z.infer<typeof NewCourseDataSchema>;
 export type EditCourseData = z.infer<typeof EditCourseDataSchema>;
+export type CourseWithFinalGrades = z.infer<typeof CourseWithFinalGradesSchema>;

@@ -158,6 +158,51 @@ definitions:
         items:
           $ref: '#/definitions/UserEmail'
 
+  CourseDataWithFinalGrades:
+    type: object
+    description: Course general information with translations and final grades of a user.
+    properties:
+      id:
+        $ref: '#/definitions/CourseId'
+      courseCode:
+        $ref: '#/definitions/CourseCode'
+      minCredits:
+        $ref: '#/definitions/MinCredits'
+      maxCredits:
+        $ref: '#/definitions/MaxCredits'
+      department:
+        $ref: '#/definitions/LocalizedString'
+      name:
+        $ref: '#/definitions/LocalizedString'
+      gradingScale:
+        $ref: '#/definitions/GradingScale'
+      languageOfInstruction:
+        $ref: '#/definitions/LanguageOfInstruction'
+      teachersInCharge:
+        type: array
+        items:
+          $ref: '#/definitions/UserWithEmail'
+      assistants:
+        type: array
+        items:
+          $ref: '#/definitions/UserWithEmail'
+      finalGrades:
+        type: array
+        items:
+          $ref: '#/definitions/FinalGradeData'
+    required:
+      - id
+      - courseCode
+      - minCredits
+      - maxCredits
+      - department
+      - name
+      - gradingScale
+      - languageOfInstruction
+      - teachersInCharge
+      - assistants
+      - finalGrades
+
 /v1/courses:
   get:
     tags: [Course]

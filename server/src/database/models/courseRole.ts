@@ -84,6 +84,8 @@ Course.belongsToMany(User, {
   onUpdate: 'CASCADE',
 });
 
+Course.hasMany(CourseRole);
+
 CourseRole.updateCourseRoles = async (
   teachers: User[] | null,
   assistants: User[] | null,
