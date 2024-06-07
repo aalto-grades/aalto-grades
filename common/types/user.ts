@@ -25,6 +25,8 @@ export const NewIdpUserSchema = z.object({
 });
 export const IdpUsersSchema = z.array(IdpUserSchema);
 
+export const UserDataArraySchema = z.array(UserDataSchema);
+
 export type UserData = z.infer<typeof UserDataSchema>;
 export type TeacherData = z.infer<typeof TeacherDataSchema>;
 export type NewIdpUser = z.infer<typeof NewIdpUserSchema>;

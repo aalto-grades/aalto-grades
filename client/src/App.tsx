@@ -16,7 +16,7 @@ import {
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
 import {enqueueSnackbar} from 'notistack';
 import {CSSProperties, JSX} from 'react';
-import {Outlet, RouterProvider, createBrowserRouter} from 'react-router-dom';
+import {RouterProvider, createBrowserRouter} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
 import AppView from './components/AppView';
@@ -24,6 +24,7 @@ import CourseResultsView from './components/CourseResultsView';
 import CourseView from './components/CourseView';
 import FrontPage from './components/FrontPage';
 import NotFound from './components/NotFound';
+import StudentsView from './components/StudentsView';
 import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
 import CoursePartsView from './components/course-view/CoursePartsView';
@@ -222,7 +223,6 @@ const router = createBrowserRouter([
     children: [
       {path: '/login', element: <Login />},
       {
-        // All Roles
         path: '/',
         element: (
           <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]}>
@@ -230,10 +230,17 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
         children: [
-          {path: '/', index: true, element: <FrontPage />},
+          {
+            index: true,
+            path: '/',
+            element: <FrontPage />,
+          },
+          {
+            path: '/students/:userId?',
+            element: <StudentsView />,
+          },
           {
             path: '/:courseId',
-            element: <Outlet />,
             children: [
               {
                 // Temporary default view

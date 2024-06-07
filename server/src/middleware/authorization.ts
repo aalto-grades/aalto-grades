@@ -5,7 +5,7 @@
 import {NextFunction, Request, Response} from 'express';
 
 import {CourseRoleType, HttpCode, SystemRole} from '@/common/types';
-import {getUserCourseRole, isAdminOrOwner} from '../controllers/utils/user';
+import {getUserCourseRole} from '../controllers/utils/user';
 import {JwtClaims, stringToIdSchema} from '../types';
 
 /**
@@ -73,31 +73,5 @@ export const courseAuthorization = (
   // To avoid async
   return (req: Request, res: Response, next: NextFunction) => {
     handler(req, res, next).catch(next);
-  };
-};
-
-/**
- * Validates that the user is either an admin or the same user as in the url
- * param.
- */
-export const adminOrOwner = (): ((
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => void) => {
-  return (req, res, next) => {
-    const result = stringToIdSchema.safeParse(req.params.userId);
-    if (!result.success) {
-      return res.status(HttpCode.BadRequest).send({
-        errors: [`Invalid course id ${req.params.courseId}`],
-      });
-    }
-
-    try {
-      isAdminOrOwner(req.user as JwtClaims, result.data);
-      return next();
-    } catch (e) {
-      return res.status(HttpCode.Forbidden).send({errors: ['forbidden']});
-    }
   };
 };

@@ -11,8 +11,6 @@ import {
   Avatar,
   Box,
   Button,
-  CircularProgress,
-  Grid,
   IconButton,
   List,
   ListItem,
@@ -22,6 +20,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import Grid from '@mui/material/Unstable_Grid2';
 import {Form, Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {
@@ -48,6 +47,7 @@ import useAuth from '../../hooks/useAuth';
 import {convertToClientGradingScale} from '../../utils/textFormat';
 import {sisuLanguageOptions} from '../../utils/utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import SaveBar from '../shared/SaveBar';
 
 const ValidationSchema = z
   .object({
@@ -298,20 +298,24 @@ const EditCourseView = (): JSX.Element => {
     );
   };
 
-  const changed = (formData: FormData): boolean => {
+  const changed = (formData?: FormData): boolean => {
     if (initialValues === null) return false;
     return (
       JSON.stringify(initTeachersInCharge) !==
         JSON.stringify(teachersInCharge) ||
-      !Object.keys(initialValues)
-        .filter(key => key !== 'teacherEmail')
-        .every(
-          key =>
-            JSON.stringify(initialValues[key as keyof FormData]) ===
-            JSON.stringify(formData[key as keyof FormData])
-        )
+      JSON.stringify(initAssistants) !== JSON.stringify(assistants) ||
+      (formData
+        ? !Object.keys(initialValues)
+            .filter(key => key !== 'teacherEmail' && key !== 'assistantEmail')
+            .every(
+              key =>
+                JSON.stringify(initialValues[key as keyof FormData]) ===
+                JSON.stringify(formData[key as keyof FormData])
+            )
+        : false)
     );
   };
+
   const validateForm = (
     values: FormData
   ): {[key in keyof FormData]?: string[]} | undefined => {
@@ -324,52 +328,15 @@ const EditCourseView = (): JSX.Element => {
     );
   };
 
+  useEffect(() => {
+    setUnsavedChanges(changed());
+  }, [assistants, teachersInCharge, initTeachersInCharge, initAssistants]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!initialValues || finalGrades.data === undefined)
     return <Typography>Loading</Typography>;
 
   return (
     <>
-      <Typography width={'fit-content'} variant="h2">
-        Edit Course
-      </Typography>
-      {/* <Button
-        id="ag_create_course_btn"
-        variant={'contained'}
-        type="submit"
-        onclick={() => {
-          if (formRef.current) {
-            formRef.current.handleSubmit();
-          }
-        }}
-        disabled={formRef.current?.isSubmitting}
-        sx={{float: 'right'}}
-      >
-        Save
-        {formRef.current?.isSubmitting && (
-          <CircularProgress
-            size={24}
-            sx={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              marginTop: '-12px',
-              marginLeft: '-12px',
-            }}
-          />
-        )}
-      </Button>
-      {changed(formRef.current?.values) && (
-        <Button
-          variant="outlined"
-          // disabled={form.isSubmitting}
-          sx={{float: 'right', mr: 2}}
-          color="error"
-          onClick={() => setUnsavedDialogOpen(true)}
-        >
-          Discard changes
-        </Button>
-      )} */}
-
       <Formik
         initialValues={initialValues}
         validate={validateForm}
@@ -378,24 +345,41 @@ const EditCourseView = (): JSX.Element => {
       >
         {form => (
           <>
-            <UnsavedChangesDialog
-              open={unsavedDialogOpen || blocker.state === 'blocked'}
-              onClose={() => {
-                setUnsavedDialogOpen(false);
-                if (blocker.state === 'blocked') blocker.reset();
-              }}
-              handleDiscard={() => {
-                form.resetForm();
-                setTeachersInCharge(initTeachersInCharge);
-                setAssistants(initAssistants);
-
-                if (blocker.state === 'blocked') {
-                  blocker.proceed();
-                }
-              }}
-            />
             <Form>
-              <Grid container justifyContent="flex-start" gap={5}>
+              <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                <Typography width={'fit-content'} variant="h2">
+                  Edit Course
+                </Typography>
+                <SaveBar
+                  show={unsavedChanges}
+                  handleDiscard={() => setUnsavedDialogOpen(true)}
+                  loading={form.isSubmitting}
+                  disabled={!form.isValid}
+                />
+              </div>
+              <UnsavedChangesDialog
+                open={unsavedDialogOpen || blocker.state === 'blocked'}
+                onClose={() => {
+                  setUnsavedDialogOpen(false);
+                  if (blocker.state === 'blocked') blocker.reset();
+                }}
+                handleDiscard={() => {
+                  form.resetForm();
+                  setTeachersInCharge(initTeachersInCharge);
+                  setAssistants(initAssistants);
+
+                  if (blocker.state === 'blocked') {
+                    blocker.proceed();
+                  }
+                }}
+              />
+
+              <Grid
+                container
+                justifyContent="flex-start"
+                gap={5}
+                sx={{overflow: 'auto', height: '100%'}}
+              >
                 <Grid md={5}>
                   <FormField
                     form={form}
@@ -616,7 +600,7 @@ const EditCourseView = (): JSX.Element => {
                     )}
                   </Box>
                 </Grid>
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                   <Button
                     id="ag_create_course_btn"
                     variant={'contained'}
@@ -649,7 +633,7 @@ const EditCourseView = (): JSX.Element => {
                       Discard changes
                     </Button>
                   )}
-                </Grid>
+                </Grid> */}
               </Grid>
             </Form>
           </>
