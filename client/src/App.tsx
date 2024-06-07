@@ -223,24 +223,7 @@ const router = createBrowserRouter([
     children: [
       {path: '/login', element: <Login />},
       {
-        index: true,
         path: '/',
-        element: (
-          <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]}>
-            <FrontPage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: '/students/:userId?',
-        element: (
-          <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]}>
-            <StudentsView />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: '/:courseId',
         element: (
           <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]}>
             <CourseView />
@@ -248,25 +231,39 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            // Temporary default view
             index: true,
-            element: <CourseResultsView />,
+            path: '/',
+            element: <FrontPage />,
           },
           {
-            path: '/:courseId/course-results',
-            element: <CourseResultsView />,
+            path: '/students/:userId?',
+            element: <StudentsView />,
           },
           {
-            path: '/:courseId/models/:modelId?/:userId?',
-            element: <ModelsView />,
-          },
-          {
-            path: '/:courseId/course-parts',
-            element: <CoursePartsView />,
-          },
-          {
-            path: '/:courseId/edit',
-            element: <EditCourseView />,
+            path: '/:courseId',
+            children: [
+              {
+                // Temporary default view
+                index: true,
+                element: <CourseResultsView />,
+              },
+              {
+                path: '/:courseId/course-results',
+                element: <CourseResultsView />,
+              },
+              {
+                path: '/:courseId/models/:modelId?/:userId?',
+                element: <ModelsView />,
+              },
+              {
+                path: '/:courseId/course-parts',
+                element: <CoursePartsView />,
+              },
+              {
+                path: '/:courseId/edit',
+                element: <EditCourseView />,
+              },
+            ],
           },
         ],
       },
