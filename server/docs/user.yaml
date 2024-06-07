@@ -15,6 +15,11 @@ definitions:
     description: User's email address.
     example: john.doe@aalto.fi
 
+  StudentNumber:
+    type: string
+    description: User's student number.
+    example: 2683926
+
   UserData:
     type: object
     description: User's personal information.
@@ -73,30 +78,68 @@ definitions:
     required:
       - email
 
-/v1/user/{userId}/courses:
+/v1/user/courses:
   get:
     tags: [User]
     description: >
-      Get all courses the given user has or is currently participating in.
-      Regular users can only access their own course list. Admin users can
-      access the courses of any user.
-    parameters:
-      - $ref: '#/components/parameters/userId'
+      Get all courses the requester has or is currently participating in.
     responses:
       200:
-        description: Courses the user has participated in.
+        description: Courses the requester has participated in.
         content:
           application/json:
             schema:
               type: array
               items:
                 $ref: '#/definitions/CourseData'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+    security:
+      - cookieAuth: []
+
+/v1/user/{userId}/grades:
+  get:
+    tags: [User]
+    description: >
+      Get all courses and final grades from the courses the user is currently participating in.
+      Only returns the courses the requester has a teacher or assistant role in.
+    responses:
+      200:
+        description: Courses and final grades of the user.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/CourseDataWithFinalGrades'
       400:
         $ref: '#/components/responses/BadRequest'
       401:
         $ref: '#/components/responses/Unauthorized'
-      403:
-        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+    security:
+      - cookieAuth: []
+
+/v1/students:
+  get:
+    tags: [User]
+    description: >
+      Get all students from the courses the requester has a teacher or assistant role in.
+      If the requester has an assistant role the names and emails of the students will be set to null.
+    responses:
+      200:
+        description: All students from the courses the requester has a teacher or assistant role in.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/UserData'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
       404:
         $ref: '#/components/responses/NotFound'
     security:
