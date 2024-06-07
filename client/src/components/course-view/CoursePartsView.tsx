@@ -32,6 +32,7 @@ import {
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import SaveBar from '../shared/SaveBar';
 
 type ColTypes = {
   id: number;
@@ -284,41 +285,20 @@ const CoursePartsView = (): JSX.Element => {
           if (blocker.state === 'blocked') blocker.proceed();
         }}
       />
-      <div style={{display: 'flex'}}>
-        <Typography width={'fit-content'} variant="h2">
-          Course Part
-        </Typography>
 
-        {editRights && unsavedChanges && (
-          <Box
-            sx={{
-              marginLeft: '10px',
-              borderRadius: 4,
-              // border: '1px solid black',
-              // backgroundColor: 'lightgray',
-              alignItems: 'center',
-              textAlign: 'center',
-              // p: 1,
-            }}
-          >
-            {/* {unsavedChanges && (
-              <>
-                Unsaved Changes
-                <Button onClick={() => setUnsavedDialogOpen(true)}>
-                  Discard
-                </Button>
-                <Button
-                  onClick={handleSubmit}
-                  variant={unsavedChanges ? 'contained' : 'text'}
-                  disabled={error || editing}
-                >
-                  Save
-                </Button>
-              </>
-            )} */}
-          </Box>
-        )}
+      <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+        <Typography width={'fit-content'} variant="h2">
+          Course parts
+        </Typography>
+        <SaveBar
+          show={editRights && unsavedChanges}
+          handleDiscard={() => setUnsavedDialogOpen(true)}
+          handleSave={handleSubmit}
+          disabled={editing}
+          // loading={form.isSubmitting}
+        />
       </div>
+
       <Box sx={{display: 'flex', gap: 1, mb: 1, mt: 1}}>
         {editRights && (
           <>
@@ -327,20 +307,6 @@ const CoursePartsView = (): JSX.Element => {
             </Button>
             <Button variant="outlined" onClick={() => setAplusDialogOpen(true)}>
               Add From A+
-            </Button>
-          </>
-        )}
-
-        {editRights && unsavedChanges && (
-          <>
-            <Button onClick={() => setUnsavedDialogOpen(true)}>Discard</Button>
-
-            <Button
-              onClick={handleSubmit}
-              variant="contained"
-              disabled={editing}
-            >
-              Save
             </Button>
           </>
         )}
