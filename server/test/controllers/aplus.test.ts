@@ -26,6 +26,15 @@ import {ResponseTests} from '../util/responses';
 const request = supertest(app);
 const responseTests = new ResponseTests(request);
 
+const authorization = 'Aplus-Token abcdefghijklmnopqrstuvwxyzabcdefghijklmn';
+const invalidAuthorization = [
+  'abcdefghijklmnopqrstuvwxyzabcdefghijklmn',
+  'Aplus-Token',
+  'Aplus-Token abcdefghijklmnopqrst',
+  'Token abcdefghijklmnopqrstuvwxyzabcdefghijklmn',
+  '',
+];
+
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
 let addGradeSourceCoursePartId = -1;
@@ -134,12 +143,24 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
     const res = await request
       .get('/v1/aplus/courses')
       .set('Cookie', cookies.adminCookie)
+      .set('Authorization', authorization)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
     const Schema = z.array(AplusCourseDataSchema);
     const result = await Schema.safeParseAsync(res.body);
     expect(result.success).toBeTruthy();
+  });
+
+  it('should respond with 400 if A+ token parsing fails', async () => {
+    const url = '/v1/aplus/courses';
+    await responseTests.testBadRequest(url, cookies.adminCookie).get();
+    for (const invalid of invalidAuthorization) {
+      await responseTests
+        .testBadRequest(url, cookies.adminCookie)
+        .set('Authorization', invalid)
+        .get();
+    }
   });
 
   it('should respond with 401 if not logged in', async () => {
@@ -155,7 +176,10 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
     });
 
     const url = '/v1/aplus/courses';
-    await responseTests.testNotFound(url, cookies.adminCookie).get();
+    await responseTests
+      .testNotFound(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
   });
 
   it('should respond with 502 if A+ request fails', async () => {
@@ -164,7 +188,10 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
     });
 
     const url = '/v1/aplus/courses';
-    await responseTests.testBadGateway(url, cookies.adminCookie).get();
+    await responseTests
+      .testBadGateway(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
   });
 });
 
@@ -192,6 +219,7 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
     const res = await request
       .get('/v1/aplus/courses/1')
       .set('Cookie', cookies.adminCookie)
+      .set('Authorization', authorization)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
@@ -201,7 +229,21 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
 
   it('should respond with 400 if validation fails (non-number A+ course ID)', async () => {
     const url = '/v1/aplus/courses/abc';
+    await responseTests
+      .testBadRequest(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
+  });
+
+  it('should respond with 400 if A+ token parsing fails', async () => {
+    const url = '/v1/aplus/courses/1';
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
+    for (const invalid of invalidAuthorization) {
+      await responseTests
+        .testBadRequest(url, cookies.adminCookie)
+        .set('Authorization', invalid)
+        .get();
+    }
   });
 
   it('should respond with 401 if not logged in', async () => {
@@ -215,7 +257,10 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
     });
 
     const url = '/v1/aplus/courses/1';
-    await responseTests.testBadGateway(url, cookies.adminCookie).get();
+    await responseTests
+      .testBadGateway(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
   });
 });
 
@@ -374,6 +419,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
           `/v1/courses/${courseId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`
         )
         .set('Cookie', cookie)
+        .set('Authorization', authorization)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -390,6 +436,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
           `/v1/courses/${courseId}/aplus-fetch?course-parts=[${moduleCoursePartId}]`
         )
         .set('Cookie', cookie)
+        .set('Authorization', authorization)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -406,6 +453,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
           `/v1/courses/${courseId}/aplus-fetch?course-parts=[${difficultyCoursePartId}]`
         )
         .set('Cookie', cookie)
+        .set('Authorization', authorization)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -422,6 +470,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
           `/v1/courses/${courseId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}, ${moduleCoursePartId}, ${difficultyCoursePartId}]`
         )
         .set('Cookie', cookie)
+        .set('Authorization', authorization)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
@@ -430,9 +479,23 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     }
   });
 
+  it('should respond with 400 if A+ token parsing fails', async () => {
+    const url = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`;
+    await responseTests.testBadRequest(url, cookies.adminCookie).get();
+    for (const invalid of invalidAuthorization) {
+      await responseTests
+        .testBadRequest(url, cookies.adminCookie)
+        .set('Authorization', invalid)
+        .get();
+    }
+  });
+
   it('should respond with 400 if course ID is invalid', async () => {
     const url = `/v1/courses/abc/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`;
-    await responseTests.testBadRequest(url, cookies.adminCookie).get();
+    await responseTests
+      .testBadRequest(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
   });
 
   it('should respond with 400 if course part list is invalid', async () => {
@@ -449,6 +512,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     for (const query of invalid) {
       await responseTests
         .testBadRequest(url + query, cookies.adminCookie)
+        .set('Authorization', authorization)
         .get();
     }
   });
@@ -469,22 +533,30 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
 
   it('should respond with 404 when not found', async () => {
     const urlNoCourse = `/v1/courses/${nonExistentId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`;
-    await responseTests.testNotFound(urlNoCourse, cookies.adminCookie).get();
+    await responseTests
+      .testNotFound(urlNoCourse, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
 
     const urlNoCoursePart = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${nonExistentId}]`;
     await responseTests
       .testNotFound(urlNoCoursePart, cookies.adminCookie)
+      .set('Authorization', authorization)
       .get();
 
     const urlNoGradeSource = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${noGradeSourceCoursePartId}]`;
     await responseTests
       .testNotFound(urlNoGradeSource, cookies.adminCookie)
+      .set('Authorization', authorization)
       .get();
   });
 
   it('should respond with 409 when course part does not belong to the course', async () => {
     const url = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${differentCoursePartId}]`;
-    await responseTests.testConflict(url, cookies.adminCookie).get();
+    await responseTests
+      .testConflict(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
   });
 
   it('should respond with 502 if A+ request fails', async () => {
@@ -493,6 +565,9 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
     });
 
     const url = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`;
-    await responseTests.testBadGateway(url, cookies.adminCookie).get();
+    await responseTests
+      .testBadGateway(url, cookies.adminCookie)
+      .set('Authorization', authorization)
+      .get();
   });
 });

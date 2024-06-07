@@ -10,6 +10,7 @@ import {
   useMutation,
   useQuery,
 } from '@tanstack/react-query';
+import {AxiosRequestConfig} from 'axios';
 
 import {
   AplusCourseData,
@@ -22,6 +23,13 @@ import {
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
+import {getAplusToken} from '../../utils/utils';
+
+const getHeaders = (): AxiosRequestConfig => ({
+  headers: {
+    Authorization: `Aplus-Token ${getAplusToken()}`,
+  },
+});
 
 export const useFetchAplusCourses = (
   options?: Partial<UseQueryOptions<AplusCourseData[]>>
@@ -30,7 +38,7 @@ export const useFetchAplusCourses = (
     queryKey: ['a+-courses'],
     queryFn: async () =>
       AplusCourseDataArraySchema.parse(
-        (await axios.get('/v1/aplus/courses')).data
+        (await axios.get('/v1/aplus/courses', getHeaders())).data
       ),
     ...options,
   });
@@ -43,7 +51,8 @@ export const useFetchAplusExerciseData = (
     queryKey: ['a+-exercises', aplusCourseId],
     queryFn: async () =>
       AplusExerciseDataSchema.parse(
-        (await axios.get(`/v1/aplus/courses/${aplusCourseId}`)).data
+        (await axios.get(`/v1/aplus/courses/${aplusCourseId}`, getHeaders()))
+          .data
       ),
     ...options,
   });
@@ -66,7 +75,8 @@ export const useFetchAplusGrades = (
     queryKey: ['a+-grades', courseId],
     queryFn: async () =>
       NewGradeArraySchema.parse(
-        (await axios.get(`/v1/courses/${courseId}/aplus-fetch`)).data
+        (await axios.get(`/v1/courses/${courseId}/aplus-fetch`, getHeaders()))
+          .data
       ),
     ...options,
   });

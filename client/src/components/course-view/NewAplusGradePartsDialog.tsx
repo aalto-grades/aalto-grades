@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import {JSX, useState} from 'react';
+import {JSX, useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
 import {
@@ -25,6 +25,8 @@ import {
   useAddCoursePart,
   useFetchAplusCourses,
 } from '../../hooks/useApi';
+import {getAplusToken} from '../../utils/utils';
+import AplusTokenDialog from '../shared/AplusTokenDialog';
 
 import Type = AplusGradeSourceType;
 
@@ -39,16 +41,22 @@ const NewAplusCoursePartsDialog = ({
   open,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const aplusCourses = useFetchAplusCourses();
+  const aplusCourses = useFetchAplusCourses({enabled: !!getAplusToken()});
   const addCoursePart = useAddCoursePart(courseId);
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
+  const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
+    useState<boolean>(false);
   const [step, setStep] = useState<number>(0);
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
-  const [CoursePartsWithSource, setCoursePartsWithSource] = useState<
+  const [coursePartsWithSource, setCoursePartsWithSource] = useState<
     [{name: string; daysValid: number}, AplusGradeSourceData][]
   >([]);
+
+  useEffect(() => {
+    setAplusTokenDialogOpen(!getAplusToken() || aplusCourses.isError);
+  }, [open, aplusCourses]);
 
   const handleResetAndClose = (): void => {
     setStep(0);
@@ -64,12 +72,12 @@ const NewAplusCoursePartsDialog = ({
   ): void => {
     if (checked) {
       setCoursePartsWithSource([
-        ...CoursePartsWithSource,
+        ...coursePartsWithSource,
         [{name: name, daysValid: 365}, source],
       ]);
     } else {
       setCoursePartsWithSource(
-        CoursePartsWithSource.filter(([_, s]) => {
+        coursePartsWithSource.filter(([_, s]) => {
           if (s.sourceType === Type.Module && source.sourceType === Type.Module)
             return s.moduleId !== source.moduleId;
 
@@ -93,7 +101,7 @@ const NewAplusCoursePartsDialog = ({
     coursePart: {name?: string; daysValid?: number}
   ): void => {
     setCoursePartsWithSource(
-      CoursePartsWithSource.map(([a, s], i) => {
+      coursePartsWithSource.map(([a, s], i) => {
         if (i === index) {
           return [
             {
@@ -110,7 +118,7 @@ const NewAplusCoursePartsDialog = ({
 
   const handleSubmit = async (): Promise<void> => {
     const sources: AplusGradeSourceData[] = [];
-    for (const [coursePart, source] of CoursePartsWithSource) {
+    for (const [coursePart, source] of coursePartsWithSource) {
       sources.push({
         ...source,
         coursePartId: await addCoursePart.mutateAsync(coursePart),
@@ -121,51 +129,62 @@ const NewAplusCoursePartsDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleResetAndClose}>
-      <DialogTitle>A+ Courses</DialogTitle>
-      <DialogContent>
-        {step === 0 && aplusCourses.data && (
-          <SelectAplusCourse
-            aplusCourses={aplusCourses.data}
-            setAplusCourse={setAplusCourse}
-          />
-        )}
-        {step === 1 && aplusCourse && (
-          <SelectAplusGradeSources
-            aplusCourse={aplusCourse}
-            handleChange={handleSelectionChange}
-          />
-        )}
-        {step === 2 && aplusCourse && (
-          <CreateAplusCourseParts
-            coursePartsWithSource={CoursePartsWithSource}
-            handleChange={handleCoursePartChange}
-          />
-        )}
-      </DialogContent>
-      <DialogActions>
-        {step > 0 && (
-          <Button onClick={() => setStep(step - 1)} sx={{mr: 'auto'}}>
-            Back
-          </Button>
-        )}
-        {step <= 1 && (
-          <Button disabled={!aplusCourse} onClick={() => setStep(step + 1)}>
-            Next
-          </Button>
-        )}
-        {step === 2 && (
-          <Button
-            onClick={async () => {
-              await handleSubmit();
-              handleResetAndClose();
-            }}
-          >
-            Submit
-          </Button>
-        )}
-      </DialogActions>
-    </Dialog>
+    <>
+      <Dialog open={open} onClose={handleResetAndClose}>
+        <DialogTitle>A+ Courses</DialogTitle>
+        <DialogContent>
+          {step === 0 && aplusCourses.data && (
+            <SelectAplusCourse
+              aplusCourses={aplusCourses.data}
+              setAplusCourse={setAplusCourse}
+            />
+          )}
+          {step === 1 && aplusCourse && (
+            <SelectAplusGradeSources
+              aplusCourse={aplusCourse}
+              handleChange={handleSelectionChange}
+            />
+          )}
+          {step === 2 && aplusCourse && (
+            <CreateAplusCourseParts
+              coursePartsWithSource={coursePartsWithSource}
+              handleChange={handleCoursePartChange}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          {step > 0 && (
+            <Button onClick={() => setStep(step - 1)} sx={{mr: 'auto'}}>
+              Back
+            </Button>
+          )}
+          {step <= 1 && (
+            <Button disabled={!aplusCourse} onClick={() => setStep(step + 1)}>
+              Next
+            </Button>
+          )}
+          {step === 2 && (
+            <Button
+              onClick={async () => {
+                await handleSubmit();
+                handleResetAndClose();
+              }}
+            >
+              Submit
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
+      <AplusTokenDialog
+        handleClose={handleClose}
+        handleSubmit={() => {
+          setAplusTokenDialogOpen(false);
+          aplusCourses.refetch();
+        }}
+        open={aplusTokenDialogOpen && open}
+        error={aplusCourses.isError}
+      />
+    </>
   );
 };
 

@@ -16,7 +16,11 @@ import {
   NewAplusGradeSourceData,
   NewGrade,
 } from '@/common/types';
-import {fetchFromAplus, validateAplusCourseId} from './utils/aplus';
+import {
+  fetchFromAplus,
+  parseAplusToken,
+  validateAplusCourseId,
+} from './utils/aplus';
 import {validateCoursePartPath} from './utils/coursePart';
 import {APLUS_API_URL} from '../configs/environment';
 import AplusGradeSource from '../database/models/aplusGradeSource';
@@ -31,6 +35,7 @@ export const fetchAplusCourses = async (
   req: Request,
   res: Response
 ): Promise<void> => {
+  const aplusToken = parseAplusToken(req);
   const coursesRes = await fetchFromAplus<{
     staff_courses: {
       id: number;
@@ -39,7 +44,7 @@ export const fetchAplusCourses = async (
       instance_name: string;
       html_url: string;
     }[];
-  }>(`${APLUS_API_URL}/users/me`);
+  }>(`${APLUS_API_URL}/users/me`, aplusToken);
 
   const staffCourses = coursesRes.data.staff_courses;
   if (staffCourses.length === 0) {
@@ -66,6 +71,7 @@ export const fetchAplusExerciseData = async (
   req: Request,
   res: Response
 ): Promise<void> => {
+  const aplusToken = parseAplusToken(req);
   const aplusCourseId = validateAplusCourseId(req.params.aplusCourseId);
 
   const exercisesRes = await fetchFromAplus<{
@@ -76,7 +82,10 @@ export const fetchAplusExerciseData = async (
         difficulty: string;
       }[];
     }[];
-  }>(`${APLUS_API_URL}/courses/${aplusCourseId}/exercises?format=json`);
+  }>(
+    `${APLUS_API_URL}/courses/${aplusCourseId}/exercises?format=json`,
+    aplusToken
+  );
 
   // There doesn't appear to be a better way to get difficulties
   const difficulties = new Set<string>();
@@ -126,7 +135,9 @@ export const fetchAplusGrades = async (
   req: Request,
   res: Response
 ): Promise<void> => {
+  const aplusToken = parseAplusToken(req);
   let coursePartIds: number[] = [];
+
   try {
     coursePartIds = z
       .array(IdSchema)
@@ -163,7 +174,8 @@ export const fetchAplusGrades = async (
         points: string;
       }[];
     }>(
-      `${APLUS_API_URL}/courses/${gradeSource.aplusCourseId}/points?format=json`
+      `${APLUS_API_URL}/courses/${gradeSource.aplusCourseId}/points?format=json`,
+      aplusToken
     );
 
     for (const result of allPointsRes.data.results) {
@@ -179,7 +191,7 @@ export const fetchAplusGrades = async (
           id: number;
           points: number;
         }[];
-      }>(result.points);
+      }>(result.points, aplusToken);
 
       let grade: number | undefined;
       switch (gradeSource.sourceType) {

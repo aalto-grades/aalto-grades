@@ -79,6 +79,14 @@ components:
       required: true
       example: 1
       description: The ID of a course in A+.
+    aplusToken:
+      in: header
+      name: Authorization
+      schema:
+        type: string
+      required: true
+      example: Aplus-Token abcdefghijklmnopqrstuvwxyzabcdefghijklmn
+      description: An API token from A+.
 
   responses:
     BadRequest:

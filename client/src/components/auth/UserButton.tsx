@@ -11,12 +11,16 @@ import {useNavigate} from 'react-router-dom';
 
 import {useLogOut} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
+import AplusTokenDialog from '../shared/AplusTokenDialog';
 
 const UserButton = (): JSX.Element => {
   const navigate = useNavigate();
   const {auth, setAuth} = useAuth();
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const open = Boolean(anchorEl);
+
+  const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
+    useState<boolean>(false);
 
   const queryClient = useQueryClient();
   const logOut = useLogOut({
@@ -55,8 +59,16 @@ const UserButton = (): JSX.Element => {
         onClose={() => setAnchorEl(null)}
         MenuListProps={{'aria-labelledby': 'basic-button'}}
       >
+        <MenuItem onClick={() => setAplusTokenDialogOpen(true)}>
+          A+ Token
+        </MenuItem>
         <MenuItem onClick={() => logOut.mutate(null)}>Logout</MenuItem>
       </Menu>
+      <AplusTokenDialog
+        handleClose={() => setAplusTokenDialogOpen(false)}
+        handleSubmit={() => setAplusTokenDialogOpen(false)}
+        open={aplusTokenDialogOpen}
+      />
     </>
   );
 };

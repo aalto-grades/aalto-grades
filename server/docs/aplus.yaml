@@ -99,6 +99,8 @@ definitions:
   get:
     tags: [A+]
     description: Gets a list of courses the requester is staff in.
+    parameters:
+      - $ref: '#/components/parameters/aplusToken'
     responses:
       200:
         description: >
@@ -126,6 +128,7 @@ definitions:
       modules and difficulties exist in the course.
     parameters:
       - $ref: '#/components/parameters/aplusCourseId'
+      - $ref: '#/components/parameters/aplusToken'
     responses:
       200:
         description: >
@@ -187,6 +190,7 @@ definitions:
           example: [1, 2, 3]
           items:
             $ref: '#/definitions/CoursePartId'
+      - $ref: '#/components/parameters/aplusToken'
     responses:
       200:
         description: >

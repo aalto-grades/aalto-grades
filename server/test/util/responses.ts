@@ -11,11 +11,13 @@ import {ErrorSchema, ZodErrorSchema} from './general';
 
 type ReqData = string | object | undefined;
 type ReturnType = {
+  set: (field: string, val: string) => ReturnType;
   get: () => Promise<void>;
   post: (data: ReqData) => Promise<void>;
   put: (data: ReqData) => Promise<void>;
   delete: () => Promise<void>;
 };
+type Header = {field: string; val: string};
 
 export class ResponseTests {
   request: TestAgent;
@@ -26,15 +28,24 @@ export class ResponseTests {
 
   private next(
     call: (request: Test) => Promise<void>,
-    url: string
+    url: string,
+    headers: Header[] = []
   ): ReturnType {
+    // .set() cannot be called before .get(), .post(), .put(), or .delete()
+    const setHeaders = (request: Test, toSet: Header[] = headers): Test =>
+      toSet.length > 0
+        ? setHeaders(request.set(toSet[0].field, toSet[0].val), toSet.slice(1))
+        : request;
+
     return {
-      get: async () => await call(this.request.get(url)),
+      set: (field: string, val: string) =>
+        this.next(call, url, [...headers, {field: field, val: val}]),
+      get: async () => await call(setHeaders(this.request.get(url))),
       post: async (data: ReqData) =>
-        await call(this.request.post(url).send(data)),
+        await call(setHeaders(this.request.post(url).send(data))),
       put: async (data: ReqData) =>
-        await call(this.request.put(url).send(data)),
-      delete: async () => await call(this.request.delete(url)),
+        await call(setHeaders(this.request.put(url).send(data))),
+      delete: async () => await call(setHeaders(this.request.delete(url))),
     };
   }
 
