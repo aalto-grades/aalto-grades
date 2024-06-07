@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Archive, Delete, Unarchive} from '@mui/icons-material';
+import {AddCircle, Archive, Delete, More, Unarchive} from '@mui/icons-material';
 import {Box, Button, Typography} from '@mui/material';
 import {
   DataGrid,
@@ -16,6 +16,7 @@ import {JSX, useEffect, useMemo, useState} from 'react';
 import {useBlocker, useParams} from 'react-router-dom';
 
 import {
+  AplusGradeSourceData,
   EditCoursePartData,
   NewCoursePartData,
   SystemRole,
@@ -39,6 +40,7 @@ type ColTypes = {
   name: string;
   daysValid: number;
   validUntil: Date | null;
+  aplusGradeSources: AplusGradeSourceData[];
   archived: boolean;
 };
 
@@ -108,6 +110,7 @@ const CoursePartsView = (): JSX.Element => {
       name: coursePart.name,
       daysValid: coursePart.daysValid,
       validUntil: null,
+      aplusGradeSources: coursePart.aplusGradeSources,
       archived: coursePart.archived,
     }));
     if (JSON.stringify(newRows) === JSON.stringify(rows)) return;
@@ -137,6 +140,7 @@ const CoursePartsView = (): JSX.Element => {
         name,
         daysValid,
         validUntil: null,
+        aplusGradeSources: [],
         archived: false,
       });
     });
@@ -187,6 +191,26 @@ const CoursePartsView = (): JSX.Element => {
 
     enqueueSnackbar('Course parts saved successfully', {variant: 'success'});
     setInitRows(structuredClone(rows));
+  };
+
+  const getAplusActions = (params: GridRowParams<ColTypes>) => {
+    const elements: JSX.Element[] = [];
+
+    elements.push(
+      <GridActionsCellItem
+        icon={<AddCircle />}
+        label="AddCircle"
+        onClick={() => {}}
+      />
+    );
+
+    if (params.row.aplusGradeSources.length > 0) {
+      elements.push(
+        <GridActionsCellItem icon={<More />} label="More" onClick={() => {}} />
+      );
+    }
+
+    return elements;
   };
 
   const getActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
@@ -244,6 +268,12 @@ const CoursePartsView = (): JSX.Element => {
       headerName: 'Valid until',
       type: 'date',
       editable: true,
+    },
+    {
+      field: 'aplusGradeSources',
+      headerName: 'A+ grade sources',
+      type: 'actions',
+      getActions: getAplusActions,
     },
     {
       field: 'archived',
