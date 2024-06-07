@@ -64,9 +64,18 @@ export const getGradesOfUser = async (
   const userId = await validateUserId(req.params.userId);
   const requester = req.user as JwtClaims;
 
-  if (userId !== requester.id && requester.role !== SystemRole.Admin) {
-    throw new ApiError("Cannot access user's data", HttpCode.Forbidden);
-  }
+  const needsRole =
+    requester.id !== userId && requester.role !== SystemRole.Admin;
+  const roleFilter = needsRole
+    ? [
+        {
+          userId: requester.id,
+          role: {
+            [Op.in]: [CourseRoleType.Teacher, CourseRoleType.Assistant],
+          },
+        },
+      ]
+    : [];
 
   type DBData = CourseFull & {
     FinalGrades: FinalGrade[];
@@ -99,12 +108,7 @@ export const getGradesOfUser = async (
         model: CourseRole,
         where: {
           [Op.or]: [
-            {
-              userId: requester.id,
-              role: {
-                [Op.in]: [CourseRoleType.Teacher, CourseRoleType.Assistant],
-              },
-            },
+            ...roleFilter,
             {
               userId: userId,
               role: CourseRoleType.Student,
@@ -120,7 +124,8 @@ export const getGradesOfUser = async (
   for (const course of courses) {
     // Validate that the user and the requester exist in the course roles
     const roleUsers = new Set(course.CourseRoles.map(role => role.userId));
-    if (!roleUsers.has(userId) || !roleUsers.has(requester.id)) continue;
+    if (!roleUsers.has(userId) || (needsRole && !roleUsers.has(requester.id)))
+      continue;
 
     userGrades.push({
       ...parseCourseFull(course),
