@@ -20,14 +20,14 @@ type PropsType = {
   handleClose: () => void;
   handleSubmit: () => void;
   open: boolean;
-  error: boolean;
+  error?: boolean;
 };
 
 const AplusTokenDialog = ({
   handleClose,
   handleSubmit,
   open,
-  error,
+  error = false,
 }: PropsType): JSX.Element => {
   const currentToken = getAplusToken();
   const [token, setToken] = useState<string>('');
