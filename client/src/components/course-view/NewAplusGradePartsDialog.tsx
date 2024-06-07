@@ -50,13 +50,13 @@ const NewAplusCoursePartsDialog = ({
   const [step, setStep] = useState<number>(0);
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
-  const [CoursePartsWithSource, setCoursePartsWithSource] = useState<
+  const [coursePartsWithSource, setCoursePartsWithSource] = useState<
     [{name: string; daysValid: number}, AplusGradeSourceData][]
   >([]);
 
   useEffect(() => {
-    setAplusTokenDialogOpen(!getAplusToken());
-  }, [open]);
+    setAplusTokenDialogOpen(!getAplusToken() || aplusCourses.isError);
+  }, [open, aplusCourses]);
 
   const handleResetAndClose = (): void => {
     setStep(0);
@@ -72,12 +72,12 @@ const NewAplusCoursePartsDialog = ({
   ): void => {
     if (checked) {
       setCoursePartsWithSource([
-        ...CoursePartsWithSource,
+        ...coursePartsWithSource,
         [{name: name, daysValid: 365}, source],
       ]);
     } else {
       setCoursePartsWithSource(
-        CoursePartsWithSource.filter(([_, s]) => {
+        coursePartsWithSource.filter(([_, s]) => {
           if (s.sourceType === Type.Module && source.sourceType === Type.Module)
             return s.moduleId !== source.moduleId;
 
@@ -101,7 +101,7 @@ const NewAplusCoursePartsDialog = ({
     coursePart: {name?: string; daysValid?: number}
   ): void => {
     setCoursePartsWithSource(
-      CoursePartsWithSource.map(([a, s], i) => {
+      coursePartsWithSource.map(([a, s], i) => {
         if (i === index) {
           return [
             {
@@ -118,7 +118,7 @@ const NewAplusCoursePartsDialog = ({
 
   const handleSubmit = async (): Promise<void> => {
     const sources: AplusGradeSourceData[] = [];
-    for (const [coursePart, source] of CoursePartsWithSource) {
+    for (const [coursePart, source] of coursePartsWithSource) {
       sources.push({
         ...source,
         coursePartId: await addCoursePart.mutateAsync(coursePart),
@@ -147,7 +147,7 @@ const NewAplusCoursePartsDialog = ({
           )}
           {step === 2 && aplusCourse && (
             <CreateAplusCourseParts
-              coursePartsWithSource={CoursePartsWithSource}
+              coursePartsWithSource={coursePartsWithSource}
               handleChange={handleCoursePartChange}
             />
           )}
@@ -177,8 +177,12 @@ const NewAplusCoursePartsDialog = ({
       </Dialog>
       <AplusTokenDialog
         handleClose={handleClose}
-        handleSubmit={() => setAplusTokenDialogOpen(false)}
+        handleSubmit={() => {
+          setAplusTokenDialogOpen(false);
+          aplusCourses.refetch();
+        }}
         open={aplusTokenDialogOpen && open}
+        error={aplusCourses.isError}
       />
     </>
   );

@@ -20,14 +20,17 @@ type PropsType = {
   handleClose: () => void;
   handleSubmit: () => void;
   open: boolean;
+  error: boolean;
 };
 
 const AplusTokenDialog = ({
   handleClose,
   handleSubmit,
   open,
+  error,
 }: PropsType): JSX.Element => {
-  const [token, setToken] = useState<string | null>(getAplusToken());
+  const currentToken = getAplusToken();
+  const [token, setToken] = useState<string>('');
 
   return (
     <Dialog open={open} onClose={handleClose}>
@@ -42,13 +45,26 @@ const AplusTokenDialog = ({
             https://plus.cs.aalto.fi/accounts/accounts/
           </Link>
         </Typography>
+        {currentToken && (
+          <>
+            <Typography sx={{mt: 1}}>
+              Your current token: {currentToken}
+            </Typography>
+          </>
+        )}
         <TextField
-          sx={{mt: 1, width: 1}}
+          sx={{my: 2, width: 1}}
           label="API Token"
-          value={token ?? ''}
+          value={token}
           onChange={e => setToken(e.target.value)}
           required={true}
         />
+        {error && (
+          <Typography sx={{color: 'red'}}>
+            The A+ token you have entered is invalid, please make sure your
+            token is correct.
+          </Typography>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
