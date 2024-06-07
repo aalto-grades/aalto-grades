@@ -4,6 +4,8 @@
 
 import {ClearRounded, SaveOutlined} from '@mui/icons-material';
 import {Box, Button, Fade, Typography, useTheme} from '@mui/material';
+import {JSX} from 'react';
+
 const SaveBar = ({
   show,
   handleSave,
@@ -14,8 +16,8 @@ const SaveBar = ({
   show: boolean;
   loading?: boolean;
   disabled?: boolean;
-  handleSave?: Function;
-  handleDiscard: Function;
+  handleSave?: () => void;
+  handleDiscard: () => void;
 }): JSX.Element => {
   const theme = useTheme();
   return (
@@ -63,7 +65,7 @@ const SaveBar = ({
           disabled={loading || disabled}
           // sx={{float: 'right', mr: 2}}
           color="error"
-          onClick={() => handleDiscard()}
+          onClick={handleDiscard}
           startIcon={<ClearRounded />}
         >
           Discard
