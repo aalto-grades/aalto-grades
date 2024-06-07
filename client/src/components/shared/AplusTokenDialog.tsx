@@ -46,25 +46,28 @@ const AplusTokenDialog = ({
           </Link>
         </Typography>
         {currentToken && (
-          <>
-            <Typography sx={{mt: 1}}>
-              Your current token: {currentToken}
-            </Typography>
-          </>
+          <Typography sx={{mt: 1}}>
+            Your current token: {currentToken}
+          </Typography>
         )}
         <TextField
-          sx={{my: 2, width: 1}}
+          sx={{mt: 2, width: 1}}
           label="API Token"
           value={token}
           onChange={e => setToken(e.target.value)}
           required={true}
+          error={
+            (error && token.length === 0) ||
+            (token.length > 0 && token.length !== 40)
+          }
+          helperText={
+            error && !token
+              ? 'The token you have entered is invalid, please make sure your token is correct.'
+              : token.length > 0 && token.length !== 40
+                ? 'The token should be 40 characters long.'
+                : ''
+          }
         />
-        {error && (
-          <Typography sx={{color: 'red'}}>
-            The A+ token you have entered is invalid, please make sure your
-            token is correct.
-          </Typography>
-        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
