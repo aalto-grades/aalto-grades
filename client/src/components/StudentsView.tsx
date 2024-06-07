@@ -97,7 +97,11 @@ const StudentsView = (): JSX.Element => {
               </TableHead>
               <TableBody>
                 {studentGrades.data.map(course => (
-                  <TableRow key={`list-item-${course.id}`}>
+                  <TableRow
+                    key={`list-item-${course.id}`}
+                    hover
+                    onClick={() => navigate(`/${course.id}/course-results`)}
+                  >
                     <TableCell>{course.name.en}</TableCell>
                     <TableCell align="right">
                       {course.finalGrades

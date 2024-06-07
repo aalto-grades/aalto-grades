@@ -250,6 +250,9 @@ const router = createBrowserRouter([
           {
             // Temporary default view
             index: true,
+            element: <CourseResultsView />,
+          },
+          {
             path: '/:courseId/course-results',
             element: <CourseResultsView />,
           },

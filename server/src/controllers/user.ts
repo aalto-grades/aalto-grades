@@ -170,7 +170,7 @@ export const getStudents = async (
               [Op.in]: [CourseRoleType.Teacher, CourseRoleType.Assistant],
             },
           },
-          attributes: ['userId'], // remove data
+          attributes: ['role'], // remove data
         },
       ],
     })) as DBData[];
