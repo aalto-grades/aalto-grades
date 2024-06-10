@@ -12,7 +12,13 @@ export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
-      for (const column of ['courseName', 'courseInstance', 'sourceName']) {
+      for (const column of [
+        'courseCode',
+        'courseName',
+        'courseInstance',
+        'courseUrl',
+        'sourceName',
+      ]) {
         await queryInterface.addColumn(
           'aplus_grade_source',
           column,
@@ -30,7 +36,13 @@ export default {
   down: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
-      for (const column of ['courseName', 'courseInstance', 'sourceName']) {
+      for (const column of [
+        'courseCode',
+        'courseName',
+        'courseInstance',
+        'courseUrl',
+        'sourceName',
+      ]) {
         await queryInterface.removeColumn('aplus_grade_source', column, {
           transaction,
         });
