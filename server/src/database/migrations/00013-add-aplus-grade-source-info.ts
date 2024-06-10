@@ -12,6 +12,13 @@ export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
+      // Data will be lost, is that fine?
+      await queryInterface.removeColumn(
+        'aplus_grade_source',
+        'aplus_course_id',
+        {transaction}
+      );
+
       await queryInterface.addColumn(
         'aplus_grade_source',
         'aplus_course',
@@ -35,6 +42,13 @@ export default {
   down: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
+      await queryInterface.addColumn(
+        'aplus_grade_source',
+        'aplus_course_id',
+        {type: DataTypes.INTEGER, defaultValue: -1, allowNull: false},
+        {transaction}
+      );
+
       await queryInterface.removeColumn('aplus_grade_source', 'aplus_course', {
         transaction,
       });

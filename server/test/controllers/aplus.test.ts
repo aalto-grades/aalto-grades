@@ -323,6 +323,10 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
           sourceType === AplusGradeSourceType.Module
             ? gradeSource.moduleId
             : null,
+        moduleName:
+          sourceType === AplusGradeSourceType.Module
+            ? gradeSource.moduleName
+            : null,
         difficulty:
           sourceType === AplusGradeSourceType.Difficulty
             ? gradeSource.difficulty
