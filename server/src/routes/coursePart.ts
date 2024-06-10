@@ -20,12 +20,14 @@ import {
 import {handleInvalidRequestJson} from '../middleware';
 import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
+import {authLogger} from '../middleware/requestLogger';
 
 export const router = Router();
 
 router.get(
   '/v1/courses/:courseId/parts',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authLogger,
   courseAuthorization([
     CourseRoleType.Teacher,
     CourseRoleType.Assistant,
@@ -37,9 +39,10 @@ router.get(
 router.post(
   '/v1/courses/:courseId/parts',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
+  authLogger,
+  courseAuthorization([CourseRoleType.Teacher]),
   processRequestBody(NewCoursePartDataSchema),
   controllerDispatcher(addCoursePart)
 );
@@ -47,9 +50,10 @@ router.post(
 router.put(
   '/v1/courses/:courseId/parts/:coursePartId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
+  authLogger,
+  courseAuthorization([CourseRoleType.Teacher]),
   processRequestBody(EditCoursePartDataSchema),
   controllerDispatcher(editCoursePart)
 );
@@ -57,6 +61,7 @@ router.put(
 router.delete(
   '/v1/courses/:courseId/parts/:coursePartId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authLogger,
   courseAuthorization([CourseRoleType.Teacher]),
   controllerDispatcher(deleteCoursePart)
 );

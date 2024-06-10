@@ -17,28 +17,18 @@ const colors: winston.config.AbstractConfigSetColors = {
 winston.addColors(colors);
 
 /**
- * Lowest logging level included in the logs per environment. E.g., 'info' logs
- * info level and anything above ('warn' and 'error').
- */
-const level: string = ((): string => {
-  switch (NODE_ENV) {
-    case 'production':
-      return 'http';
-    case 'test':
-      return 'error';
-    default:
-      return 'debug';
-  }
-})();
-
-/**
  * Set up a Winston logger to log all output to the console and errors to
  * separate log files in the ./logs directory. More information about logger
  * transports (for streaming logs automatically to a database, log managers,
  * etc.): https://github.com/winstonjs/winston/blob/master/docs/transports.md
  */
 const logger: winston.Logger = winston.createLogger({
-  level,
+  level:
+    NODE_ENV === 'production'
+      ? 'http'
+      : NODE_ENV === 'test'
+        ? 'error'
+        : 'debug',
   levels: {
     error: 0,
     warn: 1,
@@ -48,7 +38,7 @@ const logger: winston.Logger = winston.createLogger({
   },
   format: winston.format.combine(
     winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),
-    winston.format.colorize({all: true}),
+    winston.format.colorize({all: NODE_ENV !== 'production'}), // Remove (some) colors in prod?
     winston.format.printf(
       (http: winston.Logform.TransformableInfo) =>
         `${http.timestamp} ${http.level}: ${http.message}`

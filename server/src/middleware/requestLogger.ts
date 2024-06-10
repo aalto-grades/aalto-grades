@@ -6,6 +6,7 @@ import {RequestHandler} from 'express';
 import morgan from 'morgan';
 
 import logger, {syslogger} from '../configs/winston';
+import {JwtClaims} from '../types';
 
 morgan.token('remote-addr', req => {
   return (req.headers['x-real-ip'] ||
@@ -47,3 +48,19 @@ export const requestSyslogger: RequestHandler = morgan(
     },
   }
 );
+
+/**
+ * Log auth info with more details about request. Use after
+ * passport.authenticate and express.json but before authorization and
+ * processRequestBody
+ */
+export const authLogger: RequestHandler = (req, res, next) => {
+  const params = JSON.stringify(req.params);
+  const query = JSON.stringify(req.query);
+  const body = JSON.stringify(req.body ?? {});
+  const user = req.user as JwtClaims;
+  logger.info(
+    `${user.id} ${user.role} ${req.method} ${req.url} ${params} ${query} ${body}`
+  );
+  next();
+};

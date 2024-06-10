@@ -4,17 +4,18 @@
 
 // This file reads all environment variables and defines their values as constants.
 
-// Config dotenv so environment variables are also accessible from .env file.
 import * as dotenv from 'dotenv';
-dotenv.config();
 import {readFileSync} from 'fs';
 
-import logger from './winston';
+// Config dotenv so environment variables are also accessible from .env file.
+dotenv.config();
+
+export const NODE_ENV: string = process.env.NODE_ENV ?? 'development';
+
+import logger from './winston'; // The logger needs NODE_ENV to be defined
 
 const parsedPort: number = Number(process.env.AALTO_GRADES_BACKEND_PORT);
 export const PORT: number = isNaN(parsedPort) ? 3000 : parsedPort;
-
-export const NODE_ENV: string = process.env.NODE_ENV ?? 'development';
 
 export const JWT_SECRET: string =
   process.env.AALTO_GRADES_JWT_SECRET || 'TOP_SECRET';

@@ -21,12 +21,14 @@ import {
 import {handleInvalidRequestJson} from '../middleware';
 import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
+import {authLogger} from '../middleware/requestLogger';
 
 export const router = Router();
 
 router.get(
   '/v1/courses/:courseId/grading-models/:gradingModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authLogger,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]), // TODO: Allow students to view grading models?
   controllerDispatcher(getGradingModel)
 );
@@ -34,6 +36,7 @@ router.get(
 router.get(
   '/v1/courses/:courseId/grading-models',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authLogger,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(getAllGradingModels)
 );
@@ -41,9 +44,10 @@ router.get(
 router.post(
   '/v1/courses/:courseId/grading-models',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
+  authLogger,
+  courseAuthorization([CourseRoleType.Teacher]),
   processRequestBody(NewGradingModelDataSchema),
   controllerDispatcher(addGradingModel)
 );
@@ -51,9 +55,10 @@ router.post(
 router.put(
   '/v1/courses/:courseId/grading-models/:gradingModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
+  authLogger,
+  courseAuthorization([CourseRoleType.Teacher]),
   processRequestBody(EditGradingModelDataSchema),
   controllerDispatcher(editGradingModel)
 );
@@ -61,6 +66,7 @@ router.put(
 router.delete(
   '/v1/courses/:courseId/grading-models/:gradingModelId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authLogger,
   courseAuthorization([CourseRoleType.Teacher]),
   controllerDispatcher(deleteGradingModel)
 );
