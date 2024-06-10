@@ -11,10 +11,26 @@ const colors: winston.config.AbstractConfigSetColors = {
   warn: 'yellow',
   info: 'green',
   http: 'magenta',
+  verbose: 'grey',
   debug: 'white',
 };
 
 winston.addColors(colors);
+
+const baseFormat = winston.format.combine(
+  winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),
+  winston.format.printf(
+    (http: winston.Logform.TransformableInfo) =>
+      `${http.timestamp} ${http.level}: ${http.message}`
+  )
+);
+const format =
+  NODE_ENV === 'production'
+    ? baseFormat
+    : winston.format.combine(
+        winston.format.colorize({all: true}), // Just setting this to false doesn't remove the colors
+        baseFormat
+      );
 
 /**
  * Set up a Winston logger to log all output to the console and errors to
@@ -36,14 +52,7 @@ const httpLogger: winston.Logger = winston.createLogger({
     http: 3,
     debug: 4,
   },
-  format: winston.format.combine(
-    winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),
-    winston.format.colorize({all: NODE_ENV !== 'production'}), // Remove (some) colors in prod?
-    winston.format.printf(
-      (http: winston.Logform.TransformableInfo) =>
-        `${http.timestamp} ${http.level}: ${http.message}`
-    )
-  ),
+  format,
   transports: [
     new winston.transports.Console(),
     new winston.transports.File({
@@ -59,7 +68,7 @@ const httpLogger: winston.Logger = winston.createLogger({
 export const dbLogger: winston.Logger = winston.createLogger({
   level:
     NODE_ENV === 'production'
-      ? 'info'
+      ? 'verbose'
       : NODE_ENV === 'test'
         ? 'error'
         : 'debug',
@@ -67,20 +76,15 @@ export const dbLogger: winston.Logger = winston.createLogger({
     error: 0,
     warn: 1,
     info: 2,
-    debug: 3,
+    verbose: 3,
+    debug: 4,
   },
-  format: winston.format.combine(
-    winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),
-    winston.format.printf(
-      (http: winston.Logform.TransformableInfo) =>
-        `${http.timestamp} ${http.level}: ${http.message}`
-    )
-  ),
+  format,
   transports: [
     new winston.transports.Console(),
     new winston.transports.File({
       filename: 'logs/database.log',
-      level: 'info',
+      level: 'verbose', // The actual db logs are verbose level.
       handleExceptions: true,
       maxsize: 5242880, // 5MB
       maxFiles: 5,

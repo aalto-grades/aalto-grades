@@ -10,7 +10,14 @@ import {readFileSync} from 'fs';
 // Config dotenv so environment variables are also accessible from .env file.
 dotenv.config();
 
-export const NODE_ENV: string = process.env.NODE_ENV ?? 'development';
+type NodeEnv = 'test' | 'development' | 'production';
+export const NODE_ENV: NodeEnv =
+  (process.env.NODE_ENV as NodeEnv | undefined) ?? 'development';
+if (!['test', 'development', 'production'].includes(NODE_ENV)) {
+  throw new Error(
+    `Invalid NODE_ENV '${NODE_ENV}'. Possible values are 'test', 'development', and 'production'`
+  );
+}
 
 import httpLogger from './winston'; // The logger needs NODE_ENV to be defined
 

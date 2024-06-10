@@ -49,7 +49,7 @@ export const authLogger: RequestHandler = (req, res, next) => {
   const query = JSON.stringify(req.query);
   const body = JSON.stringify(req.body ?? {});
   const user = req.user as JwtClaims;
-  httpLogger.info(
+  httpLogger.http(
     `${user.id} ${user.role} ${req.method} ${req.url} ${params} ${query} ${body}`
   );
   next();

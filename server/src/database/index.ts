@@ -28,7 +28,7 @@ export const sequelize: Sequelize = new Sequelize(
       underscored: true,
       freezeTableName: true,
     },
-    logging: (msg: string) => dbLogger.info(`Sequelize: ${msg}`),
+    logging: (msg: string) => dbLogger.verbose(`Sequelize: ${msg}`),
   }
 );
 
