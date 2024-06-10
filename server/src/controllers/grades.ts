@@ -103,6 +103,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
     userGrades[userId][grade.coursePartId].push({
       gradeId: grade.id,
       grader: grader,
+      aplusGradeSourceId: grade.aplusGradeSourceId,
       grade: grade.grade,
       exportedToSisu: grade.sisuExportDate,
       date: new Date(grade.date),

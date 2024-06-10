@@ -247,6 +247,7 @@ export const fetchAplusGrades = async (
       newGrades.push({
         studentNumber: pointsRes.data.student_id,
         coursePartId: coursePart.id,
+        aplusGradeSourceId: gradeSource.id,
         grade: grade,
         date: date,
         expiryDate: expiryDate,

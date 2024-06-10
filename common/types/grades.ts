@@ -11,6 +11,7 @@ import {UserDataSchema} from './user';
 export const BaseGradeDataSchema = z.object({
   gradeId: z.number().int(),
   grader: UserDataSchema,
+  aplusGradeSourceId: z.number().int().nullable(), // TODO: Should this be AplusGradeSourceData?
   grade: z.number(),
   exportedToSisu: DateSchema.nullable(),
   date: DateSchema,
@@ -25,6 +26,7 @@ export const NewGradeSchema = z
   .object({
     studentNumber: z.string(),
     coursePartId: z.number().int(),
+    aplusGradeSourceId: z.number().int().optional(),
     grade: z.number(),
     date: DateSchema,
     expiryDate: DateSchema,
