@@ -37,6 +37,9 @@ const GradeSourceBase = z
   .object({
     coursePartId: IdSchema,
     aplusCourseId: z.number().int(),
+    courseName: z.string(),
+    courseInstance: z.string(),
+    sourceName: z.string(),
   })
   .strict();
 

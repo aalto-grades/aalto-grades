@@ -92,6 +92,9 @@ class CreateData {
     await AplusGradeSource.create({
       coursePartId: fullPointsCoursePart.id,
       aplusCourseId: 1,
+      courseName: 'The Course',
+      courseInstance: '2024',
+      sourceName: 'Full Points',
       sourceType: AplusGradeSourceType.FullPoints,
     });
 
@@ -99,6 +102,9 @@ class CreateData {
     await AplusGradeSource.create({
       coursePartId: moduleCoursePart.id,
       aplusCourseId: 1,
+      courseName: 'The Course',
+      courseInstance: '2024',
+      sourceName: 'Module Name',
       sourceType: AplusGradeSourceType.Module,
       moduleId: 1,
     });
@@ -107,6 +113,9 @@ class CreateData {
     await AplusGradeSource.create({
       coursePartId: difficultyCoursePart.id,
       aplusCourseId: 1,
+      courseName: 'The Course',
+      courseInstance: '2024',
+      sourceName: 'A',
       sourceType: AplusGradeSourceType.Difficulty,
       difficulty: 'A',
     });

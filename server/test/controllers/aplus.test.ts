@@ -268,6 +268,9 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
   type AplusGradeSourceAny = {
     coursePartId: number;
     aplusCourseId: number;
+    courseName: string;
+    courseInstance: string;
+    sourceName: string;
     sourceType: AplusGradeSourceType;
     moduleId?: number;
     difficulty?: string;
@@ -283,6 +286,9 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
   ): AplusGradeSourceAny => ({
     coursePartId,
     aplusCourseId: 1,
+    courseName: 'The Course',
+    courseInstance: '2024',
+    sourceName: 'The Source',
     sourceType: sourceType,
     moduleId: withModuleId ? 1 : undefined,
     difficulty: withDifficulty ? 'A' : undefined,
@@ -309,6 +315,9 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
       where: {
         coursePartId: gradeSource.coursePartId,
         aplusCourseId: gradeSource.aplusCourseId,
+        courseName: gradeSource.courseName,
+        courseInstance: gradeSource.courseInstance,
+        sourceName: gradeSource.sourceName,
         sourceType: sourceType,
         moduleId:
           sourceType === AplusGradeSourceType.Module
