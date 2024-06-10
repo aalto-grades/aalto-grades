@@ -206,7 +206,7 @@ const CoursePartsView = (): JSX.Element => {
     elements.push(
       <GridActionsCellItem
         icon={<AddCircle />}
-        label="AddCircle"
+        label="Add A+ Grade Source"
         onClick={() => window.alert('Not implemented!')}
       />
     );
@@ -215,7 +215,7 @@ const CoursePartsView = (): JSX.Element => {
       elements.push(
         <GridActionsCellItem
           icon={<More />}
-          label="More"
+          label="View A+ Grade Sources"
           onClick={() => {
             setAplusGradeSources(params.row.aplusGradeSources);
             setViewAplusSourcesOpen(true);
