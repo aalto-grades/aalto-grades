@@ -11,6 +11,7 @@ export const mockCourseParts: CoursePartData[] = [
     name: 'Exercise 1',
     daysValid: 365,
     archived: false,
+    aplusGradeSources: [],
   },
   {
     id: 2,
@@ -18,6 +19,7 @@ export const mockCourseParts: CoursePartData[] = [
     name: 'Exercise 2',
     daysValid: 365,
     archived: false,
+    aplusGradeSources: [],
   },
   {
     id: 3,
@@ -25,5 +27,6 @@ export const mockCourseParts: CoursePartData[] = [
     name: 'Exam',
     daysValid: 365,
     archived: false,
+    aplusGradeSources: [],
   },
 ];

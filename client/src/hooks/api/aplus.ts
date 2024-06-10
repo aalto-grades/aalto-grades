@@ -9,6 +9,7 @@ import {
   UseQueryResult,
   useMutation,
   useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
 import {AxiosRequestConfig} from 'axios';
 
@@ -60,12 +61,21 @@ export const useFetchAplusExerciseData = (
 export const useAddAplusGradeSources = (
   courseId: Numeric,
   options?: UseMutationOptions<void, unknown, AplusGradeSourceData[]>
-): UseMutationResult<void, unknown, AplusGradeSourceData[]> =>
-  useMutation({
+): UseMutationResult<void, unknown, AplusGradeSourceData[]> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
     mutationFn: async (gradeSources: AplusGradeSourceData[]) =>
       await axios.post(`/v1/courses/${courseId}/aplus-source`, gradeSources),
+
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: ['course-parts', courseId],
+      }),
+
     ...options,
   });
+};
 
 export const useFetchAplusGrades = (
   courseId: Numeric,
