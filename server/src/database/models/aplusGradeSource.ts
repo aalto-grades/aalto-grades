@@ -22,6 +22,9 @@ export default class AplusGradeSource extends Model<
   declare id: CreationOptional<number>;
   declare coursePartId: ForeignKey<CoursePart['id']>;
   declare aplusCourseId: number;
+  declare courseName: string;
+  declare courseInstance: string;
+  declare sourceName: string;
   declare sourceType: AplusGradeSourceType;
   declare moduleId: CreationOptional<number | null>;
   declare difficulty: CreationOptional<string | null>;
@@ -46,6 +49,18 @@ AplusGradeSource.init(
     },
     aplusCourseId: {
       type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    courseName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    courseInstance: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    sourceName: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     sourceType: {
