@@ -37,23 +37,26 @@ export const findCoursePartByCourseId = async (
     AplusGradeSources: AplusGradeSource[];
   })[];
 
-  return courseParts.map(coursePart => ({
-    id: coursePart.id,
-    courseId: coursePart.courseId,
-    name: coursePart.name,
-    daysValid: coursePart.daysValid,
-    archived: coursePart.archived,
-    aplusGradeSources: coursePart.AplusGradeSources.map(
-      gradeSource =>
-        ({
-          coursePartId: coursePart.id, // TODO: Redundant
-          aplusCourse: gradeSource.aplusCourse,
-          sourceType: gradeSource.sourceType,
-          moduleId: gradeSource.moduleId ?? undefined,
-          difficulty: gradeSource.difficulty ?? undefined,
-        }) as AplusGradeSourceData
-    ),
-  }));
+  return courseParts.map(
+    (coursePart): CoursePartData => ({
+      id: coursePart.id,
+      courseId: coursePart.courseId,
+      name: coursePart.name,
+      daysValid: coursePart.daysValid,
+      archived: coursePart.archived,
+      aplusGradeSources: coursePart.AplusGradeSources.map(
+        gradeSource =>
+          ({
+            coursePartId: coursePart.id, // TODO: Redundant
+            aplusCourse: gradeSource.aplusCourse,
+            sourceType: gradeSource.sourceType,
+            moduleId: gradeSource.moduleId ?? undefined,
+            moduleName: gradeSource.moduleName ?? undefined,
+            difficulty: gradeSource.difficulty ?? undefined,
+          }) as AplusGradeSourceData
+      ),
+    })
+  );
 };
 
 /**
