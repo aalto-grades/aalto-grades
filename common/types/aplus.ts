@@ -33,25 +33,36 @@ export const AplusExerciseDataSchema = z.object({
   difficulties: z.array(z.string()),
 });
 
-const GradeSourceBase = z
+// coursePartId is omitted in the A+ grade source list in course parts, but
+// omiting from a union type doesn't appear to be possible
+// https://github.com/colinhacks/zod/discussions/1434
+const AplusGradeSourceBaseSchema = z
   .object({
     coursePartId: IdSchema,
     aplusCourseId: z.number().int(),
   })
   .strict();
 
-export const AplusGradeSourceDataSchema = z.discriminatedUnion('sourceType', [
-  GradeSourceBase.extend({
+export const AplusGradeSourceFullPointsSchema =
+  AplusGradeSourceBaseSchema.extend({
     sourceType: z.literal(AplusGradeSourceType.FullPoints),
-  }),
-  GradeSourceBase.extend({
-    sourceType: z.literal(AplusGradeSourceType.Module),
-    moduleId: z.number().int(),
-  }),
-  GradeSourceBase.extend({
+  });
+
+export const AplusGradeSourceModuleSchema = AplusGradeSourceBaseSchema.extend({
+  sourceType: z.literal(AplusGradeSourceType.Module),
+  moduleId: z.number().int(),
+});
+
+export const AplusGradeSourceDifficultySchema =
+  AplusGradeSourceBaseSchema.extend({
     sourceType: z.literal(AplusGradeSourceType.Difficulty),
     difficulty: z.string(),
-  }),
+  });
+
+export const AplusGradeSourceDataSchema = z.discriminatedUnion('sourceType', [
+  AplusGradeSourceFullPointsSchema,
+  AplusGradeSourceModuleSchema,
+  AplusGradeSourceDifficultySchema,
 ]);
 
 export const NewAplusGradeSourceArraySchema = z.array(
