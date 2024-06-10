@@ -2,8 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CoursePartData, HttpCode} from '@/common/types';
+import {AplusGradeSourceData, CoursePartData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
+import AplusGradeSource from '../../database/models/aplusGradeSource';
 import Course from '../../database/models/course';
 import CoursePart from '../../database/models/coursePart';
 import {ApiError, stringToIdSchema} from '../../types';
@@ -28,18 +29,34 @@ export const findCoursePartById = async (id: number): Promise<CoursePart> => {
 export const findCoursePartByCourseId = async (
   courseId: number
 ): Promise<CoursePartData[]> => {
-  const courseParts = await CoursePart.findAll({
+  const courseParts = (await CoursePart.findAll({
     where: {courseId: courseId},
+    include: AplusGradeSource,
     order: [['id', 'ASC']],
-  });
+  })) as (CoursePart & {
+    AplusGradeSources: AplusGradeSource[];
+  })[];
 
-  return courseParts.map(coursePart => ({
-    id: coursePart.id,
-    courseId: coursePart.courseId,
-    name: coursePart.name,
-    daysValid: coursePart.daysValid,
-    archived: coursePart.archived,
-  }));
+  return courseParts.map(
+    (coursePart): CoursePartData => ({
+      id: coursePart.id,
+      courseId: coursePart.courseId,
+      name: coursePart.name,
+      daysValid: coursePart.daysValid,
+      archived: coursePart.archived,
+      aplusGradeSources: coursePart.AplusGradeSources.map(
+        gradeSource =>
+          ({
+            coursePartId: coursePart.id, // TODO: Redundant
+            aplusCourse: gradeSource.aplusCourse,
+            sourceType: gradeSource.sourceType,
+            moduleId: gradeSource.moduleId ?? undefined,
+            moduleName: gradeSource.moduleName ?? undefined,
+            difficulty: gradeSource.difficulty ?? undefined,
+          }) as AplusGradeSourceData
+      ),
+    })
+  );
 };
 
 /**

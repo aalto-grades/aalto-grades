@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Archive, Delete, Unarchive} from '@mui/icons-material';
+import {AddCircle, Archive, Delete, More, Unarchive} from '@mui/icons-material';
 import {Box, Button, Typography} from '@mui/material';
 import {
   DataGrid,
@@ -16,12 +16,14 @@ import {JSX, useEffect, useMemo, useState} from 'react';
 import {useBlocker, useParams} from 'react-router-dom';
 
 import {
+  AplusGradeSourceData,
   EditCoursePartData,
   NewCoursePartData,
   SystemRole,
 } from '@/common/types';
 import NewAplusCoursePartsDialog from './NewAplusGradePartsDialog';
 import AddCoursePartDialog from './NewCoursePartDialog';
+import ViewAplusGradeSourcesDialog from './ViewAplusGradeSourcesDialog';
 import {
   useAddCoursePart,
   useDeleteCoursePart,
@@ -40,6 +42,7 @@ type ColTypes = {
   name: string;
   daysValid: number;
   validUntil: Date | null;
+  aplusGradeSources: AplusGradeSourceData[];
   archived: boolean;
 };
 
@@ -59,6 +62,11 @@ const CoursePartsView = (): JSX.Element => {
   const [editing, setEditing] = useState<boolean>(false);
   const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false);
   const [aplusDialogOpen, setAplusDialogOpen] = useState<boolean>(false);
+  const [viewAplusSourcesOpen, setViewAplusSourcesOpen] =
+    useState<boolean>(false);
+  const [aplusGradeSources, setAplusGradeSources] = useState<
+    AplusGradeSourceData[]
+  >([]);
   const [unsavedDialogOpen, setUnsavedDialogOpen] = useState<boolean>(false);
 
   const coursePartsWithGrades = useMemo(() => {
@@ -109,6 +117,7 @@ const CoursePartsView = (): JSX.Element => {
       name: coursePart.name,
       daysValid: coursePart.daysValid,
       validUntil: null,
+      aplusGradeSources: coursePart.aplusGradeSources,
       archived: coursePart.archived,
     }));
     if (JSON.stringify(newRows) === JSON.stringify(rows)) return;
@@ -138,6 +147,7 @@ const CoursePartsView = (): JSX.Element => {
         name,
         daysValid,
         validUntil: null,
+        aplusGradeSources: [],
         archived: false,
       });
     });
@@ -188,6 +198,33 @@ const CoursePartsView = (): JSX.Element => {
 
     enqueueSnackbar('Course parts saved successfully', {variant: 'success'});
     setInitRows(structuredClone(rows));
+  };
+
+  const getAplusActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
+    const elements: JSX.Element[] = [];
+
+    elements.push(
+      <GridActionsCellItem
+        icon={<AddCircle />}
+        label="Add A+ Grade Source"
+        onClick={() => window.alert('Not implemented!')}
+      />
+    );
+
+    if (params.row.aplusGradeSources.length > 0) {
+      elements.push(
+        <GridActionsCellItem
+          icon={<More />}
+          label="View A+ Grade Sources"
+          onClick={() => {
+            setAplusGradeSources(params.row.aplusGradeSources);
+            setViewAplusSourcesOpen(true);
+          }}
+        />
+      );
+    }
+
+    return elements;
   };
 
   const getActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
@@ -247,6 +284,12 @@ const CoursePartsView = (): JSX.Element => {
       editable: true,
     },
     {
+      field: 'aplusGradeSources',
+      headerName: 'A+ grade sources',
+      type: 'actions',
+      getActions: getAplusActions,
+    },
+    {
       field: 'archived',
       headerName: 'Archived',
       type: 'boolean',
@@ -273,6 +316,11 @@ const CoursePartsView = (): JSX.Element => {
       <NewAplusCoursePartsDialog
         handleClose={() => setAplusDialogOpen(false)}
         open={aplusDialogOpen}
+      />
+      <ViewAplusGradeSourcesDialog
+        handleClose={() => setViewAplusSourcesOpen(false)}
+        open={viewAplusSourcesOpen}
+        aplusGradeSources={aplusGradeSources}
       />
       <UnsavedChangesDialog
         open={unsavedDialogOpen || blocker.state === 'blocked'}

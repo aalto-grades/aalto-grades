@@ -68,7 +68,14 @@ class CreateData {
       daysValid: this.randInt(10, 365),
     });
     this.freeCoursePartId += 1;
-    return newCoursePart;
+    return {
+      id: newCoursePart.id,
+      courseId: newCoursePart.courseId,
+      name: newCoursePart.name,
+      daysValid: newCoursePart.daysValid,
+      archived: newCoursePart.archived,
+      aplusGradeSources: [],
+    };
   }
 
   private async createCourseParts(courseId: number): Promise<CoursePartData[]> {
@@ -80,7 +87,14 @@ class CreateData {
         daysValid: this.randInt(10, 365),
       });
 
-      courseParts.push(newCoursePart);
+      courseParts.push({
+        id: newCoursePart.id,
+        courseId: newCoursePart.courseId,
+        name: newCoursePart.name,
+        daysValid: newCoursePart.daysValid,
+        archived: newCoursePart.archived,
+        aplusGradeSources: [],
+      });
     }
     return courseParts;
   }
