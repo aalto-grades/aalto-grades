@@ -13,6 +13,10 @@ definitions:
     description: The ID of a module in A+.
     format: int32
     example: 1
+  AplusModuleName:
+    type: string
+    description: Name of the module.
+    example: Round 1
   AplusDifficulty:
     type: string
     description: The name or identifier of a difficulty level in A+.
@@ -62,9 +66,7 @@ definitions:
             id:
               $ref: '#/definitions/AplusModuleId'
             name:
-              type: string
-              description: Name of the module.
-              example: Round 1
+              $ref: '#/definitions/AplusModuleName'
           required:
             - id
             - name
@@ -82,12 +84,14 @@ definitions:
     properties:
       coursePartId:
         $ref: '#/definitions/CoursePartId'
-      aplusCourseId:
-        $ref: '#/definitions/AplusCourseId'
+      aplusCourse:
+        $ref: '#/definitions/AplusCourseData'
       sourceType:
         $ref: '#/definitions/AplusGradeSourceType'
       moduleId:
         $ref: '#/definitions/AplusModuleId'
+      moduleName:
+        $ref: '#/definitions/AplusModuleName'
       difficulty:
         $ref: '#/definitions/AplusDifficulty'
     required:

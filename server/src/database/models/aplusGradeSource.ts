@@ -11,7 +11,7 @@ import {
   Model,
 } from 'sequelize';
 
-import {AplusGradeSourceType} from '@/common/types';
+import {AplusCourseData, AplusGradeSourceType} from '@/common/types';
 import CoursePart from './coursePart';
 import {sequelize} from '..';
 
@@ -21,9 +21,10 @@ export default class AplusGradeSource extends Model<
 > {
   declare id: CreationOptional<number>;
   declare coursePartId: ForeignKey<CoursePart['id']>;
-  declare aplusCourseId: number;
+  declare aplusCourse: AplusCourseData; // TODO: Store as a table? Or individual fields?
   declare sourceType: AplusGradeSourceType;
   declare moduleId: CreationOptional<number | null>;
+  declare moduleName: CreationOptional<string | null>;
   declare difficulty: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -44,8 +45,8 @@ AplusGradeSource.init(
         key: 'id',
       },
     },
-    aplusCourseId: {
-      type: DataTypes.INTEGER,
+    aplusCourse: {
+      type: DataTypes.JSONB,
       allowNull: false,
     },
     sourceType: {
@@ -54,6 +55,10 @@ AplusGradeSource.init(
     },
     moduleId: {
       type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    moduleName: {
+      type: DataTypes.STRING,
       allowNull: true,
     },
     difficulty: {
