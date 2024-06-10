@@ -4,26 +4,15 @@
 
 import {z} from 'zod';
 
-import {
-  AplusGradeSourceDifficultySchema,
-  AplusGradeSourceFullPointsSchema,
-  AplusGradeSourceModuleSchema,
-} from './aplus';
+import {AplusGradeSourceDataSchema} from './aplus';
 
-const omit = {coursePartId: true} as const;
 export const CoursePartDataSchema = z.object({
   id: z.number().int(),
   courseId: z.number().int(),
   name: z.string().min(1),
   daysValid: z.number().int().nonnegative(),
   archived: z.boolean(),
-  aplusGradeSources: z.array(
-    z.discriminatedUnion('sourceType', [
-      AplusGradeSourceFullPointsSchema.omit(omit),
-      AplusGradeSourceModuleSchema.omit(omit),
-      AplusGradeSourceDifficultySchema.omit(omit),
-    ])
-  ),
+  aplusGradeSources: z.array(AplusGradeSourceDataSchema),
 });
 export const NewCoursePartDataSchema = CoursePartDataSchema.omit({
   id: true,
