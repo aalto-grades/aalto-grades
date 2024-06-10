@@ -14,6 +14,7 @@ import {
   AplusGradeSourceType,
   HttpCode,
   NewGradeArraySchema,
+  AplusCourseData,
 } from '@/common/types';
 import {app} from '../../src/app';
 import {APLUS_API_URL} from '../../src/configs/environment';
@@ -267,9 +268,10 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
 describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', () => {
   type AplusGradeSourceAny = {
     coursePartId: number;
-    aplusCourseId: number;
+    aplusCourse: AplusCourseData;
     sourceType: AplusGradeSourceType;
     moduleId?: number;
+    moduleName?: string;
     difficulty?: string;
   };
 
@@ -282,9 +284,16 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     }
   ): AplusGradeSourceAny => ({
     coursePartId,
-    aplusCourseId: 1,
+    aplusCourse: {
+      id: 1,
+      courseCode: 'CS-789',
+      name: 'The Name',
+      instance: '1970',
+      url: 'https://plus.cs.aalto.fi',
+    },
     sourceType: sourceType,
     moduleId: withModuleId ? 1 : undefined,
+    moduleName: withModuleId ? 'Module Name' : undefined,
     difficulty: withDifficulty ? 'A' : undefined,
   });
 
@@ -308,7 +317,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     const result = await AplusGradeSource.findOne({
       where: {
         coursePartId: gradeSource.coursePartId,
-        aplusCourseId: gradeSource.aplusCourseId,
+        aplusCourse: gradeSource.aplusCourse,
         sourceType: sourceType,
         moduleId:
           sourceType === AplusGradeSourceType.Module

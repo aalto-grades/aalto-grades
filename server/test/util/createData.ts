@@ -91,22 +91,41 @@ class CreateData {
     const fullPointsCoursePart = await this.createCoursePart(courseId);
     await AplusGradeSource.create({
       coursePartId: fullPointsCoursePart.id,
-      aplusCourseId: 1,
+      aplusCourse: {
+        id: 1,
+        courseCode: 'CS-789',
+        name: 'The Name',
+        instance: '1970',
+        url: 'https://plus.cs.aalto.fi',
+      },
       sourceType: AplusGradeSourceType.FullPoints,
     });
 
     const moduleCoursePart = await this.createCoursePart(courseId);
     await AplusGradeSource.create({
       coursePartId: moduleCoursePart.id,
-      aplusCourseId: 1,
+      aplusCourse: {
+        id: 1,
+        courseCode: 'CS-789',
+        name: 'The Name',
+        instance: '1970',
+        url: 'https://plus.cs.aalto.fi',
+      },
       sourceType: AplusGradeSourceType.Module,
       moduleId: 1,
+      moduleName: 'Module Name',
     });
 
     const difficultyCoursePart = await this.createCoursePart(courseId);
     await AplusGradeSource.create({
       coursePartId: difficultyCoursePart.id,
-      aplusCourseId: 1,
+      aplusCourse: {
+        id: 1,
+        courseCode: 'CS-789',
+        name: 'The Name',
+        instance: '1970',
+        url: 'https://plus.cs.aalto.fi',
+      },
       sourceType: AplusGradeSourceType.Difficulty,
       difficulty: 'A',
     });
