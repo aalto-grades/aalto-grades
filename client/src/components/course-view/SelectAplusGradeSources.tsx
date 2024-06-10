@@ -50,7 +50,7 @@ const SelectAplusGradeSources = ({
                 onChange={e =>
                   handleChange(e.target.checked, 'A+ Course', {
                     coursePartId: -1,
-                    aplusCourseId: aplusCourse.id,
+                    aplusCourse: aplusCourse,
                     sourceType: AplusGradeSourceType.FullPoints,
                   })
                 }
@@ -76,9 +76,10 @@ const SelectAplusGradeSources = ({
                         `A+ Module: ${module.name}`,
                         {
                           coursePartId: -1,
-                          aplusCourseId: aplusCourse.id,
+                          aplusCourse: aplusCourse,
                           sourceType: AplusGradeSourceType.Module,
                           moduleId: module.id,
+                          moduleName: module.name,
                         }
                       )
                     }
@@ -107,7 +108,7 @@ const SelectAplusGradeSources = ({
                           `A+ Difficulty: ${difficulty}`,
                           {
                             coursePartId: -1,
-                            aplusCourseId: aplusCourse.id,
+                            aplusCourse: aplusCourse,
                             sourceType: AplusGradeSourceType.Difficulty,
                             difficulty: difficulty,
                           }

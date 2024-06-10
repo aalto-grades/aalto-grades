@@ -36,7 +36,7 @@ export const AplusExerciseDataSchema = z.object({
 const GradeSourceBase = z
   .object({
     coursePartId: IdSchema,
-    aplusCourseId: z.number().int(),
+    aplusCourse: AplusCourseDataSchema,
   })
   .strict();
 
@@ -47,6 +47,7 @@ export const AplusGradeSourceDataSchema = z.discriminatedUnion('sourceType', [
   GradeSourceBase.extend({
     sourceType: z.literal(AplusGradeSourceType.Module),
     moduleId: z.number().int(),
+    moduleName: z.string(),
   }),
   GradeSourceBase.extend({
     sourceType: z.literal(AplusGradeSourceType.Difficulty),
