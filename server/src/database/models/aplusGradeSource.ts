@@ -21,7 +21,7 @@ export default class AplusGradeSource extends Model<
 > {
   declare id: CreationOptional<number>;
   declare coursePartId: ForeignKey<CoursePart['id']>;
-  declare aplusCourse: AplusCourseData; // TODO: Store as a table?
+  declare aplusCourse: AplusCourseData; // TODO: Store as a table? Or individual fields?
   declare sourceType: AplusGradeSourceType;
   declare moduleId: CreationOptional<number | null>;
   declare moduleName: CreationOptional<string | null>;
