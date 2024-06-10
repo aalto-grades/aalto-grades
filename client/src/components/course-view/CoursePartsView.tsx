@@ -200,7 +200,7 @@ const CoursePartsView = (): JSX.Element => {
     setInitRows(structuredClone(rows));
   };
 
-  const getAplusActions = (params: GridRowParams<ColTypes>) => {
+  const getAplusActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
     const elements: JSX.Element[] = [];
 
     elements.push(
