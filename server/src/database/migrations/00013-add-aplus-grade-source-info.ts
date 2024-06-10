@@ -12,17 +12,20 @@ export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
-      // Data will be lost, is that fine?
-      await queryInterface.removeColumn(
-        'aplus_grade_source',
-        'aplus_course_id',
-        {transaction}
-      );
-
       await queryInterface.addColumn(
         'aplus_grade_source',
         'aplus_course',
-        {type: DataTypes.JSONB, defaultValue: {}, allowNull: false},
+        {
+          type: DataTypes.JSONB,
+          defaultValue: {
+            id: -1,
+            courseCode: '',
+            name: '',
+            instance: '',
+            url: '',
+          },
+          allowNull: false,
+        },
         {transaction}
       );
 
@@ -30,6 +33,18 @@ export default {
         'aplus_grade_source',
         'module_name',
         {type: DataTypes.STRING, defaultValue: null, allowNull: true},
+        {transaction}
+      );
+
+      await queryInterface.sequelize.query(
+        `UPDATE aplus_grade_source
+        SET aplus_course = jsonb_set(aplus_course, '{id}', to_jsonb(aplus_course_id))`,
+        {transaction}
+      );
+
+      await queryInterface.removeColumn(
+        'aplus_grade_source',
+        'aplus_course_id',
         {transaction}
       );
 
@@ -46,6 +61,12 @@ export default {
         'aplus_grade_source',
         'aplus_course_id',
         {type: DataTypes.INTEGER, defaultValue: -1, allowNull: false},
+        {transaction}
+      );
+
+      await queryInterface.sequelize.query(
+        `UPDATE aplus_grade_source
+        SET aplus_course_id = (aplus_course->>'id')::int`,
         {transaction}
       );
 
