@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
 import {NODE_ENV} from './environment';
 
@@ -16,6 +17,34 @@ const colors: winston.config.AbstractConfigSetColors = {
 };
 
 winston.addColors(colors);
+
+const httpFileTransport: DailyRotateFile = new DailyRotateFile({
+  filename: 'logs/http-%DATE%.log',
+  datePattern: 'YYYY-MM-DD-HH',
+  level: 'http',
+  zippedArchive: true,
+  handleExceptions: true,
+  maxSize: '5m',
+  maxFiles: '3d',
+});
+const dbFileTransport: DailyRotateFile = new DailyRotateFile({
+  filename: 'logs/database-%DATE%.log',
+  datePattern: 'YYYY-MM-DD-HH',
+  level: 'verbose',
+  zippedArchive: true,
+  handleExceptions: true,
+  maxSize: '5m',
+  maxFiles: '3d',
+});
+
+httpFileTransport.on('error', error => {
+  // TODO: Handle error
+  throw error;
+});
+dbFileTransport.on('error', error => {
+  // TODO: Handle error
+  throw error;
+});
 
 const baseFormat = winston.format.combine(
   winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),
@@ -53,16 +82,7 @@ const httpLogger: winston.Logger = winston.createLogger({
     debug: 4,
   },
   format,
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({
-      filename: 'logs/http.log',
-      level: 'http',
-      handleExceptions: true,
-      maxsize: 5242880, // 5MB
-      maxFiles: 5,
-    }),
-  ],
+  transports: [new winston.transports.Console(), httpFileTransport],
 });
 
 export const dbLogger: winston.Logger = winston.createLogger({
@@ -80,16 +100,7 @@ export const dbLogger: winston.Logger = winston.createLogger({
     debug: 4,
   },
   format,
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({
-      filename: 'logs/database.log',
-      level: 'verbose', // The actual db logs are verbose level.
-      handleExceptions: true,
-      maxsize: 5242880, // 5MB
-      maxFiles: 5,
-    }),
-  ],
+  transports: [new winston.transports.Console(), dbFileTransport],
 });
 
 export default httpLogger;
