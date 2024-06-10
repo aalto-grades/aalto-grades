@@ -174,7 +174,7 @@ export const fetchAplusGrades = async (
         points: string;
       }[];
     }>(
-      `${APLUS_API_URL}/courses/${gradeSource.aplusCourseId}/points?format=json`,
+      `${APLUS_API_URL}/courses/${gradeSource.aplusCourse.id}/points?format=json`,
       aplusToken
     );
 
@@ -213,7 +213,7 @@ export const fetchAplusGrades = async (
           }
           if (!grade) {
             throw new ApiError(
-              `A+ course with ID ${gradeSource.aplusCourseId} has no module with ID ${gradeSource.moduleId}`,
+              `A+ course with ID ${gradeSource.aplusCourse.id} has no module with ID ${gradeSource.moduleId}`,
               HttpCode.InternalServerError
             );
           }
@@ -230,7 +230,7 @@ export const fetchAplusGrades = async (
             !(gradeSource.difficulty in pointsRes.data.points_by_difficulty)
           ) {
             throw new ApiError(
-              `A+ course with ID ${gradeSource.aplusCourseId} has no difficulty ${gradeSource.difficulty}`,
+              `A+ course with ID ${gradeSource.aplusCourse.id} has no difficulty ${gradeSource.difficulty}`,
               HttpCode.InternalServerError
             );
           }
