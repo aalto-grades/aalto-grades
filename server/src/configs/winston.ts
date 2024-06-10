@@ -22,7 +22,7 @@ winston.addColors(colors);
  * transports (for streaming logs automatically to a database, log managers,
  * etc.): https://github.com/winstonjs/winston/blob/master/docs/transports.md
  */
-const logger: winston.Logger = winston.createLogger({
+const httpLogger: winston.Logger = winston.createLogger({
   level:
     NODE_ENV === 'production'
       ? 'http'
@@ -47,8 +47,8 @@ const logger: winston.Logger = winston.createLogger({
   transports: [
     new winston.transports.Console(),
     new winston.transports.File({
-      filename: 'logs/error.log',
-      level: 'error',
+      filename: 'logs/http.log',
+      level: 'http',
       handleExceptions: true,
       maxsize: 5242880, // 5MB
       maxFiles: 5,
@@ -56,14 +56,19 @@ const logger: winston.Logger = winston.createLogger({
   ],
 });
 
-export const syslogger: winston.Logger = winston.createLogger({
+export const dbLogger: winston.Logger = winston.createLogger({
   level:
     NODE_ENV === 'production'
       ? 'info'
       : NODE_ENV === 'test'
         ? 'error'
         : 'debug',
-  levels: winston.config.syslog.levels,
+  levels: {
+    error: 0,
+    warn: 1,
+    info: 2,
+    debug: 3,
+  },
   format: winston.format.combine(
     winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),
     winston.format.printf(
@@ -71,7 +76,16 @@ export const syslogger: winston.Logger = winston.createLogger({
         `${http.timestamp} ${http.level}: ${http.message}`
     )
   ),
-  transports: [new winston.transports.Console()],
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({
+      filename: 'logs/database.log',
+      level: 'info',
+      handleExceptions: true,
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
+    }),
+  ],
 });
 
-export default logger;
+export default httpLogger;

@@ -14,7 +14,7 @@ import {getSamlStrategy, validateLogin} from './utils/auth';
 import {findUserById} from './utils/user';
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
 import {JWT_SECRET, NODE_ENV, SAML_SP_CERT_PATH} from '../configs/environment';
-import logger from '../configs/winston';
+import httpLogger from '../configs/winston';
 import {ApiError, JwtClaims} from '../types';
 
 /**
@@ -30,7 +30,7 @@ export const authSelfInfo = async (
   const userFromDb = await findUserById(user.id);
 
   if (userFromDb.name === null) {
-    logger.error(`Logged in user ${userFromDb.id} does not have a name`);
+    httpLogger.error(`Logged in user ${userFromDb.id} does not have a name`);
     throw new ApiError(
       'Logged in user does not have a name',
       HttpCode.InternalServerError

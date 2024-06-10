@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {CourseData, CourseRoleType, HttpCode} from '@/common/types';
-import logger from '../../configs/winston';
+import httpLogger from '../../configs/winston';
 import Course from '../../database/models/course';
 import CourseRole from '../../database/models/courseRole';
 import CourseTranslation from '../../database/models/courseTranslation';
@@ -91,7 +91,7 @@ export const parseCourseFull = (course: CourseFull): CourseData => {
     if (role === CourseRoleType.Student) continue;
 
     if (user.name === null || user.email === null) {
-      logger.error(
+      httpLogger.error(
         `Teacher or assistant user ${user.id} is missing a name or an email`
       );
       throw new ApiError(

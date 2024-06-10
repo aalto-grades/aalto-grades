@@ -21,7 +21,7 @@ import {
   SAML_METADATA_URL,
   SAML_PRIVATE_KEY,
 } from '../../configs/environment';
-import logger from '../../configs/winston';
+import httpLogger from '../../configs/winston';
 import User from '../../database/models/user';
 import {ApiError} from '../../types';
 
@@ -36,7 +36,7 @@ export const validateLogin = async (
     throw new ApiError('invalid credentials', HttpCode.Unauthorized);
   }
   if (user.password === null) {
-    logger.warn(`User password was null for user ${user.id}`);
+    httpLogger.warn(`User password was null for user ${user.id}`);
     throw new ApiError('invalid credentials', HttpCode.Unauthorized);
   }
 
@@ -47,7 +47,7 @@ export const validateLogin = async (
   }
 
   if (user.name === null) {
-    logger.error(`User name was null for user ${user.id}`);
+    httpLogger.error(`User name was null for user ${user.id}`);
     throw new ApiError(
       'User does not have a name',
       HttpCode.InternalServerError

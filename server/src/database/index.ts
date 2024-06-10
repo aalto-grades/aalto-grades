@@ -6,7 +6,7 @@ import {Sequelize} from 'sequelize';
 
 import dbCreds from '../configs/database';
 import {NODE_ENV} from '../configs/environment';
-import logger from '../configs/winston';
+import {dbLogger} from '../configs/winston';
 
 // Configure and initialize Sequelize instance with database details and options.
 export const sequelize: Sequelize = new Sequelize(
@@ -28,8 +28,7 @@ export const sequelize: Sequelize = new Sequelize(
       underscored: true,
       freezeTableName: true,
     },
-    logging: (msg: string) =>
-      NODE_ENV === 'test' ? undefined : logger.debug(`Sequelize: ${msg}`),
+    logging: (msg: string) => dbLogger.info(`Sequelize: ${msg}`),
   }
 );
 
@@ -37,12 +36,12 @@ export const sequelize: Sequelize = new Sequelize(
 export const connectToDatabase = async (): Promise<void> => {
   try {
     await sequelize.authenticate();
-    logger.info('database connected');
+    dbLogger.info('database connected');
   } catch (error) {
     if (typeof error === 'string' || error instanceof Error) {
-      logger.error(`database connection failed: ${error.toString()}`);
+      dbLogger.error(`database connection failed: ${error.toString()}`);
     } else {
-      logger.error('database connection failed with an unknown error type');
+      dbLogger.error('database connection failed with an unknown error type');
     }
 
     throw new Error('database connection failed');

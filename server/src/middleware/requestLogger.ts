@@ -5,7 +5,7 @@
 import {RequestHandler} from 'express';
 import morgan from 'morgan';
 
-import logger, {syslogger} from '../configs/winston';
+import httpLogger from '../configs/winston';
 import {JwtClaims} from '../types';
 
 morgan.token('remote-addr', req => {
@@ -34,17 +34,7 @@ export const requestLogger: RequestHandler = morgan(
     ' :status :res[content-length] ":referrer" ":user-agent"',
   {
     stream: {
-      write: (message: string) => logger.http(message.trim()),
-    },
-  }
-);
-
-export const requestSyslogger: RequestHandler = morgan(
-  ':remote-addr :remote-user ":method :url HTTP/:http-version"' +
-    ' :status  :res[content-length] ":referrer" ":user-agent"',
-  {
-    stream: {
-      write: (message: string) => syslogger.info(message.trim()),
+      write: (message: string) => httpLogger.http(message.trim()),
     },
   }
 );
@@ -59,7 +49,7 @@ export const authLogger: RequestHandler = (req, res, next) => {
   const query = JSON.stringify(req.query);
   const body = JSON.stringify(req.body ?? {});
   const user = req.user as JwtClaims;
-  logger.info(
+  httpLogger.info(
     `${user.id} ${user.role} ${req.method} ${req.url} ${params} ${query} ${body}`
   );
   next();

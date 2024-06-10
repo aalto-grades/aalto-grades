@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import {QueryInterface} from 'sequelize';
 
-import logger from '../../configs/winston';
+import {dbLogger} from '../../configs/winston';
 
 const mockDataDir = path.resolve(__dirname, '../../../../../mock-data');
 const readSql = (fileName: string): string =>
@@ -36,7 +36,7 @@ export default {
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
-      logger.error(error);
+      dbLogger.error(error);
     }
   },
   down: async (queryInterface: QueryInterface): Promise<void> => {
@@ -91,7 +91,7 @@ export default {
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
-      logger.error(error);
+      dbLogger.error(error);
     }
   },
 };
