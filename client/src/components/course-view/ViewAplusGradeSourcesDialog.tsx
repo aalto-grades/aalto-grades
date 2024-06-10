@@ -2,7 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Dialog, DialogContent, DialogTitle, Typography} from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+} from '@mui/material';
 import {JSX} from 'react';
 
 import {AplusGradeSourceData} from '@/common/types';
@@ -23,9 +30,13 @@ const ViewAplusGradeSourcesDialog = ({
       <DialogTitle>A+ grade sources</DialogTitle>
       <DialogContent>
         {aplusGradeSources.map(source => (
+          // TODO: Actual design
           <Typography>{JSON.stringify(source)}</Typography>
         ))}
       </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose}>Close</Button>
+      </DialogActions>
     </Dialog>
   );
 };
