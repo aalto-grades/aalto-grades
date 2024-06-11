@@ -8,6 +8,11 @@ definitions:
     description: The ID of a course in A+.
     format: int32
     example: 1
+  AplusGradeSourceId:
+    type: integer
+    description: The ID of an A+ grade source.
+    format: int32
+    example: 1
   AplusModuleId:
     type: integer
     description: The ID of a module in A+.
