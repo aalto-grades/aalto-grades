@@ -76,7 +76,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
           />
 
           <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-            <DialogTitle>{'Add a user'}</DialogTitle>
+            <DialogTitle>Add a User</DialogTitle>
             <DialogContent>
               <TextField
                 id="email"

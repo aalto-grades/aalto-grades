@@ -82,7 +82,7 @@ const FinalGradeCell = ({
           onClose={() => setGradeDialogOpen(false)}
           userId={userId}
           finalGrades={finalGrades}
-          title={`Final grades of ${studentNumber}`}
+          title={`Final Grades of ${studentNumber}`}
         />
       }
       {bestFinalGrade?.date && (

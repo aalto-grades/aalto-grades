@@ -129,9 +129,9 @@ const UploadDialogConfirm = ({
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Course part</TableCell>
-                      <TableCell>Completion date</TableCell>
-                      <TableCell>Expiration date</TableCell>
+                      <TableCell>Course Part</TableCell>
+                      <TableCell>Completion Date</TableCell>
+                      <TableCell>Expiration Date</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

@@ -192,7 +192,7 @@ const UploadDialogUpload = ({
         fullWidth
         onClose={() => setTextFieldOpen(false)}
       >
-        <DialogTitle>Paste text</DialogTitle>
+        <DialogTitle>Paste Text</DialogTitle>
         <DialogContent>
           <TextField
             multiline

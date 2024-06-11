@@ -273,19 +273,19 @@ const CoursePartsView = (): JSX.Element => {
     },
     {
       field: 'daysValid',
-      headerName: 'Days valid',
+      headerName: 'Days Valid',
       type: 'number',
       editable: true,
     },
     {
       field: 'validUntil',
-      headerName: 'Valid until',
+      headerName: 'Valid Until',
       type: 'date',
       editable: true,
     },
     {
       field: 'aplusGradeSources',
-      headerName: 'A+ grade sources',
+      headerName: 'A+ Grade Sources',
       type: 'actions',
       getActions: getAplusActions,
     },
@@ -336,7 +336,7 @@ const CoursePartsView = (): JSX.Element => {
 
       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
         <Typography width={'fit-content'} variant="h2">
-          Course parts
+          Course Parts
         </Typography>
         <SaveBar
           show={editRights && unsavedChanges}

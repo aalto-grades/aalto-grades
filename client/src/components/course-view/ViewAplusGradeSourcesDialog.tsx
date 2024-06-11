@@ -45,7 +45,7 @@ const ViewAplusGradeSourcesDialog = ({
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>A+ grade sources</DialogTitle>
+      <DialogTitle>A+ Grade Sources</DialogTitle>
       <DialogContent>
         <TableContainer component={Paper}>
           <Table>

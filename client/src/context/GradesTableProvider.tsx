@@ -367,7 +367,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       ),
     }),
     columnHelper.accessor(row => row, {
-      header: 'Grade preview',
+      header: 'Grade Preview',
       meta: {PrettyChipPosition: 'middle'},
       sortingFn: (a, b, columnId) => {
         const modelId =

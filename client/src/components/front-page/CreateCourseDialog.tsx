@@ -280,7 +280,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               <FormLanguagesField
                 form={form}
                 valueFormat="department%"
-                labelFormat="Organizing department in %*"
+                labelFormat="Organizing Department in %*"
                 helperTextFormat="Give the organizing department of the new course in %."
               />
               <FormField
@@ -313,7 +313,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               <FormField
                 form={form}
                 value="languageOfInstruction"
-                label="Course language*"
+                label="Course Language*"
                 helperText="Language in which the course will be conducted."
                 select
               >

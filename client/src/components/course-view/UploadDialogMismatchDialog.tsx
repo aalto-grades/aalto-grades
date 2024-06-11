@@ -100,7 +100,7 @@ const MismatchDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle>Mismatching columns found</DialogTitle>
+      <DialogTitle>Mismatching Columns Found</DialogTitle>
       <DialogContent>
         <Alert severity={error !== '' ? 'error' : 'success'} sx={{mb: 2}}>
           {getErrorText()}
@@ -109,7 +109,7 @@ const MismatchDialog = ({
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>CSV column</TableCell>
+                <TableCell>CSV Column</TableCell>
                 <TableCell>Import as</TableCell>
               </TableRow>
             </TableHead>

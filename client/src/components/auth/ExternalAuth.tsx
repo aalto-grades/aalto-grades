@@ -18,7 +18,7 @@ const ExternalAuth = (): JSX.Element => {
       }}
     >
       <Typography variant="h3" sx={{mb: 1}}>
-        Aalto University users
+        Aalto University Users
       </Typography>
       <Typography variant="body2" sx={{mb: 1}}>
         Log in with your Aalto University user account by clicking on the button

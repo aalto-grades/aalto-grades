@@ -60,7 +60,7 @@ const StudentsView = (): JSX.Element => {
   return (
     <>
       <Typography variant="h2" sx={{pb: 2}}>
-        Select student
+        Select Student
       </Typography>
       <Autocomplete
         options={students.data ?? []}
@@ -83,7 +83,7 @@ const StudentsView = (): JSX.Element => {
         <>
           <Divider sx={{my: 2}} />
           <Typography variant="h2" sx={{pb: 2}}>
-            Viewing grades for{' '}
+            Viewing Grades For{' '}
             {selectedStudent?.name ?? selectedStudent?.studentNumber ?? ''}
           </Typography>
 

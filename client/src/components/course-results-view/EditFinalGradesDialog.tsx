@@ -172,13 +172,13 @@ const EditFinalGradesDialog = ({
     },
     {
       field: 'gradingModel',
-      headerName: 'Grading model name',
+      headerName: 'Grading Model Name',
       type: 'string',
       editable: false,
     },
     {
       field: 'exportDate',
-      headerName: 'Export date',
+      headerName: 'Export Date',
       type: 'date',
       editable: true,
       width: 110, // Enough width to fit the calendar icon

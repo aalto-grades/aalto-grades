@@ -399,7 +399,7 @@ const EditCourseView = (): JSX.Element => {
                     form={form}
                     disabled={auth?.role !== SystemRole.Admin}
                     valueFormat="department%"
-                    labelFormat="Organizing department in %*"
+                    labelFormat="Organizing Department in %*"
                     helperTextFormat="Give the organizing department of the new course in %."
                   />
                   <FormField
@@ -439,7 +439,7 @@ const EditCourseView = (): JSX.Element => {
                     form={form}
                     value="languageOfInstruction"
                     disabled={auth?.role !== SystemRole.Admin}
-                    label="Course language*"
+                    label="Course Language*"
                     helperText="Language in which the course will be conducted."
                     select
                   >

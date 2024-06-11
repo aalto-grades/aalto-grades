@@ -59,7 +59,7 @@ const Login = (): JSX.Element => {
         }}
       >
         <Typography variant="h3" sx={{mb: 1}}>
-          Local users
+          Local Users
         </Typography>
         <Typography variant="body2" sx={{mb: 1}}>
           If you have been provided with credentials specifically for Aalto

@@ -49,7 +49,7 @@ const UserGraphDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
-      <DialogTitle>Final grade preview</DialogTitle>
+      <DialogTitle>Final Grade Preview</DialogTitle>
       <DialogContent>
         {row === null ? (
           <>Data is undefined</>
