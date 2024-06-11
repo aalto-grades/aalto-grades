@@ -22,8 +22,8 @@ import {JSX, useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {
-  GradingModelData,
   CourseRoleType,
+  GradingModelData,
   StudentRow,
   SystemRole,
 } from '@/common/types';
@@ -35,8 +35,8 @@ import {
   useDeleteGradingModel,
   useEditGradingModel,
   useGetAllGradingModels,
-  useGetCourseParts,
   useGetCourse,
+  useGetCourseParts,
   useGetGrades,
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
@@ -365,6 +365,7 @@ const ModelsView = (): JSX.Element => {
           }
           readOnly={!editRights}
           onSave={onSave}
+          modelHasFinalGrades={modelsWithFinalGrades.has(currentModel.id)}
         />
       )}
     </>

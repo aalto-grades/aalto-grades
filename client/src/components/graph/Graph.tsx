@@ -63,6 +63,7 @@ import {
   NodeValuesContext,
 } from '../../context/GraphProvider';
 import {GradeSelectOption, findBestGrade} from '../../utils/bestGrade';
+import SaveConfirmDialog from '../alerts/SaveConfirmDialog';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 const nodeTypesMap = {
@@ -85,6 +86,7 @@ type GraphProps = {
   gradeSelectOption?: GradeSelectOption;
   onSave?: (graphStructure: GraphStructure) => Promise<void>;
   readOnly?: boolean;
+  modelHasFinalGrades?: boolean;
 };
 const Graph = ({
   initGraph,
@@ -93,6 +95,7 @@ const Graph = ({
   gradeSelectOption,
   onSave,
   readOnly = false,
+  modelHasFinalGrades = false,
 }: GraphProps): JSX.Element => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -118,6 +121,7 @@ const Graph = ({
     useState<boolean>(false);
   const [coursePartValuesOpen, setCoursePartValuesOpen] =
     useState<boolean>(false);
+  const [saveConfirmOpen, setSaveConfirmOpen] = useState<boolean>(false);
   // Course part nodes that the user is allowed to delete
   const [delCourseParts, setDelCourseParts] = useState<string[]>([]);
   const [originalGraphStructure, setOriginalGraphStructure] =
@@ -483,6 +487,41 @@ const Graph = ({
   );
   return (
     <>
+      <UnsavedChangesDialog
+        open={blocker.state === 'blocked'}
+        onClose={blocker.reset ?? (() => {})}
+        handleDiscard={blocker.proceed ?? (() => {})}
+        dontCloseOnDiscard
+      />
+      <SelectCoursePartsDialog
+        nodes={nodes}
+        courseParts={courseParts}
+        open={coursePartsSelectOpen}
+        handleCoursePartSelect={handleCoursePartSelect}
+        onClose={() => setCoursePartsSelectOpen(false)}
+      />
+      <SaveConfirmDialog
+        open={saveConfirmOpen}
+        onClose={() => setSaveConfirmOpen(false)}
+        onSave={async () => {
+          if (onSave === undefined) return;
+          setSaveConfirmOpen(false);
+
+          enqueueSnackbar('Saving model.', {
+            variant: 'info',
+          });
+          await onSave({nodes, edges, nodeData});
+          enqueueSnackbar('Model saved successfully.', {
+            variant: 'success',
+          });
+          setOriginalGraphStructure(structuredClone({nodes, edges, nodeData}));
+          setUnsaved(false);
+        }}
+        text={
+          'There are final grades using this model. Editing it might cause ' +
+          'accidentally overwriting old final grades.'
+        }
+      />
       <div style={{position: 'relative'}}>
         {unsaved && (
           <Alert
@@ -513,19 +552,6 @@ const Graph = ({
           </Alert>
         )}
       </div>
-      <UnsavedChangesDialog
-        open={blocker.state === 'blocked'}
-        onClose={blocker.reset ?? (() => {})}
-        handleDiscard={blocker.proceed ?? (() => {})}
-        dontCloseOnDiscard
-      />
-      <SelectCoursePartsDialog
-        nodes={nodes}
-        courseParts={courseParts}
-        open={coursePartsSelectOpen}
-        handleCoursePartSelect={handleCoursePartSelect}
-        onClose={() => setCoursePartsSelectOpen(false)}
-      />
       <CoursePartValuesDialog
         nodes={nodes}
         nodeValues={nodeValues}
@@ -673,6 +699,10 @@ const Graph = ({
                   <Button
                     variant={unsaved ? 'contained' : 'text'}
                     onClick={async () => {
+                      if (modelHasFinalGrades) {
+                        setSaveConfirmOpen(true);
+                        return;
+                      }
                       enqueueSnackbar('Saving model.', {
                         variant: 'info',
                       });
