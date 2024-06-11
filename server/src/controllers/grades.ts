@@ -18,6 +18,7 @@ import {
   StudentRow,
   UserData,
 } from '@/common/types';
+import {validateAplusGradeSourceBelongsToCoursePart} from './utils/aplus';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {validateCoursePartBelongsToCourse} from './utils/coursePart';
 import {
@@ -159,9 +160,16 @@ export const addGrades = async (
 
   // Validate that course parts belong to correct course
   const coursePartIds = new Set<number>();
-  for (const grade of req.body) coursePartIds.add(grade.coursePartId);
-  for (const gradeId of coursePartIds) {
-    await validateCoursePartBelongsToCourse(courseId, gradeId);
+  for (const grade of req.body) {
+    await validateCoursePartBelongsToCourse(courseId, grade.coursePartId);
+    if (grade.aplusGradeSourceId) {
+      await validateAplusGradeSourceBelongsToCoursePart(
+        grade.coursePartId,
+        grade.aplusGradeSourceId
+      );
+    }
+
+    coursePartIds.add(grade.coursePartId);
   }
 
   // Check all users (students) exists in db, create new users if needed.
@@ -214,6 +222,7 @@ export const addGrades = async (
     userId: studentNumberToId[gradeEntry.studentNumber],
     coursePartId: gradeEntry.coursePartId,
     graderId: grader.id,
+    aplusGradeSourceId: gradeEntry.aplusGradeSourceId,
     date: gradeEntry.date,
     expiryDate: gradeEntry.expiryDate,
     grade: gradeEntry.grade,

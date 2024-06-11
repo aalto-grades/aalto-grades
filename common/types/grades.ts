@@ -35,6 +35,7 @@ export const NewGradeSchema = z
   .refine(val => val.expiryDate >= val.date, {path: ['date']});
 export const EditGradeDataSchema = BaseGradeDataSchema.omit({
   gradeId: true,
+  aplusGradeSourceId: true,
   grader: true,
 })
   .partial()
