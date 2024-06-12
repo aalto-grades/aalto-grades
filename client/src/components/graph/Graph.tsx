@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Alert, Button, Divider, Typography} from '@mui/material';
+import {Alert, Button, Divider, Tooltip, Typography} from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
 import {
   DragEvent,
@@ -78,6 +78,17 @@ const nodeTypesMap = {
   stepper: StepperNode,
   substitute: SubstituteNode,
 };
+
+const dragAndDropNodes: {type: DropInNodes; title: string}[] = [
+  {type: 'addition', title: 'Addition'},
+  {type: 'average', title: 'Average'},
+  {type: 'stepper', title: 'Stepper'},
+  {type: 'minpoints', title: 'Require Minimum Points'},
+  {type: 'max', title: 'Maximum'},
+  {type: 'require', title: 'Require Passing Values'},
+  {type: 'round', title: 'Round'},
+  {type: 'substitute', title: 'Substitute'},
+];
 
 type GraphProps = {
   initGraph: GraphStructure;
@@ -537,11 +548,34 @@ const Graph = ({
             Unsaved changes
           </Alert>
         )}
+        {unsaved && modelHasFinalGrades && (
+          <Tooltip
+            title={
+              'There are final grades using this model. Editing it might cause ' +
+              'accidentally overwriting old final grades.'
+            }
+          >
+            <Alert
+              sx={{
+                position: 'absolute',
+                top: 70,
+                right: 10,
+                zIndex: 1,
+              }}
+              severity="warning"
+            >
+              Model has final grades
+            </Alert>
+          </Tooltip>
+        )}
         {courseFail && (
           <Alert
             sx={{
               position: 'absolute',
-              top: unsaved ? 70 : 10,
+              top:
+                Number(unsaved) * 60 +
+                Number(unsaved && modelHasFinalGrades) * 60 +
+                10,
               right: 10,
               zIndex: 1,
             }}
@@ -606,62 +640,18 @@ const Graph = ({
             {!readOnly && onSave !== undefined && (
               <>
                 <div style={{marginBottom: '5px'}}>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'addition')}
-                    draggable
-                  >
-                    Addition
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'average')}
-                    draggable
-                  >
-                    Average
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'stepper')}
-                    draggable
-                  >
-                    Stepper
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'minpoints')}
-                    draggable
-                  >
-                    Require Minimum Points
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'max')}
-                    draggable
-                  >
-                    Maximum
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'require')}
-                    draggable
-                  >
-                    Require Passing Values
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'round')}
-                    draggable
-                  >
-                    Round
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'substitute')}
-                    draggable
-                  >
-                    Substitute
-                  </div>
+                  {dragAndDropNodes.map(dragAndDropNode => (
+                    <div
+                      key={dragAndDropNode.type}
+                      className="dndnode"
+                      onDragStart={event =>
+                        onDragStart(event, dragAndDropNode.type)
+                      }
+                      draggable
+                    >
+                      {dragAndDropNode.title}
+                    </div>
+                  ))}
                 </div>
                 <Divider sx={{my: 1}} />
                 <div style={{float: 'left'}}>
