@@ -265,10 +265,10 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         return (
           <>
             <Checkbox
+              id="select-all"
               checked={table.getIsAllRowsSelected()}
               indeterminate={table.getIsSomeRowsSelected()}
               onChange={table.getToggleAllRowsSelectedHandler()}
-              id="select-all"
             />
             <span style={{marginLeft: '4px', marginRight: '15px'}}>
               <Badge

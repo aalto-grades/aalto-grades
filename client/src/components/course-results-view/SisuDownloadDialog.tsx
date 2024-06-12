@@ -249,7 +249,7 @@ const SisuDownloadDialog = ({
           Cancel
         </Button>
         <Button
-          id="ag_confirm_file_upload_btn"
+          id="ag-confirm-file-upload-btn"
           variant="contained"
           onClick={handleDownloadSisuGradeCsv}
         >

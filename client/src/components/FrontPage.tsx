@@ -75,7 +75,7 @@ const FrontPage = (): JSX.Element => {
             </Typography>
             {
               <Button
-                id="ag_new_course_btn"
+                id="ag-new-course-btn"
                 size="large"
                 variant="contained"
                 onClick={() => setCreateDialogOpen(true)}

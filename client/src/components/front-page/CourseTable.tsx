@@ -81,7 +81,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
           .map(course => (
             <TableRow
               key={course.id}
-              id={`ag_see_instances_tr_${course.id}`}
+              id={`ag-see-instances-tr-${course.id}`}
               hover={true}
               onClick={() =>
                 navigate(`/${course.id}/course-results`, {

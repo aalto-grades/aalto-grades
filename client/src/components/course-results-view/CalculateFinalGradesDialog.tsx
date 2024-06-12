@@ -125,10 +125,10 @@ const CalculateFinalGradesDialog = ({
           </Alert>
         )}
         <FormControl sx={{display: 'block'}}>
-          <InputLabel id="calculateGradesSelect">Grading model</InputLabel>
+          <InputLabel id="calculate-grades-select">Grading model</InputLabel>
           <Select
+            labelId="calculate-grades-select"
             sx={{width: '100%'}}
-            labelId="calculateGradesSelect"
             value={selectedModel?.name ?? ''}
             onChange={e => {
               setSelectedModel(

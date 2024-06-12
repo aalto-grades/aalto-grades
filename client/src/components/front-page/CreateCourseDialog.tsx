@@ -324,7 +324,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 ))}
               </FormField>
               <TextField
-                id="teacherEmail"
+                id="teacherEmail" // Must be in camelCase to match data
                 type="text"
                 fullWidth
                 value={form.values.teacherEmail}
@@ -396,7 +396,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 )}
               </Box>
               <TextField
-                id="assistantEmail"
+                id="assistantEmail" // Must be in camelCase to match data
                 type="text"
                 fullWidth
                 value={form.values.assistantEmail}
@@ -493,7 +493,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 Cancel
               </Button>
               <Button
-                id="ag_create_course_btn"
+                id="ag-create-course-btn"
                 variant="contained"
                 onClick={form.submitForm}
                 disabled={form.isSubmitting}

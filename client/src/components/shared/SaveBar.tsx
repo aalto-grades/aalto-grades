@@ -44,7 +44,7 @@ const SaveBar = ({
             )}{' '}   */}
         <Typography variant="body2">Unsaved Changes</Typography>
         <Button
-          id="ag_create_course_btn"
+          id="ag-save-course-btn"
           // variant="outlined"
           type="submit"
           size="small"

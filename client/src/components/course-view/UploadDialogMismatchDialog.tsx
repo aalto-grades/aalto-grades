@@ -131,11 +131,11 @@ const MismatchDialog = ({
                         (error === 'duplicate' && selections[key] === duplicate)
                       }
                     >
-                      <InputLabel id={`mismatch-select${key}`}>
+                      <InputLabel id={`mismatch-select-${key}`}>
                         Import as
                       </InputLabel>
                       <Select
-                        labelId={`mismatch-select${key}`}
+                        labelId={`mismatch-select-${key}`}
                         label="Import as"
                         size="small"
                         value={selections[key] ?? ''}

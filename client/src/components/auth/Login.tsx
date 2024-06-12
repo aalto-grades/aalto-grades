@@ -118,7 +118,7 @@ const Login = (): JSX.Element => {
             margin="normal"
           />
           <Button
-            id="ag_login_btn"
+            id="ag-login-btn"
             variant="contained"
             type="submit"
             fullWidth

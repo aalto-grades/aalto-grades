@@ -166,9 +166,6 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
       </span>
       <Menu
         id="long-menu"
-        MenuListProps={{
-          'aria-labelledby': 'long-ButtonBase',
-        }}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
@@ -321,9 +318,6 @@ const AssesmentFilterButton = forwardRef<HTMLSpanElement>(
         </span>
         <Menu
           id="long-menu"
-          MenuListProps={{
-            'aria-labelledby': 'long-ButtonBase',
-          }}
           anchorEl={anchorEl}
           open={open}
           onClose={handleClose}

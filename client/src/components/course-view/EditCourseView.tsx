@@ -452,7 +452,7 @@ const EditCourseView = (): JSX.Element => {
                 </Grid>
                 <Grid md={5}>
                   <TextField
-                    id="teacherEmail"
+                    id="teacherEmail" // Must be in camelCase to match data
                     type="text"
                     fullWidth
                     value={form.values.teacherEmail}
@@ -529,7 +529,7 @@ const EditCourseView = (): JSX.Element => {
                     )}
                   </Box>
                   <TextField
-                    id="assistantEmail"
+                    id="assistantEmail" // Must be in camelCase to match data
                     type="text"
                     fullWidth
                     value={form.values.assistantEmail}
@@ -600,40 +600,6 @@ const EditCourseView = (): JSX.Element => {
                     )}
                   </Box>
                 </Grid>
-                {/* <Grid item xs={12}>
-                  <Button
-                    id="ag_create_course_btn"
-                    variant={'contained'}
-                    type="submit"
-                    disabled={form.isSubmitting}
-                    sx={{float: 'right'}}
-                  >
-                    Save
-                    {form.isSubmitting && (
-                      <CircularProgress
-                        size={24}
-                        sx={{
-                          position: 'absolute',
-                          top: '50%',
-                          left: '50%',
-                          marginTop: '-12px',
-                          marginLeft: '-12px',
-                        }}
-                      />
-                    )}
-                  </Button>
-                  {changed(form.values) && (
-                    <Button
-                      variant="outlined"
-                      disabled={form.isSubmitting}
-                      sx={{float: 'right', mr: 2}}
-                      color="error"
-                      onClick={() => setUnsavedDialogOpen(true)}
-                    >
-                      Discard changes
-                    </Button>
-                  )}
-                </Grid> */}
               </Grid>
             </Form>
           </>

@@ -28,7 +28,7 @@ const UsersView = (): JSX.Element => {
           Users
         </Typography>
         <Button
-          id="ag_new_course_btn"
+          id="ag-new-user-btn"
           size="large"
           variant="contained"
           onClick={() => setAddOpen(true)}

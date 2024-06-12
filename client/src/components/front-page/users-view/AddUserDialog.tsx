@@ -106,7 +106,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
                 Cancel
               </Button>
               <Button
-                id="add_user"
+                id="add-user"
                 variant="contained"
                 onClick={form.submitForm}
                 disabled={form.isSubmitting}
