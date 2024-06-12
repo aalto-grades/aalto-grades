@@ -7,6 +7,7 @@ import {Op} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
+  AplusGradeSourceData,
   CourseRoleType,
   EditGradeDataSchema,
   FinalGradeData,
@@ -18,6 +19,7 @@ import {
   StudentRow,
   UserData,
 } from '@/common/types';
+import {validateAplusGradeSourceBelongsToCoursePart} from './utils/aplus';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {validateCoursePartBelongsToCourse} from './utils/coursePart';
 import {
@@ -29,6 +31,7 @@ import {
 } from './utils/grades';
 import logger from '../configs/winston';
 import {sequelize} from '../database';
+import AplusGradeSource from '../database/models/aplusGradeSource';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import CoursePart from '../database/models/coursePart';
 import CourseRole from '../database/models/courseRole';
@@ -58,6 +61,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
         as: 'grader',
         attributes: ['id', 'name', 'email', 'studentNumber'],
       },
+      {model: AplusGradeSource},
     ],
     where: {
       coursePartId: {
@@ -103,6 +107,16 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
     userGrades[userId][grade.coursePartId].push({
       gradeId: grade.id,
       grader: grader,
+      aplusGradeSource: grade.AplusGradeSource
+        ? ({
+            coursePartId: grade.AplusGradeSource.id, // TODO: Redundant
+            aplusCourse: grade.AplusGradeSource.aplusCourse,
+            sourceType: grade.AplusGradeSource.sourceType,
+            moduleId: grade.AplusGradeSource.moduleId ?? undefined,
+            moduleName: grade.AplusGradeSource.moduleName ?? undefined,
+            difficulty: grade.AplusGradeSource.difficulty ?? undefined,
+          } as AplusGradeSourceData)
+        : null,
       grade: grade.grade,
       exportedToSisu: grade.sisuExportDate,
       date: new Date(grade.date),
@@ -158,9 +172,16 @@ export const addGrades = async (
 
   // Validate that course parts belong to correct course
   const coursePartIds = new Set<number>();
-  for (const grade of req.body) coursePartIds.add(grade.coursePartId);
-  for (const gradeId of coursePartIds) {
-    await validateCoursePartBelongsToCourse(courseId, gradeId);
+  for (const grade of req.body) {
+    await validateCoursePartBelongsToCourse(courseId, grade.coursePartId);
+    if (grade.aplusGradeSourceId) {
+      await validateAplusGradeSourceBelongsToCoursePart(
+        grade.coursePartId,
+        grade.aplusGradeSourceId
+      );
+    }
+
+    coursePartIds.add(grade.coursePartId);
   }
 
   // Check all users (students) exists in db, create new users if needed.
@@ -213,6 +234,7 @@ export const addGrades = async (
     userId: studentNumberToId[gradeEntry.studentNumber],
     coursePartId: gradeEntry.coursePartId,
     graderId: grader.id,
+    aplusGradeSourceId: gradeEntry.aplusGradeSourceId,
     date: gradeEntry.date,
     expiryDate: gradeEntry.expiryDate,
     grade: gradeEntry.grade,

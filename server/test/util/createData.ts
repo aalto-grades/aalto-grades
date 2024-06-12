@@ -101,9 +101,9 @@ class CreateData {
 
   async createAplusGradeSources(
     courseId: number
-  ): Promise<[number, number, number]> {
+  ): Promise<[[number, number], [number, number], [number, number]]> {
     const fullPointsCoursePart = await this.createCoursePart(courseId);
-    await AplusGradeSource.create({
+    const fullPointsGradeSource = await AplusGradeSource.create({
       coursePartId: fullPointsCoursePart.id,
       aplusCourse: {
         id: 1,
@@ -116,7 +116,7 @@ class CreateData {
     });
 
     const moduleCoursePart = await this.createCoursePart(courseId);
-    await AplusGradeSource.create({
+    const moduleGradeSource = await AplusGradeSource.create({
       coursePartId: moduleCoursePart.id,
       aplusCourse: {
         id: 1,
@@ -131,7 +131,7 @@ class CreateData {
     });
 
     const difficultyCoursePart = await this.createCoursePart(courseId);
-    await AplusGradeSource.create({
+    const difficultyGradeSource = await AplusGradeSource.create({
       coursePartId: difficultyCoursePart.id,
       aplusCourse: {
         id: 1,
@@ -145,9 +145,9 @@ class CreateData {
     });
 
     return [
-      fullPointsCoursePart.id,
-      moduleCoursePart.id,
-      difficultyCoursePart.id,
+      [fullPointsCoursePart.id, fullPointsGradeSource.id],
+      [moduleCoursePart.id, moduleGradeSource.id],
+      [difficultyCoursePart.id, difficultyGradeSource.id],
     ];
   }
 

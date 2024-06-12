@@ -4,6 +4,7 @@
 
 import {z} from 'zod';
 
+import {AplusGradeSourceDataSchema} from './aplus';
 import {FinalGradeDataArraySchema} from './finalGrade';
 import {DateSchema, LanguageSchema} from './general';
 import {UserDataSchema} from './user';
@@ -11,6 +12,7 @@ import {UserDataSchema} from './user';
 export const BaseGradeDataSchema = z.object({
   gradeId: z.number().int(),
   grader: UserDataSchema,
+  aplusGradeSource: AplusGradeSourceDataSchema.nullable(),
   grade: z.number(),
   exportedToSisu: DateSchema.nullable(),
   date: DateSchema,
@@ -25,6 +27,7 @@ export const NewGradeSchema = z
   .object({
     studentNumber: z.string(),
     coursePartId: z.number().int(),
+    aplusGradeSourceId: z.number().int().optional(),
     grade: z.number(),
     date: DateSchema,
     expiryDate: DateSchema,
@@ -33,6 +36,7 @@ export const NewGradeSchema = z
   .refine(val => val.expiryDate >= val.date, {path: ['date']});
 export const EditGradeDataSchema = BaseGradeDataSchema.omit({
   gradeId: true,
+  aplusGradeSource: true,
   grader: true,
 })
   .partial()
