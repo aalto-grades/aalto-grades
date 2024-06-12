@@ -8,6 +8,7 @@ import {z} from 'zod';
 
 import {HttpCode} from '@/common/types';
 import {AXIOS_TIMEOUT} from '../../configs/constants';
+import AplusGradeSource from '../../database/models/aplusGradeSource';
 import {ApiError, stringToIdSchema} from '../../types';
 
 /**
@@ -24,6 +25,33 @@ export const validateAplusCourseId = (aplusCourseId: string): number => {
     );
   }
   return result.data;
+};
+
+/**
+ * Validates that an A+ grade source exists and belongs to a course part.
+ *
+ * @throws ApiError(404|409) if A+ grade soruce is not found or doesn't belong
+ *   to the course part.
+ */
+export const validateAplusGradeSourceBelongsToCoursePart = async (
+  coursePartId: number,
+  aplusGradeSourceId: number
+): Promise<void> => {
+  const aplusGradeSource = await AplusGradeSource.findByPk(aplusGradeSourceId);
+  if (!aplusGradeSource) {
+    throw new ApiError(
+      `A+ grade source with ID ${aplusGradeSourceId} not found`,
+      HttpCode.NotFound
+    );
+  }
+
+  if (aplusGradeSource.coursePartId !== coursePartId) {
+    throw new ApiError(
+      `A+ grade source with ID ${aplusGradeSource.id} ` +
+        `does not  belong to the course part with ID ${coursePartId}`,
+      HttpCode.Conflict
+    );
+  }
 };
 
 /**

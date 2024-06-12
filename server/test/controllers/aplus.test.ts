@@ -56,7 +56,7 @@ beforeAll(async () => {
 
   let courseParts: CoursePartData[];
   [courseId, courseParts] = await createData.createCourse({});
-  [fullPointsCoursePartId, moduleCoursePartId, difficultyCoursePartId] =
+  [[fullPointsCoursePartId], [moduleCoursePartId], [difficultyCoursePartId]] =
     await createData.createAplusGradeSources(courseId);
   addGradeSourceCoursePartId = courseParts[0].id;
   noGradeSourceCoursePartId = courseParts[2].id;

@@ -31,6 +31,8 @@ let cookies: Cookies = {} as Cookies;
 let courseId = -1;
 let courseParts: CoursePartData[] = [];
 let editGradeId = -1;
+let aplusGradeSourceId = -1;
+let aplusCoursePartId = -1;
 let noRoleCourseId = -1;
 let noRoleCourseParts: CoursePartData[] = [];
 let noRoleGradeId = -1;
@@ -108,6 +110,9 @@ beforeAll(async () => {
     noRoleCourseParts[0].id,
     TEACHER_ID
   );
+
+  [[aplusCoursePartId, aplusGradeSourceId]] =
+    await createData.createAplusGradeSources(courseId);
 });
 
 afterAll(async () => {
@@ -193,6 +198,15 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       {
         studentNumber: studentNumber,
         coursePartId: courseParts[2].id,
+        grade: Math.floor(Math.random() * 11),
+        date: new Date(),
+        expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
+        comment: '',
+      },
+      {
+        studentNumber: studentNumber,
+        coursePartId: aplusCoursePartId,
+        aplusGradeSourceId: aplusGradeSourceId,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
@@ -373,13 +387,31 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
-  it('should respond with 409 when course-part does not belong to course', async () => {
+  it('should respond with 409 when course part does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/grades`;
     const student = await genStudent();
     const data = [
       {
         studentNumber: student.studentNumber,
         coursePartId: noRoleCourseParts[0].id,
+        grade: Math.floor(Math.random() * 11),
+        date: new Date(),
+        expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),
+        comment: '',
+      },
+    ];
+
+    await responseTests.testConflict(url, cookies.adminCookie).post(data);
+  });
+
+  it('should respond with 409 when A+ grade source does not belong to course part', async () => {
+    const url = `/v1/courses/${courseId}/grades`;
+    const student = await genStudent();
+    const data = [
+      {
+        studentNumber: student.studentNumber,
+        coursePartId: courseParts[0].id,
+        aplusGradeSourceId: aplusGradeSourceId,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),

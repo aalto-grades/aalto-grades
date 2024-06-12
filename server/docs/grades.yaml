@@ -46,6 +46,10 @@ definitions:
         $ref: '#/definitions/GradeId'
       grader:
         $ref: '#/definitions/UserData'
+      aplusGradeSource:
+        nullable: true
+        allOf:
+          - $ref: '#/definitions/AplusGradeSourceData'
       grade:
         $ref: '#/definitions/Grade'
       exportedToSisu:
@@ -72,6 +76,7 @@ definitions:
     required:
       - gradeId
       - grader
+      - aplusGradeSourceId
       - grade
       - exportedToSisu
       - date
@@ -88,6 +93,8 @@ definitions:
         example: 1234567
       coursePartId:
         $ref: '#/definitions/CoursePartId'
+      aplusGradeSourceId:
+        $ref: '#/definitions/AplusGradeSourceId'
       grade:
         $ref: '#/definitions/Grade'
       date:
