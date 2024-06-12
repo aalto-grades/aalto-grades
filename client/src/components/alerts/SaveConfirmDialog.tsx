@@ -27,8 +27,8 @@ const SaveConfirmDialog = ({
     open={open}
     onClose={onClose}
     scroll="paper"
-    aria-labelledby="unsaved-changes"
-    aria-describedby="dialog-for-unsaved-changes"
+    aria-labelledby="confirm-save"
+    aria-describedby="dialog-for-confirming-save"
   >
     <DialogTitle>Confirm save</DialogTitle>
     <DialogContent>
