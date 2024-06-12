@@ -83,6 +83,27 @@ definitions:
       - modules
       - difficulties
 
+  AplusGradeSourceData:
+    type: object
+    description: Information about an A+ grade source..
+    properties:
+      coursePartId:
+        $ref: '#/definitions/CoursePartId'
+      aplusCourse:
+        $ref: '#/definitions/AplusCourseData'
+      sourceType:
+        $ref: '#/definitions/AplusGradeSourceType'
+      moduleId:
+        $ref: '#/definitions/AplusModuleId'
+      moduleName:
+        $ref: '#/definitions/AplusModuleName'
+      difficulty:
+        $ref: '#/definitions/AplusDifficulty'
+    required:
+      - coursePartId
+      - aplusCourse
+      - sourceType
+
   NewAplusGradeSourceData:
     type: object
     description: Information to add a new A+ grade source to a course part.
@@ -101,7 +122,7 @@ definitions:
         $ref: '#/definitions/AplusDifficulty'
     required:
       - coursePartId
-      - aplusCourseId
+      - aplusCourse
       - sourceType
 
 /v1/aplus/courses:

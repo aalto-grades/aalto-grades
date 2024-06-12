@@ -4,6 +4,7 @@
 
 import {z} from 'zod';
 
+import {AplusGradeSourceDataSchema} from './aplus';
 import {FinalGradeDataArraySchema} from './finalGrade';
 import {DateSchema, LanguageSchema} from './general';
 import {UserDataSchema} from './user';
@@ -11,7 +12,7 @@ import {UserDataSchema} from './user';
 export const BaseGradeDataSchema = z.object({
   gradeId: z.number().int(),
   grader: UserDataSchema,
-  aplusGradeSourceId: z.number().int().nullable(), // TODO: Should this be AplusGradeSourceData?
+  aplusGradeSource: AplusGradeSourceDataSchema.nullable(),
   grade: z.number(),
   exportedToSisu: DateSchema.nullable(),
   date: DateSchema,

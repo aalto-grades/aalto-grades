@@ -7,6 +7,7 @@ import {Op} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
+  AplusGradeSourceData,
   CourseRoleType,
   EditGradeDataSchema,
   FinalGradeData,
@@ -30,6 +31,7 @@ import {
 } from './utils/grades';
 import logger from '../configs/winston';
 import {sequelize} from '../database';
+import AplusGradeSource from '../database/models/aplusGradeSource';
 import AttainmentGrade from '../database/models/attainmentGrade';
 import CoursePart from '../database/models/coursePart';
 import CourseRole from '../database/models/courseRole';
@@ -59,6 +61,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
         as: 'grader',
         attributes: ['id', 'name', 'email', 'studentNumber'],
       },
+      {model: AplusGradeSource},
     ],
     where: {
       coursePartId: {
@@ -104,7 +107,16 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
     userGrades[userId][grade.coursePartId].push({
       gradeId: grade.id,
       grader: grader,
-      aplusGradeSourceId: grade.aplusGradeSourceId,
+      aplusGradeSource: grade.AplusGradeSource
+        ? ({
+            coursePartId: grade.AplusGradeSource.id, // TODO: Redundant
+            aplusCourse: grade.AplusGradeSource.aplusCourse,
+            sourceType: grade.AplusGradeSource.sourceType,
+            moduleId: grade.AplusGradeSource.moduleId ?? undefined,
+            moduleName: grade.AplusGradeSource.moduleName ?? undefined,
+            difficulty: grade.AplusGradeSource.difficulty ?? undefined,
+          } as AplusGradeSourceData)
+        : null,
       grade: grade.grade,
       exportedToSisu: grade.sisuExportDate,
       date: new Date(grade.date),

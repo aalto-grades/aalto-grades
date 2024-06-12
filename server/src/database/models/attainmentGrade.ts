@@ -38,6 +38,7 @@ export default class AttainmentGrade extends Model<
   grader?: User;
   User?: User;
   CoursePart?: CoursePart;
+  AplusGradeSource?: AplusGradeSource;
 }
 
 AttainmentGrade.init(

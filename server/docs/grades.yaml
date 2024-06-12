@@ -46,10 +46,10 @@ definitions:
         $ref: '#/definitions/GradeId'
       grader:
         $ref: '#/definitions/UserData'
-      aplusGradeSourceId:
+      aplusGradeSource:
         nullable: true
         allOf:
-          - $ref: '#/definitions/AplusGradeSourceId'
+          - $ref: '#/definitions/AplusGradeSourceData'
       grade:
         $ref: '#/definitions/Grade'
       exportedToSisu:
