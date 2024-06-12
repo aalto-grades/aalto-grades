@@ -567,6 +567,7 @@ const Graph = ({
                 elementsSelectable={!readOnly}
                 nodesConnectable={!readOnly}
                 nodesDraggable={!readOnly}
+                deleteKeyCode={['Backspace', 'Delete']}
               >
                 {!readOnly && <Controls />}
                 <MiniMap />
