@@ -138,10 +138,7 @@ const CalculateFinalGradesDialog = ({
             label="Grading model"
           >
             {modelList.map(model => (
-              <MenuItem
-                key={`calculateGradesSelectModel-${model.id}`}
-                value={model.name}
-              >
+              <MenuItem key={model.id} value={model.name}>
                 {model.name}
               </MenuItem>
             ))}

@@ -114,7 +114,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
     <BaseNode {...props} error={error} courseFail={nodeValue.courseFail}>
       {handles.map((key, index) => (
         <Handle
-          key={`handle-${key}`}
+          key={key}
           type="target"
           id={key}
           style={{
@@ -167,7 +167,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
             .filter(([, source]) => source.isConnected)
             .map(([key, source]) => (
               <tr
-                key={`tr-${key}`}
+                key={key}
                 style={{
                   height: rowHeight,
                   backgroundColor: source.value === 'fail' ? '#fcc' : '',
@@ -195,7 +195,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
 
       {handles.map((key, index) => (
         <Handle
-          key={`handle-${key}-source`}
+          key={key}
           type="source"
           id={`${key}-source`}
           style={{

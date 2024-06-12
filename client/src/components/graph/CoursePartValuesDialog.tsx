@@ -110,8 +110,8 @@ const CoursePartValuesDialog = ({
       <DialogContent>
         {coursePartNodeIds.map(coursePartId => (
           <TextField
+            key={coursePartId}
             sx={{mt: 2}}
-            key={`attval-${coursePartId}`}
             value={values[coursePartId] ?? 0}
             label={coursePartNames[coursePartId]}
             onChange={e => onChange(coursePartId, e)}

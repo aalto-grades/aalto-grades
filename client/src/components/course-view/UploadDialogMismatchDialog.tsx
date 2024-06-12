@@ -116,7 +116,7 @@ const MismatchDialog = ({
             <TableBody>
               {mismatchData.keys.map(key => (
                 <TableRow
-                  key={`mismatch-${key}`}
+                  key={key}
                   sx={{
                     background:
                       selections[key] === 'Ignore Column' ? '#eceff1' : '',
@@ -149,7 +149,7 @@ const MismatchDialog = ({
                       >
                         {mismatchData.fields.map((field, index) => (
                           <MenuItem
-                            key={`mismatch-${key}-select-${field}`}
+                            key={field}
                             value={field}
                             divider={
                               index === 0 ||

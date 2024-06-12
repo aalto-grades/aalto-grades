@@ -179,13 +179,12 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
         {groupByElements.map((groups, i) => [
           ...groups.map(element => (
             <Tooltip
+              key={element.id}
               title={element.info}
-              key={`Tooltip${element.id}`}
               placement="top"
               disableInteractive
             >
               <MenuItem
-                key={element.id}
                 selected={table.getState().grouping.includes(element.id)}
                 onClick={() => {
                   console.log(table.getAllColumns());
@@ -334,11 +333,11 @@ const AssesmentFilterButton = forwardRef<HTMLSpanElement>(
         >
           {(gradingModels ?? []).map(model => (
             <MenuItem
+              key={model.id}
               onClick={() => {
                 setSelectedGradingModel(model.id);
                 handleClose();
               }}
-              key={`grading-model-select-${model.id}`}
               value={model.id}
               selected={selectedGradingModel === model.id}
             >

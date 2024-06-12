@@ -140,7 +140,7 @@ const UploadDialogConfirm = ({
                         nonEmptyCols.includes(date.coursePartName)
                       )
                       .map(date => (
-                        <TableRow key={`dateRow-${date.coursePartName}`}>
+                        <TableRow key={date.coursePartName}>
                           <TableCell>{date.coursePartName}</TableCell>
                           <TableCell>
                             <DatePicker

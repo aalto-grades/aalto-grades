@@ -285,8 +285,8 @@ const ModelsView = (): JSX.Element => {
           <List sx={{width: 400}} disablePadding>
             {models.map(model => (
               <ListItem
+                key={model.id}
                 sx={{backgroundColor: model.archived ? grey[200] : ''}}
-                key={`graph-${model.id}-select`}
                 disablePadding
                 secondaryAction={
                   editRights ? (

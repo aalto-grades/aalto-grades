@@ -154,7 +154,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
     <BaseNode {...props} error={error}>
       {substituteHandles.map((key, index) => (
         <Handle
-          key={`handle-${key}`}
+          key={key}
           type="target"
           id={key}
           style={{
@@ -179,7 +179,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
       />
       {exerciseHandles.map((key, index) => (
         <Handle
-          key={`handle-${key}`}
+          key={key}
           type="target"
           id={key}
           style={{
@@ -230,7 +230,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
             .filter(key => nodeValue.sources[key].isConnected)
             .map(key => (
               <tr
-                key={`tr-${key}`}
+                key={key}
                 style={{
                   height: rowHeight,
                   backgroundColor:
@@ -270,7 +270,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
             .filter(key => nodeValue.sources[key].isConnected)
             .map((key, index) => (
               <tr
-                key={`tr-${key}`}
+                key={key}
                 style={{
                   height: rowHeight,
                   backgroundColor:
@@ -308,7 +308,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
 
       {substituteHandles.map((key, index) => (
         <Handle
-          key={`handle-${key}-source`}
+          key={key}
           type="source"
           id={`${key}-source`}
           style={{
@@ -322,7 +322,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
       ))}
       {exerciseHandles.map((key, index) => (
         <Handle
-          key={`handle-${key}-source`}
+          key={key}
           type="source"
           id={`${key}-source`}
           style={{
