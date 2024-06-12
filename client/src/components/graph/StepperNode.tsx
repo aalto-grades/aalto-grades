@@ -47,7 +47,9 @@ const checkError = (settings: LocalSettings): boolean => {
   return false;
 };
 
-const StepperNode = (props: NodeProps): JSX.Element => {
+const StepperNode = (
+  props: NodeProps<{onDelete: (nodeId: string) => void}>
+): JSX.Element => {
   const {id, isConnectable} = props;
 
   const {nodeValues} = useContext(NodeValuesContext);

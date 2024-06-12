@@ -13,7 +13,9 @@ import {NodeValuesContext} from '../../context/GraphProvider';
 const handleStartHeight = 45.5 + 30;
 const rowHeight = 30;
 
-const AdditionNode = (props: NodeProps): JSX.Element => {
+const AdditionNode = (
+  props: NodeProps<{onDelete: (nodeId: string) => void}>
+): JSX.Element => {
   const {id, isConnectable} = props;
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);

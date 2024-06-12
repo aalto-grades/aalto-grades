@@ -44,7 +44,9 @@ const convertFromLocalSettings = (
   ),
 });
 
-const SubstituteNode = (props: NodeProps): JSX.Element => {
+const SubstituteNode = (
+  props: NodeProps<{onDelete: (nodeId: string) => void}>
+): JSX.Element => {
   const {id, isConnectable} = props;
 
   const updateNodeInternals = useUpdateNodeInternals();

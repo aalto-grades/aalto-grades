@@ -13,7 +13,9 @@ type RoundSetting = 'round-up' | 'round-closest' | 'round-down';
 type LocalSettings = {roundingSetting: RoundSetting};
 const initialSettings: LocalSettings = {roundingSetting: 'round-closest'};
 
-const RoundNode = (props: NodeProps): JSX.Element => {
+const RoundNode = (
+  props: NodeProps<{onDelete: (nodeId: string) => void}>
+): JSX.Element => {
   const {id, isConnectable} = props;
 
   const {nodeValues} = useContext(NodeValuesContext);
