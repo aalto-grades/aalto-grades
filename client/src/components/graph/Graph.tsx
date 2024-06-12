@@ -518,13 +518,9 @@ const Graph = ({
           if (onSave === undefined) return;
           setSaveConfirmOpen(false);
 
-          enqueueSnackbar('Saving model.', {
-            variant: 'info',
-          });
+          enqueueSnackbar('Saving model.', {variant: 'info'});
           await onSave({nodes, edges, nodeData});
-          enqueueSnackbar('Model saved successfully.', {
-            variant: 'success',
-          });
+          enqueueSnackbar('Model saved successfully.', {variant: 'success'});
           setOriginalGraphStructure(structuredClone({nodes, edges, nodeData}));
           setUnsaved(false);
         }}
@@ -693,9 +689,7 @@ const Graph = ({
                         setSaveConfirmOpen(true);
                         return;
                       }
-                      enqueueSnackbar('Saving model.', {
-                        variant: 'info',
-                      });
+                      enqueueSnackbar('Saving model.', {variant: 'info'});
                       await onSave({nodes, edges, nodeData});
                       enqueueSnackbar('Model saved successfully.', {
                         variant: 'success',
