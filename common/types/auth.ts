@@ -15,7 +15,7 @@ export const LoginResultSchema = z.object({
   id: z.number().int(),
   name: z.string(),
   role: SystemRoleSchema,
-  firstLogin: z.boolean().nullable(),
+  forcePasswordReset: z.boolean().nullable(),
 });
 
 export type LoginResult = z.infer<typeof LoginResultSchema>;

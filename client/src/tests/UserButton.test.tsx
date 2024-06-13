@@ -45,7 +45,7 @@ describe('Tests for button component displaying user data and logout', () => {
       id: 1,
       role: SystemRole.User,
       name: 'John Doe',
-      firstLogin: false,
+      forcePasswordReset: false,
     };
     renderButton(auth);
     await waitFor(() =>
@@ -65,7 +65,7 @@ describe('Tests for button component displaying user data and logout', () => {
       id: 1,
       role: SystemRole.User,
       name: 'John Doe',
-      firstLogin: false,
+      forcePasswordReset: false,
     };
     renderButton(auth);
 

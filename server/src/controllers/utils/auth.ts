@@ -58,7 +58,7 @@ export const validateLogin = async (
     id: user.id,
     role: user.role as SystemRole,
     name: user.name,
-    firstLogin: user.firstLogin,
+    forcePasswordReset: user.forcePasswordReset,
   };
 };
 

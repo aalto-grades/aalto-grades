@@ -153,7 +153,18 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
             }}
           />
 
-          <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
+          <Dialog
+            open={open}
+            onClose={() => {
+              onClose();
+              if (userData !== null) {
+                setUserData(null);
+                form.resetForm();
+              }
+            }}
+            fullWidth
+            maxWidth="xs"
+          >
             <DialogTitle>
               {userData === null ? 'Add a User' : 'Admin Added'}
             </DialogTitle>

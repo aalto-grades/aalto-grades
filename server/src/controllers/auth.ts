@@ -41,7 +41,7 @@ export const authSelfInfo = async (
     id: userFromDb.id,
     role: userFromDb.role as SystemRole,
     name: userFromDb.name,
-    firstLogin: userFromDb.firstLogin,
+    forcePasswordReset: userFromDb.forcePasswordReset,
   };
 
   res.json(auth);

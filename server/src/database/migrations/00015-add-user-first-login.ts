@@ -14,7 +14,7 @@ export default {
     try {
       await queryInterface.addColumn(
         'user',
-        'first_login',
+        'force_password_reset',
         {
           type: DataTypes.BOOLEAN,
           allowNull: true,
@@ -32,7 +32,9 @@ export default {
   down: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.removeColumn('user', 'first_login', {transaction});
+      await queryInterface.removeColumn('user', 'force_password_reset', {
+        transaction,
+      });
 
       await transaction.commit();
     } catch (error) {

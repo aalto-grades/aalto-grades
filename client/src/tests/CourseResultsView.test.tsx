@@ -29,7 +29,7 @@ describe('Tests for CourseResultsView components', () => {
                 id: 2,
                 name: 'Timmy Teacher',
                 role: SystemRole.User,
-                firstLogin: false,
+                forcePasswordReset: false,
               },
               setAuth: vi.fn(),
               isTeacherInCharge: true,

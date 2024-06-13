@@ -274,7 +274,7 @@ export const addUser = async (
       timeCost: 2,
     }),
     role: SystemRole.Admin,
-    firstLogin: true,
+    forcePasswordReset: true,
   });
 
   const resData: NewUserResponse = {temporaryPassword};

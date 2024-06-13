@@ -54,7 +54,7 @@ export const EditUserSchema = z
     email: z.string().email(),
     studentNumber: z.string(),
     password: PasswordSchema,
-    firstLogin: z.boolean(),
+    forcePasswordReset: z.boolean(),
   })
   .optional();
 export const NewUserResponseSchema = z.object({
