@@ -72,41 +72,33 @@ beforeAll(async () => {
   // eslint-disable-next-line @typescript-eslint/require-await
   mockedAxios.get.mockImplementation(async url => {
     const urlPoints = `${APLUS_API_URL}/courses/1/points?format=json`;
-    const urlA = `${APLUS_API_URL}/courses/1/points/1?format=json`;
-    const urlB = `${APLUS_API_URL}/courses/1/points/2?format=json`;
 
     /* eslint-disable camelcase */
-    switch (url) {
-      case urlPoints:
-        return {
-          data: {results: [{points: urlA}, {points: urlB}]},
-        };
-
-      case urlA:
-        return {
-          data: {
-            student_id: '123456',
-            points: 50,
-            points_by_difficulty: {A: 30},
-            modules: [
-              {id: 1, points: 10},
-              {id: 2, points: 40},
-            ],
-          },
-        };
-
-      case urlB:
-        return {
-          data: {
-            student_id: '654321',
-            points: 40,
-            points_by_difficulty: {A: 25},
-            modules: [
-              {id: 1, points: 7},
-              {id: 2, points: 33},
-            ],
-          },
-        };
+    if (url === urlPoints) {
+      return {
+        data: {
+          results: [
+            {
+              student_id: '123456',
+              points: 50,
+              points_by_difficulty: {A: 30},
+              modules: [
+                {id: 1, points: 10},
+                {id: 2, points: 40},
+              ],
+            },
+            {
+              student_id: '654321',
+              points: 40,
+              points_by_difficulty: {A: 25},
+              modules: [
+                {id: 1, points: 7},
+                {id: 2, points: 33},
+              ],
+            },
+          ],
+        },
+      };
     }
     /* eslint-enable camelcase */
   });

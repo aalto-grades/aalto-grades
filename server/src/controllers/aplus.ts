@@ -148,6 +148,26 @@ export const fetchAplusGrades = async (
     }
   }
 
+  type StudentPoints = {
+    student_id: string;
+    points: number;
+    points_by_difficulty: {
+      [key: string]: number;
+    };
+    modules: {
+      id: number;
+      points: number;
+    }[];
+  };
+
+  /*
+   * Grade sources may point to the same or different courses in A+, so we will
+   * fetch the points for each A+ course only once.
+   *
+   * A+ course ID -> points result
+   */
+  const pointsResCache: {[key: number]: StudentPoints[]} = {};
+
   const newGrades: NewGrade[] = [];
   for (const coursePartId of coursePartIds) {
     const [, coursePart] = await validateCoursePartPath(
@@ -167,36 +187,25 @@ export const fetchAplusGrades = async (
       );
     }
 
-    // We cannot fetch the student list outside this loop because course part
-    // grade sources may point to different A+ courses
-    const allPointsRes = await fetchFromAplus<{
-      results: {
-        points: string;
-      }[];
-    }>(
-      `${APLUS_API_URL}/courses/${gradeSource.aplusCourse.id}/points?format=json`,
-      aplusToken
-    );
+    const aplusCourseId = gradeSource.aplusCourse.id;
 
-    for (const result of allPointsRes.data.results) {
-      // TODO: Don't fetch points individually for each student
-      // Related: https://github.com/apluslms/a-plus/issues/1360
+    if (!(aplusCourseId in pointsResCache)) {
       const pointsRes = await fetchFromAplus<{
-        student_id: string;
-        points: number;
-        points_by_difficulty: {
-          [key: string]: number;
-        };
-        modules: {
-          id: number;
-          points: number;
-        }[];
-      }>(result.points, aplusToken);
+        results: StudentPoints[];
+      }>(
+        `${APLUS_API_URL}/courses/${aplusCourseId}/points?format=json`,
+        aplusToken
+      );
 
+      pointsResCache[aplusCourseId] = pointsRes.data.results;
+    }
+
+    const points = pointsResCache[aplusCourseId];
+    for (const student of points) {
       let grade: number | undefined;
       switch (gradeSource.sourceType) {
         case AplusGradeSourceType.FullPoints:
-          grade = pointsRes.data.points;
+          grade = student.points;
           break;
 
         case AplusGradeSourceType.Module:
@@ -206,14 +215,14 @@ export const fetchAplusGrades = async (
               HttpCode.InternalServerError
             );
           }
-          for (const module of pointsRes.data.modules) {
+          for (const module of student.modules) {
             if (module.id === gradeSource.moduleId) {
               grade = module.points;
             }
           }
           if (!grade) {
             throw new ApiError(
-              `A+ course with ID ${gradeSource.aplusCourse.id} has no module with ID ${gradeSource.moduleId}`,
+              `A+ course with ID ${aplusCourseId} has no module with ID ${gradeSource.moduleId}`,
               HttpCode.InternalServerError
             );
           }
@@ -226,15 +235,13 @@ export const fetchAplusGrades = async (
               HttpCode.InternalServerError
             );
           }
-          if (
-            !(gradeSource.difficulty in pointsRes.data.points_by_difficulty)
-          ) {
+          if (!(gradeSource.difficulty in student.points_by_difficulty)) {
             throw new ApiError(
-              `A+ course with ID ${gradeSource.aplusCourse.id} has no difficulty ${gradeSource.difficulty}`,
+              `A+ course with ID ${aplusCourseId} has no difficulty ${gradeSource.difficulty}`,
               HttpCode.InternalServerError
             );
           }
-          grade = pointsRes.data.points_by_difficulty[gradeSource.difficulty];
+          grade = student.points_by_difficulty[gradeSource.difficulty];
           break;
       }
 
@@ -245,7 +252,7 @@ export const fetchAplusGrades = async (
       expiryDate.setDate(date.getDate() + coursePart.daysValid);
 
       newGrades.push({
-        studentNumber: pointsRes.data.student_id,
+        studentNumber: student.student_id,
         coursePartId: coursePart.id,
         aplusGradeSourceId: gradeSource.id,
         grade: grade,
