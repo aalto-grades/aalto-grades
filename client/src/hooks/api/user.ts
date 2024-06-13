@@ -18,7 +18,9 @@ import {
   CourseWithFinalGrades,
   CourseWithFinalGradesArraySchema,
   IdpUsersSchema,
-  NewIdpUser,
+  NewUser,
+  NewUserResponse,
+  NewUserResponseSchema,
   UserData,
   UserDataArraySchema,
 } from '@/common/types';
@@ -59,11 +61,14 @@ export const useGetStudents = (
   });
 
 export const useAddUser = (
-  options?: UseMutationOptions<unknown, unknown, NewIdpUser>
-): UseMutationResult<unknown, unknown, NewIdpUser> => {
+  options?: UseMutationOptions<NewUserResponse, unknown, NewUser>
+): UseMutationResult<NewUserResponse, unknown, NewUser> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async idpUser => await axios.post('/v1/idp-users', idpUser),
+    mutationFn: async idpUser =>
+      NewUserResponseSchema.parse(
+        (await axios.post('/v1/users', idpUser)).data
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['idp-users']});
     },

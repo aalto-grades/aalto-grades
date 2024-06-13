@@ -41,7 +41,12 @@ describe('Tests for button component displaying user data and logout', () => {
     );
 
   test('User button should display the currently logged in users name', async () => {
-    const auth: LoginResult = {id: 1, role: SystemRole.User, name: 'John Doe'};
+    const auth: LoginResult = {
+      id: 1,
+      role: SystemRole.User,
+      name: 'John Doe',
+      firstLogin: false,
+    };
     renderButton(auth);
     await waitFor(() =>
       expect(screen.queryByText('John Doe')).toBeInTheDocument()
@@ -56,7 +61,12 @@ describe('Tests for button component displaying user data and logout', () => {
   });
 
   test('Clicking user button should display logout option', async () => {
-    const auth: LoginResult = {id: 1, role: SystemRole.User, name: 'John Doe'};
+    const auth: LoginResult = {
+      id: 1,
+      role: SystemRole.User,
+      name: 'John Doe',
+      firstLogin: false,
+    };
     renderButton(auth);
 
     const button: HTMLElement = screen.getByText('John Doe');

@@ -6,13 +6,13 @@ import express, {RequestHandler, Router} from 'express';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
-import {NewIdpUserSchema, SystemRole} from '@/common/types';
+import {NewUserSchema, SystemRole} from '@/common/types';
 import {
-  addIdpUser,
+  addUser,
   deleteIdpUser,
-  getOwnCourses,
-  getIdpUsers,
   getGradesOfUser,
+  getIdpUsers,
+  getOwnCourses,
   getStudents,
 } from '../controllers/user';
 import {handleInvalidRequestJson} from '../middleware';
@@ -47,13 +47,13 @@ router.get(
 );
 
 router.post(
-  '/v1/idp-users',
+  '/v1/users',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(NewIdpUserSchema),
-  controllerDispatcher(addIdpUser)
+  processRequestBody(NewUserSchema),
+  controllerDispatcher(addUser)
 );
 
 router.delete(
