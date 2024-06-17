@@ -11,6 +11,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
 import {NewGrade} from '@/common/types';
+import UploadDialogAplusImport from './UploadDialogAplusImport';
 import UploadDialogConfirm from './UploadDialogConfirm';
 import UploadDialogUpload from './UploadDialogUpload';
 import {useAddGrades, useGetCourseParts} from '../../hooks/useApi';
@@ -149,7 +150,8 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   return (
     <>
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
-        {currentStep === 0 ? (
+        <UploadDialogAplusImport />
+        {/* currentStep === 0 ? (
           <UploadDialogUpload
             columns={columns}
             rows={rows}
@@ -168,7 +170,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
             expanded={confirmExpanded}
             setExpanded={setConfirmExpanded}
           />
-        )}
+          )*/}
 
         <DialogActions>
           {currentStep === 1 && (
