@@ -4,6 +4,7 @@
 
 import {
   Checkbox,
+  CircularProgress,
   DialogContent,
   DialogTitle,
   FormControlLabel,
@@ -13,6 +14,7 @@ import {
 import {JSX, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
+import {CoursePartData} from '@/common/types';
 import {useFetchAplusGrades, useGetCourseParts} from '../../hooks/useApi';
 import AplusTokenDialog from '../shared/AplusTokenDialog';
 
@@ -25,9 +27,12 @@ const UploadDialogAplusImport = ({step}: PropsType): JSX.Element => {
   const courseParts = useGetCourseParts(courseId);
   const fetchAplusGrades = useFetchAplusGrades(courseId, {enabled: false});
 
+  const [selected, setSelected] = useState<CoursePartData[]>([]);
+
   return (
     <>
       {step === 0 && <DialogTitle>Select Course Parts</DialogTitle>}
+      {step === 1 && <DialogTitle>Fetching Grades</DialogTitle>}
       <DialogContent>
         {step === 0 && (
           <>
@@ -40,7 +45,17 @@ const UploadDialogAplusImport = ({step}: PropsType): JSX.Element => {
                   .filter(coursePart => coursePart.aplusGradeSources.length > 0)
                   .map(coursePart => (
                     <FormControlLabel
-                      control={<Checkbox />}
+                      control={
+                        <Checkbox
+                          onChange={e =>
+                            setSelected(
+                              e.target.checked
+                                ? [...selected, coursePart]
+                                : selected.filter(s => s.id !== coursePart.id)
+                            )
+                          }
+                        />
+                      }
                       label={coursePart.name}
                     />
                   ))}
@@ -55,7 +70,10 @@ const UploadDialogAplusImport = ({step}: PropsType): JSX.Element => {
               open={step === 1}
               error={false}
             />
-            <p>Loading</p>
+            <Typography>
+              Fetching grades from A+, this may take a few minutes...
+            </Typography>
+            <CircularProgress />
           </>
         )}
       </DialogContent>
