@@ -271,7 +271,9 @@ const UploadDialogUpload = ({
               <Button variant="outlined" onClick={downloadTemplate}>
                 Download CSV Template
               </Button>
-              <Button variant="outlined" onClick={handleAplusImport}>Import from A+</Button>
+              <Button variant="outlined" onClick={handleAplusImport}>
+                Import from A+
+              </Button>
               <Button variant="outlined">Import from MyCourses</Button>
               <Button variant="outlined" onClick={() => setTextFieldOpen(true)}>
                 Paste text

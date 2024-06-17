@@ -16,14 +16,14 @@ import {useParams} from 'react-router-dom';
 import {useFetchAplusGrades, useGetCourseParts} from '../../hooks/useApi';
 import AplusTokenDialog from '../shared/AplusTokenDialog';
 
-type PropsType = unknown;
+type PropsType = {
+  step: number;
+};
 
-const UploadDialogAplusImport = (props: PropsType): JSX.Element => {
+const UploadDialogAplusImport = ({step}: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const courseParts = useGetCourseParts(courseId);
   const fetchAplusGrades = useFetchAplusGrades(courseId, {enabled: false});
-
-  const [step, setStep] = useState<number>(0);
 
   return (
     <>

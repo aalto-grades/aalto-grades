@@ -45,6 +45,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     {coursePartName: string; completionDate: Dayjs; expirationDate: Dayjs}[]
   >([]);
   const [aplusImport, setAplusImport] = useState<boolean>(false);
+  const [aplusStep, setAplusStep] = useState<number>(0);
 
   useEffect(() => {
     if (coursePartData.length === dates.length) return;
@@ -174,7 +175,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
             />
           )
         ) : (
-          <UploadDialogAplusImport />
+          <UploadDialogAplusImport step={aplusStep} />
         )}
         <DialogActions>
           {currentStep === 1 && (
@@ -187,8 +188,14 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
           )}
           {currentStep === 0 && (
             <Button
-              onClick={() => setCurrentStep(cur => cur + 1)}
-              disabled={!ready || rows.length === 0}
+              onClick={() => {
+                if (!aplusImport) {
+                  setCurrentStep(cur => cur + 1);
+                } else {
+                  setAplusStep(aplusStep + 1);
+                }
+              }}
+              disabled={!aplusImport && (!ready || rows.length === 0)}
             >
               Next
             </Button>
