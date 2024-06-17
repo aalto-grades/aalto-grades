@@ -44,6 +44,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const [dates, setDates] = useState<
     {coursePartName: string; completionDate: Dayjs; expirationDate: Dayjs}[]
   >([]);
+  const [aplusImport, setAplusImport] = useState<boolean>(false);
 
   useEffect(() => {
     if (coursePartData.length === dates.length) return;
@@ -150,28 +151,31 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   return (
     <>
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
-        <UploadDialogAplusImport />
-        {/* currentStep === 0 ? (
-          <UploadDialogUpload
-            columns={columns}
-            rows={rows}
-            setRows={setRows}
-            setReady={setReady}
-            expanded={uploadExpanded}
-            setExpanded={setUploadExpanded}
-          />
+        {!aplusImport ? (
+          currentStep === 0 ? (
+            <UploadDialogUpload
+              columns={columns}
+              rows={rows}
+              setRows={setRows}
+              setReady={setReady}
+              expanded={uploadExpanded}
+              setExpanded={setUploadExpanded}
+              handleAplusImport={() => setAplusImport(true)}
+            />
+          ) : (
+            <UploadDialogConfirm
+              columns={readOnlycolumns}
+              rows={rows}
+              dates={dates}
+              setDates={setDates}
+              setReady={setReady}
+              expanded={confirmExpanded}
+              setExpanded={setConfirmExpanded}
+            />
+          )
         ) : (
-          <UploadDialogConfirm
-            columns={readOnlycolumns}
-            rows={rows}
-            dates={dates}
-            setDates={setDates}
-            setReady={setReady}
-            expanded={confirmExpanded}
-            setExpanded={setConfirmExpanded}
-          />
-          )*/}
-
+          <UploadDialogAplusImport />
+        )}
         <DialogActions>
           {currentStep === 1 && (
             <Button

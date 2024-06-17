@@ -38,6 +38,7 @@ type PropsType = {
   setReady: Dispatch<SetStateAction<boolean>>;
   expanded: '' | 'upload' | 'edit';
   setExpanded: Dispatch<SetStateAction<'' | 'upload' | 'edit'>>;
+  handleAplusImport: () => void;
 };
 
 const UploadDialogUpload = ({
@@ -47,6 +48,7 @@ const UploadDialogUpload = ({
   setReady,
   expanded,
   setExpanded,
+  handleAplusImport,
 }: PropsType): JSX.Element => {
   const [textFieldText, setTextFieldText] = useState<string>('');
   const [textFieldOpen, setTextFieldOpen] = useState<boolean>(false);
@@ -269,7 +271,7 @@ const UploadDialogUpload = ({
               <Button variant="outlined" onClick={downloadTemplate}>
                 Download CSV Template
               </Button>
-              <Button variant="outlined">Import from A+</Button>
+              <Button variant="outlined" onClick={handleAplusImport}>Import from A+</Button>
               <Button variant="outlined">Import from MyCourses</Button>
               <Button variant="outlined" onClick={() => setTextFieldOpen(true)}>
                 Paste text
