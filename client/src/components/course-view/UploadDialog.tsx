@@ -45,7 +45,6 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     {coursePartName: string; completionDate: Dayjs; expirationDate: Dayjs}[]
   >([]);
   const [aplusImport, setAplusImport] = useState<boolean>(false);
-  const [aplusStep, setAplusStep] = useState<number>(0);
 
   useEffect(() => {
     if (coursePartData.length === dates.length) return;
@@ -153,65 +152,61 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     <>
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
         {!aplusImport ? (
-          currentStep === 0 ? (
-            <UploadDialogUpload
-              columns={columns}
-              rows={rows}
-              setRows={setRows}
-              setReady={setReady}
-              expanded={uploadExpanded}
-              setExpanded={setUploadExpanded}
-              handleAplusImport={() => setAplusImport(true)}
-            />
-          ) : (
-            <UploadDialogConfirm
-              columns={readOnlycolumns}
-              rows={rows}
-              dates={dates}
-              setDates={setDates}
-              setReady={setReady}
-              expanded={confirmExpanded}
-              setExpanded={setConfirmExpanded}
-            />
-          )
+          <>
+            {currentStep === 0 ? (
+              <UploadDialogUpload
+                columns={columns}
+                rows={rows}
+                setRows={setRows}
+                setReady={setReady}
+                expanded={uploadExpanded}
+                setExpanded={setUploadExpanded}
+                handleAplusImport={() => setAplusImport(true)}
+              />
+            ) : (
+              <UploadDialogConfirm
+                columns={readOnlycolumns}
+                rows={rows}
+                dates={dates}
+                setDates={setDates}
+                setReady={setReady}
+                expanded={confirmExpanded}
+                setExpanded={setConfirmExpanded}
+              />
+            )}
+            <DialogActions>
+              {currentStep === 1 && (
+                <Button
+                  onClick={() => setCurrentStep(cur => cur - 1)}
+                  sx={{mr: 'auto'}}
+                >
+                  Back
+                </Button>
+              )}
+              {currentStep === 0 && (
+                <Button
+                  onClick={() => setCurrentStep(cur => cur + 1)}
+                  disabled={!ready || rows.length === 0}
+                >
+                  Next
+                </Button>
+              )}
+              {currentStep === 1 && confirmExpanded === 'date' && (
+                <Button
+                  onClick={() => setConfirmExpanded('confirm')}
+                  disabled={!ready}
+                >
+                  Confirm
+                </Button>
+              )}
+              {currentStep === 1 && confirmExpanded === 'confirm' && (
+                <Button onClick={onSubmit}>Submit</Button>
+              )}
+            </DialogActions>
+          </>
         ) : (
-          <UploadDialogAplusImport step={aplusStep} />
+          <UploadDialogAplusImport />
         )}
-        <DialogActions>
-          {currentStep === 1 && (
-            <Button
-              onClick={() => setCurrentStep(cur => cur - 1)}
-              sx={{mr: 'auto'}}
-            >
-              Back
-            </Button>
-          )}
-          {currentStep === 0 && (
-            <Button
-              onClick={() => {
-                if (!aplusImport) {
-                  setCurrentStep(cur => cur + 1);
-                } else {
-                  setAplusStep(aplusStep + 1);
-                }
-              }}
-              disabled={!aplusImport && (!ready || rows.length === 0)}
-            >
-              Next
-            </Button>
-          )}
-          {currentStep === 1 && confirmExpanded === 'date' && (
-            <Button
-              onClick={() => setConfirmExpanded('confirm')}
-              disabled={!ready}
-            >
-              Confirm
-            </Button>
-          )}
-          {currentStep === 1 && confirmExpanded === 'confirm' && (
-            <Button onClick={onSubmit}>Submit</Button>
-          )}
-        </DialogActions>
       </Dialog>
     </>
   );

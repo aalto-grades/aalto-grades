@@ -3,31 +3,41 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  Button,
   Checkbox,
   CircularProgress,
+  DialogActions,
   DialogContent,
   DialogTitle,
   FormControlLabel,
   FormGroup,
   Typography,
 } from '@mui/material';
-import {JSX, useState} from 'react';
+import {JSX, useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
-import {CoursePartData} from '@/common/types';
 import {useFetchAplusGrades, useGetCourseParts} from '../../hooks/useApi';
+import {getAplusToken} from '../../utils/utils';
 import AplusTokenDialog from '../shared/AplusTokenDialog';
 
-type PropsType = {
-  step: number;
-};
+type PropsType = unknown;
 
-const UploadDialogAplusImport = ({step}: PropsType): JSX.Element => {
+const UploadDialogAplusImport = (props: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const courseParts = useGetCourseParts(courseId);
   const fetchAplusGrades = useFetchAplusGrades(courseId, {enabled: false});
 
-  const [selected, setSelected] = useState<CoursePartData[]>([]);
+  const [step, setStep] = useState<number>(0);
+
+  // Array of selected course part IDs
+  const [selected, setSelected] = useState<number[]>([]);
+
+  const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
+    useState<boolean>(false);
+
+  useEffect(() => {
+    setAplusTokenDialogOpen(!getAplusToken() || fetchAplusGrades.isError);
+  }, [fetchAplusGrades]);
 
   return (
     <>
@@ -50,8 +60,8 @@ const UploadDialogAplusImport = ({step}: PropsType): JSX.Element => {
                           onChange={e =>
                             setSelected(
                               e.target.checked
-                                ? [...selected, coursePart]
-                                : selected.filter(s => s.id !== coursePart.id)
+                                ? [...selected, coursePart.id]
+                                : selected.filter(id => id !== coursePart.id)
                             )
                           }
                         />
@@ -67,8 +77,8 @@ const UploadDialogAplusImport = ({step}: PropsType): JSX.Element => {
             <AplusTokenDialog
               handleClose={() => {}}
               handleSubmit={() => {}}
-              open={step === 1}
-              error={false}
+              open={aplusTokenDialogOpen}
+              error={fetchAplusGrades.isError}
             />
             <Typography>
               Fetching grades from A+, this may take a few minutes...
@@ -77,6 +87,16 @@ const UploadDialogAplusImport = ({step}: PropsType): JSX.Element => {
           </>
         )}
       </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={() => setStep(step + 1)}
+          disabled={
+            selected.length === 0 || (step === 1 && !fetchAplusGrades.data)
+          }
+        >
+          Next
+        </Button>
+      </DialogActions>
     </>
   );
 };
