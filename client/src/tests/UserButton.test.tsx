@@ -13,14 +13,14 @@ import {
 import {userEvent} from '@testing-library/user-event';
 import {BrowserRouter} from 'react-router-dom';
 
-import {LoginResult, SystemRole} from '@/common/types';
+import {AuthData, SystemRole} from '@/common/types';
 import UserButton from '../components/auth/UserButton';
 import AuthContext from '../context/AuthProvider';
 
 afterEach(cleanup);
 
 describe('Tests for button component displaying user data and logout', () => {
-  const renderButton = (auth: LoginResult | null): RenderResult =>
+  const renderButton = (auth: AuthData | null): RenderResult =>
     render(
       <QueryClientProvider client={new QueryClient()}>
         <BrowserRouter>
@@ -41,11 +41,10 @@ describe('Tests for button component displaying user data and logout', () => {
     );
 
   test('User button should display the currently logged in users name', async () => {
-    const auth: LoginResult = {
+    const auth: AuthData = {
       id: 1,
       role: SystemRole.User,
       name: 'John Doe',
-      forcePasswordReset: false,
     };
     renderButton(auth);
     await waitFor(() =>
@@ -61,11 +60,10 @@ describe('Tests for button component displaying user data and logout', () => {
   });
 
   test('Clicking user button should display logout option', async () => {
-    const auth: LoginResult = {
+    const auth: AuthData = {
       id: 1,
       role: SystemRole.User,
       name: 'John Doe',
-      forcePasswordReset: false,
     };
     renderButton(auth);
 

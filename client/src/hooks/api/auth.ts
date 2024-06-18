@@ -11,25 +11,31 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 
-import {LoginResult, LoginResultSchema} from '@/common/types';
+import {
+  AuthData,
+  AuthDataSchema,
+  LoginData,
+  LoginResult,
+  LoginResultSchema,
+  ResetPasswordData,
+} from '@/common/types';
 import axios from './axios';
-import {LoginCredentials} from '../../types';
 
 export const useGetRefreshToken = (
-  options?: Partial<UseQueryOptions<LoginResult>>
-): UseQueryResult<LoginResult> =>
+  options?: Partial<UseQueryOptions<AuthData>>
+): UseQueryResult<AuthData> =>
   useQuery({
     queryKey: ['refresh-token'],
     queryFn: async () =>
-      LoginResultSchema.parse((await axios.get('/v1/auth/self-info')).data),
+      AuthDataSchema.parse((await axios.get('/v1/auth/self-info')).data),
     ...options,
   });
 
 export const useLogIn = (
-  options?: UseMutationOptions<LoginResult, unknown, LoginCredentials>
-): UseMutationResult<LoginResult, unknown, LoginCredentials> =>
+  options?: UseMutationOptions<LoginResult, unknown, LoginData>
+): UseMutationResult<LoginResult, unknown, LoginData> =>
   useMutation({
-    mutationFn: async (credentials: LoginCredentials) =>
+    mutationFn: async (credentials: LoginData) =>
       LoginResultSchema.parse(
         (await axios.post('/v1/auth/login', credentials)).data
       ),
@@ -41,5 +47,16 @@ export const useLogOut = (
 ): UseMutationResult<unknown, unknown, unknown> =>
   useMutation({
     mutationFn: async () => await axios.post('/v1/auth/logout'),
+    ...options,
+  });
+
+export const useResetPassword = (
+  options?: UseMutationOptions<AuthData, unknown, ResetPasswordData>
+): UseMutationResult<AuthData, unknown, ResetPasswordData> =>
+  useMutation({
+    mutationFn: async (credentials: ResetPasswordData) =>
+      AuthDataSchema.parse(
+        (await axios.post('/v1/auth/reset-password', credentials)).data
+      ),
     ...options,
   });

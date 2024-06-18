@@ -10,7 +10,7 @@ import {
 import argon from 'argon2';
 import {Request} from 'express';
 
-import {HttpCode, LoginResult, SystemRole} from '@/common/types';
+import {HttpCode, SystemRole} from '@/common/types';
 import {getIdpSignCert} from './saml';
 import {
   SAML_CALLBACK,
@@ -23,13 +23,13 @@ import {
 } from '../../configs/environment';
 import logger from '../../configs/winston';
 import User from '../../database/models/user';
-import {ApiError} from '../../types';
+import {ApiError, FullLoginResult} from '../../types';
 
 /** @throws ApiError(401) */
 export const validateLogin = async (
   email: string,
   password: string
-): Promise<LoginResult> => {
+): Promise<FullLoginResult> => {
   const user = await User.findByEmail(email);
 
   if (user === null) {

@@ -1,4 +1,9 @@
-import {TextField} from '@mui/material';
+import {
+  FilledInputProps,
+  InputProps as InputPropsType,
+  OutlinedInputProps,
+  TextField,
+} from '@mui/material';
 import {FormikProps} from 'formik';
 import {HTMLInputTypeAttribute, PropsWithChildren, JSX} from 'react';
 
@@ -10,6 +15,11 @@ type PropsType = {
   select?: boolean;
   type?: HTMLInputTypeAttribute;
   disabled?: boolean;
+  InputProps?:
+    | Partial<FilledInputProps>
+    | Partial<OutlinedInputProps>
+    | Partial<InputPropsType>
+    | undefined;
 };
 const FormField = ({
   form,
@@ -20,6 +30,7 @@ const FormField = ({
   type,
   children,
   disabled,
+  InputProps,
 }: PropsType & PropsWithChildren): JSX.Element => (
   <TextField
     id={value}
@@ -30,6 +41,7 @@ const FormField = ({
     disabled={disabled || form.isSubmitting}
     label={label}
     InputLabelProps={{shrink: true}}
+    InputProps={InputProps}
     margin="normal"
     helperText={form.errors[value] ? form.errors[value] : helperText}
     error={form.touched[value] && form.errors[value] !== undefined}

@@ -3,5 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 export * from './apiError';
+export * from './auth';
 export * from './dbNewDataTypes';
 export * from './general';

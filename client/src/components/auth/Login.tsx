@@ -23,21 +23,19 @@ import useAuth from '../../hooks/useAuth';
 const Login = (): JSX.Element => {
   const navigate = useNavigate();
   const {setAuth} = useAuth();
+  const logIn = useLogIn();
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
-  const logIn = useLogIn({
-    onSuccess: auth => {
-      setAuth(auth);
-      navigate('/', {replace: true});
-    },
-  });
-
-  const handleSubmit = (event: SyntheticEvent): void => {
+  const handleSubmit = async (event: SyntheticEvent): Promise<void> => {
     event.preventDefault();
-    logIn.mutate({email: email, password: password});
+    const auth = await logIn.mutateAsync({email: email, password: password});
+
+    if (auth.resetPassword) return navigate('/reset-password');
+    setAuth(auth);
+    navigate('/', {replace: true});
   };
 
   return (
@@ -72,11 +70,7 @@ const Login = (): JSX.Element => {
             name="email"
             label="Email"
             fullWidth
-            onChange={({
-              target,
-            }: {
-              target: EventTarget & (HTMLInputElement | HTMLTextAreaElement);
-            }): void => setEmail(target.value)}
+            onChange={e => setEmail(e.target.value)}
             InputLabelProps={{shrink: true}}
             margin="normal"
           />
@@ -86,11 +80,7 @@ const Login = (): JSX.Element => {
             name="password"
             label="Password"
             fullWidth
-            onChange={({
-              target,
-            }: {
-              target: EventTarget & (HTMLInputElement | HTMLTextAreaElement);
-            }): void => setPassword(target.value)}
+            onChange={e => setPassword(e.target.value)}
             InputLabelProps={{shrink: true}}
             InputProps={{
               endAdornment: (

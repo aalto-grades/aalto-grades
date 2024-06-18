@@ -2,23 +2,34 @@
 //
 // SPDX-License-Identifier: MIT
 
+import * as argon from 'argon2';
 import {NextFunction, Request, RequestHandler, Response} from 'express';
 import {readFileSync} from 'fs';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';
 import {IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
+import {TypedRequestBody} from 'zod-express-middleware';
 
-import {HttpCode, LoginResult, SystemRole} from '@/common/types';
+import {
+  AuthData,
+  HttpCode,
+  LoginDataSchema,
+  LoginResult,
+  PasswordSchema,
+  ResetPasswordDataSchema,
+  SystemRole,
+} from '@/common/types';
 import {getSamlStrategy, validateLogin} from './utils/auth';
 import {findUserById} from './utils/user';
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
 import {JWT_SECRET, NODE_ENV, SAML_SP_CERT_PATH} from '../configs/environment';
 import logger from '../configs/winston';
-import {ApiError, JwtClaims} from '../types';
+import User from '../database/models/user';
+import {ApiError, FullLoginResult, JwtClaims} from '../types';
 
 /**
- * Responds with LoginResult
+ * Responds with AuthData
  *
  * @throws ApiError(404)
  */
@@ -37,11 +48,10 @@ export const authSelfInfo = async (
     );
   }
 
-  const auth: LoginResult = {
+  const auth: AuthData = {
     id: userFromDb.id,
     role: userFromDb.role as SystemRole,
     name: userFromDb.name,
-    forcePasswordReset: userFromDb.forcePasswordReset,
   };
 
   res.json(auth);
@@ -53,24 +63,28 @@ export const authSelfInfo = async (
  * @throws ApiError(401)
  */
 export const authLogin = (
-  req: Request,
+  req: TypedRequestBody<typeof LoginDataSchema>,
   res: Response,
   next: NextFunction
 ): void => {
   (
     passport.authenticate(
       'login',
-      (error: unknown, loginResult: LoginResult | boolean) => {
+      (error: unknown, loginResult: FullLoginResult | false) => {
         if (error) return next(error);
 
         if (typeof loginResult === 'boolean') {
           return res.status(HttpCode.Unauthorized).send({
-            errors: ['incorrect email or password'],
+            errors: ['Incorrect email or password'],
           });
         }
 
-        req.login(loginResult, {session: false}, (loginError: unknown) => {
+        req.login(loginResult, {session: false}, loginError => {
           if (loginError) return next(loginError);
+
+          if (loginResult.forcePasswordReset) {
+            return res.json({resetPassword: true});
+          }
 
           const body: JwtClaims = {
             id: loginResult.id,
@@ -88,7 +102,13 @@ export const authLogin = (
             maxAge: JWT_COOKIE_EXPIRY_MS,
           });
 
-          return res.json(loginResult);
+          const result: LoginResult = {
+            resetPassword: false,
+            id: loginResult.id,
+            name: loginResult.name,
+            role: loginResult.role,
+          };
+          return res.json(result);
         });
       }
     ) as RequestHandler
@@ -100,6 +120,96 @@ export const authLogout = (_req: Request, res: Response): void => {
   res.sendStatus(HttpCode.Ok);
 };
 
+/**
+ * Responds with AuthData
+ *
+ * @throws ApiError(401)
+ */
+export const authResetPassword = (
+  req: TypedRequestBody<typeof ResetPasswordDataSchema>,
+  res: Response,
+  next: NextFunction
+): void => {
+  (
+    passport.authenticate(
+      'login',
+      (error: unknown, loginResult: FullLoginResult | false) => {
+        if (error) return next(error);
+
+        if (typeof loginResult === 'boolean') {
+          return res.status(HttpCode.Unauthorized).send({
+            errors: ['Incorrect email or password'],
+          });
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        req.login(loginResult, {session: false}, async loginError => {
+          if (loginError) return next(loginError);
+
+          // Validate password strength
+          const passwordResult = PasswordSchema.safeParse(req.body.newPassword);
+          if (!passwordResult.success) {
+            return next(passwordResult.error);
+          }
+
+          if (req.body.password === req.body.newPassword)
+            return res.status(HttpCode.BadRequest).send({
+              errors: ['New password cannot be the same as the old one'],
+            });
+
+          const user = await User.findByEmail(req.body.email);
+          if (user === null) {
+            logger.error(
+              `User ${req.body.email} not found after validating credentials`
+            );
+            throw new ApiError(
+              'User not found after validating credentials',
+              HttpCode.InternalServerError
+            );
+          }
+
+          // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+          await user
+            .set({
+              password: await argon.hash(req.body.newPassword, {
+                type: argon.argon2id,
+                memoryCost: 19456,
+                parallelism: 1,
+                timeCost: 2,
+              }),
+              forcePasswordReset: false,
+            })
+            .save();
+
+          const body: JwtClaims = {
+            id: loginResult.id,
+            role: loginResult.role,
+          };
+
+          const token = jwt.sign(body, JWT_SECRET, {
+            expiresIn: JWT_EXPIRY_SECONDS,
+          });
+
+          res.cookie('jwt', token, {
+            httpOnly: true,
+            secure: NODE_ENV !== 'test',
+            sameSite: 'none',
+            maxAge: JWT_COOKIE_EXPIRY_MS,
+          });
+
+          const result: LoginResult = {
+            resetPassword: false,
+            id: loginResult.id,
+            name: loginResult.name,
+            role: loginResult.role,
+          };
+          return res.json(result);
+        });
+      }
+    ) as RequestHandler
+  )(req, res, next);
+};
+
 /** @throws ApiError(401) */
 export const authSamlLogin = (
   req: Request,
@@ -109,7 +219,7 @@ export const authSamlLogin = (
   (
     passport.authenticate(
       'saml',
-      (error: Error | null, loginResult: LoginResult | undefined) => {
+      (error: Error | null, loginResult: FullLoginResult | undefined) => {
         if (error) return next(error);
 
         if (loginResult === undefined) {
@@ -172,7 +282,7 @@ passport.use(
       password: string,
       done: (
         error: unknown,
-        user?: LoginResult | false,
+        user?: FullLoginResult | false,
         options?: IVerifyOptions
       ) => void
     ) => {

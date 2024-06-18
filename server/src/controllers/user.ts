@@ -260,7 +260,7 @@ export const addUser = async (
   }
 
   const temporaryPassword = generator.generate({
-    length: 16,
+    length: 24,
     numbers: true,
   });
   // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html

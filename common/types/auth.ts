@@ -11,11 +11,35 @@ export enum SystemRole {
 
 export const SystemRoleSchema = z.nativeEnum(SystemRole);
 
-export const LoginResultSchema = z.object({
+export const AuthDataSchema = z.object({
   id: z.number().int(),
   name: z.string(),
   role: SystemRoleSchema,
-  forcePasswordReset: z.boolean().nullable(),
 });
 
+export const LoginDataSchema = z.object({
+  email: z.string(),
+  password: z.string(),
+});
+export const LoginResultSchema = z.discriminatedUnion('resetPassword', [
+  z.object({
+    resetPassword: z.literal(true),
+  }),
+  z.object({
+    resetPassword: z.literal(false),
+    id: z.number().int(),
+    name: z.string(),
+    role: SystemRoleSchema,
+  }),
+]);
+
+export const ResetPasswordDataSchema = z.object({
+  email: z.string(),
+  password: z.string(),
+  newPassword: z.string(),
+});
+
+export type AuthData = z.infer<typeof AuthDataSchema>;
+export type LoginData = z.infer<typeof LoginDataSchema>;
 export type LoginResult = z.infer<typeof LoginResultSchema>;
+export type ResetPasswordData = z.infer<typeof ResetPasswordDataSchema>;

@@ -5,14 +5,18 @@
 import bodyParser from 'body-parser';
 import express, {RequestHandler, Router} from 'express';
 import passport from 'passport';
+import {processRequestBody} from 'zod-express-middleware';
 
+import {LoginDataSchema, ResetPasswordDataSchema} from '@/common/types';
 import {
   authLogin,
   authLogout,
+  authResetPassword,
   authSamlLogin,
   authSelfInfo,
   samlMetadata,
 } from '../controllers/auth';
+import {handleInvalidRequestJson} from '../middleware';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
@@ -25,13 +29,28 @@ router.get(
 );
 
 // Dispatchers not needed, because not async
-router.post('/v1/auth/login', express.json(), authLogin);
+router.post(
+  '/v1/auth/login',
+  express.json(),
+  handleInvalidRequestJson,
+  processRequestBody(LoginDataSchema),
+  authLogin
+);
 
 router.post(
   '/v1/auth/logout',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   authLogout
+);
+
+// Dispatchers not needed, because not async
+router.post(
+  '/v1/auth/reset-password',
+  express.json(),
+  handleInvalidRequestJson,
+  processRequestBody(ResetPasswordDataSchema),
+  authResetPassword
 );
 
 router.get(

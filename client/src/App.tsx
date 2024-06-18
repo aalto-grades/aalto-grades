@@ -27,6 +27,7 @@ import NotFound from './components/NotFound';
 import StudentsView from './components/StudentsView';
 import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
+import ResetPassword from './components/auth/ResetPassword';
 import CoursePartsView from './components/course-view/CoursePartsView';
 import EditCourseView from './components/course-view/EditCourseView';
 import ModelsView from './components/course-view/ModelsView';
@@ -222,6 +223,7 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       {path: '/login', element: <Login />},
+      {path: '/reset-password', element: <ResetPassword />},
       {
         path: '/',
         element: (

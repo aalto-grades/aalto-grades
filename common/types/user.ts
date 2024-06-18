@@ -26,6 +26,21 @@ export const IdpUserSchema = z.object({
 
 export const PasswordSchema = z.string().superRefine((password, ctx) => {
   const result = zxcvbn(password);
+  if (password.length < 12) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Password must be at least 12 characters long',
+    });
+  }
+
+  if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/.test(password)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        'A password must include at least one upper case character, one lower case character and one numeric',
+    });
+  }
+
   if (result.score < 4) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -48,15 +63,6 @@ export const NewUserSchema = z.discriminatedUnion('admin', [
       .min(3, {message: 'Name must be at least 3 characters long'}),
   }),
 ]);
-export const EditUserSchema = z
-  .object({
-    name: z.string(),
-    email: z.string().email(),
-    studentNumber: z.string(),
-    password: PasswordSchema,
-    forcePasswordReset: z.boolean(),
-  })
-  .optional();
 export const NewUserResponseSchema = z.object({
   temporaryPassword: z.string().nullable(),
 });
@@ -67,6 +73,5 @@ export const UserDataArraySchema = z.array(UserDataSchema);
 export type UserData = z.infer<typeof UserDataSchema>;
 export type TeacherData = z.infer<typeof TeacherDataSchema>;
 export type NewUser = z.infer<typeof NewUserSchema>;
-export type EditUser = z.infer<typeof EditUserSchema>;
 export type NewUserResponse = z.infer<typeof NewUserResponseSchema>;
 export type IdpUsers = z.infer<typeof IdpUsersSchema>;

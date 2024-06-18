@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Dispatch, SetStateAction} from 'react';
-
 import {Language} from '@/common/types';
 
 export type HeadCellData = {
@@ -11,14 +9,7 @@ export type HeadCellData = {
   label: string;
 };
 
-export type LoginCredentials = {
-  email: string;
-  password: string;
-};
-
 export type Numeric = number | string;
-
-export type State<T> = [T, Dispatch<SetStateAction<T>>];
 
 export type LanguageOption = {
   id: Language;
