@@ -5,19 +5,23 @@
 import {
   Button,
   Checkbox,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControlLabel,
   FormGroup,
+  LinearProgress,
   Typography,
 } from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
-import {useFetchAplusGrades, useGetCourseParts} from '../../hooks/useApi';
+import {
+  useAddGrades,
+  useFetchAplusGrades,
+  useGetCourseParts,
+} from '../../hooks/useApi';
 import {getAplusToken} from '../../utils/utils';
 import AplusTokenDialog from '../shared/AplusTokenDialog';
 
@@ -35,11 +39,18 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
   const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
     useState<boolean>(false);
 
+  const addGrades = useAddGrades(courseId);
   const aplusGrades = useFetchAplusGrades(courseId, coursePartIds, {
     enabled: false,
   });
 
   useEffect(() => {
+    if (aplusGrades.data) {
+      addGrades.mutate(aplusGrades.data);
+      handleClose();
+      return;
+    }
+
     setAplusTokenDialogOpen(!getAplusToken() || aplusGrades.isError);
   }, [aplusGrades]);
 
@@ -92,20 +103,22 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
             <Typography>
               Fetching grades from A+, this may take a few minutes...
             </Typography>
-            <CircularProgress />
+            <LinearProgress sx={{mt: 2}} />
           </>
         )}
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={() => {
-            setStep(1);
-            aplusGrades.refetch();
-          }}
-          disabled={coursePartIds.length === 0 || step === 1}
-        >
-          Next
-        </Button>
+        {step === 0 && (
+          <Button
+            onClick={() => {
+              setStep(1);
+              aplusGrades.refetch();
+            }}
+            disabled={coursePartIds.length === 0}
+          >
+            Next
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );
