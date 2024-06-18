@@ -49,7 +49,8 @@
     "xmldom": "^0.6.0",
     "xpath": "^0.0.34",
     "zod": "^3.22.4",
-    "zod-express-middleware": "^1.4.0"
+    "zod-express-middleware": "^1.4.0",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",
