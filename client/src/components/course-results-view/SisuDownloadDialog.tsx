@@ -185,7 +185,7 @@ const SisuDownloadDialog = ({
           >
             <DatePicker
               sx={{mt: 2}}
-              label="Assessment Date"
+              label="Assessment date"
               value={assessmentDate}
               onChange={newDate => newDate && setAssessmentDate(newDate)}
             />
@@ -225,7 +225,7 @@ const SisuDownloadDialog = ({
           </Box>
         )}
         <Typography variant="h6" sx={{mt: 1}}>
-          Selected students:
+          Selected students
         </Typography>
         <Paper sx={{maxHeight: 200, overflow: 'auto', my: 1}}>
           <List dense>
@@ -249,7 +249,7 @@ const SisuDownloadDialog = ({
           Cancel
         </Button>
         <Button
-          id="ag_confirm_file_upload_btn"
+          id="ag-confirm-file-upload-btn"
           variant="contained"
           onClick={handleDownloadSisuGradeCsv}
         >

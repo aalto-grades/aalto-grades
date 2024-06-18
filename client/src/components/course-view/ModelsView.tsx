@@ -250,7 +250,7 @@ const ModelsView = (): JSX.Element => {
         name={editDialogModel?.name ?? null}
       />
       <Typography width={'fit-content'} variant="h2">
-        Grading Models
+        Grading models
       </Typography>
       <Box sx={{display: 'flex', mb: 1}}>
         {(auth?.role === SystemRole.Admin || isTeacherInCharge) &&
@@ -261,7 +261,7 @@ const ModelsView = (): JSX.Element => {
                 variant="outlined"
                 onClick={() => setCreateDialogOpen(true)}
               >
-                Create New
+                Create new
               </Button>
             </Tooltip>
           )}
@@ -285,8 +285,8 @@ const ModelsView = (): JSX.Element => {
           <List sx={{width: 400}} disablePadding>
             {models.map(model => (
               <ListItem
+                key={model.id}
                 sx={{backgroundColor: model.archived ? grey[200] : ''}}
-                key={`graph-${model.id}-select`}
                 disablePadding
                 secondaryAction={
                   editRights ? (

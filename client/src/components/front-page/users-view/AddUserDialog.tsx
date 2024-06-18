@@ -76,7 +76,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
           />
 
           <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-            <DialogTitle>{'Add a user'}</DialogTitle>
+            <DialogTitle>Add a user</DialogTitle>
             <DialogContent>
               <TextField
                 id="email"
@@ -106,12 +106,12 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
                 Cancel
               </Button>
               <Button
-                id="add_user"
+                id="add-user"
                 variant="contained"
                 onClick={form.submitForm}
                 disabled={form.isSubmitting}
               >
-                Add User
+                Add user
               </Button>
             </DialogActions>
           </Dialog>

@@ -90,7 +90,7 @@ const MaxNode = (props: NodeProps): JSX.Element => {
     <BaseNode {...props} error={error}>
       {handles.map((key, index) => (
         <Handle
-          key={`handle-${key}`}
+          key={key}
           type="target"
           id={key}
           style={{
@@ -139,7 +139,7 @@ const MaxNode = (props: NodeProps): JSX.Element => {
             .filter(([, source]) => source.isConnected)
             .map(([key, source], index) => (
               <tr
-                key={`tr-${id}-${key}`}
+                key={key}
                 style={{
                   height: rowHeight,
                   backgroundColor: index === selectedIndex ? '#ccf' : '',

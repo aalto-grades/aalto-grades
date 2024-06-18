@@ -58,7 +58,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const columns: GridColDef<GradeUploadColTypes>[] = [
     {
       field: 'studentNo',
-      headerName: 'Student Number',
+      headerName: 'Student number',
       type: 'string',
       width: 120,
       editable: true,
@@ -88,7 +88,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const readOnlycolumns: GridColDef<GradeUploadColTypes>[] = [
     {
       field: 'studentNo',
-      headerName: 'Student Number',
+      headerName: 'Student number',
       type: 'string',
     },
     ...coursePartData.map(

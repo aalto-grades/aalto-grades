@@ -49,7 +49,7 @@ const AdditionNode = (props: NodeProps): JSX.Element => {
     <BaseNode {...props}>
       {handles.map((key, index) => (
         <Handle
-          key={`handle-${key}`}
+          key={key}
           type="target"
           id={key}
           style={{
@@ -81,7 +81,7 @@ const AdditionNode = (props: NodeProps): JSX.Element => {
           {Object.entries(nodeValue.sources)
             .filter(([, source]) => source.isConnected)
             .map(([key, source]) => (
-              <tr key={`tr-${key}`}>
+              <tr key={key}>
                 <td>{Math.round(source.value * 100) / 100}</td>
               </tr>
             ))}

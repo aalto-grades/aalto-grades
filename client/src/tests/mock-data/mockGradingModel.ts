@@ -83,7 +83,7 @@ export const mockGradingModel: GradingModelData = {
       },
     ],
     nodeData: {
-      'final-grade': {title: 'Final Grade'},
+      'final-grade': {title: 'Final grade'},
       'coursepart-1': {
         title: 'Exercise 1',
         settings: {minPoints: 1, onFailSetting: 'coursefail'},

@@ -66,6 +66,7 @@ const CourseResultsTable = (): JSX.Element => {
               >
                 {headerGroup.headers.map(header => (
                   <th
+                    key={header.id}
                     style={{
                       // border: '1px solid lightgray',
                       padding: '0px',
@@ -80,7 +81,6 @@ const CourseResultsTable = (): JSX.Element => {
                             )
                           : header.getSize(),
                     }}
-                    key={header.id}
                     colSpan={header.colSpan}
                   >
                     {header.isPlaceholder ? null : (
@@ -140,9 +140,9 @@ const CourseResultsTable = (): JSX.Element => {
               const row = table.getRowModel().rows[virtualRow.index];
               return (
                 <tr
+                  key={row.id}
                   data-index={virtualRow.index} // needed for dynamic row height measurement
                   ref={node => virtualizer.measureElement(node)} // measure dynamic row height
-                  key={row.id}
                   style={{
                     display: 'flex',
                     position: 'absolute',

@@ -298,7 +298,7 @@ describe('Test Put /v1/courses/:courseId/grading-models/:gradingModId - edit a g
 
   it('should partially edit a grading model', async () => {
     const data: EditGradingModelData[] = [
-      {name: 'Edited 3 Addition model'},
+      {name: 'Edited 3 addition model'},
       {graphStructure: testStructure},
     ];
     for (const editData of data) {

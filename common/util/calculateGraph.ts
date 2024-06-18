@@ -54,7 +54,7 @@ export const initNode = (
       return {
         value: {type, source: 0, value: 0, courseFail: false},
         data: {
-          title: 'Course Part',
+          title: 'Course part',
           settings: {onFailSetting: 'coursefail', minPoints: 0},
         },
       };
@@ -80,7 +80,7 @@ export const initNode = (
       return {
         value: {type, source: 0, value: 0, courseFail: false},
         data: {
-          title: 'Require Points',
+          title: 'Require points',
           settings: {minPoints: 0, onFailSetting: 'coursefail'},
         },
       };

@@ -348,7 +348,7 @@ const EditCourseView = (): JSX.Element => {
             <Form>
               <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                 <Typography width={'fit-content'} variant="h2">
-                  Edit Course
+                  Edit course
                 </Typography>
                 <SaveBar
                   show={unsavedChanges}
@@ -385,14 +385,14 @@ const EditCourseView = (): JSX.Element => {
                     form={form}
                     value="courseCode"
                     disabled={auth?.role !== SystemRole.Admin}
-                    label="Course Code*"
+                    label="Course code*"
                     helperText="Give code for the new course."
                   />
                   <FormLanguagesField
                     form={form}
                     disabled={auth?.role !== SystemRole.Admin}
                     valueFormat="name%"
-                    labelFormat="Course Name in %*"
+                    labelFormat="Course name in %*"
                     helperTextFormat="Give the name of the course in %."
                   />
                   <FormLanguagesField
@@ -406,7 +406,7 @@ const EditCourseView = (): JSX.Element => {
                     form={form}
                     value="minCredits"
                     disabled={auth?.role !== SystemRole.Admin}
-                    label="Minimum Course Credits (ECTS)*"
+                    label="Minimum course credits (ECTS)*"
                     helperText="Input minimum credits."
                     type="number"
                   />
@@ -414,7 +414,7 @@ const EditCourseView = (): JSX.Element => {
                     form={form}
                     value="maxCredits"
                     disabled={auth?.role !== SystemRole.Admin}
-                    label="Maximum Course Credits (ECTS)*"
+                    label="Maximum course credits (ECTS)*"
                     helperText="Input maximum credits."
                     type="number"
                   />
@@ -425,7 +425,7 @@ const EditCourseView = (): JSX.Element => {
                       auth?.role !== SystemRole.Admin &&
                       finalGrades.data.length > 0
                     }
-                    label="Grading Scale*"
+                    label="Grading scale*"
                     helperText="Grading scale of the course, e.g., 0-5 or pass/fail."
                     select
                   >
@@ -452,14 +452,14 @@ const EditCourseView = (): JSX.Element => {
                 </Grid>
                 <Grid md={5}>
                   <TextField
-                    id="teacherEmail"
+                    id="teacherEmail" // Must be in camelCase to match data
                     type="text"
                     fullWidth
                     value={form.values.teacherEmail}
                     disabled={
                       auth?.role !== SystemRole.Admin || form.isSubmitting
                     }
-                    label="Teachers In Charge*"
+                    label="Teachers in charge*"
                     margin="normal"
                     InputLabelProps={{shrink: true}}
                     helperText={
@@ -529,7 +529,7 @@ const EditCourseView = (): JSX.Element => {
                     )}
                   </Box>
                   <TextField
-                    id="assistantEmail"
+                    id="assistantEmail" // Must be in camelCase to match data
                     type="text"
                     fullWidth
                     value={form.values.assistantEmail}
@@ -600,40 +600,6 @@ const EditCourseView = (): JSX.Element => {
                     )}
                   </Box>
                 </Grid>
-                {/* <Grid item xs={12}>
-                  <Button
-                    id="ag_create_course_btn"
-                    variant={'contained'}
-                    type="submit"
-                    disabled={form.isSubmitting}
-                    sx={{float: 'right'}}
-                  >
-                    Save
-                    {form.isSubmitting && (
-                      <CircularProgress
-                        size={24}
-                        sx={{
-                          position: 'absolute',
-                          top: '50%',
-                          left: '50%',
-                          marginTop: '-12px',
-                          marginLeft: '-12px',
-                        }}
-                      />
-                    )}
-                  </Button>
-                  {changed(form.values) && (
-                    <Button
-                      variant="outlined"
-                      disabled={form.isSubmitting}
-                      sx={{float: 'right', mr: 2}}
-                      color="error"
-                      onClick={() => setUnsavedDialogOpen(true)}
-                    >
-                      Discard changes
-                    </Button>
-                  )}
-                </Grid> */}
               </Grid>
             </Form>
           </>

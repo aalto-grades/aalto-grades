@@ -11,7 +11,7 @@ const useAuth = (): AuthContextType => {
   const {auth} = useContext(AuthContext);
 
   // debug information is displayed within the react dev tools
-  useDebugValue(auth, authResult => (authResult ? 'Logged In' : 'Logged Out'));
+  useDebugValue(auth, authResult => (authResult ? 'Logged in' : 'Logged out'));
   return useContext(AuthContext);
 };
 

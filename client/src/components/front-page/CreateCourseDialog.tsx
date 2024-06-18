@@ -263,18 +263,18 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
             }}
           />
           <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-            <DialogTitle>Create a New Course</DialogTitle>
+            <DialogTitle>Create a new course</DialogTitle>
             <DialogContent dividers>
               <FormField
                 form={form}
                 value="courseCode"
-                label="Course Code*"
+                label="Course code*"
                 helperText="Give code for the new course."
               />
               <FormLanguagesField
                 form={form}
                 valueFormat="name%"
-                labelFormat="Course Name in %*"
+                labelFormat="Course name in %*"
                 helperTextFormat="Give the name of the course in %."
               />
               <FormLanguagesField
@@ -286,21 +286,21 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               <FormField
                 form={form}
                 value="minCredits"
-                label="Minimum Course Credits (ECTS)*"
+                label="Minimum course credits (ECTS)*"
                 helperText="Input minimum credits."
                 type="number"
               />
               <FormField
                 form={form}
                 value="maxCredits"
-                label="Maximum Course Credits (ECTS)*"
+                label="Maximum course credits (ECTS)*"
                 helperText="Input maximum credits."
                 type="number"
               />
               <FormField
                 form={form}
                 value="gradingScale"
-                label="Grading Scale*"
+                label="Grading scale*"
                 helperText="Grading scale of the course, e.g., 0-5 or pass/fail."
                 select
               >
@@ -324,12 +324,12 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 ))}
               </FormField>
               <TextField
-                id="teacherEmail"
+                id="teacherEmail" // Must be in camelCase to match data
                 type="text"
                 fullWidth
                 value={form.values.teacherEmail}
                 disabled={form.isSubmitting}
-                label="Teachers In Charge*"
+                label="Teachers in charge*"
                 margin="normal"
                 InputLabelProps={{shrink: true}}
                 helperText={
@@ -396,7 +396,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 )}
               </Box>
               <TextField
-                id="assistantEmail"
+                id="assistantEmail" // Must be in camelCase to match data
                 type="text"
                 fullWidth
                 value={form.values.assistantEmail}
@@ -493,7 +493,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 Cancel
               </Button>
               <Button
-                id="ag_create_course_btn"
+                id="ag-create-course-btn"
                 variant="contained"
                 onClick={form.submitForm}
                 disabled={form.isSubmitting}

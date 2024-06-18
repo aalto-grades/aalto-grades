@@ -125,7 +125,7 @@ export class ResponseTests {
     return this.next(call, url);
   }
 
-  /** Send a request and expect a 422 Unprocessable Entity */
+  /** Send a request and expect a 422 unprocessable entity */
   testUnprocessableEntity(url: string, cookie: string[]): ReturnType {
     const call = async (request: Test): Promise<void> => {
       const res = await request
@@ -140,7 +140,7 @@ export class ResponseTests {
     return this.next(call, url);
   }
 
-  /** Send a request and expect a 502 Bad Gateway */
+  /** Send a request and expect a 502 bad gateway */
   testBadGateway(url: string, cookie: string[]): ReturnType {
     const call = async (request: Test): Promise<void> => {
       const res = await request

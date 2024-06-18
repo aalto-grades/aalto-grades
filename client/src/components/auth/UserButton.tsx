@@ -32,15 +32,15 @@ const UserButton = (): JSX.Element => {
     },
   });
 
-  if (!auth?.name) {
+  if (auth?.name === undefined) {
     return <div data-testid="not-logged-in"></div>;
   }
 
   return (
     <>
       <Button
-        color="inherit"
         id="basic-button"
+        color="inherit"
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
