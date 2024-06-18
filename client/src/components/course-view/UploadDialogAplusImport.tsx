@@ -20,24 +20,22 @@ import {useFetchAplusGrades, useGetCourseParts} from '../../hooks/useApi';
 import {getAplusToken} from '../../utils/utils';
 import AplusTokenDialog from '../shared/AplusTokenDialog';
 
-type PropsType = unknown;
-
-const UploadDialogAplusImport = (props: PropsType): JSX.Element => {
+const UploadDialogAplusImport = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const courseParts = useGetCourseParts(courseId);
-  const fetchAplusGrades = useFetchAplusGrades(courseId, {enabled: false});
 
   const [step, setStep] = useState<number>(0);
-
-  // Array of selected course part IDs
-  const [selected, setSelected] = useState<number[]>([]);
-
+  const [coursePartIds, setCoursePartIds] = useState<number[]>([]);
   const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
     useState<boolean>(false);
 
+  const aplusGrades = useFetchAplusGrades(courseId, coursePartIds, {
+    enabled: false,
+  });
+
   useEffect(() => {
-    setAplusTokenDialogOpen(!getAplusToken() || fetchAplusGrades.isError);
-  }, [fetchAplusGrades]);
+    setAplusTokenDialogOpen(!getAplusToken() || aplusGrades.isError);
+  }, [aplusGrades]);
 
   return (
     <>
@@ -58,10 +56,12 @@ const UploadDialogAplusImport = (props: PropsType): JSX.Element => {
                       control={
                         <Checkbox
                           onChange={e =>
-                            setSelected(
+                            setCoursePartIds(
                               e.target.checked
-                                ? [...selected, coursePart.id]
-                                : selected.filter(id => id !== coursePart.id)
+                                ? [...coursePartIds, coursePart.id]
+                                : coursePartIds.filter(
+                                    id => id !== coursePart.id
+                                  )
                             )
                           }
                         />
@@ -76,9 +76,12 @@ const UploadDialogAplusImport = (props: PropsType): JSX.Element => {
           <>
             <AplusTokenDialog
               handleClose={() => {}}
-              handleSubmit={() => {}}
+              handleSubmit={() => {
+                setAplusTokenDialogOpen(false);
+                aplusGrades.refetch();
+              }}
               open={aplusTokenDialogOpen}
-              error={fetchAplusGrades.isError}
+              error={aplusGrades.isError}
             />
             <Typography>
               Fetching grades from A+, this may take a few minutes...
@@ -89,10 +92,11 @@ const UploadDialogAplusImport = (props: PropsType): JSX.Element => {
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={() => setStep(step + 1)}
-          disabled={
-            selected.length === 0 || (step === 1 && !fetchAplusGrades.data)
-          }
+          onClick={() => {
+            setStep(1);
+            aplusGrades.refetch();
+          }}
+          disabled={coursePartIds.length === 0 || step === 1}
         >
           Next
         </Button>
