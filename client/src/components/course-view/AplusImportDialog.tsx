@@ -56,8 +56,8 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      {step === 0 && <DialogTitle>Select Course Parts</DialogTitle>}
-      {step === 1 && <DialogTitle>Fetching Grades</DialogTitle>}
+      {step === 0 && <DialogTitle>Select course parts</DialogTitle>}
+      {step === 1 && <DialogTitle>Fetching grades</DialogTitle>}
       <DialogContent>
         {step === 0 && (
           <>
