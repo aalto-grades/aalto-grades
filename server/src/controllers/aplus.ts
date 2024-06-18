@@ -149,7 +149,7 @@ export const fetchAplusGrades = async (
   }
 
   type StudentPoints = {
-    student_id: string;
+    student_id: string | null;
     points: number;
     points_by_difficulty: {
       [key: string]: number;
@@ -202,6 +202,11 @@ export const fetchAplusGrades = async (
 
     const points = pointsResCache[aplusCourseId];
     for (const student of points) {
+      // TODO: https://github.com/aalto-grades/base-repository/issues/747
+      if (!student.student_id) {
+        continue;
+      }
+
       let grade: number | undefined;
       switch (gradeSource.sourceType) {
         case AplusGradeSourceType.FullPoints:

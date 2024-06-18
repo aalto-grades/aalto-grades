@@ -81,7 +81,7 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
         {step === 1 && (
           <>
             <AplusTokenDialog
-              handleClose={() => {}}
+              handleClose={() => setAplusTokenDialogOpen(false)}
               handleSubmit={() => {
                 setAplusTokenDialogOpen(false);
                 aplusGrades.refetch();
