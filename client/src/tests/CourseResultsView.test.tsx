@@ -106,7 +106,6 @@ describe('Tests for CourseResultsView components', () => {
     });
   });
 
-  // Broken for some reason
   test('CourseResultsTable should show a dialog when clicking Download Sisu CSV', async () => {
     renderCourseResultsView();
 
