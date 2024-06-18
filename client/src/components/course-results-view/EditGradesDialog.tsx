@@ -152,7 +152,7 @@ const EditGradesDialog = ({
     },
     {
       field: 'expiryDate',
-      headerName: 'Expiry Date',
+      headerName: 'Expiry date',
       type: 'date',
       editable: true,
       width: 120,
@@ -214,7 +214,7 @@ const EditGradesDialog = ({
     return (
       <GridToolbarContainer>
         <Button startIcon={<Add />} onClick={handleClick}>
-          Add Grade
+          Add grade
         </Button>
       </GridToolbarContainer>
     );

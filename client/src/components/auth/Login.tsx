@@ -108,14 +108,14 @@ const Login = (): JSX.Element => {
             margin="normal"
           />
           <Button
-            id="ag_login_btn"
+            id="ag-login-btn"
             variant="contained"
             type="submit"
             fullWidth
             sx={{mt: 1}}
             disabled={email === '' || password === ''}
           >
-            log in
+            Log in
           </Button>
         </form>
       </Box>

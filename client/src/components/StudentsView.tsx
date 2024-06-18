@@ -98,7 +98,7 @@ const StudentsView = (): JSX.Element => {
               <TableBody>
                 {studentGrades.data.map(course => (
                   <TableRow
-                    key={`list-item-${course.id}`}
+                    key={course.id}
                     hover
                     onClick={() => navigate(`/${course.id}/course-results`)}
                   >

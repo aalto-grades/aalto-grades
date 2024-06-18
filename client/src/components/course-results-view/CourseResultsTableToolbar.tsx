@@ -65,11 +65,11 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
     [
       {
         id: 'latestBestGrade',
-        name: 'Latest Part Date',
+        name: 'Latest part date',
         info: 'Group by the latest obtainment date of all course parts',
       },
       {id: 'Exported to Sisu', name: 'Exported to Sisu'},
-      {id: 'finalGrade', name: 'Final Grade'},
+      {id: 'finalGrade', name: 'Final grade'},
     ],
     [
       ...table
@@ -166,9 +166,6 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
       </span>
       <Menu
         id="long-menu"
-        MenuListProps={{
-          'aria-labelledby': 'long-ButtonBase',
-        }}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
@@ -179,13 +176,12 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
         {groupByElements.map((groups, i) => [
           ...groups.map(element => (
             <Tooltip
+              key={element.id}
               title={element.info}
-              key={`Tooltip${element.id}`}
               placement="top"
               disableInteractive
             >
               <MenuItem
-                key={element.id}
                 selected={table.getState().grouping.includes(element.id)}
                 onClick={() => {
                   console.log(table.getAllColumns());
@@ -280,7 +276,7 @@ const AssesmentFilterButton = forwardRef<HTMLSpanElement>(
                 ? gradingModels?.filter(
                     ass => ass.id === selectedGradingModel
                   )[0]?.name
-                : 'Grading Model'}
+                : 'Grading model'}
             </div>
 
             {!isActive && (
@@ -322,9 +318,6 @@ const AssesmentFilterButton = forwardRef<HTMLSpanElement>(
         </span>
         <Menu
           id="long-menu"
-          MenuListProps={{
-            'aria-labelledby': 'long-ButtonBase',
-          }}
           anchorEl={anchorEl}
           open={open}
           onClose={handleClose}
@@ -334,11 +327,11 @@ const AssesmentFilterButton = forwardRef<HTMLSpanElement>(
         >
           {(gradingModels ?? []).map(model => (
             <MenuItem
+              key={model.id}
               onClick={() => {
                 setSelectedGradingModel(model.id);
                 handleClose();
               }}
-              key={`grading-model-select-${model.id}`}
               value={model.id}
               selected={selectedGradingModel === model.id}
             >
@@ -504,7 +497,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
             startIcon={<Add />}
             color="primary"
           >
-            Add Grades
+            Add grades
           </Button>
         ) : (
           <Box
@@ -554,7 +547,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                   >
                     {missingFinalGrades
                       ? 'Calculate final grades'
-                      : ' Re-Calculate final grades'}
+                      : 'Re-calculate final grades'}
                   </Button>
                 </Tooltip>
                 <Tooltip

@@ -232,7 +232,7 @@ const EditFinalGradesDialog = ({
     return (
       <GridToolbarContainer>
         <Button startIcon={<Add />} onClick={addFinalGrade}>
-          Add Final Grade
+          Add final grade
         </Button>
       </GridToolbarContainer>
     );

@@ -166,7 +166,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
             maxWidth="xs"
           >
             <DialogTitle>
-              {userData === null ? 'Add a User' : 'Admin Added'}
+              {userData === null ? 'Add a user' : 'Admin added'}
             </DialogTitle>
             <DialogContent>
               {userData === null ? (
@@ -186,7 +186,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
                 </Button>
               )}
               <Button
-                id="add_user"
+                id="add-user"
                 variant="contained"
                 onClick={() => {
                   if (userData === null) {
@@ -199,7 +199,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
                 }}
                 disabled={form.isSubmitting}
               >
-                {userData === null ? 'Add User' : 'Close'}
+                Add user
               </Button>
             </DialogActions>
           </Dialog>

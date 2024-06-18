@@ -72,8 +72,8 @@ describe('Tests for CourseResultsView components', () => {
     renderCourseResultsView();
 
     await waitFor(() => {
-      expect(screen.getByText('Student Number')).toBeVisible();
-      expect(screen.getByText('Final Grade')).toBeVisible();
+      expect(screen.getByText('Student number')).toBeVisible();
+      expect(screen.getByText('Final grade')).toBeVisible();
       expect(screen.getByText('Exported to Sisu')).toBeVisible();
       expect(screen.getByText('Exercise 1')).toBeVisible();
       expect(screen.getByText('Exercise 2')).toBeVisible();

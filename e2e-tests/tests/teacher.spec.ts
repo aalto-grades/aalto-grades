@@ -20,7 +20,7 @@ test.beforeEach(async ({page}) => {
   await expect(
     page.getByRole('heading', {name: 'Log in to Aalto Grades'})
   ).toBeHidden();
-  await expect(page.getByRole('heading', {name: 'Your Courses'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Your courses'})).toBeVisible();
 });
 
 test.afterEach(async ({page}) => {
@@ -30,7 +30,7 @@ test.afterEach(async ({page}) => {
   await page.getByRole('menuitem', {name: 'Logout'}).click();
 });
 
-test.describe('Test Courses as Teacher', () => {
+test.describe('Test courses as teacher', () => {
   test('Check course', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
@@ -38,7 +38,7 @@ test.describe('Test Courses as Teacher', () => {
 
   test('View grading model', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
-    await page.getByRole('button', {name: 'Grading Models'}).click();
+    await page.getByRole('button', {name: 'Grading models'}).click();
 
     await page.getByRole('button', {name: 'O1 Grading'}).click();
     await expect(page.getByTestId('rf__wrapper')).toBeVisible();
@@ -46,10 +46,10 @@ test.describe('Test Courses as Teacher', () => {
 
   test('Create grading model', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
-    await page.getByRole('button', {name: 'Grading Models'}).click();
+    await page.getByRole('button', {name: 'Grading models'}).click();
     await page.getByLabel('New grading model').click();
     await page.getByLabel('Name *').click();
-    await page.getByLabel('Name *').fill('Test Model');
+    await page.getByLabel('Name *').fill('Test model');
     await page.getByLabel('Select template').click();
     await page.getByRole('option', {name: 'Addition'}).click();
     await page.getByRole('button', {name: 'Submit'}).click();
@@ -61,14 +61,14 @@ test.describe('Test Courses as Teacher', () => {
     await page.getByRole('button', {name: 'Save'}).click();
     await expect(page.getByText('Model saved successfully.')).toBeVisible();
     await page.getByRole('button', {name: 'Grades', exact: true}).click();
-    await page.getByRole('button', {name: 'Grading Models'}).click();
-    await expect(page.getByRole('button', {name: 'Test Model'})).toBeVisible();
+    await page.getByRole('button', {name: 'Grading models'}).click();
+    await expect(page.getByRole('button', {name: 'Test model'})).toBeVisible();
   });
 
   test('View Course Parts', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page
-      .getByRole('link', {name: 'Course Parts'})
+      .getByRole('link', {name: 'Course parts'})
       .getByRole('button')
       .click();
     await expect(page.getByText('Days valid')).toBeVisible();
@@ -78,12 +78,12 @@ test.describe('Test Courses as Teacher', () => {
   test('Add Course Part', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page
-      .getByRole('link', {name: 'Course Parts'})
+      .getByRole('link', {name: 'Course parts'})
       .getByRole('button')
       .click();
     await expect(page.getByText('Days valid')).toBeVisible();
     await expect(page.getByText('Tier A')).toBeVisible();
-    await page.getByRole('button', {name: 'Add New'}).click();
+    await page.getByRole('button', {name: 'Add new'}).click();
     await page.getByRole('textbox', {name: 'Name'}).fill('test Tier D');
     await page.getByRole('button', {name: 'Save'}).click();
     await page.getByRole('button', {name: 'Save'}).click();

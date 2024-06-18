@@ -17,7 +17,7 @@ const NotFound = (): JSX.Element => {
       }}
     >
       <Typography variant="h4" sx={{my: 4}}>
-        404 - Not Found
+        404 - Not found
       </Typography>
       <Typography variant="body1" sx={{mb: 5}}>
         The page you’re looking for doesn’t exist.
