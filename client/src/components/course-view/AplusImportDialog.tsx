@@ -6,6 +6,7 @@ import {
   Button,
   Checkbox,
   CircularProgress,
+  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -20,7 +21,12 @@ import {useFetchAplusGrades, useGetCourseParts} from '../../hooks/useApi';
 import {getAplusToken} from '../../utils/utils';
 import AplusTokenDialog from '../shared/AplusTokenDialog';
 
-const UploadDialogAplusImport = (): JSX.Element => {
+type PropsType = {
+  handleClose: () => void;
+  open: boolean;
+};
+
+const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const courseParts = useGetCourseParts(courseId);
 
@@ -38,7 +44,7 @@ const UploadDialogAplusImport = (): JSX.Element => {
   }, [aplusGrades]);
 
   return (
-    <>
+    <Dialog open={open} onClose={handleClose}>
       {step === 0 && <DialogTitle>Select Course Parts</DialogTitle>}
       {step === 1 && <DialogTitle>Fetching Grades</DialogTitle>}
       <DialogContent>
@@ -101,8 +107,8 @@ const UploadDialogAplusImport = (): JSX.Element => {
           Next
         </Button>
       </DialogActions>
-    </>
+    </Dialog>
   );
 };
 
-export default UploadDialogAplusImport;
+export default AplusImportDialog;
