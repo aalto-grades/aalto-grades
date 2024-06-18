@@ -110,7 +110,7 @@ const SideMenu = (): JSX.Element => {
     >
       <List>
         <SideMenuButton
-          text="Courses List"
+          text="Courses list"
           to={'/'}
           Icon={HomeMaxRounded}
           IconOutlined={ArrowBack}
@@ -124,13 +124,13 @@ const SideMenu = (): JSX.Element => {
           IconOutlined={FlagCircleOutlined}
         />
         <SideMenuButton
-          text="Grading Models"
+          text="Grading models"
           to={`/${courseId}/models`}
           Icon={AccountTree}
           IconOutlined={AccountTreeOutlined}
         />
         <SideMenuButton
-          text="Course Parts"
+          text="Course parts"
           to={`/${courseId}/course-parts`}
           Icon={Widgets}
           IconOutlined={WidgetsOutlined}
@@ -140,7 +140,7 @@ const SideMenu = (): JSX.Element => {
           <>
             <Divider sx={{my: 2}} />
             <SideMenuButton
-              text="Edit Course"
+              text="Edit course"
               to={`/${courseId}/edit`}
               Icon={Edit}
               IconOutlined={EditOutlined}

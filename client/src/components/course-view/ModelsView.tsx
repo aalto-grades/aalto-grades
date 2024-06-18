@@ -250,7 +250,7 @@ const ModelsView = (): JSX.Element => {
         name={editDialogModel?.name ?? null}
       />
       <Typography width={'fit-content'} variant="h2">
-        Grading Models
+        Grading models
       </Typography>
       <Box sx={{display: 'flex', mb: 1}}>
         {(auth?.role === SystemRole.Admin || isTeacherInCharge) &&
@@ -261,7 +261,7 @@ const ModelsView = (): JSX.Element => {
                 variant="outlined"
                 onClick={() => setCreateDialogOpen(true)}
               >
-                Create New
+                Create new
               </Button>
             </Tooltip>
           )}

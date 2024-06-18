@@ -34,7 +34,7 @@ const AddCoursePartDialog = ({
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Create New Course Part</DialogTitle>
+      <DialogTitle>Create new course part</DialogTitle>
       <DialogContent>
         <TextField
           sx={{mt: 1}}

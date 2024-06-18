@@ -209,7 +209,7 @@ const Root = (): JSX.Element => {
       <NotistackWrapper />
       <QueryClientProvider client={queryClient}>
         <AppView />
-        {/* Query Debug Tool */}
+        {/* Query debug tool */}
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </CssVarsProvider>

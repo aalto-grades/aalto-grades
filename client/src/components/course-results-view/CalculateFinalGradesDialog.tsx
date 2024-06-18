@@ -111,7 +111,7 @@ const CalculateFinalGradesDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Calculate Final Grades</DialogTitle>
+      <DialogTitle>Calculate final grades</DialogTitle>
       <DialogContent>
         <Typography sx={{mb: 2}}>
           {selectedRows.length === 1

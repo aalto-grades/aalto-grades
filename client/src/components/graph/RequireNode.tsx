@@ -149,7 +149,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
         </select>
       </div>
       <div>
-        <label>Allowed Fails </label>
+        <label>Allowed fails </label>
         <input
           style={{width: '90px'}}
           type="number"

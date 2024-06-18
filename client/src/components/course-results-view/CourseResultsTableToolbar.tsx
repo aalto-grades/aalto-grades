@@ -65,11 +65,11 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
     [
       {
         id: 'latestBestGrade',
-        name: 'Latest Part Date',
+        name: 'Latest part date',
         info: 'Group by the latest obtainment date of all course parts',
       },
       {id: 'Exported to Sisu', name: 'Exported to Sisu'},
-      {id: 'finalGrade', name: 'Final Grade'},
+      {id: 'finalGrade', name: 'Final grade'},
     ],
     [
       ...table
@@ -276,7 +276,7 @@ const AssesmentFilterButton = forwardRef<HTMLSpanElement>(
                 ? gradingModels?.filter(
                     ass => ass.id === selectedGradingModel
                   )[0]?.name
-                : 'Grading Model'}
+                : 'Grading model'}
             </div>
 
             {!isActive && (
@@ -497,7 +497,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
             startIcon={<Add />}
             color="primary"
           >
-            Add Grades
+            Add grades
           </Button>
         ) : (
           <Box
@@ -547,7 +547,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                   >
                     {missingFinalGrades
                       ? 'Calculate final grades'
-                      : ' Re-Calculate final grades'}
+                      : 'Re-calculate final grades'}
                   </Button>
                 </Tooltip>
                 <Tooltip

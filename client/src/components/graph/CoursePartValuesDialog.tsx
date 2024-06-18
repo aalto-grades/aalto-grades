@@ -105,7 +105,7 @@ const CoursePartValuesDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Set Test Course Part Values</DialogTitle>
+      <DialogTitle>Set test course part values</DialogTitle>
 
       <DialogContent>
         {coursePartNodeIds.map(coursePartId => (

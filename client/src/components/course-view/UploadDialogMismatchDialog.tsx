@@ -67,7 +67,7 @@ const MismatchDialog = ({
     // Find duplicates
     const usedSelections: string[] = [];
     for (const value of Object.values(selections)) {
-      if (usedSelections.includes(value) && value !== 'Ignore Column') {
+      if (usedSelections.includes(value) && value !== 'ignoreColumn') {
         setError('duplicate');
         setDuplicate(value);
         return;
@@ -88,7 +88,7 @@ const MismatchDialog = ({
   const getErrorText = (): string => {
     switch (error) {
       case '':
-        return 'All Done!';
+        return 'All done!';
       case 'duplicate':
         return 'The same "Import as" value cannot appear twice';
       case 'empty':
@@ -100,7 +100,7 @@ const MismatchDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle>Mismatching Columns Found</DialogTitle>
+      <DialogTitle>Mismatching columns found</DialogTitle>
       <DialogContent>
         <Alert severity={error !== '' ? 'error' : 'success'} sx={{mb: 2}}>
           {getErrorText()}
@@ -109,7 +109,7 @@ const MismatchDialog = ({
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>CSV Column</TableCell>
+                <TableCell>CSV column</TableCell>
                 <TableCell>Import as</TableCell>
               </TableRow>
             </TableHead>
@@ -119,7 +119,7 @@ const MismatchDialog = ({
                   key={key}
                   sx={{
                     background:
-                      selections[key] === 'Ignore Column' ? '#eceff1' : '',
+                      selections[key] === 'ignoreColumn' ? '#eceff1' : '',
                   }}
                 >
                   <TableCell>{key}</TableCell>
@@ -159,8 +159,8 @@ const MismatchDialog = ({
                             {field}
                           </MenuItem>
                         ))}
-                        <MenuItem key="Ignore Column" value="Ignore Column">
-                          Ignore Column
+                        <MenuItem key="ignoreColumn" value="Ignore column">
+                          Ignore column
                         </MenuItem>
                       </Select>
                     </FormControl>

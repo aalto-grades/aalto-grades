@@ -33,7 +33,7 @@ const FrontPage = (): JSX.Element => {
         }}
       >
         <Typography variant="h2" align="left" sx={{flexGrow: 1}}>
-          Your Courses
+          Your courses
         </Typography>
       </Box>
       {coursesOfUser.data && coursesOfUser.data.length > 0 ? (
@@ -80,7 +80,7 @@ const FrontPage = (): JSX.Element => {
                 variant="contained"
                 onClick={() => setCreateDialogOpen(true)}
               >
-                Create New Course
+                Create new course
               </Button>
             }
           </Box>

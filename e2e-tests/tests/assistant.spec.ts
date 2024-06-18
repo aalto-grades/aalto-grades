@@ -20,7 +20,7 @@ test.beforeEach(async ({page}) => {
   await expect(
     page.getByRole('heading', {name: 'Log in to Aalto Grades'})
   ).toBeHidden();
-  await expect(page.getByRole('heading', {name: 'Your Courses'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Your courses'})).toBeVisible();
 });
 
 test.afterEach(async ({page}) => {
@@ -30,7 +30,7 @@ test.afterEach(async ({page}) => {
   await page.getByRole('menuitem', {name: 'Logout'}).click();
 });
 
-test.describe('Test Courses as Assistant', () => {
+test.describe('Test courses as Assistant', () => {
   test('Check course', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
@@ -38,7 +38,7 @@ test.describe('Test Courses as Assistant', () => {
 
   test('View grading model', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
-    await page.getByRole('button', {name: 'Grading Models'}).click();
+    await page.getByRole('button', {name: 'Grading models'}).click();
 
     await page.getByRole('button', {name: 'O1 Grading'}).click();
     await expect(page.getByTestId('rf__wrapper')).toBeVisible();
@@ -47,7 +47,7 @@ test.describe('Test Courses as Assistant', () => {
   test('View Course Parts', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page
-      .getByRole('link', {name: 'Course Parts'})
+      .getByRole('link', {name: 'Course parts'})
       .getByRole('button')
       .click();
     await expect(page.getByText('Tier A')).toBeVisible();

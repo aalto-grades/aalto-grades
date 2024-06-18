@@ -113,7 +113,7 @@ const UploadDialogConfirm = ({
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'date' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            Completion And Expiration Dates
+            Completion and expiration dates
           </AccordionSummary>
           <AccordionDetails>
             {dates.length > nonEmptyCols.length && (
@@ -129,9 +129,9 @@ const UploadDialogConfirm = ({
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Course Part</TableCell>
-                      <TableCell>Completion Date</TableCell>
-                      <TableCell>Expiration Date</TableCell>
+                      <TableCell>Course part</TableCell>
+                      <TableCell>Completion date</TableCell>
+                      <TableCell>Expiration date</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -197,7 +197,7 @@ const UploadDialogConfirm = ({
           disabled={error}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            Confirm Data
+            Confirm data
           </AccordionSummary>
           <AccordionDetails>
             <div style={{height: '70vh'}}>

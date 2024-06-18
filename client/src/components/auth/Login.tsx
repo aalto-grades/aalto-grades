@@ -59,7 +59,7 @@ const Login = (): JSX.Element => {
         }}
       >
         <Typography variant="h3" sx={{mb: 1}}>
-          Local Users
+          Local users
         </Typography>
         <Typography variant="body2" sx={{mb: 1}}>
           If you have been provided with credentials specifically for Aalto
@@ -125,7 +125,7 @@ const Login = (): JSX.Element => {
             sx={{mt: 1}}
             disabled={email === '' || password === ''}
           >
-            log in
+            Log in
           </Button>
         </form>
       </Box>

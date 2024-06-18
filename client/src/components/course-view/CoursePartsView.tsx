@@ -206,7 +206,7 @@ const CoursePartsView = (): JSX.Element => {
     elements.push(
       <GridActionsCellItem
         icon={<AddCircle />}
-        label="Add A+ Grade Source"
+        label="Add A+ grade source"
         onClick={() => window.alert('Not implemented!')}
       />
     );
@@ -215,7 +215,7 @@ const CoursePartsView = (): JSX.Element => {
       elements.push(
         <GridActionsCellItem
           icon={<More />}
-          label="View A+ Grade Sources"
+          label="View A+ grade sources"
           onClick={() => {
             setAplusGradeSources(params.row.aplusGradeSources);
             setViewAplusSourcesOpen(true);
@@ -273,19 +273,19 @@ const CoursePartsView = (): JSX.Element => {
     },
     {
       field: 'daysValid',
-      headerName: 'Days Valid',
+      headerName: 'Days valid',
       type: 'number',
       editable: true,
     },
     {
       field: 'validUntil',
-      headerName: 'Valid Until',
+      headerName: 'Valid until',
       type: 'date',
       editable: true,
     },
     {
       field: 'aplusGradeSources',
-      headerName: 'A+ Grade Sources',
+      headerName: 'A+ grade sources',
       type: 'actions',
       getActions: getAplusActions,
     },
@@ -336,7 +336,7 @@ const CoursePartsView = (): JSX.Element => {
 
       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
         <Typography width={'fit-content'} variant="h2">
-          Course Parts
+          Course parts
         </Typography>
         <SaveBar
           show={editRights && unsavedChanges}
@@ -351,10 +351,10 @@ const CoursePartsView = (): JSX.Element => {
         {editRights && (
           <>
             <Button variant="outlined" onClick={() => setAddDialogOpen(true)}>
-              Add New
+              Add new
             </Button>
             <Button variant="outlined" onClick={() => setAplusDialogOpen(true)}>
-              Add From A+
+              Add from A+
             </Button>
           </>
         )}

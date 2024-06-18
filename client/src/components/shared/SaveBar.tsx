@@ -40,9 +40,9 @@ const SaveBar = ({
         {/* {loading ? (
             <Typography variant="body2">Saving...</Typography>
           ) : (
-            <Typography variant="body2">Unsaved Changes</Typography>
+            <Typography variant="body2">Unsaved changes</Typography>
             )}{' '}   */}
-        <Typography variant="body2">Unsaved Changes</Typography>
+        <Typography variant="body2">Unsaved changes</Typography>
         <Button
           id="ag-save-course-btn"
           // variant="outlined"

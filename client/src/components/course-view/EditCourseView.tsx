@@ -348,7 +348,7 @@ const EditCourseView = (): JSX.Element => {
             <Form>
               <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                 <Typography width={'fit-content'} variant="h2">
-                  Edit Course
+                  Edit course
                 </Typography>
                 <SaveBar
                   show={unsavedChanges}
@@ -385,28 +385,28 @@ const EditCourseView = (): JSX.Element => {
                     form={form}
                     value="courseCode"
                     disabled={auth?.role !== SystemRole.Admin}
-                    label="Course Code*"
+                    label="Course code*"
                     helperText="Give code for the new course."
                   />
                   <FormLanguagesField
                     form={form}
                     disabled={auth?.role !== SystemRole.Admin}
                     valueFormat="name%"
-                    labelFormat="Course Name in %*"
+                    labelFormat="Course name in %*"
                     helperTextFormat="Give the name of the course in %."
                   />
                   <FormLanguagesField
                     form={form}
                     disabled={auth?.role !== SystemRole.Admin}
                     valueFormat="department%"
-                    labelFormat="Organizing Department in %*"
+                    labelFormat="Organizing department in %*"
                     helperTextFormat="Give the organizing department of the new course in %."
                   />
                   <FormField
                     form={form}
                     value="minCredits"
                     disabled={auth?.role !== SystemRole.Admin}
-                    label="Minimum Course Credits (ECTS)*"
+                    label="Minimum course credits (ECTS)*"
                     helperText="Input minimum credits."
                     type="number"
                   />
@@ -414,7 +414,7 @@ const EditCourseView = (): JSX.Element => {
                     form={form}
                     value="maxCredits"
                     disabled={auth?.role !== SystemRole.Admin}
-                    label="Maximum Course Credits (ECTS)*"
+                    label="Maximum course credits (ECTS)*"
                     helperText="Input maximum credits."
                     type="number"
                   />
@@ -425,7 +425,7 @@ const EditCourseView = (): JSX.Element => {
                       auth?.role !== SystemRole.Admin &&
                       finalGrades.data.length > 0
                     }
-                    label="Grading Scale*"
+                    label="Grading scale*"
                     helperText="Grading scale of the course, e.g., 0-5 or pass/fail."
                     select
                   >
@@ -439,7 +439,7 @@ const EditCourseView = (): JSX.Element => {
                     form={form}
                     value="languageOfInstruction"
                     disabled={auth?.role !== SystemRole.Admin}
-                    label="Course Language*"
+                    label="Course language*"
                     helperText="Language in which the course will be conducted."
                     select
                   >
@@ -459,7 +459,7 @@ const EditCourseView = (): JSX.Element => {
                     disabled={
                       auth?.role !== SystemRole.Admin || form.isSubmitting
                     }
-                    label="Teachers In Charge*"
+                    label="Teachers in charge*"
                     margin="normal"
                     InputLabelProps={{shrink: true}}
                     helperText={

@@ -142,7 +142,7 @@ const SisuDownloadDialog = ({
       TransitionProps={{onExited: handleExited}}
       fullWidth
     >
-      <DialogTitle>Download Final Grades as Sisu CSV</DialogTitle>
+      <DialogTitle>Download final grades as Sisu CSV</DialogTitle>
       <DialogContent sx={{pb: 0}}>
         <DialogContentText sx={{mb: 3, color: 'black'}}>
           Grading date defaults to the latest submission of the student.
@@ -185,7 +185,7 @@ const SisuDownloadDialog = ({
           >
             <DatePicker
               sx={{mt: 2}}
-              label="Assessment Date"
+              label="Assessment date"
               value={assessmentDate}
               onChange={newDate => newDate && setAssessmentDate(newDate)}
             />
@@ -225,7 +225,7 @@ const SisuDownloadDialog = ({
           </Box>
         )}
         <Typography variant="h6" sx={{mt: 1}}>
-          Selected Students
+          Selected students
         </Typography>
         <Paper sx={{maxHeight: 200, overflow: 'auto', my: 1}}>
           <List dense>

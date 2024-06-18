@@ -22,7 +22,7 @@ import {getCourseRole} from '../../utils/utils';
 const headCells: HeadCellData[] = [
   {id: 'code', label: 'Code'},
   {id: 'name', label: 'Name'},
-  {id: 'department', label: 'Organizing Department'},
+  {id: 'department', label: 'Organizing department'},
   {id: 'role', label: 'Role'},
 ];
 

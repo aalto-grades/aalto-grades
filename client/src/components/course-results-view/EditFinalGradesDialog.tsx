@@ -172,13 +172,13 @@ const EditFinalGradesDialog = ({
     },
     {
       field: 'gradingModel',
-      headerName: 'Grading Model Name',
+      headerName: 'Grading model name',
       type: 'string',
       editable: false,
     },
     {
       field: 'exportDate',
-      headerName: 'Export Date',
+      headerName: 'Export date',
       type: 'date',
       editable: true,
       width: 110, // Enough width to fit the calendar icon
@@ -232,7 +232,7 @@ const EditFinalGradesDialog = ({
     return (
       <GridToolbarContainer>
         <Button startIcon={<Add />} onClick={addFinalGrade}>
-          Add Final Grade
+          Add final grade
         </Button>
       </GridToolbarContainer>
     );

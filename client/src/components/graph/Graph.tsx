@@ -606,7 +606,7 @@ const Graph = ({
                     onDragStart={event => onDragStart(event, 'minpoints')}
                     draggable
                   >
-                    Require Minimum Points
+                    Require minimum points
                   </div>
                   <div
                     className="dndnode"
@@ -620,7 +620,7 @@ const Graph = ({
                     onDragStart={event => onDragStart(event, 'require')}
                     draggable
                   >
-                    Require Passing Values
+                    Require passing values
                   </div>
                   <div
                     className="dndnode"
@@ -643,7 +643,7 @@ const Graph = ({
                     onClick={() => setCoursePartsSelectOpen(true)}
                     variant="outlined"
                   >
-                    Select Course Parts
+                    Select course parts
                   </Button>
                   <Button
                     onClick={() => setCoursePartValuesOpen(true)}

@@ -35,7 +35,7 @@ const ViewAplusGradeSourcesDialog = ({
   const getSourceName = (source: AplusGradeSourceData): string => {
     switch (source.sourceType) {
       case AplusGradeSourceType.FullPoints:
-        return 'Full Points';
+        return 'Full points';
       case AplusGradeSourceType.Module:
         return source.moduleName;
       case AplusGradeSourceType.Difficulty:
@@ -45,17 +45,17 @@ const ViewAplusGradeSourcesDialog = ({
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>A+ Grade Sources</DialogTitle>
+      <DialogTitle>A+ grade sources</DialogTitle>
       <DialogContent>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Course Code</TableCell>
-                <TableCell>Course Name</TableCell>
-                <TableCell>Course Instance</TableCell>
+                <TableCell>Course code</TableCell>
+                <TableCell>Course name</TableCell>
+                <TableCell>Course instance</TableCell>
                 <TableCell>Course URL</TableCell>
-                <TableCell>Source Name</TableCell>
+                <TableCell>Source name</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

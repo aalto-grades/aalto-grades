@@ -37,8 +37,8 @@ describe('Tests for Login and LoginForm components', () => {
     renderLogin();
 
     expect(screen.getByText('Log in to Aalto Grades')).toBeDefined();
-    expect(screen.getByText('Aalto University Users')).toBeDefined();
-    expect(screen.getByText('Local Users')).toBeDefined();
+    expect(screen.getByText('Aalto University users')).toBeDefined();
+    expect(screen.getByText('Local users')).toBeDefined();
     expect(screen.getByLabelText('Email')).toBeDefined();
     expect(screen.getByLabelText('Password')).toBeDefined();
     expect(screen.getByText('log in')).toBeDefined();

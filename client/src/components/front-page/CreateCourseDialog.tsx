@@ -263,44 +263,44 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
             }}
           />
           <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-            <DialogTitle>Create a New Course</DialogTitle>
+            <DialogTitle>Create a new course</DialogTitle>
             <DialogContent dividers>
               <FormField
                 form={form}
                 value="courseCode"
-                label="Course Code*"
+                label="Course code*"
                 helperText="Give code for the new course."
               />
               <FormLanguagesField
                 form={form}
                 valueFormat="name%"
-                labelFormat="Course Name in %*"
+                labelFormat="Course name in %*"
                 helperTextFormat="Give the name of the course in %."
               />
               <FormLanguagesField
                 form={form}
                 valueFormat="department%"
-                labelFormat="Organizing Department in %*"
+                labelFormat="Organizing department in %*"
                 helperTextFormat="Give the organizing department of the new course in %."
               />
               <FormField
                 form={form}
                 value="minCredits"
-                label="Minimum Course Credits (ECTS)*"
+                label="Minimum course credits (ECTS)*"
                 helperText="Input minimum credits."
                 type="number"
               />
               <FormField
                 form={form}
                 value="maxCredits"
-                label="Maximum Course Credits (ECTS)*"
+                label="Maximum course credits (ECTS)*"
                 helperText="Input maximum credits."
                 type="number"
               />
               <FormField
                 form={form}
                 value="gradingScale"
-                label="Grading Scale*"
+                label="Grading scale*"
                 helperText="Grading scale of the course, e.g., 0-5 or pass/fail."
                 select
               >
@@ -313,7 +313,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               <FormField
                 form={form}
                 value="languageOfInstruction"
-                label="Course Language*"
+                label="Course language*"
                 helperText="Language in which the course will be conducted."
                 select
               >
@@ -329,7 +329,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 fullWidth
                 value={form.values.teacherEmail}
                 disabled={form.isSubmitting}
-                label="Teachers In Charge*"
+                label="Teachers in charge*"
                 margin="normal"
                 InputLabelProps={{shrink: true}}
                 helperText={

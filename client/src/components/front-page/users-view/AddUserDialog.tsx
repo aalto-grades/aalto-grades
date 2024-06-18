@@ -111,7 +111,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
                 onClick={form.submitForm}
                 disabled={form.isSubmitting}
               >
-                Add User
+                Add user
               </Button>
             </DialogActions>
           </Dialog>
