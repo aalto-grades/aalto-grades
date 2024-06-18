@@ -9,13 +9,14 @@ import {
   Grid,
   IconButton,
   InputAdornment,
+  Link,
   Tooltip,
   Typography,
 } from '@mui/material';
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {Navigate, useLocation, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
 import {AaltoEmailSchema, PasswordSchema} from '@/common/types';
@@ -134,6 +135,9 @@ const ResetPassword = (): JSX.Element => {
     </InputAdornment>
   );
 
+  // TODO: Redirect if no auth data
+  if (state === null) return <Navigate to="/login" />;
+
   return (
     <Grid
       container
@@ -149,6 +153,7 @@ const ResetPassword = (): JSX.Element => {
           borderRadius: '8px',
           borderColor: 'gray',
           p: 2,
+          mt: 1,
         }}
       >
         <Formik
@@ -158,21 +163,6 @@ const ResetPassword = (): JSX.Element => {
         >
           {form => (
             <>
-              <FormField
-                form={form as unknown as FormikProps<{[key: string]: unknown}>}
-                value="email"
-                label="Email*"
-                helperText="Email"
-                type={'email'}
-              />
-              <FormField
-                form={form as unknown as FormikProps<{[key: string]: unknown}>}
-                value="oldPassword"
-                label="Old Password*"
-                helperText="Old password"
-                type={showPassword.old ? 'text' : 'password'}
-                InputProps={{endAdornment: <ShowPasswordButton type="old" />}}
-              />
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="newPassword"
@@ -191,13 +181,27 @@ const ResetPassword = (): JSX.Element => {
                   endAdornment: <ShowPasswordButton type="repeat" />,
                 }}
               />
-              <Button
-                variant="contained"
-                onClick={form.submitForm}
-                disabled={form.isSubmitting}
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-end',
+                }}
               >
-                Reset password
-              </Button>
+                <Link
+                  href="https://www.aalto.fi/en/services/password-guidelines"
+                  target="_blank"
+                >
+                  Aalto password requirements
+                </Link>
+                <Button
+                  variant="contained"
+                  onClick={form.submitForm}
+                  disabled={form.isSubmitting}
+                >
+                  Reset password
+                </Button>
+              </Box>
             </>
           )}
         </Formik>
