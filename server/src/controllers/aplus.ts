@@ -223,9 +223,10 @@ export const fetchAplusGrades = async (
           for (const module of student.modules) {
             if (module.id === gradeSource.moduleId) {
               grade = module.points;
+              break;
             }
           }
-          if (!grade) {
+          if (grade === undefined) {
             throw new ApiError(
               `A+ course with ID ${aplusCourseId} has no module with ID ${gradeSource.moduleId}`,
               HttpCode.InternalServerError
