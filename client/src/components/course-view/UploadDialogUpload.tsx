@@ -121,7 +121,7 @@ const UploadDialogUpload = ({
       const rowData = {id: rowI} as GradeUploadColTypes;
       for (let i = 0; i < csvRow.length; i++) {
         const columnKey = keyMap[csvKeys[i]];
-        if (columnKey === 'Ignore Column') continue;
+        if (columnKey === 'ignoreColumn') continue;
         if (columnKey === 'studentNo') {
           rowData.studentNo = csvRow[i].toString();
           continue;
@@ -189,7 +189,7 @@ const UploadDialogUpload = ({
 
   return (
     <>
-      <DialogTitle>Upload Grades</DialogTitle>
+      <DialogTitle>Upload grades</DialogTitle>
       <Dialog
         open={textFieldOpen}
         fullWidth
@@ -259,7 +259,7 @@ const UploadDialogUpload = ({
           }
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            Upload Grades
+            Upload grades
           </AccordionSummary>
           <AccordionDetails>
             <ButtonGroup>
@@ -275,7 +275,7 @@ const UploadDialogUpload = ({
                 />
               </Button>
               <Button variant="outlined" onClick={downloadTemplate}>
-                Download CSV Template
+                Download CSV template
               </Button>
               <Button
                 variant="outlined"

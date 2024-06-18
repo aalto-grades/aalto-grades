@@ -33,7 +33,7 @@ const FrontPage = (): JSX.Element => {
         }}
       >
         <Typography variant="h2" align="left" sx={{flexGrow: 1}}>
-          Your Courses
+          Your courses
         </Typography>
       </Box>
       {coursesOfUser.data && coursesOfUser.data.length > 0 ? (
@@ -75,12 +75,12 @@ const FrontPage = (): JSX.Element => {
             </Typography>
             {
               <Button
-                id="ag_new_course_btn"
+                id="ag-new-course-btn"
                 size="large"
                 variant="contained"
                 onClick={() => setCreateDialogOpen(true)}
               >
-                Create New Course
+                Create new course
               </Button>
             }
           </Box>

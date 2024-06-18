@@ -52,7 +52,7 @@ const AplusTokenDialog = ({
         )}
         <TextField
           sx={{mt: 2, width: 1}}
-          label="API Token"
+          label="API token"
           value={token}
           onChange={e => setToken(e.target.value)}
           required={true}
