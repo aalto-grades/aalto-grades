@@ -17,6 +17,7 @@ export type NewDbGradeData = {
   userId: number;
   coursePartId: number;
   graderId: number;
+  aplusGradeSourceId?: number;
   grade: number;
   sisuExportDate?: Date | null;
   date: Date;
