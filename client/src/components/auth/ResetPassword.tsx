@@ -15,7 +15,7 @@ import {
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
 import {AaltoEmailSchema, PasswordSchema} from '@/common/types';
@@ -44,12 +44,6 @@ type FormData = {
   newPassword: string;
   repeatPassword: string;
 };
-const initialValues = {
-  email: '',
-  oldPassword: '',
-  newPassword: '',
-  repeatPassword: '',
-};
 
 type ShowPassword = {
   old: boolean;
@@ -60,6 +54,16 @@ const ResetPassword = (): JSX.Element => {
   const navigate = useNavigate();
   const {setAuth} = useAuth();
   const resetPassword = useResetPassword();
+  const {state} = useLocation() as {
+    state: {email: string; password: string} | null;
+  };
+
+  const initialValues = {
+    email: state?.email ?? '',
+    oldPassword: state?.password ?? '',
+    newPassword: '',
+    repeatPassword: '',
+  };
 
   const [showPassword, setShowPassword] = useState<ShowPassword>({
     old: false,

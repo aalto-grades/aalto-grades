@@ -31,9 +31,10 @@ const Login = (): JSX.Element => {
 
   const handleSubmit = async (event: SyntheticEvent): Promise<void> => {
     event.preventDefault();
-    const auth = await logIn.mutateAsync({email: email, password: password});
+    const auth = await logIn.mutateAsync({email, password});
 
-    if (auth.resetPassword) return navigate('/reset-password');
+    if (auth.resetPassword)
+      return navigate('/reset-password', {state: {email, password}});
     setAuth(auth);
     navigate('/', {replace: true});
   };
