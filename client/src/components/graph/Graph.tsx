@@ -83,9 +83,9 @@ const dragAndDropNodes: {type: DropInNodes; title: string}[] = [
   {type: 'addition', title: 'Addition'},
   {type: 'average', title: 'Average'},
   {type: 'stepper', title: 'Stepper'},
-  {type: 'minpoints', title: 'Require Minimum Points'},
+  {type: 'minpoints', title: 'Require minimum points'},
   {type: 'max', title: 'Maximum'},
-  {type: 'require', title: 'Require Passing Values'},
+  {type: 'require', title: 'Require passing values'},
   {type: 'round', title: 'Round'},
   {type: 'substitute', title: 'Substitute'},
 ];

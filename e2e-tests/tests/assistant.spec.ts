@@ -44,7 +44,7 @@ test.describe('Test courses as Assistant', () => {
     await expect(page.getByTestId('rf__wrapper')).toBeVisible();
   });
 
-  test('View Course Parts', async ({page}) => {
+  test('View course parts', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page
       .getByRole('link', {name: 'Course parts'})
