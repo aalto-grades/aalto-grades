@@ -63,7 +63,7 @@ const CreateGradingModelDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Create Grading Model</DialogTitle>
+      <DialogTitle>Create grading model</DialogTitle>
       <DialogContent>
         <TextField
           sx={{mt: 1}}

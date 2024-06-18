@@ -17,16 +17,16 @@ const Footer = (): JSX.Element => {
       }}
     >
       <Link href="/privacy-notice" underline="none" sx={{mx: 3}}>
-        Privacy Notice
+        Privacy notice
       </Link>
       <Link href="/accessibility-statement" underline="none" sx={{mr: 3}}>
-        Accessibility Statement
+        Accessibility statement
       </Link>
       <Link href="/support" underline="none" sx={{mr: 3}}>
         Support
       </Link>
       <Link href="/javascript.html" underline="none" sx={{mr: 3}}>
-        JavaScript Licenses
+        JavaScript licenses
       </Link>
       <Tooltip title="Source code opens in a new tab">
         <Link
@@ -43,7 +43,7 @@ const Footer = (): JSX.Element => {
           underline="none"
           sx={{mr: 3}}
         >
-          Source Code
+          Source code
         </Link>
       </Tooltip>
       <Tooltip title="Feedback form opens in a new tab">

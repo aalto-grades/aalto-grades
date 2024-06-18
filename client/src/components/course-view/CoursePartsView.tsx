@@ -206,7 +206,7 @@ const CoursePartsView = (): JSX.Element => {
     elements.push(
       <GridActionsCellItem
         icon={<AddCircle />}
-        label="Add A+ Grade Source"
+        label="Add A+ grade source"
         onClick={() => window.alert('Not implemented!')}
       />
     );
@@ -215,7 +215,7 @@ const CoursePartsView = (): JSX.Element => {
       elements.push(
         <GridActionsCellItem
           icon={<More />}
-          label="View A+ Grade Sources"
+          label="View A+ grade sources"
           onClick={() => {
             setAplusGradeSources(params.row.aplusGradeSources);
             setViewAplusSourcesOpen(true);
@@ -351,10 +351,10 @@ const CoursePartsView = (): JSX.Element => {
         {editRights && (
           <>
             <Button variant="outlined" onClick={() => setAddDialogOpen(true)}>
-              Add New
+              Add new
             </Button>
             <Button variant="outlined" onClick={() => setAplusDialogOpen(true)}>
-              Add From A+
+              Add from A+
             </Button>
           </>
         )}

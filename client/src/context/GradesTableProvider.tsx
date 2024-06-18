@@ -66,7 +66,7 @@ type PropsType = PropsWithChildren & {
   data: StudentRow[];
 };
 
-// // TABLE CREATION
+// Table creation
 declare module '@tanstack/table-core' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -209,7 +209,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     [gradingModels, courseParts.data]
   );
 
-  // Creating Grades columns
+  // Creating grades columns
   const gradeColumns = useMemo(() => {
     const selectedCourseParts =
       getCoursePartsForGradingModel(selectedGradingModel);
@@ -241,13 +241,13 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   // For example calculating the latest attainment date
   // For example grouping by Exported to sisu has no need to create a column
   const groupingColumns =
-    // TODO: SHOULD USE THE VISIBILITY API
+    // TODO: Should use the visibility API
     [
       columnHelper.accessor(row => row.latestBestGrade, {
         id: 'latestBestGrade',
         meta: {PrettyChipPosition: 'first'},
         header: () => {
-          return 'Latest Part Date';
+          return 'Latest part date';
         },
         cell: prop => prop.getValue(),
       }),
@@ -256,7 +256,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   // Creating static columns
   const staticColumns = [
     ...groupingColumns,
-    // Selection Column
+    // Selection column
     columnHelper.display({
       id: 'select',
       size: 70,
@@ -265,12 +265,10 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         return (
           <>
             <Checkbox
-              {...{
-                checked: table.getIsAllRowsSelected(),
-                indeterminate: table.getIsSomeRowsSelected(),
-                onChange: table.getToggleAllRowsSelectedHandler(),
-                id: 'select-all',
-              }}
+              id="select-all"
+              checked={table.getIsAllRowsSelected()}
+              indeterminate={table.getIsSomeRowsSelected()}
+              onChange={table.getToggleAllRowsSelectedHandler()}
             />
             <span style={{marginLeft: '4px', marginRight: '15px'}}>
               <Badge
@@ -349,11 +347,11 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       ),
     }),
     columnHelper.accessor('user.studentNumber', {
-      header: 'Student Number',
+      header: 'Student number',
       meta: {PrettyChipPosition: 'first'},
     }),
     columnHelper.accessor(row => row.finalGrades ?? [], {
-      header: 'Final Grade',
+      header: 'Final grade',
       id: 'finalGrade',
       enableSorting: false,
       getGroupingValue: row => findBestFinalGrade(row.finalGrades ?? [])?.grade,
@@ -433,7 +431,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       }
     ),
     // columnHelper.group({
-    //   header: 'Course Parts',
+    //   header: 'Course parts',
     //   meta: {PrettyChipPosition: 'alone'},
     //   columns: gradeColumns,
     // }),

@@ -105,13 +105,13 @@ const CoursePartValuesDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Set Test Course Part Values</DialogTitle>
+      <DialogTitle>Set test course part values</DialogTitle>
 
       <DialogContent>
         {coursePartNodeIds.map(coursePartId => (
           <TextField
+            key={coursePartId}
             sx={{mt: 2}}
-            key={`attval-${coursePartId}`}
             value={values[coursePartId] ?? 0}
             label={coursePartNames[coursePartId]}
             onChange={e => onChange(coursePartId, e)}

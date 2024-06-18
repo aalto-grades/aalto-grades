@@ -14,7 +14,7 @@ export const mockCourse: CourseData = {
     en: 'Department of Computer Science',
     sv: 'Institutionen för datateknik',
   },
-  name: {fi: 'Example Average', en: 'Example Average', sv: 'Example Average'},
+  name: {fi: 'Example average', en: 'Example average', sv: 'Example average'},
   gradingScale: GradingScale.Numerical,
   languageOfInstruction: Language.English,
   teachersInCharge: [

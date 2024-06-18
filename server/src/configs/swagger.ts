@@ -13,8 +13,8 @@ export const definition: OAS3Definition = {
   openapi: '3.0.1',
   info: {
     version: '1.0.0',
-    title: 'API Documentation',
-    description: 'Documentation of Aalto Grades Backend API',
+    title: 'API documentation',
+    description: 'Documentation of Aalto Grades backend API',
     termsOfService: '',
     license: {
       name: 'Expat (MIT)',

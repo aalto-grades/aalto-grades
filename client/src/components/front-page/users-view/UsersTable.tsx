@@ -38,7 +38,7 @@ const UsersTable = (): JSX.Element => {
   return (
     <>
       <DeleteUserDialog
-        title="Delete User"
+        title="Delete user"
         handleAccept={handleDelete}
         handleClose={() => setToBeDeleted(null)}
         open={toBeDeleted !== null}

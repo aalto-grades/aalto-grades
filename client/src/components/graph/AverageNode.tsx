@@ -154,7 +154,7 @@ const AverageNode = (props: NodeProps): JSX.Element => {
     <BaseNode {...props} error={error}>
       {handles.map((key, index) => (
         <Handle
-          key={`handle-${key}`}
+          key={key}
           type="target"
           id={key}
           style={{
@@ -196,7 +196,7 @@ const AverageNode = (props: NodeProps): JSX.Element => {
             <th>value</th>
           </tr>
           {Object.entries(localSettings.weights).map(([key, weight]) => (
-            <tr key={`tr-${id}-${key}`}>
+            <tr key={key}>
               <td>
                 <input
                   style={{width: '40px'}}
