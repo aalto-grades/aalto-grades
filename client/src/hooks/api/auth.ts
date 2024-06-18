@@ -14,6 +14,7 @@ import {
 import {
   AuthData,
   AuthDataSchema,
+  ChangePasswordData,
   LoginData,
   LoginResult,
   LoginResultSchema,
@@ -46,7 +47,7 @@ export const useLogOut = (
   options?: UseMutationOptions<unknown, unknown, unknown>
 ): UseMutationResult<unknown, unknown, unknown> =>
   useMutation({
-    mutationFn: async () => await axios.post('/v1/auth/logout'),
+    mutationFn: () => axios.post('/v1/auth/logout'),
     ...options,
   });
 
@@ -58,5 +59,14 @@ export const useResetPassword = (
       AuthDataSchema.parse(
         (await axios.post('/v1/auth/reset-password', credentials)).data
       ),
+    ...options,
+  });
+
+export const useChangePassword = (
+  options?: UseMutationOptions<unknown, unknown, ChangePasswordData>
+): UseMutationResult<unknown, unknown, ChangePasswordData> =>
+  useMutation({
+    mutationFn: (credentials: ChangePasswordData) =>
+      axios.post('/v1/auth/change-password', credentials),
     ...options,
   });

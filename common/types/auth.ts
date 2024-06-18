@@ -4,6 +4,8 @@
 
 import {z} from 'zod';
 
+import {PasswordSchema} from './user';
+
 export enum SystemRole {
   User = 'USER',
   Admin = 'ADMIN',
@@ -38,8 +40,10 @@ export const ResetPasswordDataSchema = z.object({
   password: z.string(),
   newPassword: z.string(),
 });
+export const ChangePasswordDataSchema = z.object({newPassword: PasswordSchema});
 
 export type AuthData = z.infer<typeof AuthDataSchema>;
 export type LoginData = z.infer<typeof LoginDataSchema>;
 export type LoginResult = z.infer<typeof LoginResultSchema>;
 export type ResetPasswordData = z.infer<typeof ResetPasswordDataSchema>;
+export type ChangePasswordData = z.infer<typeof ChangePasswordDataSchema>;

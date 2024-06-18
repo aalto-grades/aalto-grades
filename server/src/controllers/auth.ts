@@ -13,6 +13,7 @@ import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   AuthData,
+  ChangePasswordDataSchema,
   HttpCode,
   LoginDataSchema,
   LoginResult,
@@ -208,6 +209,36 @@ export const authResetPassword = (
       }
     ) as RequestHandler
   )(req, res, next);
+};
+
+export const authChangePassword = async (
+  req: TypedRequestBody<typeof ChangePasswordDataSchema>,
+  res: Response
+): Promise<Response | void> => {
+  const user = req.user as JwtClaims;
+
+  const dbUser = await User.findByPk(user.id);
+  if (dbUser === null) {
+    logger.error(`User ${user.id} not found after validating credentials`);
+    throw new ApiError(
+      'User not found after validating credentials',
+      HttpCode.InternalServerError
+    );
+  }
+
+  // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+  await dbUser
+    .set({
+      password: await argon.hash(req.body.newPassword, {
+        type: argon.argon2id,
+        memoryCost: 19456,
+        parallelism: 1,
+        timeCost: 2,
+      }),
+    })
+    .save();
+
+  res.sendStatus(HttpCode.Ok);
 };
 
 /** @throws ApiError(401) */

@@ -7,8 +7,13 @@ import express, {RequestHandler, Router} from 'express';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
-import {LoginDataSchema, ResetPasswordDataSchema} from '@/common/types';
 import {
+  ChangePasswordDataSchema,
+  LoginDataSchema,
+  ResetPasswordDataSchema,
+} from '@/common/types';
+import {
+  authChangePassword,
   authLogin,
   authLogout,
   authResetPassword,
@@ -51,6 +56,15 @@ router.post(
   handleInvalidRequestJson,
   processRequestBody(ResetPasswordDataSchema),
   authResetPassword
+);
+
+router.post(
+  '/v1/auth/change-password',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  express.json(),
+  handleInvalidRequestJson,
+  processRequestBody(ChangePasswordDataSchema),
+  controllerDispatcher(authChangePassword)
 );
 
 router.get(

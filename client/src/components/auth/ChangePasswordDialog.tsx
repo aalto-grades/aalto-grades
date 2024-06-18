@@ -4,93 +4,68 @@
 
 import {Visibility, VisibilityOff} from '@mui/icons-material';
 import {
-  Box,
   Button,
-  Grid,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
   InputAdornment,
   Link,
   Tooltip,
-  Typography,
 } from '@mui/material';
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
-import {Navigate, useLocation, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
-import {AaltoEmailSchema, PasswordSchema} from '@/common/types';
-import {useResetPassword} from '../../hooks/useApi';
-import useAuth from '../../hooks/useAuth';
+import {PasswordSchema} from '@/common/types';
+import {useChangePassword} from '../../hooks/useApi';
 import FormField from '../shared/FormikField';
 
 const ValidationSchema = z
   .object({
-    email: AaltoEmailSchema,
-    oldPassword: z.string(),
     newPassword: PasswordSchema,
     repeatPassword: PasswordSchema,
   })
   .refine(val => val.newPassword === val.repeatPassword, {
     path: ['repeatPassword'],
     message: 'Passwords must match',
-  })
-  .refine(val => val.oldPassword !== val.newPassword, {
-    path: ['newPassword'],
-    message: 'New password cannot be the same as the old password',
   });
 type FormData = {
-  email: string;
-  oldPassword: string;
   newPassword: string;
   repeatPassword: string;
 };
+const initialValues = {newPassword: '', repeatPassword: ''};
 
 type ShowPassword = {
-  old: boolean;
   new: boolean;
   repeat: boolean;
 };
-const ResetPassword = (): JSX.Element => {
-  const navigate = useNavigate();
-  const {setAuth} = useAuth();
-  const resetPassword = useResetPassword();
-  const {state} = useLocation() as {
-    state: {email: string; password: string} | null;
-  };
+
+type PropsType = {open: boolean; onClose: () => void};
+const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
+  const changePassword = useChangePassword();
 
   const [showPassword, setShowPassword] = useState<ShowPassword>({
-    old: false,
     new: false,
     repeat: false,
   });
-
-  const initialValues = {
-    email: state?.email ?? '',
-    oldPassword: state?.password ?? '',
-    newPassword: '',
-    repeatPassword: '',
-  };
 
   const handleSubmit = async (
     values: FormData,
     {resetForm, setSubmitting}: FormikHelpers<FormData>
   ): Promise<void> => {
-    const auth = await resetPassword
-      .mutateAsync({
-        email: values.email,
-        password: values.oldPassword,
-        newPassword: values.newPassword,
-      })
-      .catch(() => setSubmitting(false));
-    if (auth === undefined) return;
-
-    enqueueSnackbar('Password reset successfully', {variant: 'success'});
+    try {
+      await changePassword.mutateAsync({newPassword: values.newPassword});
+    } catch (e) {
+      setSubmitting(false);
+      return;
+    }
+    enqueueSnackbar('Password changed successfully', {variant: 'success'});
     setSubmitting(false);
     resetForm();
-
-    setAuth(auth);
-    navigate('/', {replace: true});
+    onClose();
   };
 
   const validateForm = (
@@ -105,8 +80,8 @@ const ResetPassword = (): JSX.Element => {
     );
   };
 
-  type PropsType = {type: keyof ShowPassword};
-  const ShowPasswordButton = ({type}: PropsType): JSX.Element => (
+  type ButtonPropsType = {type: keyof ShowPassword};
+  const ShowPasswordButton = ({type}: ButtonPropsType): JSX.Element => (
     <InputAdornment position="start">
       <IconButton
         aria-label="toggle password visibility"
@@ -133,34 +108,17 @@ const ResetPassword = (): JSX.Element => {
     </InputAdornment>
   );
 
-  // TODO: Redirect if no auth data
-  if (state === null) return <Navigate to="/login" />;
-
   return (
-    <Grid
-      container
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-    >
-      <Typography variant="h2">Reset password</Typography>
-      <Box
-        sx={{
-          width: 1 / 2,
-          border: 1,
-          borderRadius: '8px',
-          borderColor: 'gray',
-          p: 2,
-          mt: 1,
-        }}
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
+      <Formik
+        initialValues={initialValues}
+        validate={validateForm}
+        onSubmit={handleSubmit}
       >
-        <Formik
-          initialValues={initialValues}
-          validate={validateForm}
-          onSubmit={handleSubmit}
-        >
-          {form => (
-            <>
+        {form => (
+          <>
+            <DialogTitle>Change password</DialogTitle>
+            <DialogContent>
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="newPassword"
@@ -179,32 +137,32 @@ const ResetPassword = (): JSX.Element => {
                   endAdornment: <ShowPasswordButton type="repeat" />,
                 }}
               />
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-end',
-                }}
+            </DialogContent>
+            <DialogActions
+              sx={{
+                justifyContent: 'space-between',
+                alignItems: 'flex-end',
+              }}
+            >
+              <Link
+                sx={{mb: 1, ml: 1.5}}
+                href="https://www.aalto.fi/en/services/password-guidelines"
+                target="_blank"
               >
-                <Link
-                  href="https://www.aalto.fi/en/services/password-guidelines"
-                  target="_blank"
-                >
-                  Aalto password requirements
-                </Link>
-                <Button
-                  variant="contained"
-                  onClick={form.submitForm}
-                  disabled={form.isSubmitting}
-                >
-                  Reset password
-                </Button>
-              </Box>
-            </>
-          )}
-        </Formik>
-      </Box>
-    </Grid>
+                Aalto password requirements
+              </Link>
+              <Button
+                variant="contained"
+                onClick={form.submitForm}
+                disabled={form.isSubmitting}
+              >
+                Reset password
+              </Button>
+            </DialogActions>
+          </>
+        )}
+      </Formik>
+    </Dialog>
   );
 };
-export default ResetPassword;
+export default ChangePasswordDialog;
