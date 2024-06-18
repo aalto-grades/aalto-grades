@@ -240,13 +240,7 @@ export const fetchAplusGrades = async (
               HttpCode.InternalServerError
             );
           }
-          if (!(gradeSource.difficulty in student.points_by_difficulty)) {
-            throw new ApiError(
-              `A+ course with ID ${aplusCourseId} has no difficulty ${gradeSource.difficulty}`,
-              HttpCode.InternalServerError
-            );
-          }
-          grade = student.points_by_difficulty[gradeSource.difficulty];
+          grade = student.points_by_difficulty[gradeSource.difficulty] ?? 0;
           break;
       }
 
