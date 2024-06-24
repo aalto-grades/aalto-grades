@@ -17,12 +17,13 @@ import {
   CourseDataArraySchema,
   CourseWithFinalGrades,
   CourseWithFinalGradesArraySchema,
-  IdpUsersSchema,
   NewUser,
   NewUserResponse,
   NewUserResponseSchema,
   UserData,
   UserDataArraySchema,
+  FullUserData,
+  UserWithRoleArraySchema,
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
@@ -60,6 +61,16 @@ export const useGetStudents = (
     ...options,
   });
 
+export const useGetUsers = (
+  options?: Partial<UseQueryOptions<FullUserData[]>>
+): UseQueryResult<FullUserData[]> =>
+  useQuery({
+    queryKey: ['users'],
+    queryFn: async () =>
+      UserWithRoleArraySchema.parse((await axios.get('/v1/users')).data),
+    ...options,
+  });
+
 export const useAddUser = (
   options?: UseMutationOptions<NewUserResponse, unknown, NewUser>
 ): UseMutationResult<NewUserResponse, unknown, NewUser> => {
@@ -70,30 +81,20 @@ export const useAddUser = (
         (await axios.post('/v1/users', idpUser)).data
       ),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['idp-users']});
+      queryClient.invalidateQueries({queryKey: ['users']});
     },
     ...options,
   });
 };
-
-export const useGetIdpUsers = (
-  options?: Partial<UseQueryOptions<{email: string | null; id: number}[]>>
-): UseQueryResult<{email: string | null; id: number}[]> =>
-  useQuery({
-    queryKey: ['idp-users'],
-    queryFn: async () =>
-      IdpUsersSchema.parse((await axios.get('/v1/idp-users')).data),
-    ...options,
-  });
 
 export const useDeleteUser = (
   options?: UseMutationOptions<unknown, unknown, number>
 ): UseMutationResult<unknown, unknown, number> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: number) => axios.delete(`/v1/idp-users/${id}`),
+    mutationFn: (id: number) => axios.delete(`/v1/users/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['idp-users']});
+      queryClient.invalidateQueries({queryKey: ['users']});
     },
     ...options,
   });

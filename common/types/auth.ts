@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {z} from 'zod';
-
-import {PasswordSchema} from './user';
+import zxcvbn from 'zxcvbn';
 
 export enum SystemRole {
   User = 'USER',
@@ -12,6 +11,30 @@ export enum SystemRole {
 }
 
 export const SystemRoleSchema = z.nativeEnum(SystemRole);
+export const PasswordSchema = z.string().superRefine((password, ctx) => {
+  const result = zxcvbn(password);
+  if (password.length < 12) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Password must be at least 12 characters long',
+    });
+  }
+
+  if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/.test(password)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        'A password must include at least one upper case character, one lower case character and one numeric',
+    });
+  }
+
+  if (result.score < 4) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Password too weak. (estimated 10^${Math.floor(10 * result.guesses_log10) / 10} <= 10^10 guesses)`,
+    });
+  }
+});
 
 export const AuthDataSchema = z.object({
   id: z.number().int(),

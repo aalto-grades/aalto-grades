@@ -9,9 +9,9 @@ import {processRequestBody} from 'zod-express-middleware';
 import {NewUserSchema, SystemRole} from '@/common/types';
 import {
   addUser,
-  deleteIdpUser,
+  deleteUser,
   getGradesOfUser,
-  getIdpUsers,
+  getUsers,
   getOwnCourses,
   getStudents,
 } from '../controllers/user';
@@ -40,10 +40,10 @@ router.get(
 );
 
 router.get(
-  '/v1/idp-users',
+  '/v1/users',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   authorization([SystemRole.Admin]),
-  controllerDispatcher(getIdpUsers)
+  controllerDispatcher(getUsers)
 );
 
 router.post(
@@ -57,9 +57,9 @@ router.post(
 );
 
 router.delete(
-  '/v1/idp-users/:userId',
+  '/v1/users/:userId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   authorization([SystemRole.Admin]),
   express.json(),
-  controllerDispatcher(deleteIdpUser)
+  controllerDispatcher(deleteUser)
 );

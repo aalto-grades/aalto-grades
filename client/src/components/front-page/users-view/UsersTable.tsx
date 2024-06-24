@@ -4,18 +4,22 @@
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
+  Box,
   IconButton,
+  Tab,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  Tabs,
   Typography,
 } from '@mui/material';
-import {JSX, useState} from 'react';
+import {JSX, useMemo, useState} from 'react';
 
+import {SystemRole} from '@/common/types';
 import DeleteUserDialog from './DeleteUserDialog';
-import {useDeleteUser, useGetIdpUsers} from '../../../hooks/useApi';
+import {useDeleteUser, useGetUsers} from '../../../hooks/useApi';
 import {HeadCellData} from '../../../types';
 
 const headCells: HeadCellData[] = [
@@ -25,8 +29,16 @@ const headCells: HeadCellData[] = [
 
 const UsersTable = (): JSX.Element => {
   const deleteUser = useDeleteUser();
-  const users = useGetIdpUsers();
+  const users = useGetUsers();
+  const [tab, setTab] = useState<number>(0);
   const [toBeDeleted, setToBeDeleted] = useState<number | null>(null);
+
+  const shownUsers = useMemo(() => {
+    if (users.data === undefined) return [];
+    if (tab === 0)
+      return users.data.filter(user => user.idpUser && user.email !== null);
+    return users.data.filter(user => user.role === SystemRole.Admin);
+  }, [tab, users.data]);
 
   const handleDelete = (id: number): void => {
     setToBeDeleted(null);
@@ -46,37 +58,40 @@ const UsersTable = (): JSX.Element => {
         description="Do you want to delete this user?"
       />
 
-      <Table>
-        <TableHead>
-          <TableRow>
-            {headCells.map(headCell => (
-              <TableCell key={headCell.id}>
-                <Typography sx={{fontWeight: 'bold'}}>
-                  {headCell.label}
-                </Typography>
-              </TableCell>
+      <Tabs value={tab} onChange={(_, newTab: number) => setTab(newTab)}>
+        <Tab label="IDP-Users" sx={{textTransform: 'none'}} />
+        <Tab label="Admins" sx={{textTransform: 'none'}} />
+      </Tabs>
+      <Box sx={{px: 1}}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              {headCells.map(headCell => (
+                <TableCell key={headCell.id}>
+                  <Typography sx={{fontWeight: 'bold'}}>
+                    {headCell.label}
+                  </Typography>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {shownUsers.map(user => (
+              <TableRow key={user.email} hover={true}>
+                <TableCell sx={{width: '75%'}}>{user.email}</TableCell>
+                <TableCell>
+                  <IconButton
+                    aria-label="delete"
+                    onClick={() => setToBeDeleted(user.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
             ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {users.data?.map(
-            user =>
-              user.email && (
-                <TableRow key={user.email} hover={true}>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <IconButton
-                      aria-label="delete"
-                      onClick={() => setToBeDeleted(user.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              )
-          )}
-        </TableBody>
-      </Table>
+          </TableBody>
+        </Table>
+      </Box>
     </>
   );
 };

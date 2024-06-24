@@ -13,11 +13,11 @@ import {
   CourseRoleType,
   CourseWithFinalGrades,
   HttpCode,
-  IdpUsers,
   NewUserResponse,
   NewUserSchema,
   SystemRole,
   UserData,
+  FullUserData,
 } from '@/common/types';
 import {parseCourseFull} from './utils/course';
 import {validateUserAndGrader} from './utils/grades';
@@ -220,15 +220,16 @@ export const getStudents = async (
   res.json(Array.from(users.values()));
 };
 
-/** Responds with IdpUsers */
-export const getIdpUsers = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const idpUsers = await User.findIdpUsers();
-  const users: IdpUsers = idpUsers.map(user => ({
-    email: user.email,
+/** Responds with FullUserData[] */
+export const getUsers = async (req: Request, res: Response): Promise<void> => {
+  const dbUsers = await User.findAll();
+  const users: FullUserData[] = dbUsers.map(user => ({
     id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    studentNumber: user.studentNumber,
+    idpUser: user.password === null,
   }));
 
   res.json(users);
@@ -282,7 +283,7 @@ export const addUser = async (
 };
 
 /** @throws ApiError(400|404) */
-export const deleteIdpUser = async (
+export const deleteUser = async (
   req: Request,
   res: Response
 ): Promise<void> => {
