@@ -51,11 +51,11 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
     {resetForm, setSubmitting}: FormikHelpers<FormData>
   ): Promise<void> => {
     const res = await addUser
-      .mutateAsync({
-        admin: values.admin,
-        email: values.email,
-        name: values.name,
-      })
+      .mutateAsync(
+        values.admin
+          ? {admin: true, email: values.email, name: values.name}
+          : {admin: false, email: values.email}
+      )
       .catch(() => {
         setSubmitting(false);
       });
