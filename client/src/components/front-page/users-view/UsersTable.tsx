@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import DeleteIcon from '@mui/icons-material/Delete';
+import {Delete, LockReset} from '@mui/icons-material';
 import {
   Box,
   IconButton,
@@ -13,25 +13,27 @@ import {
   TableHead,
   TableRow,
   Tabs,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import {JSX, useMemo, useState} from 'react';
 
-import {SystemRole} from '@/common/types';
+import {SystemRole, UserData} from '@/common/types';
 import DeleteUserDialog from './DeleteUserDialog';
-import {useDeleteUser, useGetUsers} from '../../../hooks/useApi';
+import ResetPasswordDialog from './resetPasswordDialog';
+import {useGetUsers} from '../../../hooks/useApi';
 import {HeadCellData} from '../../../types';
 
 const headCells: HeadCellData[] = [
   {id: 'email', label: 'Email'},
-  {id: 'del', label: ''},
+  {id: 'actions', label: ''},
 ];
 
 const UsersTable = (): JSX.Element => {
-  const deleteUser = useDeleteUser();
   const users = useGetUsers();
   const [tab, setTab] = useState<number>(0);
-  const [toBeDeleted, setToBeDeleted] = useState<number | null>(null);
+  const [toBeDeleted, setToBeDeleted] = useState<UserData | null>(null);
+  const [toBeReset, setToBeReset] = useState<UserData | null>(null);
 
   const shownUsers = useMemo(() => {
     if (users.data === undefined) return [];
@@ -40,22 +42,19 @@ const UsersTable = (): JSX.Element => {
     return users.data.filter(user => user.role === SystemRole.Admin);
   }, [tab, users.data]);
 
-  const handleDelete = (id: number): void => {
-    setToBeDeleted(null);
-    deleteUser.mutate(id);
-  };
-
   if (users.data?.length === 0 && users.isFetched) return <>No users found</>;
 
   return (
     <>
       <DeleteUserDialog
-        title="Delete user"
-        handleAccept={handleDelete}
-        handleClose={() => setToBeDeleted(null)}
         open={toBeDeleted !== null}
-        userId={toBeDeleted}
-        description="Do you want to delete this user?"
+        onClose={() => setToBeDeleted(null)}
+        user={toBeDeleted}
+      />
+      <ResetPasswordDialog
+        open={toBeReset !== null}
+        onClose={() => setToBeReset(null)}
+        user={toBeReset}
       />
 
       <Tabs value={tab} onChange={(_, newTab: number) => setTab(newTab)}>
@@ -80,12 +79,27 @@ const UsersTable = (): JSX.Element => {
               <TableRow key={user.email} hover={true}>
                 <TableCell sx={{width: '75%'}}>{user.email}</TableCell>
                 <TableCell>
-                  <IconButton
-                    aria-label="delete"
-                    onClick={() => setToBeDeleted(user.id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  <Tooltip title="Reset password" placement="top">
+                    <span>
+                      <IconButton
+                        disabled={tab === 0}
+                        aria-label="reset password"
+                        onClick={() => setToBeReset(user)}
+                      >
+                        <LockReset />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                  <Tooltip title="Delete user" placement="top">
+                    <span>
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => setToBeDeleted(user)}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}

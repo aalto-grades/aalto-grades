@@ -20,7 +20,7 @@ import {Navigate, useLocation, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
 import {AaltoEmailSchema, PasswordSchema} from '@/common/types';
-import {useResetPassword} from '../../hooks/useApi';
+import {useResetOwnPassword} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import FormField from '../shared/FormikField';
 
@@ -54,7 +54,7 @@ type ShowPassword = {
 const ResetPassword = (): JSX.Element => {
   const navigate = useNavigate();
   const {setAuth} = useAuth();
-  const resetPassword = useResetPassword();
+  const resetPassword = useResetOwnPassword();
   const {state} = useLocation() as {
     state: {email: string; password: string} | null;
   };

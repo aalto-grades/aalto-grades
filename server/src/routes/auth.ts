@@ -13,12 +13,13 @@ import {
   ResetPasswordDataSchema,
 } from '@/common/types';
 import {
-  authChangePassword,
+  changePassword,
   authLogin,
   authLogout,
-  authResetPassword,
+  authResetOwnPassword,
   authSamlLogin,
-  authSelfInfo,
+  selfInfo,
+  resetPassword,
   samlMetadata,
 } from '../controllers/auth';
 import {handleInvalidRequestJson} from '../middleware';
@@ -30,7 +31,7 @@ router.get(
   '/v1/auth/self-info',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
-  controllerDispatcher(authSelfInfo)
+  controllerDispatcher(selfInfo)
 );
 
 // Dispatchers not needed, because not async
@@ -55,7 +56,13 @@ router.post(
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(ResetPasswordDataSchema),
-  authResetPassword
+  authResetOwnPassword
+);
+
+router.post(
+  '/v1/auth/reset-password/:userId',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  controllerDispatcher(resetPassword)
 );
 
 router.post(
@@ -64,7 +71,7 @@ router.post(
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(ChangePasswordDataSchema),
-  controllerDispatcher(authChangePassword)
+  controllerDispatcher(changePassword)
 );
 
 router.get(

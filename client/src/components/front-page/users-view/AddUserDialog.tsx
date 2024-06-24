@@ -199,7 +199,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
                 }}
                 disabled={form.isSubmitting}
               >
-                Add user
+                {userData === null ? 'Add user' : 'Close'}
               </Button>
             </DialogActions>
           </Dialog>

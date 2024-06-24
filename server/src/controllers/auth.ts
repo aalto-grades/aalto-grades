@@ -5,6 +5,7 @@
 import * as argon from 'argon2';
 import {NextFunction, Request, RequestHandler, Response} from 'express';
 import {readFileSync} from 'fs';
+import generator from 'generate-password';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';
@@ -19,10 +20,11 @@ import {
   LoginResult,
   PasswordSchema,
   ResetPasswordDataSchema,
+  ResetPasswordResponse,
   SystemRole,
 } from '@/common/types';
 import {getSamlStrategy, validateLogin} from './utils/auth';
-import {findUserById} from './utils/user';
+import {findAndValidateUserId, findUserById} from './utils/user';
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
 import {JWT_SECRET, NODE_ENV, SAML_SP_CERT_PATH} from '../configs/environment';
 import logger from '../configs/winston';
@@ -34,10 +36,7 @@ import {ApiError, FullLoginResult, JwtClaims} from '../types';
  *
  * @throws ApiError(404)
  */
-export const authSelfInfo = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const selfInfo = async (req: Request, res: Response): Promise<void> => {
   const user = req.user as JwtClaims;
   const userFromDb = await findUserById(user.id);
 
@@ -126,7 +125,7 @@ export const authLogout = (_req: Request, res: Response): void => {
  *
  * @throws ApiError(401)
  */
-export const authResetPassword = (
+export const authResetOwnPassword = (
   req: TypedRequestBody<typeof ResetPasswordDataSchema>,
   res: Response,
   next: NextFunction
@@ -198,8 +197,7 @@ export const authResetPassword = (
             maxAge: JWT_COOKIE_EXPIRY_MS,
           });
 
-          const result: LoginResult = {
-            resetPassword: false,
+          const result: AuthData = {
             id: loginResult.id,
             name: loginResult.name,
             role: loginResult.role,
@@ -211,7 +209,40 @@ export const authResetPassword = (
   )(req, res, next);
 };
 
-export const authChangePassword = async (
+/**
+ * Responds with ResetPasswordResponse
+ *
+ * @throws ApiError(400|404)
+ */
+export const resetPassword = async (
+  req: Request,
+  res: Response
+): Promise<Response | void> => {
+  const user = await findAndValidateUserId(req.params.userId);
+
+  const temporaryPassword = generator.generate({
+    length: 16,
+    numbers: true,
+  });
+
+  // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+  await user
+    .set({
+      password: await argon.hash(temporaryPassword, {
+        type: argon.argon2id,
+        memoryCost: 19456,
+        parallelism: 1,
+        timeCost: 2,
+      }),
+      forcePasswordReset: true,
+    })
+    .save();
+
+  const resData: ResetPasswordResponse = {temporaryPassword};
+  res.json(resData);
+};
+
+export const changePassword = async (
   req: TypedRequestBody<typeof ChangePasswordDataSchema>,
   res: Response
 ): Promise<Response | void> => {
