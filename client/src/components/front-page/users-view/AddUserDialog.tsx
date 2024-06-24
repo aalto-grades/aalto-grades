@@ -138,7 +138,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
         <Typography sx={{display: 'inline'}}>
           {userData!.temporaryPassword}
         </Typography>
-        <Tooltip title="Copy password" placement="top" sx={{my: -1, ml: 1}}>
+        <Tooltip title="Copy" placement="top" sx={{my: -1, ml: 1, mr: -2}}>
           <IconButton
             size="small"
             onClick={() => {

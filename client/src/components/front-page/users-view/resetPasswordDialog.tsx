@@ -81,9 +81,9 @@ const ResetPasswordDialog = ({open, onClose, user}: PropsType): JSX.Element => {
                 {temporaryPassword}
               </Typography>
               <Tooltip
-                title="Copy password"
+                title="Copy"
                 placement="top"
-                sx={{my: -1, ml: 1}}
+                sx={{my: -1, ml: 1, mr: -2}}
               >
                 <IconButton
                   size="small"
