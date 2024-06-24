@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {ContentCopy, Done} from '@mui/icons-material';
 import {
   Button,
   Dialog,
@@ -10,6 +11,8 @@ import {
   DialogContentText,
   DialogTitle,
   Grid,
+  IconButton,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
@@ -28,6 +31,7 @@ const ResetPasswordDialog = ({open, onClose, user}: PropsType): JSX.Element => {
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(
     null
   );
+  const [copied, setCopied] = useState<boolean>(false);
 
   const onReset = async (): Promise<void> => {
     const res = await resetPassword.mutateAsync(user!.id);
@@ -73,7 +77,34 @@ const ResetPasswordDialog = ({open, onClose, user}: PropsType): JSX.Element => {
               <Typography>Temporary password</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography>{temporaryPassword}</Typography>
+              <Typography sx={{display: 'inline'}}>
+                {temporaryPassword}
+              </Typography>
+              <Tooltip
+                title="Copy password"
+                placement="top"
+                sx={{my: -1, ml: 1}}
+              >
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    navigator.clipboard.writeText(temporaryPassword);
+                    setCopied(true);
+                    enqueueSnackbar('Password copied to clipboard', {
+                      variant: 'success',
+                    });
+                    setTimeout(() => {
+                      setCopied(false);
+                    }, 1500);
+                  }}
+                >
+                  {!copied ? (
+                    <ContentCopy fontSize="small" />
+                  ) : (
+                    <Done fontSize="small" />
+                  )}
+                </IconButton>
+              </Tooltip>
             </Grid>
           </Grid>
         )}

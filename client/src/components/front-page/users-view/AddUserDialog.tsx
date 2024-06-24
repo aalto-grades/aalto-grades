@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {ContentCopy, Done} from '@mui/icons-material';
 import {
   Button,
   Collapse,
@@ -11,7 +12,9 @@ import {
   DialogTitle,
   FormControlLabel,
   Grid,
+  IconButton,
   Switch,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import {Formik, FormikHelpers, FormikProps} from 'formik';
@@ -41,6 +44,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
   const addUser = useAddUser();
   const [showUnsavedDialog, setShowUnsavedDialog] = useState<boolean>(false);
   const [userData, setUserData] = useState<NewUserData | null>(null);
+  const [copied, setCopied] = useState<boolean>(false);
 
   const submitAddUser = async (
     values: FormData,
@@ -131,7 +135,30 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
         <Typography>Temporary password</Typography>
       </Grid>
       <Grid item xs={6}>
-        <Typography>{userData!.temporaryPassword}</Typography>
+        <Typography sx={{display: 'inline'}}>
+          {userData!.temporaryPassword}
+        </Typography>
+        <Tooltip title="Copy password" placement="top" sx={{my: -1, ml: 1}}>
+          <IconButton
+            size="small"
+            onClick={() => {
+              navigator.clipboard.writeText(userData!.temporaryPassword);
+              setCopied(true);
+              enqueueSnackbar('Password copied to clipboard', {
+                variant: 'success',
+              });
+              setTimeout(() => {
+                setCopied(false);
+              }, 1500);
+            }}
+          >
+            {!copied ? (
+              <ContentCopy fontSize="small" />
+            ) : (
+              <Done fontSize="small" />
+            )}
+          </IconButton>
+        </Tooltip>
       </Grid>
     </Grid>
   );
