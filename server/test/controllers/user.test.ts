@@ -6,12 +6,13 @@ import supertest from 'supertest';
 import {z} from 'zod';
 
 import {
-  BaseCourseDataSchema,
+  CourseDataArraySchema,
   CourseRoleType,
-  FinalGradeDataArraySchema,
+  CourseWithFinalGradesArraySchema,
   HttpCode,
+  UserDataArraySchema,
   UserDataSchema,
-  FullUserDataSchema,
+  UserWithRoleArraySchema,
 } from '@/common/types';
 import {app} from '../../src/app';
 import User from '../../src/database/models/user';
@@ -67,10 +68,6 @@ afterAll(async () => {
 });
 
 describe('Test GET /v1/user/courses - get all courses user has role in', () => {
-  const UserCoursesSchema = BaseCourseDataSchema.strict().refine(
-    val => val.maxCredits >= val.minCredits
-  );
-
   it('should get user courses', async () => {
     await createData.createCourse({}); // Create course the student is a part of
 
@@ -87,8 +84,8 @@ describe('Test GET /v1/user/courses - get all courses user has role in', () => {
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = z.array(UserCoursesSchema);
-      const result = await Schema.safeParseAsync(res.body);
+      const Schema = CourseDataArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
@@ -100,12 +97,6 @@ describe('Test GET /v1/user/courses - get all courses user has role in', () => {
 });
 
 describe('Test GET /v1/user/:userId/grades - get all courses and grades of user where the requester has a role', () => {
-  const UserGradesSchema = BaseCourseDataSchema.extend({
-    finalGrades: FinalGradeDataArraySchema,
-  })
-    .strict()
-    .refine(val => val.maxCredits >= val.minCredits);
-
   it('should get user grades', async () => {
     const testCookies: [string[], number][] = [
       [cookies.adminCookie, STUDENT_ID],
@@ -121,8 +112,8 @@ describe('Test GET /v1/user/:userId/grades - get all courses and grades of user 
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = z.array(UserGradesSchema).nonempty();
-      const result = await Schema.safeParseAsync(res.body);
+      const Schema = CourseWithFinalGradesArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
@@ -140,8 +131,8 @@ describe('Test GET /v1/user/:userId/grades - get all courses and grades of user 
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = z.array(UserGradesSchema).length(0);
-      const result = await Schema.safeParseAsync(res.body);
+      const Schema = CourseWithFinalGradesArraySchema.length(0);
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
@@ -182,7 +173,7 @@ describe('Test GET /v1/students - get all students from courses where the reques
         .expect(HttpCode.Ok);
 
       const Schema = z.array(UserSchema).nonempty();
-      const result = await Schema.safeParseAsync(res.body);
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
@@ -194,8 +185,8 @@ describe('Test GET /v1/students - get all students from courses where the reques
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    const Schema = z.array(UserDataSchema).length(0);
-    const result = await Schema.safeParseAsync(res.body);
+    const Schema = UserDataArraySchema.length(0);
+    const result = Schema.safeParse(res.body);
     expect(result.success).toBeTruthy();
   });
 
@@ -213,8 +204,8 @@ describe('Test GET /v1/users/ - get all users', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    const Schema = z.array(FullUserDataSchema.strict());
-    const result = await Schema.safeParseAsync(res.body);
+    const Schema = UserWithRoleArraySchema.nonempty();
+    const result = Schema.safeParse(res.body);
     expect(result.success).toBeTruthy();
   });
 

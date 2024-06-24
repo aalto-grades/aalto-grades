@@ -51,7 +51,7 @@ describe('Test GET /v1/auth/self-info - check users own info', () => {
       .withCredentials(true)
       .expect(HttpCode.Unauthorized);
 
-    const result = await LoginResultSchema.safeParseAsync(res.body);
+    const result = LoginResultSchema.safeParse(res.body);
     expect(result.success).toBeTruthy();
   });
 });
@@ -64,7 +64,7 @@ describe('Test POST /v1/auth/login - logging in with an existing user', () => {
       .expect('Content-Type', /json/)
       .expect(HttpCode.Ok);
 
-    const result = await LoginResultSchema.safeParseAsync(res.body);
+    const result = LoginResultSchema.safeParse(res.body);
     expect(result.success).toBeTruthy();
     if (result.success) {
       expect(result.data.resetPassword).toBeFalsy();
@@ -87,7 +87,7 @@ describe('Test POST /v1/auth/login - logging in with an existing user', () => {
         .expect(HttpCode.Unauthorized)
         .expect('Content-Type', /json/);
 
-      const result = await ErrorSchema.safeParseAsync(res.body);
+      const result = ErrorSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
       if (result.success)
         expect(result.data.errors[0]).toMatch(/incorrect email or password/);

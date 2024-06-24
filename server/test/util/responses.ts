@@ -58,7 +58,7 @@ export class ResponseTests {
         .expect(HttpCode.BadRequest);
 
       const Schema = z.union([ErrorSchema, ZodErrorSchema]);
-      const result = await Schema.safeParseAsync(res.body);
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     };
 
@@ -87,7 +87,7 @@ export class ResponseTests {
           .set('Accept', 'application/json')
           .expect(HttpCode.Forbidden);
 
-        const result = await ErrorSchema.safeParseAsync(res.body);
+        const result = ErrorSchema.safeParse(res.body);
         expect(result.success).toBeTruthy();
       }
     };
@@ -103,7 +103,7 @@ export class ResponseTests {
         .set('Accept', 'application/json')
         .expect(HttpCode.NotFound);
 
-      const result = await ErrorSchema.safeParseAsync(res.body);
+      const result = ErrorSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     };
 
@@ -118,7 +118,7 @@ export class ResponseTests {
         .set('Accept', 'application/json')
         .expect(HttpCode.Conflict);
 
-      const result = await ErrorSchema.safeParseAsync(res.body);
+      const result = ErrorSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     };
 
@@ -133,7 +133,7 @@ export class ResponseTests {
         .set('Accept', 'application/json')
         .expect(HttpCode.UnprocessableEntity);
 
-      const result = await ErrorSchema.safeParseAsync(res.body);
+      const result = ErrorSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     };
 
@@ -148,7 +148,7 @@ export class ResponseTests {
         .set('Accept', 'application/json')
         .expect(HttpCode.BadGateway);
 
-      const result = await ErrorSchema.safeParseAsync(res.body);
+      const result = ErrorSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     };
 

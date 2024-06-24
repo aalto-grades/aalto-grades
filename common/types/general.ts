@@ -43,7 +43,7 @@ export const AaltoEmailSchema = z
   .email()
   .regex(/^.*@aalto\.fi$/, 'Email must be a valid aalto email');
 
-export const LocalizedStringSchema = z.object({
+export const LocalizedStringSchema = z.strictObject({
   fi: z.string(),
   en: z.string(),
   sv: z.string(),

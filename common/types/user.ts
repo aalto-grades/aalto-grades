@@ -7,13 +7,13 @@ import {z} from 'zod';
 import {SystemRoleSchema} from './auth';
 import {AaltoEmailSchema} from './general';
 
-export const UserDataSchema = z.object({
+export const UserDataSchema = z.strictObject({
   id: z.number().int(),
   name: z.string().nullable(),
   email: z.string().email().nullable(),
   studentNumber: z.string().nullable(),
 });
-export const FullUserDataSchema = z.object({
+export const FullUserDataSchema = z.strictObject({
   id: z.number().int(),
   name: z.string().nullable(),
   email: z.string().email().nullable(),
@@ -21,7 +21,7 @@ export const FullUserDataSchema = z.object({
   role: SystemRoleSchema,
   idpUser: z.boolean(),
 });
-export const TeacherDataSchema = z.object({
+export const TeacherDataSchema = z.strictObject({
   id: z.number().int(),
   name: z.string().nullable(),
   email: z.string().email(),
@@ -30,12 +30,12 @@ export const TeacherDataSchema = z.object({
 
 export const NewUserSchema = z.discriminatedUnion('admin', [
   // Idp user
-  z.object({
+  z.strictObject({
     admin: z.literal(false),
     email: AaltoEmailSchema,
   }),
   // Admin
-  z.object({
+  z.strictObject({
     admin: z.literal(true),
     email: AaltoEmailSchema,
     name: z
@@ -43,7 +43,7 @@ export const NewUserSchema = z.discriminatedUnion('admin', [
       .min(3, {message: 'Name must be at least 3 characters long'}),
   }),
 ]);
-export const NewUserResponseSchema = z.object({
+export const NewUserResponseSchema = z.strictObject({
   temporaryPassword: z.string().nullable(),
 });
 

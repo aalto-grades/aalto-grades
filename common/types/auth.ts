@@ -36,21 +36,21 @@ export const PasswordSchema = z.string().superRefine((password, ctx) => {
   }
 });
 
-export const AuthDataSchema = z.object({
+export const AuthDataSchema = z.strictObject({
   id: z.number().int(),
   name: z.string(),
   role: SystemRoleSchema,
 });
 
-export const LoginDataSchema = z.object({
+export const LoginDataSchema = z.strictObject({
   email: z.string(),
   password: z.string(),
 });
 export const LoginResultSchema = z.discriminatedUnion('resetPassword', [
-  z.object({
+  z.strictObject({
     resetPassword: z.literal(true),
   }),
-  z.object({
+  z.strictObject({
     resetPassword: z.literal(false),
     id: z.number().int(),
     name: z.string(),
@@ -58,12 +58,14 @@ export const LoginResultSchema = z.discriminatedUnion('resetPassword', [
   }),
 ]);
 
-export const ResetPasswordDataSchema = z.object({
+export const ResetPasswordDataSchema = z.strictObject({
   email: z.string(),
   password: z.string(),
   newPassword: z.string(),
 });
-export const ChangePasswordDataSchema = z.object({newPassword: PasswordSchema});
+export const ChangePasswordDataSchema = z.strictObject({
+  newPassword: PasswordSchema,
+});
 
 export type AuthData = z.infer<typeof AuthDataSchema>;
 export type LoginData = z.infer<typeof LoginDataSchema>;
