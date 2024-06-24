@@ -10,6 +10,7 @@ import {
   CourseRoleType,
   CourseWithFinalGradesArraySchema,
   HttpCode,
+  NewUserResponseSchema,
   UserDataArraySchema,
   UserDataSchema,
   UserWithRoleArraySchema,
@@ -84,7 +85,10 @@ describe('Test GET /v1/user/courses - get all courses user has role in', () => {
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = CourseDataArraySchema.nonempty();
+      const Schema =
+        cookie === cookies.adminCookie
+          ? CourseDataArraySchema.length(0)
+          : CourseDataArraySchema.nonempty();
       const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
@@ -227,12 +231,13 @@ describe('Test POST /v1/users/ - add a user', () => {
   it('should add a user', async () => {
     const res = await request
       .post('/v1/users')
-      .send({email: 'idpuser1@aalto.fi'})
+      .send({admin: false, email: 'idpuser1@aalto.fi'})
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Created);
 
-    expect(JSON.stringify(res.body)).toBe('{}');
+    const result = NewUserResponseSchema.safeParse(res.body);
+    expect(result.success).toBeTruthy();
 
     const user = await User.findByEmail('idpuser1@aalto.fi');
     expect(user).not.toBe(null);
@@ -254,7 +259,7 @@ describe('Test POST /v1/users/ - add a user', () => {
 
   it('should respond with 409 when user with email already exists', async () => {
     const url = '/v1/users';
-    const data = {email: 'idpuser1@aalto.fi'};
+    const data = {admin: false, email: 'idpuser1@aalto.fi'};
     await responseTests.testConflict(url, cookies.adminCookie).post(data);
   });
 });

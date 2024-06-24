@@ -7,7 +7,12 @@ import * as fs from 'fs';
 import mockdate from 'mockdate';
 import supertest from 'supertest';
 
-import {HttpCode, LoginResultSchema, SystemRole} from '@/common/types';
+import {
+  AuthDataSchema,
+  HttpCode,
+  LoginResultSchema,
+  SystemRole,
+} from '@/common/types';
 import {app} from '../../src/app';
 import {
   JWT_COOKIE_EXPIRY_MS,
@@ -51,7 +56,7 @@ describe('Test GET /v1/auth/self-info - check users own info', () => {
       .withCredentials(true)
       .expect(HttpCode.Unauthorized);
 
-    const result = LoginResultSchema.safeParse(res.body);
+    const result = AuthDataSchema.safeParse(res.body);
     expect(result.success).toBeTruthy();
   });
 });
@@ -90,7 +95,7 @@ describe('Test POST /v1/auth/login - logging in with an existing user', () => {
       const result = ErrorSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
       if (result.success)
-        expect(result.data.errors[0]).toMatch(/incorrect email or password/);
+        expect(result.data.errors[0]).toMatch(/Incorrect email or password/);
     };
 
     await badCreds({email: 'admin', password: 'password'});
