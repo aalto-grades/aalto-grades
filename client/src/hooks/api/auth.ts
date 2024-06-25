@@ -19,8 +19,8 @@ import {
   LoginResult,
   LoginResultSchema,
   ResetPasswordData,
-  ResetPasswordResponse,
-  ResetPasswordResponseSchema,
+  ResetPasswordResult,
+  ResetPasswordResultSchema,
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
@@ -66,11 +66,11 @@ export const useResetOwnPassword = (
   });
 
 export const useResetPassword = (
-  options?: UseMutationOptions<ResetPasswordResponse, unknown, Numeric>
-): UseMutationResult<ResetPasswordResponse, unknown, Numeric> =>
+  options?: UseMutationOptions<ResetPasswordResult, unknown, Numeric>
+): UseMutationResult<ResetPasswordResult, unknown, Numeric> =>
   useMutation({
     mutationFn: async (userId: Numeric) =>
-      ResetPasswordResponseSchema.parse(
+      ResetPasswordResultSchema.parse(
         (await axios.post(`/v1/auth/reset-password/${userId}`)).data
       ),
     ...options,

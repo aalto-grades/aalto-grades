@@ -63,6 +63,10 @@ export const ResetPasswordDataSchema = z.strictObject({
   password: z.string(),
   newPassword: z.string(),
 });
+export const ResetPasswordResultSchema = z.strictObject({
+  temporaryPassword: z.string(),
+});
+
 export const ChangePasswordDataSchema = z.strictObject({
   newPassword: PasswordSchema,
 });
@@ -72,3 +76,4 @@ export type LoginData = z.infer<typeof LoginDataSchema>;
 export type LoginResult = z.infer<typeof LoginResultSchema>;
 export type ResetPasswordData = z.infer<typeof ResetPasswordDataSchema>;
 export type ChangePasswordData = z.infer<typeof ChangePasswordDataSchema>;
+export type ResetPasswordResult = z.infer<typeof ResetPasswordResultSchema>;

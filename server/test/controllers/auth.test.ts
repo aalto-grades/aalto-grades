@@ -11,7 +11,7 @@ import {
   AuthDataSchema,
   HttpCode,
   LoginResultSchema,
-  ResetPasswordResponseSchema,
+  ResetPasswordResultSchema,
   UserData,
 } from '@/common/types';
 import {app} from '../../src/app';
@@ -234,7 +234,7 @@ describe("Test POST /v1/auth/reset-password/:userId - reset other admin's passwo
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    const result = ResetPasswordResponseSchema.safeParse(res.body);
+    const result = ResetPasswordResultSchema.safeParse(res.body);
     expect(result.success).toBeTruthy();
     if (result.success)
       await testLogin(

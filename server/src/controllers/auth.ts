@@ -20,7 +20,7 @@ import {
   LoginResult,
   PasswordSchema,
   ResetPasswordDataSchema,
-  ResetPasswordResponse,
+  ResetPasswordResult,
   SystemRole,
 } from '@/common/types';
 import {validateLogin} from './utils/auth';
@@ -214,7 +214,7 @@ export const authResetOwnPassword = (
 };
 
 /**
- * Responds with ResetPasswordResponse
+ * Responds with ResetPasswordResult
  *
  * @throws ApiError(400|404)
  */
@@ -242,7 +242,7 @@ export const resetPassword = async (
     })
     .save();
 
-  const resData: ResetPasswordResponse = {temporaryPassword};
+  const resData: ResetPasswordResult = {temporaryPassword};
   res.json(resData);
 };
 
