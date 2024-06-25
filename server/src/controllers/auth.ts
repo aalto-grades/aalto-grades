@@ -149,13 +149,16 @@ export const authResetOwnPassword = (
           // Validate password strength
           const passwordResult = PasswordSchema.safeParse(req.body.newPassword);
           if (!passwordResult.success) {
-            return next(passwordResult.error);
+            return res.status(HttpCode.BadRequest).send({
+              errors: [passwordResult.error.errors[0].message],
+            });
           }
 
-          if (req.body.password === req.body.newPassword)
+          if (req.body.password === req.body.newPassword) {
             return res.status(HttpCode.BadRequest).send({
               errors: ['New password cannot be the same as the old one'],
             });
+          }
 
           const user = await User.findByEmail(req.body.email);
           if (user === null) {

@@ -11,6 +11,7 @@ import {
   ChangePasswordDataSchema,
   LoginDataSchema,
   ResetPasswordDataSchema,
+  SystemRole,
 } from '@/common/types';
 import {
   changePassword,
@@ -23,6 +24,7 @@ import {
   samlMetadata,
 } from '../controllers/auth';
 import {handleInvalidRequestJson} from '../middleware';
+import {authorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
@@ -62,6 +64,7 @@ router.post(
 router.post(
   '/v1/auth/reset-password/:userId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authorization([SystemRole.Admin]),
   controllerDispatcher(resetPassword)
 );
 

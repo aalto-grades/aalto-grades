@@ -11,21 +11,54 @@ import {
   AuthDataSchema,
   HttpCode,
   LoginResultSchema,
-  SystemRole,
+  ResetPasswordResponseSchema,
+  UserData,
 } from '@/common/types';
 import {app} from '../../src/app';
 import {
   JWT_COOKIE_EXPIRY_MS,
   JWT_EXPIRY_SECONDS,
 } from '../../src/configs/constants';
-import {ErrorSchema} from '../util/general';
+import {createData} from '../util/createData';
+import {Cookies, getCookies} from '../util/getCookies';
+import {resetDb} from '../util/resetDb';
+import {ResponseTests} from '../util/responses';
 
 const request = supertest(app);
+const responseTests = new ResponseTests(request);
+
+const testLogin = async (
+  email: string,
+  password: string,
+  forcePasswordReset: boolean = false
+): Promise<void> => {
+  const res = await request
+    .post('/v1/auth/login')
+    .send({email, password})
+    .expect('Content-Type', /json/)
+    .expect(HttpCode.Ok);
+
+  const result = LoginResultSchema.safeParse(res.body);
+  expect(result.success).toBeTruthy();
+  if (result.success) {
+    expect(result.data.resetPassword).toEqual(forcePasswordReset);
+  }
+};
+
+let cookies: Cookies = {} as Cookies;
+
+beforeAll(async () => {
+  cookies = await getCookies();
+});
+
+afterAll(async () => {
+  await resetDb();
+});
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 jest.mock('fs', () => ({__esModule: true, ...jest.requireActual('fs')}));
 
-describe('Test GET /v1/auth/self-info - check users own info', () => {
+describe('Test GET /v1/auth/self-info - fetch own info', () => {
   it('should act differently when user is logged in or out', async () => {
     // Use the agent for cookie persistence
     const agent = supertest.agent(app);
@@ -61,47 +94,28 @@ describe('Test GET /v1/auth/self-info - check users own info', () => {
   });
 });
 
-describe('Test POST /v1/auth/login - logging in with an existing user', () => {
-  it('should allow logging in with the correct credentials', async () => {
-    const res = await request
-      .post('/v1/auth/login')
-      .send({email: 'admin@aalto.fi', password: 'password'})
-      .expect('Content-Type', /json/)
-      .expect(HttpCode.Ok);
-
-    const result = LoginResultSchema.safeParse(res.body);
-    expect(result.success).toBeTruthy();
-    if (result.success) {
-      expect(result.data.resetPassword).toBeFalsy();
-      if (!result.data.resetPassword) {
-        expect(result.data.role).toBe(SystemRole.Admin);
-        expect(result.data.name).toBe('Andy Admin');
-      }
-    }
+describe('Test POST /v1/auth/login - log in with an existing user', () => {
+  it('should log in', async () => {
+    await testLogin('admin@aalto.fi', 'password');
   });
 
-  it('should respond with 401 unauthorized, if logging in with invalid credentials', async () => {
-    const badCreds = async (credentials: {
-      email: string;
-      password: string;
-    }): Promise<void> => {
-      const res = await request
-        .post('/v1/auth/login')
-        .set('Accept', 'application/json')
-        .send(credentials)
-        .expect(HttpCode.Unauthorized)
-        .expect('Content-Type', /json/);
+  it('should force reset password if necessary', async () => {
+    const user = await createData.createAuthUser({
+      forcePasswordReset: true,
+    });
+    await testLogin(user.email as string, 'password', true);
+  });
 
-      const result = ErrorSchema.safeParse(res.body);
-      expect(result.success).toBeTruthy();
-      if (result.success)
-        expect(result.data.errors[0]).toMatch(/Incorrect email or password/);
-    };
+  it('should respond with 401 when logging in with invalid credentials', async () => {
+    const badCreds = responseTests.testUnauthorized(
+      '/v1/auth/login',
+      '{"errors":["Incorrect email or password"]}'
+    );
 
-    await badCreds({email: 'admin', password: 'password'});
-    await badCreds({email: 'aalto.fi', password: 'password'});
-    await badCreds({email: 'admin@aalto.fi', password: ''});
-    await badCreds({email: 'admin@aalto.fi', password: 'password '});
+    await badCreds.post({email: 'admin', password: 'password'});
+    await badCreds.post({email: 'aalto.fi', password: 'password'});
+    await badCreds.post({email: 'admin@aalto.fi', password: ''});
+    await badCreds.post({email: 'admin@aalto.fi', password: 'password '});
   });
 });
 
@@ -145,6 +159,148 @@ describe('Test POST /v1/auth/login and expiry', () => {
       .get('/v1/auth/self-info')
       .withCredentials(true)
       .expect(HttpCode.Unauthorized);
+  });
+});
+
+describe('Test POST /v1/auth/reset-password - reset own password', () => {
+  it('should reset own password', async () => {
+    const user = await createData.createAuthUser();
+    const newPassword = '¹X)1Õ,ì?¨ã$Z©N3Ú°jM¤ëÊyf';
+
+    const res = await request
+      .post('/v1/auth/reset-password')
+      .send({email: user.email, password: 'password', newPassword: newPassword})
+      .expect('Content-Type', /json/)
+      .expect(HttpCode.Ok);
+
+    const result = AuthDataSchema.safeParse(res.body);
+    expect(result.success).toBeTruthy();
+
+    await testLogin(user.email as string, newPassword);
+  });
+
+  it('should respond with 400 if too weak password', async () => {
+    const user = await createData.createAuthUser();
+    const newPassword = 'weak';
+
+    const data = {email: user.email, password: 'password', newPassword};
+    await responseTests
+      .testBadRequest('/v1/auth/reset-password', null)
+      .post(data);
+
+    await testLogin(user.email as string, 'password');
+  });
+
+  it('should respond with 400 if same password', async () => {
+    const password = '¹X)1Õ,ì?¨ã$Z©N3Ú°jM¤ëÊyf';
+    const user = await createData.createAuthUser({password});
+
+    const data = {email: user.email, password, newPassword: password};
+    await responseTests
+      .testBadRequest('/v1/auth/reset-password', null)
+      .post(data);
+
+    await testLogin(user.email as string, password);
+  });
+
+  it('should respond with 401 when wrong password', async () => {
+    const user = await createData.createAuthUser();
+    const newPassword = '¹X)1Õ,ì?¨ã$Z©N3Ú°jM¤ëÊyf';
+
+    const data = {email: user.email, password: 'wrong', newPassword};
+    await responseTests
+      .testUnauthorized(
+        '/v1/auth/reset-password',
+        '{"errors":["Incorrect email or password"]}'
+      )
+      .post(data);
+
+    await testLogin(user.email as string, 'password');
+  });
+});
+
+describe("Test POST /v1/auth/reset-password/:userId - reset other admin's password", () => {
+  // Broken if cookies are not refetched for some reason :/
+  beforeAll(async () => {
+    cookies = await getCookies();
+  });
+
+  it("Should reset other admin's password", async () => {
+    const user = await createData.createAuthUser();
+
+    const res = await request
+      .post(`/v1/auth/reset-password/${user.id}`)
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    const result = ResetPasswordResponseSchema.safeParse(res.body);
+    expect(result.success).toBeTruthy();
+    if (result.success)
+      await testLogin(
+        user.email as string,
+        result.data.temporaryPassword,
+        true
+      );
+  });
+
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const user = await createData.createAuthUser();
+    const url = `/v1/auth/reset-password/${user.id}`;
+
+    await responseTests.testUnauthorized(url).post({});
+
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .post({});
+  });
+});
+
+describe('Test POST /v1/auth/change-password - change own password', () => {
+  const createUser = async (): Promise<[UserData, string[]]> => {
+    const user = await createData.createAuthUser();
+    const userRes = await request
+      .post('/v1/auth/login')
+      .set('Accept', 'application/json')
+      .send({email: user.email, password: 'password'});
+    const cookie = [userRes.headers['set-cookie']];
+    return [user, cookie];
+  };
+
+  it('Should reset own password', async () => {
+    const [user, cookie] = await createUser();
+    const newPassword = '¹X)1Õ,ì?¨ã$Z©N3Ú°jM¤ëÊyf';
+
+    const res = await request
+      .post('/v1/auth/change-password')
+      .send({newPassword})
+      .set('Cookie', cookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(JSON.stringify(res.body)).toBe('{}');
+
+    await testLogin(user.email as string, newPassword);
+  });
+
+  it('should respond with 400 if new password is too weak', async () => {
+    const [, cookie] = await createUser();
+    const newPassword = 'weak';
+
+    await responseTests
+      .testBadRequest('/v1/auth/change-password', cookie)
+      .post({newPassword});
+  });
+
+  it('should respond with 401 authorized', async () => {
+    const newPassword = '¹X)1Õ,ì?¨ã$Z©N3Ú°jM¤ëÊyf';
+    await responseTests
+      .testUnauthorized('/v1/auth/change-password')
+      .post({newPassword});
   });
 });
 

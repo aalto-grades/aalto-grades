@@ -50,10 +50,10 @@ export class ResponseTests {
   }
 
   /** Send a request and expect a 400 bad request */
-  testBadRequest(url: string, cookie: string[]): ReturnType {
+  testBadRequest(url: string, cookie: string[] | null): ReturnType {
     const call = async (request: Test): Promise<void> => {
+      if (cookie !== null) request = request.set('Cookie', cookie);
       const res = await request
-        .set('Cookie', cookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.BadRequest);
 
@@ -66,13 +66,13 @@ export class ResponseTests {
   }
 
   /** Send a request and expect a 401 unauthorized */
-  testUnauthorized(url: string): ReturnType {
+  testUnauthorized(url: string, expected: string = '{}'): ReturnType {
     const call = async (request: Test): Promise<void> => {
       const res = await request
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
 
-      expect(JSON.stringify(res.body)).toBe('{}');
+      expect(JSON.stringify(res.body)).toBe(expected);
     };
 
     return this.next(call, url);
