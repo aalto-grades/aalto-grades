@@ -238,6 +238,27 @@ describe('Test POST /v1/users/ - add a user', () => {
 
     const result = NewUserResponseSchema.safeParse(res.body);
     expect(result.success).toBeTruthy();
+    if (result.success) expect(result.data.temporaryPassword).toBeNull();
+
+    const user = await User.findByEmail('idpuser1@aalto.fi');
+    expect(user).not.toBe(null);
+  });
+
+  it('should add an admin user', async () => {
+    const res = await request
+      .post('/v1/users')
+      .send({admin: true, email: 'admin2@aalto.fi', name: 'admin2'})
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Created);
+
+    const result = NewUserResponseSchema.safeParse(res.body);
+    expect(result.success).toBeTruthy();
+    if (result.success) {
+      const Schema = z.string().regex(/^[a-zA-Z\d]{16}$/);
+      const result2 = Schema.safeParse(result.data.temporaryPassword);
+      expect(result2.success);
+    }
 
     const user = await User.findByEmail('idpuser1@aalto.fi');
     expect(user).not.toBe(null);
