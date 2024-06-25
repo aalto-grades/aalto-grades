@@ -2,21 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Visibility, VisibilityOff} from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  InputAdornment,
-  TextField,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import {Box, Button, Grid, TextField, Typography} from '@mui/material';
 import {JSX, SyntheticEvent, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 import ExternalAuth from './ExternalAuth';
+import ShowPasswordButton from './ShowPasswordButton';
 import {useLogIn} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 
@@ -85,25 +76,10 @@ const Login = (): JSX.Element => {
             InputLabelProps={{shrink: true}}
             InputProps={{
               endAdornment: (
-                <InputAdornment position="start">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={() => setShowPassword(!showPassword)}
-                    onMouseDown={event => event.preventDefault()}
-                    edge="end"
-                  >
-                    <Tooltip
-                      placement="top"
-                      title={
-                        showPassword
-                          ? 'Click to hide password from view'
-                          : 'Click to show password'
-                      }
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </Tooltip>
-                  </IconButton>
-                </InputAdornment>
+                <ShowPasswordButton
+                  shown={showPassword}
+                  onClick={() => setShowPassword(oldShow => !oldShow)}
+                />
               ),
             }}
             margin="normal"

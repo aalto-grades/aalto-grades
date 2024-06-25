@@ -2,17 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Visibility, VisibilityOff} from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  InputAdornment,
-  Link,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import {Box, Button, Grid, Link, Typography} from '@mui/material';
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
@@ -20,6 +10,7 @@ import {Navigate, useLocation, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
 import {AaltoEmailSchema, PasswordSchema} from '@/common/types';
+import BaseShowPasswordButton from './ShowPasswordButton';
 import {useResetOwnPassword} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import FormField from '../shared/FormikField';
@@ -107,30 +98,15 @@ const ResetPassword = (): JSX.Element => {
 
   type PropsType = {type: keyof ShowPassword};
   const ShowPasswordButton = ({type}: PropsType): JSX.Element => (
-    <InputAdornment position="start">
-      <IconButton
-        aria-label="toggle password visibility"
-        onClick={() =>
-          setShowPassword(oldShowPassword => ({
-            ...oldShowPassword,
-            [type]: !oldShowPassword[type],
-          }))
-        }
-        onMouseDown={event => event.preventDefault()}
-        edge="end"
-      >
-        <Tooltip
-          placement="top"
-          title={
-            showPassword[type]
-              ? 'Click to hide password from view'
-              : 'Click to show password'
-          }
-        >
-          {showPassword[type] ? <VisibilityOff /> : <Visibility />}
-        </Tooltip>
-      </IconButton>
-    </InputAdornment>
+    <BaseShowPasswordButton
+      shown={showPassword[type]}
+      onClick={() =>
+        setShowPassword(oldShowPassword => ({
+          ...oldShowPassword,
+          [type]: !oldShowPassword[type],
+        }))
+      }
+    />
   );
 
   // TODO: Redirect if no auth data
