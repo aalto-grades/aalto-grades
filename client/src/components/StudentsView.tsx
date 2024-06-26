@@ -2,9 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {Delete} from '@mui/icons-material';
 import {
   Autocomplete,
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   Paper,
   Table,
@@ -17,11 +24,16 @@ import {
   Typography,
   createFilterOptions,
 } from '@mui/material';
+import {enqueueSnackbar} from 'notistack';
 import {JSX, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {UserData} from '@/common/types';
-import {useGetGradesOfStudent, useGetStudents} from '../hooks/useApi';
+import {
+  useDeleteUser,
+  useGetGradesOfStudent,
+  useGetStudents,
+} from '../hooks/useApi';
 
 const getString = (student: UserData): string => {
   let string = student.studentNumber!.toString();
@@ -30,16 +42,13 @@ const getString = (student: UserData): string => {
   return string;
 };
 
-const filterOptions = createFilterOptions<UserData>({
-  // Remove commas from filter strings
-  stringify: student => getString(student).replaceAll(',', ''),
-});
-
 const StudentsView = (): JSX.Element => {
   const {userId} = useParams();
   const navigate = useNavigate();
-
   const students = useGetStudents();
+  const deleteUser = useDeleteUser();
+
+  const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
 
   const urlStudent = useMemo(
     () =>
@@ -49,7 +58,6 @@ const StudentsView = (): JSX.Element => {
         : null,
     [students.data, userId]
   );
-
   const [selectedStudent, setSelectedStudent] = useState<UserData | null>(
     urlStudent ?? null
   );
@@ -57,20 +65,48 @@ const StudentsView = (): JSX.Element => {
     enabled: selectedStudent !== null,
   });
 
+  const onDelete = async (): Promise<void> => {
+    await deleteUser.mutateAsync(selectedStudent!.id);
+    setConfirmOpen(false);
+    setSelectedStudent(null);
+    enqueueSnackbar('Student deleted', {variant: 'success'});
+    navigate('/students');
+  };
+
   return (
     <>
+      <Dialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle>Delete student</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            All of the data of the student will be deleted permanently!
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
+          <Button onClick={onDelete} variant="contained" color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Typography variant="h2" sx={{pb: 2}}>
         Select student
       </Typography>
       <Autocomplete
         options={students.data ?? []}
         value={selectedStudent}
-        onChange={(event: unknown, newValue: UserData | null) => {
+        onChange={(_, newValue: UserData | null) => {
           setSelectedStudent(newValue);
           if (newValue !== null) navigate(`/students/${newValue.id}`);
           else navigate('/students');
         }}
-        filterOptions={filterOptions}
+        filterOptions={createFilterOptions({stringify: getString})}
         getOptionLabel={getString}
         renderOption={(props, student: UserData) => (
           <Box component="li" {...props}>
@@ -86,7 +122,14 @@ const StudentsView = (): JSX.Element => {
             Viewing grades for{' '}
             {selectedStudent?.name ?? selectedStudent?.studentNumber ?? ''}
           </Typography>
-
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => setConfirmOpen(true)}
+            startIcon={<Delete />}
+          >
+            Delete student data
+          </Button>
           <TableContainer component={Paper}>
             <Table sx={{minWidth: 650}} aria-label="simple table">
               <TableHead>

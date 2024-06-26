@@ -118,7 +118,7 @@ AttainmentGrade.belongsTo(CoursePart, {foreignKey: 'coursePartId'});
 
 User.hasMany(AttainmentGrade, {
   foreignKey: 'graderId',
-  onDelete: 'CASCADE',
+  onDelete: 'NO ACTION',
   onUpdate: 'CASCADE',
 });
 AttainmentGrade.belongsTo(User, {foreignKey: 'graderId', as: 'grader'});

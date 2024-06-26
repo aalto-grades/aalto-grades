@@ -89,6 +89,7 @@ export const useDeleteUser = (
     mutationFn: async (id: number) => await axios.delete(`/v1/idp-users/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['idp-users']});
+      queryClient.invalidateQueries({queryKey: ['students']});
     },
     ...options,
   });
