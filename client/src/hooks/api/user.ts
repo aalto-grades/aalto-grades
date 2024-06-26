@@ -17,10 +17,11 @@ import {
   CourseDataArraySchema,
   CourseWithFinalGrades,
   CourseWithFinalGradesArraySchema,
+  UserIdArray,
   IdpUsersSchema,
   NewIdpUser,
   UserData,
-  UserDataArraySchema,
+  UserArraySchema,
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
@@ -31,19 +32,21 @@ export const useGetOwnCourses = (
   useQuery({
     queryKey: ['own-courses'],
     queryFn: async () =>
-      CourseDataArraySchema.parse((await axios.get('/v1/user/courses')).data),
+      CourseDataArraySchema.parse(
+        (await axios.get('/v1/users/own-courses')).data
+      ),
     ...options,
   });
 
-export const useGetGradesOfStudent = (
+export const useGetCoursesOfStudent = (
   userId: Numeric,
   options?: Partial<UseQueryOptions<CourseWithFinalGrades[]>>
 ): UseQueryResult<CourseWithFinalGrades[]> =>
   useQuery({
-    queryKey: ['student-grades', userId],
+    queryKey: ['student-courses', userId],
     queryFn: async () =>
       CourseWithFinalGradesArraySchema.parse(
-        (await axios.get(`/v1/user/${userId}/grades`)).data
+        (await axios.get(`/v1/users/${userId}/courses`)).data
       ),
     ...options,
   });
@@ -54,7 +57,7 @@ export const useGetStudents = (
   useQuery({
     queryKey: ['students'],
     queryFn: async () =>
-      UserDataArraySchema.parse((await axios.get('/v1/students')).data),
+      UserArraySchema.parse((await axios.get('/v1/users/students')).data),
     ...options,
   });
 
@@ -63,7 +66,7 @@ export const useAddUser = (
 ): UseMutationResult<unknown, unknown, NewIdpUser> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async idpUser => await axios.post('/v1/idp-users', idpUser),
+    mutationFn: idpUser => axios.post('/v1/idp-users', idpUser),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['idp-users']});
     },
@@ -86,7 +89,21 @@ export const useDeleteUser = (
 ): UseMutationResult<unknown, unknown, number> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id: number) => await axios.delete(`/v1/idp-users/${id}`),
+    mutationFn: userId => axios.delete(`/v1/idp-users/${userId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['idp-users']});
+      queryClient.invalidateQueries({queryKey: ['students']});
+    },
+    ...options,
+  });
+};
+
+export const useDeleteUsers = (
+  options?: UseMutationOptions<unknown, unknown, UserIdArray>
+): UseMutationResult<unknown, unknown, UserIdArray> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: userIds => axios.post('/v1/users/delete', userIds),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['idp-users']});
       queryClient.invalidateQueries({queryKey: ['students']});

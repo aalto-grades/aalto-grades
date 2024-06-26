@@ -2,16 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Delete} from '@mui/icons-material';
 import {
   Autocomplete,
   Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Divider,
   Paper,
   Table,
@@ -24,16 +17,11 @@ import {
   Typography,
   createFilterOptions,
 } from '@mui/material';
-import {enqueueSnackbar} from 'notistack';
 import {JSX, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {UserData} from '@/common/types';
-import {
-  useDeleteUser,
-  useGetGradesOfStudent,
-  useGetStudents,
-} from '../hooks/useApi';
+import {useGetCoursesOfStudent, useGetStudents} from '../hooks/useApi';
 
 const getString = (student: UserData): string => {
   let string = student.studentNumber!.toString();
@@ -46,9 +34,6 @@ const StudentsView = (): JSX.Element => {
   const {userId} = useParams();
   const navigate = useNavigate();
   const students = useGetStudents();
-  const deleteUser = useDeleteUser();
-
-  const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
 
   const urlStudent = useMemo(
     () =>
@@ -61,40 +46,12 @@ const StudentsView = (): JSX.Element => {
   const [selectedStudent, setSelectedStudent] = useState<UserData | null>(
     urlStudent ?? null
   );
-  const studentGrades = useGetGradesOfStudent(selectedStudent?.id as number, {
+  const studentGrades = useGetCoursesOfStudent(selectedStudent?.id as number, {
     enabled: selectedStudent !== null,
   });
 
-  const onDelete = async (): Promise<void> => {
-    await deleteUser.mutateAsync(selectedStudent!.id);
-    setConfirmOpen(false);
-    setSelectedStudent(null);
-    enqueueSnackbar('Student deleted', {variant: 'success'});
-    navigate('/students');
-  };
-
   return (
     <>
-      <Dialog
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        fullWidth
-        maxWidth="xs"
-      >
-        <DialogTitle>Delete student</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            All of the data of the student will be deleted permanently!
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
-          <Button onClick={onDelete} variant="contained" color="error">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       <Typography variant="h2" sx={{pb: 2}}>
         Select student
       </Typography>
@@ -122,14 +79,6 @@ const StudentsView = (): JSX.Element => {
             Viewing grades for{' '}
             {selectedStudent?.name ?? selectedStudent?.studentNumber ?? ''}
           </Typography>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => setConfirmOpen(true)}
-            startIcon={<Delete />}
-          >
-            Delete student data
-          </Button>
           <TableContainer component={Paper}>
             <Table sx={{minWidth: 650}} aria-label="simple table">
               <TableHead>

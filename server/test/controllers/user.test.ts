@@ -66,7 +66,7 @@ afterAll(async () => {
   await resetDb();
 });
 
-describe('Test GET /v1/user/courses - get all courses user has role in', () => {
+describe('Test GET /v1/users/own-courses - get all courses user has role in', () => {
   const UserCoursesSchema = BaseCourseDataSchema.strict().refine(
     val => val.maxCredits >= val.minCredits
   );
@@ -82,7 +82,7 @@ describe('Test GET /v1/user/courses - get all courses user has role in', () => {
     ];
     for (const cookie of testCookies) {
       const res = await request
-        .get('/v1/user/courses')
+        .get('/v1/users/own-courses')
         .set('Cookie', cookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -94,12 +94,12 @@ describe('Test GET /v1/user/courses - get all courses user has role in', () => {
   });
 
   it('should respond with 401 if not authorized', async () => {
-    const url = '/v1/user/courses';
+    const url = '/v1/users/own-courses';
     await responseTests.testUnauthorized(url).get();
   });
 });
 
-describe('Test GET /v1/user/:userId/grades - get all courses and grades of user where the requester has a role', () => {
+describe('Test GET /v1/users/:userId/courses - get all courses and grades of user where the requester has a role', () => {
   const UserGradesSchema = BaseCourseDataSchema.extend({
     finalGrades: FinalGradeDataArraySchema,
   })
@@ -116,7 +116,7 @@ describe('Test GET /v1/user/:userId/grades - get all courses and grades of user 
     ];
     for (const [cookie, userId] of testCookies) {
       const res = await request
-        .get(`/v1/user/${userId}/grades`)
+        .get(`/v1/users/${userId}/courses`)
         .set('Cookie', cookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -135,7 +135,7 @@ describe('Test GET /v1/user/:userId/grades - get all courses and grades of user 
     ];
     for (const cookie of testCookies) {
       const res = await request
-        .get(`/v1/user/${noTeachersUserId}/grades`)
+        .get(`/v1/users/${noTeachersUserId}/courses`)
         .set('Cookie', cookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -147,22 +147,22 @@ describe('Test GET /v1/user/:userId/grades - get all courses and grades of user 
   });
 
   it('should respond with 400 if invalid', async () => {
-    const url = `/v1/user/${'bad'}/grades`;
+    const url = `/v1/users/${'bad'}/courses`;
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 
   it('should respond with 401 if not authorized', async () => {
-    const url = `/v1/user/${noTeachersUserId}/grades`;
+    const url = `/v1/users/${noTeachersUserId}/courses`;
     await responseTests.testUnauthorized(url).get();
   });
 
   it('should respond with 404 if not found', async () => {
-    const url = `/v1/user/${nonExistentId}/grades`;
+    const url = `/v1/users/${nonExistentId}/courses`;
     await responseTests.testNotFound(url, cookies.adminCookie).get();
   });
 });
 
-describe('Test GET /v1/students - get all students from courses where the requester has a role', () => {
+describe('Test GET /v1/users/students - get all students from courses where the requester has a role', () => {
   const AssistantUserSchema = UserDataSchema.extend({
     name: z.literal(null),
     email: z.literal(null),
@@ -176,7 +176,7 @@ describe('Test GET /v1/students - get all students from courses where the reques
     ];
     for (const [cookie, UserSchema] of testCookies) {
       const res = await request
-        .get('/v1/students')
+        .get('/v1/users/students')
         .set('Cookie', cookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
@@ -189,7 +189,7 @@ describe('Test GET /v1/students - get all students from courses where the reques
 
   it('should not get students if requester has no roles', async () => {
     const res = await request
-      .get('/v1/students')
+      .get('/v1/users/students')
       .set('Cookie', cookies.studentCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
@@ -200,7 +200,7 @@ describe('Test GET /v1/students - get all students from courses where the reques
   });
 
   it('should respond with 401 if not authorized', async () => {
-    const url = '/v1/students';
+    const url = '/v1/users/students';
     await responseTests.testUnauthorized(url).get();
   });
 });

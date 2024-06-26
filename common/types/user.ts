@@ -24,10 +24,14 @@ export const NewIdpUserSchema = z.object({
   email: z.string().email(),
 });
 export const IdpUsersSchema = z.array(IdpUserSchema);
+export const UserIdArraySchema = z
+  .array(z.number().int())
+  .refine(items => new Set(items).size === items.length);
 
-export const UserDataArraySchema = z.array(UserDataSchema);
+export const UserArraySchema = z.array(UserDataSchema);
 
 export type UserData = z.infer<typeof UserDataSchema>;
 export type TeacherData = z.infer<typeof TeacherDataSchema>;
 export type NewIdpUser = z.infer<typeof NewIdpUserSchema>;
 export type IdpUsers = z.infer<typeof IdpUsersSchema>;
+export type UserIdArray = z.infer<typeof UserIdArraySchema>;
