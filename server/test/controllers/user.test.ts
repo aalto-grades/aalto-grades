@@ -304,3 +304,47 @@ describe('Test DELETE /v1/idp-users/:userId - delete an idp user', () => {
     await responseTests.testNotFound(url, cookies.adminCookie).delete();
   });
 });
+
+describe('Test POST /v1/users/delete - delete multiple users', () => {
+  it('should multiple users', async () => {
+    const user = await createData.createUser();
+    const user2 = await createData.createUser();
+
+    const res = await request
+      .post('/v1/users/delete')
+      .send([user.id, user2.id])
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(JSON.stringify(res.body)).toBe('{}');
+
+    const deletedUser = await User.findByPk(user.id);
+    const deletedUser2 = await User.findByPk(user2.id);
+    expect(deletedUser).toBe(null);
+    expect(deletedUser2).toBe(null);
+  });
+
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const user = await createData.createUser();
+
+    const url = '/v1/users/delete';
+    await responseTests.testUnauthorized(url).post([user.id]);
+
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .post([user.id]);
+  });
+
+  it('should respond with 404 when not found', async () => {
+    const user = await createData.createUser();
+
+    const url = '/v1/users/delete';
+    const data = [user.id, nonExistentId];
+    await responseTests.testNotFound(url, cookies.adminCookie).post(data);
+  });
+});
