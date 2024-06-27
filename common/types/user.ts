@@ -28,7 +28,7 @@ export const UserIdArraySchema = z
   .array(z.number().int())
   .refine(items => new Set(items).size === items.length);
 
-export const UserArraySchema = z.array(UserDataSchema);
+export const UserDataArraySchema = z.array(UserDataSchema);
 
 export type UserData = z.infer<typeof UserDataSchema>;
 export type TeacherData = z.infer<typeof TeacherDataSchema>;

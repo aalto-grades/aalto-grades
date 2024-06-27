@@ -21,7 +21,7 @@ import {
   IdpUsersSchema,
   NewIdpUser,
   UserData,
-  UserArraySchema,
+  UserDataArraySchema,
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
@@ -57,7 +57,7 @@ export const useGetStudents = (
   useQuery({
     queryKey: ['students'],
     queryFn: async () =>
-      UserArraySchema.parse((await axios.get('/v1/users/students')).data),
+      UserDataArraySchema.parse((await axios.get('/v1/users/students')).data),
     ...options,
   });
 
