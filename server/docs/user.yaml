@@ -78,7 +78,7 @@ definitions:
     required:
       - email
 
-/v1/user/courses:
+/v1/users/own-courses:
   get:
     tags: [User]
     description: >
@@ -97,7 +97,7 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/user/{userId}/grades:
+/v1/users/{userId}/courses:
   get:
     tags: [User]
     description: >
@@ -121,7 +121,7 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/students:
+/v1/users/students:
   get:
     tags: [User]
     description: >
@@ -200,6 +200,32 @@ definitions:
     responses:
       200:
         description: User deleted.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+    security:
+      - cookieAuth: []
+
+/v1/users/delete:
+  post:
+    tags: [User]
+    description: Delete multiple users at once
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: array
+            description: List of user IDs to delete
+            items:
+              $ref: '#/definitions/UserId'
+    responses:
+      200:
+        description: Users deleted.
       400:
         $ref: '#/components/responses/BadRequest'
       401:

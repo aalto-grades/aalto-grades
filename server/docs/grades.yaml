@@ -172,6 +172,23 @@ definitions:
               items:
                 $ref: '#/definitions/GradeData'
 
+  LatestGrades:
+    type: array
+    description: Latest grades for each student
+    items:
+      type: object
+      properties:
+        userId:
+          $ref: '#/definitions/UserId'
+        date:
+          type: string
+          format: date
+          description: Date of the latest grade
+          example: 2024-05-01T00:00:00.000Z
+      required:
+        - userId
+        - date
+
 /v1/courses/{courseId}/grades:
   get:
     tags: [Grades]
@@ -279,6 +296,36 @@ definitions:
         $ref: '#/components/responses/NotFound'
       409:
         $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+
+/v1/latest-grades:
+  get:
+    tags: [Grades]
+    description: Get latest grade date for each student
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: array
+            description: User IDs to query
+            items:
+              $ref: '#/definitions/UserId'
+    responses:
+      200:
+        description: The dates of the latest grades for each student.
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/LatestGrades'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
     security:
       - cookieAuth: []
 
