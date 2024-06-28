@@ -26,12 +26,15 @@ import axios from './axios';
 import {Numeric} from '../../types';
 
 export const useGetRefreshToken = (
-  options?: Partial<UseQueryOptions<AuthData>>
-): UseQueryResult<AuthData> =>
+  options?: Partial<UseQueryOptions<AuthData | null>>
+): UseQueryResult<AuthData | null> =>
   useQuery({
     queryKey: ['refresh-token'],
-    queryFn: async () =>
-      AuthDataSchema.parse((await axios.get('/v1/auth/self-info')).data),
+    queryFn: async () => {
+      const res = await axios.get('/v1/auth/self-info');
+      if (res.status === 401) return null;
+      return AuthDataSchema.parse(res.data);
+    },
     ...options,
   });
 
