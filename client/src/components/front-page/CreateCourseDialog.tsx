@@ -25,7 +25,7 @@ import {
   TextField,
 } from '@mui/material';
 import {Formik, FormikHelpers, FormikProps} from 'formik';
-import {HTMLInputTypeAttribute, JSX, PropsWithChildren, useState} from 'react';
+import {JSX, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
@@ -39,6 +39,8 @@ import {useAddCourse} from '../../hooks/useApi';
 import {convertToClientGradingScale} from '../../utils/textFormat';
 import {sisuLanguageOptions} from '../../utils/utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import FormField from '../shared/FormikField';
+import FormLanguagesField from '../shared/FormikLanguageField';
 
 const ValidationSchema = z
   .object({
@@ -101,72 +103,6 @@ type FormData = {
   nameFi: string;
   nameSv: string;
 };
-
-const FormField = ({
-  form,
-  value,
-  label,
-  helperText,
-  select,
-  type,
-  children,
-}: {
-  form: FormikProps<FormData>;
-  value: keyof FormData;
-  label: string;
-  helperText: string;
-  select?: boolean;
-  type?: HTMLInputTypeAttribute;
-} & PropsWithChildren): JSX.Element => (
-  <TextField
-    id={value}
-    name={value}
-    type={type ?? 'text'}
-    fullWidth
-    value={form.values[value]}
-    disabled={form.isSubmitting}
-    label={label}
-    InputLabelProps={{shrink: true}}
-    margin="normal"
-    helperText={form.errors[value] ? form.errors[value] : helperText}
-    error={form.touched[value] && form.errors[value] !== undefined}
-    onChange={form.handleChange}
-    select={select}
-    // SelectProps={{native: true}}
-    sx={{textAlign: 'left'}}
-  >
-    {children}
-  </TextField>
-);
-
-const languages = [
-  {value: 'En', name: 'English'},
-  {value: 'Fi', name: 'Finnish'},
-  {value: 'Sv', name: 'Swedish'},
-];
-const FormLanguagesField = ({
-  form,
-  valueFormat,
-  labelFormat,
-  helperTextFormat,
-}: {
-  form: FormikProps<FormData>;
-  valueFormat: string;
-  labelFormat: string;
-  helperTextFormat: string;
-}): JSX.Element => (
-  <>
-    {languages.map(language => (
-      <FormField
-        key={language.value}
-        form={form}
-        value={valueFormat.replace('%', language.value) as keyof FormData}
-        label={labelFormat.replace('%', language.name)}
-        helperText={helperTextFormat.replace('%', language.name)}
-      />
-    ))}
-  </>
-);
 
 const initialValues = {
   courseCode: '',
@@ -263,44 +199,44 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
             }}
           />
           <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-            <DialogTitle>Create a New Course</DialogTitle>
+            <DialogTitle>Create a new course</DialogTitle>
             <DialogContent dividers>
               <FormField
-                form={form}
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="courseCode"
-                label="Course Code*"
+                label="Course code*"
                 helperText="Give code for the new course."
               />
               <FormLanguagesField
-                form={form}
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 valueFormat="name%"
-                labelFormat="Course Name in %*"
+                labelFormat="Course name in %*"
                 helperTextFormat="Give the name of the course in %."
               />
               <FormLanguagesField
-                form={form}
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 valueFormat="department%"
                 labelFormat="Organizing department in %*"
                 helperTextFormat="Give the organizing department of the new course in %."
               />
               <FormField
-                form={form}
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="minCredits"
-                label="Minimum Course Credits (ECTS)*"
+                label="Minimum course credits (ECTS)*"
                 helperText="Input minimum credits."
                 type="number"
               />
               <FormField
-                form={form}
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="maxCredits"
-                label="Maximum Course Credits (ECTS)*"
+                label="Maximum course credits (ECTS)*"
                 helperText="Input maximum credits."
                 type="number"
               />
               <FormField
-                form={form}
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="gradingScale"
-                label="Grading Scale*"
+                label="Grading scale*"
                 helperText="Grading scale of the course, e.g., 0-5 or pass/fail."
                 select
               >
@@ -311,7 +247,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 ))}
               </FormField>
               <FormField
-                form={form}
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="languageOfInstruction"
                 label="Course language*"
                 helperText="Language in which the course will be conducted."
@@ -324,12 +260,12 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 ))}
               </FormField>
               <TextField
-                id="teacherEmail"
+                id="teacherEmail" // Must be in camelCase to match data
                 type="text"
                 fullWidth
                 value={form.values.teacherEmail}
                 disabled={form.isSubmitting}
-                label="Teachers In Charge*"
+                label="Teachers in charge*"
                 margin="normal"
                 InputLabelProps={{shrink: true}}
                 helperText={
@@ -396,7 +332,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 )}
               </Box>
               <TextField
-                id="assistantEmail"
+                id="assistantEmail" // Must be in camelCase to match data
                 type="text"
                 fullWidth
                 value={form.values.assistantEmail}
@@ -493,7 +429,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 Cancel
               </Button>
               <Button
-                id="ag_create_course_btn"
+                id="ag-create-course-btn"
                 variant="contained"
                 onClick={form.submitForm}
                 disabled={form.isSubmitting}

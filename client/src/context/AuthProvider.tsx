@@ -2,25 +2,24 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Context, createContext, JSX, useState} from 'react';
+import {createContext, JSX, PropsWithChildren, useState} from 'react';
 
-import {LoginResult} from '@/common/types';
-import {State} from '../types';
+import {AuthData} from '@/common/types';
 
 /**
  * AuthContext stores both the users authentication information and is the user
  * teacher in charge on the currently selected course.
  */
 export type AuthContextType = {
-  auth: LoginResult | null;
-  setAuth: (auth: LoginResult | null) => void;
+  auth: AuthData | null;
+  setAuth: (auth: AuthData | null) => void;
   isTeacherInCharge: boolean;
   setIsTeacherInCharge: (isTeacherIncharge: boolean) => void;
   isAssistant: boolean;
   setIsAssistant: (isAssistant: boolean) => void;
 };
 
-const AuthContext: Context<AuthContextType> = createContext<AuthContextType>({
+const AuthContext = createContext<AuthContextType>({
   auth: null,
   setAuth: () => console.error('Called empty setAuth()'),
   isTeacherInCharge: false,
@@ -30,12 +29,10 @@ const AuthContext: Context<AuthContextType> = createContext<AuthContextType>({
   setIsAssistant: () => console.error('Called empty setAssistant()'),
 });
 
-export const AuthProvider = (params: {children: JSX.Element}): JSX.Element => {
-  const [auth, setAuth]: State<LoginResult | null> =
-    useState<LoginResult | null>(null);
-  const [isTeacherInCharge, setIsTeacherInCharge]: State<boolean> =
-    useState(false);
-  const [isAssistant, setIsAssistant]: State<boolean> = useState(false);
+export const AuthProvider = ({children}: PropsWithChildren): JSX.Element => {
+  const [auth, setAuth] = useState<AuthData | null>(null);
+  const [isTeacherInCharge, setIsTeacherInCharge] = useState<boolean>(false);
+  const [isAssistant, setIsAssistant] = useState<boolean>(false);
 
   return (
     <AuthContext.Provider
@@ -48,7 +45,7 @@ export const AuthProvider = (params: {children: JSX.Element}): JSX.Element => {
         setIsAssistant,
       }}
     >
-      {params.children}
+      {children}
     </AuthContext.Provider>
   );
 };

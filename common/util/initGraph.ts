@@ -46,7 +46,7 @@ export const initGraph = (
   ];
   const edges: Edge[] = [];
   const nodeData: FullNodeData = {
-    'final-grade': {title: 'Final Grade'},
+    'final-grade': {title: 'Final grade'},
     ...courseParts.reduce((map: {[key: string]: NodeData}, coursePart) => {
       map[`coursepart-${coursePart.id}`] = {
         title: coursePart.name,

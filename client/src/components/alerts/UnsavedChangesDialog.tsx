@@ -29,7 +29,7 @@ const UnsavedChangesDialog = ({
     aria-labelledby="unsaved-changes"
     aria-describedby="dialog-for-unsaved-changes"
   >
-    <DialogTitle>Unsaved Changes</DialogTitle>
+    <DialogTitle>Unsaved changes</DialogTitle>
     <DialogContent>
       You have unsaved changes. Data you have entered will not be saved.
     </DialogContent>

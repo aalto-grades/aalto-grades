@@ -7,7 +7,7 @@ import {z} from 'zod';
 import {DateSchema} from './general';
 import {UserDataSchema} from './user';
 
-export const FinalGradeDataSchema = z.object({
+export const FinalGradeDataSchema = z.strictObject({
   finalGradeId: z.number().int(),
   user: UserDataSchema,
   courseId: z.number().int(),
@@ -18,7 +18,7 @@ export const FinalGradeDataSchema = z.object({
   sisuExportDate: DateSchema.nullable(),
   comment: z.string().nullable(),
 });
-export const NewFinalGradeSchema = z.object({
+export const NewFinalGradeSchema = z.strictObject({
   userId: z.number().int(),
   gradingModelId: z.number().int().nullable(),
   grade: z.number().int().min(0).max(5),
@@ -26,7 +26,7 @@ export const NewFinalGradeSchema = z.object({
   comment: z.string().nullable(),
 });
 export const EditFinalGradeSchema = z
-  .object({
+  .strictObject({
     grade: z.number().int().min(0).max(5),
     date: DateSchema,
     sisuExportDate: DateSchema.nullable(),

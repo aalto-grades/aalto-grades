@@ -4,13 +4,16 @@
 
 import {Box, Button, Typography} from '@mui/material';
 import {JSX, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 
 import AddUserDialog from './AddUserDialog';
 import UsersTable from './UsersTable';
 
 // Assumes admin validation is already done
 const UsersView = (): JSX.Element => {
+  const navigate = useNavigate();
   const [addOpen, setAddOpen] = useState<boolean>(false);
+
   return (
     <>
       <AddUserDialog open={addOpen} onClose={() => setAddOpen(false)} />
@@ -28,7 +31,16 @@ const UsersView = (): JSX.Element => {
           Users
         </Typography>
         <Button
-          id="ag_new_course_btn"
+          id="ag-manage-users-btn"
+          sx={{mr: 1.5}}
+          size="large"
+          variant="contained"
+          onClick={() => navigate('/manage-students')}
+        >
+          Manage users
+        </Button>
+        <Button
+          id="ag-new-user-btn"
           size="large"
           variant="contained"
           onClick={() => setAddOpen(true)}

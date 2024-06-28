@@ -67,7 +67,7 @@ const MismatchDialog = ({
     // Find duplicates
     const usedSelections: string[] = [];
     for (const value of Object.values(selections)) {
-      if (usedSelections.includes(value) && value !== 'Ignore Column') {
+      if (usedSelections.includes(value) && value !== 'ignoreColumn') {
         setError('duplicate');
         setDuplicate(value);
         return;
@@ -88,7 +88,7 @@ const MismatchDialog = ({
   const getErrorText = (): string => {
     switch (error) {
       case '':
-        return 'All Done!';
+        return 'All done!';
       case 'duplicate':
         return 'The same "Import as" value cannot appear twice';
       case 'empty':
@@ -116,10 +116,10 @@ const MismatchDialog = ({
             <TableBody>
               {mismatchData.keys.map(key => (
                 <TableRow
-                  key={`mismatch-${key}`}
+                  key={key}
                   sx={{
                     background:
-                      selections[key] === 'Ignore Column' ? '#eceff1' : '',
+                      selections[key] === 'ignoreColumn' ? '#eceff1' : '',
                   }}
                 >
                   <TableCell>{key}</TableCell>
@@ -131,11 +131,11 @@ const MismatchDialog = ({
                         (error === 'duplicate' && selections[key] === duplicate)
                       }
                     >
-                      <InputLabel id={`mismatch-select${key}`}>
+                      <InputLabel id={`mismatch-select-${key}`}>
                         Import as
                       </InputLabel>
                       <Select
-                        labelId={`mismatch-select${key}`}
+                        labelId={`mismatch-select-${key}`}
                         label="Import as"
                         size="small"
                         value={selections[key] ?? ''}
@@ -149,7 +149,7 @@ const MismatchDialog = ({
                       >
                         {mismatchData.fields.map((field, index) => (
                           <MenuItem
-                            key={`mismatch-${key}-select-${field}`}
+                            key={field}
                             value={field}
                             divider={
                               index === 0 ||
@@ -159,8 +159,8 @@ const MismatchDialog = ({
                             {field}
                           </MenuItem>
                         ))}
-                        <MenuItem key="Ignore Column" value="Ignore Column">
-                          Ignore Column
+                        <MenuItem key="ignoreColumn" value="Ignore column">
+                          Ignore column
                         </MenuItem>
                       </Select>
                     </FormControl>

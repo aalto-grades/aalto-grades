@@ -89,7 +89,7 @@ const SelectCoursePartsDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Select Course Parts</DialogTitle>
+      <DialogTitle>Select course parts</DialogTitle>
 
       <DialogContent>
         <FormGroup>

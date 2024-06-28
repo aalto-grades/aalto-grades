@@ -4,15 +4,15 @@
 
 import assert from 'assert';
 import supertest from 'supertest';
-import {z} from 'zod';
 
 import {
-  HttpCode,
   CoursePartData,
-  NewGrade,
-  StudentRowSchema,
   EditGradeData,
   GradingScale,
+  HttpCode,
+  NewGrade,
+  StudentRowArraySchema,
+  LatestGradesSchema,
 } from '@/common/types';
 import {app} from '../../src/app';
 import * as gradesUtil from '../../src/controllers/utils/grades';
@@ -31,6 +31,8 @@ let cookies: Cookies = {} as Cookies;
 let courseId = -1;
 let courseParts: CoursePartData[] = [];
 let editGradeId = -1;
+let aplusGradeSourceId = -1;
+let aplusCoursePartId = -1;
 let noRoleCourseId = -1;
 let noRoleCourseParts: CoursePartData[] = [];
 let noRoleGradeId = -1;
@@ -108,6 +110,9 @@ beforeAll(async () => {
     noRoleCourseParts[0].id,
     TEACHER_ID
   );
+
+  [[aplusCoursePartId, aplusGradeSourceId]] =
+    await createData.createAplusGradeSources(courseId);
 });
 
 afterAll(async () => {
@@ -128,8 +133,8 @@ describe('Test GET /v1/courses/:courseId/grades - get all grades', () => {
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = z.array(StudentRowSchema.strict()).nonempty();
-      const result = await Schema.safeParseAsync(res.body);
+      const Schema = StudentRowArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
@@ -193,6 +198,15 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       {
         studentNumber: studentNumber,
         coursePartId: courseParts[2].id,
+        grade: Math.floor(Math.random() * 11),
+        date: new Date(),
+        expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
+        comment: '',
+      },
+      {
+        studentNumber: studentNumber,
+        coursePartId: aplusCoursePartId,
+        aplusGradeSourceId: aplusGradeSourceId,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
@@ -373,13 +387,31 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
-  it('should respond with 409 when course-part does not belong to course', async () => {
+  it('should respond with 409 when course part does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/grades`;
     const student = await genStudent();
     const data = [
       {
         studentNumber: student.studentNumber,
         coursePartId: noRoleCourseParts[0].id,
+        grade: Math.floor(Math.random() * 11),
+        date: new Date(),
+        expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),
+        comment: '',
+      },
+    ];
+
+    await responseTests.testConflict(url, cookies.adminCookie).post(data);
+  });
+
+  it('should respond with 409 when A+ grade source does not belong to course part', async () => {
+    const url = `/v1/courses/${courseId}/grades`;
+    const student = await genStudent();
+    const data = [
+      {
+        studentNumber: student.studentNumber,
+        coursePartId: courseParts[0].id,
+        aplusGradeSourceId: aplusGradeSourceId,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),
@@ -565,6 +597,94 @@ describe('Test Delete/v1/courses/:courseId/grades/:gradeId - delete a grade', ()
   it('should respond with 409 when grade does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/grades/${noRoleGradeId}`;
     await responseTests.testConflict(url, cookies.adminCookie).delete();
+  });
+});
+
+describe('Test POST /v1/latest-grades - fetch latest grades for multiple students', () => {
+  const createGrades = async (): Promise<[number, Date]> => {
+    const user = await createData.createUser();
+    let latestDate = new Date(0);
+
+    const start = new Date(2020, 0, 1);
+    const end = new Date(2024, 6, 1);
+    for (let i = 0; i < 5; i++) {
+      const gradeDate = new Date(
+        start.getTime() + Math.random() * (end.getTime() - start.getTime())
+      );
+      // gradeDate.setHours(0, 0, 0, 0);
+      await createData.createGrade(
+        user.id,
+        courseParts[0].id,
+        TEACHER_ID,
+        undefined,
+        gradeDate
+      );
+      if (gradeDate > latestDate) latestDate = gradeDate;
+    }
+    return [user.id, latestDate];
+  };
+
+  it('should fetch latest grades for multiple students', async () => {
+    const data: [number, Date | null][] = [];
+    for (let i = 0; i < 10; i++) data.push(await createGrades());
+    const user = await createData.createUser();
+    data.push([user.id, null]);
+
+    const res = await request
+      .post('/v1/latest-grades')
+      .send(data.map(item => item[0]))
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    const result = LatestGradesSchema.safeParse(res.body);
+    expect(result.success).toBeTruthy();
+
+    if (result.success) {
+      const resMap = new Map<number, Date | null>(
+        result.data.map(item => [item.userId, item.date])
+      );
+
+      for (const item of data) {
+        // Set date time portion to UTC midnight.
+        // Example: 03:00:00 +3:00 / 02:00:00 +2:00
+        const gradeDate =
+          item[1] === null
+            ? item[1]
+            : new Date(
+                Date.UTC(
+                  item[1].getFullYear(),
+                  item[1].getMonth(),
+                  item[1].getDate()
+                )
+              );
+        expect(gradeDate).toEqual(resMap.get(item[0]));
+      }
+    }
+  });
+
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const userIds = [];
+    for (let i = 0; i < 10; i++) userIds.push((await createGrades())[0]);
+
+    await responseTests.testUnauthorized('/v1/latest-grades').post(userIds);
+
+    await responseTests
+      .testForbidden('/v1/latest-grades', [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .post(userIds);
+  });
+
+  it('should respond with 404 if not found', async () => {
+    const userIds = [];
+    for (let i = 0; i < 10; i++) userIds.push((await createGrades())[0]);
+    userIds.push(nonExistentId);
+
+    const url = '/v1/latest-grades';
+    await responseTests.testNotFound(url, cookies.adminCookie).post(userIds);
   });
 });
 

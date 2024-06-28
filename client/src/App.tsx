@@ -23,10 +23,12 @@ import AppView from './components/AppView';
 import CourseResultsView from './components/CourseResultsView';
 import CourseView from './components/CourseView';
 import FrontPage from './components/FrontPage';
+import ManageStudentsView from './components/ManageStudentsView';
 import NotFound from './components/NotFound';
 import StudentsView from './components/StudentsView';
 import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
+import ResetPassword from './components/auth/ResetPassword';
 import CoursePartsView from './components/course-view/CoursePartsView';
 import EditCourseView from './components/course-view/EditCourseView';
 import ModelsView from './components/course-view/ModelsView';
@@ -209,7 +211,7 @@ const Root = (): JSX.Element => {
       <NotistackWrapper />
       <QueryClientProvider client={queryClient}>
         <AppView />
-        {/* Query Debug Tool */}
+        {/* Query debug tool */}
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </CssVarsProvider>
@@ -222,6 +224,7 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       {path: '/login', element: <Login />},
+      {path: '/reset-password', element: <ResetPassword />},
       {
         path: '/',
         element: (
@@ -239,6 +242,15 @@ const router = createBrowserRouter([
             path: '/students/:userId?',
             element: <StudentsView />,
           },
+          {
+            path: '/manage-students',
+            element: (
+              <PrivateRoute roles={[SystemRole.Admin]}>
+                <ManageStudentsView />
+              </PrivateRoute>
+            ),
+          },
+
           {
             path: '/:courseId',
             children: [

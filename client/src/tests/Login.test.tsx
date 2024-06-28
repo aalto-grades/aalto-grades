@@ -8,6 +8,7 @@ import {userEvent} from '@testing-library/user-event';
 import {http} from 'msw';
 import {BrowserRouter} from 'react-router-dom';
 
+import {LoginResult, SystemRole} from '@/common/types';
 import {mockPostSuccess, server} from './mock-data/server';
 import Login from '../components/auth/Login';
 import AuthContext from '../context/AuthProvider';
@@ -41,18 +42,24 @@ describe('Tests for Login and LoginForm components', () => {
     expect(screen.getByText('Local users')).toBeDefined();
     expect(screen.getByLabelText('Email')).toBeDefined();
     expect(screen.getByLabelText('Password')).toBeDefined();
-    expect(screen.getByText('log in')).toBeDefined();
+    expect(screen.getByText('Log in')).toBeDefined();
   });
 
   test('Login should allow a user to submit their credentials', async () => {
     renderLogin();
 
     const logIn = vi.fn();
-    server.use(http.post('*/v1/auth/login', mockPostSuccess(logIn, null)));
+    const loginData: LoginResult = {
+      resetPassword: false,
+      id: 5,
+      name: 'Terry Tester',
+      role: SystemRole.User,
+    };
+    server.use(http.post('*/v1/auth/login', mockPostSuccess(logIn, loginData)));
 
     await userEvent.type(screen.getByLabelText('Email'), 'test@email.com');
     await userEvent.type(screen.getByLabelText('Password'), 'secret');
-    await userEvent.click(screen.getByText('log in'));
+    await userEvent.click(screen.getByText('Log in'));
 
     await waitFor(() => {
       expect(logIn).toHaveBeenCalledTimes(1);

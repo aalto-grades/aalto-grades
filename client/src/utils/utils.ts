@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  AuthData,
   CourseData,
   CourseRoleType,
   GradingScale,
   Language,
-  LoginResult,
 } from '@/common/types';
 import {LanguageOption} from '../types';
 
@@ -24,7 +24,7 @@ export const getMaxFinalGrade = (gradingScale: GradingScale): number => {
 
 export const getCourseRole = (
   course: CourseData,
-  auth: LoginResult
+  auth: AuthData
 ): CourseRoleType => {
   const {teachersInCharge, assistants} = course;
   const isTeacher = teachersInCharge.find(teacher => teacher.id === auth.id);

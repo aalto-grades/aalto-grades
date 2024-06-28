@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+import * as argon from 'argon2';
+
 import {
   AplusGradeSourceType,
   CoursePartData,
@@ -61,6 +63,33 @@ class CreateData {
     };
   }
 
+  async createAuthUser(
+    user?: Partial<UserData & {password: string; forcePasswordReset: boolean}>
+  ): Promise<UserData> {
+    const password = await argon.hash(user?.password ?? 'password', {
+      type: argon.argon2id,
+      memoryCost: 19456,
+      parallelism: 1,
+      timeCost: 2,
+    });
+
+    const newUser = await User.create({
+      email: user?.email ?? `testuser${this.freeUserId}@aalto.fi`,
+      name: user?.name ?? `test user${this.freeUserId}`,
+      studentNumber: user?.studentNumber ?? `12345${this.freeUserId}`,
+      role: SystemRole.User,
+      password: password,
+      forcePasswordReset: user?.forcePasswordReset ?? false,
+    });
+    this.freeUserId += 1;
+    return {
+      id: newUser.id,
+      email: newUser.email,
+      name: newUser.name,
+      studentNumber: newUser.studentNumber,
+    };
+  }
+
   async createCoursePart(courseId: number): Promise<CoursePartData> {
     const newCoursePart = await CoursePart.create({
       courseId: courseId,
@@ -101,9 +130,9 @@ class CreateData {
 
   async createAplusGradeSources(
     courseId: number
-  ): Promise<[number, number, number]> {
+  ): Promise<[[number, number], [number, number], [number, number]]> {
     const fullPointsCoursePart = await this.createCoursePart(courseId);
-    await AplusGradeSource.create({
+    const fullPointsGradeSource = await AplusGradeSource.create({
       coursePartId: fullPointsCoursePart.id,
       aplusCourse: {
         id: 1,
@@ -116,7 +145,7 @@ class CreateData {
     });
 
     const moduleCoursePart = await this.createCoursePart(courseId);
-    await AplusGradeSource.create({
+    const moduleGradeSource = await AplusGradeSource.create({
       coursePartId: moduleCoursePart.id,
       aplusCourse: {
         id: 1,
@@ -131,7 +160,7 @@ class CreateData {
     });
 
     const difficultyCoursePart = await this.createCoursePart(courseId);
-    await AplusGradeSource.create({
+    const difficultyGradeSource = await AplusGradeSource.create({
       coursePartId: difficultyCoursePart.id,
       aplusCourse: {
         id: 1,
@@ -145,9 +174,9 @@ class CreateData {
     });
 
     return [
-      fullPointsCoursePart.id,
-      moduleCoursePart.id,
-      difficultyCoursePart.id,
+      [fullPointsCoursePart.id, fullPointsGradeSource.id],
+      [moduleCoursePart.id, moduleGradeSource.id],
+      [difficultyCoursePart.id, difficultyGradeSource.id],
     ];
   }
 

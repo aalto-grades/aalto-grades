@@ -11,6 +11,7 @@ import {
   Model,
 } from 'sequelize';
 
+import AplusGradeSource from './aplusGradeSource';
 import CoursePart from './coursePart';
 import User from './user';
 import {sequelize} from '..';
@@ -23,6 +24,9 @@ export default class AttainmentGrade extends Model<
   declare userId: ForeignKey<User['id']>;
   declare coursePartId: ForeignKey<CoursePart['id']>;
   declare graderId: ForeignKey<User['id']>;
+  declare aplusGradeSourceId: CreationOptional<ForeignKey<
+    AplusGradeSource['id']
+  > | null>;
   declare grade: number;
   declare sisuExportDate: CreationOptional<Date | null>;
   // Date when course part is completed (e.g., deadline or exam date)
@@ -34,6 +38,7 @@ export default class AttainmentGrade extends Model<
   grader?: User;
   User?: User;
   CoursePart?: CoursePart;
+  AplusGradeSource?: AplusGradeSource;
 }
 
 AttainmentGrade.init(
@@ -62,6 +67,14 @@ AttainmentGrade.init(
       allowNull: false,
       references: {
         model: 'user',
+        key: 'id',
+      },
+    },
+    aplusGradeSourceId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'aplus_grade_source',
         key: 'id',
       },
     },
@@ -105,7 +118,13 @@ AttainmentGrade.belongsTo(CoursePart, {foreignKey: 'coursePartId'});
 
 User.hasMany(AttainmentGrade, {
   foreignKey: 'graderId',
-  onDelete: 'CASCADE',
+  onDelete: 'NO ACTION',
   onUpdate: 'CASCADE',
 });
 AttainmentGrade.belongsTo(User, {foreignKey: 'graderId', as: 'grader'});
+
+AplusGradeSource.hasMany(AttainmentGrade, {
+  onDelete: 'RESTRICT',
+  onUpdate: 'CASCADE',
+});
+AttainmentGrade.belongsTo(AplusGradeSource, {foreignKey: 'aplusGradeSourceId'});
