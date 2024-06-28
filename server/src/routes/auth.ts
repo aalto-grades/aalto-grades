@@ -49,8 +49,6 @@ router.post(
 router.post(
   '/v1/auth/logout',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  express.json(),
-  handleInvalidRequestJson,
   authLogger,
   authLogout
 );
@@ -67,6 +65,7 @@ router.post(
 router.post(
   '/v1/auth/reset-password/:userId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authLogger,
   authorization([SystemRole.Admin]),
   controllerDispatcher(resetPassword)
 );
@@ -76,6 +75,7 @@ router.post(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   express.json(),
   handleInvalidRequestJson,
+  authLogger,
   processRequestBody(ChangePasswordDataSchema),
   controllerDispatcher(changePassword)
 );

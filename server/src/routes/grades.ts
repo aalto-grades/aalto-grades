@@ -71,9 +71,10 @@ router.delete(
 router.post(
   '/v1/latest-grades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
+  authLogger,
+  authorization([SystemRole.Admin]),
   processRequestBody(UserIdArraySchema),
   controllerDispatcher(getLatestGrades)
 );

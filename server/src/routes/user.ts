@@ -66,6 +66,7 @@ router.post(
 router.delete(
   '/v1/users/:userId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authLogger,
   authorization([SystemRole.Admin]),
   controllerDispatcher(deleteUser)
 );
