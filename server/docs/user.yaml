@@ -26,14 +26,14 @@ definitions:
     properties:
       id:
         $ref: '#/definitions/UserId'
-      studentNumber:
-        $ref: '#/definitions/StudentNumber'
       name:
         type: string
         description: User's name.
         example: Eddy Engineer
       email:
         $ref: '#/definitions/UserEmail'
+      studentNumber:
+        $ref: '#/definitions/StudentNumber'
     required:
       - id
 
@@ -56,27 +56,63 @@ definitions:
       - id
       - email
 
-  IdpUser:
+  FullUserData:
     type: object
-    description: Minimal idp user information.
+    description: User data with a couple of extra fields.
     properties:
       id:
         $ref: '#/definitions/UserId'
+      name:
+        type: string
+        description: User's name.
+        example: Eddy Engineer
       email:
         $ref: '#/definitions/UserEmail'
-        nullable: true
+      studentNumber:
+        $ref: '#/definitions/StudentNumber'
+      role:
+        $ref: '#/definitions/SystemRole'
+      idpUser:
+        type: boolean
+        description: If the user is an IDP user
+        example: true
     required:
       - id
-      - email
+      - role
+      - idpUser
 
-  NewIdpUser:
+  IdpUser:
     type: object
-    description: Minimal idp user information.
     properties:
+      admin:
+        type: boolean
+        enum: [false]
+        example: false
       email:
         $ref: '#/definitions/UserEmail'
     required:
+      - admin
       - email
+  AdminUser:
+    type: object
+    properties:
+      admin:
+        type: boolean
+        enum: [true]
+      email:
+        $ref: '#/definitions/UserEmail'
+      name:
+        type: string
+        description: User's name.
+        example: Eddy Engineer
+    required:
+      - admin
+      - email
+      - name
+  NewUser:
+    oneOf:
+      - $ref: '#/definitions/IdpUser'
+      - $ref: '#/definitions/AdminUser'
 
 /v1/users/own-courses:
   get:
@@ -146,12 +182,10 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/idp-users:
+/v1/users:
   get:
     tags: [User]
-    description: >
-      Get all users that can login with aalto idp.
-      Available only to admin users.
+    description: Get list of all users. Available only to admin users.
     responses:
       200:
         description: User information.
@@ -160,7 +194,7 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/IdpUser'
+                $ref: '#/definitions/FullUserData'
       401:
         $ref: '#/components/responses/Unauthorized'
       403:
@@ -170,13 +204,13 @@ definitions:
   post:
     tags: [User]
     description: >
-      Add users that can login with aalto idp.
+      Add admins or users that can login with aalto idp.
       Available only to admin users.
     requestBody:
-    content:
-      application/json:
-        schema:
-          $ref: '#/definitions/NewIdpUser'
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/NewUser'
     responses:
       201:
         description: User created.
@@ -189,11 +223,11 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/idp-users/{userId}:
+/v1/users/{userId}:
   delete:
     tags: [User]
     description: >
-      delete idp user.
+      delete an idp user or an admin user.
       Available only to admin users.
     parameters:
       - $ref: '#/components/parameters/userId'

@@ -9,7 +9,7 @@ import {FinalGradeDataArraySchema} from './finalGrade';
 import {DateSchema, LanguageSchema} from './general';
 import {UserDataSchema} from './user';
 
-export const BaseGradeDataSchema = z.object({
+export const BaseGradeDataSchema = z.strictObject({
   gradeId: z.number().int(),
   grader: UserDataSchema,
   aplusGradeSource: AplusGradeSourceDataSchema.nullable(),
@@ -24,7 +24,7 @@ export const GradeDataSchema = BaseGradeDataSchema.refine(
   {path: ['date']}
 );
 export const NewGradeSchema = z
-  .object({
+  .strictObject({
     studentNumber: z.string(),
     coursePartId: z.number().int(),
     aplusGradeSourceId: z.number().int().optional(),
@@ -39,6 +39,7 @@ export const EditGradeDataSchema = BaseGradeDataSchema.omit({
   aplusGradeSource: true,
   grader: true,
 })
+  .strict()
   .partial()
   .refine(
     val =>
@@ -50,12 +51,12 @@ export const EditGradeDataSchema = BaseGradeDataSchema.omit({
 
 export const NewGradeArraySchema = z.array(NewGradeSchema);
 
-export const CoursePartGradesDataSchema = z.object({
+export const CoursePartGradesDataSchema = z.strictObject({
   coursePartId: z.number().int(),
   coursePartName: z.string(),
   grades: z.array(GradeDataSchema),
 });
-export const StudentRowSchema = z.object({
+export const StudentRowSchema = z.strictObject({
   user: UserDataSchema,
   courseParts: z.array(CoursePartGradesDataSchema),
   finalGrades: FinalGradeDataArraySchema.optional(),
@@ -67,7 +68,7 @@ export const LatestGradesSchema = z.array(
     date: DateSchema.nullable(),
   })
 );
-export const SisuCsvUploadSchema = z.object({
+export const SisuCsvUploadSchema = z.strictObject({
   assessmentDate: DateSchema.optional(), // Assessment date override
   completionLanguage: LanguageSchema.optional(), // Defaults to course language
   studentNumbers: z.array(z.string()).nonempty(),

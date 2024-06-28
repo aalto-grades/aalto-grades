@@ -6,15 +6,15 @@ import express, {RequestHandler, Router} from 'express';
 import passport from 'passport';
 import {processRequestBody, validateRequestBody} from 'zod-express-middleware';
 
-import {UserIdArraySchema, NewIdpUserSchema, SystemRole} from '@/common/types';
+import {NewUserSchema, SystemRole, UserIdArraySchema} from '@/common/types';
 import {
-  addIdpUser,
-  deleteIdpUser,
-  getOwnCourses,
-  getIdpUsers,
-  getCoursesOfUser,
-  getStudents,
+  addUser,
+  deleteUser,
   deleteUsers,
+  getCoursesOfUser,
+  getOwnCourses,
+  getStudents,
+  getUsers,
 } from '../controllers/user';
 import {handleInvalidRequestJson} from '../middleware';
 import {authorization} from '../middleware/authorization';
@@ -41,27 +41,27 @@ router.get(
 );
 
 router.get(
-  '/v1/idp-users',
+  '/v1/users',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   authorization([SystemRole.Admin]),
-  controllerDispatcher(getIdpUsers)
+  controllerDispatcher(getUsers)
 );
 
 router.post(
-  '/v1/idp-users',
+  '/v1/users',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(NewIdpUserSchema),
-  controllerDispatcher(addIdpUser)
+  processRequestBody(NewUserSchema),
+  controllerDispatcher(addUser)
 );
 
 router.delete(
-  '/v1/idp-users/:userId',
+  '/v1/users/:userId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   authorization([SystemRole.Admin]),
-  controllerDispatcher(deleteIdpUser)
+  controllerDispatcher(deleteUser)
 );
 
 router.post(

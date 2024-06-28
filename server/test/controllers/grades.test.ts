@@ -4,15 +4,14 @@
 
 import assert from 'assert';
 import supertest from 'supertest';
-import {z} from 'zod';
 
 import {
-  HttpCode,
   CoursePartData,
-  NewGrade,
-  StudentRowSchema,
   EditGradeData,
   GradingScale,
+  HttpCode,
+  NewGrade,
+  StudentRowArraySchema,
   LatestGradesSchema,
 } from '@/common/types';
 import {app} from '../../src/app';
@@ -134,8 +133,8 @@ describe('Test GET /v1/courses/:courseId/grades - get all grades', () => {
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = z.array(StudentRowSchema.strict()).nonempty();
-      const result = await Schema.safeParseAsync(res.body);
+      const Schema = StudentRowArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
