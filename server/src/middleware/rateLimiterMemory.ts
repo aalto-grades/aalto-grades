@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {NextFunction, Response} from 'express';
 import {RateLimiterMemory} from 'rate-limiter-flexible';
 import {TypedRequestBody} from 'zod-express-middleware';
