@@ -40,6 +40,7 @@
     "passport-local": "^1.0.0",
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
+    "rate-limiter-flexible": "^5.0.3",
     "sequelize": "^6.37.1",
     "sequelize-cli": "^6.5.2",
     "swagger-jsdoc": "^6.2.8",
