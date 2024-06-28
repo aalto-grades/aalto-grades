@@ -25,7 +25,11 @@ describe('Tests for CourseResultsView components', () => {
         <QueryClientProvider client={new QueryClient()}>
           <AuthContext.Provider
             value={{
-              auth: {id: 2, name: 'Timmy Teacher', role: SystemRole.User},
+              auth: {
+                id: 2,
+                name: 'Timmy Teacher',
+                role: SystemRole.User,
+              },
               setAuth: vi.fn(),
               isTeacherInCharge: true,
               setIsTeacherInCharge: vi.fn(),

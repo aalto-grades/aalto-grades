@@ -23,7 +23,6 @@ axiosInstance.interceptors.response.use(response => {
   // Zod error
   if (response.status === 400 && Array.isArray(resData)) {
     const resErrors = resData[0];
-    console.log(resErrors.errors.issues);
     throw new Error(
       `${response.status} - ${response.statusText}: ` +
         resErrors.errors.issues

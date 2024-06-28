@@ -24,7 +24,7 @@ export const authorization = (
 
     if (!allowedRoles.includes(user.role)) {
       return res.status(HttpCode.Forbidden).send({
-        errors: ['forbidden'],
+        errors: ['Forbidden'],
       });
     }
     return next();
@@ -61,12 +61,12 @@ export const courseAuthorization = (
         req.user as JwtClaims
       );
       if (!allowedRoles.includes(courseRole.role)) {
-        return res.status(HttpCode.Forbidden).send({errors: ['forbidden']});
+        return res.status(HttpCode.Forbidden).send({errors: ['Forbidden']});
       }
 
       return next();
     } catch (e) {
-      return res.status(HttpCode.Forbidden).send({errors: ['forbidden']});
+      return res.status(HttpCode.Forbidden).send({errors: ['Forbidden']});
     }
   };
 

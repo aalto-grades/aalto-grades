@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+import * as argon from 'argon2';
 import {Request, Response} from 'express';
+import generator from 'generate-password';
 import {Op} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
@@ -11,10 +13,11 @@ import {
   CourseRoleType,
   CourseWithFinalGrades,
   HttpCode,
-  IdpUsers,
-  NewIdpUserSchema,
+  NewUserResponse,
+  NewUserSchema,
   SystemRole,
   UserData,
+  FullUserData,
 } from '@/common/types';
 import {parseCourseFull} from './utils/course';
 import {validateUserAndGrader} from './utils/grades';
@@ -217,38 +220,70 @@ export const getStudents = async (
   res.json(Array.from(users.values()));
 };
 
-/** Responds with IdpUsers */
-export const getIdpUsers = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const idpUsers = await User.findIdpUsers();
-  const users: IdpUsers = idpUsers.map(user => ({
-    email: user.email,
+/** Responds with FullUserData[] */
+export const getUsers = async (req: Request, res: Response): Promise<void> => {
+  const dbUsers = await User.findAll();
+  const users: FullUserData[] = dbUsers.map(user => ({
     id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    studentNumber: user.studentNumber,
+    idpUser: user.password === null,
   }));
 
   res.json(users);
 };
 
-/** @throws ApiError(409) */
-export const addIdpUser = async (
-  req: TypedRequestBody<typeof NewIdpUserSchema>,
+/**
+ * Responds with NewUserResponse
+ *
+ * @throws ApiError(409)
+ */
+export const addUser = async (
+  req: TypedRequestBody<typeof NewUserSchema>,
   res: Response
-): Promise<void> => {
+): Promise<Response | void> => {
   const email = req.body.email;
 
-  const userAlreadyExists = await User.findIdpUserByEmail(email);
-  if (userAlreadyExists) {
-    throw new ApiError('User already exists', HttpCode.Conflict);
+  const existingUser = await User.findByEmail(email);
+  if (existingUser !== null) {
+    throw new ApiError(
+      `User with email ${email} already exists`,
+      HttpCode.Conflict
+    );
   }
 
-  await User.create({email: email, role: SystemRole.User, name: email});
-  res.sendStatus(HttpCode.Created);
+  if (!req.body.admin) {
+    await User.create({email: email, role: SystemRole.User});
+    const resData: NewUserResponse = {temporaryPassword: null};
+    return res.status(HttpCode.Created).json(resData);
+  }
+
+  const temporaryPassword = generator.generate({
+    length: 16,
+    numbers: true,
+  });
+  // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+  await User.create({
+    name: req.body.name,
+    email: req.body.email,
+    password: await argon.hash(temporaryPassword, {
+      type: argon.argon2id,
+      memoryCost: 19456,
+      parallelism: 1,
+      timeCost: 2,
+    }),
+    role: SystemRole.Admin,
+    forcePasswordReset: true,
+  });
+
+  const resData: NewUserResponse = {temporaryPassword};
+  return res.status(HttpCode.Created).json(resData);
 };
 
 /** @throws ApiError(400|404) */
-export const deleteIdpUser = async (
+export const deleteUser = async (
   req: Request,
   res: Response
 ): Promise<void> => {
