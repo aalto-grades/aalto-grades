@@ -12,7 +12,7 @@ export enum AplusGradeSourceType {
   Difficulty = 'DIFFICULTY',
 }
 
-export const AplusCourseDataSchema = z.object({
+export const AplusCourseDataSchema = z.strictObject({
   id: z.number().int(),
   courseCode: z.string(),
   name: z.string(),
@@ -23,9 +23,9 @@ export const AplusCourseDataArraySchema = z.array(AplusCourseDataSchema);
 
 export const AplusGradeSourceTypeSchema = z.nativeEnum(AplusGradeSourceType);
 
-export const AplusExerciseDataSchema = z.object({
+export const AplusExerciseDataSchema = z.strictObject({
   modules: z.array(
-    z.object({
+    z.strictObject({
       id: z.number().int(),
       name: z.string(),
     })
@@ -33,26 +33,24 @@ export const AplusExerciseDataSchema = z.object({
   difficulties: z.array(z.string()),
 });
 
-const GradeSourceBase = z
-  .object({
-    coursePartId: IdSchema,
-    aplusCourse: AplusCourseDataSchema,
-  })
-  .strict();
+const GradeSourceBase = z.strictObject({
+  coursePartId: IdSchema,
+  aplusCourse: AplusCourseDataSchema,
+});
 
 export const AplusGradeSourceDataSchema = z.discriminatedUnion('sourceType', [
   GradeSourceBase.extend({
     sourceType: z.literal(AplusGradeSourceType.FullPoints),
-  }),
+  }).strict(),
   GradeSourceBase.extend({
     sourceType: z.literal(AplusGradeSourceType.Module),
     moduleId: z.number().int(),
     moduleName: z.string(),
-  }),
+  }).strict(),
   GradeSourceBase.extend({
     sourceType: z.literal(AplusGradeSourceType.Difficulty),
     difficulty: z.string(),
-  }),
+  }).strict(),
 ]);
 
 export const NewAplusGradeSourceArraySchema = z.array(

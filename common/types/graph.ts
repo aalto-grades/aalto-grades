@@ -72,9 +72,7 @@ export type NodeValue =
   | StepperNodeValue
   | SubstituteNodeValue;
 
-export type NodeValues = {
-  [key: string]: NodeValue;
-};
+export type NodeValues = {[key: string]: NodeValue};
 
 // Types with schemas
 const CustomNodeTypesSchema = z.enum([
@@ -94,34 +92,34 @@ const DropInNodesSchema = CustomNodeTypesSchema.exclude([
   'grade',
 ]);
 
-const AverageNodeSettingsSchema = z.object({
+const AverageNodeSettingsSchema = z.strictObject({
   weights: z.record(z.number()),
   percentageMode: z.boolean(),
 });
-const CoursePartNodeSettingsSchema = z.object({
+const CoursePartNodeSettingsSchema = z.strictObject({
   minPoints: z.union([z.number(), z.null()]),
   onFailSetting: z.enum(['coursefail', 'fail']),
 });
-const MaxNodeSettingsSchema = z.object({
+const MaxNodeSettingsSchema = z.strictObject({
   minValue: z.number(),
 });
-const MinPointsNodeSettingsSchema = z.object({
+const MinPointsNodeSettingsSchema = z.strictObject({
   minPoints: z.number(),
   onFailSetting: z.enum(['coursefail', 'fail']),
 });
-const RequireNodeSettingsSchema = z.object({
+const RequireNodeSettingsSchema = z.strictObject({
   numFail: z.number(),
   onFailSetting: z.enum(['coursefail', 'fail']),
 });
-const RoundNodeSettingsSchema = z.object({
+const RoundNodeSettingsSchema = z.strictObject({
   roundingSetting: z.enum(['round-up', 'round-closest', 'round-down']),
 });
-const StepperNodeSettingsSchema = z.object({
+const StepperNodeSettingsSchema = z.strictObject({
   numSteps: z.number(),
   outputValues: z.array(z.union([z.number(), z.literal('same')])),
   middlePoints: z.array(z.number()),
 });
-const SubstituteNodeSettingsSchema = z.object({
+const SubstituteNodeSettingsSchema = z.strictObject({
   maxSubstitutions: z.number(),
   substituteValues: z.array(z.number()),
 });
@@ -136,14 +134,15 @@ const NodeSettingsSchema = z.union([
   StepperNodeSettingsSchema,
   SubstituteNodeSettingsSchema,
 ]);
-const NodeDataSchema = z.object({
+const NodeDataSchema = z.strictObject({
   title: z.string(),
   settings: NodeSettingsSchema.optional(),
 });
 const FullNodeDataSchema = z.record(z.string(), NodeDataSchema);
 
-export const GraphStructureSchema = z.object({
+export const GraphStructureSchema = z.strictObject({
   nodes: z.array(
+    // Not strict
     z.object({
       id: z.string(),
       position: z.object({x: z.number(), y: z.number()}),

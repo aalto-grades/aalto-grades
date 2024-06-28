@@ -67,8 +67,8 @@ export const useEditCourse = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: EditCourseVars) =>
-      await axios.put(`/v1/courses/${vars.courseId}`, vars.course),
+    mutationFn: (vars: EditCourseVars) =>
+      axios.put(`/v1/courses/${vars.courseId}`, vars.course),
 
     onSuccess: (_data: unknown, vars: EditCourseVars) => {
       queryClient.invalidateQueries({queryKey: ['course', vars.courseId]});
