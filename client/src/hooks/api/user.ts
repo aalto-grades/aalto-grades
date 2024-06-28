@@ -110,6 +110,7 @@ export const useDeleteUsers = (
     mutationFn: userIds => axios.post('/v1/users/delete', userIds),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['users']});
+      queryClient.invalidateQueries({queryKey: ['students']});
     },
     ...options,
   });
