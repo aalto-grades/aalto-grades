@@ -69,10 +69,6 @@ afterAll(async () => {
 });
 
 describe('Test GET /v1/users/own-courses - get all courses user has role in', () => {
-  const UserCoursesSchema = BaseCourseDataSchema.strict().refine(
-    val => val.maxCredits >= val.minCredits
-  );
-
   it('should get user courses', async () => {
     await createData.createCourse({}); // Create course the student is a part of
 
@@ -105,12 +101,6 @@ describe('Test GET /v1/users/own-courses - get all courses user has role in', ()
 });
 
 describe('Test GET /v1/users/:userId/courses - get all courses and grades of user where the requester has a role', () => {
-  const UserGradesSchema = BaseCourseDataSchema.extend({
-    finalGrades: FinalGradeDataArraySchema,
-  })
-    .strict()
-    .refine(val => val.maxCredits >= val.minCredits);
-
   it('should get user grades', async () => {
     const testCookies: [string[], number][] = [
       [cookies.adminCookie, STUDENT_ID],
