@@ -62,6 +62,12 @@ export const StudentRowSchema = z.strictObject({
   finalGrades: FinalGradeDataArraySchema.optional(),
 });
 export const StudentRowArraySchema = z.array(StudentRowSchema);
+export const LatestGradesSchema = z.array(
+  z.strictObject({
+    userId: z.number().int(),
+    date: DateSchema.nullable(),
+  })
+);
 export const SisuCsvUploadSchema = z.strictObject({
   assessmentDate: DateSchema.optional(), // Assessment date override
   completionLanguage: LanguageSchema.optional(), // Defaults to course language
@@ -73,5 +79,5 @@ export type EditGradeData = z.infer<typeof EditGradeDataSchema>;
 export type NewGrade = z.infer<typeof NewGradeSchema>;
 export type CoursePartGradesData = z.infer<typeof CoursePartGradesDataSchema>;
 export type StudentRow = z.infer<typeof StudentRowSchema>;
-
+export type LatestGrades = z.infer<typeof LatestGradesSchema>;
 export type SisuCsvUpload = z.infer<typeof SisuCsvUploadSchema>;

@@ -14,10 +14,13 @@ import {
 
 import {
   EditGradeData,
+  LatestGrades,
+  LatestGradesSchema,
   NewGrade,
   SisuCsvUpload,
   StudentRow,
   StudentRowArraySchema,
+  UserIdArray,
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
@@ -32,21 +35,6 @@ export const useGetGrades = (
       StudentRowArraySchema.parse(
         (await axios.get(`/v1/courses/${courseId}/grades`)).data
       ),
-    ...options,
-  });
-
-type DownloadSisuGradeCsvVars = {courseId: Numeric; data: SisuCsvUpload};
-export const useDownloadSisuGradeCsv = (
-  options?: UseMutationOptions<BlobPart, unknown, DownloadSisuGradeCsvVars>
-): UseMutationResult<BlobPart, unknown, DownloadSisuGradeCsvVars> =>
-  useMutation({
-    mutationFn: async vars =>
-      (
-        await axios.post<BlobPart>(
-          `/v1/courses/${vars.courseId}/grades/csv/sisu`,
-          vars.data
-        )
-      ).data,
     ...options,
   });
 
@@ -98,3 +86,29 @@ export const useDeleteGrade = (
     ...options,
   });
 };
+
+export const useGetLatestGrades = (
+  options?: UseMutationOptions<LatestGrades, unknown, UserIdArray>
+): UseMutationResult<LatestGrades, unknown, UserIdArray> =>
+  useMutation({
+    mutationFn: async userIds =>
+      LatestGradesSchema.parse(
+        (await axios.post('/v1/latest-grades', userIds)).data
+      ),
+    ...options,
+  });
+
+type DownloadSisuGradeCsvVars = {courseId: Numeric; data: SisuCsvUpload};
+export const useDownloadSisuGradeCsv = (
+  options?: UseMutationOptions<BlobPart, unknown, DownloadSisuGradeCsvVars>
+): UseMutationResult<BlobPart, unknown, DownloadSisuGradeCsvVars> =>
+  useMutation({
+    mutationFn: async vars =>
+      (
+        await axios.post<BlobPart>(
+          `/v1/courses/${vars.courseId}/grades/csv/sisu`,
+          vars.data
+        )
+      ).data,
+    ...options,
+  });

@@ -14,10 +14,12 @@ import {
   GradeData,
   GradingScale,
   HttpCode,
+  LatestGrades,
   NewGradeArraySchema,
   SisuCsvUploadSchema,
   StudentRow,
   UserData,
+  UserIdArraySchema,
 } from '@/common/types';
 import {validateAplusGradeSourceBelongsToCoursePart} from './utils/aplus';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
@@ -332,6 +334,43 @@ export const deleteGrade = async (
   await grade.destroy();
 
   res.sendStatus(HttpCode.Ok);
+};
+
+/**
+ * Responds with LatestGrades
+ *
+ * @throws ApiError(404)
+ */
+export const getLatestGrades = async (
+  req: TypedRequestBody<typeof UserIdArraySchema>,
+  res: Response
+): Promise<void> => {
+  const dbUsers = await User.findAll({where: {id: req.body}});
+  if (dbUsers.length < req.body.length)
+    throw new ApiError('Some user ids not found', HttpCode.NotFound);
+
+  const dbGrades = await AttainmentGrade.findAll({
+    where: {userId: req.body},
+    group: ['userId'],
+    attributes: [
+      'userId',
+      [sequelize.fn('MAX', sequelize.col('date')), 'date'],
+    ],
+    raw: true,
+  });
+  const latestItems: LatestGrades = dbGrades.map(item => ({
+    userId: item.userId,
+    date: new Date(item.date),
+  }));
+
+  const missingStudents = new Set<number>(req.body);
+  for (const item of latestItems) missingStudents.delete(item.userId);
+  for (const userId of missingStudents) {
+    latestItems.push({userId: userId, date: null});
+  }
+  console.log(latestItems);
+
+  res.json(latestItems);
 };
 
 /**

@@ -23,6 +23,7 @@ import AppView from './components/AppView';
 import CourseResultsView from './components/CourseResultsView';
 import CourseView from './components/CourseView';
 import FrontPage from './components/FrontPage';
+import ManageStudentsView from './components/ManageStudentsView';
 import NotFound from './components/NotFound';
 import StudentsView from './components/StudentsView';
 import Login from './components/auth/Login';
@@ -241,6 +242,15 @@ const router = createBrowserRouter([
             path: '/students/:userId?',
             element: <StudentsView />,
           },
+          {
+            path: '/manage-students',
+            element: (
+              <PrivateRoute roles={[SystemRole.Admin]}>
+                <ManageStudentsView />
+              </PrivateRoute>
+            ),
+          },
+
           {
             path: '/:courseId',
             children: [

@@ -12,6 +12,7 @@ import {
   CourseData,
   CourseRoleType,
   CourseWithFinalGrades,
+  UserIdArraySchema,
   HttpCode,
   NewUserResponse,
   NewUserSchema,
@@ -60,7 +61,7 @@ export const getOwnCourses = async (
  *
  * @throws ApiError(400|404)
  */
-export const getGradesOfUser = async (
+export const getCoursesOfUser = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -289,5 +290,18 @@ export const deleteUser = async (
 ): Promise<void> => {
   const user = await findAndValidateUserId(req.params.userId);
   await user.destroy();
+  res.sendStatus(HttpCode.Ok);
+};
+
+/** @throws ApiError(404) */
+export const deleteUsers = async (
+  req: TypedRequestBody<typeof UserIdArraySchema>,
+  res: Response
+): Promise<void> => {
+  const dbUsers = await User.findAll({where: {id: req.body}});
+  if (dbUsers.length < req.body.length)
+    throw new ApiError('Some users not found', HttpCode.NotFound);
+
+  await User.destroy({where: {id: req.body}});
   res.sendStatus(HttpCode.Ok);
 };

@@ -46,6 +46,9 @@ export const NewUserSchema = z.discriminatedUnion('admin', [
 export const NewUserResponseSchema = z.strictObject({
   temporaryPassword: z.string().nullable(),
 });
+export const UserIdArraySchema = z
+  .array(z.number().int())
+  .refine(items => new Set(items).size === items.length);
 
 export const UserDataArraySchema = z.array(UserDataSchema);
 export const UserWithRoleArraySchema = z.array(FullUserDataSchema);
@@ -55,3 +58,4 @@ export type FullUserData = z.infer<typeof FullUserDataSchema>;
 export type TeacherData = z.infer<typeof TeacherDataSchema>;
 export type NewUser = z.infer<typeof NewUserSchema>;
 export type NewUserResponse = z.infer<typeof NewUserResponseSchema>;
+export type UserIdArray = z.infer<typeof UserIdArraySchema>;
