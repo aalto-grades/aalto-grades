@@ -3,14 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import supertest from 'supertest';
-import {z} from 'zod';
 
 import {
-  GradingModelDataSchema,
   CoursePartData,
   EditGradingModelData,
+  GradingModelDataArraySchema,
+  GradingModelDataSchema,
   GraphStructure,
   HttpCode,
+  IdSchema,
   NewGradingModelData,
 } from '@/common/types';
 import {initGraph} from '@/common/util/initGraph';
@@ -100,8 +101,7 @@ describe('Test GET /v1/courses/:courseId/grading-models/:gradingModelId - get gr
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = GradingModelDataSchema.strict();
-      const result = await Schema.safeParseAsync(res.body);
+      const result = GradingModelDataSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
@@ -154,8 +154,8 @@ describe('Test GET /v1/courses/:courseId/grading-models - get all grading models
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = z.array(GradingModelDataSchema.strict()).length(2);
-      const result = await Schema.safeParseAsync(res.body);
+      const Schema = GradingModelDataArraySchema.length(2);
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
@@ -167,8 +167,8 @@ describe('Test GET /v1/courses/:courseId/grading-models - get all grading models
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    const Schema = z.array(z.any()).length(0);
-    const result = await Schema.safeParseAsync(res.body);
+    const Schema = GradingModelDataArraySchema.length(0);
+    const result = Schema.safeParse(res.body);
     expect(result.success).toBeTruthy();
   });
 
@@ -216,8 +216,7 @@ describe('Test POST /v1/courses/:courseId/grading-models - add grading model', (
         .set('Accept', 'application/json')
         .expect(HttpCode.Created);
 
-      const Schema = z.number().int();
-      const result = await Schema.safeParseAsync(res.body);
+      const result = IdSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
       if (result.success) await checkModel(result.data, newModel);
     }

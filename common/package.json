@@ -9,9 +9,11 @@
   },
   "devDependencies": {
     "@types/react": "^18.2.63",
+    "@types/zxcvbn": "^4.4.4",
     "reactflow": "^11.10.4"
   },
   "dependencies": {
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "zxcvbn": "^4.4.2"
   }
 }

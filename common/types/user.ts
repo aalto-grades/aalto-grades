@@ -4,30 +4,54 @@
 
 import {z} from 'zod';
 
-export const UserDataSchema = z.object({
+import {SystemRoleSchema} from './auth';
+import {AaltoEmailSchema} from './general';
+
+export const UserDataSchema = z.strictObject({
   id: z.number().int(),
   name: z.string().nullable(),
   email: z.string().email().nullable(),
   studentNumber: z.string().nullable(),
 });
-export const TeacherDataSchema = z.object({
+export const FullUserDataSchema = z.strictObject({
+  id: z.number().int(),
+  name: z.string().nullable(),
+  email: z.string().email().nullable(),
+  studentNumber: z.string().nullable(),
+  role: SystemRoleSchema,
+  idpUser: z.boolean(),
+});
+export const TeacherDataSchema = z.strictObject({
   id: z.number().int(),
   name: z.string().nullable(),
   email: z.string().email(),
   studentNumber: z.string().nullable(),
 });
-export const IdpUserSchema = z.object({
-  id: z.number().int(),
-  email: z.string().email().nullable(),
+
+export const NewUserSchema = z.discriminatedUnion('admin', [
+  // Idp user
+  z.strictObject({
+    admin: z.literal(false),
+    email: AaltoEmailSchema,
+  }),
+  // Admin
+  z.strictObject({
+    admin: z.literal(true),
+    email: AaltoEmailSchema,
+    name: z
+      .string()
+      .min(3, {message: 'Name must be at least 3 characters long'}),
+  }),
+]);
+export const NewUserResponseSchema = z.strictObject({
+  temporaryPassword: z.string().nullable(),
 });
-export const NewIdpUserSchema = z.object({
-  email: z.string().email(),
-});
-export const IdpUsersSchema = z.array(IdpUserSchema);
 
 export const UserDataArraySchema = z.array(UserDataSchema);
+export const UserWithRoleArraySchema = z.array(FullUserDataSchema);
 
 export type UserData = z.infer<typeof UserDataSchema>;
+export type FullUserData = z.infer<typeof FullUserDataSchema>;
 export type TeacherData = z.infer<typeof TeacherDataSchema>;
-export type NewIdpUser = z.infer<typeof NewIdpUserSchema>;
-export type IdpUsers = z.infer<typeof IdpUsersSchema>;
+export type NewUser = z.infer<typeof NewUserSchema>;
+export type NewUserResponse = z.infer<typeof NewUserResponseSchema>;

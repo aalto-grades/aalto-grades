@@ -9,6 +9,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {JSX, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
+import ChangePasswordDialog from './ChangePasswordDialog';
 import {useLogOut} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import AplusTokenDialog from '../shared/AplusTokenDialog';
@@ -16,21 +17,24 @@ import AplusTokenDialog from '../shared/AplusTokenDialog';
 const UserButton = (): JSX.Element => {
   const navigate = useNavigate();
   const {auth, setAuth} = useAuth();
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-  const open = Boolean(anchorEl);
+  const queryClient = useQueryClient();
+  const logOut = useLogOut();
 
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
     useState<boolean>(false);
+  const [changePasswordDialogOpen, setChangePasswordDialogOpen] =
+    useState<boolean>(false);
 
-  const queryClient = useQueryClient();
-  const logOut = useLogOut({
-    onSuccess: () => {
-      setAuth(null);
-      setAnchorEl(null);
-      queryClient.clear();
-      navigate('/login', {replace: true});
-    },
-  });
+  const handleLogOut = async (): Promise<void> => {
+    await logOut.mutateAsync(null);
+    setAuth(null);
+    setAnchorEl(null);
+    queryClient.clear();
+    navigate('/login', {replace: true});
+  };
+
+  const menuOpen = Boolean(anchorEl);
 
   if (auth?.name === undefined) {
     return <div data-testid="not-logged-in"></div>;
@@ -38,12 +42,22 @@ const UserButton = (): JSX.Element => {
 
   return (
     <>
+      <AplusTokenDialog
+        handleClose={() => setAplusTokenDialogOpen(false)}
+        handleSubmit={() => setAplusTokenDialogOpen(false)}
+        open={aplusTokenDialogOpen}
+      />
+      <ChangePasswordDialog
+        onClose={() => setChangePasswordDialogOpen(false)}
+        open={changePasswordDialogOpen}
+      />
+
       <Button
         id="basic-button"
         color="inherit"
-        aria-controls={open ? 'basic-menu' : undefined}
+        aria-controls={menuOpen ? 'basic-menu' : undefined}
         aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
+        aria-expanded={menuOpen ? 'true' : undefined}
         onClick={event => setAnchorEl(event.currentTarget)}
       >
         <Box sx={{marginRight: 1, marginTop: 1}}>
@@ -55,20 +69,28 @@ const UserButton = (): JSX.Element => {
       <Menu
         id="basic-menu"
         anchorEl={anchorEl}
-        open={open}
+        open={menuOpen}
         onClose={() => setAnchorEl(null)}
         MenuListProps={{'aria-labelledby': 'basic-button'}}
       >
-        <MenuItem onClick={() => setAplusTokenDialogOpen(true)}>
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            setAplusTokenDialogOpen(true);
+          }}
+        >
           A+ Token
         </MenuItem>
-        <MenuItem onClick={() => logOut.mutate(null)}>Logout</MenuItem>
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            setChangePasswordDialogOpen(true);
+          }}
+        >
+          Change password
+        </MenuItem>
+        <MenuItem onClick={handleLogOut}>Logout</MenuItem>
       </Menu>
-      <AplusTokenDialog
-        handleClose={() => setAplusTokenDialogOpen(false)}
-        handleSubmit={() => setAplusTokenDialogOpen(false)}
-        open={aplusTokenDialogOpen}
-      />
     </>
   );
 };

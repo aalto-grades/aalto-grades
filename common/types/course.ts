@@ -22,7 +22,7 @@ export enum CourseRoleType {
 
 export const GradingScaleSchema = z.nativeEnum(GradingScale);
 
-export const BaseCourseDataSchema = z.object({
+export const BaseCourseDataSchema = z.strictObject({
   id: z.number().int(),
   courseCode: z.string(),
   minCredits: z.number().int().min(0),
@@ -43,12 +43,14 @@ export const NewCourseDataSchema = BaseCourseDataSchema.omit({id: true})
     teachersInCharge: z.array(z.string().email()),
     assistants: z.array(z.string().email()),
   })
+  .strict()
   .refine(val => val.maxCredits >= val.minCredits, {path: ['maxCredits']});
 export const EditCourseDataSchema = BaseCourseDataSchema.omit({id: true})
   .extend({
     teachersInCharge: z.array(z.string().email()),
     assistants: z.array(z.string().email()),
   })
+  .strict()
   .partial()
   .refine(
     val =>
@@ -60,7 +62,9 @@ export const EditCourseDataSchema = BaseCourseDataSchema.omit({id: true})
 
 export const CourseWithFinalGradesSchema = BaseCourseDataSchema.extend({
   finalGrades: FinalGradeDataArraySchema,
-}).refine(val => val.maxCredits >= val.minCredits);
+})
+  .strict()
+  .refine(val => val.maxCredits >= val.minCredits);
 
 export const CourseDataArraySchema = z.array(CourseDataSchema);
 export const CourseWithFinalGradesArraySchema = z.array(
