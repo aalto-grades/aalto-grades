@@ -16,12 +16,15 @@ import axios from './axios';
 import {LoginCredentials} from '../../types';
 
 export const useGetRefreshToken = (
-  options?: Partial<UseQueryOptions<LoginResult>>
-): UseQueryResult<LoginResult> =>
+  options?: Partial<UseQueryOptions<LoginResult | null>>
+): UseQueryResult<LoginResult | null> =>
   useQuery({
     queryKey: ['refresh-token'],
-    queryFn: async () =>
-      LoginResultSchema.parse((await axios.get('/v1/auth/self-info')).data),
+    queryFn: async () => {
+      const res = await axios.get('/v1/auth/self-info');
+      if (res.status === 401) return null;
+      return LoginResultSchema.parse(res.data);
+    },
     ...options,
   });
 
