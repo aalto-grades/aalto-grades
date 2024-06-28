@@ -19,7 +19,7 @@ export const rateLimiterMemoryMiddleware = (
   req: TypedRequestBody<typeof LoginDataSchema>,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   rateLimiter
     .consume(req.ip ?? '')
     .then(() => {
