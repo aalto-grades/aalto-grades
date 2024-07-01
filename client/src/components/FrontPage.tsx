@@ -23,36 +23,40 @@ const FrontPage = (): JSX.Element => {
 
   return (
     <>
-      <Box
-        component="span"
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexDirection: 'row',
-        }}
-      >
-        <Typography variant="h2" align="left" sx={{flexGrow: 1}}>
-          Your courses
-        </Typography>
-      </Box>
-      {coursesOfUser.data && coursesOfUser.data.length > 0 ? (
-        <CourseTable courses={coursesOfUser.data} />
-      ) : (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-evenly',
-            backgroundColor: theme.vars.palette.hoverGrey2,
-            flexDirection: 'row',
-          }}
-        >
-          <p>
-            You have no courses. Please contact support to have your course
-            added.
-          </p>
-        </Box>
+      {auth?.role !== SystemRole.Admin && (
+        <>
+          <Box
+            component="span"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexDirection: 'row',
+            }}
+          >
+            <Typography variant="h2" align="left" sx={{flexGrow: 1}}>
+              Your courses
+            </Typography>
+          </Box>
+          {coursesOfUser.data && coursesOfUser.data.length > 0 ? (
+            <CourseTable courses={coursesOfUser.data} />
+          ) : (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-evenly',
+                backgroundColor: theme.vars.palette.hoverGrey2,
+                flexDirection: 'row',
+              }}
+            >
+              <Typography>
+                You have no courses. Please contact support to have your course
+                added.
+              </Typography>
+            </Box>
+          )}
+        </>
       )}
       {auth?.role === SystemRole.Admin && (
         <>
@@ -67,22 +71,20 @@ const FrontPage = (): JSX.Element => {
               alignItems: 'center',
               justifyContent: 'space-between',
               flexDirection: 'row',
-              mt: 5,
             }}
           >
             <Typography variant="h2" align="left" sx={{flexGrow: 1}}>
               Courses
             </Typography>
-            {
-              <Button
-                id="ag-new-course-btn"
-                size="large"
-                variant="contained"
-                onClick={() => setCreateDialogOpen(true)}
-              >
-                Create new course
-              </Button>
-            }
+            <Button
+              id="ag-new-course-btn"
+              size="large"
+              variant="contained"
+              onClick={() => setCreateDialogOpen(true)}
+              sx={{mb: -11.25}} // Align with search
+            >
+              Create new course
+            </Button>
           </Box>
           {courses.data && <CourseTable courses={courses.data} />}
           <UsersView />
