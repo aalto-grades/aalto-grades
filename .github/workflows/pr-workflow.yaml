@@ -47,8 +47,6 @@ jobs:
         working-directory: ./server
     steps:
       - uses: actions/checkout@v4
-      - name: Add Jest problem matcher
-        run: echo "::add-matcher::.github/jest-problem-matcher.json"
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
@@ -60,8 +58,6 @@ jobs:
         run: >
           docker-compose -f docker-compose-test.yaml up
           --abort-on-container-exit --exit-code-from backend
-      - name: Remove Jest problem matcher
-        run: echo "::remove-matcher owner=jest::"
       - name: Install dependencies
         run: npm ci
       - name: Install common dependencies
