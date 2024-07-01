@@ -54,18 +54,14 @@ jobs:
         run: docker-compose -f docker-compose-test.yaml down --volumes --remove-orphans
       - name: Docker compose build
         run: docker-compose -f docker-compose-test.yaml build --no-cache
-      # - name: Run tests
-      #   run: >
-      #     docker-compose -f docker-compose-test.yaml up
-      #     --abort-on-container-exit --exit-code-from backend
-      - uses: mattallty/jest-github-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          test-coverage: false
-          test-command: >
-            docker-compose -f docker-compose-test.yaml up
-            --abort-on-container-exit --exit-code-from backend
+      - name: Add Jest problem matcher
+        run: echo "::add-matcher::.github/jest-problem-matcher.json"
+      - name: Run tests
+        run: >
+          docker-compose -f docker-compose-test.yaml up
+          --abort-on-container-exit --exit-code-from backend
+      - name: Remove Jest problem matcher
+        run: echo "::remove-matcher owner=jest::"
       - name: Install dependencies
         run: npm ci
       - name: Install common dependencies

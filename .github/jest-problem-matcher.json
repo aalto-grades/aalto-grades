@@ -1,0 +1,26 @@
+{
+    "problemMatcher": [
+      {
+        "owner": "jest",
+        "pattern": [
+          {
+            "regexp": "^\\s*(●|✖|✓|◌)\\s+(.*)\\s*\\((\\d+ ms)\\)$",
+            "severity": "error",
+            "message": 2,
+            "file": 1
+          },
+          {
+            "regexp": "^\\s+●\\s+(.*)$",
+            "severity": "error",
+            "message": 1
+          },
+          {
+            "regexp": "^\\s+at\\s+(.*)\\s+\\(([^:]+):(\\d+):(\\d+)\\)$",
+            "file": 2,
+            "line": 3,
+            "column": 4
+          }
+        ]
+      }
+    ]
+  }
