@@ -71,6 +71,7 @@ router.post(
 router.post(
   '/v1/auth/change-password',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(ChangePasswordDataSchema),

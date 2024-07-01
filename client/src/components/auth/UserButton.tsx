@@ -9,6 +9,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {JSX, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
+import {SystemRole} from '@/common/types';
 import ChangePasswordDialog from './ChangePasswordDialog';
 import {useLogOut} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
@@ -21,6 +22,7 @@ const UserButton = (): JSX.Element => {
   const logOut = useLogOut();
 
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+  const [anchorWidth, setAnchorWidth] = useState<number | null>(null);
   const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
     useState<boolean>(false);
   const [changePasswordDialogOpen, setChangePasswordDialogOpen] =
@@ -47,10 +49,12 @@ const UserButton = (): JSX.Element => {
         handleSubmit={() => setAplusTokenDialogOpen(false)}
         open={aplusTokenDialogOpen}
       />
-      <ChangePasswordDialog
-        onClose={() => setChangePasswordDialogOpen(false)}
-        open={changePasswordDialogOpen}
-      />
+      {auth.role === SystemRole.Admin && (
+        <ChangePasswordDialog
+          onClose={() => setChangePasswordDialogOpen(false)}
+          open={changePasswordDialogOpen}
+        />
+      )}
 
       <Button
         id="basic-button"
@@ -58,7 +62,10 @@ const UserButton = (): JSX.Element => {
         aria-controls={menuOpen ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={menuOpen ? 'true' : undefined}
-        onClick={event => setAnchorEl(event.currentTarget)}
+        onClick={event => {
+          setAnchorEl(event.currentTarget);
+          setAnchorWidth(event.currentTarget.offsetWidth);
+        }}
       >
         <Box sx={{marginRight: 1, marginTop: 1}}>
           <PersonIcon color="inherit" />
@@ -70,10 +77,12 @@ const UserButton = (): JSX.Element => {
         id="basic-menu"
         anchorEl={anchorEl}
         open={menuOpen}
+        keepMounted
         onClose={() => setAnchorEl(null)}
         MenuListProps={{'aria-labelledby': 'basic-button'}}
       >
         <MenuItem
+          sx={{width: anchorWidth ?? '100%'}}
           onClick={() => {
             setAnchorEl(null);
             setAplusTokenDialogOpen(true);
@@ -81,14 +90,16 @@ const UserButton = (): JSX.Element => {
         >
           A+ Token
         </MenuItem>
-        <MenuItem
-          onClick={() => {
-            setAnchorEl(null);
-            setChangePasswordDialogOpen(true);
-          }}
-        >
-          Change password
-        </MenuItem>
+        {auth.role === SystemRole.Admin && (
+          <MenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              setChangePasswordDialogOpen(true);
+            }}
+          >
+            Change password
+          </MenuItem>
+        )}
         <MenuItem onClick={handleLogOut}>Logout</MenuItem>
       </Menu>
     </>
