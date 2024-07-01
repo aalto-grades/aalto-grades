@@ -297,9 +297,17 @@ describe('Test POST /v1/auth/change-password - change own password', () => {
   });
 
   it('should respond with 401 authorized', async () => {
+    const url = '/v1/auth/change-password';
     const newPassword = '¹X)1Õ,ì?¨ã$Z©N3Ú°jM¤ëÊyf';
+
+    await responseTests.testUnauthorized(url).post({newPassword});
+
     await responseTests
-      .testUnauthorized('/v1/auth/change-password')
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
       .post({newPassword});
   });
 });
