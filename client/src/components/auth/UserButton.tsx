@@ -77,7 +77,6 @@ const UserButton = (): JSX.Element => {
         id="basic-menu"
         anchorEl={anchorEl}
         open={menuOpen}
-        keepMounted
         onClose={() => setAnchorEl(null)}
         MenuListProps={{'aria-labelledby': 'basic-button'}}
       >
