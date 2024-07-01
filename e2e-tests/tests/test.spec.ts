@@ -20,7 +20,7 @@ test.beforeEach(async ({page}) => {
   await expect(
     page.getByRole('heading', {name: 'Log in to Aalto Grades'})
   ).toBeHidden();
-  await expect(page.getByRole('heading', {name: 'Your courses'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Courses'})).toBeVisible();
 });
 
 test.afterEach(async ({page}) => {
