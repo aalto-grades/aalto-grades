@@ -47,6 +47,8 @@ jobs:
         working-directory: ./server
     steps:
       - uses: actions/checkout@v4
+      - name: Add Jest problem matcher
+        run: echo "::add-matcher::.github/jest-problem-matcher.json"
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
@@ -54,8 +56,6 @@ jobs:
         run: docker-compose -f docker-compose-test.yaml down --volumes --remove-orphans
       - name: Docker compose build
         run: docker-compose -f docker-compose-test.yaml build --no-cache
-      - name: Add Jest problem matcher
-        run: echo "::add-matcher::jest-problem-matcher.json"
       - name: Run tests
         run: >
           docker-compose -f docker-compose-test.yaml up
