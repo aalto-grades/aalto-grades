@@ -59,6 +59,8 @@ jobs:
       #     docker-compose -f docker-compose-test.yaml up
       #     --abort-on-container-exit --exit-code-from backend
       - uses: mattallty/jest-github-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           test-coverage: false
           test-command: >
