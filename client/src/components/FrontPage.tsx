@@ -43,11 +43,9 @@ const FrontPage = (): JSX.Element => {
           ) : (
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-evenly',
                 backgroundColor: theme.vars.palette.hoverGrey2,
-                flexDirection: 'row',
+                p: 1,
+                mt: 1,
               }}
             >
               <Typography>
