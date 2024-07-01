@@ -55,7 +55,7 @@ jobs:
       - name: Docker compose build
         run: docker-compose -f docker-compose-test.yaml build --no-cache
       - name: Add Jest problem matcher
-        run: echo "::add-matcher::.github/jest-problem-matcher.json"
+        run: echo "::add-matcher::../.github/jest-problem-matcher.json"
       - name: Run tests
         run: >
           docker-compose -f docker-compose-test.yaml up
