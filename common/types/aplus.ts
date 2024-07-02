@@ -29,6 +29,12 @@ export const AplusExerciseDataSchema = z.strictObject({
     z.strictObject({
       id: z.number().int(),
       name: z.string(),
+      exercises: z.array(
+        z.strictObject({
+          id: z.number().int(),
+          name: z.string(),
+        })
+      )
     })
   ),
   difficulties: z.array(z.string()),

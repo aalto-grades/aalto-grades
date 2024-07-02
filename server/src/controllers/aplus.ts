@@ -79,6 +79,8 @@ export const fetchAplusExerciseData = async (
       id: number;
       display_name: string;
       exercises: {
+        id: number;
+        display_name: string;
         difficulty: string;
       }[];
     }[];
@@ -98,9 +100,13 @@ export const fetchAplusExerciseData = async (
   }
 
   const exerciseData: AplusExerciseData = {
-    modules: exercisesRes.data.results.map(result => ({
-      id: result.id,
-      name: result.display_name,
+    modules: exercisesRes.data.results.map(module => ({
+      id: module.id,
+      name: module.display_name,
+      exercises: module.exercises.map(exercise => ({
+        id: exercise.id,
+        name: exercise.display_name,
+      }))
     })),
     difficulties: Array.from(difficulties),
   };
@@ -157,6 +163,10 @@ export const fetchAplusGrades = async (
     modules: {
       id: number;
       points: number;
+      exercises: {
+        id: number;
+        points: number;
+      }[];
     }[];
   };
 
@@ -223,6 +233,28 @@ export const fetchAplusGrades = async (
           if (!grade) {
             throw new ApiError(
               `A+ course with ID ${aplusCourseId} has no module with ID ${gradeSource.moduleId}`,
+              HttpCode.InternalServerError
+            );
+          }
+          break;
+
+        case AplusGradeSourceType.Exercise:
+          if (!gradeSource.exerciseId) {
+            throw new ApiError(
+              `grade source with ID ${gradeSource.id} has exercise type but does not define exerciseId`,
+              HttpCode.InternalServerError
+            );
+          }
+          for (const module of student.modules) {
+            for (const exercise of module.exercises) {
+              if (exercise.id === gradeSource.exerciseId) {
+                grade = exercise.points;
+              }
+            }
+          }
+          if (!grade) {
+            throw new ApiError(
+              `A+ course with ID ${aplusCourseId} has no exercise with ID ${gradeSource.exerciseId}`,
               HttpCode.InternalServerError
             );
           }
