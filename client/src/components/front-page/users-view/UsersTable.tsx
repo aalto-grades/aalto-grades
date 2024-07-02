@@ -57,7 +57,11 @@ const UsersTable = (): JSX.Element => {
         user={toBeReset}
       />
 
-      <Tabs value={tab} onChange={(_, newTab: number) => setTab(newTab)}>
+      <Tabs
+        value={tab}
+        onChange={(_, newTab: number) => setTab(newTab)}
+        sx={{width: 'fit-content' /* Fix buttons not being clickable */}}
+      >
         <Tab label="IDP-Users" sx={{textTransform: 'none'}} />
         <Tab label="Admins" sx={{textTransform: 'none'}} />
       </Tabs>
