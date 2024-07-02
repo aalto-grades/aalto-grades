@@ -4,17 +4,16 @@
 
 import axios, {AxiosError, AxiosStatic} from 'axios';
 import supertest from 'supertest';
-import {z} from 'zod';
 
 import {
-  CoursePartData,
-  AplusCourseDataSchema,
+  AplusCourseData,
+  AplusCourseDataArraySchema,
   AplusExerciseDataSchema,
   AplusGradeSourceData,
   AplusGradeSourceType,
+  CoursePartData,
   HttpCode,
   NewGradeArraySchema,
-  AplusCourseData,
 } from '@/common/types';
 import {app} from '../../src/app';
 import {APLUS_API_URL} from '../../src/configs/environment';
@@ -140,8 +139,8 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    const Schema = z.array(AplusCourseDataSchema);
-    const result = await Schema.safeParseAsync(res.body);
+    const Schema = AplusCourseDataArraySchema.nonempty();
+    const result = Schema.safeParse(res.body);
     expect(result.success).toBeTruthy();
   });
 
@@ -216,7 +215,7 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    const result = await AplusExerciseDataSchema.safeParseAsync(res.body);
+    const result = AplusExerciseDataSchema.safeParse(res.body);
     expect(result.success).toBeTruthy();
   });
 
@@ -428,7 +427,8 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const result = await NewGradeArraySchema.safeParseAsync(res.body);
+      const Schema = NewGradeArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
@@ -445,7 +445,8 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const result = await NewGradeArraySchema.safeParseAsync(res.body);
+      const Schema = NewGradeArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
@@ -462,7 +463,8 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const result = await NewGradeArraySchema.safeParseAsync(res.body);
+      const Schema = NewGradeArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
@@ -479,7 +481,8 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const result = await NewGradeArraySchema.safeParseAsync(res.body);
+      const Schema = NewGradeArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });

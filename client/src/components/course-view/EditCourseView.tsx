@@ -23,14 +23,7 @@ import {
 import Grid from '@mui/material/Unstable_Grid2';
 import {Form, Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
-import {
-  HTMLInputTypeAttribute,
-  JSX,
-  PropsWithChildren,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import {JSX, useEffect, useRef, useState} from 'react';
 import {useBlocker, useParams} from 'react-router-dom';
 import {z} from 'zod';
 
@@ -47,6 +40,8 @@ import useAuth from '../../hooks/useAuth';
 import {convertToClientGradingScale} from '../../utils/textFormat';
 import {sisuLanguageOptions} from '../../utils/utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import FormField from '../shared/FormikField';
+import FormLanguagesField from '../shared/FormikLanguageField';
 import SaveBar from '../shared/SaveBar';
 
 const ValidationSchema = z
@@ -110,77 +105,6 @@ type FormData = {
   nameFi: string;
   nameSv: string;
 };
-
-const FormField = ({
-  form,
-  value,
-  label,
-  helperText,
-  select,
-  type,
-  children,
-  disabled,
-}: {
-  form: FormikProps<FormData>;
-  value: keyof FormData;
-  label: string;
-  helperText: string;
-  select?: boolean;
-  type?: HTMLInputTypeAttribute;
-  disabled?: boolean;
-} & PropsWithChildren): JSX.Element => (
-  <TextField
-    id={value}
-    name={value}
-    type={type ?? 'text'}
-    fullWidth
-    value={form.values[value]}
-    disabled={disabled || form.isSubmitting}
-    label={label}
-    InputLabelProps={{shrink: true}}
-    margin="normal"
-    helperText={form.errors[value] ? form.errors[value] : helperText}
-    error={form.touched[value] && form.errors[value] !== undefined}
-    onChange={form.handleChange}
-    select={select}
-    // SelectProps={{native: true}}
-    sx={{textAlign: 'left'}}
-  >
-    {children}
-  </TextField>
-);
-
-const languages = [
-  {value: 'En', name: 'English'},
-  {value: 'Fi', name: 'Finnish'},
-  {value: 'Sv', name: 'Swedish'},
-];
-const FormLanguagesField = ({
-  form,
-  valueFormat,
-  labelFormat,
-  helperTextFormat,
-  disabled,
-}: {
-  form: FormikProps<FormData>;
-  valueFormat: string;
-  labelFormat: string;
-  helperTextFormat: string;
-  disabled?: boolean;
-}): JSX.Element => (
-  <>
-    {languages.map(language => (
-      <FormField
-        key={language.value}
-        form={form}
-        value={valueFormat.replace('%', language.value) as keyof FormData}
-        disabled={disabled || form.isSubmitting}
-        label={labelFormat.replace('%', language.name)}
-        helperText={helperTextFormat.replace('%', language.name)}
-      />
-    ))}
-  </>
-);
 
 const EditCourseView = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
@@ -382,28 +306,36 @@ const EditCourseView = (): JSX.Element => {
               >
                 <Grid md={5}>
                   <FormField
-                    form={form}
+                    form={
+                      form as unknown as FormikProps<{[key: string]: unknown}>
+                    }
                     value="courseCode"
                     disabled={auth?.role !== SystemRole.Admin}
                     label="Course code*"
                     helperText="Give code for the new course."
                   />
                   <FormLanguagesField
-                    form={form}
+                    form={
+                      form as unknown as FormikProps<{[key: string]: unknown}>
+                    }
                     disabled={auth?.role !== SystemRole.Admin}
                     valueFormat="name%"
                     labelFormat="Course name in %*"
                     helperTextFormat="Give the name of the course in %."
                   />
                   <FormLanguagesField
-                    form={form}
+                    form={
+                      form as unknown as FormikProps<{[key: string]: unknown}>
+                    }
                     disabled={auth?.role !== SystemRole.Admin}
                     valueFormat="department%"
                     labelFormat="Organizing department in %*"
                     helperTextFormat="Give the organizing department of the new course in %."
                   />
                   <FormField
-                    form={form}
+                    form={
+                      form as unknown as FormikProps<{[key: string]: unknown}>
+                    }
                     value="minCredits"
                     disabled={auth?.role !== SystemRole.Admin}
                     label="Minimum course credits (ECTS)*"
@@ -411,7 +343,9 @@ const EditCourseView = (): JSX.Element => {
                     type="number"
                   />
                   <FormField
-                    form={form}
+                    form={
+                      form as unknown as FormikProps<{[key: string]: unknown}>
+                    }
                     value="maxCredits"
                     disabled={auth?.role !== SystemRole.Admin}
                     label="Maximum course credits (ECTS)*"
@@ -419,7 +353,9 @@ const EditCourseView = (): JSX.Element => {
                     type="number"
                   />
                   <FormField
-                    form={form}
+                    form={
+                      form as unknown as FormikProps<{[key: string]: unknown}>
+                    }
                     value="gradingScale"
                     disabled={
                       auth?.role !== SystemRole.Admin &&
@@ -436,7 +372,9 @@ const EditCourseView = (): JSX.Element => {
                     ))}
                   </FormField>
                   <FormField
-                    form={form}
+                    form={
+                      form as unknown as FormikProps<{[key: string]: unknown}>
+                    }
                     value="languageOfInstruction"
                     disabled={auth?.role !== SystemRole.Admin}
                     label="Course language*"

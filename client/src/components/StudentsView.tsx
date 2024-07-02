@@ -21,7 +21,7 @@ import {JSX, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {UserData} from '@/common/types';
-import {useGetGradesOfStudent, useGetStudents} from '../hooks/useApi';
+import {useGetCoursesOfStudent, useGetStudents} from '../hooks/useApi';
 
 const getString = (student: UserData): string => {
   let string = student.studentNumber!.toString();
@@ -30,15 +30,9 @@ const getString = (student: UserData): string => {
   return string;
 };
 
-const filterOptions = createFilterOptions<UserData>({
-  // Remove commas from filter strings
-  stringify: student => getString(student).replaceAll(',', ''),
-});
-
 const StudentsView = (): JSX.Element => {
   const {userId} = useParams();
   const navigate = useNavigate();
-
   const students = useGetStudents();
 
   const urlStudent = useMemo(
@@ -49,11 +43,10 @@ const StudentsView = (): JSX.Element => {
         : null,
     [students.data, userId]
   );
-
   const [selectedStudent, setSelectedStudent] = useState<UserData | null>(
     urlStudent ?? null
   );
-  const studentGrades = useGetGradesOfStudent(selectedStudent?.id as number, {
+  const studentGrades = useGetCoursesOfStudent(selectedStudent?.id as number, {
     enabled: selectedStudent !== null,
   });
 
@@ -65,12 +58,12 @@ const StudentsView = (): JSX.Element => {
       <Autocomplete
         options={students.data ?? []}
         value={selectedStudent}
-        onChange={(event: unknown, newValue: UserData | null) => {
+        onChange={(_, newValue: UserData | null) => {
           setSelectedStudent(newValue);
           if (newValue !== null) navigate(`/students/${newValue.id}`);
           else navigate('/students');
         }}
-        filterOptions={filterOptions}
+        filterOptions={createFilterOptions({stringify: getString})}
         getOptionLabel={getString}
         renderOption={(props, student: UserData) => (
           <Box component="li" {...props}>
@@ -86,7 +79,6 @@ const StudentsView = (): JSX.Element => {
             Viewing grades for{' '}
             {selectedStudent?.name ?? selectedStudent?.studentNumber ?? ''}
           </Typography>
-
           <TableContainer component={Paper}>
             <Table sx={{minWidth: 650}} aria-label="simple table">
               <TableHead>

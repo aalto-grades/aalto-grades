@@ -6,12 +6,14 @@ import supertest from 'supertest';
 import {z} from 'zod';
 
 import {
-  BaseCourseDataSchema,
+  CourseDataArraySchema,
   CourseRoleType,
-  FinalGradeDataArraySchema,
+  CourseWithFinalGradesArraySchema,
   HttpCode,
-  IdpUserSchema,
+  NewUserResponseSchema,
+  UserDataArraySchema,
   UserDataSchema,
+  UserWithRoleArraySchema,
 } from '@/common/types';
 import {app} from '../../src/app';
 import User from '../../src/database/models/user';
@@ -66,11 +68,7 @@ afterAll(async () => {
   await resetDb();
 });
 
-describe('Test GET /v1/user/courses - get all courses user has role in', () => {
-  const UserCoursesSchema = BaseCourseDataSchema.strict().refine(
-    val => val.maxCredits >= val.minCredits
-  );
-
+describe('Test GET /v1/users/own-courses - get all courses user has role in', () => {
   it('should get user courses', async () => {
     await createData.createCourse({}); // Create course the student is a part of
 
@@ -82,30 +80,27 @@ describe('Test GET /v1/user/courses - get all courses user has role in', () => {
     ];
     for (const cookie of testCookies) {
       const res = await request
-        .get('/v1/user/courses')
+        .get('/v1/users/own-courses')
         .set('Cookie', cookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = z.array(UserCoursesSchema);
-      const result = await Schema.safeParseAsync(res.body);
+      const Schema =
+        cookie === cookies.adminCookie
+          ? CourseDataArraySchema.length(0)
+          : CourseDataArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
 
   it('should respond with 401 if not authorized', async () => {
-    const url = '/v1/user/courses';
+    const url = '/v1/users/own-courses';
     await responseTests.testUnauthorized(url).get();
   });
 });
 
-describe('Test GET /v1/user/:userId/grades - get all courses and grades of user where the requester has a role', () => {
-  const UserGradesSchema = BaseCourseDataSchema.extend({
-    finalGrades: FinalGradeDataArraySchema,
-  })
-    .strict()
-    .refine(val => val.maxCredits >= val.minCredits);
-
+describe('Test GET /v1/users/:userId/courses - get all courses and grades of user where the requester has a role', () => {
   it('should get user grades', async () => {
     const testCookies: [string[], number][] = [
       [cookies.adminCookie, STUDENT_ID],
@@ -116,13 +111,13 @@ describe('Test GET /v1/user/:userId/grades - get all courses and grades of user 
     ];
     for (const [cookie, userId] of testCookies) {
       const res = await request
-        .get(`/v1/user/${userId}/grades`)
+        .get(`/v1/users/${userId}/courses`)
         .set('Cookie', cookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = z.array(UserGradesSchema).nonempty();
-      const result = await Schema.safeParseAsync(res.body);
+      const Schema = CourseWithFinalGradesArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
@@ -135,34 +130,34 @@ describe('Test GET /v1/user/:userId/grades - get all courses and grades of user 
     ];
     for (const cookie of testCookies) {
       const res = await request
-        .get(`/v1/user/${noTeachersUserId}/grades`)
+        .get(`/v1/users/${noTeachersUserId}/courses`)
         .set('Cookie', cookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = z.array(UserGradesSchema).length(0);
-      const result = await Schema.safeParseAsync(res.body);
+      const Schema = CourseWithFinalGradesArraySchema.length(0);
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
 
   it('should respond with 400 if invalid', async () => {
-    const url = `/v1/user/${'bad'}/grades`;
+    const url = `/v1/users/${'bad'}/courses`;
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 
   it('should respond with 401 if not authorized', async () => {
-    const url = `/v1/user/${noTeachersUserId}/grades`;
+    const url = `/v1/users/${noTeachersUserId}/courses`;
     await responseTests.testUnauthorized(url).get();
   });
 
   it('should respond with 404 if not found', async () => {
-    const url = `/v1/user/${nonExistentId}/grades`;
+    const url = `/v1/users/${nonExistentId}/courses`;
     await responseTests.testNotFound(url, cookies.adminCookie).get();
   });
 });
 
-describe('Test GET /v1/students - get all students from courses where the requester has a role', () => {
+describe('Test GET /v1/users/students - get all students from courses where the requester has a role', () => {
   const AssistantUserSchema = UserDataSchema.extend({
     name: z.literal(null),
     email: z.literal(null),
@@ -176,50 +171,50 @@ describe('Test GET /v1/students - get all students from courses where the reques
     ];
     for (const [cookie, UserSchema] of testCookies) {
       const res = await request
-        .get('/v1/students')
+        .get('/v1/users/students')
         .set('Cookie', cookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
       const Schema = z.array(UserSchema).nonempty();
-      const result = await Schema.safeParseAsync(res.body);
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
 
   it('should not get students if requester has no roles', async () => {
     const res = await request
-      .get('/v1/students')
+      .get('/v1/users/students')
       .set('Cookie', cookies.studentCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    const Schema = z.array(UserDataSchema).length(0);
-    const result = await Schema.safeParseAsync(res.body);
+    const Schema = UserDataArraySchema.length(0);
+    const result = Schema.safeParse(res.body);
     expect(result.success).toBeTruthy();
   });
 
   it('should respond with 401 if not authorized', async () => {
-    const url = '/v1/students';
+    const url = '/v1/users/students';
     await responseTests.testUnauthorized(url).get();
   });
 });
 
-describe('Test GET /v1/idp-users/ - get all idp users', () => {
-  it('should get all idp users', async () => {
+describe('Test GET /v1/users/ - get all users', () => {
+  it('should get all users', async () => {
     const res = await request
-      .get('/v1/idp-users')
+      .get('/v1/users')
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    const Schema = z.array(IdpUserSchema.strict());
-    const result = await Schema.safeParseAsync(res.body);
+    const Schema = UserWithRoleArraySchema.nonempty();
+    const result = Schema.safeParse(res.body);
     expect(result.success).toBeTruthy();
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
-    const url = '/v1/idp-users';
+    const url = '/v1/users';
     await responseTests.testUnauthorized(url).get();
 
     await responseTests
@@ -232,23 +227,45 @@ describe('Test GET /v1/idp-users/ - get all idp users', () => {
   });
 });
 
-describe('Test POST /v1/idp-users/ - add an idp user', () => {
-  it('should add idp user', async () => {
+describe('Test POST /v1/users/ - add a user', () => {
+  it('should add a user', async () => {
     const res = await request
-      .post('/v1/idp-users')
-      .send({email: 'idpuser1@aalto.fi'})
+      .post('/v1/users')
+      .send({admin: false, email: 'idpuser1@aalto.fi'})
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Created);
 
-    expect(JSON.stringify(res.body)).toBe('{}');
+    const result = NewUserResponseSchema.safeParse(res.body);
+    expect(result.success).toBeTruthy();
+    if (result.success) expect(result.data.temporaryPassword).toBeNull();
+
+    const user = await User.findByEmail('idpuser1@aalto.fi');
+    expect(user).not.toBe(null);
+  });
+
+  it('should add an admin user', async () => {
+    const res = await request
+      .post('/v1/users')
+      .send({admin: true, email: 'admin2@aalto.fi', name: 'admin2'})
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Created);
+
+    const result = NewUserResponseSchema.safeParse(res.body);
+    expect(result.success).toBeTruthy();
+    if (result.success) {
+      const Schema = z.string().regex(/^[a-zA-Z\d]{16}$/);
+      const result2 = Schema.safeParse(result.data.temporaryPassword);
+      expect(result2.success);
+    }
 
     const user = await User.findByEmail('idpuser1@aalto.fi');
     expect(user).not.toBe(null);
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
-    const url = '/v1/idp-users';
+    const url = '/v1/users';
     const data = {email: 'idpuser2@aalto.fi'};
     await responseTests.testUnauthorized(url).post(data);
 
@@ -261,19 +278,19 @@ describe('Test POST /v1/idp-users/ - add an idp user', () => {
       .post(data);
   });
 
-  it('should respond with 409 when idp user with email already exists', async () => {
-    const url = '/v1/idp-users';
-    const data = {email: 'idpuser1@aalto.fi'};
+  it('should respond with 409 when user with email already exists', async () => {
+    const url = '/v1/users';
+    const data = {admin: false, email: 'idpuser1@aalto.fi'};
     await responseTests.testConflict(url, cookies.adminCookie).post(data);
   });
 });
 
-describe('Test DELETE /v1/idp-users/:userId - delete an idp user', () => {
-  it('should delete an idp user', async () => {
+describe('Test DELETE /v1/users/:userId - delete a user', () => {
+  it('should delete a user', async () => {
     const user = await createData.createUser();
 
     const res = await request
-      .delete(`/v1/idp-users/${user.id}`)
+      .delete(`/v1/users/${user.id}`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
@@ -287,7 +304,7 @@ describe('Test DELETE /v1/idp-users/:userId - delete an idp user', () => {
   it('should respond with 401 or 403 if not authorized', async () => {
     const user = await createData.createUser();
 
-    const url = `/v1/idp-users/${user.id}`;
+    const url = `/v1/users/${user.id}`;
     await responseTests.testUnauthorized(url).delete();
 
     await responseTests
@@ -300,7 +317,51 @@ describe('Test DELETE /v1/idp-users/:userId - delete an idp user', () => {
   });
 
   it('should respond with 404 when not found', async () => {
-    const url = `/v1/idp-users/${nonExistentId}`;
+    const url = `/v1/users/${nonExistentId}`;
     await responseTests.testNotFound(url, cookies.adminCookie).delete();
+  });
+});
+
+describe('Test POST /v1/users/delete - delete multiple users', () => {
+  it('should multiple users', async () => {
+    const user = await createData.createUser();
+    const user2 = await createData.createUser();
+
+    const res = await request
+      .post('/v1/users/delete')
+      .send([user.id, user2.id])
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    expect(JSON.stringify(res.body)).toBe('{}');
+
+    const deletedUser = await User.findByPk(user.id);
+    const deletedUser2 = await User.findByPk(user2.id);
+    expect(deletedUser).toBe(null);
+    expect(deletedUser2).toBe(null);
+  });
+
+  it('should respond with 401 or 403 if not authorized', async () => {
+    const user = await createData.createUser();
+
+    const url = '/v1/users/delete';
+    await responseTests.testUnauthorized(url).post([user.id]);
+
+    await responseTests
+      .testForbidden(url, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .post([user.id]);
+  });
+
+  it('should respond with 404 when not found', async () => {
+    const user = await createData.createUser();
+
+    const url = '/v1/users/delete';
+    const data = [user.id, nonExistentId];
+    await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 });

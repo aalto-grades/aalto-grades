@@ -94,8 +94,8 @@ export const useEditGradingModel = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: EditGradingModelVars) =>
-      await axios.put(
+    mutationFn: (vars: EditGradingModelVars) =>
+      axios.put(
         `/v1/courses/${vars.courseId}/grading-models/${vars.gradingModelId}`,
         vars.gradingModel
       ),
@@ -123,8 +123,8 @@ export const useDeleteGradingModel = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: DeleteGradingModelVars) =>
-      await axios.delete(
+    mutationFn: (vars: DeleteGradingModelVars) =>
+      axios.delete(
         `/v1/courses/${vars.courseId}/grading-models/${vars.gradingModelId}`
       ),
 

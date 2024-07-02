@@ -14,10 +14,13 @@ import {
 
 import {
   EditGradeData,
+  LatestGrades,
+  LatestGradesSchema,
   NewGrade,
   SisuCsvUpload,
   StudentRow,
   StudentRowArraySchema,
+  UserIdArray,
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
@@ -31,6 +34,66 @@ export const useGetGrades = (
     queryFn: async () =>
       StudentRowArraySchema.parse(
         (await axios.get(`/v1/courses/${courseId}/grades`)).data
+      ),
+    ...options,
+  });
+
+export const useAddGrades = (
+  courseId: Numeric,
+  options?: UseMutationOptions<unknown, unknown, NewGrade[]>
+): UseMutationResult<unknown, unknown, NewGrade[]> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (newGrades: NewGrade[]) =>
+      axios.post(`/v1/courses/${courseId}/grades`, newGrades),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['grades', courseId],
+      });
+    },
+    ...options,
+  });
+};
+
+type EditGradeVars = {gradeId: Numeric; data: EditGradeData};
+export const useEditGrade = (
+  courseId: Numeric,
+  options?: UseMutationOptions<unknown, unknown, EditGradeVars>
+): UseMutationResult<unknown, unknown, EditGradeVars> =>
+  useMutation({
+    mutationFn: (vars: EditGradeVars) =>
+      axios.put(`/v1/courses/${courseId}/grades/${vars.gradeId}`, vars.data),
+    ...options,
+  });
+
+export const useDeleteGrade = (
+  courseId: Numeric,
+  options?: UseMutationOptions<unknown, unknown, Numeric>
+): UseMutationResult<unknown, unknown, Numeric> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (gradeId: Numeric) =>
+      axios.delete(`/v1/courses/${courseId}/grades/${gradeId}`),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['course-parts', courseId],
+      });
+    },
+    ...options,
+  });
+};
+
+export const useGetLatestGrades = (
+  options?: UseMutationOptions<LatestGrades, unknown, UserIdArray>
+): UseMutationResult<LatestGrades, unknown, UserIdArray> =>
+  useMutation({
+    mutationFn: async userIds =>
+      LatestGradesSchema.parse(
+        (await axios.post('/v1/latest-grades', userIds)).data
       ),
     ...options,
   });
@@ -49,55 +112,3 @@ export const useDownloadSisuGradeCsv = (
       ).data,
     ...options,
   });
-
-export const useAddGrades = (
-  courseId: Numeric,
-  options?: UseMutationOptions<unknown, unknown, NewGrade[]>
-): UseMutationResult<unknown, unknown, NewGrade[]> => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (newGrades: NewGrade[]) =>
-      await axios.post(`/v1/courses/${courseId}/grades`, newGrades),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['grades', courseId],
-      });
-    },
-    ...options,
-  });
-};
-
-type EditGradeVars = {gradeId: Numeric; data: EditGradeData};
-export const useEditGrade = (
-  courseId: Numeric,
-  options?: UseMutationOptions<unknown, unknown, EditGradeVars>
-): UseMutationResult<unknown, unknown, EditGradeVars> =>
-  useMutation({
-    mutationFn: async (vars: EditGradeVars) =>
-      await axios.put(
-        `/v1/courses/${courseId}/grades/${vars.gradeId}`,
-        vars.data
-      ),
-    ...options,
-  });
-
-export const useDeleteGrade = (
-  courseId: Numeric,
-  options?: UseMutationOptions<unknown, unknown, Numeric>
-): UseMutationResult<unknown, unknown, Numeric> => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (gradeId: Numeric) =>
-      await axios.delete(`/v1/courses/${courseId}/grades/${gradeId}`),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['course-parts', courseId],
-      });
-    },
-    ...options,
-  });
-};

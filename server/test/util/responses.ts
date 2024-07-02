@@ -50,15 +50,15 @@ export class ResponseTests {
   }
 
   /** Send a request and expect a 400 bad request */
-  testBadRequest(url: string, cookie: string[]): ReturnType {
+  testBadRequest(url: string, cookie: string[] | null): ReturnType {
     const call = async (request: Test): Promise<void> => {
+      if (cookie !== null) request = request.set('Cookie', cookie);
       const res = await request
-        .set('Cookie', cookie)
         .set('Accept', 'application/json')
         .expect(HttpCode.BadRequest);
 
       const Schema = z.union([ErrorSchema, ZodErrorSchema]);
-      const result = await Schema.safeParseAsync(res.body);
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     };
 
@@ -66,13 +66,13 @@ export class ResponseTests {
   }
 
   /** Send a request and expect a 401 unauthorized */
-  testUnauthorized(url: string): ReturnType {
+  testUnauthorized(url: string, expected: string = '{}'): ReturnType {
     const call = async (request: Test): Promise<void> => {
       const res = await request
         .set('Accept', 'application/json')
         .expect(HttpCode.Unauthorized);
 
-      expect(JSON.stringify(res.body)).toBe('{}');
+      expect(JSON.stringify(res.body)).toBe(expected);
     };
 
     return this.next(call, url);
@@ -87,7 +87,7 @@ export class ResponseTests {
           .set('Accept', 'application/json')
           .expect(HttpCode.Forbidden);
 
-        const result = await ErrorSchema.safeParseAsync(res.body);
+        const result = ErrorSchema.safeParse(res.body);
         expect(result.success).toBeTruthy();
       }
     };
@@ -103,7 +103,7 @@ export class ResponseTests {
         .set('Accept', 'application/json')
         .expect(HttpCode.NotFound);
 
-      const result = await ErrorSchema.safeParseAsync(res.body);
+      const result = ErrorSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     };
 
@@ -118,7 +118,7 @@ export class ResponseTests {
         .set('Accept', 'application/json')
         .expect(HttpCode.Conflict);
 
-      const result = await ErrorSchema.safeParseAsync(res.body);
+      const result = ErrorSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     };
 
@@ -133,7 +133,7 @@ export class ResponseTests {
         .set('Accept', 'application/json')
         .expect(HttpCode.UnprocessableEntity);
 
-      const result = await ErrorSchema.safeParseAsync(res.body);
+      const result = ErrorSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     };
 
@@ -148,7 +148,7 @@ export class ResponseTests {
         .set('Accept', 'application/json')
         .expect(HttpCode.BadGateway);
 
-      const result = await ErrorSchema.safeParseAsync(res.body);
+      const result = ErrorSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     };
 
