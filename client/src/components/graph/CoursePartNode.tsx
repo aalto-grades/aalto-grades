@@ -19,9 +19,7 @@ const initialSettings: LocalSettings = {
   minPoints: '',
 };
 
-const CoursePartNode = (
-  props: NodeProps<{onDelete: (nodeId: string) => void}>
-): JSX.Element => {
+const CoursePartNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;
 
   const {nodeValues} = useContext(NodeValuesContext);

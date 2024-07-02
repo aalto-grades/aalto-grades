@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import CloseIcon from '@mui/icons-material/Close';
 import WarningIcon from '@mui/icons-material/Warning';
 import {Tooltip} from '@mui/material';
 import {JSX, PropsWithChildren, useContext, useEffect, useState} from 'react';
@@ -26,7 +25,6 @@ const BaseNode = ({
   selected,
   error = false,
   courseFail = false,
-  data,
   children,
 }: PropsType): JSX.Element => {
   const {nodeData, setNodeTitle} = useContext(NodeDataContext);
@@ -66,9 +64,6 @@ const BaseNode = ({
         filter: selected ? 'brightness(95%)' : '',
       }}
     >
-      <button onClick={() => data.onDelete(id)}>
-        <CloseIcon />
-      </button>
       <div>
         <h4
           style={{margin: 0}}

@@ -48,9 +48,7 @@ const checkError = (settings: LocalSettings): boolean => {
   return false;
 };
 
-const AverageNode = (
-  props: NodeProps<{onDelete: (nodeId: string) => void}>
-): JSX.Element => {
+const AverageNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;
 
   const updateNodeInternals = useUpdateNodeInternals();

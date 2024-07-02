@@ -128,6 +128,7 @@ const Graph = ({
   );
 
   const [unsaved, setUnsaved] = useState<boolean>(false);
+  const [selected, setSelected] = useState<Node[]>([]);
   const [coursePartsSelectOpen, setCoursePartsSelectOpen] =
     useState<boolean>(false);
   const [coursePartValuesOpen, setCoursePartValuesOpen] =
@@ -582,6 +583,27 @@ const Graph = ({
           </Alert>
         )}
       </div>
+      <div style={{position: 'relative'}}>
+        {selected.length > 0 && (
+          <Button
+            onClick={() => {
+              onNodesChange(
+                selected.map(node => ({type: 'remove', id: node.id}))
+              );
+            }}
+            variant="contained"
+            color="error"
+            sx={{
+              position: 'absolute',
+              top: 10,
+              left: 10,
+              zIndex: 1,
+            }}
+          >
+            Delete node{selected.length > 1 && 's'}
+          </Button>
+        )}
+      </div>
       <CoursePartValuesDialog
         nodes={nodes}
         nodeValues={nodeValues}
@@ -610,6 +632,7 @@ const Graph = ({
                     )
                   )
                 }
+                onSelectionChange={changes => setSelected(changes.nodes)}
                 minZoom={0.25}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}

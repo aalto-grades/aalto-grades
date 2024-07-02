@@ -15,9 +15,7 @@ const initialSettings = {minValue: '0'};
 const handleStartHeight = 83 + 33.9;
 const rowHeight = 33.9;
 
-const MaxNode = (
-  props: NodeProps<{onDelete: (nodeId: string) => void}>
-): JSX.Element => {
+const MaxNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;
 
   const updateNodeInternals = useUpdateNodeInternals();

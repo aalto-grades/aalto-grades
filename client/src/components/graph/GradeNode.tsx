@@ -9,9 +9,7 @@ import {GradeNodeValue} from '@/common/types/graph';
 import BaseNode from './BaseNode';
 import {NodeValuesContext} from '../../context/GraphProvider';
 
-const GradeNode = (
-  props: NodeProps<{onDelete: (nodeId: string) => void}>
-): JSX.Element => {
+const GradeNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;
 
   const {nodeValues} = useContext(NodeValuesContext);

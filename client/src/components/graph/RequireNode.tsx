@@ -18,9 +18,7 @@ const initialSettings: LocalSettings = {
 const handleStartHeight = 128.5;
 const rowHeight = 33.9;
 
-const RequireNode = (
-  props: NodeProps<{onDelete: (nodeId: string) => void}>
-): JSX.Element => {
+const RequireNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;
 
   const updateNodeInternals = useUpdateNodeInternals();
