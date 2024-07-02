@@ -34,7 +34,7 @@ export const AplusExerciseDataSchema = z.strictObject({
           id: z.number().int(),
           name: z.string(),
         })
-      )
+      ),
     })
   ),
   difficulties: z.array(z.string()),

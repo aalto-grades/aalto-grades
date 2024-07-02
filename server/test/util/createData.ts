@@ -130,45 +130,46 @@ class CreateData {
 
   async createAplusGradeSources(
     courseId: number
-  ): Promise<[[number, number], [number, number], [number, number]]> {
+  ): Promise<
+    [[number, number], [number, number], [number, number], [number, number]]
+  > {
+    const aplusCourse = {
+      id: 1,
+      courseCode: 'CS-789',
+      name: 'The Name',
+      instance: '1970',
+      url: 'https://plus.cs.aalto.fi',
+    };
+
     const fullPointsCoursePart = await this.createCoursePart(courseId);
     const fullPointsGradeSource = await AplusGradeSource.create({
       coursePartId: fullPointsCoursePart.id,
-      aplusCourse: {
-        id: 1,
-        courseCode: 'CS-789',
-        name: 'The Name',
-        instance: '1970',
-        url: 'https://plus.cs.aalto.fi',
-      },
+      aplusCourse: aplusCourse,
       sourceType: AplusGradeSourceType.FullPoints,
     });
 
     const moduleCoursePart = await this.createCoursePart(courseId);
     const moduleGradeSource = await AplusGradeSource.create({
       coursePartId: moduleCoursePart.id,
-      aplusCourse: {
-        id: 1,
-        courseCode: 'CS-789',
-        name: 'The Name',
-        instance: '1970',
-        url: 'https://plus.cs.aalto.fi',
-      },
+      aplusCourse: aplusCourse,
       sourceType: AplusGradeSourceType.Module,
       moduleId: 1,
       moduleName: 'Module Name',
     });
 
+    const exerciseCoursePart = await this.createCoursePart(courseId);
+    const exerciseGradeSource = await AplusGradeSource.create({
+      coursePartId: exerciseCoursePart.id,
+      aplusCourse: aplusCourse,
+      sourceType: AplusGradeSourceType.Exercise,
+      exerciseId: 1,
+      exerciseName: 'Exercise Name',
+    });
+
     const difficultyCoursePart = await this.createCoursePart(courseId);
     const difficultyGradeSource = await AplusGradeSource.create({
       coursePartId: difficultyCoursePart.id,
-      aplusCourse: {
-        id: 1,
-        courseCode: 'CS-789',
-        name: 'The Name',
-        instance: '1970',
-        url: 'https://plus.cs.aalto.fi',
-      },
+      aplusCourse: aplusCourse,
       sourceType: AplusGradeSourceType.Difficulty,
       difficulty: 'A',
     });
@@ -176,6 +177,7 @@ class CreateData {
     return [
       [fullPointsCoursePart.id, fullPointsGradeSource.id],
       [moduleCoursePart.id, moduleGradeSource.id],
+      [exerciseCoursePart.id, exerciseGradeSource.id],
       [difficultyCoursePart.id, difficultyGradeSource.id],
     ];
   }

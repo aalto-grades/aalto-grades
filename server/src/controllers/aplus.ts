@@ -91,8 +91,8 @@ export const fetchAplusExerciseData = async (
 
   // There doesn't appear to be a better way to get difficulties
   const difficulties = new Set<string>();
-  for (const result of exercisesRes.data.results) {
-    for (const exercise of result.exercises) {
+  for (const module of exercisesRes.data.results) {
+    for (const exercise of module.exercises) {
       if (exercise.difficulty) {
         difficulties.add(exercise.difficulty);
       }
@@ -106,7 +106,7 @@ export const fetchAplusExerciseData = async (
       exercises: module.exercises.map(exercise => ({
         id: exercise.id,
         name: exercise.display_name,
-      }))
+      })),
     })),
     difficulties: Array.from(difficulties),
   };
