@@ -6,6 +6,7 @@ import {NextFunction, Response} from 'express';
 import {RateLimiterMemory} from 'rate-limiter-flexible';
 import {TypedRequestBody} from 'zod-express-middleware';
 
+import {HttpCode} from '@/common/types';
 import {LoginDataSchema} from '@/common/types/auth';
 import logger from '../configs/winston';
 
@@ -39,26 +40,8 @@ export const rateLimiterMemoryMiddleware = (
       next();
     })
     .catch(() => {
-      return res.status(429).send({
+      return res.status(HttpCode.TooManyRequests).send({
         errors: [`Try again in ${rateLimiter.blockDuration} seconds`],
       });
     });
-};
-
-export const rateLimiterMemoryMiddlewareOnFail = (
-  req: TypedRequestBody<typeof LoginDataSchema>,
-  res: Response,
-  next: NextFunction
-): void => {
-  if (res.statusCode !== 200)
-    rateLimiter
-      .consume(req.ip ?? '')
-      .then(() => {
-        next();
-      })
-      .catch(() => {
-        return res.status(429).send({
-          errors: [`Try again in ${rateLimiter.blockDuration} seconds`],
-        });
-      });
 };
