@@ -30,23 +30,25 @@ const UsersView = (): JSX.Element => {
         <Typography variant="h2" align="left" sx={{flexGrow: 1}}>
           Users
         </Typography>
-        <Button
-          id="ag-manage-users-btn"
-          sx={{mr: 1.5}}
-          size="large"
-          variant="contained"
-          onClick={() => navigate('/manage-students')}
-        >
-          Manage users
-        </Button>
-        <Button
-          id="ag-new-user-btn"
-          size="large"
-          variant="contained"
-          onClick={() => setAddOpen(true)}
-        >
-          Add user
-        </Button>
+        <Box sx={{mb: -10 /* Align with tabs */}}>
+          <Button
+            id="ag-manage-users-btn"
+            sx={{mr: 1.5}}
+            size="large"
+            variant="contained"
+            onClick={() => navigate('/manage-students')}
+          >
+            Manage users
+          </Button>
+          <Button
+            id="ag-new-user-btn"
+            size="large"
+            variant="contained"
+            onClick={() => setAddOpen(true)}
+          >
+            Add user
+          </Button>
+        </Box>
       </Box>
       <UsersTable />
     </>
