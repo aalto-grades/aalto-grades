@@ -25,6 +25,8 @@ export default class AplusGradeSource extends Model<
   declare sourceType: AplusGradeSourceType;
   declare moduleId: CreationOptional<number | null>;
   declare moduleName: CreationOptional<string | null>;
+  declare exerciseId: CreationOptional<number | null>;
+  declare exerciseName: CreationOptional<string | null>;
   declare difficulty: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -50,7 +52,7 @@ AplusGradeSource.init(
       allowNull: false,
     },
     sourceType: {
-      type: DataTypes.ENUM('FULL_POINTS', 'MODULE', 'DIFFICULTY'),
+      type: DataTypes.ENUM('FULL_POINTS', 'MODULE', 'EXERCISE', 'DIFFICULTY'),
       allowNull: false,
     },
     moduleId: {
@@ -58,6 +60,14 @@ AplusGradeSource.init(
       allowNull: true,
     },
     moduleName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    exerciseId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    exerciseName: {
       type: DataTypes.STRING,
       allowNull: true,
     },
