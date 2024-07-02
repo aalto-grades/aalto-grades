@@ -12,6 +12,13 @@ import {
   FormControlLabel,
   FormGroup,
   LinearProgress,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
 } from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
@@ -45,13 +52,14 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
   });
 
   useEffect(() => {
-    if (aplusGrades.data) {
-      addGrades.mutate(aplusGrades.data);
-      handleClose();
-      return;
-    }
+    if (step === 1) {
+      if (!aplusGrades.isFetching && aplusGrades.data) {
+        setStep(2);
+        return;
+      }
 
-    setAplusTokenDialogOpen(!getAplusToken() || aplusGrades.isError);
+      setAplusTokenDialogOpen(!getAplusToken() || aplusGrades.isError);
+    }
   }, [aplusGrades]);
 
   const handleResetAndClose = (): void => {
@@ -65,6 +73,7 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
     <Dialog open={open} onClose={handleResetAndClose}>
       {step === 0 && <DialogTitle>Select course parts</DialogTitle>}
       {step === 1 && <DialogTitle>Fetching grades</DialogTitle>}
+      {step === 2 && <DialogTitle>Confirm</DialogTitle>}
       <DialogContent>
         {step === 0 && (
           <>
@@ -113,6 +122,37 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
             <LinearProgress sx={{mt: 2}} />
           </>
         )}
+        {step === 2 && (
+          // TODO: We probably want to show a preview in the same table as all
+          // other grade uploads, for now this is a simple solution to have
+          // some kind of preview.
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Student number</TableCell>
+                  <TableCell>Course part ID</TableCell>
+                  <TableCell>A+ grade source ID</TableCell>
+                  <TableCell>Grade</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Expiry date</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {aplusGrades.data && aplusGrades.data.map(row =>
+                  <TableRow>
+                    <TableCell>{row.studentNumber}</TableCell>
+                    <TableCell>{row.coursePartId}</TableCell>
+                    <TableCell>{row.aplusGradeSourceId}</TableCell>
+                    <TableCell>{row.grade}</TableCell>
+                    <TableCell>{row.date.toDateString()}</TableCell>
+                    <TableCell>{row.expiryDate.toDateString()}</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </DialogContent>
       <DialogActions>
         {step === 0 && (
@@ -126,6 +166,16 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
             disabled={coursePartIds.length === 0}
           >
             Next
+          </Button>
+        )}
+        {step === 2 && (
+          <Button
+            onClick={() => {
+              addGrades.mutate(aplusGrades.data!);
+              handleResetAndClose();
+            }}
+          >
+            Submit
           </Button>
         )}
       </DialogActions>
