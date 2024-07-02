@@ -60,7 +60,7 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
 
       setAplusTokenDialogOpen(!getAplusToken() || aplusGrades.isError);
     }
-  }, [aplusGrades]);
+  }, [aplusGrades]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleResetAndClose = (): void => {
     setStep(0);
@@ -139,16 +139,17 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {aplusGrades.data && aplusGrades.data.map(row =>
-                  <TableRow>
-                    <TableCell>{row.studentNumber}</TableCell>
-                    <TableCell>{row.coursePartId}</TableCell>
-                    <TableCell>{row.aplusGradeSourceId}</TableCell>
-                    <TableCell>{row.grade}</TableCell>
-                    <TableCell>{row.date.toDateString()}</TableCell>
-                    <TableCell>{row.expiryDate.toDateString()}</TableCell>
-                  </TableRow>
-                )}
+                {aplusGrades.data &&
+                  aplusGrades.data.map(row => (
+                    <TableRow>
+                      <TableCell>{row.studentNumber}</TableCell>
+                      <TableCell>{row.coursePartId}</TableCell>
+                      <TableCell>{row.aplusGradeSourceId}</TableCell>
+                      <TableCell>{row.grade}</TableCell>
+                      <TableCell>{row.date.toDateString()}</TableCell>
+                      <TableCell>{row.expiryDate.toDateString()}</TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>
