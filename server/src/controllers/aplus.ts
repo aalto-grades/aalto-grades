@@ -155,7 +155,7 @@ export const fetchAplusGrades = async (
   }
 
   type StudentPoints = {
-    student_id: string;
+    student_id: string | null;
     points: number;
     points_by_difficulty: {
       [key: string]: number;
@@ -212,6 +212,11 @@ export const fetchAplusGrades = async (
 
     const points = pointsResCache[aplusCourseId];
     for (const student of points) {
+      // TODO: https://github.com/aalto-grades/base-repository/issues/747
+      if (!student.student_id) {
+        continue;
+      }
+
       let grade: number | undefined;
       switch (gradeSource.sourceType) {
         case AplusGradeSourceType.FullPoints:
@@ -228,9 +233,10 @@ export const fetchAplusGrades = async (
           for (const module of student.modules) {
             if (module.id === gradeSource.moduleId) {
               grade = module.points;
+              break;
             }
           }
-          if (!grade) {
+          if (grade === undefined) {
             throw new ApiError(
               `A+ course with ID ${aplusCourseId} has no module with ID ${gradeSource.moduleId}`,
               HttpCode.InternalServerError
@@ -267,13 +273,7 @@ export const fetchAplusGrades = async (
               HttpCode.InternalServerError
             );
           }
-          if (!(gradeSource.difficulty in student.points_by_difficulty)) {
-            throw new ApiError(
-              `A+ course with ID ${aplusCourseId} has no difficulty ${gradeSource.difficulty}`,
-              HttpCode.InternalServerError
-            );
-          }
-          grade = student.points_by_difficulty[gradeSource.difficulty];
+          grade = student.points_by_difficulty[gradeSource.difficulty] ?? 0;
           break;
       }
 

@@ -14,18 +14,19 @@ import {
   SystemRole,
 } from '@/common/types';
 import {
-  changePassword,
   authLogin,
   authLogout,
   authResetOwnPassword,
   authSamlLogin,
-  selfInfo,
+  changePassword,
   resetPassword,
   samlMetadata,
+  selfInfo,
 } from '../controllers/auth';
 import {handleInvalidRequestJson} from '../middleware';
 import {authorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
+import {rateLimiterMemoryMiddleware} from '../middleware/rateLimiterMemory';
 
 export const router = Router();
 
@@ -42,6 +43,7 @@ router.post(
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(LoginDataSchema),
+  rateLimiterMemoryMiddleware,
   authLogin
 );
 
@@ -71,6 +73,7 @@ router.post(
 router.post(
   '/v1/auth/change-password',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(ChangePasswordDataSchema),

@@ -77,7 +77,7 @@ class CreateData {
       email: user?.email ?? `testuser${this.freeUserId}@aalto.fi`,
       name: user?.name ?? `test user${this.freeUserId}`,
       studentNumber: user?.studentNumber ?? `12345${this.freeUserId}`,
-      role: SystemRole.User,
+      role: SystemRole.Admin,
       password: password,
       forcePasswordReset: user?.forcePasswordReset ?? false,
     });
