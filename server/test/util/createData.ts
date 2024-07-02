@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+import * as argon from 'argon2';
+
 import {
   AplusGradeSourceType,
   CoursePartData,
@@ -51,6 +53,33 @@ class CreateData {
       name: user?.name ?? `test user${this.freeUserId}`,
       studentNumber: user?.studentNumber ?? `12345${this.freeUserId}`,
       role: SystemRole.User,
+    });
+    this.freeUserId += 1;
+    return {
+      id: newUser.id,
+      email: newUser.email,
+      name: newUser.name,
+      studentNumber: newUser.studentNumber,
+    };
+  }
+
+  async createAuthUser(
+    user?: Partial<UserData & {password: string; forcePasswordReset: boolean}>
+  ): Promise<UserData> {
+    const password = await argon.hash(user?.password ?? 'password', {
+      type: argon.argon2id,
+      memoryCost: 19456,
+      parallelism: 1,
+      timeCost: 2,
+    });
+
+    const newUser = await User.create({
+      email: user?.email ?? `testuser${this.freeUserId}@aalto.fi`,
+      name: user?.name ?? `test user${this.freeUserId}`,
+      studentNumber: user?.studentNumber ?? `12345${this.freeUserId}`,
+      role: SystemRole.Admin,
+      password: password,
+      forcePasswordReset: user?.forcePasswordReset ?? false,
     });
     this.freeUserId += 1;
     return {

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Alert, Button, Divider, Typography} from '@mui/material';
+import {Alert, Button, Divider, Tooltip, Typography} from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
 import {
   DragEvent,
@@ -63,6 +63,7 @@ import {
   NodeValuesContext,
 } from '../../context/GraphProvider';
 import {GradeSelectOption, findBestGrade} from '../../utils/bestGrade';
+import SaveConfirmDialog from '../alerts/SaveConfirmDialog';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 const nodeTypesMap = {
@@ -78,6 +79,17 @@ const nodeTypesMap = {
   substitute: SubstituteNode,
 };
 
+const dragAndDropNodes: {type: DropInNodes; title: string}[] = [
+  {type: 'addition', title: 'Addition'},
+  {type: 'average', title: 'Average'},
+  {type: 'stepper', title: 'Stepper'},
+  {type: 'minpoints', title: 'Require minimum points'},
+  {type: 'max', title: 'Maximum'},
+  {type: 'require', title: 'Require passing values'},
+  {type: 'round', title: 'Round'},
+  {type: 'substitute', title: 'Substitute'},
+];
+
 type GraphProps = {
   initGraph: GraphStructure;
   courseParts: {id: number; name: string; archived: boolean}[];
@@ -85,6 +97,7 @@ type GraphProps = {
   gradeSelectOption?: GradeSelectOption;
   onSave?: (graphStructure: GraphStructure) => Promise<void>;
   readOnly?: boolean;
+  modelHasFinalGrades?: boolean;
 };
 const Graph = ({
   initGraph,
@@ -93,6 +106,7 @@ const Graph = ({
   gradeSelectOption,
   onSave,
   readOnly = false,
+  modelHasFinalGrades = false,
 }: GraphProps): JSX.Element => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -118,6 +132,7 @@ const Graph = ({
     useState<boolean>(false);
   const [coursePartValuesOpen, setCoursePartValuesOpen] =
     useState<boolean>(false);
+  const [saveConfirmOpen, setSaveConfirmOpen] = useState<boolean>(false);
   // Course part nodes that the user is allowed to delete
   const [delCourseParts, setDelCourseParts] = useState<string[]>([]);
   const [originalGraphStructure, setOriginalGraphStructure] =
@@ -483,6 +498,37 @@ const Graph = ({
   );
   return (
     <>
+      <UnsavedChangesDialog
+        open={blocker.state === 'blocked'}
+        onClose={blocker.reset ?? (() => {})}
+        handleDiscard={blocker.proceed ?? (() => {})}
+        dontCloseOnDiscard
+      />
+      <SelectCoursePartsDialog
+        nodes={nodes}
+        courseParts={courseParts}
+        open={coursePartsSelectOpen}
+        handleCoursePartSelect={handleCoursePartSelect}
+        onClose={() => setCoursePartsSelectOpen(false)}
+      />
+      <SaveConfirmDialog
+        open={saveConfirmOpen}
+        onClose={() => setSaveConfirmOpen(false)}
+        onSave={async () => {
+          if (onSave === undefined) return;
+          setSaveConfirmOpen(false);
+
+          enqueueSnackbar('Saving model.', {variant: 'info'});
+          await onSave({nodes, edges, nodeData});
+          enqueueSnackbar('Model saved successfully.', {variant: 'success'});
+          setOriginalGraphStructure(structuredClone({nodes, edges, nodeData}));
+          setUnsaved(false);
+        }}
+        text={
+          'There are final grades using this model. Editing it might cause ' +
+          'accidentally overwriting old final grades.'
+        }
+      />
       <div style={{position: 'relative'}}>
         {unsaved && (
           <Alert
@@ -498,11 +544,34 @@ const Graph = ({
             Unsaved changes
           </Alert>
         )}
+        {unsaved && modelHasFinalGrades && (
+          <Tooltip
+            title={
+              'There are final grades using this model. Editing it might cause ' +
+              'accidentally overwriting old final grades.'
+            }
+          >
+            <Alert
+              sx={{
+                position: 'absolute',
+                top: 70,
+                right: 10,
+                zIndex: 1,
+              }}
+              severity="warning"
+            >
+              Model has final grades
+            </Alert>
+          </Tooltip>
+        )}
         {courseFail && (
           <Alert
             sx={{
               position: 'absolute',
-              top: unsaved ? 70 : 10,
+              top:
+                Number(unsaved) * 60 +
+                Number(unsaved && modelHasFinalGrades) * 60 +
+                10,
               right: 10,
               zIndex: 1,
             }}
@@ -513,19 +582,6 @@ const Graph = ({
           </Alert>
         )}
       </div>
-      <UnsavedChangesDialog
-        open={blocker.state === 'blocked'}
-        onClose={blocker.reset ?? (() => {})}
-        handleDiscard={blocker.proceed ?? (() => {})}
-        dontCloseOnDiscard
-      />
-      <SelectCoursePartsDialog
-        nodes={nodes}
-        courseParts={courseParts}
-        open={coursePartsSelectOpen}
-        handleCoursePartSelect={handleCoursePartSelect}
-        onClose={() => setCoursePartsSelectOpen(false)}
-      />
       <CoursePartValuesDialog
         nodes={nodes}
         nodeValues={nodeValues}
@@ -581,62 +637,18 @@ const Graph = ({
             {!readOnly && onSave !== undefined && (
               <>
                 <div style={{marginBottom: '5px'}}>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'addition')}
-                    draggable
-                  >
-                    Addition
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'average')}
-                    draggable
-                  >
-                    Average
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'stepper')}
-                    draggable
-                  >
-                    Stepper
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'minpoints')}
-                    draggable
-                  >
-                    Require Minimum Points
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'max')}
-                    draggable
-                  >
-                    Maximum
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'require')}
-                    draggable
-                  >
-                    Require Passing Values
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'round')}
-                    draggable
-                  >
-                    Round
-                  </div>
-                  <div
-                    className="dndnode"
-                    onDragStart={event => onDragStart(event, 'substitute')}
-                    draggable
-                  >
-                    Substitute
-                  </div>
+                  {dragAndDropNodes.map(dragAndDropNode => (
+                    <div
+                      key={dragAndDropNode.type}
+                      className="dndnode"
+                      onDragStart={event =>
+                        onDragStart(event, dragAndDropNode.type)
+                      }
+                      draggable
+                    >
+                      {dragAndDropNode.title}
+                    </div>
+                  ))}
                 </div>
                 <Divider sx={{my: 1}} />
                 <div style={{float: 'left'}}>
@@ -644,7 +656,7 @@ const Graph = ({
                     onClick={() => setCoursePartsSelectOpen(true)}
                     variant="outlined"
                   >
-                    Select Course Parts
+                    Select course parts
                   </Button>
                   <Button
                     onClick={() => setCoursePartValuesOpen(true)}
@@ -674,9 +686,11 @@ const Graph = ({
                   <Button
                     variant={unsaved ? 'contained' : 'text'}
                     onClick={async () => {
-                      enqueueSnackbar('Saving model.', {
-                        variant: 'info',
-                      });
+                      if (modelHasFinalGrades) {
+                        setSaveConfirmOpen(true);
+                        return;
+                      }
+                      enqueueSnackbar('Saving model.', {variant: 'info'});
                       await onSave({nodes, edges, nodeData});
                       enqueueSnackbar('Model saved successfully.', {
                         variant: 'success',

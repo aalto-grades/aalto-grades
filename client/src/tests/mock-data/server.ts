@@ -37,7 +37,7 @@ export const mockPostSuccess = (
 ): ResponseResolver => {
   return async ({request}) => {
     func(await request.json());
-    return new Response(JSON.stringify({data: data}), {
+    return new Response(JSON.stringify(data), {
       headers: {'Content-Type': 'application/json'},
       status: 200,
     });

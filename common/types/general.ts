@@ -13,6 +13,7 @@ export enum HttpCode {
   NotFound = 404,
   Conflict = 409,
   UnprocessableEntity = 422,
+  TooManyRequests = 429,
   InternalServerError = 500,
   BadGateway = 502,
 }
@@ -43,7 +44,7 @@ export const AaltoEmailSchema = z
   .email()
   .regex(/^.*@aalto\.fi$/, 'Email must be a valid aalto email');
 
-export const LocalizedStringSchema = z.object({
+export const LocalizedStringSchema = z.strictObject({
   fi: z.string(),
   en: z.string(),
   sv: z.string(),

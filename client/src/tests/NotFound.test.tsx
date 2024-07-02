@@ -31,7 +31,7 @@ describe('Tests for NotFound component', () => {
   test('Not found page should display message when route does not exist', async () => {
     renderFetchInstancesView();
     await waitFor(() => {
-      expect(screen.getByText('404 - Not Found')).toBeInTheDocument();
+      expect(screen.getByText('404 - Not found')).toBeInTheDocument();
       expect(
         screen.getByText('The page you’re looking for doesn’t exist.')
       ).toBeInTheDocument();

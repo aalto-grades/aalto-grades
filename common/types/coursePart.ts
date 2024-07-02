@@ -6,7 +6,7 @@ import {z} from 'zod';
 
 import {AplusGradeSourceDataSchema} from './aplus';
 
-export const CoursePartDataSchema = z.object({
+export const CoursePartDataSchema = z.strictObject({
   id: z.number().int(),
   courseId: z.number().int(),
   name: z.string().min(1),
@@ -19,12 +19,14 @@ export const NewCoursePartDataSchema = CoursePartDataSchema.omit({
   courseId: true,
   archived: true,
   aplusGradeSources: true,
-});
+}).strict();
 export const EditCoursePartDataSchema = CoursePartDataSchema.omit({
   id: true,
   courseId: true,
   aplusGradeSources: true,
-}).partial();
+})
+  .strict()
+  .partial();
 
 export const CoursePartDataArraySchema = z.array(CoursePartDataSchema);
 

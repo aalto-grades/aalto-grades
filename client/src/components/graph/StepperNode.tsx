@@ -166,7 +166,7 @@ const StepperNode = (
           </tr>
           {new Array(localSettings.numSteps).fill(0).map((_, index) => (
             <tr
-              key={`${id}-${index}`}
+              key={index}
               style={{
                 background: !error && isCurrentSlot(index) ? '#ccf' : '',
               }}

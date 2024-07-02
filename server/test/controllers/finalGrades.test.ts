@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import supertest from 'supertest';
-import {z} from 'zod';
 
 import {
   EditFinalGrade,
-  FinalGradeDataSchema,
+  FinalGradeDataArraySchema,
   GradingScale,
   HttpCode,
   NewFinalGrade,
@@ -122,8 +121,8 @@ describe('Test GET /v1/courses/:courseId/final-grades - get all final grades', (
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = z.array(FinalGradeDataSchema.strict()).nonempty();
-      const result = await Schema.safeParseAsync(res.body);
+      const Schema = FinalGradeDataArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });

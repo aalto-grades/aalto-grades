@@ -20,7 +20,7 @@ test.beforeEach(async ({page}) => {
   await expect(
     page.getByRole('heading', {name: 'Log in to Aalto Grades'})
   ).toBeHidden();
-  await expect(page.getByRole('heading', {name: 'Your Courses'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Courses'})).toBeVisible();
 });
 
 test.afterEach(async ({page}) => {
@@ -35,7 +35,7 @@ test.describe('Manage users as admin', () => {
     await page.getByRole('button', {name: 'Add user'}).click();
     await page.getByLabel('Email').click();
     await page.getByLabel('Email').fill('testuser@aalto.fi');
-    await page.getByRole('button', {name: 'Add User'}).click();
+    await page.getByRole('button', {name: 'Add user'}).click();
     await page.goto('/');
     await expect(
       page.getByRole('cell', {name: 'testuser@aalto.fi'})
@@ -49,44 +49,44 @@ test.describe('Manage users as admin', () => {
     const parent = page.getByRole('row').filter({has: cell});
     await parent.getByTestId('DeleteIcon').click();
     await expect(
-      page.getByRole('heading', {name: 'Delete User'})
+      page.getByRole('heading', {name: 'Delete user'})
     ).toBeVisible();
     await page.getByRole('button', {name: 'Delete'}).click();
     await expect(cell).not.toBeAttached();
   });
 });
 
-test.describe('Test Courses as Admin', () => {
+test.describe('Test courses as admin', () => {
   test('Check course', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
   });
 
   test('Add course', async ({page}) => {
-    await page.getByRole('button', {name: 'Create New Course'}).click();
-    await page.getByLabel('Course Code*').click();
-    await page.getByLabel('Course Code*').fill('cs-testcourse123');
-    await page.getByLabel('Course Code*').press('Tab');
-    await page.getByLabel('Course Name in English*').fill('testcourse');
-    await page.getByLabel('Course Name in Finnish*').click();
-    await page.getByLabel('Course Name in Finnish*').fill('testikurssi');
-    await page.getByLabel('Course Name in Finnish*').press('Tab');
-    await page.getByLabel('Course Name in Swedish*').fill('...');
-    await page.getByLabel('Course Name in Swedish*').press('Tab');
+    await page.getByRole('button', {name: 'Create new course'}).click();
+    await page.getByLabel('Course code*').click();
+    await page.getByLabel('Course code*').fill('cs-testcourse123');
+    await page.getByLabel('Course code*').press('Tab');
+    await page.getByLabel('Course name in English*').fill('testcourse');
+    await page.getByLabel('Course name in Finnish*').click();
+    await page.getByLabel('Course name in Finnish*').fill('testikurssi');
+    await page.getByLabel('Course name in Finnish*').press('Tab');
+    await page.getByLabel('Course name in Swedish*').fill('...');
+    await page.getByLabel('Course name in Swedish*').press('Tab');
     await page.getByLabel('Organizing department in English*').fill('aalto');
     await page.getByLabel('Organizing department in English*').press('Tab');
     await page.getByLabel('Organizing department in Finnish*').fill('aalto');
     await page.getByLabel('Organizing department in Finnish*').press('Tab');
     await page.getByLabel('Organizing department in Swedish*').fill('...');
-    await page.getByLabel('Minimum Course Credits (ECTS)*').dblclick();
-    await page.getByLabel('Maximum Course Credits (ECTS)*').click();
-    await page.getByLabel('Maximum Course Credits (ECTS)*').fill('150');
+    await page.getByLabel('Minimum course credits (ECTS)*').dblclick();
+    await page.getByLabel('Maximum course credits (ECTS)*').click();
+    await page.getByLabel('Maximum course credits (ECTS)*').fill('150');
     await page.getByLabel('General scale, 0-').click();
     await page.locator('#menu-gradingScale div').first().click();
     await page.getByLabel('Course language*').click();
     await page.getByRole('option', {name: 'Japanese'}).click();
-    await page.getByLabel('Teachers In Charge*').click();
-    await page.getByLabel('Teachers In Charge*').fill('teacher@aalto.fi');
+    await page.getByLabel('Teachers in charge*').click();
+    await page.getByLabel('Teachers in charge*').fill('teacher@aalto.fi');
     await page.getByRole('button', {name: 'Add'}).first().click();
     await page.getByLabel('Assistants*').click();
     await page.getByLabel('Assistants*').fill('assistant@aalto.fi');
@@ -101,19 +101,19 @@ test.describe('Test Courses as Admin', () => {
 
   test('Edit course', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
-    await page.getByRole('button', {name: 'Edit Course'}).click();
-    await page.getByLabel('Course Code*').click();
-    await page.getByLabel('Course Code*').fill('CS-A1120 - edit');
-    await page.getByLabel('Course Code*').press('Tab');
-    await page.getByLabel('Course Name in Finnish*').click();
+    await page.getByRole('button', {name: 'Edit course'}).click();
+    await page.getByLabel('Course code*').click();
+    await page.getByLabel('Course code*').fill('CS-A1120 - edit');
+    await page.getByLabel('Course code*').press('Tab');
+    await page.getByLabel('Course name in Finnish*').click();
     await page
-      .getByLabel('Course Name in Finnish*')
+      .getByLabel('Course name in Finnish*')
       .fill('Ohjelmointi 2 - edit');
-    await page.getByLabel('Course Name in Finnish*').press('Tab');
+    await page.getByLabel('Course name in Finnish*').press('Tab');
     await page
-      .getByLabel('Course Name in Swedish*')
+      .getByLabel('Course name in Swedish*')
       .fill('Programmering 2 - edit');
-    await page.getByLabel('Course Name in Swedish*').press('Tab');
+    await page.getByLabel('Course name in Swedish*').press('Tab');
     await page
       .getByLabel('Organizing department in English*')
       .fill('Department of Computer Science - edit');
@@ -125,10 +125,10 @@ test.describe('Test Courses as Admin', () => {
     await page
       .getByLabel('Organizing department in Swedish*')
       .fill('Institutionen för datateknik - edit');
-    await page.getByLabel('Minimum Course Credits (ECTS)*').dblclick();
-    await page.getByLabel('Maximum Course Credits (ECTS)*').click();
-    await page.getByLabel('Maximum Course Credits (ECTS)*').fill('6');
-    await page.getByLabel('Grading Scale*').click();
+    await page.getByLabel('Minimum course credits (ECTS)*').dblclick();
+    await page.getByLabel('Maximum course credits (ECTS)*').click();
+    await page.getByLabel('Maximum course credits (ECTS)*').fill('6');
+    await page.getByLabel('Grading scale*').click();
     await page.getByRole('option', {name: 'Pass-Fail'}).click();
     await page.getByLabel('Course language*').click();
     await page.getByRole('option', {name: 'Chinese'}).click();
@@ -142,10 +142,10 @@ test.describe('Test Courses as Admin', () => {
 
   test('Create grading model', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
-    await page.getByRole('button', {name: 'Grading Models'}).click();
+    await page.getByRole('button', {name: 'Grading models'}).click();
     await page.getByLabel('New grading model').click();
     await page.getByLabel('Name *').click();
-    await page.getByLabel('Name *').fill('Test Model');
+    await page.getByLabel('Name *').fill('Test model');
     await page.getByLabel('Select template').click();
     await page.getByRole('option', {name: 'Addition'}).click();
     await page.getByRole('button', {name: 'Submit'}).click();
@@ -157,7 +157,7 @@ test.describe('Test Courses as Admin', () => {
     await page.getByRole('button', {name: 'Save'}).click();
     await expect(page.getByText('Model saved successfully.')).toBeVisible();
     await page.getByRole('button', {name: 'Grades', exact: true}).click();
-    await page.getByRole('button', {name: 'Grading Models'}).click();
-    await expect(page.getByRole('button', {name: 'Test Model'})).toBeVisible();
+    await page.getByRole('button', {name: 'Grading models'}).click();
+    await expect(page.getByRole('button', {name: 'Test model'})).toBeVisible();
   });
 });

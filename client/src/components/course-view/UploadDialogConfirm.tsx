@@ -113,7 +113,7 @@ const UploadDialogConfirm = ({
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'date' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            Completion And Expiration Dates
+            Completion and expiration dates
           </AccordionSummary>
           <AccordionDetails>
             {dates.length > nonEmptyCols.length && (
@@ -140,7 +140,7 @@ const UploadDialogConfirm = ({
                         nonEmptyCols.includes(date.coursePartName)
                       )
                       .map(date => (
-                        <TableRow key={`dateRow-${date.coursePartName}`}>
+                        <TableRow key={date.coursePartName}>
                           <TableCell>{date.coursePartName}</TableCell>
                           <TableCell>
                             <DatePicker
@@ -197,7 +197,7 @@ const UploadDialogConfirm = ({
           disabled={error}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            Confirm Data
+            Confirm data
           </AccordionSummary>
           <AccordionDetails>
             <div style={{height: '70vh'}}>

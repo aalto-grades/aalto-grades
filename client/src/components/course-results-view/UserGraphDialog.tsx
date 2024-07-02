@@ -79,8 +79,8 @@ const UserGraphDialog = ({
               Grading model
             </InputLabel>
             <Select
-              sx={{minWidth: '150px'}}
               labelId="grading-model-select-label"
+              sx={{minWidth: '150px'}}
               value={selectedModel?.id ?? gradingModels[0].id}
               label="Grading model"
               onChange={event => {

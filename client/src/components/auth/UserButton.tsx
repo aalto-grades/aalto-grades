@@ -9,6 +9,8 @@ import {useQueryClient} from '@tanstack/react-query';
 import {JSX, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
+import {SystemRole} from '@/common/types';
+import ChangePasswordDialog from './ChangePasswordDialog';
 import {useLogOut} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import AplusTokenDialog from '../shared/AplusTokenDialog';
@@ -16,35 +18,54 @@ import AplusTokenDialog from '../shared/AplusTokenDialog';
 const UserButton = (): JSX.Element => {
   const navigate = useNavigate();
   const {auth, setAuth} = useAuth();
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-  const open = Boolean(anchorEl);
+  const queryClient = useQueryClient();
+  const logOut = useLogOut();
 
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+  const [anchorWidth, setAnchorWidth] = useState<number | null>(null);
   const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
     useState<boolean>(false);
+  const [changePasswordDialogOpen, setChangePasswordDialogOpen] =
+    useState<boolean>(false);
 
-  const queryClient = useQueryClient();
-  const logOut = useLogOut({
-    onSuccess: () => {
-      setAuth(null);
-      setAnchorEl(null);
-      queryClient.clear();
-      navigate('/login', {replace: true});
-    },
-  });
+  const handleLogOut = async (): Promise<void> => {
+    await logOut.mutateAsync(null);
+    setAuth(null);
+    setAnchorEl(null);
+    queryClient.clear();
+    navigate('/login', {replace: true});
+  };
 
-  if (!auth?.name) {
+  const menuOpen = Boolean(anchorEl);
+
+  if (auth?.name === undefined) {
     return <div data-testid="not-logged-in"></div>;
   }
 
   return (
     <>
+      <AplusTokenDialog
+        handleClose={() => setAplusTokenDialogOpen(false)}
+        handleSubmit={() => setAplusTokenDialogOpen(false)}
+        open={aplusTokenDialogOpen}
+      />
+      {auth.role === SystemRole.Admin && (
+        <ChangePasswordDialog
+          onClose={() => setChangePasswordDialogOpen(false)}
+          open={changePasswordDialogOpen}
+        />
+      )}
+
       <Button
-        color="inherit"
         id="basic-button"
-        aria-controls={open ? 'basic-menu' : undefined}
+        color="inherit"
+        aria-controls={menuOpen ? 'basic-menu' : undefined}
         aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={event => setAnchorEl(event.currentTarget)}
+        aria-expanded={menuOpen ? 'true' : undefined}
+        onClick={event => {
+          setAnchorEl(event.currentTarget);
+          setAnchorWidth(event.currentTarget.offsetWidth);
+        }}
       >
         <Box sx={{marginRight: 1, marginTop: 1}}>
           <PersonIcon color="inherit" />
@@ -55,20 +76,31 @@ const UserButton = (): JSX.Element => {
       <Menu
         id="basic-menu"
         anchorEl={anchorEl}
-        open={open}
+        open={menuOpen}
         onClose={() => setAnchorEl(null)}
         MenuListProps={{'aria-labelledby': 'basic-button'}}
       >
-        <MenuItem onClick={() => setAplusTokenDialogOpen(true)}>
+        <MenuItem
+          sx={{width: anchorWidth ?? '100%'}}
+          onClick={() => {
+            setAnchorEl(null);
+            setAplusTokenDialogOpen(true);
+          }}
+        >
           A+ Token
         </MenuItem>
-        <MenuItem onClick={() => logOut.mutate(null)}>Logout</MenuItem>
+        {auth.role === SystemRole.Admin && (
+          <MenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              setChangePasswordDialogOpen(true);
+            }}
+          >
+            Change password
+          </MenuItem>
+        )}
+        <MenuItem onClick={handleLogOut}>Logout</MenuItem>
       </Menu>
-      <AplusTokenDialog
-        handleClose={() => setAplusTokenDialogOpen(false)}
-        handleSubmit={() => setAplusTokenDialogOpen(false)}
-        open={aplusTokenDialogOpen}
-      />
     </>
   );
 };

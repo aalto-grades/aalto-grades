@@ -28,6 +28,7 @@ import {enqueueSnackbar} from 'notistack';
 import {ParseResult, parse, unparse} from 'papaparse';
 import {Dispatch, JSX, SetStateAction, useEffect, useState} from 'react';
 
+import AplusImportDialog from './AplusImportDialog';
 import {GradeUploadColTypes} from './UploadDialog';
 import MismatchDialog, {MismatchData} from './UploadDialogMismatchDialog';
 
@@ -59,6 +60,8 @@ const UploadDialogUpload = ({
   } | null>(null);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
+  const [aplusImportDialogOpen, setAplusImportDialogOpen] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (error || editing) setReady(false);
@@ -118,7 +121,7 @@ const UploadDialogUpload = ({
       const rowData = {id: rowI} as GradeUploadColTypes;
       for (let i = 0; i < csvRow.length; i++) {
         const columnKey = keyMap[csvKeys[i]];
-        if (columnKey === 'Ignore Column') continue;
+        if (columnKey === 'ignoreColumn') continue;
         if (columnKey === 'studentNo') {
           rowData.studentNo = csvRow[i].toString();
           continue;
@@ -186,7 +189,7 @@ const UploadDialogUpload = ({
 
   return (
     <>
-      <DialogTitle>Upload Grades</DialogTitle>
+      <DialogTitle>Upload grades</DialogTitle>
       <Dialog
         open={textFieldOpen}
         fullWidth
@@ -231,6 +234,11 @@ const UploadDialogUpload = ({
         }
       />
 
+      <AplusImportDialog
+        handleClose={() => setAplusImportDialogOpen(false)}
+        open={aplusImportDialogOpen}
+      />
+
       <DialogContent sx={{minHeight: 500}}>
         <Snackbar
           open={snackbar !== null}
@@ -251,7 +259,7 @@ const UploadDialogUpload = ({
           }
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            Upload Grades
+            Upload grades
           </AccordionSummary>
           <AccordionDetails>
             <ButtonGroup>
@@ -267,9 +275,14 @@ const UploadDialogUpload = ({
                 />
               </Button>
               <Button variant="outlined" onClick={downloadTemplate}>
-                Download CSV Template
+                Download CSV template
               </Button>
-              <Button variant="outlined">Import from SISU</Button>
+              <Button
+                variant="outlined"
+                onClick={() => setAplusImportDialogOpen(true)}
+              >
+                Import from A+
+              </Button>
               <Button variant="outlined">Import from MyCourses</Button>
               <Button variant="outlined" onClick={() => setTextFieldOpen(true)}>
                 Paste text

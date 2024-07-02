@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import supertest from 'supertest';
-import {z} from 'zod';
 
 import {
   CoursePartData,
-  CoursePartDataSchema,
+  CoursePartDataArraySchema,
   EditCoursePartData,
   HttpCode,
   IdSchema,
@@ -88,8 +87,8 @@ describe('Test GET /v1/courses/:courseId/parts - get all course parts', () => {
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = z.array(CoursePartDataSchema.strict()).nonempty();
-      const result = await Schema.safeParseAsync(res.body);
+      const Schema = CoursePartDataArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
@@ -132,7 +131,7 @@ describe('Test POST /v1/courses/:courseId/parts - add a course part', () => {
         .set('Accept', 'application/json')
         .expect(HttpCode.Created);
 
-      const result = await IdSchema.safeParseAsync(res.body);
+      const result = IdSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
       if (result.success) await checkCoursePart(result.data, coursePart);
     }

@@ -28,17 +28,7 @@ definitions:
     format: password
     description: Plaintext password.
     example: MySuperSecretPassword123
-  Credentials:
-    type: object
-    properties:
-      email:
-        $ref: '#/definitions/Email'
-      password:
-        $ref: '#/definitions/Password'
-    required:
-      - email
-      - password
-  LoginResult:
+  AuthData:
     type: object
     properties:
       id:
@@ -51,6 +41,78 @@ definitions:
       - id
       - name
       - role
+  LoginData:
+    type: object
+    properties:
+      email:
+        $ref: '#/definitions/Email'
+      password:
+        $ref: '#/definitions/Password'
+    required:
+      - email
+      - password
+  LoginResult:
+    oneOf:
+      - $ref: '#/definitions/ResetPasswordFalse'
+      - $ref: '#/definitions/ResetPasswordTrue'
+  ResetPasswordTrue:
+    type: object
+    properties:
+      resetPassword:
+        type: boolean
+        enum: [true]
+        description: True if user should change their password
+        example: true
+    required:
+      - resetPassword
+  ResetPasswordFalse:
+    type: object
+    properties:
+      resetPassword:
+        type: boolean
+        enum: [false]
+        description: True if user should change their password
+        example: false
+      id:
+        $ref: '#/definitions/UserId'
+      name:
+        $ref: '#/definitions/Name'
+      role:
+        $ref: '#/definitions/SystemRole'
+    required:
+      - resetPassword
+      - id
+      - name
+      - role
+  ResetPasswordData:
+    type: object
+    properties:
+      email:
+        $ref: '#/definitions/Email'
+      password:
+        $ref: '#/definitions/Password'
+      newPassword:
+        $ref: '#/definitions/Password'
+    required:
+      - email
+      - password
+      - newPassword
+  ResetPasswordResult:
+    type: object
+    properties:
+      temporaryPassword:
+        type: string
+        example: 'h0AHU7f8DzhPSpED'
+    required:
+      - temporaryPassword
+  ChangePasswordData:
+    type: object
+    properties:
+      newPassword:
+        type: string
+        example: 'MySuperSecretPassword123'
+    required:
+      - newPassword
 
 /v1/auth/self-info:
   get:
@@ -62,7 +124,7 @@ definitions:
         content:
           application/json:
             schema:
-              $ref: '#/definitions/LoginResult'
+              $ref: '#/definitions/AuthData'
       401:
         $ref: '#/components/responses/Unauthorized'
       404:
@@ -79,7 +141,7 @@ definitions:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/Credentials'
+            $ref: '#/definitions/LoginData'
     responses:
       200:
         description: The login has succeeded, and an access token is return in a cookie.
@@ -110,6 +172,74 @@ definitions:
         description: The user has successfully logged out.
       401:
         $ref: '#/components/responses/Unauthorized'
+    security:
+      - cookieAuth: []
+
+/v1/auth/reset-password:
+  post:
+    tags: [Auth]
+    description: Reset own password
+    requestBody:
+      description: The credentials for the user and the new password.
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/ResetPasswordData'
+    responses:
+      200:
+        description: Information about the user who reset their password.
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/AuthData'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      404:
+        $ref: '#/components/responses/NotFound'
+
+/v1/auth/reset-password/{userId}:
+  post:
+    tags: [Auth]
+    description: Reset other admin's password. Only available to admins.
+    parameters:
+      - $ref: '#/definitions/UserId'
+    responses:
+      200:
+        description: Temporary password for the admin whose password was reset.
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/ResetPasswordResult'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+    security:
+      - cookieAuth: []
+
+/v1/auth/change-password:
+  post:
+    tags: [Auth]
+    description: Change own password after logging in
+    requestBody:
+      description: New password.
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/ChangePasswordData'
+    responses:
+      200:
+        description: Password changed succesfully
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
     security:
       - cookieAuth: []
 

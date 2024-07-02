@@ -25,6 +25,7 @@ export default class User extends Model<
   declare role: CreationOptional<SystemRole>;
   declare email: CreationOptional<string | null>;
   declare password: CreationOptional<string | null>;
+  declare forcePasswordReset: CreationOptional<boolean | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   static findByEmail: (email: string) => Promise<User | null>;
@@ -73,6 +74,11 @@ User.init(
     },
     password: {
       type: new DataTypes.CHAR(255),
+      allowNull: true,
+      defaultValue: null,
+    },
+    forcePasswordReset: {
+      type: DataTypes.BOOLEAN,
       allowNull: true,
       defaultValue: null,
     },

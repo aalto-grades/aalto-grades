@@ -156,7 +156,7 @@ const SubstituteNode = (
     <BaseNode {...props} error={error}>
       {substituteHandles.map((key, index) => (
         <Handle
-          key={`handle-${key}`}
+          key={key}
           type="target"
           id={key}
           style={{
@@ -181,7 +181,7 @@ const SubstituteNode = (
       />
       {exerciseHandles.map((key, index) => (
         <Handle
-          key={`handle-${key}`}
+          key={key}
           type="target"
           id={key}
           style={{
@@ -232,7 +232,7 @@ const SubstituteNode = (
             .filter(key => nodeValue.sources[key].isConnected)
             .map(key => (
               <tr
-                key={`tr-${key}`}
+                key={key}
                 style={{
                   height: rowHeight,
                   backgroundColor:
@@ -244,14 +244,12 @@ const SubstituteNode = (
                 <td>
                   {nodeValue.sources[key].value === 'fail'
                     ? nodeValue.sources[key].value
-                    : Math.round(
-                        (nodeValue.sources[key].value as number) * 100
-                      ) / 100}
+                    : Math.round(nodeValue.sources[key].value * 100) / 100}
                 </td>
                 <td>
                   {nodeValue.values[key] === 'fail'
                     ? nodeValue.values[key]
-                    : Math.round((nodeValue.values[key] as number) * 100) / 100}
+                    : Math.round(nodeValue.values[key] * 100) / 100}
                 </td>
               </tr>
             ))}
@@ -272,7 +270,7 @@ const SubstituteNode = (
             .filter(key => nodeValue.sources[key].isConnected)
             .map((key, index) => (
               <tr
-                key={`tr-${key}`}
+                key={key}
                 style={{
                   height: rowHeight,
                   backgroundColor:
@@ -288,9 +286,7 @@ const SubstituteNode = (
                 <td>
                   {nodeValue.sources[key].value === 'fail'
                     ? nodeValue.sources[key].value
-                    : Math.round(
-                        (nodeValue.sources[key].value as number) * 100
-                      ) / 100}
+                    : Math.round(nodeValue.sources[key].value * 100) / 100}
                 </td>
                 <td>
                   <input
@@ -310,7 +306,7 @@ const SubstituteNode = (
 
       {substituteHandles.map((key, index) => (
         <Handle
-          key={`handle-${key}-source`}
+          key={key}
           type="source"
           id={`${key}-source`}
           style={{
@@ -324,7 +320,7 @@ const SubstituteNode = (
       ))}
       {exerciseHandles.map((key, index) => (
         <Handle
-          key={`handle-${key}-source`}
+          key={key}
           type="source"
           id={`${key}-source`}
           style={{

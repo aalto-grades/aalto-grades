@@ -3,14 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import supertest from 'supertest';
-import {z} from 'zod';
 
 import {
-  BaseCourseDataSchema,
   CourseData,
+  CourseDataArraySchema,
+  CourseDataSchema,
   EditCourseData,
   GradingScale,
   HttpCode,
+  IdSchema,
   Language,
   NewCourseData,
   TeacherData,
@@ -71,10 +72,6 @@ afterAll(async () => {
   await resetDb();
 });
 
-const CourseSchema = BaseCourseDataSchema.strict().refine(
-  val => val.maxCredits >= val.minCredits
-);
-
 describe('Test GET /v1/courses/:courseId - get a course', () => {
   it('should get a course', async () => {
     const testCookies = [
@@ -90,7 +87,7 @@ describe('Test GET /v1/courses/:courseId - get a course', () => {
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const result = await CourseSchema.safeParseAsync(res.body);
+      const result = CourseDataSchema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   });
@@ -130,8 +127,8 @@ describe('Test GET /v1/courses - get all courses', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    const Schema = z.array(CourseSchema);
-    const result = await Schema.safeParseAsync(res.body);
+    const Schema = CourseDataArraySchema.nonempty();
+    const result = Schema.safeParse(res.body);
     expect(result.success).toBeTruthy();
   });
 
@@ -178,8 +175,7 @@ describe('Test POST /v1/courses - create new course', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Created);
 
-    const Schema = z.number().int();
-    const result = await Schema.safeParseAsync(res.body);
+    const result = IdSchema.safeParse(res.body);
     expect(result.success).toBeTruthy();
   });
 
@@ -280,8 +276,7 @@ describe('Test POST /v1/courses - create new course', () => {
   //     .set('Accept', 'application/json')
   //     .expect(HttpCode.Created);
 
-  //   const Schema = z.number().int();
-  //   const result = await Schema.safeParseAsync(res.body);
+  //   const result = IdSchema.safeParse(res.body);
   //   expect(result.success).toBeTruthy();
   // });
 });
@@ -476,8 +471,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
   //     .set('Accept', 'application/json')
   //     .expect(HttpCode.Created);
 
-  //   const Schema = z.number().int();
-  //   const result = await Schema.safeParseAsync(res.body);
+  //   const result = IdSchema.safeParse(res.body);
   //   expect(result.success).toBeTruthy();
   // });
 

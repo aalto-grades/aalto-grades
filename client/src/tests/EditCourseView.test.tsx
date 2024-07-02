@@ -28,10 +28,10 @@ describe('Tests for EditCourseView components', () => {
     renderEditCourseView();
 
     waitFor(() => {
-      expect(screen.getByLabelText('Course Code*')).toBeDefined();
-      expect(screen.getByLabelText('Course Name in English*')).toBeDefined();
-      expect(screen.getByLabelText('Course Name in Finnish*')).toBeDefined();
-      expect(screen.getByLabelText('Course Name in Swedish*')).toBeDefined();
+      expect(screen.getByLabelText('Course code*')).toBeDefined();
+      expect(screen.getByLabelText('Course name in English*')).toBeDefined();
+      expect(screen.getByLabelText('Course name in Finnish*')).toBeDefined();
+      expect(screen.getByLabelText('Course name in Swedish*')).toBeDefined();
       expect(
         screen.getByLabelText('Organizing department in English*')
       ).toBeDefined();
@@ -42,14 +42,14 @@ describe('Tests for EditCourseView components', () => {
         screen.getByLabelText('Organizing department in Swedish*')
       ).toBeDefined();
       expect(
-        screen.getByLabelText('Minimum Course Credits (ECTS)*')
+        screen.getByLabelText('Minimum course credits (ECTS)*')
       ).toBeDefined();
       expect(
-        screen.getByLabelText('Maximum Course Credits (ECTS)*')
+        screen.getByLabelText('Maximum course credits (ECTS)*')
       ).toBeDefined();
-      expect(screen.getByLabelText('Grading Scale*')).toBeInTheDocument();
+      expect(screen.getByLabelText('Grading scale*')).toBeInTheDocument();
       expect(screen.getByLabelText('Course language*')).toBeInTheDocument();
-      expect(screen.getByLabelText('Teachers In Charge*')).toBeDefined();
+      expect(screen.getByLabelText('Teachers in charge*')).toBeDefined();
       expect(screen.getAllByText('Add')[0]).toBeDefined();
       expect(screen.getByText('Save')).toBeDefined();
     });
@@ -62,10 +62,10 @@ describe('Tests for EditCourseView components', () => {
     server.use(http.put('/v1/courses/1', mockPostSuccess(addCourse, {})));
 
     const testValues = {
-      courseCode: {label: 'Course Code*', value: 'Test code'},
-      nameFi: {label: 'Course Name in Finnish*', value: 'Testi nimi'},
-      nameEn: {label: 'Course Name in English*', value: 'Test name'},
-      nameSv: {label: 'Course Name in Swedish*', value: 'Sama ruotsiksi'},
+      courseCode: {label: 'Course code*', value: 'Test code'},
+      nameFi: {label: 'Course name in Finnish*', value: 'Testi nimi'},
+      nameEn: {label: 'Course name in English*', value: 'Test name'},
+      nameSv: {label: 'Course name in Swedish*', value: 'Sama ruotsiksi'},
       departmentFi: {
         label: 'Organizing department in Finnish*',
         value: 'Laitos xxx',
@@ -79,11 +79,11 @@ describe('Tests for EditCourseView components', () => {
         value: 'samma på svenska',
       },
       minCredits: {
-        label: 'Minimum Course Credits (ECTS)*',
+        label: 'Minimum course credits (ECTS)*',
         value: 3,
       },
       maxCredits: {
-        label: 'Maximum Course Credits (ECTS)*',
+        label: 'Maximum course credits (ECTS)*',
         value: 5,
       },
     };
@@ -96,7 +96,7 @@ describe('Tests for EditCourseView components', () => {
       }
 
       await userEvent.type(
-        screen.getByLabelText('Teachers In Charge*'),
+        screen.getByLabelText('Teachers in charge*'),
         testTeacher
       );
       await userEvent.click(screen.getAllByText('Add')[0]);

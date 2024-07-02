@@ -10,49 +10,54 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@mui/material';
+import {enqueueSnackbar} from 'notistack';
 import {JSX} from 'react';
 
+import {UserData} from '@/common/types';
+import {useDeleteUser} from '../../../hooks/useApi';
+
 type PropsType = {
-  title: string;
-  handleAccept: (id: number) => void;
-  handleClose: () => void;
-  description: string;
   open: boolean;
-  userId: number | null;
+  onClose: () => void;
+  user: UserData | null;
 };
-const DeleteUserDialog = ({
-  title,
-  description,
-  handleAccept,
-  handleClose,
-  open,
-  userId,
-}: PropsType): JSX.Element => (
-  <Dialog
-    open={open}
-    onClose={handleClose}
-    aria-labelledby="alert-dialog-title"
-    aria-describedby="alert-dialog-description"
-  >
-    <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
-    <DialogContent>
-      <DialogContentText id="alert-dialog-description">
-        {description}
-      </DialogContentText>
-    </DialogContent>
-    <DialogActions>
-      <Button onClick={handleClose}>Cancel</Button>
-      <Button
-        onClick={() => {
-          if (userId !== null) handleAccept(userId);
-          else console.error('UserId was null');
-        }}
-        autoFocus
-      >
-        Delete
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
+const DeleteUserDialog = ({open, onClose, user}: PropsType): JSX.Element => {
+  const deleteUser = useDeleteUser();
+
+  const handleDelete = async (id: number): Promise<void> => {
+    await deleteUser.mutateAsync(id);
+    enqueueSnackbar('User deleted successfully', {variant: 'success'});
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="xs"
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle id="alert-dialog-title">Delete user</DialogTitle>
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description">
+          Do you want to delete this user?
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button
+          variant="contained"
+          onClick={async () => {
+            await handleDelete(user!.id);
+            onClose();
+          }}
+        >
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 export default DeleteUserDialog;
