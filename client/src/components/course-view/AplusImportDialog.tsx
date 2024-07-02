@@ -54,8 +54,15 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
     setAplusTokenDialogOpen(!getAplusToken() || aplusGrades.isError);
   }, [aplusGrades]);
 
+  const handleResetAndClose = (): void => {
+    setStep(0);
+    setCoursePartIds([]);
+    setAplusTokenDialogOpen(false);
+    handleClose();
+  };
+
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleResetAndClose}>
       {step === 0 && <DialogTitle>Select course parts</DialogTitle>}
       {step === 1 && <DialogTitle>Fetching grades</DialogTitle>}
       <DialogContent>
@@ -92,7 +99,7 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
         {step === 1 && (
           <>
             <AplusTokenDialog
-              handleClose={() => setAplusTokenDialogOpen(false)}
+              handleClose={handleResetAndClose}
               handleSubmit={() => {
                 setAplusTokenDialogOpen(false);
                 aplusGrades.refetch();
@@ -112,7 +119,9 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
           <Button
             onClick={() => {
               setStep(1);
-              aplusGrades.refetch();
+              if (getAplusToken()) {
+                aplusGrades.refetch();
+              }
             }}
             disabled={coursePartIds.length === 0}
           >
