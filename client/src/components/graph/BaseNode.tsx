@@ -13,7 +13,7 @@ import {
 } from '../../context/GraphProvider';
 
 type PropsType = PropsWithChildren<
-  NodeProps<{onDelete: (nodeId: string) => void}> & {
+  NodeProps & {
     error?: boolean;
     courseFail?: boolean;
   }
