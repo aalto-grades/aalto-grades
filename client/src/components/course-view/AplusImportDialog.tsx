@@ -21,7 +21,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import {JSX, useEffect, useState} from 'react';
+import {ChangeEvent, JSX, useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
 import {
@@ -62,6 +62,16 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
     }
   }, [aplusGrades]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleSelect = (
+    event: ChangeEvent<HTMLInputElement>,
+    coursePartId: number
+  ): void =>
+    setCoursePartIds(
+      event.target.checked
+        ? [...coursePartIds, coursePartId]
+        : coursePartIds.filter(id => id !== coursePartId)
+    );
+
   const handleResetAndClose = (): void => {
     setStep(0);
     setCoursePartIds([]);
@@ -88,15 +98,7 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
                     <FormControlLabel
                       control={
                         <Checkbox
-                          onChange={e =>
-                            setCoursePartIds(
-                              e.target.checked
-                                ? [...coursePartIds, coursePart.id]
-                                : coursePartIds.filter(
-                                    id => id !== coursePart.id
-                                  )
-                            )
-                          }
+                          onChange={e => handleSelect(e, coursePart.id)}
                         />
                       }
                       label={coursePart.name}
