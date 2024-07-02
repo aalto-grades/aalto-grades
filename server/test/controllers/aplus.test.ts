@@ -394,14 +394,14 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
       for (const withModuleId of [true, false]) {
         for (const withExerciseId of [true, false]) {
           for (const withDifficulty of [true, false]) {
-            if (
-              !valid.includes([
-                sourceType,
-                withModuleId,
-                withExerciseId,
-                withDifficulty,
-              ])
-            ) {
+            const format = [
+              sourceType,
+              withModuleId,
+              withExerciseId,
+              withDifficulty,
+            ];
+
+            if (!valid.find(v => v.every((_, i) => v[i] === format[i]))) {
               await responseTests
                 .testBadRequest(url, cookies.adminCookie)
                 .post([
