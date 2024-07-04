@@ -79,14 +79,21 @@ export const useAddAplusGradeSources = (
 
 export const useFetchAplusGrades = (
   courseId: Numeric,
+  coursePartIds: number[],
   options?: Partial<UseQueryOptions<NewGrade[]>>
 ): UseQueryResult<NewGrade[]> =>
   useQuery({
     queryKey: ['a+-grades', courseId],
     queryFn: async () =>
       NewGradeArraySchema.parse(
-        (await axios.get(`/v1/courses/${courseId}/aplus-fetch`, getHeaders()))
-          .data
+        (
+          await axios.get(
+            `/v1/courses/${courseId}/aplus-fetch?course-parts=${JSON.stringify(
+              coursePartIds
+            )}`,
+            getHeaders()
+          )
+        ).data
       ),
     ...options,
   });

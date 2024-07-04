@@ -13,6 +13,7 @@ const config: Config = {
   moduleNameMapper: {
     '^@/common/(.*)$': '<rootDir>/build/common/$1',
   },
+  reporters: ['default', ['github-actions', {silent: false}], 'summary'],
 };
 
 export default config;

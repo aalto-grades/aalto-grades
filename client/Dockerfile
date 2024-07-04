@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 # Build stage
-FROM node:18-alpine as build
+FROM node:18-alpine AS build
 
 WORKDIR /app
 RUN mkdir common client
@@ -31,7 +31,7 @@ COPY client/src ./src
 RUN npm run build
 
 # Run stage
-FROM nginx:1.23.3-alpine as run
+FROM nginx:1.23.3-alpine AS run
 
 COPY --from=build /app/client/build /user/share/nginx/html
 COPY client/nginx.conf /etc/nginx/conf.d/default.conf

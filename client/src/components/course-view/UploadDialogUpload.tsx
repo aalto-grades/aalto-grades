@@ -28,6 +28,7 @@ import {enqueueSnackbar} from 'notistack';
 import {ParseResult, parse, unparse} from 'papaparse';
 import {Dispatch, JSX, SetStateAction, useEffect, useState} from 'react';
 
+import AplusImportDialog from './AplusImportDialog';
 import {GradeUploadColTypes} from './UploadDialog';
 import MismatchDialog, {MismatchData} from './UploadDialogMismatchDialog';
 
@@ -59,6 +60,8 @@ const UploadDialogUpload = ({
   } | null>(null);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
+  const [aplusImportDialogOpen, setAplusImportDialogOpen] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (error || editing) setReady(false);
@@ -231,6 +234,11 @@ const UploadDialogUpload = ({
         }
       />
 
+      <AplusImportDialog
+        handleClose={() => setAplusImportDialogOpen(false)}
+        open={aplusImportDialogOpen}
+      />
+
       <DialogContent sx={{minHeight: 500}}>
         <Snackbar
           open={snackbar !== null}
@@ -269,7 +277,12 @@ const UploadDialogUpload = ({
               <Button variant="outlined" onClick={downloadTemplate}>
                 Download CSV template
               </Button>
-              <Button variant="outlined">Import from SISU</Button>
+              <Button
+                variant="outlined"
+                onClick={() => setAplusImportDialogOpen(true)}
+              >
+                Import from A+
+              </Button>
               <Button variant="outlined">Import from MyCourses</Button>
               <Button variant="outlined" onClick={() => setTextFieldOpen(true)}>
                 Paste text

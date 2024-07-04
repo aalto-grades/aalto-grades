@@ -169,7 +169,6 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
             setExpanded={setConfirmExpanded}
           />
         )}
-
         <DialogActions>
           {currentStep === 1 && (
             <Button
