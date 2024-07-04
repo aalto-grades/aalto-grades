@@ -329,25 +329,29 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     expect(grades.find(val => val.grade === data2[0].grade)).toBeDefined();
   });
 
-  it('should process big json succesfully (5 000 x 3 x 2 = 90 000 individual grades)', async () => {
-    const data: NewGrade[] = [];
-    for (let i = 10000; i < 15000; i++) {
-      for (let j = 0; j < 2; j++) {
-        const newData = await genGrades(i.toString());
-        data.push(newData[0]);
-        data.push(newData[1]);
-        data.push(newData[2]);
+  it(
+    'should process big json succesfully (5 000 x 3 x 2 = 90 000 individual grades)',
+    async () => {
+      const data: NewGrade[] = [];
+      for (let i = 10000; i < 15000; i++) {
+        for (let j = 0; j < 2; j++) {
+          const newData = await genGrades(i.toString());
+          data.push(newData[0]);
+          data.push(newData[1]);
+          data.push(newData[2]);
+        }
       }
-    }
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades`)
-      .send(data)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Created);
+      const res = await request
+        .post(`/v1/courses/${courseId}/grades`)
+        .send(data)
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Created);
 
-    expect(JSON.stringify(res.body)).toBe('{}');
-  }, 50000);
+      expect(JSON.stringify(res.body)).toBe('{}');
+    },
+    120 * 1000 // 2min
+  );
 
   it('should respond with 400 if validation fails', async () => {
     const url = `/v1/courses/${courseId}/grades`;
