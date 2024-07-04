@@ -2,11 +2,17 @@
 #
 # SPDX-License-Identifier: MIT
 
-.DS_Store
+# Dependencies
 node_modules
-robot-tests/output/*
+.pnp
+.pnp.js
+
+# Random files
+.DS_Store
 *.key
 *.crt
+*.cet
+*.pem
 
 # Emacs files
 .dir-locals.el
