@@ -4,3 +4,9 @@
 
 /build
 /.vitest-preview
+
+# Vite extra env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

@@ -368,7 +368,6 @@ export const getLatestGrades = async (
   for (const userId of missingStudents) {
     latestItems.push({userId: userId, date: null});
   }
-  console.log(latestItems);
 
   res.json(latestItems);
 };
