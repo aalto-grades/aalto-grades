@@ -78,7 +78,7 @@ const httpLogger: winston.Logger = winston.createLogger({
     error: 0,
     warn: 1,
     info: 2,
-    http: 3,
+    http: 3, // HTTP logs
     debug: 4,
   },
   format,
@@ -96,7 +96,7 @@ export const dbLogger: winston.Logger = winston.createLogger({
     error: 0,
     warn: 1,
     info: 2,
-    verbose: 3,
+    verbose: 3, // DB logs
     debug: 4,
   },
   format,

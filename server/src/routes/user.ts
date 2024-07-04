@@ -19,35 +19,30 @@ import {
 import {handleInvalidRequestJson} from '../middleware';
 import {authorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
-import {authLogger} from '../middleware/requestLogger';
 
 export const router = Router();
 
 router.get(
   '/v1/users/own-courses',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   controllerDispatcher(getOwnCourses)
 );
 
 router.get(
   '/v1/users/:userId/courses/',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   controllerDispatcher(getCoursesOfUser)
 );
 
 router.get(
   '/v1/users/students',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   controllerDispatcher(getStudents)
 );
 
 router.get(
   '/v1/users',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   authorization([SystemRole.Admin]),
   controllerDispatcher(getUsers)
 );
@@ -55,10 +50,9 @@ router.get(
 router.post(
   '/v1/users',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  authLogger,
-  authorization([SystemRole.Admin]),
   processRequestBody(NewUserSchema),
   controllerDispatcher(addUser)
 );
@@ -66,7 +60,6 @@ router.post(
 router.delete(
   '/v1/users/:userId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   authorization([SystemRole.Admin]),
   controllerDispatcher(deleteUser)
 );
@@ -74,10 +67,9 @@ router.delete(
 router.post(
   '/v1/users/delete',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  authLogger,
-  authorization([SystemRole.Admin]),
   validateRequestBody(UserIdArraySchema),
   controllerDispatcher(deleteUsers)
 );

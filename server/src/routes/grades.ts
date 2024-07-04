@@ -25,14 +25,12 @@ import {
 import {handleInvalidRequestJson} from '../middleware';
 import {authorization, courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
-import {authLogger} from '../middleware/requestLogger';
 
 export const router = Router();
 
 router.get(
   '/v1/courses/:courseId/grades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(getGrades)
 );
@@ -40,10 +38,9 @@ router.get(
 router.post(
   '/v1/courses/:courseId/grades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   express.json({limit: '25mb'}),
   handleInvalidRequestJson,
-  authLogger,
-  courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   processRequestBody(NewGradeArraySchema),
   controllerDispatcher(addGrades)
 );
@@ -51,10 +48,9 @@ router.post(
 router.put(
   '/v1/courses/:courseId/grades/:gradeId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   express.json(),
   handleInvalidRequestJson,
-  authLogger,
-  courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   processRequestBody(EditGradeDataSchema),
   controllerDispatcher(editGrade)
 );
@@ -62,7 +58,6 @@ router.put(
 router.delete(
   '/v1/courses/:courseId/grades/:gradeId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(deleteGrade)
 );
@@ -71,10 +66,9 @@ router.delete(
 router.post(
   '/v1/latest-grades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  authLogger,
-  authorization([SystemRole.Admin]),
   processRequestBody(UserIdArraySchema),
   controllerDispatcher(getLatestGrades)
 );
@@ -83,10 +77,9 @@ router.post(
 router.post(
   '/v1/courses/:courseId/grades/csv/sisu',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([CourseRoleType.Teacher]),
   express.json({limit: '10mb'}),
   handleInvalidRequestJson,
-  authLogger,
-  courseAuthorization([CourseRoleType.Teacher]),
   processRequestBody(SisuCsvUploadSchema),
   controllerDispatcher(getSisuFormattedGradingCSV)
 );

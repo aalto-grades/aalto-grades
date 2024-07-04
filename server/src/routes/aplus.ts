@@ -16,31 +16,27 @@ import {
 import {handleInvalidRequestJson} from '../middleware';
 import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
-import {authLogger} from '../middleware/requestLogger';
 
 export const router = Router();
 
 router.get(
   '/v1/aplus/courses',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   controllerDispatcher(fetchAplusCourses)
 );
 
 router.get(
   '/v1/aplus/courses/:aplusCourseId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   controllerDispatcher(fetchAplusExerciseData)
 );
 
 router.post(
   '/v1/courses/:courseId/aplus-source',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
-  authLogger,
-  courseAuthorization([CourseRoleType.Teacher]),
   processRequestBody(NewAplusGradeSourceArraySchema),
   controllerDispatcher(addAplusGradeSources)
 );
@@ -48,7 +44,6 @@ router.post(
 router.get(
   '/v1/courses/:courseId/aplus-fetch',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   courseAuthorization([CourseRoleType.Teacher]),
   controllerDispatcher(fetchAplusGrades)
 );

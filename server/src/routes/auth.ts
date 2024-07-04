@@ -27,14 +27,12 @@ import {handleInvalidRequestJson} from '../middleware';
 import {authorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {rateLimiterMemoryMiddleware} from '../middleware/rateLimiterMemory';
-import {authLogger} from '../middleware/requestLogger';
 
 export const router = Router();
 
 router.get(
   '/v1/auth/self-info',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   controllerDispatcher(selfInfo)
 );
 
@@ -51,7 +49,6 @@ router.post(
 router.post(
   '/v1/auth/logout',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   authLogout
 );
 
@@ -61,13 +58,13 @@ router.post(
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(ResetPasswordDataSchema),
+  rateLimiterMemoryMiddleware,
   authResetOwnPassword
 );
 
 router.post(
   '/v1/auth/reset-password/:userId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   authorization([SystemRole.Admin]),
   controllerDispatcher(resetPassword)
 );
@@ -78,7 +75,6 @@ router.post(
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  authLogger,
   processRequestBody(ChangePasswordDataSchema),
   controllerDispatcher(changePassword)
 );

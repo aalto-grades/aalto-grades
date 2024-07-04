@@ -21,14 +21,12 @@ import {
 import {handleInvalidRequestJson} from '../middleware';
 import {authorization, courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
-import {authLogger} from '../middleware/requestLogger';
 
 export const router = Router();
 
 router.get(
   '/v1/courses/:courseId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   courseAuthorization([
     CourseRoleType.Teacher,
     CourseRoleType.Assistant,
@@ -40,7 +38,6 @@ router.get(
 router.get(
   '/v1/courses',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogger,
   authorization([SystemRole.Admin]),
   controllerDispatcher(getAllCourses)
 );
@@ -48,10 +45,9 @@ router.get(
 router.post(
   '/v1/courses',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  authLogger,
-  authorization([SystemRole.Admin]),
   processRequestBody(NewCourseDataSchema),
   controllerDispatcher(addCourse)
 );
@@ -59,10 +55,9 @@ router.post(
 router.put(
   '/v1/courses/:courseId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
-  authLogger,
-  courseAuthorization([CourseRoleType.Teacher]),
   processRequestBody(EditCourseDataSchema),
   controllerDispatcher(editCourse)
 );

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {RequestHandler} from 'express';
+import {Request, RequestHandler} from 'express';
 import morgan from 'morgan';
 
 import httpLogger from '../configs/winston';
@@ -29,28 +29,19 @@ morgan.token('remote-addr', req => {
  * allowing for uniformity in log handling, and enabling any additional
  * configurations (like file logging) made in winston.
  */
+
+morgan.token('user', (req: Request & {user: JwtClaims | undefined}) =>
+  req.user === undefined ? 'undefined' : `${req.user.id} ${req.user.role}`
+);
+morgan.token('params', (req: Request) => JSON.stringify(req.params));
+morgan.token('data', (req: Request) => JSON.stringify(req.body));
+
 export const requestLogger: RequestHandler = morgan(
   ':remote-addr :remote-user ":method :url HTTP/:http-version"' +
-    ' :status :res[content-length] ":referrer" ":user-agent"',
+    ' :status :res[content-length] ":referrer" ":user-agent" ":user" ":params" ":data"',
   {
     stream: {
       write: (message: string) => httpLogger.http(message.trim()),
     },
   }
 );
-
-/**
- * Log auth info with more details about request. Use after
- * passport.authenticate and express.json but before authorization and
- * processRequestBody
- */
-export const authLogger: RequestHandler = (req, res, next) => {
-  const params = JSON.stringify(req.params);
-  const query = JSON.stringify(req.query);
-  const body = JSON.stringify(req.body ?? {});
-  const user = req.user as JwtClaims;
-  httpLogger.http(
-    `${user.id} ${user.role} ${req.method} ${req.url} ${params} ${query} ${body}`
-  );
-  next();
-};
