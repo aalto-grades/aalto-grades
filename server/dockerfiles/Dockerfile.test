@@ -37,4 +37,4 @@ CMD ["/bin/sh", "-c", "\
     sleep 5s && \
     npm run migration:up && \
     npm run seed:up && \
-    npm test"]
+    npm run citest"]
