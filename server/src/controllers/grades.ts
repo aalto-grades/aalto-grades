@@ -31,7 +31,7 @@ import {
   studentNumbersExist,
   validateUserAndGrader,
 } from './utils/grades';
-import logger from '../configs/winston';
+import httpLogger from '../configs/winston';
 import {sequelize} from '../database';
 import AplusGradeSource from '../database/models/aplusGradeSource';
 import AttainmentGrade from '../database/models/attainmentGrade';
@@ -368,7 +368,6 @@ export const getLatestGrades = async (
   for (const userId of missingStudents) {
     latestItems.push({userId: userId, date: null});
   }
-  console.log(latestItems);
 
   res.json(latestItems);
 };
@@ -414,7 +413,7 @@ export const getSisuFormattedGradingCSV = async (
 
   for (const finalGrade of finalGrades) {
     if (finalGrade.User === undefined) {
-      logger.error(
+      httpLogger.error(
         `Final grade ${finalGrade.id} user was undefined even though student nubmers were validated`
       );
       throw new ApiError(
@@ -423,7 +422,7 @@ export const getSisuFormattedGradingCSV = async (
       );
     }
     if (finalGrade.User.studentNumber === null) {
-      logger.error(
+      httpLogger.error(
         `Final grade ${finalGrade.id} user student number was null even though student nubmers were validated`
       );
       throw new ApiError(
@@ -467,7 +466,7 @@ export const getSisuFormattedGradingCSV = async (
       );
       if (existingCourseResult === undefined) {
         // Should pretty much never happen
-        logger.error("Couldn't find duplicate final grade again");
+        httpLogger.error("Couldn't find duplicate final grade again");
         throw new ApiError(
           "Couldn't find duplicate final grade again",
           HttpCode.InternalServerError
