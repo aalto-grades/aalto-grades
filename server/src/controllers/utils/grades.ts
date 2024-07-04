@@ -7,7 +7,7 @@ import {Includeable, Op} from 'sequelize';
 import {HttpCode} from '@/common/types';
 import {findAndValidateCourseId, findCourseById} from './course';
 import {findCoursePartById} from './coursePart';
-import logger from '../../configs/winston';
+import httpLogger from '../../configs/winston';
 import AttainmentGrade from '../../database/models/attainmentGrade';
 import Course from '../../database/models/course';
 import CoursePart from '../../database/models/coursePart';
@@ -182,7 +182,7 @@ export const validateUserAndGrader = (
   const gradeType = grade instanceof AttainmentGrade ? 'grade' : 'final grade';
 
   if (grade.User === undefined) {
-    logger.error(`Found a ${gradeType} ${grade.id} with no user`);
+    httpLogger.error(`Found a ${gradeType} ${grade.id} with no user`);
     throw new ApiError(
       `Found a ${gradeType} with no user`,
       HttpCode.InternalServerError
@@ -190,7 +190,7 @@ export const validateUserAndGrader = (
   }
 
   if (grade.User.studentNumber === null) {
-    logger.error(
+    httpLogger.error(
       `Found a ${gradeType} ${grade.id} where user ${grade.User.id} studentNumber was null`
     );
     throw new ApiError(
@@ -200,7 +200,7 @@ export const validateUserAndGrader = (
   }
 
   if (grade.grader === undefined) {
-    logger.error(`Found a ${gradeType} ${grade.id} with no grader`);
+    httpLogger.error(`Found a ${gradeType} ${grade.id} with no grader`);
     throw new ApiError(
       `Found a ${gradeType} with no grader`,
       HttpCode.InternalServerError
@@ -208,7 +208,7 @@ export const validateUserAndGrader = (
   }
 
   if (grade.grader.name === null) {
-    logger.error(
+    httpLogger.error(
       `Found a ${gradeType} ${grade.id} where grader ${grade.grader.id} name is null`
     );
     throw new ApiError(

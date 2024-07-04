@@ -22,8 +22,7 @@ rules:
   comments:
     level: warning
     min-spaces-from-content: 1
-  comments-indentation:
-    level: warning
+  comments-indentation: disable # Lots of false positives
   document-end: disable
   document-start:
     level: warning

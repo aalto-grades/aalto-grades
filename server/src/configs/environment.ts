@@ -4,17 +4,25 @@
 
 // This file reads all environment variables and defines their values as constants.
 
-// Config dotenv so environment variables are also accessible from .env file.
 import * as dotenv from 'dotenv';
-dotenv.config();
 import {readFileSync} from 'fs';
 
-import logger from './winston';
+// Config dotenv so environment variables are also accessible from .env file.
+dotenv.config();
+
+type NodeEnv = 'test' | 'development' | 'production';
+export const NODE_ENV: NodeEnv =
+  (process.env.NODE_ENV as NodeEnv | undefined) ?? 'development';
+if (!['test', 'development', 'production'].includes(NODE_ENV)) {
+  throw new Error(
+    `Invalid NODE_ENV '${NODE_ENV}'. Possible values are 'test', 'development', and 'production'`
+  );
+}
+
+import httpLogger from './winston'; // The logger needs NODE_ENV to be defined
 
 const parsedPort: number = Number(process.env.AALTO_GRADES_BACKEND_PORT);
 export const PORT: number = isNaN(parsedPort) ? 3000 : parsedPort;
-
-export const NODE_ENV: string = process.env.NODE_ENV ?? 'development';
 
 export const JWT_SECRET: string =
   process.env.AALTO_GRADES_JWT_SECRET || 'TOP_SECRET';
@@ -28,7 +36,7 @@ if (JWT_SECRET === 'TOP_SECRET' && NODE_ENV !== 'test') {
       'AALTO_GRADES_JWT_SECRET must be defined for the production environment!'
     );
   } else {
-    logger.warn(
+    httpLogger.warn(
       'No AALTO_GRADES_JWT_SECRET specified, using default value. Do not do this in production.'
     );
   }
@@ -64,7 +72,7 @@ try {
   );
 } catch (err: unknown) {
   if (NODE_ENV === 'production') throw err as Error;
-  logger.warn('SAML Private keys not read: ' + (err as Error).message);
+  httpLogger.warn('SAML Private keys not read: ' + (err as Error).message);
 }
 
 export {SAML_ENCRYPT_PVK, SAML_PRIVATE_KEY};

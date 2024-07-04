@@ -28,7 +28,7 @@ import {getSamlStrategy} from './utils/saml';
 import {findAndValidateUserId, findUserById} from './utils/user';
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
 import {JWT_SECRET, NODE_ENV, SAML_SP_CERT_PATH} from '../configs/environment';
-import logger from '../configs/winston';
+import httpLogger from '../configs/winston';
 import User from '../database/models/user';
 import {ApiError, FullLoginResult, JwtClaims} from '../types';
 
@@ -42,7 +42,7 @@ export const selfInfo = async (req: Request, res: Response): Promise<void> => {
   const userFromDb = await findUserById(user.id);
 
   if (userFromDb.name === null) {
-    logger.error(`Logged in user ${userFromDb.id} does not have a name`);
+    httpLogger.error(`Logged in user ${userFromDb.id} does not have a name`);
     throw new ApiError(
       'Logged in user does not have a name',
       HttpCode.InternalServerError
@@ -163,7 +163,7 @@ export const authResetOwnPassword = (
 
           const user = await User.findByEmail(req.body.email);
           if (user === null) {
-            logger.error(
+            httpLogger.error(
               `User ${req.body.email} not found after validating credentials`
             );
             throw new ApiError(
@@ -254,7 +254,7 @@ export const changePassword = async (
 
   const dbUser = await User.findByPk(user.id);
   if (dbUser === null) {
-    logger.error(`User ${user.id} not found after validating credentials`);
+    httpLogger.error(`User ${user.id} not found after validating credentials`);
     throw new ApiError(
       'User not found after validating credentials',
       HttpCode.InternalServerError

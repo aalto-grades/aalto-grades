@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM nginx:1.23.3-alpine
+FROM nginx:1.27-alpine
 EXPOSE 80
 
 ARG CERT_LOCATION
