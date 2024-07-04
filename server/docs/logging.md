@@ -28,6 +28,7 @@ While running, the application will log:
 - Server errors that are unhandled
 - Server exceptions that are handled, defined in middleware/controllers
 - Some database logs including all database queries
+- All calls to A+
 - All http requests, in the format:
 
   ```
