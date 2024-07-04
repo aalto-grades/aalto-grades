@@ -27,6 +27,9 @@ While running, the application will log:
 
 - Server errors that are unhandled
 - Server exceptions that are handled, defined in middleware/controllers
-- All http requests, in the format: ':remote-addr :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'
-- All http requests that have authentication, in the format 'userId userSystemRole method url params query body'
-- Database queries
+- Some database logs including all database queries
+- All http requests, in the format:
+
+  ```
+   :remote-addr :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":user" ":params" ":body"
+  ```

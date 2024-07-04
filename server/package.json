@@ -46,7 +46,6 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "winston": "^3.10.0",
-    "winston-daily-rotate-file": "^5.0.0",
     "winston-syslog": "^2.7.0",
     "xmldom": "^0.6.0",
     "xpath": "^0.0.34",

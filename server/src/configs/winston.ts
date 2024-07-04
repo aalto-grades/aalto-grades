@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import winston from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
 
 import {NODE_ENV} from './environment';
 
@@ -17,34 +16,6 @@ const colors: winston.config.AbstractConfigSetColors = {
 };
 
 winston.addColors(colors);
-
-const httpFileTransport: DailyRotateFile = new DailyRotateFile({
-  filename: 'logs/http-%DATE%.log',
-  datePattern: 'YYYY-MM-DD-HH',
-  level: 'http',
-  zippedArchive: true,
-  handleExceptions: true,
-  maxSize: '5m',
-  maxFiles: '3d',
-});
-const dbFileTransport: DailyRotateFile = new DailyRotateFile({
-  filename: 'logs/database-%DATE%.log',
-  datePattern: 'YYYY-MM-DD-HH',
-  level: 'verbose',
-  zippedArchive: true,
-  handleExceptions: true,
-  maxSize: '5m',
-  maxFiles: '3d',
-});
-
-httpFileTransport.on('error', error => {
-  // TODO: Handle error
-  throw error;
-});
-dbFileTransport.on('error', error => {
-  // TODO: Handle error
-  throw error;
-});
 
 const baseFormat = winston.format.combine(
   winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),
@@ -62,11 +33,16 @@ const format =
       );
 
 /**
- * Set up a Winston logger to log all output to the console and errors to
- * separate log files in the ./logs directory. More information about logger
- * transports (for streaming logs automatically to a database, log managers,
- * etc.): https://github.com/winstonjs/winston/blob/master/docs/transports.md
+ * Set up a Winston logger to log all output to the console. More information
+ * about logger transports (for streaming logs automatically to a database, log
+ * managers, etc.):
+ * https://github.com/winstonjs/winston/blob/master/docs/transports.md
+ *
+ * Currently both loggers log to the cli indentically but some separation might
+ * be added later
  */
+
+/** Logger for http logs */
 const httpLogger: winston.Logger = winston.createLogger({
   level:
     NODE_ENV === 'production'
@@ -82,9 +58,10 @@ const httpLogger: winston.Logger = winston.createLogger({
     debug: 4,
   },
   format,
-  transports: [new winston.transports.Console(), httpFileTransport],
+  transports: [new winston.transports.Console()],
 });
 
+/** Logger for db logs */
 export const dbLogger: winston.Logger = winston.createLogger({
   level:
     NODE_ENV === 'production'
@@ -100,7 +77,7 @@ export const dbLogger: winston.Logger = winston.createLogger({
     debug: 4,
   },
   format,
-  transports: [new winston.transports.Console(), dbFileTransport],
+  transports: [new winston.transports.Console()],
 });
 
 export default httpLogger;
