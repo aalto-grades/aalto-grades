@@ -6,11 +6,10 @@ SPDX-License-Identifier: MIT
 
 ## Logging
 
-The server handles logging using [Winston](https://github.com/winstonjs/winston) for handling and formatting logs and [Morgan](https://github.com/expressjs/morgan) for logging http requests. There are two separate winston loggers, one for http logs and another for db logs. They save files using daily rotation to `logs/http-DATE.log` & `logs/database-DATE.log`.
+The server handles logging using [Winston](https://github.com/winstonjs/winston) for handling and formatting logs and [Morgan](https://github.com/expressjs/morgan) for logging http requests. There are two separate winston loggers, one for http logs and another for db logs. Currently both of them output to the cli.
 
-[Winston Configuration](/server/src/configs/winston.ts)
-
-[Morgan Configuration](/server/src/middleware/requestLogger.ts)
+- [Winston Configuration](/server/src/configs/winston.ts)
+- [Morgan Configuration](/server/src/middleware/requestLogger.ts)
 
 ### Syslog
 
@@ -32,5 +31,5 @@ While running, the application will log:
 - All http requests, in the format:
 
   ```
-   :remote-addr :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":user" ":params" ":body"
+  :remote-addr :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":user" ":params" ":body"
   ```
