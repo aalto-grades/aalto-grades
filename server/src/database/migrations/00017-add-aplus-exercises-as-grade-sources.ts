@@ -56,6 +56,12 @@ export default {
         transaction,
       });
 
+      await queryInterface.bulkDelete(
+        'aplus_grade_source',
+        {source_type: 'EXERCISE'},
+        {transaction}
+      );
+
       await queryInterface.changeColumn(
         'aplus_grade_source',
         'source_type',
@@ -68,7 +74,6 @@ export default {
         {transaction}
       );
 
-      // We may also want to delete rows which use the EXERCISE source type?
       await queryInterface.changeColumn(
         'aplus_grade_source',
         'source_type',
