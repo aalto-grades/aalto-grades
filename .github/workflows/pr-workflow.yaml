@@ -51,12 +51,12 @@ jobs:
         with:
           node-version: '18'
       - name: Docker compose down
-        run: docker-compose -f docker-compose-test.yaml down --volumes --remove-orphans
+        run: docker compose -f docker-compose-test.yaml down --volumes --remove-orphans
       - name: Docker compose build
-        run: docker-compose -f docker-compose-test.yaml build --no-cache
+        run: docker compose -f docker-compose-test.yaml build --no-cache
       - name: Run tests
         run: >
-          docker-compose -f docker-compose-test.yaml up
+          docker compose -f docker-compose-test.yaml up
           --attach backend --no-log-prefix
           --abort-on-container-exit --exit-code-from backend
       - name: Install dependencies
