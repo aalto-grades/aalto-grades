@@ -37,13 +37,13 @@ services:
     extends:
       file: ./common-services.yaml
       service: backend-minimum
+    build:
+      context: .
+      dockerfile: ./server/dockerfiles/Dockerfile.prod.run.dev
       args:
         SAML_DECRYPTION_PVK_FILE: "${SAML_DECRYPTION_PVK_FILE}"
         SAML_PRIVATE_KEY_FILE: "${SAML_PRIVATE_KEY_FILE}"
         SAML_SP_CERT_FILE: "${SAML_SP_CERT_FILE}"
-    build:
-      context: .
-      dockerfile: ./server/dockerfiles/Dockerfile.prod.run.dev
     container_name: backend-server
     environment:
       AALTO_GRADES_BACKEND_PORT: "${AALTO_GRADES_BACKEND_PORT}"
