@@ -53,6 +53,7 @@ export default defineConfig({
   //   },
   esbuild: {
     loader: 'tsx', // Or 'jsx' if you're not using TypeScript
+    pure: ['console.log'],
   },
   optimizeDeps: {
     include: ['common'],
