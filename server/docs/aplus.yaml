@@ -22,6 +22,15 @@ definitions:
     type: string
     description: Name of the module.
     example: Round 1
+  AplusExerciseId:
+    type: integer
+    description: The ID of an exercise in A+.
+    format: int32
+    example: 1
+  AplusExerciseName:
+    type: string
+    description: Name of the exercise.
+    example: 1.1 Feedback
   AplusDifficulty:
     type: string
     description: The name or identifier of a difficulty level in A+.
@@ -72,9 +81,22 @@ definitions:
               $ref: '#/definitions/AplusModuleId'
             name:
               $ref: '#/definitions/AplusModuleName'
+            exercises:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    $ref: '#/definitions/AplusExerciseId'
+                  name:
+                    $ref: '#/definitions/AplusExerciseName'
+                required:
+                  - id
+                  - name
           required:
             - id
             - name
+            - exercises
       difficulties:
         type: array
         items:
@@ -97,6 +119,10 @@ definitions:
         $ref: '#/definitions/AplusModuleId'
       moduleName:
         $ref: '#/definitions/AplusModuleName'
+      exerciseId:
+        $ref: '#/definitions/AplusExerciseId'
+      exerciseName:
+        $ref: '#/definitions/AplusExerciseName'
       difficulty:
         $ref: '#/definitions/AplusDifficulty'
     required:
@@ -118,6 +144,10 @@ definitions:
         $ref: '#/definitions/AplusModuleId'
       moduleName:
         $ref: '#/definitions/AplusModuleName'
+      exerciseId:
+        $ref: '#/definitions/AplusExerciseId'
+      exerciseName:
+        $ref: '#/definitions/AplusExerciseName'
       difficulty:
         $ref: '#/definitions/AplusDifficulty'
     required:
