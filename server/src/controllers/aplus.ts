@@ -126,7 +126,7 @@ export const addAplusGradeSources = async (
 /**
  * Responds with NewGrade[]
  *
- * @throws ApiError(400|404|409|422|502)
+ * @throws ApiError(400|404|409|502)
  */
 export const fetchAplusGrades = async (
   req: Request,
