@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-export type APlusCoursesRes = {
+export type AplusCoursesRes = {
   staff_courses: {
     id: number;
     code: string;
@@ -12,7 +12,7 @@ export type APlusCoursesRes = {
   }[];
 };
 
-export type APlusExercisesRes = {
+export type AplusExercisesRes = {
   results: {
     id: number;
     display_name: string;
@@ -24,7 +24,7 @@ export type APlusExercisesRes = {
   }[];
 };
 
-export type APlusStudentPoints = {
+export type AplusStudentPoints = {
   student_id: string | null;
   points: number;
   points_by_difficulty: {
@@ -40,6 +40,6 @@ export type APlusStudentPoints = {
   }[];
 };
 
-export type APlusPointsRes = {
-  results: APlusStudentPoints[];
+export type AplusPointsRes = {
+  results: AplusStudentPoints[];
 };
