@@ -3,16 +3,16 @@
 // SPDX-License-Identifier: MIT
 
 import {app} from './app';
-import {PORT} from './configs/environment';
+import {BACKEND_PORT} from './configs/environment';
 import httpLogger from './configs/winston';
 import {connectToDatabase} from './database/index';
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
-app.listen(PORT, async () => {
+app.listen(BACKEND_PORT, async () => {
   try {
     await connectToDatabase();
   } catch (error) {
     httpLogger.error(error);
   }
-  httpLogger.info(`Server running on port ${PORT}`);
+  httpLogger.info(`Server running on port ${BACKEND_PORT}`);
 });
