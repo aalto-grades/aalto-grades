@@ -107,9 +107,9 @@ const defaults = {
   aPlusApiUrl: 'https://plus.cs.aalto.fi/api/v2',
 
   // Hardcoded because production docker compose always copies to the same filename
-  samlDecryptionKeyFile: 'keys/saml-decryption-key.pem',
-  samlPrivateKeyFile: 'keys/saml-private-key.pem',
-  samlSpCertFile: 'keys/saml-sp-cert.pem',
+  samlDecryptionKeyFile: '/keys/saml-decryption-key.pem',
+  samlPrivateKeyFile: '/keys/saml-private-key.pem',
+  samlSpCertFile: '/keys/saml-sp-cert.pem',
 };
 
 // Config dotenv so environment variables are also accessible from .env file.
