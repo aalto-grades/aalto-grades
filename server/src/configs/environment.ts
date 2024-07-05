@@ -48,8 +48,8 @@ export const SAML_CALLBACK: string =
 export const SAML_ENTRYPOINT: string =
   process.env.SAML_ENTRYPOINT ||
   'https://devel.idp.aalto.fi/idp/profile/SAML2/Redirect/SSO';
-export const SAML_ENTITY: string =
-  process.env.SAML_ENTITY || 'https://aalto-grades.cs.aalto.fi';
+export const SAML_ISSUER: string =
+  process.env.SAML_ISSUER || 'https://aalto-grades.cs.aalto.fi';
 export const SAML_METADATA_URL: string =
   process.env.SAML_METADATA_URL || 'https://devel.idp.aalto.fi/idp/shibboleth';
 // if not production use mock keys for testing
@@ -59,33 +59,20 @@ const mockKey =
     .split(' ')
     .join('\n') +
   '-----END PRIVATE KEY-----';
-let SAML_ENCRYPT_PVK: string = NODE_ENV === 'production' ? '' : mockKey;
+let SAML_DECRYPTION_PVK: string = NODE_ENV === 'production' ? '' : mockKey;
 let SAML_PRIVATE_KEY: string = NODE_ENV === 'production' ? '' : mockKey;
 try {
-  SAML_ENCRYPT_PVK = readFileSync(
-    process.env.ENCRYPT_PVK_FILE || 'keys/sp-key.pem',
-    'utf8'
-  );
-  SAML_PRIVATE_KEY = readFileSync(
-    process.env.PRIVATE_KEY_FILE || 'keys/sp-key.pem',
-    'utf8'
-  );
+  SAML_DECRYPTION_PVK = readFileSync('keys/saml-decryption-key.pem', 'utf8');
+  SAML_PRIVATE_KEY = readFileSync('keys/saml-private-key.pem', 'utf8');
 } catch (err: unknown) {
   if (NODE_ENV === 'production') throw err as Error;
   httpLogger.warn('SAML Private keys not read: ' + (err as Error).message);
 }
 
-export {SAML_ENCRYPT_PVK, SAML_PRIVATE_KEY};
-export const SAML_SP_CERT_PATH =
-  process.env.SAML_SP_CERT_PATH || 'keys/sp-cert.pem';
-export const SAML_IDP_CERT: string =
-  process.env.SAML_IDP_CERT ||
+export {SAML_DECRYPTION_PVK, SAML_PRIVATE_KEY};
+export const SAML_SP_CERT_PATH = 'keys/saml-sp-cert.pem';
+export const DEV_SAML_IDP_CERT: string =
   'MIIFGzCCAwOgAwIBAgIUCH/Md10XaJNOMEHEpbnvdjn0ABEwDQYJKoZIhvcNAQEL BQAwHTEbMBkGA1UEAwwSZGV2ZWwuaWRwLmFhbHRvLmZpMB4XDTE4MTEyODA3NTEz MFoXDTI4MTEyNTA3NTEzMFowHTEbMBkGA1UEAwwSZGV2ZWwuaWRwLmFhbHRvLmZp MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAx6UGxma5RNicPZ78CzQs 2lXsxj9YblGHJkT7vPQzEJvrLvkL7h6mvwhib64d+/z9rkamU4FzosKn95Ac60rM 3X/GOYgqaNw1i2lmxYuvPtzKxD1QT4aQxPoj9OzHDOfj8WqI5Y3v+5sr0N91TQGE +kFy670wwP8UgYx2knw4AEBGi8Eo3W/gUvFk8adIbtgTDIko1bc8Ktal6j487tTC NrZC/yZulmeNJQKtFA2HxQLvLOdK6NwmS1saTYvBl5i6bQGut9+sme1ZGm6DmOae 4KhoD++0fft7KFISrJJHWsYcR+kzrbKXlNf9uEqmu4bicN97mnzoz7Xf4VkvikJR FvftrJA/DDfsBrTLMdgI9sI2o7R47W4CjjiJTgs71xSMt2gMLtP7pWwjRMAQKXR8 UpecJiBi7f7mxOMrQkG8aHHk6E0kohnvn9cbPtiCCyPTUHWZvb7YKnEHFHAJfWTh P2w7RjnfxNYtfZZ4sIXCCigaOLIA+2xYL+IUW3nJMhruifoQQxe8ZDIkhKfYujqk m6aboRkRmj7dtfruv8xMzACrorIOmxwDCSfKut6hE7BhGRqyxmS3J4HN4v43HGxO kZ6gnrpZADfZsuCdnu6RzXgxMHr5HrHNm0irZn6j8juZZ83QlAkDdSXeiF/uM7Ci S3d8mmPhEEsRr0dHuL8spoMCAwEAAaNTMFEwHQYDVR0OBBYEFAJI4SEtrKp90RN3 4Cspn2e4KfgnMB8GA1UdIwQYMBaAFAJI4SEtrKp90RN34Cspn2e4KfgnMA8GA1Ud EwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggIBAJQdKMAaEhjUAqmakVYqzX/w RXaQhhchsPwFwPW/+gv3VzYC1giS63RGipHZKmlJQmXN/FNaRxbpAXbRs6/HoM+h NTqvqONxd62+pZidE9hRfPaYhqoN/G7xv9VGzYZd52s6leSewKr8nhE4feQqtM2h sboCvzp5qjbrRrtZw/4l1c5VpK7XhkCPcLLTrX2xcrVExe2D3ZJAiuhv9ppg8Mza Fe+l3chYo9oO1+5bYODYWQEV8HlE4ihpP76SyD/egy7uqBcA8448fioWflxIAfG4 xqWnPdUMbTnkMptvrKtT+8cr/+9GoSUZMwP+A1rZaxfz0umtEybDfOlSAv4aWZ9+ lJ+U1/eBEa/a4RgutF+Lb8YPn38suNvX54h1tM/vy95VW1sb+4i6P6so8pdpGty6 uTlhYFChcj9gzrl5p8cVqIhkbuTxpSetKPKI3G1sP7h503yrR/t2KubhDtdbHrhM /bkVJutFeQylksvfbKkNJNyjGeSBiw37PXbWeKH71ZtXPG6uM2teuMhHFhoy6/SK c5Ko3acY1076SK6oGEmhi7Ht53Ae7KUo5dTxPfTXz1nyWpWzsifkS/hd7gdzVGXQ anvYDUMe6iKr6Pbk/soyepefLqHrTqSxWgMtDf4ZhBEHwuRxSkjgSSo1XcTuKULA 2zkmEe3gyHpefW3suPwQ'; // need to get cert from file or ..
-
-export const RSYSLOG_TCP_PORT = process.env.RSYSLOG_TCP_PORT
-  ? Number(process.env.RSYSLOG_TCP_PORT)
-  : 601;
-export const RSYSLOG_HOST = process.env.RSYSLOG_HOST || 'localhost';
 
 export const APLUS_API_URL =
   process.env.APLUS_API_URL || 'https://plus.cs.aalto.fi/api/v2';

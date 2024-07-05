@@ -15,13 +15,15 @@ import {SelectReturnType, isArrayOfNodes, useNamespaces} from 'xpath';
 import {HttpCode, SystemRole} from '@/common/types';
 import {
   SAML_CALLBACK,
-  SAML_ENCRYPT_PVK,
-  SAML_ENTITY,
+  SAML_DECRYPTION_PVK,
+  SAML_ISSUER,
   SAML_ENTRYPOINT,
-  SAML_IDP_CERT,
+  DEV_SAML_IDP_CERT,
   SAML_METADATA_URL,
   SAML_PRIVATE_KEY,
+  NODE_ENV,
 } from '../../configs/environment';
+import httpLogger from '../../configs/winston';
 import User from '../../database/models/user';
 import {ApiError} from '../../types';
 
@@ -50,15 +52,20 @@ export const getIdpSignCert = async (
   metadataUrl: string
 ): Promise<string | null | undefined> => {
   const query = await fetchIdpMetadata(metadataUrl);
+  let result = null;
   if (query) {
     const res = query(
       '//md:IDPSSODescriptor/md:KeyDescriptor[@use="signing" or not(@use)]/ds:KeyInfo/ds:X509Data/ds:X509Certificate'
     );
     if (isArrayOfNodes(res)) {
-      return res.map(node => node.firstChild?.nodeValue)[0]?.trim();
+      result = res.map(node => node.firstChild?.nodeValue)[0]?.trim();
     }
   }
-  return null;
+  if ((result === null || result === undefined) && NODE_ENV === 'production') {
+    httpLogger.error('Failed to get IDP signing cert');
+    throw new Error('Failed to get IDP signing cert');
+  }
+  return result;
 };
 
 /** @throws ApiError(401) */
@@ -67,9 +74,9 @@ export const getSamlStrategy = async (): Promise<SamlStrategy> =>
     {
       callbackUrl: SAML_CALLBACK,
       entryPoint: SAML_ENTRYPOINT,
-      issuer: SAML_ENTITY,
-      cert: (await getIdpSignCert(SAML_METADATA_URL)) || SAML_IDP_CERT, // IdP public key in .pem format
-      decryptionPvk: SAML_ENCRYPT_PVK,
+      issuer: SAML_ISSUER,
+      cert: (await getIdpSignCert(SAML_METADATA_URL)) ?? DEV_SAML_IDP_CERT, // IdP public key in .pem format
+      decryptionPvk: SAML_DECRYPTION_PVK,
       privateKey: SAML_PRIVATE_KEY, // SP private key in .pem format
       signatureAlgorithm: 'sha256',
       identifierFormat: null,
