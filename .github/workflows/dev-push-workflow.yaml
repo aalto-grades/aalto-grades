@@ -53,7 +53,7 @@ jobs:
       - name: Run tests
         run: >
           docker-compose -f docker-compose-test.yaml up
-          --attach backend --abort-on-container-exit --exit-code-from backend
+          --abort-on-container-exit --exit-code-from backend --attach backend
           | sed -u 's/^[^|]*[^ ]* //'
       - name: Install dependencies
         run: npm ci
