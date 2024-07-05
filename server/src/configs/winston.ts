@@ -11,77 +11,73 @@ const colors: winston.config.AbstractConfigSetColors = {
   warn: 'yellow',
   info: 'green',
   http: 'magenta',
+  verbose: 'grey',
   debug: 'white',
 };
 
 winston.addColors(colors);
 
-/**
- * Lowest logging level included in the logs per environment. E.g., 'info' logs
- * info level and anything above ('warn' and 'error').
- */
-const level: string = ((): string => {
-  switch (NODE_ENV) {
-    case 'production':
-      return 'http';
-    case 'test':
-      return 'error';
-    default:
-      return 'debug';
-  }
-})();
+const baseFormat = winston.format.combine(
+  winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),
+  winston.format.printf(
+    (http: winston.Logform.TransformableInfo) =>
+      `${http.timestamp} ${http.level}: ${http.message}`
+  )
+);
+const format =
+  NODE_ENV === 'production'
+    ? baseFormat
+    : winston.format.combine(
+        winston.format.colorize({all: true}), // Just setting this to false doesn't remove the colors
+        baseFormat
+      );
 
 /**
- * Set up a Winston logger to log all output to the console and errors to
- * separate log files in the ./logs directory. More information about logger
- * transports (for streaming logs automatically to a database, log managers,
- * etc.): https://github.com/winstonjs/winston/blob/master/docs/transports.md
+ * Set up a Winston logger to log all output to the console. More information
+ * about logger transports (for streaming logs automatically to a database, log
+ * managers, etc.):
+ * https://github.com/winstonjs/winston/blob/master/docs/transports.md
+ *
+ * Currently both loggers log to the cli indentically but some separation might
+ * be added later
  */
-const logger: winston.Logger = winston.createLogger({
-  level,
+
+/** Logger for http logs */
+const httpLogger: winston.Logger = winston.createLogger({
+  level:
+    NODE_ENV === 'production'
+      ? 'http'
+      : NODE_ENV === 'test'
+        ? 'error'
+        : 'debug',
   levels: {
     error: 0,
     warn: 1,
     info: 2,
-    http: 3,
+    http: 3, // HTTP logs
     debug: 4,
   },
-  format: winston.format.combine(
-    winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),
-    winston.format.colorize({all: true}),
-    winston.format.printf(
-      (http: winston.Logform.TransformableInfo) =>
-        `${http.timestamp} ${http.level}: ${http.message}`
-    )
-  ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({
-      filename: 'logs/error.log',
-      level: 'error',
-      handleExceptions: true,
-      maxsize: 5242880, // 5MB
-      maxFiles: 5,
-    }),
-  ],
-});
-
-export const syslogger: winston.Logger = winston.createLogger({
-  level:
-    NODE_ENV === 'production'
-      ? 'info'
-      : NODE_ENV === 'test'
-        ? 'error'
-        : 'debug',
-  levels: winston.config.syslog.levels,
-  format: winston.format.combine(
-    winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),
-    winston.format.printf(
-      (http: winston.Logform.TransformableInfo) =>
-        `${http.timestamp} ${http.level}: ${http.message}`
-    )
-  ),
+  format,
   transports: [new winston.transports.Console()],
 });
 
-export default logger;
+/** Logger for db logs */
+export const dbLogger: winston.Logger = winston.createLogger({
+  level:
+    NODE_ENV === 'production'
+      ? 'verbose'
+      : NODE_ENV === 'test'
+        ? 'error'
+        : 'debug',
+  levels: {
+    error: 0,
+    warn: 1,
+    info: 2,
+    verbose: 3, // DB logs
+    debug: 4,
+  },
+  format,
+  transports: [new winston.transports.Console()],
+});
+
+export default httpLogger;

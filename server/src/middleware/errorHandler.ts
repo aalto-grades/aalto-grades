@@ -6,7 +6,7 @@ import {AxiosError} from 'axios';
 import {NextFunction, Request, RequestHandler, Response} from 'express';
 
 import {HttpCode} from '@/common/types';
-import logger from '../configs/winston';
+import httpLogger from '../configs/winston';
 import {ApiError} from '../types';
 
 /**
@@ -42,7 +42,9 @@ export const errorHandler = (
   _next: NextFunction // Required for the function to work even though not used
 ): void => {
   if (err instanceof ApiError) {
-    logger.error(`${err.name}: ${err.statusCode} - ${err.errors.toString()}`);
+    httpLogger.error(
+      `${err.name}: ${err.statusCode} - ${err.errors.toString()}`
+    );
 
     res.status(err.statusCode).send({
       errors: err.errors,
@@ -51,7 +53,7 @@ export const errorHandler = (
   }
 
   if (err instanceof AxiosError) {
-    logger.error(`${err.name}: ${err.message}`);
+    httpLogger.error(`${err.name}: ${err.message}`);
 
     res.status(HttpCode.BadGateway).send({
       errors: [
@@ -64,7 +66,7 @@ export const errorHandler = (
   }
 
   if (err instanceof Error) {
-    logger.error(`${err.name}: ${err.message}`);
+    httpLogger.error(`${err.name}: ${err.message}`);
   }
 
   // Fallback if no other error matches

@@ -8,6 +8,7 @@ import {z} from 'zod';
 
 import {HttpCode} from '@/common/types';
 import {AXIOS_TIMEOUT} from '../../configs/constants';
+import httpLogger from '../../configs/winston';
 import AplusGradeSource from '../../database/models/aplusGradeSource';
 import {ApiError, stringToIdSchema} from '../../types';
 
@@ -86,6 +87,7 @@ export const fetchFromAplus = async <T>(
   url: string,
   aplusToken: string
 ): Promise<AxiosResponse<T>> => {
+  httpLogger.http(`Calling A+ With "GET ${url}"`);
   return await axios.get<T>(url, {
     timeout: AXIOS_TIMEOUT,
     validateStatus: (status: number) => status === 200,

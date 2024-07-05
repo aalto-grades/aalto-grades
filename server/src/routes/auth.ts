@@ -33,7 +33,6 @@ export const router = Router();
 router.get(
   '/v1/auth/self-info',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  express.json(),
   controllerDispatcher(selfInfo)
 );
 
@@ -50,7 +49,6 @@ router.post(
 router.post(
   '/v1/auth/logout',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  express.json(),
   authLogout
 );
 
@@ -60,6 +58,7 @@ router.post(
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(ResetPasswordDataSchema),
+  rateLimiterMemoryMiddleware,
   authResetOwnPassword
 );
 

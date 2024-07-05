@@ -31,7 +31,7 @@ COPY client/src ./src
 RUN npm run build
 
 # Run stage
-FROM nginx:1.23.3-alpine AS run
+FROM nginx:1.27-alpine AS run
 
 COPY --from=build /app/client/build /user/share/nginx/html
 COPY client/nginx.conf /etc/nginx/conf.d/default.conf

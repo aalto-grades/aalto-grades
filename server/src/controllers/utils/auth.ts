@@ -5,7 +5,7 @@
 import argon from 'argon2';
 
 import {HttpCode, SystemRole} from '@/common/types';
-import logger from '../../configs/winston';
+import httpLogger from '../../configs/winston';
 import User from '../../database/models/user';
 import {ApiError, FullLoginResult} from '../../types';
 
@@ -20,7 +20,7 @@ export const validateLogin = async (
     throw new ApiError('Incorrect email or password', HttpCode.Unauthorized);
   }
   if (user.password === null) {
-    logger.warn(`User password was null for user ${user.id}`);
+    httpLogger.warn(`User password was null for user ${user.id}`);
     throw new ApiError('Incorrect email or password', HttpCode.Unauthorized);
   }
 
@@ -31,7 +31,7 @@ export const validateLogin = async (
   }
 
   if (user.name === null) {
-    logger.error(`User name was null for user ${user.id}`);
+    httpLogger.error(`User name was null for user ${user.id}`);
     throw new ApiError(
       'User does not have a name',
       HttpCode.InternalServerError

@@ -24,7 +24,13 @@ import {
 import {validateCoursePartPath} from './utils/coursePart';
 import {APLUS_API_URL} from '../configs/environment';
 import AplusGradeSource from '../database/models/aplusGradeSource';
-import {ApiError} from '../types';
+import {
+  ApiError,
+  APlusCoursesRes,
+  APlusExercisesRes,
+  APlusPointsRes,
+  APlusStudentPoints,
+} from '../types';
 
 /**
  * Responds with AplusCourseData[]
@@ -36,15 +42,10 @@ export const fetchAplusCourses = async (
   res: Response
 ): Promise<void> => {
   const aplusToken = parseAplusToken(req);
-  const coursesRes = await fetchFromAplus<{
-    staff_courses: {
-      id: number;
-      code: string;
-      name: string;
-      instance_name: string;
-      html_url: string;
-    }[];
-  }>(`${APLUS_API_URL}/users/me`, aplusToken);
+  const coursesRes = await fetchFromAplus<APlusCoursesRes>(
+    `${APLUS_API_URL}/users/me`,
+    aplusToken
+  );
 
   const staffCourses = coursesRes.data.staff_courses;
   if (staffCourses.length === 0) {
@@ -74,17 +75,7 @@ export const fetchAplusExerciseData = async (
   const aplusToken = parseAplusToken(req);
   const aplusCourseId = validateAplusCourseId(req.params.aplusCourseId);
 
-  const exercisesRes = await fetchFromAplus<{
-    results: {
-      id: number;
-      display_name: string;
-      exercises: {
-        id: number;
-        display_name: string;
-        difficulty: string;
-      }[];
-    }[];
-  }>(
+  const exercisesRes = await fetchFromAplus<APlusExercisesRes>(
     `${APLUS_API_URL}/courses/${aplusCourseId}/exercises?format=json`,
     aplusToken
   );
@@ -154,29 +145,13 @@ export const fetchAplusGrades = async (
     }
   }
 
-  type StudentPoints = {
-    student_id: string | null;
-    points: number;
-    points_by_difficulty: {
-      [key: string]: number;
-    };
-    modules: {
-      id: number;
-      points: number;
-      exercises: {
-        id: number;
-        points: number;
-      }[];
-    }[];
-  };
-
   /*
    * Grade sources may point to the same or different courses in A+, so we will
    * fetch the points for each A+ course only once.
    *
    * A+ course ID -> points result
    */
-  const pointsResCache: {[key: number]: StudentPoints[]} = {};
+  const pointsResCache: {[key: number]: APlusStudentPoints[]} = {};
 
   const newGrades: NewGrade[] = [];
   for (const coursePartId of coursePartIds) {
@@ -200,9 +175,7 @@ export const fetchAplusGrades = async (
     const aplusCourseId = gradeSource.aplusCourse.id;
 
     if (!(aplusCourseId in pointsResCache)) {
-      const pointsRes = await fetchFromAplus<{
-        results: StudentPoints[];
-      }>(
+      const pointsRes = await fetchFromAplus<APlusPointsRes>(
         `${APLUS_API_URL}/courses/${aplusCourseId}/points?format=json`,
         aplusToken
       );
