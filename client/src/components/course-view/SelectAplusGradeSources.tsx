@@ -91,6 +91,39 @@ const SelectAplusGradeSources = ({
           </FormGroup>
         </AccordionDetails>
       </Accordion>
+      <Accordion>
+        <AccordionSummary expandIcon={<ArrowDropDown />}>
+          Exercises
+        </AccordionSummary>
+        <AccordionDetails>
+          <FormGroup>
+            {aplusExerciseData.data.modules.map(module =>
+              module.exercises.map(exercise => (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onChange={e =>
+                        handleChange(
+                          e.target.checked,
+                          `A+ Exercise: ${exercise.name}`,
+                          {
+                            coursePartId: -1,
+                            aplusCourse: aplusCourse,
+                            sourceType: AplusGradeSourceType.Exercise,
+                            exerciseId: exercise.id,
+                            exerciseName: exercise.name,
+                          }
+                        )
+                      }
+                    />
+                  }
+                  label={exercise.name}
+                />
+              ))
+            )}
+          </FormGroup>
+        </AccordionDetails>
+      </Accordion>
       {aplusExerciseData.data.difficulties.length > 0 && (
         <Accordion>
           <AccordionSummary expandIcon={<ArrowDropDown />}>
