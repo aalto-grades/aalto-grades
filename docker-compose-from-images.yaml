@@ -37,6 +37,10 @@ services:
     extends:
       file: ./common-services.yaml
       service: backend-minimum
+      args:
+        SAML_DECRYPTION_PVK_FILE: "${SAML_DECRYPTION_PVK_FILE}"
+        SAML_PRIVATE_KEY_FILE: "${SAML_PRIVATE_KEY_FILE}"
+        SAML_SP_CERT_FILE: "${SAML_SP_CERT_FILE}"
     build:
       context: .
       dockerfile: ./server/dockerfiles/Dockerfile.prod.run
@@ -65,7 +69,6 @@ services:
       PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
       - ${POSTGRES_MOUNTDIR}:/var/lib/postgresql/data
-
 
 networks:
   local:
