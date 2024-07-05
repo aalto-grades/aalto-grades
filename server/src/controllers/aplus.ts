@@ -231,7 +231,7 @@ export const fetchAplusGrades = async (
               }
             }
           }
-          if (!grade) {
+          if (grade === undefined) {
             throw new ApiError(
               `A+ course with ID ${aplusCourseId} has no exercise with ID ${gradeSource.exerciseId}`,
               HttpCode.InternalServerError
