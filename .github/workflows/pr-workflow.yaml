@@ -58,7 +58,7 @@ jobs:
         run: >
           docker-compose -f docker-compose-test.yaml up
           --abort-on-container-exit --exit-code-from backend
-          2>&1 | sed '/^database/d; s/^[^|]*[^ ]* //'
+          2>&1 | sed '/database_1/d; s/^[^|]*[^ ]* //'
       - name: Install dependencies
         run: npm ci
       - name: Install common dependencies
