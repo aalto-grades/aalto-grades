@@ -10,6 +10,7 @@
     "start": "node build/server/src/server.js",
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
     "test": "jest --verbose --detectOpenHandles --coverage",
+    "citest": "GITHUB_ACTIONS=1 jest --detectOpenHandles",
     "lint": "eslint . --ext ts --report-unused-disable-directives",
     "lint:fix": "eslint . --ext ts --report-unused-disable-directives --fix",
     "migration:up": "npx sequelize-cli db:migrate",
