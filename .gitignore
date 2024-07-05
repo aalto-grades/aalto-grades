@@ -7,12 +7,11 @@ node_modules
 .pnp
 .pnp.js
 
+# Keys (Will be changed in the future but works until then)
+reverse-proxy/keys
+
 # Random files
 .DS_Store
-*.key
-*.crt
-*.cet
-*.pem
 
 # Emacs files
 .dir-locals.el
