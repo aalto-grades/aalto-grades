@@ -307,22 +307,25 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
     difficulty: withDifficulty ? 'A' : undefined,
   });
 
-  const getFullPoints = (): AplusGradeSourceData =>
-    getGradeSource(AplusGradeSourceType.FullPoints, {}) as AplusGradeSourceData;
+  const getFullPoints = (coursePartId?: number): AplusGradeSourceData =>
+    getGradeSource(AplusGradeSourceType.FullPoints, {coursePartId}) as AplusGradeSourceData;
 
-  const getModule = (): AplusGradeSourceData =>
+  const getModule = (coursePartId?: number): AplusGradeSourceData =>
     getGradeSource(AplusGradeSourceType.Module, {
       withModuleId: true,
+      coursePartId,
     }) as AplusGradeSourceData;
 
-  const getExercise = (): AplusGradeSourceData =>
+  const getExercise = (coursePartId?: number): AplusGradeSourceData =>
     getGradeSource(AplusGradeSourceType.Exercise, {
       withExerciseId: true,
+      coursePartId,
     }) as AplusGradeSourceData;
 
-  const getDifficulty = (): AplusGradeSourceData =>
+  const getDifficulty = (coursePartId?: number): AplusGradeSourceData =>
     getGradeSource(AplusGradeSourceType.Difficulty, {
       withDifficulty: true,
+      coursePartId,
     }) as AplusGradeSourceData;
 
   const checkAplusGradeSource = async (
@@ -463,7 +466,27 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
     ]);
   });
 
-  it('should respond with 409 when attempting to add the same grade source multiple time to the same course part', async () => {});
+  it('should respond with 409 when attempting to add the same grade source multiple time to the same course part', async () => {
+    const url = `/v1/courses/${courseId}/aplus-sources`;
+    const coursePart = await createData.createCoursePart(courseId);
+    for (const get of [getFullPoints, getModule, getExercise, getDifficulty]) {
+      const source = get(coursePart.id);
+
+      // Adding the same grade source twice in the same request
+      await responseTests.testConflict(url, cookies.adminCookie).post([
+        source, source
+      ]);
+
+      // Adding the same grade source which already exists in the database
+      await request
+        .post(url)
+        .send([source])
+        .set('Cookie', cookies.adminCookie)
+        .expect(HttpCode.Created);
+
+      await responseTests.testConflict(url, cookies.adminCookie).post([source]);
+    }
+  });
 });
 
 describe('Test DELETE /v1/courses/:courseId/aplus-sources/:aplusGradeSourceId - delete A+ grade source', () => {
