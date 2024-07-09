@@ -74,7 +74,7 @@ beforeAll(async () => {
     hasStudent: false,
   });
   differentCoursePartId = otherCourseParts[0].id;
-  let _;
+  let _ = -1;
   [[_, differentGradeSourceId]] =
     await createData.createAplusGradeSources(noRoleCourseId);
 
