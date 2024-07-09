@@ -187,7 +187,8 @@ class CreateData {
     coursePartId: number,
     graderId: number,
     grade?: number,
-    date?: Date
+    date?: Date,
+    aplusGradeSourceId?: number
   ): Promise<number> {
     const gradeDate = date ?? new Date();
     const attGrade = await AttainmentGrade.create({
@@ -197,6 +198,7 @@ class CreateData {
       date: gradeDate,
       expiryDate: new Date(gradeDate.getTime() + 365 * 24 * 3600 * 1000),
       grade: grade ?? this.randInt(0, 10),
+      aplusGradeSourceId: aplusGradeSourceId,
     });
 
     return attGrade.id;

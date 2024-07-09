@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
+import {ForeignKeyConstraintError} from 'sequelize';
 import {z} from 'zod';
 import {TypedRequestBody} from 'zod-express-middleware';
 
@@ -134,7 +135,21 @@ export const deleteAplusGradeSource = async (
     req.params.aplusGradeSourceId
   );
 
-  await aplusGradeSource.destroy();
+  try {
+    await aplusGradeSource.destroy();
+  } catch (e) {
+    if (
+      e instanceof ForeignKeyConstraintError &&
+      e.index === 'attainment_grade_aplus_grade_source_id_fkey'
+    ) {
+      throw new ApiError(
+        'Tried to delete an A+ grade source wiht grades',
+        HttpCode.Conflict
+      );
+    }
+
+    throw e;
+  }
 
   res.sendStatus(HttpCode.Ok);
 };

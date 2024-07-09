@@ -19,6 +19,7 @@ import {app} from '../../src/app';
 import {APLUS_API_URL} from '../../src/configs/environment';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
 import {createData} from '../util/createData';
+import {TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
@@ -521,6 +522,23 @@ describe('Test DELETE /v1/courses/:courseId/aplus-sources/:aplusGradeSourceId - 
 
   it('should respond with 409 if A+ grade source does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/aplus-sources/${differentGradeSourceId}`;
+    await responseTests.testConflict(url, cookies.adminCookie).delete();
+  });
+
+  it('should respond with 409 if A+ grade source has grades', async () => {
+    const [[_, aplusGradeSourceId]] =
+      await createData.createAplusGradeSources(courseId);
+    const user = await createData.createUser();
+    await createData.createGrade(
+      user.id,
+      fullPointsCoursePartId,
+      TEACHER_ID,
+      5,
+      new Date(),
+      aplusGradeSourceId
+    );
+
+    const url = `/v1/courses/${courseId}/aplus-sources/${aplusGradeSourceId}`;
     await responseTests.testConflict(url, cookies.adminCookie).delete();
   });
 });
