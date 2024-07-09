@@ -32,7 +32,7 @@ router.get(
 );
 
 router.post(
-  '/v1/courses/:courseId/aplus-source',
+  '/v1/courses/:courseId/aplus-sources',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),

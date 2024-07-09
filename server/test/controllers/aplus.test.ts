@@ -264,7 +264,7 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
   });
 });
 
-describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', () => {
+describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources', () => {
   type AplusGradeSourceAny = {
     coursePartId: number;
     aplusCourse: AplusCourseData;
@@ -358,7 +358,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
       const res = await request
-        .post(`/v1/courses/${courseId}/aplus-source`)
+        .post(`/v1/courses/${courseId}/aplus-sources`)
         .send([getFullPoints(), getModule(), getExercise(), getDifficulty()])
         .set('Cookie', cookie)
         .expect(HttpCode.Created);
@@ -372,14 +372,14 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
   });
 
   it('should respond with 400 if course ID is invalid', async () => {
-    const url = '/v1/courses/abc/aplus-source';
+    const url = '/v1/courses/abc/aplus-sources';
     await responseTests
       .testBadRequest(url, cookies.adminCookie)
       .post([getFullPoints(), getModule(), getExercise(), getDifficulty()]);
   });
 
   it('should respond with 400 if input data is invalid', async () => {
-    const url = `/v1/courses/${courseId}/aplus-source`;
+    const url = `/v1/courses/${courseId}/aplus-sources`;
 
     // prettier-ignore
     const valid: [AplusGradeSourceType, boolean, boolean, boolean][] = [
@@ -419,12 +419,12 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
-    const url401 = `/v1/courses/${courseId}/aplus-source`;
+    const url401 = `/v1/courses/${courseId}/aplus-sources`;
     await responseTests
       .testUnauthorized(url401)
       .post([getFullPoints(), getModule(), getExercise(), getDifficulty()]);
 
-    const url403 = `/v1/courses/${noRoleCourseId}/aplus-source`;
+    const url403 = `/v1/courses/${noRoleCourseId}/aplus-sources`;
     await responseTests
       .testForbidden(url403, [
         cookies.teacherCookie,
@@ -435,12 +435,12 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
   });
 
   it('should respond with 404 when not found', async () => {
-    const urlNoCourse = `/v1/courses/${nonExistentId}/aplus-source`;
+    const urlNoCourse = `/v1/courses/${nonExistentId}/aplus-sources`;
     await responseTests
       .testNotFound(urlNoCourse, cookies.adminCookie)
       .post([getFullPoints(), getModule(), getExercise(), getDifficulty()]);
 
-    const url = `/v1/courses/${courseId}/aplus-source`;
+    const url = `/v1/courses/${courseId}/aplus-sources`;
     await responseTests.testNotFound(url, cookies.adminCookie).post([
       getGradeSource(AplusGradeSourceType.FullPoints, {
         coursePartId: nonExistentId,
@@ -449,7 +449,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
   });
 
   it('should respond with 409 when course part does not belong to the course', async () => {
-    const url = `/v1/courses/${courseId}/aplus-source`;
+    const url = `/v1/courses/${courseId}/aplus-sources`;
     await responseTests.testConflict(url, cookies.adminCookie).post([
       getGradeSource(AplusGradeSourceType.FullPoints, {
         coursePartId: differentCoursePartId,

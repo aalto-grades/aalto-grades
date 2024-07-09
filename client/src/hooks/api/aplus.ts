@@ -66,7 +66,7 @@ export const useAddAplusGradeSources = (
 
   return useMutation({
     mutationFn: (gradeSources: AplusGradeSourceData[]) =>
-      axios.post(`/v1/courses/${courseId}/aplus-source`, gradeSources),
+      axios.post(`/v1/courses/${courseId}/aplus-sources`, gradeSources),
 
     onSuccess: () =>
       queryClient.invalidateQueries({
