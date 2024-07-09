@@ -6,7 +6,7 @@ import axios, {AxiosResponse} from 'axios';
 import {Request} from 'express';
 import {z} from 'zod';
 
-import {HttpCode} from '@/common/types';
+import {AplusGradeSourceData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
 import {findCoursePartById} from './coursePart';
 import {AXIOS_TIMEOUT} from '../../configs/constants';
@@ -112,6 +112,21 @@ export const validateAplusGradeSourceBelongsToCoursePart = async (
     );
   }
 };
+
+export const parseAplusGradeSource = (
+  aplusGradeSource: AplusGradeSource
+): AplusGradeSourceData =>
+  ({
+    id: aplusGradeSource.id,
+    coursePartId: aplusGradeSource.coursePartId, // TODO: Redundant in some cases
+    aplusCourse: aplusGradeSource.aplusCourse,
+    sourceType: aplusGradeSource.sourceType,
+    moduleId: aplusGradeSource.moduleId ?? undefined,
+    moduleName: aplusGradeSource.moduleName ?? undefined,
+    exerciseId: aplusGradeSource.exerciseId ?? undefined,
+    exerciseName: aplusGradeSource.exerciseName ?? undefined,
+    difficulty: aplusGradeSource.difficulty ?? undefined,
+  }) as AplusGradeSourceData;
 
 /**
  * Validates that an A+ API token was provided and parses it from the request

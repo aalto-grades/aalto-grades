@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
+import assert from 'node:assert/strict';
 import {ForeignKeyConstraintError} from 'sequelize';
 import {z} from 'zod';
 import {TypedRequestBody} from 'zod-express-middleware';
@@ -19,6 +20,7 @@ import {
 } from '@/common/types';
 import {
   fetchFromAplus,
+  parseAplusGradeSource,
   parseAplusToken,
   validateAplusCourseId,
   validateAplusGradeSourcePath,
@@ -112,12 +114,49 @@ export const addAplusGradeSources = async (
   req: TypedRequestBody<typeof NewAplusGradeSourceArraySchema>,
   res: Response
 ): Promise<void> => {
+  const partGradeSourcesById: {[key: number]: AplusGradeSource[]} = {};
   const newGradeSources: NewAplusGradeSourceData[] = req.body;
+
   for (const newGradeSource of newGradeSources) {
-    await validateCoursePartPath(
+    const [_, coursePart] = await validateCoursePartPath(
       req.params.courseId,
       String(newGradeSource.coursePartId)
     );
+
+    for (const other of newGradeSources.filter(
+      source => source !== newGradeSource
+    )) {
+      try {
+        assert.notDeepStrictEqual(newGradeSource, other);
+      } catch (e) {
+        throw new ApiError(
+          `attempted to add the same A+ grade source ${JSON.stringify(newGradeSource)} twice`,
+          HttpCode.Conflict
+        );
+      }
+    }
+
+    if (!(coursePart.id in partGradeSourcesById)) {
+      partGradeSourcesById[coursePart.id] = await AplusGradeSource.findAll({
+        where: {coursePartId: coursePart.id},
+      });
+    }
+
+    for (const partGradeSource of partGradeSourcesById[coursePart.id]) {
+      const parsed = parseAplusGradeSource(partGradeSource);
+      try {
+        assert.notDeepStrictEqual(newGradeSource, {
+          ...parsed,
+          id: undefined,
+        });
+      } catch (e) {
+        throw new ApiError(
+          `course part with ID ${parsed.coursePartId} ` +
+            `already has the A+ grade source ${JSON.stringify(newGradeSource)}`,
+          HttpCode.Conflict
+        );
+      }
+    }
   }
 
   await AplusGradeSource.bulkCreate(newGradeSources);

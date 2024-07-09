@@ -7,7 +7,6 @@ import {Op} from 'sequelize';
 import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
-  AplusGradeSourceData,
   CourseRoleType,
   EditGradeDataSchema,
   FinalGradeData,
@@ -21,7 +20,10 @@ import {
   UserData,
   UserIdArraySchema,
 } from '@/common/types';
-import {validateAplusGradeSourceBelongsToCoursePart} from './utils/aplus';
+import {
+  parseAplusGradeSource,
+  validateAplusGradeSourceBelongsToCoursePart,
+} from './utils/aplus';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {validateCoursePartBelongsToCourse} from './utils/coursePart';
 import {
@@ -110,17 +112,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
       gradeId: grade.id,
       grader: grader,
       aplusGradeSource: grade.AplusGradeSource
-        ? ({
-            id: grade.AplusGradeSource.id,
-            coursePartId: grade.AplusGradeSource.coursePartId, // TODO: Redundant
-            aplusCourse: grade.AplusGradeSource.aplusCourse,
-            sourceType: grade.AplusGradeSource.sourceType,
-            moduleId: grade.AplusGradeSource.moduleId ?? undefined,
-            moduleName: grade.AplusGradeSource.moduleName ?? undefined,
-            exerciseId: grade.AplusGradeSource.exerciseId ?? undefined,
-            exerciseName: grade.AplusGradeSource.exerciseName ?? undefined,
-            difficulty: grade.AplusGradeSource.difficulty ?? undefined,
-          } as AplusGradeSourceData)
+        ? parseAplusGradeSource(grade.AplusGradeSource)
         : null,
       grade: grade.grade,
       exportedToSisu: grade.sisuExportDate,

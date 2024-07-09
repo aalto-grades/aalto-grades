@@ -462,6 +462,8 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
       }),
     ]);
   });
+
+  it('should respond with 409 when attempting to add the same grade source multiple time to the same course part', async () => {});
 });
 
 describe('Test DELETE /v1/courses/:courseId/aplus-sources/:aplusGradeSourceId - delete A+ grade source', () => {
