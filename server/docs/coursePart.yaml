@@ -173,7 +173,7 @@ definitions:
       - $ref: '#/components/parameters/coursePartId'
     responses:
       200:
-        description: CoursePart deleted.
+        description: Course part deleted.
       400:
         $ref: '#/components/responses/BadRequest'
       401:
