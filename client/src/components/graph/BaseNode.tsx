@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
+
 import WarningIcon from '@mui/icons-material/Warning';
 import {Tooltip} from '@mui/material';
 import {JSX, PropsWithChildren, useContext, useEffect, useState} from 'react';

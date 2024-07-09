@@ -4,4 +4,14 @@
 
 FROM ghcr.io/aalto-grades/aalto-grades-backend-dev:dev
 
-COPY --chown=node:node reverse-proxy /keys
+USER 0
+RUN mkdir /keys
+USER node
+
+ARG SAML_DECRYPTION_PVK_FILE
+ARG SAML_PRIVATE_KEY_FILE
+ARG SAML_SP_CERT_FILE
+
+COPY --chown=node:node $SAML_DECRYPTION_PVK_FILE /keys/saml-decryption-key.pem
+COPY --chown=node:node $SAML_PRIVATE_KEY_FILE /keys/saml-private-key.pem
+COPY --chown=node:node $SAML_SP_CERT_FILE /keys/saml-sp-cert.pem

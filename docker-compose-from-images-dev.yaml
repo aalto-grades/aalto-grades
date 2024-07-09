@@ -16,8 +16,8 @@ services:
     build:
       context: ./reverse-proxy
       args:
-        CERT_LOCATION: "${CERT_LOCATION}"
-        CERT_KEY_LOCATION: "${CERT_KEY_LOCATION}"
+        CERT_FILE: "${CERT_FILE}"
+        CERT_KEY_FILE: "${CERT_KEY_FILE}"
     restart: always
     container_name: reverse-proxy
     ports:
@@ -40,16 +40,21 @@ services:
     build:
       context: .
       dockerfile: ./server/dockerfiles/Dockerfile.prod.run.dev
+      args:
+        SAML_DECRYPTION_PVK_FILE: "${SAML_DECRYPTION_PVK_FILE}"
+        SAML_PRIVATE_KEY_FILE: "${SAML_PRIVATE_KEY_FILE}"
+        SAML_SP_CERT_FILE: "${SAML_SP_CERT_FILE}"
     container_name: backend-server
     environment:
+      AALTO_GRADES_BACKEND_PORT: "${AALTO_GRADES_BACKEND_PORT}"
+      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "${AALTO_GRADES_FRONTEND_CORS_ORIGIN}"
       AALTO_GRADES_JWT_SECRET: "${AALTO_GRADES_JWT_SECRET}"
-      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "https://aalto-grades.cs.aalto.fi"
+      APLUS_API_URL: "${APLUS_API_URL}"
       SAML_CALLBACK: "${SAML_CALLBACK}"
       SAML_ENTRYPOINT: "${SAML_ENTRYPOINT}"
-      SAML_ENTITY: "${SAML_ENTITY}"
-      ENCRYPT_PVK_FILE: "${ENCRYPT_PVK_FILE}"
-      PRIVATE_KEY_FILE: "${PRIVATE_KEY_FILE}"
-      SAML_SP_CERT_PATH: "${SAML_SP_CERT_PATH}"
+      SAML_ISSUER: "${SAML_ISSUER}"
+      SAML_METADATA_URL: "${SAML_METADATA_URL}"
+      NODE_ENV: "production"
     logging:
       driver: syslog
       options:
@@ -64,19 +69,6 @@ services:
       PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
       - ${POSTGRES_MOUNTDIR}:/var/lib/postgresql/data
-
-  # pgadmin:
-  #   extends:
-  #     file: ./common-services.yaml
-  #     service: pgadmin
-  #   depends_on:
-  #     - database
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL}"
-  #     PGADMIN_DEFAULT_PASSWORD: "${PGADMIN_DEFAULT_PASSWORD}"
-  #   volumes:
-  #     - ./server/pgAdminSetup.json:/pgadmin4/servers.json
-  #     - ${PGADMIN_PASSFILE}:/pgpass
 
 networks:
   local:

@@ -118,11 +118,24 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
               key={course.id}
               id={`ag-see-instances-tr-${course.id}`}
               hover={true}
+              sx={{
+                cursor: 'pointer',
+                '&:focus': {backgroundColor: 'rgba(0, 0, 0, 0.04)'},
+              }}
+              role="button"
               onClick={() =>
                 navigate(`/${course.id}/course-results`, {
                   unstable_viewTransition: true,
                 })
               }
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  navigate(`/${course.id}/course-results`, {
+                    unstable_viewTransition: true,
+                  });
+                }
+              }}
+              tabIndex={0}
             >
               <TableCell>{course.courseCode}</TableCell>
               <TableCell>{course.name.en}</TableCell>
