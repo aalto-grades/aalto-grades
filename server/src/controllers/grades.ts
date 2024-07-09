@@ -111,7 +111,8 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
       grader: grader,
       aplusGradeSource: grade.AplusGradeSource
         ? ({
-            coursePartId: grade.AplusGradeSource.id, // TODO: Redundant
+            id: grade.AplusGradeSource.id,
+            coursePartId: grade.AplusGradeSource.coursePartId, // TODO: Redundant
             aplusCourse: grade.AplusGradeSource.aplusCourse,
             sourceType: grade.AplusGradeSource.sourceType,
             moduleId: grade.AplusGradeSource.moduleId ?? undefined,

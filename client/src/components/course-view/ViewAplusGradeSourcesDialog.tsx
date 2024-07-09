@@ -53,6 +53,11 @@ const ViewAplusGradeSourcesDialog = ({
     }
   };
 
+  const handleDelete = (aplusGradeSourceId: number): void => {
+    deleteAplusGradeSource.mutate(aplusGradeSourceId);
+    handleClose();
+  };
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="lg">
       <DialogTitle>A+ grade sources</DialogTitle>
@@ -82,7 +87,7 @@ const ViewAplusGradeSourcesDialog = ({
                   <TableCell>{getSourceName(source)}</TableCell>
                   <TableCell>
                     <Tooltip placement="top" title="Delete A+ grade source">
-                      <IconButton>
+                      <IconButton onClick={() => handleDelete(source.id)}>
                         <Delete />
                       </IconButton>
                     </Tooltip>

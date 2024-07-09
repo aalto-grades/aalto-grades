@@ -47,6 +47,7 @@ export const findCoursePartByCourseId = async (
       aplusGradeSources: coursePart.AplusGradeSources.map(
         gradeSource =>
           ({
+            id: gradeSource.id,
             coursePartId: coursePart.id, // TODO: Redundant
             aplusCourse: gradeSource.aplusCourse,
             sourceType: gradeSource.sourceType,
