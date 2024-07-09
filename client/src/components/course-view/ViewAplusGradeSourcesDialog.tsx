@@ -38,6 +38,8 @@ const ViewAplusGradeSourcesDialog = ({
         return 'Full points';
       case AplusGradeSourceType.Module:
         return source.moduleName;
+      case AplusGradeSourceType.Exercise:
+        return source.exerciseName;
       case AplusGradeSourceType.Difficulty:
         return source.difficulty;
     }

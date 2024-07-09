@@ -4,6 +4,6 @@
 
 export * from './apiError';
 export * from './auth';
-export * from './aPlus';
+export * from './aplus';
 export * from './dbNewDataTypes';
 export * from './general';

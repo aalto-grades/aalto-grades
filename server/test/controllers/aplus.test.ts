@@ -41,6 +41,7 @@ let addGradeSourceCoursePartId = -1;
 let noGradeSourceCoursePartId = -1;
 let fullPointsCoursePartId = -1;
 let moduleCoursePartId = -1;
+let exerciseCoursePartId = -1;
 let difficultyCoursePartId = -1;
 let noRoleCourseId = -1;
 let differentCoursePartId = -1;
@@ -55,8 +56,12 @@ beforeAll(async () => {
 
   let courseParts: CoursePartData[];
   [courseId, courseParts] = await createData.createCourse({});
-  [[fullPointsCoursePartId], [moduleCoursePartId], [difficultyCoursePartId]] =
-    await createData.createAplusGradeSources(courseId);
+  [
+    [fullPointsCoursePartId],
+    [moduleCoursePartId],
+    [exerciseCoursePartId],
+    [difficultyCoursePartId],
+  ] = await createData.createAplusGradeSources(courseId);
   addGradeSourceCoursePartId = courseParts[0].id;
   noGradeSourceCoursePartId = courseParts[2].id;
 
@@ -82,8 +87,8 @@ beforeAll(async () => {
               points: 50,
               points_by_difficulty: {A: 30},
               modules: [
-                {id: 1, points: 10},
-                {id: 2, points: 40},
+                {id: 1, points: 10, exercises: [{id: 1, points: 5}]},
+                {id: 2, points: 40, exercises: []},
               ],
             },
             {
@@ -91,8 +96,8 @@ beforeAll(async () => {
               points: 40,
               points_by_difficulty: {A: 25},
               modules: [
-                {id: 1, points: 7},
-                {id: 2, points: 33},
+                {id: 1, points: 7, exercises: [{id: 1, points: 5}]},
+                {id: 2, points: 33, exercises: []},
               ],
             },
           ],
@@ -196,12 +201,15 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
           {
             id: 1,
             display_name: 'First',
-            exercises: [{difficulty: 'A'}, {difficulty: ''}],
+            exercises: [
+              {id: 1, display_name: '1.1 First', difficulty: 'A'},
+              {id: 2, display_name: '1.2 Second', difficulty: ''},
+            ],
           },
           {
             id: 2,
             display_name: 'Second',
-            exercises: [{difficulty: ''}],
+            exercises: [{id: 3, display_name: '2.1 Third', difficulty: ''}],
           },
         ],
       },
@@ -263,6 +271,8 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     sourceType: AplusGradeSourceType;
     moduleId?: number;
     moduleName?: string;
+    exerciseId?: number;
+    exerciseName?: string;
     difficulty?: string;
   };
 
@@ -270,6 +280,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     sourceType: AplusGradeSourceType,
     {
       withModuleId = false,
+      withExerciseId = false,
       withDifficulty = false,
       coursePartId = addGradeSourceCoursePartId,
     }
@@ -285,6 +296,8 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     sourceType: sourceType,
     moduleId: withModuleId ? 1 : undefined,
     moduleName: withModuleId ? 'Module Name' : undefined,
+    exerciseId: withExerciseId ? 1 : undefined,
+    exerciseName: withExerciseId ? 'Exercise Name' : undefined,
     difficulty: withDifficulty ? 'A' : undefined,
   });
 
@@ -294,6 +307,11 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
   const getModule = (): AplusGradeSourceData =>
     getGradeSource(AplusGradeSourceType.Module, {
       withModuleId: true,
+    }) as AplusGradeSourceData;
+
+  const getExercise = (): AplusGradeSourceData =>
+    getGradeSource(AplusGradeSourceType.Exercise, {
+      withExerciseId: true,
     }) as AplusGradeSourceData;
 
   const getDifficulty = (): AplusGradeSourceData =>
@@ -318,6 +336,14 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
           sourceType === AplusGradeSourceType.Module
             ? gradeSource.moduleName
             : null,
+        exerciseId:
+          sourceType === AplusGradeSourceType.Exercise
+            ? gradeSource.exerciseId
+            : null,
+        exerciseName:
+          sourceType === AplusGradeSourceType.Exercise
+            ? gradeSource.exerciseName
+            : null,
         difficulty:
           sourceType === AplusGradeSourceType.Difficulty
             ? gradeSource.difficulty
@@ -333,13 +359,14 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     for (const cookie of testCookies) {
       const res = await request
         .post(`/v1/courses/${courseId}/aplus-source`)
-        .send([getFullPoints(), getModule(), getDifficulty()])
+        .send([getFullPoints(), getModule(), getExercise(), getDifficulty()])
         .set('Cookie', cookie)
         .expect(HttpCode.Created);
 
       expect(JSON.stringify(res.body)).toBe('{}');
       await checkAplusGradeSource(getFullPoints());
       await checkAplusGradeSource(getModule());
+      await checkAplusGradeSource(getExercise());
       await checkAplusGradeSource(getDifficulty());
     }
   });
@@ -348,29 +375,46 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     const url = '/v1/courses/abc/aplus-source';
     await responseTests
       .testBadRequest(url, cookies.adminCookie)
-      .post([getFullPoints(), getModule(), getDifficulty()]);
+      .post([getFullPoints(), getModule(), getExercise(), getDifficulty()]);
   });
 
   it('should respond with 400 if input data is invalid', async () => {
     const url = `/v1/courses/${courseId}/aplus-source`;
 
     // prettier-ignore
-    const invalid: [AplusGradeSourceType, boolean, boolean][] = [
-      [AplusGradeSourceType.FullPoints, true,  true],
-      [AplusGradeSourceType.FullPoints, true,  false],
-      [AplusGradeSourceType.FullPoints, false, true],
-      [AplusGradeSourceType.Module,     true,  true],
-      [AplusGradeSourceType.Module,     false, true],
-      [AplusGradeSourceType.Module,     false, false],
-      [AplusGradeSourceType.Difficulty, true,  true],
-      [AplusGradeSourceType.Difficulty, true,  false],
-      [AplusGradeSourceType.Difficulty, false, false],
+    const valid: [AplusGradeSourceType, boolean, boolean, boolean][] = [
+      [AplusGradeSourceType.FullPoints, false, false, false],
+      [AplusGradeSourceType.Module,     true,  false, false],
+      [AplusGradeSourceType.Exercise,   false, true,  false],
+      [AplusGradeSourceType.Difficulty, false, false, true],
     ];
 
-    for (const [sourceType, withModuleId, withDifficulty] of invalid) {
-      await responseTests
-        .testBadRequest(url, cookies.adminCookie)
-        .post([getGradeSource(sourceType, {withModuleId, withDifficulty})]);
+    // Not very pretty but it works
+    for (const sourceType of Object.values(AplusGradeSourceType)) {
+      for (const withModuleId of [true, false]) {
+        for (const withExerciseId of [true, false]) {
+          for (const withDifficulty of [true, false]) {
+            const format = [
+              sourceType,
+              withModuleId,
+              withExerciseId,
+              withDifficulty,
+            ];
+
+            if (!valid.find(v => v.every((_, i) => v[i] === format[i]))) {
+              await responseTests
+                .testBadRequest(url, cookies.adminCookie)
+                .post([
+                  getGradeSource(sourceType, {
+                    withModuleId,
+                    withExerciseId,
+                    withDifficulty,
+                  }),
+                ]);
+            }
+          }
+        }
+      }
     }
   });
 
@@ -378,7 +422,7 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
     const url401 = `/v1/courses/${courseId}/aplus-source`;
     await responseTests
       .testUnauthorized(url401)
-      .post([getFullPoints(), getModule(), getDifficulty()]);
+      .post([getFullPoints(), getModule(), getExercise(), getDifficulty()]);
 
     const url403 = `/v1/courses/${noRoleCourseId}/aplus-source`;
     await responseTests
@@ -387,14 +431,14 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
         cookies.assistantCookie,
         cookies.studentCookie,
       ])
-      .post([getFullPoints(), getModule(), getDifficulty()]);
+      .post([getFullPoints(), getModule(), getExercise(), getDifficulty()]);
   });
 
   it('should respond with 404 when not found', async () => {
     const urlNoCourse = `/v1/courses/${nonExistentId}/aplus-source`;
     await responseTests
       .testNotFound(urlNoCourse, cookies.adminCookie)
-      .post([getFullPoints(), getModule(), getDifficulty()]);
+      .post([getFullPoints(), getModule(), getExercise(), getDifficulty()]);
 
     const url = `/v1/courses/${courseId}/aplus-source`;
     await responseTests.testNotFound(url, cookies.adminCookie).post([
@@ -415,12 +459,12 @@ describe('Test POST /v1/courses/:courseId/aplus-source - add A+ grade sources', 
 });
 
 describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', () => {
-  it('should fetch grades for full points', async () => {
+  const successTest = async (courseParts: number[]): Promise<void> => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
       const res = await request
         .get(
-          `/v1/courses/${courseId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`
+          `/v1/courses/${courseId}/aplus-fetch?course-parts=${JSON.stringify(courseParts)}`
         )
         .set('Cookie', cookie)
         .set('Authorization', authorization)
@@ -431,60 +475,31 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
       const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
+  };
+
+  it('should fetch grades for full points', async () => {
+    await successTest([fullPointsCoursePartId]);
   });
 
   it('should fetch grades for module', async () => {
-    const testCookies = [cookies.adminCookie, cookies.teacherCookie];
-    for (const cookie of testCookies) {
-      const res = await request
-        .get(
-          `/v1/courses/${courseId}/aplus-fetch?course-parts=[${moduleCoursePartId}]`
-        )
-        .set('Cookie', cookie)
-        .set('Authorization', authorization)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
+    await successTest([moduleCoursePartId]);
+  });
 
-      const Schema = NewGradeArraySchema.nonempty();
-      const result = Schema.safeParse(res.body);
-      expect(result.success).toBeTruthy();
-    }
+  it('should fetch grades for exercise', async () => {
+    await successTest([exerciseCoursePartId]);
   });
 
   it('should fetch grades for difficulty', async () => {
-    const testCookies = [cookies.adminCookie, cookies.teacherCookie];
-    for (const cookie of testCookies) {
-      const res = await request
-        .get(
-          `/v1/courses/${courseId}/aplus-fetch?course-parts=[${difficultyCoursePartId}]`
-        )
-        .set('Cookie', cookie)
-        .set('Authorization', authorization)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-
-      const Schema = NewGradeArraySchema.nonempty();
-      const result = Schema.safeParse(res.body);
-      expect(result.success).toBeTruthy();
-    }
+    await successTest([difficultyCoursePartId]);
   });
 
   it('should fetch grades for multiple course parts', async () => {
-    const testCookies = [cookies.adminCookie, cookies.teacherCookie];
-    for (const cookie of testCookies) {
-      const res = await request
-        .get(
-          `/v1/courses/${courseId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}, ${moduleCoursePartId}, ${difficultyCoursePartId}]`
-        )
-        .set('Cookie', cookie)
-        .set('Authorization', authorization)
-        .set('Accept', 'application/json')
-        .expect(HttpCode.Ok);
-
-      const Schema = NewGradeArraySchema.nonempty();
-      const result = Schema.safeParse(res.body);
-      expect(result.success).toBeTruthy();
-    }
+    await successTest([
+      fullPointsCoursePartId,
+      moduleCoursePartId,
+      exerciseCoursePartId,
+      difficultyCoursePartId,
+    ]);
   });
 
   it('should respond with 400 if A+ token parsing fails', async () => {

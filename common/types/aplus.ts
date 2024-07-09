@@ -9,6 +9,7 @@ import {IdSchema} from './general';
 export enum AplusGradeSourceType {
   FullPoints = 'FULL_POINTS',
   Module = 'MODULE',
+  Exercise = 'EXERCISE',
   Difficulty = 'DIFFICULTY',
 }
 
@@ -28,6 +29,12 @@ export const AplusExerciseDataSchema = z.strictObject({
     z.strictObject({
       id: z.number().int(),
       name: z.string(),
+      exercises: z.array(
+        z.strictObject({
+          id: z.number().int(),
+          name: z.string(),
+        })
+      ),
     })
   ),
   difficulties: z.array(z.string()),
@@ -46,6 +53,11 @@ export const AplusGradeSourceDataSchema = z.discriminatedUnion('sourceType', [
     sourceType: z.literal(AplusGradeSourceType.Module),
     moduleId: z.number().int(),
     moduleName: z.string(),
+  }).strict(),
+  GradeSourceBase.extend({
+    sourceType: z.literal(AplusGradeSourceType.Exercise),
+    exerciseId: z.number().int(),
+    exerciseName: z.string(),
   }).strict(),
   GradeSourceBase.extend({
     sourceType: z.literal(AplusGradeSourceType.Difficulty),

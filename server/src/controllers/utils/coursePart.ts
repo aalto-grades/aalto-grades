@@ -52,6 +52,8 @@ export const findCoursePartByCourseId = async (
             sourceType: gradeSource.sourceType,
             moduleId: gradeSource.moduleId ?? undefined,
             moduleName: gradeSource.moduleName ?? undefined,
+            exerciseId: gradeSource.exerciseId ?? undefined,
+            exerciseName: gradeSource.exerciseName ?? undefined,
             difficulty: gradeSource.difficulty ?? undefined,
           }) as AplusGradeSourceData
       ),

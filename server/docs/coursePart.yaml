@@ -38,20 +38,7 @@ definitions:
         type: array
         description: A+ grade sources connected to the course part.
         items:
-          type: object
-          properties:
-            coursePartId:
-              $ref: '#/definitions/CoursePartId'
-            aplusCourse:
-              $ref: '#/definitions/AplusCourseData'
-            sourceType:
-              $ref: '#/definitions/AplusGradeSourceType'
-            moduleId:
-              $ref: '#/definitions/AplusModuleId'
-            moduleName:
-              $ref: '#/definitions/AplusModuleName'
-            difficulty:
-              $ref: '#/definitions/AplusDifficulty'
+          $ref: '#/definitions/AplusGradeSourceData'
     required:
       - id
       - courseId

@@ -26,10 +26,10 @@ import {APLUS_API_URL} from '../configs/environment';
 import AplusGradeSource from '../database/models/aplusGradeSource';
 import {
   ApiError,
-  APlusCoursesRes,
-  APlusExercisesRes,
-  APlusPointsRes,
-  APlusStudentPoints,
+  AplusCoursesRes,
+  AplusExercisesRes,
+  AplusPointsRes,
+  AplusStudentPoints,
 } from '../types';
 
 /**
@@ -42,7 +42,7 @@ export const fetchAplusCourses = async (
   res: Response
 ): Promise<void> => {
   const aplusToken = parseAplusToken(req);
-  const coursesRes = await fetchFromAplus<APlusCoursesRes>(
+  const coursesRes = await fetchFromAplus<AplusCoursesRes>(
     `${APLUS_API_URL}/users/me`,
     aplusToken
   );
@@ -75,15 +75,15 @@ export const fetchAplusExerciseData = async (
   const aplusToken = parseAplusToken(req);
   const aplusCourseId = validateAplusCourseId(req.params.aplusCourseId);
 
-  const exercisesRes = await fetchFromAplus<APlusExercisesRes>(
+  const exercisesRes = await fetchFromAplus<AplusExercisesRes>(
     `${APLUS_API_URL}/courses/${aplusCourseId}/exercises?format=json`,
     aplusToken
   );
 
   // There doesn't appear to be a better way to get difficulties
   const difficulties = new Set<string>();
-  for (const result of exercisesRes.data.results) {
-    for (const exercise of result.exercises) {
+  for (const module of exercisesRes.data.results) {
+    for (const exercise of module.exercises) {
       if (exercise.difficulty) {
         difficulties.add(exercise.difficulty);
       }
@@ -91,9 +91,13 @@ export const fetchAplusExerciseData = async (
   }
 
   const exerciseData: AplusExerciseData = {
-    modules: exercisesRes.data.results.map(result => ({
-      id: result.id,
-      name: result.display_name,
+    modules: exercisesRes.data.results.map(module => ({
+      id: module.id,
+      name: module.display_name,
+      exercises: module.exercises.map(exercise => ({
+        id: exercise.id,
+        name: exercise.display_name,
+      })),
     })),
     difficulties: Array.from(difficulties),
   };
@@ -122,7 +126,7 @@ export const addAplusGradeSources = async (
 /**
  * Responds with NewGrade[]
  *
- * @throws ApiError(400|404|409|422|502)
+ * @throws ApiError(400|404|409|502)
  */
 export const fetchAplusGrades = async (
   req: Request,
@@ -147,7 +151,7 @@ export const fetchAplusGrades = async (
    *
    * A+ course ID -> points result
    */
-  const pointsResCache: {[key: number]: APlusStudentPoints[]} = {};
+  const pointsResCache: {[key: number]: AplusStudentPoints[]} = {};
 
   const newGrades: NewGrade[] = [];
   for (const coursePartId of coursePartIds) {
@@ -171,7 +175,7 @@ export const fetchAplusGrades = async (
     const aplusCourseId = gradeSource.aplusCourse.id;
 
     if (!(aplusCourseId in pointsResCache)) {
-      const pointsRes = await fetchFromAplus<APlusPointsRes>(
+      const pointsRes = await fetchFromAplus<AplusPointsRes>(
         `${APLUS_API_URL}/courses/${aplusCourseId}/points?format=json`,
         aplusToken
       );
@@ -208,6 +212,28 @@ export const fetchAplusGrades = async (
           if (grade === undefined) {
             throw new ApiError(
               `A+ course with ID ${aplusCourseId} has no module with ID ${gradeSource.moduleId}`,
+              HttpCode.InternalServerError
+            );
+          }
+          break;
+
+        case AplusGradeSourceType.Exercise:
+          if (!gradeSource.exerciseId) {
+            throw new ApiError(
+              `grade source with ID ${gradeSource.id} has exercise type but does not define exerciseId`,
+              HttpCode.InternalServerError
+            );
+          }
+          for (const module of student.modules) {
+            for (const exercise of module.exercises) {
+              if (exercise.id === gradeSource.exerciseId) {
+                grade = exercise.points;
+              }
+            }
+          }
+          if (grade === undefined) {
+            throw new ApiError(
+              `A+ course with ID ${aplusCourseId} has no exercise with ID ${gradeSource.exerciseId}`,
               HttpCode.InternalServerError
             );
           }

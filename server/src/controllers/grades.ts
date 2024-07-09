@@ -116,6 +116,8 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
             sourceType: grade.AplusGradeSource.sourceType,
             moduleId: grade.AplusGradeSource.moduleId ?? undefined,
             moduleName: grade.AplusGradeSource.moduleName ?? undefined,
+            exerciseId: grade.AplusGradeSource.exerciseId ?? undefined,
+            exerciseName: grade.AplusGradeSource.exerciseName ?? undefined,
             difficulty: grade.AplusGradeSource.difficulty ?? undefined,
           } as AplusGradeSourceData)
         : null,
