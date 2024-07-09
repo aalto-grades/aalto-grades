@@ -308,7 +308,9 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
   });
 
   const getFullPoints = (coursePartId?: number): AplusGradeSourceData =>
-    getGradeSource(AplusGradeSourceType.FullPoints, {coursePartId}) as AplusGradeSourceData;
+    getGradeSource(AplusGradeSourceType.FullPoints, {
+      coursePartId,
+    }) as AplusGradeSourceData;
 
   const getModule = (coursePartId?: number): AplusGradeSourceData =>
     getGradeSource(AplusGradeSourceType.Module, {
@@ -366,17 +368,23 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
   it('should add sources', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
+      const coursePart = await createData.createCoursePart(courseId);
       const res = await request
         .post(`/v1/courses/${courseId}/aplus-sources`)
-        .send([getFullPoints(), getModule(), getExercise(), getDifficulty()])
+        .send([
+          getFullPoints(coursePart.id),
+          getModule(coursePart.id),
+          getExercise(coursePart.id),
+          getDifficulty(coursePart.id),
+        ])
         .set('Cookie', cookie)
         .expect(HttpCode.Created);
 
       expect(JSON.stringify(res.body)).toBe('{}');
-      await checkAplusGradeSource(getFullPoints());
-      await checkAplusGradeSource(getModule());
-      await checkAplusGradeSource(getExercise());
-      await checkAplusGradeSource(getDifficulty());
+      await checkAplusGradeSource(getFullPoints(coursePart.id));
+      await checkAplusGradeSource(getModule(coursePart.id));
+      await checkAplusGradeSource(getExercise(coursePart.id));
+      await checkAplusGradeSource(getDifficulty(coursePart.id));
     }
   });
 
@@ -473,9 +481,9 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
       const source = get(coursePart.id);
 
       // Adding the same grade source twice in the same request
-      await responseTests.testConflict(url, cookies.adminCookie).post([
-        source, source
-      ]);
+      await responseTests
+        .testConflict(url, cookies.adminCookie)
+        .post([source, source]);
 
       // Adding the same grade source which already exists in the database
       await request

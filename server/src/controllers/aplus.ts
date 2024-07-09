@@ -145,10 +145,16 @@ export const addAplusGradeSources = async (
     for (const partGradeSource of partGradeSourcesById[coursePart.id]) {
       const parsed = parseAplusGradeSource(partGradeSource);
       try {
-        assert.notDeepStrictEqual(newGradeSource, {
-          ...parsed,
-          id: undefined,
-        });
+        // This comparison doesn't work without JSON magic and I don't know why
+        assert.notDeepStrictEqual(
+          JSON.parse(JSON.stringify(newGradeSource)),
+          JSON.parse(
+            JSON.stringify({
+              ...parsed,
+              id: undefined,
+            })
+          )
+        );
       } catch (e) {
         throw new ApiError(
           `course part with ID ${parsed.coursePartId} ` +
