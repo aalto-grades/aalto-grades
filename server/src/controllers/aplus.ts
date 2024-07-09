@@ -20,6 +20,7 @@ import {
   fetchFromAplus,
   parseAplusToken,
   validateAplusCourseId,
+  validateAplusGradeSourcePath,
 } from './utils/aplus';
 import {validateCoursePartPath} from './utils/coursePart';
 import {APLUS_API_URL} from '../configs/environment';
@@ -121,6 +122,21 @@ export const addAplusGradeSources = async (
   await AplusGradeSource.bulkCreate(newGradeSources);
 
   res.sendStatus(HttpCode.Created);
+};
+
+/** @throws ApiError(400|404|409) */
+export const deleteAplusGradeSource = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const [_, aplusGradeSource] = await validateAplusGradeSourcePath(
+    req.params.courseId,
+    req.params.aplusGradeSourceId
+  );
+
+  await aplusGradeSource.destroy();
+
+  res.sendStatus(HttpCode.Ok);
 };
 
 /**

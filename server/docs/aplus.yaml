@@ -207,7 +207,7 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/courses/{courseId}/aplus-source:
+/v1/courses/{courseId}/aplus-sources:
   post:
     tags: [A+]
     description: Add A+ grade sources to course parts.
