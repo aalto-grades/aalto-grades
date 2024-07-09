@@ -77,6 +77,27 @@ export const useAddAplusGradeSources = (
   });
 };
 
+export const useDeleteAplusGradeSource = (
+  courseId: Numeric,
+  options?: UseMutationOptions<unknown, unknown, Numeric>
+): UseMutationResult<unknown, unknown, Numeric> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (aplusGradeSourceId: Numeric) =>
+      axios.delete(
+        `/v1/courses/${courseId}/aplus-sources/${aplusGradeSourceId}`
+      ),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['course-parts', courseId],
+      });
+    },
+    ...options,
+  });
+};
+
 export const useFetchAplusGrades = (
   courseId: Numeric,
   coursePartIds: number[],
