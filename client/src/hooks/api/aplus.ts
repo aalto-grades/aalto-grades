@@ -18,7 +18,7 @@ import {
   AplusCourseDataArraySchema,
   AplusExerciseData,
   AplusExerciseDataSchema,
-  AplusGradeSourceData,
+  NewAplusGradeSourceData,
   NewGrade,
   NewGradeArraySchema,
 } from '@/common/types';
@@ -60,12 +60,12 @@ export const useFetchAplusExerciseData = (
 
 export const useAddAplusGradeSources = (
   courseId: Numeric,
-  options?: UseMutationOptions<void, unknown, AplusGradeSourceData[]>
-): UseMutationResult<void, unknown, AplusGradeSourceData[]> => {
+  options?: UseMutationOptions<void, unknown, NewAplusGradeSourceData[]>
+): UseMutationResult<void, unknown, NewAplusGradeSourceData[]> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (gradeSources: AplusGradeSourceData[]) =>
+    mutationFn: (gradeSources: NewAplusGradeSourceData[]) =>
       axios.post(`/v1/courses/${courseId}/aplus-sources`, gradeSources),
 
     onSuccess: () =>
