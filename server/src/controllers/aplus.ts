@@ -188,7 +188,7 @@ export const deleteAplusGradeSource = async (
       e.index === 'attainment_grade_aplus_grade_source_id_fkey'
     ) {
       throw new ApiError(
-        'Tried to delete an A+ grade source wiht grades',
+        'Tried to delete an A+ grade source with grades',
         HttpCode.Conflict
       );
     }
