@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
+import assert from 'node:assert/strict';
+import {ForeignKeyConstraintError} from 'sequelize';
 import {z} from 'zod';
 import {TypedRequestBody} from 'zod-express-middleware';
 
@@ -18,8 +20,10 @@ import {
 } from '@/common/types';
 import {
   fetchFromAplus,
+  parseAplusGradeSource,
   parseAplusToken,
   validateAplusCourseId,
+  validateAplusGradeSourcePath,
 } from './utils/aplus';
 import {validateCoursePartPath} from './utils/coursePart';
 import {APLUS_API_URL} from '../configs/environment';
@@ -110,17 +114,89 @@ export const addAplusGradeSources = async (
   req: TypedRequestBody<typeof NewAplusGradeSourceArraySchema>,
   res: Response
 ): Promise<void> => {
+  const partGradeSourcesById: {[key: number]: AplusGradeSource[]} = {};
   const newGradeSources: NewAplusGradeSourceData[] = req.body;
+
   for (const newGradeSource of newGradeSources) {
-    await validateCoursePartPath(
+    const [_, coursePart] = await validateCoursePartPath(
       req.params.courseId,
       String(newGradeSource.coursePartId)
     );
+
+    for (const other of newGradeSources.filter(
+      source => source !== newGradeSource
+    )) {
+      try {
+        assert.notDeepStrictEqual(newGradeSource, other);
+      } catch (e) {
+        throw new ApiError(
+          `attempted to add the same A+ grade source ${JSON.stringify(newGradeSource)} twice`,
+          HttpCode.Conflict
+        );
+      }
+    }
+
+    if (!(coursePart.id in partGradeSourcesById)) {
+      partGradeSourcesById[coursePart.id] = await AplusGradeSource.findAll({
+        where: {coursePartId: coursePart.id},
+      });
+    }
+
+    for (const partGradeSource of partGradeSourcesById[coursePart.id]) {
+      const parsed = parseAplusGradeSource(partGradeSource);
+      try {
+        // This comparison doesn't work without JSON magic and I don't know why
+        assert.notDeepStrictEqual(
+          JSON.parse(JSON.stringify(newGradeSource)),
+          JSON.parse(
+            JSON.stringify({
+              ...parsed,
+              id: undefined,
+            })
+          )
+        );
+      } catch (e) {
+        throw new ApiError(
+          `course part with ID ${parsed.coursePartId} ` +
+            `already has the A+ grade source ${JSON.stringify(newGradeSource)}`,
+          HttpCode.Conflict
+        );
+      }
+    }
   }
 
   await AplusGradeSource.bulkCreate(newGradeSources);
 
   res.sendStatus(HttpCode.Created);
+};
+
+/** @throws ApiError(400|404|409) */
+export const deleteAplusGradeSource = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const [_, aplusGradeSource] = await validateAplusGradeSourcePath(
+    req.params.courseId,
+    req.params.aplusGradeSourceId
+  );
+
+  try {
+    await aplusGradeSource.destroy();
+  } catch (e) {
+    if (
+      e instanceof ForeignKeyConstraintError &&
+      e.index === 'attainment_grade_aplus_grade_source_id_fkey'
+    ) {
+      throw new ApiError(
+        'Tried to delete an A+ grade source with grades',
+        HttpCode.Conflict
+      );
+    }
+
+    throw e;
+  }
+
+  res.sendStatus(HttpCode.Ok);
 };
 
 /**

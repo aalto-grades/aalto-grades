@@ -15,7 +15,7 @@ import {JSX} from 'react';
 
 import {
   AplusCourseData,
-  AplusGradeSourceData,
+  NewAplusGradeSourceData,
   AplusGradeSourceType,
 } from '@/common/types';
 import {useFetchAplusExerciseData} from '../../hooks/useApi';
@@ -25,7 +25,7 @@ type PropsType = {
   handleChange: (
     checked: boolean,
     name: string,
-    source: AplusGradeSourceData
+    source: NewAplusGradeSourceData
   ) => void;
 };
 

@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AplusGradeSourceData, CoursePartData, HttpCode} from '@/common/types';
+import {CoursePartData, HttpCode} from '@/common/types';
+import {parseAplusGradeSource} from './aplus';
 import {findAndValidateCourseId} from './course';
 import AplusGradeSource from '../../database/models/aplusGradeSource';
 import Course from '../../database/models/course';
@@ -44,18 +45,8 @@ export const findCoursePartByCourseId = async (
       name: coursePart.name,
       daysValid: coursePart.daysValid,
       archived: coursePart.archived,
-      aplusGradeSources: coursePart.AplusGradeSources.map(
-        gradeSource =>
-          ({
-            coursePartId: coursePart.id, // TODO: Redundant
-            aplusCourse: gradeSource.aplusCourse,
-            sourceType: gradeSource.sourceType,
-            moduleId: gradeSource.moduleId ?? undefined,
-            moduleName: gradeSource.moduleName ?? undefined,
-            exerciseId: gradeSource.exerciseId ?? undefined,
-            exerciseName: gradeSource.exerciseName ?? undefined,
-            difficulty: gradeSource.difficulty ?? undefined,
-          }) as AplusGradeSourceData
+      aplusGradeSources: coursePart.AplusGradeSources.map(gradeSource =>
+        parseAplusGradeSource(gradeSource)
       ),
     })
   );

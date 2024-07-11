@@ -18,7 +18,7 @@ import {
   AplusCourseDataArraySchema,
   AplusExerciseData,
   AplusExerciseDataSchema,
-  AplusGradeSourceData,
+  NewAplusGradeSourceData,
   NewGrade,
   NewGradeArraySchema,
 } from '@/common/types';
@@ -60,19 +60,40 @@ export const useFetchAplusExerciseData = (
 
 export const useAddAplusGradeSources = (
   courseId: Numeric,
-  options?: UseMutationOptions<void, unknown, AplusGradeSourceData[]>
-): UseMutationResult<void, unknown, AplusGradeSourceData[]> => {
+  options?: UseMutationOptions<void, unknown, NewAplusGradeSourceData[]>
+): UseMutationResult<void, unknown, NewAplusGradeSourceData[]> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (gradeSources: AplusGradeSourceData[]) =>
-      axios.post(`/v1/courses/${courseId}/aplus-source`, gradeSources),
+    mutationFn: (gradeSources: NewAplusGradeSourceData[]) =>
+      axios.post(`/v1/courses/${courseId}/aplus-sources`, gradeSources),
 
     onSuccess: () =>
       queryClient.invalidateQueries({
         queryKey: ['course-parts', courseId],
       }),
 
+    ...options,
+  });
+};
+
+export const useDeleteAplusGradeSource = (
+  courseId: Numeric,
+  options?: UseMutationOptions<unknown, unknown, Numeric>
+): UseMutationResult<unknown, unknown, Numeric> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (aplusGradeSourceId: Numeric) =>
+      axios.delete(
+        `/v1/courses/${courseId}/aplus-sources/${aplusGradeSourceId}`
+      ),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['course-parts', courseId],
+      });
+    },
     ...options,
   });
 };

@@ -9,6 +9,7 @@ import {processRequestBody} from 'zod-express-middleware';
 import {CourseRoleType, NewAplusGradeSourceArraySchema} from '@/common/types';
 import {
   addAplusGradeSources,
+  deleteAplusGradeSource,
   fetchAplusCourses,
   fetchAplusExerciseData,
   fetchAplusGrades,
@@ -32,13 +33,20 @@ router.get(
 );
 
 router.post(
-  '/v1/courses/:courseId/aplus-source',
+  '/v1/courses/:courseId/aplus-sources',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(NewAplusGradeSourceArraySchema),
   controllerDispatcher(addAplusGradeSources)
+);
+
+router.delete(
+  '/v1/courses/:courseId/aplus-sources/:aplusGradeSourceId',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([CourseRoleType.Teacher]),
+  controllerDispatcher(deleteAplusGradeSource)
 );
 
 router.get(

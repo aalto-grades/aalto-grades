@@ -207,7 +207,7 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/courses/{courseId}/aplus-source:
+/v1/courses/{courseId}/aplus-sources:
   post:
     tags: [A+]
     description: Add A+ grade sources to course parts.
@@ -223,6 +223,29 @@ definitions:
     responses:
       201:
         description: A+ grade sources created.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+
+/v1/courses/{courseId}/aplus-sources/{aplusGradeSourceId}:
+  delete:
+    tags: [A+]
+    descripton: Delete A+ grade source.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/components/parameters/aplusGradeSourceId'
+    responses:
+      200:
+        descrption: A+ grade source deleted.
       400:
         $ref: '#/components/responses/BadRequest'
       401:

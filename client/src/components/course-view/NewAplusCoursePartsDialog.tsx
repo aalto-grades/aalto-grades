@@ -14,7 +14,7 @@ import {useParams} from 'react-router-dom';
 
 import {
   AplusCourseData,
-  AplusGradeSourceData,
+  NewAplusGradeSourceData,
   AplusGradeSourceType,
 } from '@/common/types';
 import CreateAplusCourseParts from './CreateAplusCourseParts';
@@ -51,7 +51,7 @@ const NewAplusCoursePartsDialog = ({
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
   const [coursePartsWithSource, setCoursePartsWithSource] = useState<
-    [{name: string; daysValid: number}, AplusGradeSourceData][]
+    [{name: string; daysValid: number}, NewAplusGradeSourceData][]
   >([]);
 
   useEffect(() => {
@@ -68,7 +68,7 @@ const NewAplusCoursePartsDialog = ({
   const handleSelectionChange = (
     checked: boolean,
     name: string,
-    source: AplusGradeSourceData
+    source: NewAplusGradeSourceData
   ): void => {
     if (checked) {
       setCoursePartsWithSource([
@@ -117,7 +117,7 @@ const NewAplusCoursePartsDialog = ({
   };
 
   const handleSubmit = async (): Promise<void> => {
-    const sources: AplusGradeSourceData[] = [];
+    const sources: NewAplusGradeSourceData[] = [];
     for (const [coursePart, source] of coursePartsWithSource) {
       sources.push({
         ...source,
@@ -131,7 +131,9 @@ const NewAplusCoursePartsDialog = ({
   return (
     <>
       <Dialog open={open} onClose={handleResetAndClose}>
-        <DialogTitle>A+ Courses</DialogTitle>
+        {step === 0 && <DialogTitle>A+ courses</DialogTitle>}
+        {step === 1 && <DialogTitle>Select grade sources</DialogTitle>}
+        {step === 2 && <DialogTitle>Create course parts</DialogTitle>}
         <DialogContent>
           {step === 0 && aplusCourses.data && (
             <SelectAplusCourse
