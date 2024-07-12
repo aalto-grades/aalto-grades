@@ -19,6 +19,7 @@ import {
   AplusGradeSourceType,
 } from '@/common/types';
 import {useFetchAplusExerciseData} from '../../hooks/useApi';
+import {getLatestAplusModuleDate} from '../../utils/utils';
 
 type PropsType = {
   aplusCourse: AplusCourseData;
@@ -52,6 +53,7 @@ const SelectAplusGradeSources = ({
                     coursePartId: -1,
                     aplusCourse: aplusCourse,
                     sourceType: AplusGradeSourceType.FullPoints,
+                    date: getLatestAplusModuleDate(aplusExerciseData.data),
                   })
                 }
               />
@@ -80,6 +82,7 @@ const SelectAplusGradeSources = ({
                           sourceType: AplusGradeSourceType.Module,
                           moduleId: module.id,
                           moduleName: module.name,
+                          date: module.closingDate,
                         }
                       )
                     }
@@ -112,6 +115,7 @@ const SelectAplusGradeSources = ({
                             sourceType: AplusGradeSourceType.Exercise,
                             exerciseId: exercise.id,
                             exerciseName: exercise.name,
+                            date: module.closingDate,
                           }
                         )
                       }
@@ -144,6 +148,9 @@ const SelectAplusGradeSources = ({
                             aplusCourse: aplusCourse,
                             sourceType: AplusGradeSourceType.Difficulty,
                             difficulty: difficulty,
+                            date: getLatestAplusModuleDate(
+                              aplusExerciseData.data
+                            ),
                           }
                         )
                       }

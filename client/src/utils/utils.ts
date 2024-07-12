@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  AplusExerciseData,
   AuthData,
   CourseData,
   CourseRoleType,
@@ -84,3 +85,10 @@ export const setAplusToken = (token: string): void =>
 
 export const getAplusToken = (): string | null =>
   localStorage.getItem('Aplus-Token');
+
+export const getLatestAplusModuleDate = (
+  aplusExerciseData: AplusExerciseData
+): Date =>
+  aplusExerciseData.modules.sort(
+    (a, b) => b.closingDate.getTime() - a.closingDate.getTime()
+  )[0].closingDate;
