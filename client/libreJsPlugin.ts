@@ -5,6 +5,7 @@
 import axios from 'axios';
 import {load} from 'cheerio';
 import fs from 'fs';
+import parse, {Info} from 'spdx-expression-parse';
 import {Plugin} from 'vite';
 
 type Dependency = {
@@ -24,6 +25,15 @@ type LicenseInfo = {
   url: string;
   type: LicenseType;
 };
+
+type DependencyLicenseInfo =
+  | {
+      left: DependencyLicenseInfo;
+      conjunction: 'and' | 'or';
+      right: DependencyLicenseInfo;
+    }
+  | LicenseInfo
+  | undefined;
 
 type Options = {
   /** Path of the index HTML file relative to the build directory. */
@@ -159,40 +169,109 @@ function findLicenseInfo(
   list: LicenseInfo[],
   aliases: {[key: string]: string | undefined},
   dependency: Dependency
-): LicenseInfo | undefined {
-  return list.find(info => info.id === transform(aliases, dependency.license));
+): DependencyLicenseInfo {
+  const info = list.find(
+    val => val.id === transform(aliases, dependency.license)
+  );
+
+  function traverseSpdxExpr(expr: Info): DependencyLicenseInfo {
+    if ('license' in expr) {
+      return list.find(val => val.id === transform(aliases, expr.license));
+    }
+
+    return {
+      left: traverseSpdxExpr(expr.left),
+      conjunction: expr.conjunction,
+      right: traverseSpdxExpr(expr.right),
+    };
+  }
+
+  if (!info) {
+    return traverseSpdxExpr(parse(dependency.license));
+  }
+
+  return info;
 }
 
 function validateLicense(
   dependency: Dependency,
-  info: LicenseInfo | undefined
-): info is LicenseInfo {
-  if (!info) {
-    throw new Error(
-      `Dependency ${dependency.name} has an unrecognized license: ${dependency.license}. ` +
-        'If this is a free software license, add it as an alias to the licenseExceptions property, otherwise this dependency MUST be removed.'
-    );
+  info: DependencyLicenseInfo
+): LicenseInfo[] {
+  function traverseSpdxExpr(
+    expr: DependencyLicenseInfo,
+    throwError: boolean
+  ): (LicenseInfo | Error)[] {
+    function raiseError(message: string): [Error] {
+      const error = new Error(message);
+      if (throwError) {
+        throw error;
+      }
+
+      return [error];
+    }
+
+    if (!expr) {
+      return raiseError(
+        `Dependency ${dependency.name} has an unrecognized license: ${dependency.license}. ` +
+          'If this is a free software license, add it as an alias to the licenseExceptions property, otherwise this dependency MUST be removed.'
+      );
+    }
+
+    if ('id' in expr) {
+      switch (expr.type) {
+        case LicenseType.Free:
+          return [expr];
+        case LicenseType.NonFree:
+          return raiseError(
+            `Dependency ${dependency.name} has a NON-FREE license: ${expr.id}. ` +
+              'This dependency MUST be removed.'
+          );
+        case LicenseType.OpenSource:
+          return raiseError(
+            `Dependency ${dependency.name} has an open source license: ${expr.id}. ` +
+              'If this is a free software license, add it as exception to the licenseExceptions property, otherwise this dependency MUST be removed.'
+          );
+        case LicenseType.Unknown:
+          return raiseError(
+            `Dependency ${dependency.name} has an unknown license: ${expr.id}. ` +
+              'If this is a free software license, add it as exception to the licenseExceptions property, otherwise this dependency MUST be removed.'
+          );
+      }
+    }
+
+    switch (expr.conjunction) {
+      case 'and': {
+        const result = [
+          ...traverseSpdxExpr(expr.left, false),
+          ...traverseSpdxExpr(expr.right, false),
+        ];
+
+        const error = result.find(val => val instanceof Error);
+        if (error) {
+          throw error;
+        }
+
+        return result;
+      }
+
+      case 'or': {
+        const left = traverseSpdxExpr(expr.left, false);
+        const right = traverseSpdxExpr(expr.right, false);
+
+        const leftError = left.find(val => val instanceof Error);
+        const rightError = right.find(val => val instanceof Error);
+        if (leftError && rightError) {
+          throw leftError;
+        }
+
+        return [...(leftError ? [] : left), ...(rightError ? [] : right)];
+      }
+    }
   }
 
-  switch (info.type) {
-    case LicenseType.Free:
-      return true;
-    case LicenseType.NonFree:
-      throw new Error(
-        `Dependency ${dependency.name} has a NON-FREE license: ${info.id}. ` +
-          'This dependency MUST be removed.'
-      );
-    case LicenseType.OpenSource:
-      throw new Error(
-        `Dependency ${dependency.name} has an open source license: ${info.id}. ` +
-          'If this is a free software license, add it as exception to the licenseExceptions property, otherwise this dependency MUST be removed.'
-      );
-    case LicenseType.Unknown:
-      throw new Error(
-        `Dependency ${dependency.name} has an unknown license: ${info.id}. ` +
-          'If this is a free software license, add it as exception to the licenseExceptions property, otherwise this dependency MUST be removed.'
-      );
-  }
+  return traverseSpdxExpr(info, true).filter(
+    val => !(val instanceof Error)
+  ) as LicenseInfo[];
 }
 
 export default function libreJs({
@@ -222,14 +301,18 @@ export default function libreJs({
         // Find the licenses of dependencies
         const webLabelsList: LicenseInfo[] = [];
         for (const dependency of dependencies) {
-          const info = findLicenseInfo(list, licenseAliases, dependency);
+          const infoList = validateLicense(
+            dependency,
+            findLicenseInfo(list, licenseAliases, dependency)
+          );
 
-          if (
-            validateLicense(dependency, info) &&
-            !webLabelsList.find(val => val.id === info.id) &&
-            info.id !== transform(licenseAliases, projectLicense)
-          ) {
-            webLabelsList.push(info);
+          for (const info of infoList) {
+            if (
+              !webLabelsList.find(val => val.id === info.id) &&
+              info.id !== transform(licenseAliases, projectLicense)
+            ) {
+              webLabelsList.push(info);
+            }
           }
         }
 
