@@ -247,8 +247,8 @@ export default function libreJs({
 
         // Add a link to the bundle script to the web labels list
         const script = index('script').get()[0].attribs.src;
-        webLabels('#main').replaceWith(
-          `<a id="main" href="${script}">${script}</a>`
+        webLabels('#bundle').replaceWith(
+          `<a id="bundle" href="${script}">${script}</a>`
         );
 
         fs.writeFileSync(indexPath, index.html());

@@ -37,8 +37,7 @@
   "scripts": {
     "start": "vite",
     "test": "vitest run",
-    "build": "./build.sh",
-    "build:vite": "tsc && vite build",
+    "build": "tsc && vite build",
     "preview": "vite preview --port 3005",
     "vitest-preview": "vitest-preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
