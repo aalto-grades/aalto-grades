@@ -30,8 +30,9 @@ export default defineConfig({
       },
     }),
     libreJs({
-      webLabelsFile: 'build/javascript.html',
-      dependenciesFile: 'build/dependencies.json',
+      webLabelsFile: 'javascript.html',
+      dependenciesFile: 'dependencies.json',
+      projectLicense: 'Expat',
       licenseExceptions: ['0BSD'],
     }),
   ],
