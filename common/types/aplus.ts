@@ -4,7 +4,7 @@
 
 import {z} from 'zod';
 
-import {IdSchema} from './general';
+import {DateSchema, IdSchema} from './general';
 
 export enum AplusGradeSourceType {
   FullPoints = 'FULL_POINTS',
@@ -29,6 +29,7 @@ export const AplusExerciseDataSchema = z.strictObject({
     z.strictObject({
       id: z.number().int(),
       name: z.string(),
+      closingDate: DateSchema,
       exercises: z.array(
         z.strictObject({
           id: z.number().int(),
@@ -73,6 +74,7 @@ export const AplusGradeSourceDataSchema = z.discriminatedUnion('sourceType', [
 const NewGradeSourceBase = z.strictObject({
   coursePartId: IdSchema,
   aplusCourse: AplusCourseDataSchema,
+  date: DateSchema,
 });
 const NewAplusGradeSourceSchema = z.discriminatedUnion('sourceType', [
   NewGradeSourceBase.extend(fullPointsBase).strict(),
