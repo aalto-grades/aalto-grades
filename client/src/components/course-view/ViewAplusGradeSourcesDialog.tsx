@@ -2,12 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {Delete} from '@mui/icons-material';
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   Link,
   Paper,
   Table,
@@ -16,10 +18,13 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
 } from '@mui/material';
 import {JSX} from 'react';
+import {useParams} from 'react-router-dom';
 
 import {AplusGradeSourceData, AplusGradeSourceType} from '@/common/types';
+import {useDeleteAplusGradeSource} from '../../hooks/useApi';
 
 type PropsType = {
   handleClose: () => void;
@@ -32,6 +37,9 @@ const ViewAplusGradeSourcesDialog = ({
   open,
   aplusGradeSources,
 }: PropsType): JSX.Element => {
+  const {courseId} = useParams() as {courseId: string};
+  const deleteAplusGradeSource = useDeleteAplusGradeSource(courseId);
+
   const getSourceName = (source: AplusGradeSourceData): string => {
     switch (source.sourceType) {
       case AplusGradeSourceType.FullPoints:
@@ -45,8 +53,13 @@ const ViewAplusGradeSourcesDialog = ({
     }
   };
 
+  const handleDelete = (aplusGradeSourceId: number): void => {
+    deleteAplusGradeSource.mutate(aplusGradeSourceId);
+    handleClose();
+  };
+
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} maxWidth="lg">
       <DialogTitle>A+ grade sources</DialogTitle>
       <DialogContent>
         <TableContainer component={Paper}>
@@ -72,6 +85,13 @@ const ViewAplusGradeSourcesDialog = ({
                     </Link>
                   </TableCell>
                   <TableCell>{getSourceName(source)}</TableCell>
+                  <TableCell>
+                    <Tooltip placement="top" title="Delete A+ grade source">
+                      <IconButton onClick={() => handleDelete(source.id)}>
+                        <Delete />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

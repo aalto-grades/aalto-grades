@@ -5,12 +5,12 @@
 import {Box, Card, CardContent, TextField} from '@mui/material';
 import {JSX} from 'react';
 
-import {AplusGradeSourceData} from '@/common/types';
+import {NewAplusGradeSourceData} from '@/common/types';
 
 type CreateAplusCoursePartsProps = {
   coursePartsWithSource: [
     {name: string; daysValid: number},
-    AplusGradeSourceData,
+    NewAplusGradeSourceData,
   ][];
   handleChange: (
     index: number,

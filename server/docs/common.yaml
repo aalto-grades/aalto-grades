@@ -79,6 +79,15 @@ components:
       required: true
       example: 1
       description: The ID of a course in A+.
+    aplusGradeSourceId:
+      in: path
+      name: aplusGradeSourceId
+      schema:
+        type: integer
+        format: int32
+      required: true
+      example: 1
+      description: The ID of the A+ grade source.
     aplusToken:
       in: header
       name: Authorization

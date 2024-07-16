@@ -40,38 +40,51 @@ export const AplusExerciseDataSchema = z.strictObject({
   difficulties: z.array(z.string()),
 });
 
+const fullPointsBase = {
+  sourceType: z.literal(AplusGradeSourceType.FullPoints),
+};
+const moduleBase = {
+  sourceType: z.literal(AplusGradeSourceType.Module),
+  moduleId: z.number().int(),
+  moduleName: z.string(),
+};
+const exerciseBase = {
+  sourceType: z.literal(AplusGradeSourceType.Exercise),
+  exerciseId: z.number().int(),
+  exerciseName: z.string(),
+};
+const difficultyBase = {
+  sourceType: z.literal(AplusGradeSourceType.Difficulty),
+  difficulty: z.string(),
+};
+
 const GradeSourceBase = z.strictObject({
+  id: IdSchema,
   coursePartId: IdSchema,
   aplusCourse: AplusCourseDataSchema,
 });
-
 export const AplusGradeSourceDataSchema = z.discriminatedUnion('sourceType', [
-  GradeSourceBase.extend({
-    sourceType: z.literal(AplusGradeSourceType.FullPoints),
-  }).strict(),
-  GradeSourceBase.extend({
-    sourceType: z.literal(AplusGradeSourceType.Module),
-    moduleId: z.number().int(),
-    moduleName: z.string(),
-  }).strict(),
-  GradeSourceBase.extend({
-    sourceType: z.literal(AplusGradeSourceType.Exercise),
-    exerciseId: z.number().int(),
-    exerciseName: z.string(),
-  }).strict(),
-  GradeSourceBase.extend({
-    sourceType: z.literal(AplusGradeSourceType.Difficulty),
-    difficulty: z.string(),
-  }).strict(),
+  GradeSourceBase.extend(fullPointsBase).strict(),
+  GradeSourceBase.extend(moduleBase).strict(),
+  GradeSourceBase.extend(exerciseBase).strict(),
+  GradeSourceBase.extend(difficultyBase).strict(),
 ]);
 
+const NewGradeSourceBase = z.strictObject({
+  coursePartId: IdSchema,
+  aplusCourse: AplusCourseDataSchema,
+});
+const NewAplusGradeSourceSchema = z.discriminatedUnion('sourceType', [
+  NewGradeSourceBase.extend(fullPointsBase).strict(),
+  NewGradeSourceBase.extend(moduleBase).strict(),
+  NewGradeSourceBase.extend(exerciseBase).strict(),
+  NewGradeSourceBase.extend(difficultyBase).strict(),
+]);
 export const NewAplusGradeSourceArraySchema = z.array(
-  AplusGradeSourceDataSchema
+  NewAplusGradeSourceSchema
 );
 
 export type AplusCourseData = z.infer<typeof AplusCourseDataSchema>;
 export type AplusExerciseData = z.infer<typeof AplusExerciseDataSchema>;
 export type AplusGradeSourceData = z.infer<typeof AplusGradeSourceDataSchema>;
-
-// In case this changes later
-export type NewAplusGradeSourceData = AplusGradeSourceData;
+export type NewAplusGradeSourceData = z.infer<typeof NewAplusGradeSourceSchema>;

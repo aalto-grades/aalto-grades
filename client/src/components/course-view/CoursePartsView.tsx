@@ -21,7 +21,8 @@ import {
   NewCoursePartData,
   SystemRole,
 } from '@/common/types';
-import NewAplusCoursePartsDialog from './NewAplusGradePartsDialog';
+import AddAplusGradeSourceDialog from './AddAplusGradeSourceDialog';
+import NewAplusCoursePartsDialog from './NewAplusCoursePartsDialog';
 import AddCoursePartDialog from './NewCoursePartDialog';
 import ViewAplusGradeSourcesDialog from './ViewAplusGradeSourcesDialog';
 import {
@@ -62,6 +63,9 @@ const CoursePartsView = (): JSX.Element => {
   const [editing, setEditing] = useState<boolean>(false);
   const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false);
   const [aplusDialogOpen, setAplusDialogOpen] = useState<boolean>(false);
+  const [addAplusSourcesTo, setAddAplusSourcesTo] = useState<number | null>(
+    null
+  );
   const [viewAplusSourcesOpen, setViewAplusSourcesOpen] =
     useState<boolean>(false);
   const [aplusGradeSources, setAplusGradeSources] = useState<
@@ -207,7 +211,7 @@ const CoursePartsView = (): JSX.Element => {
       <GridActionsCellItem
         icon={<AddCircle />}
         label="Add A+ grade source"
-        onClick={() => window.alert('Not implemented!')}
+        onClick={() => setAddAplusSourcesTo(params.row.id)}
       />
     );
 
@@ -316,6 +320,10 @@ const CoursePartsView = (): JSX.Element => {
       <NewAplusCoursePartsDialog
         handleClose={() => setAplusDialogOpen(false)}
         open={aplusDialogOpen}
+      />
+      <AddAplusGradeSourceDialog
+        handleClose={() => setAddAplusSourcesTo(null)}
+        coursePartId={addAplusSourcesTo}
       />
       <ViewAplusGradeSourcesDialog
         handleClose={() => setViewAplusSourcesOpen(false)}

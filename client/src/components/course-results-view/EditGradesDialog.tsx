@@ -13,6 +13,7 @@ import {
 import {
   DataGrid,
   GridActionsCellItem,
+  GridCellParams,
   GridColDef,
   GridRowModel,
   GridRowsProp,
@@ -39,6 +40,7 @@ type ColTypes = {
   exported: boolean;
   comment: string;
   selected: string;
+  aplusGrade: boolean;
 };
 
 type PropsType = {
@@ -123,6 +125,7 @@ const EditGradesDialog = ({
       exported: grade.exportedToSisu !== null,
       comment: grade.comment ?? '',
       selected: '',
+      aplusGrade: grade.aplusGradeSource !== null,
     }));
     setRows(newRows);
     setInitRows(structuredClone(newRows));
@@ -207,6 +210,7 @@ const EditGradesDialog = ({
           exported: false,
           comment: '',
           selected: '',
+          aplusGrade: false,
         };
         return oldRows.concat(newRow);
       });
@@ -223,7 +227,7 @@ const EditGradesDialog = ({
   const handleSubmit = async (): Promise<void> => {
     const newGrades: NewGrade[] = [];
     const deletedGrades: number[] = [];
-    const editedGrades: ({gradeId: number} & EditGradeData)[] = [];
+    const editedGrades: {gradeId: number; data: EditGradeData}[] = [];
 
     for (const row of rows) {
       if (row.gradeId === -1) {
@@ -238,10 +242,12 @@ const EditGradesDialog = ({
       } else {
         editedGrades.push({
           gradeId: row.gradeId,
-          grade: row.grade,
-          date: row.date,
-          expiryDate: row.expiryDate,
-          comment: row.comment,
+          data: {
+            grade: row.aplusGrade ? undefined : row.grade,
+            date: row.date,
+            expiryDate: row.expiryDate,
+            comment: row.comment,
+          },
         });
       }
     }
@@ -255,9 +261,7 @@ const EditGradesDialog = ({
     await Promise.all([
       addGrades.mutateAsync(newGrades),
       ...deletedGrades.map(gradeId => deleteGrade.mutateAsync(gradeId)),
-      ...editedGrades.map(grade =>
-        editGrade.mutateAsync({gradeId: grade.gradeId, data: grade})
-      ),
+      ...editedGrades.map(editedGrade => editGrade.mutateAsync(editedGrade)),
     ]);
 
     onClose();
@@ -308,6 +312,9 @@ const EditGradesDialog = ({
               }}
               onRowEditStart={() => setEditing(true)}
               onRowEditStop={() => setEditing(false)}
+              isCellEditable={(params: GridCellParams<ColTypes>) =>
+                !(params.row.aplusGrade && params.field === 'grade')
+              }
               processRowUpdate={(
                 updatedRow: GridRowModel<ColTypes>,
                 oldRow: GridRowModel<ColTypes>
