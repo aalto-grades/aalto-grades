@@ -96,8 +96,7 @@ function transform(
 }
 
 async function makeLicenseList(
-  exceptions: string[],
-  aliases: {[key: string]: string | undefined}
+  exceptions: string[]
 ): Promise<LicenseInfo[]> {
   // Licenses recognized as free by LibreJS
   const libreJsList = (
@@ -152,7 +151,7 @@ async function makeLicenseList(
       }
 
       return {
-        id: transform(aliases, val.licenseId),
+        id: transform({}, val.licenseId),
         url: val.reference,
         type: exception ? LicenseType.Free : type,
       };
@@ -296,7 +295,7 @@ export default function libreJs({
       ) as Dependency[];
 
       (async () => {
-        const list = await makeLicenseList(licenseExceptions, licenseAliases);
+        const list = await makeLicenseList(licenseExceptions);
 
         // Find the licenses of dependencies
         const webLabelsList: LicenseInfo[] = [];
