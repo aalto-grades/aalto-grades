@@ -95,9 +95,7 @@ function transform(
   return spdxToLibreJsId[alias] || alias;
 }
 
-async function makeLicenseList(
-  exceptions: string[]
-): Promise<LicenseInfo[]> {
+async function makeLicenseList(exceptions: string[]): Promise<LicenseInfo[]> {
   // Licenses recognized as free by LibreJS
   const libreJsList = (
     await axios.get<{
