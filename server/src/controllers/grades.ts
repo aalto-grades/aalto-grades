@@ -167,8 +167,7 @@ export const addGrades = async (
   const grader = req.user as JwtClaims;
   const courseId = await validateCourseId(req.params.courseId);
 
-  // Validate that course parts belong to correct course
-  const coursePartIds = new Set<number>();
+  // Validate that course parts and A+ grade sources belong to correct course
   for (const grade of req.body) {
     await validateCoursePartBelongsToCourse(courseId, grade.coursePartId);
     if (grade.aplusGradeSourceId) {
@@ -177,8 +176,6 @@ export const addGrades = async (
         grade.aplusGradeSourceId
       );
     }
-
-    coursePartIds.add(grade.coursePartId);
   }
 
   // Check all users (students) exists in db, create new users if needed.
@@ -225,20 +222,50 @@ export const addGrades = async (
     students.map(student => [student.studentNumber, student.id])
   );
 
-  // Use studentsWithId to update course parts by flatmapping each
-  // students grades into a one array of all the grades.
-  const preparedBulkCreate: NewDbGradeData[] = req.body.map(gradeEntry => ({
-    userId: studentNumberToId[gradeEntry.studentNumber],
-    coursePartId: gradeEntry.coursePartId,
-    graderId: grader.id,
-    aplusGradeSourceId: gradeEntry.aplusGradeSourceId,
-    date: gradeEntry.date,
-    expiryDate: gradeEntry.expiryDate,
-    grade: gradeEntry.grade,
-  }));
+  await sequelize.transaction(async t => {
+    const preparedBulkCreate: NewDbGradeData[] = [];
 
-  // TODO: Optimize if datasets are big.
-  await AttainmentGrade.bulkCreate(preparedBulkCreate);
+    for (const gradeEntry of req.body) {
+      const userId = studentNumberToId[gradeEntry.studentNumber];
+
+      // If a student already has a grade for a particular A+ grade source,
+      // don't create a new grade row. Instead, update the existing one.
+      if (gradeEntry.aplusGradeSourceId !== undefined) {
+        const grade = await AttainmentGrade.findOne({
+          where: {
+            userId: userId,
+            coursePartId: gradeEntry.coursePartId,
+            aplusGradeSourceId: gradeEntry.aplusGradeSourceId,
+          },
+        });
+
+        if (grade) {
+          await grade
+            .set({
+              grade: gradeEntry.grade,
+              date: gradeEntry.date,
+              expiryDate: gradeEntry.expiryDate,
+              graderId: grader.id,
+            })
+            .save({transaction: t});
+          continue;
+        }
+      }
+
+      preparedBulkCreate.push({
+        userId: userId,
+        coursePartId: gradeEntry.coursePartId,
+        graderId: grader.id,
+        aplusGradeSourceId: gradeEntry.aplusGradeSourceId,
+        date: gradeEntry.date,
+        expiryDate: gradeEntry.expiryDate,
+        grade: gradeEntry.grade,
+      });
+    }
+
+    // TODO: Optimize if datasets are big.
+    await AttainmentGrade.bulkCreate(preparedBulkCreate, {transaction: t});
+  });
 
   // Create student roles for all the students (TODO: Remove role if grades are removed?)
   const dbCourseRoles = await CourseRole.findAll({
