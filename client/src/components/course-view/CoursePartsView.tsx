@@ -63,9 +63,13 @@ const CoursePartsView = (): JSX.Element => {
   const [editing, setEditing] = useState<boolean>(false);
   const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false);
   const [aplusDialogOpen, setAplusDialogOpen] = useState<boolean>(false);
-  const [addAplusSourcesTo, setAddAplusSourcesTo] = useState<number | null>(
-    null
-  );
+  const [addAplusSourcesTo, setAddAplusSourcesTo] = useState<{
+    coursePartId: number | null;
+    aplusGradeSources: AplusGradeSourceData[];
+  }>({
+    coursePartId: null,
+    aplusGradeSources: [],
+  });
   const [viewAplusSourcesOpen, setViewAplusSourcesOpen] =
     useState<boolean>(false);
   const [aplusGradeSources, setAplusGradeSources] = useState<
@@ -211,7 +215,12 @@ const CoursePartsView = (): JSX.Element => {
       <GridActionsCellItem
         icon={<AddCircle />}
         label="Add A+ grade source"
-        onClick={() => setAddAplusSourcesTo(params.row.id)}
+        onClick={() =>
+          setAddAplusSourcesTo({
+            coursePartId: params.row.id,
+            aplusGradeSources: params.row.aplusGradeSources,
+          })
+        }
       />
     );
 
@@ -322,8 +331,14 @@ const CoursePartsView = (): JSX.Element => {
         open={aplusDialogOpen}
       />
       <AddAplusGradeSourceDialog
-        handleClose={() => setAddAplusSourcesTo(null)}
-        coursePartId={addAplusSourcesTo}
+        handleClose={() =>
+          setAddAplusSourcesTo({
+            coursePartId: null,
+            aplusGradeSources: [],
+          })
+        }
+        coursePartId={addAplusSourcesTo.coursePartId}
+        aplusGradeSources={addAplusSourcesTo.aplusGradeSources}
       />
       <ViewAplusGradeSourcesDialog
         handleClose={() => setViewAplusSourcesOpen(false)}

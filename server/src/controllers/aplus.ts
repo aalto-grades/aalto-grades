@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
-import assert from 'node:assert/strict';
 import {ForeignKeyConstraintError} from 'sequelize';
 import {z} from 'zod';
 import {TypedRequestBody} from 'zod-express-middleware';
@@ -18,6 +17,7 @@ import {
   NewAplusGradeSourceData,
   NewGrade,
 } from '@/common/types';
+import {aplusGradeSourcesEqual} from '@/common/util/aplus';
 import {
   fetchFromAplus,
   parseAplusGradeSource,
@@ -126,9 +126,7 @@ export const addAplusGradeSources = async (
     for (const other of newGradeSources.filter(
       source => source !== newGradeSource
     )) {
-      try {
-        assert.notDeepStrictEqual(newGradeSource, other);
-      } catch (e) {
+      if (aplusGradeSourcesEqual(newGradeSource, other)) {
         throw new ApiError(
           `attempted to add the same A+ grade source ${JSON.stringify(newGradeSource)} twice`,
           HttpCode.Conflict
@@ -144,18 +142,7 @@ export const addAplusGradeSources = async (
 
     for (const partGradeSource of partGradeSourcesById[coursePart.id]) {
       const parsed = parseAplusGradeSource(partGradeSource);
-      try {
-        // This comparison doesn't work without JSON magic and I don't know why
-        assert.notDeepStrictEqual(
-          JSON.parse(JSON.stringify(newGradeSource)),
-          JSON.parse(
-            JSON.stringify({
-              ...parsed,
-              id: undefined,
-            })
-          )
-        );
-      } catch (e) {
+      if (aplusGradeSourcesEqual(newGradeSource, parsed)) {
         throw new ApiError(
           `course part with ID ${parsed.coursePartId} ` +
             `already has the A+ grade source ${JSON.stringify(newGradeSource)}`,
