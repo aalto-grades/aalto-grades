@@ -3,11 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  AplusCourseData,
+  AplusGradeSourceType,
   AuthData,
   CourseData,
   CourseRoleType,
   GradingScale,
   Language,
+  NewAplusGradeSourceData,
 } from '@/common/types';
 import {LanguageOption} from '../types';
 
@@ -84,3 +87,55 @@ export const setAplusToken = (token: string): void =>
 
 export const getAplusToken = (): string | null =>
   localStorage.getItem('Aplus-Token');
+
+export const newAplusGradeSource = (
+  aplusCourse: AplusCourseData,
+  {
+    module,
+    exercise,
+    difficulty,
+  }: {
+    module?: {
+      id: number;
+      name: string;
+    };
+    exercise?: {
+      id: number;
+      name: string;
+    };
+    difficulty?: string;
+  }
+): NewAplusGradeSourceData => {
+  const base = {coursePartId: -1, aplusCourse: aplusCourse};
+
+  if (module !== undefined) {
+    return {
+      ...base,
+      sourceType: AplusGradeSourceType.Module,
+      moduleId: module.id,
+      moduleName: module.name,
+    };
+  }
+
+  if (exercise !== undefined) {
+    return {
+      ...base,
+      sourceType: AplusGradeSourceType.Exercise,
+      exerciseId: exercise.id,
+      exerciseName: exercise.name,
+    };
+  }
+
+  if (difficulty !== undefined) {
+    return {
+      ...base,
+      sourceType: AplusGradeSourceType.Difficulty,
+      difficulty: difficulty,
+    };
+  }
+
+  return {
+    ...base,
+    sourceType: AplusGradeSourceType.FullPoints,
+  };
+};
