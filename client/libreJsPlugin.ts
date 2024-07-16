@@ -210,7 +210,8 @@ function validateLicense(
     if (!expr) {
       return raiseError(
         `Dependency ${dependency.name} has an unrecognized license: ${dependency.license}. ` +
-          'If this is a free software license, add it as an alias to the licenseExceptions property, otherwise this dependency MUST be removed.'
+          'If this is a free software license, add it as an alias to the licenseAliases property, ' +
+          'otherwise this dependency MUST be removed.'
       );
     }
 
@@ -226,12 +227,14 @@ function validateLicense(
         case LicenseType.OpenSource:
           return raiseError(
             `Dependency ${dependency.name} has an open source license: ${expr.id}. ` +
-              'If this is a free software license, add it as exception to the licenseExceptions property, otherwise this dependency MUST be removed.'
+              'If this is a free software license, add it as exception to the licenseExceptions property, ' +
+              'otherwise this dependency MUST be removed.'
           );
         case LicenseType.Unknown:
           return raiseError(
             `Dependency ${dependency.name} has an unknown license: ${expr.id}. ` +
-              'If this is a free software license, add it as exception to the licenseExceptions property, otherwise this dependency MUST be removed.'
+              'If this is a free software license, add it as exception to the licenseExceptions property, ' +
+              'otherwise this dependency MUST be removed.'
           );
       }
     }
