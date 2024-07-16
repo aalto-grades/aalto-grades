@@ -13,12 +13,9 @@ import {
 } from '@mui/material';
 import {JSX} from 'react';
 
-import {
-  AplusCourseData,
-  NewAplusGradeSourceData,
-  AplusGradeSourceType,
-} from '@/common/types';
+import {AplusCourseData, NewAplusGradeSourceData} from '@/common/types';
 import {useFetchAplusExerciseData} from '../../hooks/useApi';
+import {newAplusGradeSource} from '../../utils/utils';
 
 type PropsType = {
   aplusCourse: AplusCourseData;
@@ -48,11 +45,11 @@ const SelectAplusGradeSources = ({
             control={
               <Checkbox
                 onChange={e =>
-                  handleChange(e.target.checked, 'A+ Course', {
-                    coursePartId: -1,
-                    aplusCourse: aplusCourse,
-                    sourceType: AplusGradeSourceType.FullPoints,
-                  })
+                  handleChange(
+                    e.target.checked,
+                    'A+ Course',
+                    newAplusGradeSource(aplusCourse, {})
+                  )
                 }
               />
             }
@@ -74,13 +71,7 @@ const SelectAplusGradeSources = ({
                       handleChange(
                         e.target.checked,
                         `A+ Module: ${module.name}`,
-                        {
-                          coursePartId: -1,
-                          aplusCourse: aplusCourse,
-                          sourceType: AplusGradeSourceType.Module,
-                          moduleId: module.id,
-                          moduleName: module.name,
-                        }
+                        newAplusGradeSource(aplusCourse, {module})
                       )
                     }
                   />
@@ -106,13 +97,7 @@ const SelectAplusGradeSources = ({
                         handleChange(
                           e.target.checked,
                           `A+ Exercise: ${exercise.name}`,
-                          {
-                            coursePartId: -1,
-                            aplusCourse: aplusCourse,
-                            sourceType: AplusGradeSourceType.Exercise,
-                            exerciseId: exercise.id,
-                            exerciseName: exercise.name,
-                          }
+                          newAplusGradeSource(aplusCourse, {exercise})
                         )
                       }
                     />
@@ -139,12 +124,7 @@ const SelectAplusGradeSources = ({
                         handleChange(
                           e.target.checked,
                           `A+ Difficulty: ${difficulty}`,
-                          {
-                            coursePartId: -1,
-                            aplusCourse: aplusCourse,
-                            sourceType: AplusGradeSourceType.Difficulty,
-                            difficulty: difficulty,
-                          }
+                          newAplusGradeSource(aplusCourse, {difficulty})
                         )
                       }
                     />
