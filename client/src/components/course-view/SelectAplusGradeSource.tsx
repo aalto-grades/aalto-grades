@@ -15,9 +15,9 @@ import {JSX} from 'react';
 import {
   AplusCourseData,
   AplusGradeSourceData,
-  AplusGradeSourceType,
   NewAplusGradeSourceData,
 } from '@/common/types';
+import {aplusGradeSourcesEqual} from '@/common/util/aplus';
 import {useFetchAplusExerciseData} from '../../hooks/useApi';
 import {newAplusGradeSource} from '../../utils/utils';
 
@@ -36,33 +36,8 @@ const SelectAplusGradeSource = ({
 
   const isDisabled = (newSource: NewAplusGradeSourceData): boolean => {
     for (const source of aplusGradeSources) {
-      type ComparisonType = {
-        aplusCourse: AplusCourseData;
-        sourceType: AplusGradeSourceType;
-        moduleId?: number;
-        exerciseId?: number;
-        difficulty?: string;
-      };
-
-      const a: ComparisonType = source;
-      const b: ComparisonType = newSource;
-      if (
-        a.sourceType === b.sourceType &&
-        a.aplusCourse.id === b.aplusCourse.id
-      ) {
-        switch (a.sourceType) {
-          case AplusGradeSourceType.FullPoints:
-            return true;
-          case AplusGradeSourceType.Module:
-            if (a.moduleId === b.moduleId) return true;
-            break;
-          case AplusGradeSourceType.Exercise:
-            if (a.exerciseId === b.exerciseId) return true;
-            break;
-          case AplusGradeSourceType.Difficulty:
-            if (a.difficulty === b.difficulty) return true;
-            break;
-        }
+      if (aplusGradeSourcesEqual(newSource, source)) {
+        return true;
       }
     }
     return false;
