@@ -537,6 +537,23 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 
+  it('should respond with 400 if trying to edit the grade field of an A+ grade', async () => {
+    const user = await createData.createUser();
+    const gradeId = await createData.createGrade(
+      user.id,
+      aplusCoursePartId,
+      TEACHER_ID,
+      undefined,
+      undefined,
+      aplusGradeSourceId
+    );
+
+    const url = `/v1/courses/${courseId}/grades/${gradeId}`;
+    await responseTests
+      .testBadRequest(url, cookies.adminCookie)
+      .put({grade: 5});
+  });
+
   it('should respond with 401 or 403 if not authorized', async () => {
     let url = `/v1/courses/${courseId}/grades/${editGradeId}`;
     const data = {comment: 'not edited'};

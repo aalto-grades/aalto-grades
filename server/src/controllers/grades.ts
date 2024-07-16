@@ -330,6 +330,13 @@ export const editGrade = async (
     );
   }
 
+  if (gradeData.aplusGradeSourceId !== null && grade !== undefined) {
+    throw new ApiError(
+      'Grade field of A+ grades cannot be edited',
+      HttpCode.BadRequest
+    );
+  }
+
   await gradeData
     .set({
       grade: grade ?? gradeData.grade,
