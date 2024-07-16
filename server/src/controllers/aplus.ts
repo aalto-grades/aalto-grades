@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import {Request, Response} from 'express';
-import assert from 'node:assert/strict';
 import {ForeignKeyConstraintError} from 'sequelize';
 import {z} from 'zod';
 import {TypedRequestBody} from 'zod-express-middleware';
