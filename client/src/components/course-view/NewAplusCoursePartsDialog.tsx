@@ -139,7 +139,10 @@ const NewAplusCoursePartsDialog = ({
             <SelectAplusCourse
               aplusCourses={aplusCourses.data}
               selectedAplusCourse={aplusCourse}
-              setAplusCourse={setAplusCourse}
+              setAplusCourse={(aplusCourse: AplusCourseData | null) => {
+                setAplusCourse(aplusCourse);
+                if (aplusCourse) setCoursePartsWithSource([]);
+              }}
             />
           )}
           {step === 1 && aplusCourse && (
