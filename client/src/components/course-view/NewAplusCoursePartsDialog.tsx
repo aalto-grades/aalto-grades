@@ -130,7 +130,7 @@ const NewAplusCoursePartsDialog = ({
 
   return (
     <>
-      <Dialog open={open} onClose={handleResetAndClose}>
+      <Dialog open={open} onClose={handleResetAndClose} maxWidth="md">
         {step === 0 && <DialogTitle>A+ courses</DialogTitle>}
         {step === 1 && <DialogTitle>Select grade sources</DialogTitle>}
         {step === 2 && <DialogTitle>Create course parts</DialogTitle>}
