@@ -35,7 +35,6 @@ type PropsType = {
   open: boolean;
 };
 
-// TODO: Better state handling between different stages
 const NewAplusCoursePartsDialog = ({
   handleClose,
   open,
