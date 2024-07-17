@@ -60,7 +60,7 @@ const SelectAplusGradeSources = ({
                 onChange={e =>
                   handleChange(
                     e.target.checked,
-                    'A+ Course',
+                    `A+ Course: ${aplusCourse.name}`,
                     newAplusGradeSource(aplusCourse, {})
                   )
                 }
