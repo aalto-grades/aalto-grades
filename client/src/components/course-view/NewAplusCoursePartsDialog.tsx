@@ -145,6 +145,7 @@ const NewAplusCoursePartsDialog = ({
           {step === 1 && aplusCourse && (
             <SelectAplusGradeSources
               aplusCourse={aplusCourse}
+              selectedGradeSources={coursePartsWithSource.map(([_, s]) => s)}
               handleChange={handleSelectionChange}
             />
           )}
