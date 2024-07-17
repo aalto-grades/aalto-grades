@@ -139,9 +139,9 @@ const NewAplusCoursePartsDialog = ({
             <SelectAplusCourse
               aplusCourses={aplusCourses.data}
               selectedAplusCourse={aplusCourse}
-              setAplusCourse={(aplusCourse: AplusCourseData | null) => {
-                setAplusCourse(aplusCourse);
-                if (aplusCourse) setCoursePartsWithSource([]);
+              setAplusCourse={(course: AplusCourseData | null) => {
+                setAplusCourse(course);
+                if (course) setCoursePartsWithSource([]);
               }}
             />
           )}
@@ -166,7 +166,12 @@ const NewAplusCoursePartsDialog = ({
             </Button>
           )}
           {step <= 1 && (
-            <Button disabled={!aplusCourse} onClick={() => setStep(step + 1)}>
+            <Button
+              disabled={
+                step === 0 ? !aplusCourse : coursePartsWithSource.length === 0
+              }
+              onClick={() => setStep(step + 1)}
+            >
               Next
             </Button>
           )}
