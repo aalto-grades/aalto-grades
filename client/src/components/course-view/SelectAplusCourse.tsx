@@ -11,21 +11,27 @@ import {useGetCourse} from '../../hooks/useApi';
 
 type PropsType = {
   aplusCourses: AplusCourseData[];
+  selectedAplusCourse: AplusCourseData | null;
   setAplusCourse: (course: AplusCourseData | null) => void;
 };
 
 const SelectAplusCourse = ({
   aplusCourses,
+  selectedAplusCourse,
   setAplusCourse,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const course = useGetCourse(courseId);
 
   // Course code
-  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<string | null>(
+    selectedAplusCourse?.courseCode ?? null
+  );
 
   // Instance name, used to set the default selected instance
-  const [selectedInstance, setSelectedInstance] = useState<string | null>(null);
+  const [selectedInstance, setSelectedInstance] = useState<string | null>(
+    selectedAplusCourse?.instance ?? null
+  );
 
   const setInstance = (aplusCourse: AplusCourseData | undefined): void => {
     setSelectedInstance(aplusCourse?.instance ?? null);
@@ -48,7 +54,9 @@ const SelectAplusCourse = ({
     }));
 
   const defaultCourse = courseOptions.find(
-    option => option.courseCode === course.data?.courseCode
+    option =>
+      option.courseCode ===
+      (selectedAplusCourse?.courseCode ?? course.data?.courseCode)
   );
 
   const instanceOptions = aplusCourses
@@ -59,11 +67,13 @@ const SelectAplusCourse = ({
     }));
 
   useEffect(() => {
-    setCourse(
-      aplusCourses.find(
-        aplusCourse => aplusCourse.courseCode === defaultCourse?.courseCode
-      )
-    );
+    if (!selectedAplusCourse) {
+      setCourse(
+        aplusCourses.find(
+          aplusCourse => aplusCourse.courseCode === defaultCourse?.courseCode
+        )
+      );
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!course.data) return <></>;

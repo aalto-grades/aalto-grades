@@ -63,6 +63,7 @@ const AddAplusGradeSourceDialog = ({
           {step === 0 && aplusCourses.data && (
             <SelectAplusCourse
               aplusCourses={aplusCourses.data}
+              selectedAplusCourse={aplusCourse}
               setAplusCourse={setAplusCourse}
             />
           )}
