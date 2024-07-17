@@ -4,8 +4,10 @@
 
 import {Autocomplete, Box, MenuItem, Select, TextField} from '@mui/material';
 import {JSX, useState} from 'react';
+import {useParams} from 'react-router-dom';
 
 import {AplusCourseData} from '@/common/types';
+import {useGetCourse} from '../../hooks/useApi';
 
 type PropsType = {
   aplusCourses: AplusCourseData[];
@@ -16,11 +18,25 @@ const SelectAplusCourse = ({
   aplusCourses,
   setAplusCourse,
 }: PropsType): JSX.Element => {
+  const {courseId} = useParams() as {courseId: string};
+  const course = useGetCourse(courseId);
+
   // Course code
   const [selected, setSelected] = useState<string | null>(null);
 
-  // TODO: Default course should be chosen based on the course code and the
-  // default instance should be chosen as the latest instance
+  const courseOptions = aplusCourses
+    .filter(
+      (a, index) =>
+        index === aplusCourses.findIndex(b => a.courseCode === b.courseCode)
+    )
+    .map(option => ({
+      label: `${option.courseCode} - ${option.name}`,
+      courseCode: option.courseCode,
+    }));
+
+  if (!course.data) return <></>;
+
+  // TODO: Default instance should be chosen as the latest instance
   return (
     <Box sx={{display: 'flex', mt: 1}}>
       <Autocomplete
@@ -28,17 +44,11 @@ const SelectAplusCourse = ({
         onChange={(_, value) =>
           setSelected(value !== null ? value.courseCode : null)
         }
-        options={aplusCourses
-          .filter(
-            (a, index) =>
-              index ===
-              aplusCourses.findIndex(b => a.courseCode === b.courseCode)
-          )
-          .map(course => ({
-            label: `${course.courseCode} - ${course.name}`,
-            courseCode: course.courseCode,
-          }))}
+        options={courseOptions}
         renderInput={params => <TextField {...params} label="Course" />}
+        defaultValue={courseOptions.find(
+          option => option.courseCode === course.data.courseCode
+        )}
       />
       {/* TODO: Label */}
       <Select
