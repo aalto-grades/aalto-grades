@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AccountTreeRounded} from '@mui/icons-material';
-import {IconButton, Tooltip} from '@mui/material';
+import {AccountTreeRounded, Error} from '@mui/icons-material';
+import {Box, IconButton, Tooltip} from '@mui/material';
 import {JSX, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
@@ -39,6 +39,25 @@ const PredictedGradeCell = ({
         position: 'relative',
       }}
     >
+      {row.errors?.some(
+        error =>
+          error.type === 'InvalidPredictedGrade' &&
+          gradingModelIds?.includes(Number(error.info.modelId))
+      ) && (
+        <Box sx={{position: 'absolute', top: 0}}>
+          <Tooltip
+            title={
+              gradingModelIds?.length === 1
+                ? 'Predicted grade is out of range'
+                : 'One of the predicted grades is out of range'
+            }
+            placement="top"
+            disableInteractive
+          >
+            <Error sx={{fontSize: '20px'}} color="error" />
+          </Tooltip>
+        </Box>
+      )}
       <Tooltip
         title={
           gradingModelIds !== undefined && gradingModelIds.length > 1

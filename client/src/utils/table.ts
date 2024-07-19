@@ -89,3 +89,27 @@ export const predictGrades = (
   }
   return result;
 };
+
+/** Get the number of errors in the selected rows. */
+export const getErrorCount = (
+  rowModel: GroupedStudentRow[],
+  selectedGradingModel: 'any' | number
+) => {
+  return rowModel.reduce((acc, row) => {
+    for (const error of row.errors ?? []) {
+      switch (error.type) {
+        case 'InvalidPredictedGrade':
+          if (selectedGradingModel !== 'any') {
+            return selectedGradingModel === Number(error.info.modelId)
+              ? acc + 1
+              : acc;
+          }
+          return acc + 1;
+          break;
+        default:
+          return acc;
+      }
+    }
+    return acc;
+  }, 0);
+};

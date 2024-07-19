@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Add} from '@mui/icons-material';
+import { Add } from '@mui/icons-material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClearIcon from '@mui/icons-material/Clear';
 import {
@@ -11,33 +11,34 @@ import {
   ButtonBase,
   Chip,
   Divider,
+  Fade,
   Menu,
   MenuItem,
   Tooltip,
   useTheme,
 } from '@mui/material';
-import {enqueueSnackbar} from 'notistack';
-import {JSX, forwardRef, useEffect, useMemo, useState} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
-import {z} from 'zod';
+import { enqueueSnackbar } from 'notistack';
+import { JSX, forwardRef, useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { z } from 'zod';
 
-import {StudentRow, SystemRole} from '@/common/types';
-import {batchCalculateGraph} from '@/common/util/calculateGraph';
-import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
-import SisuDownloadDialog from './SisuDownloadDialog';
-import {useTableContext} from '../../context/useTableContext';
-import {useAddFinalGrades} from '../../hooks/api/finalGrade';
+import { StudentRow, SystemRole } from '@/common/types';
+import { batchCalculateGraph } from '@/common/util/calculateGraph';
+import { useTableContext } from '../../context/useTableContext';
+import { useAddFinalGrades } from '../../hooks/api/finalGrade';
 import {
   useGetAllGradingModels,
   useGetCourse,
   useGetGrades,
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import {findBestGrade} from '../../utils/bestGrade';
-import {findLatestGrade} from '../../utils/table';
-import {getMaxFinalGrade} from '../../utils/utils';
+import { findBestGrade } from '../../utils/bestGrade';
+import { findLatestGrade, getErrorCount } from '../../utils/table';
+import { getMaxFinalGrade } from '../../utils/utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import UploadDialog from '../course-view/UploadDialog';
+import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
+import SisuDownloadDialog from './SisuDownloadDialog';
 
 /**
  * Toggle a string in an array: Adds it if not present, removes it if already
@@ -347,7 +348,7 @@ const AssesmentFilterButton = forwardRef<HTMLSpanElement>(
 const CourseResultsTableToolbar = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
-  const {table, gradeSelectOption} = useTableContext();
+  const {table, gradeSelectOption, selectedGradingModel} = useTableContext();
   const navigate = useNavigate();
   const theme = useTheme();
 
@@ -447,7 +448,8 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         userId: selectedRow.user.id,
         courseParts: selectedRow.courseParts.map(coursePart => ({
           coursePartId: coursePart.coursePartId,
-          grade: findBestGrade(coursePart.grades, {gradeSelectOption})!.grade, // TODO: Manage expired course parts
+          grade:
+            findBestGrade(coursePart.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Manage expired course parts
         })),
       }))
     );
@@ -480,17 +482,21 @@ const CourseResultsTableToolbar = (): JSX.Element => {
 
   return (
     <>
-      <Box
-        sx={{
-          // mx: 1,
-          p: 0.5,
-          borderRadius: 3,
-          display: 'flex',
-          backgroundColor: theme.vars.palette.hoverGrey2,
-          // height: '45px',
-        }}
-      >
-        {table.getSelectedRowModel().rows.length === 0 ? (
+      {table.getSelectedRowModel().rows.length === 0 ? (
+        <Box
+          sx={{
+            // mx: 1,
+            p: 0.5,
+            borderRadius: 3,
+            display: 'flex',
+            backgroundColor:
+              table.getSelectedRowModel().rows.length === 0
+                ? 'none'
+                : theme.vars.palette.primary.light,
+            width: '700px',
+            // height: '45px',
+          }}
+        >
           <Button
             variant="tonal"
             onClick={() => setUploadOpen(true)}
@@ -499,89 +505,107 @@ const CourseResultsTableToolbar = (): JSX.Element => {
           >
             Add grades
           </Button>
-        ) : (
+        </Box>
+      ) : (
+        <Fade in={table.getSelectedRowModel().rows.length !== 0}>
           <Box
             sx={{
+              // mx: 1,
+              p: 0.5,
+              borderRadius: 3,
               display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              px: 1,
-              // backgroundColor: theme.vars.palette.primary.light,
-              // border: '1px solid black',
-              borderRadius: 200,
+              backgroundColor:
+                table.getSelectedRowModel().rows.length === 0
+                  ? 'none'
+                  : theme.vars.palette.primary.light,
+              width: '700px',
+              // height: '45px',
             }}
           >
-            <div style={{alignContent: 'center'}}>
-              {table.getSelectedRowModel().rows.length} selected student
-              {table.getSelectedRowModel().rows.length > 1 && 's'}
-            </div>
-            {editRights && (
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  gap: 1,
-                }}
-              >
-                <Tooltip
-                  title={
-                    table.getSelectedRowModel().rows.length === 0
-                      ? 'Select at least one student number for grade calculation.'
-                      : 'Calculate course final grades for selected students.'
-                  }
-                  placement="top"
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'nowrap',
+                alignItems: 'center',
+                gap: 1,
+                px: 1,
+                // backgroundColor: theme.vars.palette.primary.light,
+                // border: '1px solid black',
+                borderRadius: 200,
+              }}
+            >
+              <div style={{alignContent: 'center'}}>
+                {table.getSelectedRowModel().rows.length} selected student
+                {table.getSelectedRowModel().rows.length > 1 && 's'}
+              </div>
+              {editRights && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}
                 >
-                  <Button
-                    variant={
+                  <Tooltip
+                    title={
                       table.getSelectedRowModel().rows.length === 0
-                        ? 'outlined'
-                        : !missingFinalGrades
+                        ? 'Select at least one student number for grade calculation.'
+                        : 'Calculate course final grades for selected students.'
+                    }
+                    placement="top"
+                  >
+                    <Button
+                      variant={
+                        table.getSelectedRowModel().rows.length === 0
                           ? 'outlined'
-                          : 'contained'
-                    }
-                    onClick={() => setShowCalculateDialog(true)}
-                    disabled={table.getSelectedRowModel().rows.length === 0}
-                    id="calculate-final-grades"
-                  >
-                    {missingFinalGrades
-                      ? 'Calculate final grades'
-                      : 'Re-calculate final grades'}
-                  </Button>
-                </Tooltip>
-                <Tooltip
-                  title={
-                    table.getSelectedRowModel().rows.length === 0
-                      ? 'Select at least one student number for downloading grades.'
-                      : missingFinalGrades
-                        ? 'Grades with status "PENDING" cannot be downloaded, ' +
-                          'unselect or calculate grades for these.'
-                        : 'Download final course grades as a Sisu compatible CSV file.'
-                  }
-                  placement="top"
-                >
-                  <Button
-                    variant="contained"
-                    color={missingFinalGrades ? 'error' : 'primary'}
-                    onClick={(): void => {
-                      if (!missingFinalGrades) {
-                        setShowSisuDialog(true);
+                          : !missingFinalGrades
+                            ? 'outlined'
+                            : 'contained'
                       }
-                    }}
-                    disabled={
-                      table.getSelectedRowModel().rows.length !== 0 &&
-                      missingFinalGrades
+                      onClick={() => setShowCalculateDialog(true)}
+                      disabled={table.getSelectedRowModel().rows.length === 0}
+                      id="calculate-final-grades"
+                    >
+                      {missingFinalGrades
+                        ? 'Calculate final grades'
+                        : 'Re-calculate final grades'}
+                    </Button>
+                  </Tooltip>
+                  <Tooltip
+                    title={
+                      table.getSelectedRowModel().rows.length === 0
+                        ? 'Select at least one student number for downloading grades.'
+                        : missingFinalGrades
+                          ? 'Grades with status "PENDING" cannot be downloaded, ' +
+                            'unselect or calculate grades for these.'
+                          : 'Download final course grades as a Sisu compatible CSV file.'
                     }
+                    placement="top"
                   >
-                    Download Sisu CSV
-                  </Button>
-                </Tooltip>
-              </Box>
-            )}
+                    <Button
+                      variant="contained"
+                      color={missingFinalGrades ? 'error' : 'primary'}
+                      onClick={(): void => {
+                        if (!missingFinalGrades) {
+                          setShowSisuDialog(true);
+                        }
+                      }}
+                      disabled={
+                        table.getSelectedRowModel().rows.length !== 0 &&
+                        missingFinalGrades
+                      }
+                    >
+                      Download Sisu CSV
+                    </Button>
+                  </Tooltip>
+                </Box>
+              )}
+            </Box>
           </Box>
-        )}
-      </Box>
+        </Fade>
+      )}
       <Box
         sx={{
           // mx: 1,
@@ -631,6 +655,58 @@ const CourseResultsTableToolbar = (): JSX.Element => {
           placeholder={'Search...'}
           className="w-36 border shadow rounded"
         />
+        <Box sx={{display: 'flex', alignItems: 'center'}}>
+          Showing: {table.getFilteredRowModel().rows.length} rows
+          <Fade
+            // in={
+            //   !!getErrorCount(
+            //     table.getFilteredRowModel().rows.map(e => e.original),
+            //     selectedGradingModel
+            //   )
+            // }
+            in={true}
+          >
+            <Button
+              sx={{
+                background: theme.vars.palette.Alert.errorStandardBg,
+                color: theme.vars.palette.error.main,
+                // fontWeight: theme.vars.typography.fontWeightBold,
+                fontWeight: '500',
+                p: 0.5,
+                px: 2,
+                py: 0.5,
+                borderRadius: 3,
+                display: 'flex',
+                gap: 1,
+                alignItems: 'center',
+                height: '36px',
+                boxSizing: 'border-box',
+                border:
+                  table.getColumn('errors')?.getFilterValue() === 'errorsFilter'
+                    ? `1px solid ${theme.vars.palette.error.main}`
+                    : 'none',
+              }}
+              onClick={() => {
+                if (
+                  // table.getVisibleFlatColumns().find(c => c.id === 'errors')
+                  table.getColumn('errors')?.getFilterValue() === 'errorsFilter'
+                ) {
+                  // table.setColumnVisibility({errors: false});
+                  table.getColumn('errors')?.setFilterValue('');
+                } else {
+                  // table.setColumnVisibility({errors: true});
+                  table.getColumn('errors')?.setFilterValue('errorsFilter');
+                }
+              }}
+            >
+              {getErrorCount(
+                table.getFilteredRowModel().rows.map(e => e.original),
+                selectedGradingModel
+              )}
+              {' errors'}
+            </Button>
+          </Fade>
+        </Box>
       </Box>
       {/* <Box
         sx={{
