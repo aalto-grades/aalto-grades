@@ -441,7 +441,6 @@ const CourseResultsTableToolbar = (): JSX.Element => {
     if (model === undefined || course.data === undefined) return false;
 
     enqueueSnackbar('Calculating final grades...', {variant: 'info'});
-
     const finalGrades = batchCalculateGraph(
       model.graphStructure,
       selectedRows.map(selectedRow => ({

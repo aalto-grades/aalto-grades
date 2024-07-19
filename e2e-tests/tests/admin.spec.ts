@@ -73,16 +73,15 @@ test.describe('Test courses as admin', () => {
     await page.getByLabel('Course name in Finnish*').press('Tab');
     await page.getByLabel('Course name in Swedish*').fill('...');
     await page.getByLabel('Course name in Swedish*').press('Tab');
-    await page.getByLabel('Organizing department in English*').fill('aalto');
-    await page.getByLabel('Organizing department in English*').press('Tab');
-    await page.getByLabel('Organizing department in Finnish*').fill('aalto');
-    await page.getByLabel('Organizing department in Finnish*').press('Tab');
-    await page.getByLabel('Organizing department in Swedish*').fill('...');
+    await page.getByLabel('Organizing department*').click();
+    await page
+      .getByRole('option', {name: 'Department of Computer Science'})
+      .click();
     await page.getByLabel('Minimum course credits (ECTS)*').dblclick();
     await page.getByLabel('Maximum course credits (ECTS)*').click();
     await page.getByLabel('Maximum course credits (ECTS)*').fill('150');
-    await page.getByLabel('General scale, 0-').click();
-    await page.locator('#menu-gradingScale div').first().click();
+    await page.getByLabel('Grading scale*').click();
+    await page.getByRole('option', {name: 'Pass-Fail'}).click();
     await page.getByLabel('Course language*').click();
     await page.getByRole('option', {name: 'Japanese'}).click();
     await page.getByLabel('Teachers in charge*').click();
@@ -114,17 +113,10 @@ test.describe('Test courses as admin', () => {
       .getByLabel('Course name in Swedish*')
       .fill('Programmering 2 - edit');
     await page.getByLabel('Course name in Swedish*').press('Tab');
+    await page.getByLabel('Organizing department*').click();
     await page
-      .getByLabel('Organizing department in English*')
-      .fill('Department of Computer Science - edit');
-    await page.getByLabel('Organizing department in English*').press('Tab');
-    await page
-      .getByLabel('Organizing department in Finnish*')
-      .fill('Tietotekniikan laitos - edit');
-    await page.getByLabel('Organizing department in Finnish*').press('Tab');
-    await page
-      .getByLabel('Organizing department in Swedish*')
-      .fill('Institutionen för datateknik - edit');
+      .getByRole('option', {name: 'Department of Computer Science'})
+      .click();
     await page.getByLabel('Minimum course credits (ECTS)*').dblclick();
     await page.getByLabel('Maximum course credits (ECTS)*').click();
     await page.getByLabel('Maximum course credits (ECTS)*').fill('6');
