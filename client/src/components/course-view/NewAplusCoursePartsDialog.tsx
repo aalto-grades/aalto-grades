@@ -35,7 +35,6 @@ type PropsType = {
   open: boolean;
 };
 
-// TODO: Better state handling between different stages
 const NewAplusCoursePartsDialog = ({
   handleClose,
   open,
@@ -130,7 +129,7 @@ const NewAplusCoursePartsDialog = ({
 
   return (
     <>
-      <Dialog open={open} onClose={handleResetAndClose}>
+      <Dialog open={open} onClose={handleResetAndClose} maxWidth="md">
         {step === 0 && <DialogTitle>A+ courses</DialogTitle>}
         {step === 1 && <DialogTitle>Select grade sources</DialogTitle>}
         {step === 2 && <DialogTitle>Create course parts</DialogTitle>}
@@ -138,12 +137,17 @@ const NewAplusCoursePartsDialog = ({
           {step === 0 && aplusCourses.data && (
             <SelectAplusCourse
               aplusCourses={aplusCourses.data}
-              setAplusCourse={setAplusCourse}
+              selectedAplusCourse={aplusCourse}
+              setAplusCourse={(course: AplusCourseData | null) => {
+                setAplusCourse(course);
+                if (course) setCoursePartsWithSource([]);
+              }}
             />
           )}
           {step === 1 && aplusCourse && (
             <SelectAplusGradeSources
               aplusCourse={aplusCourse}
+              selectedGradeSources={coursePartsWithSource.map(([_, s]) => s)}
               handleChange={handleSelectionChange}
             />
           )}
@@ -161,7 +165,12 @@ const NewAplusCoursePartsDialog = ({
             </Button>
           )}
           {step <= 1 && (
-            <Button disabled={!aplusCourse} onClick={() => setStep(step + 1)}>
+            <Button
+              disabled={
+                step === 0 ? !aplusCourse : coursePartsWithSource.length === 0
+              }
+              onClick={() => setStep(step + 1)}
+            >
               Next
             </Button>
           )}

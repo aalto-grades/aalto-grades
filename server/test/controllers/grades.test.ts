@@ -329,6 +329,40 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     expect(grades.find(val => val.grade === data2[0].grade)).toBeDefined();
   });
 
+  it('should update existing grade for a student from an A+ grade source rather than adding a new grade', async () => {
+    const student = await genStudent();
+
+    const upload = async (): Promise<NewGrade[]> => {
+      const data = (await genGrades(student.studentNumber)).filter(
+        grade => grade.aplusGradeSourceId !== undefined
+      );
+
+      const res = await request
+        .post(`/v1/courses/${courseId}/grades`)
+        .send(data)
+        .set('Cookie', cookies.adminCookie)
+        .set('Accept', 'application/json')
+        .expect(HttpCode.Created);
+
+      expect(JSON.stringify(res.body)).toBe('{}');
+      return data;
+    };
+
+    let data = await upload();
+    let grades = await AttainmentGrade.findAll({
+      where: {userId: student.id, coursePartId: aplusCoursePartId},
+    });
+    expect(grades.length).toEqual(1);
+    expect(grades[0].grade).toEqual(data[0].grade);
+
+    data = await upload();
+    grades = await AttainmentGrade.findAll({
+      where: {userId: student.id, coursePartId: aplusCoursePartId},
+    });
+    expect(grades.length).toEqual(1);
+    expect(grades[0].grade).toEqual(data[0].grade);
+  });
+
   it(
     'should process big json succesfully (5 000 x 3 x 2 = 90 000 individual grades)',
     async () => {
@@ -501,6 +535,23 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
 
     url = `/v1/courses/${courseId}/parts/${-1}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
+  });
+
+  it('should respond with 400 if trying to edit the grade field of an A+ grade', async () => {
+    const user = await createData.createUser();
+    const gradeId = await createData.createGrade(
+      user.id,
+      aplusCoursePartId,
+      TEACHER_ID,
+      undefined,
+      undefined,
+      aplusGradeSourceId
+    );
+
+    const url = `/v1/courses/${courseId}/grades/${gradeId}`;
+    await responseTests
+      .testBadRequest(url, cookies.adminCookie)
+      .put({grade: 5});
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {

@@ -13,16 +13,14 @@ import {
 } from '@mui/material';
 import {JSX} from 'react';
 
-import {
-  AplusCourseData,
-  NewAplusGradeSourceData,
-  AplusGradeSourceType,
-} from '@/common/types';
+import {AplusCourseData, NewAplusGradeSourceData} from '@/common/types';
+import {aplusGradeSourcesEqual} from '@/common/util/aplus';
 import {useFetchAplusExerciseData} from '../../hooks/useApi';
-import {getLatestAplusModuleDate} from '../../utils/utils';
+import {getLatestAplusModuleDate, newAplusGradeSource} from '../../utils/utils';
 
 type PropsType = {
   aplusCourse: AplusCourseData;
+  selectedGradeSources: NewAplusGradeSourceData[];
   handleChange: (
     checked: boolean,
     name: string,
@@ -32,9 +30,19 @@ type PropsType = {
 
 const SelectAplusGradeSources = ({
   aplusCourse,
+  selectedGradeSources,
   handleChange,
 }: PropsType): JSX.Element => {
   const aplusExerciseData = useFetchAplusExerciseData(aplusCourse.id);
+
+  const isChecked = (newSource: NewAplusGradeSourceData): boolean => {
+    for (const source of selectedGradeSources) {
+      if (aplusGradeSourcesEqual(newSource, source)) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   if (aplusExerciseData.data === undefined) return <></>;
 
@@ -48,13 +56,23 @@ const SelectAplusGradeSources = ({
           <FormControlLabel
             control={
               <Checkbox
+                defaultChecked={isChecked(
+                  newAplusGradeSource(
+                    aplusCourse,
+                    getLatestAplusModuleDate(aplusExerciseData.data),
+                    {}
+                  )
+                )}
                 onChange={e =>
-                  handleChange(e.target.checked, 'A+ Course', {
-                    coursePartId: -1,
-                    aplusCourse: aplusCourse,
-                    sourceType: AplusGradeSourceType.FullPoints,
-                    date: getLatestAplusModuleDate(aplusExerciseData.data),
-                  })
+                  handleChange(
+                    e.target.checked,
+                    `A+ Course: ${aplusCourse.name}`,
+                    newAplusGradeSource(
+                      aplusCourse,
+                      getLatestAplusModuleDate(aplusExerciseData.data),
+                      {}
+                    )
+                  )
                 }
               />
             }
@@ -72,18 +90,18 @@ const SelectAplusGradeSources = ({
               <FormControlLabel
                 control={
                   <Checkbox
+                    defaultChecked={isChecked(
+                      newAplusGradeSource(aplusCourse, module.closingDate, {
+                        module,
+                      })
+                    )}
                     onChange={e =>
                       handleChange(
                         e.target.checked,
                         `A+ Module: ${module.name}`,
-                        {
-                          coursePartId: -1,
-                          aplusCourse: aplusCourse,
-                          sourceType: AplusGradeSourceType.Module,
-                          moduleId: module.id,
-                          moduleName: module.name,
-                          date: module.closingDate,
-                        }
+                        newAplusGradeSource(aplusCourse, module.closingDate, {
+                          module,
+                        })
                       )
                     }
                   />
@@ -105,18 +123,18 @@ const SelectAplusGradeSources = ({
                 <FormControlLabel
                   control={
                     <Checkbox
+                      defaultChecked={isChecked(
+                        newAplusGradeSource(aplusCourse, module.closingDate, {
+                          exercise,
+                        })
+                      )}
                       onChange={e =>
                         handleChange(
                           e.target.checked,
                           `A+ Exercise: ${exercise.name}`,
-                          {
-                            coursePartId: -1,
-                            aplusCourse: aplusCourse,
-                            sourceType: AplusGradeSourceType.Exercise,
-                            exerciseId: exercise.id,
-                            exerciseName: exercise.name,
-                            date: module.closingDate,
-                          }
+                          newAplusGradeSource(aplusCourse, module.closingDate, {
+                            exercise,
+                          })
                         )
                       }
                     />
@@ -139,19 +157,22 @@ const SelectAplusGradeSources = ({
                 <FormControlLabel
                   control={
                     <Checkbox
+                      defaultChecked={isChecked(
+                        newAplusGradeSource(
+                          aplusCourse,
+                          getLatestAplusModuleDate(aplusExerciseData.data),
+                          {difficulty}
+                        )
+                      )}
                       onChange={e =>
                         handleChange(
                           e.target.checked,
                           `A+ Difficulty: ${difficulty}`,
-                          {
-                            coursePartId: -1,
-                            aplusCourse: aplusCourse,
-                            sourceType: AplusGradeSourceType.Difficulty,
-                            difficulty: difficulty,
-                            date: getLatestAplusModuleDate(
-                              aplusExerciseData.data
-                            ),
-                          }
+                          newAplusGradeSource(
+                            aplusCourse,
+                            getLatestAplusModuleDate(aplusExerciseData.data),
+                            {difficulty}
+                          )
                         )
                       }
                     />

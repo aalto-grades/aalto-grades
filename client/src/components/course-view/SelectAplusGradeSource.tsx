@@ -14,22 +14,34 @@ import {JSX} from 'react';
 
 import {
   AplusCourseData,
+  AplusGradeSourceData,
   NewAplusGradeSourceData,
-  AplusGradeSourceType,
 } from '@/common/types';
+import {aplusGradeSourcesEqual} from '@/common/util/aplus';
 import {useFetchAplusExerciseData} from '../../hooks/useApi';
-import {getLatestAplusModuleDate} from '../../utils/utils';
+import {getLatestAplusModuleDate, newAplusGradeSource} from '../../utils/utils';
 
 type PropsType = {
   aplusCourse: AplusCourseData;
+  aplusGradeSources: AplusGradeSourceData[];
   handleSelect: (source: NewAplusGradeSourceData) => void;
 };
 
 const SelectAplusGradeSource = ({
   aplusCourse,
+  aplusGradeSources,
   handleSelect,
 }: PropsType): JSX.Element => {
   const aplusExerciseData = useFetchAplusExerciseData(aplusCourse.id);
+
+  const isDisabled = (newSource: NewAplusGradeSourceData): boolean => {
+    for (const source of aplusGradeSources) {
+      if (aplusGradeSourcesEqual(newSource, source)) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   if (aplusExerciseData.data === undefined) return <></>;
 
@@ -41,13 +53,21 @@ const SelectAplusGradeSource = ({
         </AccordionSummary>
         <AccordionDetails>
           <Button
+            disabled={isDisabled(
+              newAplusGradeSource(
+                aplusCourse,
+                getLatestAplusModuleDate(aplusExerciseData.data),
+                {}
+              )
+            )}
             onClick={() =>
-              handleSelect({
-                coursePartId: -1,
-                aplusCourse: aplusCourse,
-                sourceType: AplusGradeSourceType.FullPoints,
-                date: getLatestAplusModuleDate(aplusExerciseData.data),
-              })
+              handleSelect(
+                newAplusGradeSource(
+                  aplusCourse,
+                  getLatestAplusModuleDate(aplusExerciseData.data),
+                  {}
+                )
+              )
             }
           >
             Full points
@@ -62,15 +82,15 @@ const SelectAplusGradeSource = ({
           <FormGroup>
             {aplusExerciseData.data.modules.map(module => (
               <Button
+                disabled={isDisabled(
+                  newAplusGradeSource(aplusCourse, module.closingDate, {module})
+                )}
                 onClick={() =>
-                  handleSelect({
-                    coursePartId: -1,
-                    aplusCourse: aplusCourse,
-                    sourceType: AplusGradeSourceType.Module,
-                    moduleId: module.id,
-                    moduleName: module.name,
-                    date: module.closingDate,
-                  })
+                  handleSelect(
+                    newAplusGradeSource(aplusCourse, module.closingDate, {
+                      module,
+                    })
+                  )
                 }
               >
                 {module.name}
@@ -88,15 +108,17 @@ const SelectAplusGradeSource = ({
             {aplusExerciseData.data.modules.map(module =>
               module.exercises.map(exercise => (
                 <Button
-                  onClick={() =>
-                    handleSelect({
-                      coursePartId: -1,
-                      aplusCourse: aplusCourse,
-                      sourceType: AplusGradeSourceType.Exercise,
-                      exerciseId: exercise.id,
-                      exerciseName: exercise.name,
-                      date: module.closingDate,
+                  disabled={isDisabled(
+                    newAplusGradeSource(aplusCourse, module.closingDate, {
+                      exercise,
                     })
+                  )}
+                  onClick={() =>
+                    handleSelect(
+                      newAplusGradeSource(aplusCourse, module.closingDate, {
+                        exercise,
+                      })
+                    )
                   }
                 >
                   {exercise.name}
@@ -115,14 +137,21 @@ const SelectAplusGradeSource = ({
             <FormGroup>
               {aplusExerciseData.data.difficulties.map(difficulty => (
                 <Button
+                  disabled={isDisabled(
+                    newAplusGradeSource(
+                      aplusCourse,
+                      getLatestAplusModuleDate(aplusExerciseData.data),
+                      {difficulty}
+                    )
+                  )}
                   onClick={() =>
-                    handleSelect({
-                      coursePartId: -1,
-                      aplusCourse: aplusCourse,
-                      sourceType: AplusGradeSourceType.Difficulty,
-                      difficulty: difficulty,
-                      date: getLatestAplusModuleDate(aplusExerciseData.data),
-                    })
+                    handleSelect(
+                      newAplusGradeSource(
+                        aplusCourse,
+                        getLatestAplusModuleDate(aplusExerciseData.data),
+                        {difficulty}
+                      )
+                    )
                   }
                 >
                   {difficulty}

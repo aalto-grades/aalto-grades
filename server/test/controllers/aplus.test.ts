@@ -9,10 +9,10 @@ import {
   AplusCourseData,
   AplusCourseDataArraySchema,
   AplusExerciseDataSchema,
-  AplusGradeSourceData,
   AplusGradeSourceType,
   CoursePartData,
   HttpCode,
+  NewAplusGradeSourceData,
   NewGradeArraySchema,
 } from '@/common/types';
 import {app} from '../../src/app';
@@ -273,7 +273,7 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
 });
 
 describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources', () => {
-  type AplusGradeSourceAny = {
+  type NewAplusGradeSourceAny = {
     coursePartId: number;
     aplusCourse: AplusCourseData;
     sourceType: AplusGradeSourceType;
@@ -292,7 +292,7 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
       withDifficulty = false,
       coursePartId = addGradeSourceCoursePartId,
     }
-  ): AplusGradeSourceAny => ({
+  ): NewAplusGradeSourceAny => ({
     coursePartId,
     aplusCourse: {
       id: 1,
@@ -309,31 +309,31 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
     difficulty: withDifficulty ? 'A' : undefined,
   });
 
-  const getFullPoints = (coursePartId?: number): AplusGradeSourceData =>
+  const getFullPoints = (coursePartId?: number): NewAplusGradeSourceData =>
     getGradeSource(AplusGradeSourceType.FullPoints, {
       coursePartId,
-    }) as AplusGradeSourceData;
+    }) as NewAplusGradeSourceData;
 
-  const getModule = (coursePartId?: number): AplusGradeSourceData =>
+  const getModule = (coursePartId?: number): NewAplusGradeSourceData =>
     getGradeSource(AplusGradeSourceType.Module, {
       withModuleId: true,
       coursePartId,
-    }) as AplusGradeSourceData;
+    }) as NewAplusGradeSourceData;
 
-  const getExercise = (coursePartId?: number): AplusGradeSourceData =>
+  const getExercise = (coursePartId?: number): NewAplusGradeSourceData =>
     getGradeSource(AplusGradeSourceType.Exercise, {
       withExerciseId: true,
       coursePartId,
-    }) as AplusGradeSourceData;
+    }) as NewAplusGradeSourceData;
 
-  const getDifficulty = (coursePartId?: number): AplusGradeSourceData =>
+  const getDifficulty = (coursePartId?: number): NewAplusGradeSourceData =>
     getGradeSource(AplusGradeSourceType.Difficulty, {
       withDifficulty: true,
       coursePartId,
-    }) as AplusGradeSourceData;
+    }) as NewAplusGradeSourceData;
 
   const checkAplusGradeSource = async (
-    gradeSource: AplusGradeSourceData
+    gradeSource: NewAplusGradeSourceData
   ): Promise<void> => {
     const sourceType = gradeSource.sourceType;
     const result = await AplusGradeSource.findOne({

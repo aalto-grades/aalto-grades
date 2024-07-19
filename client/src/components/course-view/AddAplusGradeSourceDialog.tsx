@@ -12,7 +12,11 @@ import {
 import {JSX, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
-import {NewAplusGradeSourceData, AplusCourseData} from '@/common/types';
+import {
+  NewAplusGradeSourceData,
+  AplusCourseData,
+  AplusGradeSourceData,
+} from '@/common/types';
 import SelectAplusCourse from './SelectAplusCourse';
 import SelectAplusGradeSource from './SelectAplusGradeSource';
 import {
@@ -25,11 +29,13 @@ import AplusTokenDialog from '../shared/AplusTokenDialog';
 type PropsType = {
   handleClose: () => void;
   coursePartId: number | null;
+  aplusGradeSources: AplusGradeSourceData[];
 };
 
 const AddAplusGradeSourceDialog = ({
   handleClose,
   coursePartId,
+  aplusGradeSources,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const aplusCourses = useFetchAplusCourses({enabled: !!getAplusToken()});
@@ -50,19 +56,21 @@ const AddAplusGradeSourceDialog = ({
 
   return (
     <>
-      <Dialog open={open} onClose={handleResetAndClose}>
+      <Dialog open={open} onClose={handleResetAndClose} maxWidth="md">
         {step === 0 && <DialogTitle>A+ courses</DialogTitle>}
         {step === 1 && <DialogTitle>Select grade source</DialogTitle>}
         <DialogContent>
           {step === 0 && aplusCourses.data && (
             <SelectAplusCourse
               aplusCourses={aplusCourses.data}
+              selectedAplusCourse={aplusCourse}
               setAplusCourse={setAplusCourse}
             />
           )}
           {step === 1 && aplusCourse && (
             <SelectAplusGradeSource
               aplusCourse={aplusCourse}
+              aplusGradeSources={aplusGradeSources}
               handleSelect={(aplusGradeSource: NewAplusGradeSourceData) => {
                 if (coursePartId !== null) {
                   addAplusGradeSources.mutate([
