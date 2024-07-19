@@ -116,7 +116,7 @@ export const departments: LocalizedString[] = [
   {
     fi: 'Informaatio- ja tietoliikennetekniikan laitos',
     en: 'Department of Information and Communications Engineering',
-    sv: '', // TODO: Find translation
+    sv: 'Institutionen för informations- och kommunikationsteknik',
   },
   {
     fi: 'Elektroniikan ja nanotekniikan laitos',
@@ -150,7 +150,7 @@ export const departments: LocalizedString[] = [
   {
     fi: 'Teknillisen fysiikan laitos',
     en: 'Department of Applied Physics',
-    sv: '', // TODO: Find translation
+    sv: 'Institutionen för teknisk fysik',
   },
   {
     fi: 'Tietotekniikan laitos',
