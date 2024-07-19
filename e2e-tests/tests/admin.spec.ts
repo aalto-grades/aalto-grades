@@ -74,7 +74,7 @@ test.describe('Test courses as admin', () => {
     await page.getByLabel('Course name in Swedish*').fill('...');
     await page.getByLabel('Course name in Swedish*').press('Tab');
     await page.getByLabel('Organizing department*').click();
-    await page.getByLabel('Department of Computer Science').click();
+    await page.getByRole('option', {name: 'Department of Computer Science'}).click();
     await page.getByLabel('Minimum course credits (ECTS)*').dblclick();
     await page.getByLabel('Maximum course credits (ECTS)*').click();
     await page.getByLabel('Maximum course credits (ECTS)*').fill('150');
@@ -112,7 +112,7 @@ test.describe('Test courses as admin', () => {
       .fill('Programmering 2 - edit');
     await page.getByLabel('Course name in Swedish*').press('Tab');
     await page.getByLabel('Organizing department*').click();
-    await page.getByLabel('Department of Computer Science').click();
+    await page.getByRole('option', {name: 'Department of Computer Science'}).click();
     await page.getByLabel('Minimum course credits (ECTS)*').dblclick();
     await page.getByLabel('Maximum course credits (ECTS)*').click();
     await page.getByLabel('Maximum course credits (ECTS)*').fill('6');
