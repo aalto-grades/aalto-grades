@@ -302,7 +302,7 @@ const EditCourseView = (): JSX.Element => {
                     value="courseCode"
                     disabled={auth?.role !== SystemRole.Admin}
                     label="Course code*"
-                    helperText="Give code for the new course."
+                    helperText="Give code for the course."
                   />
                   <FormLanguagesField
                     form={
@@ -320,7 +320,7 @@ const EditCourseView = (): JSX.Element => {
                     value="department"
                     disabled={auth?.role !== SystemRole.Admin}
                     label="Organizing department*"
-                    helperText="Select the organizing department of the new course"
+                    helperText="Select the organizing department of the course"
                     select
                   >
                     {departments.map((department, i) => (
