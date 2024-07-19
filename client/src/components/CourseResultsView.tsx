@@ -2,18 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Typography} from '@mui/material';
+import {Box, Typography, useTheme} from '@mui/material';
 import {JSX} from 'react';
-import {useParams} from 'react-router-dom';
+import {unstable_useViewTransitionState, useParams} from 'react-router-dom';
 
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
+import Delayed from './shared/Delay';
 import {GradesTableProvider} from '../context/GradesTableProvider';
 import {useGetGrades} from '../hooks/useApi';
 
 const CourseResultsView = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-
+  const isTransitioning = unstable_useViewTransitionState('');
+  const theme = useTheme();
   const gradesQuery = useGetGrades(courseId);
 
   return (
@@ -21,11 +23,14 @@ const CourseResultsView = (): JSX.Element => {
       <Typography width={'fit-content'} variant="h2">
         Grades
       </Typography>
-      {gradesQuery.data && (
-        <GradesTableProvider data={gradesQuery.data}>
-          <CourseResultsTableToolbar />
-          <CourseResultsTable />
-        </GradesTableProvider>
+
+      {gradesQuery.data && !isTransitioning && (
+        <Delayed>
+          <GradesTableProvider data={gradesQuery.data}>
+            <CourseResultsTableToolbar />
+            <CourseResultsTable />
+          </GradesTableProvider>
+        </Delayed>
       )}
     </Box>
   );
