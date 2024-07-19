@@ -121,7 +121,7 @@ export const departments: LocalizedString[] = [
   {
     fi: 'Elektroniikan ja nanotekniikan laitos',
     en: 'Department of Electronics and Nanoengineering',
-    sv: ' Institutionen för elektronik och nanoteknik',
+    sv: 'Institutionen för elektronik och nanoteknik',
   },
   {
     fi: 'Sähkötekniikan ja automaation laitos',
