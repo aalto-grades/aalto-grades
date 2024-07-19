@@ -111,17 +111,8 @@ test.describe('Test courses as admin', () => {
       .getByLabel('Course name in Swedish*')
       .fill('Programmering 2 - edit');
     await page.getByLabel('Course name in Swedish*').press('Tab');
-    await page
-      .getByLabel('Organizing department in English*')
-      .fill('Department of Computer Science - edit');
-    await page.getByLabel('Organizing department in English*').press('Tab');
-    await page
-      .getByLabel('Organizing department in Finnish*')
-      .fill('Tietotekniikan laitos - edit');
-    await page.getByLabel('Organizing department in Finnish*').press('Tab');
-    await page
-      .getByLabel('Organizing department in Swedish*')
-      .fill('Institutionen för datateknik - edit');
+    await page.getByLabel('Organizing department*').click();
+    await page.getByLabel('Department of Computer Science').click();
     await page.getByLabel('Minimum course credits (ECTS)*').dblclick();
     await page.getByLabel('Maximum course credits (ECTS)*').click();
     await page.getByLabel('Maximum course credits (ECTS)*').fill('6');
