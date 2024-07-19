@@ -282,7 +282,10 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
     exerciseId?: number;
     exerciseName?: string;
     difficulty?: string;
+    date: Date;
   };
+
+  const date = new Date();
 
   const getGradeSource = (
     sourceType: AplusGradeSourceType,
@@ -307,6 +310,7 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
     exerciseId: withExerciseId ? 1 : undefined,
     exerciseName: withExerciseId ? 'Exercise Name' : undefined,
     difficulty: withDifficulty ? 'A' : undefined,
+    date: date,
   });
 
   const getFullPoints = (coursePartId?: number): NewAplusGradeSourceData =>
