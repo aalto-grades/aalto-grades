@@ -657,13 +657,12 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         <Box sx={{display: 'flex', alignItems: 'center'}}>
           Showing: {table.getFilteredRowModel().rows.length} rows
           <Fade
-            // in={
-            //   !!getErrorCount(
-            //     table.getFilteredRowModel().rows.map(e => e.original),
-            //     selectedGradingModel
-            //   )
-            // }
-            in={true}
+            in={
+              !!getErrorCount(
+                table.getFilteredRowModel().rows.map(e => e.original),
+                selectedGradingModel
+              )
+            }
           >
             <Button
               sx={{
