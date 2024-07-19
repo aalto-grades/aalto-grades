@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Add } from '@mui/icons-material';
+import {Add} from '@mui/icons-material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClearIcon from '@mui/icons-material/Clear';
 import {
@@ -17,28 +17,28 @@ import {
   Tooltip,
   useTheme,
 } from '@mui/material';
-import { enqueueSnackbar } from 'notistack';
-import { JSX, forwardRef, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { z } from 'zod';
+import {enqueueSnackbar} from 'notistack';
+import {JSX, forwardRef, useEffect, useMemo, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {z} from 'zod';
 
-import { StudentRow, SystemRole } from '@/common/types';
-import { batchCalculateGraph } from '@/common/util/calculateGraph';
-import { useTableContext } from '../../context/useTableContext';
-import { useAddFinalGrades } from '../../hooks/api/finalGrade';
+import {StudentRow, SystemRole} from '@/common/types';
+import {batchCalculateGraph} from '@/common/util/calculateGraph';
+import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
+import SisuDownloadDialog from './SisuDownloadDialog';
+import {useTableContext} from '../../context/useTableContext';
+import {useAddFinalGrades} from '../../hooks/api/finalGrade';
 import {
   useGetAllGradingModels,
   useGetCourse,
   useGetGrades,
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import { findBestGrade } from '../../utils/bestGrade';
-import { findLatestGrade, getErrorCount } from '../../utils/table';
-import { getMaxFinalGrade } from '../../utils/utils';
+import {findBestGrade} from '../../utils/bestGrade';
+import {findLatestGrade, getErrorCount} from '../../utils/table';
+import {getMaxFinalGrade} from '../../utils/utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import UploadDialog from '../course-view/UploadDialog';
-import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
-import SisuDownloadDialog from './SisuDownloadDialog';
 
 /**
  * Toggle a string in an array: Adds it if not present, removes it if already
