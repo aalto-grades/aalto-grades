@@ -50,8 +50,9 @@ const PredictedGradeCell = ({
             title={row.errors
               .filter(
                 e =>
-                  e.info.columnId === 'predictedFinalGrades' &&
-                  gradingModelIds?.includes(Number(e.info.modelId ?? 0))
+                  ('InvalidPredictedGrade' === e.type ||
+                    'OutOfRangePredictedGrade' === e.type) &&
+                  gradingModelIds?.includes(Number(e.info.modelId))
               )
               .map(e => e.message)
               .join('\n')}

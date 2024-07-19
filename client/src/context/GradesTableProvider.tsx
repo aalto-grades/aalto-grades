@@ -50,7 +50,6 @@ import {
   groupByLatestBestGrade,
   predictedGradesErrorCheck,
   predictGrades,
-  predictGradeTests,
 } from '../utils/table';
 
 // Define the shape of the context
