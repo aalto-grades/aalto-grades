@@ -14,11 +14,13 @@ import {
 import {JSX} from 'react';
 
 import {AplusCourseData, NewAplusGradeSourceData} from '@/common/types';
+import {aplusGradeSourcesEqual} from '@/common/util/aplus';
 import {useFetchAplusExerciseData} from '../../hooks/useApi';
 import {newAplusGradeSource} from '../../utils/utils';
 
 type PropsType = {
   aplusCourse: AplusCourseData;
+  selectedGradeSources: NewAplusGradeSourceData[];
   handleChange: (
     checked: boolean,
     name: string,
@@ -28,9 +30,19 @@ type PropsType = {
 
 const SelectAplusGradeSources = ({
   aplusCourse,
+  selectedGradeSources,
   handleChange,
 }: PropsType): JSX.Element => {
   const aplusExerciseData = useFetchAplusExerciseData(aplusCourse.id);
+
+  const isChecked = (newSource: NewAplusGradeSourceData): boolean => {
+    for (const source of selectedGradeSources) {
+      if (aplusGradeSourcesEqual(newSource, source)) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   if (aplusExerciseData.data === undefined) return <></>;
 
@@ -44,10 +56,11 @@ const SelectAplusGradeSources = ({
           <FormControlLabel
             control={
               <Checkbox
+                defaultChecked={isChecked(newAplusGradeSource(aplusCourse, {}))}
                 onChange={e =>
                   handleChange(
                     e.target.checked,
-                    'A+ Course',
+                    `A+ Course: ${aplusCourse.name}`,
                     newAplusGradeSource(aplusCourse, {})
                   )
                 }
@@ -67,6 +80,9 @@ const SelectAplusGradeSources = ({
               <FormControlLabel
                 control={
                   <Checkbox
+                    defaultChecked={isChecked(
+                      newAplusGradeSource(aplusCourse, {module})
+                    )}
                     onChange={e =>
                       handleChange(
                         e.target.checked,
@@ -93,6 +109,9 @@ const SelectAplusGradeSources = ({
                 <FormControlLabel
                   control={
                     <Checkbox
+                      defaultChecked={isChecked(
+                        newAplusGradeSource(aplusCourse, {exercise})
+                      )}
                       onChange={e =>
                         handleChange(
                           e.target.checked,
@@ -120,6 +139,9 @@ const SelectAplusGradeSources = ({
                 <FormControlLabel
                   control={
                     <Checkbox
+                      defaultChecked={isChecked(
+                        newAplusGradeSource(aplusCourse, {difficulty})
+                      )}
                       onChange={e =>
                         handleChange(
                           e.target.checked,

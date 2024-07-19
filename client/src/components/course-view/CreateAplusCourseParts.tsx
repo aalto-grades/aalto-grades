@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Card, CardContent, TextField} from '@mui/material';
+import {Box, Card, CardContent, TextField, Typography} from '@mui/material';
 import {JSX} from 'react';
 
 import {NewAplusGradeSourceData} from '@/common/types';
@@ -27,6 +27,9 @@ const CreateAplusCourseParts = ({
       {coursePartsWithSource.map(([coursePart, _], index) => (
         <Card sx={{m: 1}}>
           <CardContent>
+            {/* In case the teacher changes the course part's name, this is intended
+                to show which source the course part was initially created from. */}
+            <Typography>{coursePart.name}</Typography>
             <TextField
               sx={{mt: 1}}
               label="Name"
