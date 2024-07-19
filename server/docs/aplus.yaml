@@ -109,8 +109,6 @@ definitions:
     type: object
     description: Information about an A+ grade source..
     properties:
-      coursePartId:
-        $ref: '#/definitions/CoursePartId'
       aplusCourse:
         $ref: '#/definitions/AplusCourseData'
       sourceType:
