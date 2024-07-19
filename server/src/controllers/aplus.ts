@@ -144,7 +144,7 @@ export const addAplusGradeSources = async (
       const parsed = parseAplusGradeSource(partGradeSource);
       if (aplusGradeSourcesEqual(newGradeSource, parsed)) {
         throw new ApiError(
-          `course part with ID ${parsed.coursePartId} ` +
+          `course part with ID ${partGradeSource.coursePartId} ` +
             `already has the A+ grade source ${JSON.stringify(newGradeSource)}`,
           HttpCode.Conflict
         );
