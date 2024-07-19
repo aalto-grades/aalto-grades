@@ -2,12 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {GradingModelData, StudentRow} from '@/common/types';
+import {GradingModelData, GradingScale, StudentRow} from '@/common/types';
 import {batchCalculateGraph} from '@/common/util/calculateGraph';
 import {GradeSelectOption, findBestGrade} from './bestGrade';
 import {
   ExtendedStudentRow,
   GroupedStudentRow,
+  RowError,
 } from '../context/GradesTableProvider';
 
 /**
@@ -90,26 +91,74 @@ export const predictGrades = (
   return result;
 };
 
-/** Get the number of errors in the selected rows. */
+export const predictedGradesErrorCheck = (
+  studentPredictedGrades: {[k: string]: {finalGrade: number}},
+  courseScale: GradingScale
+) => {
+  return Object.entries(studentPredictedGrades).reduce(
+    (errorsArray, [modelId, grade]) => {
+      // if grade is a float
+      if (grade.finalGrade % 1 !== 0) {
+        errorsArray.push({
+          message: 'The predicted grade is not an integer',
+          type: 'InvalidPredictedGrade',
+          info: {
+            columnId: 'predictedFinalGrades',
+            modelId: modelId,
+          },
+        });
+      }
+      // if grade is out of range
+      if (
+        (courseScale === GradingScale.Numerical &&
+          !(grade.finalGrade >= 0 && grade.finalGrade <= 5)) ||
+        (courseScale === GradingScale.PassFail &&
+          !(grade.finalGrade >= 0 && grade.finalGrade <= 1))
+      ) {
+        errorsArray.push({
+          message: 'The predicted grade is out of range',
+          type: 'OutOfRangePredictedGrade',
+          info: {
+            columnId: 'predictedFinalGrades',
+            modelId: modelId,
+          },
+        });
+      }
+      return errorsArray;
+    },
+    [] as RowError[]
+  );
+};
+
+/**
+ * Calculates the total count of errors in the given row model based on the
+ * selected grading model.
+ *
+ * @param rowModel - The array of grouped student rows.
+ * @param selectedGradingModel - The selected grading model. Can be 'any' or a
+ *   number.
+ * @returns The total count of errors.
+ */
 export const getErrorCount = (
   rowModel: GroupedStudentRow[],
   selectedGradingModel: 'any' | number
 ) => {
   return rowModel.reduce((acc, row) => {
-    for (const error of row.errors ?? []) {
-      switch (error.type) {
-        case 'InvalidPredictedGrade':
-          if (selectedGradingModel !== 'any') {
-            return selectedGradingModel === Number(error.info.modelId)
+    return (
+      acc +
+      (row.errors?.reduce((acc, error) => {
+        switch (error.type) {
+          case 'OutOfRangePredictedGrade':
+          case 'InvalidPredictedGrade':
+            return selectedGradingModel === 'any' ||
+              selectedGradingModel === Number(error.info.modelId)
               ? acc + 1
               : acc;
-          }
-          return acc + 1;
-          break;
-        default:
-          return acc;
-      }
-    }
-    return acc;
+
+          default:
+            return acc;
+        }
+      }, 0) ?? 0)
+    );
   }, 0);
 };

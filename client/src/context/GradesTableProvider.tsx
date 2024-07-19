@@ -46,7 +46,12 @@ import {
   useGetCourseParts,
 } from '../hooks/useApi';
 import {findBestFinalGrade} from '../utils/bestGrade';
-import {groupByLatestBestGrade, predictGrades} from '../utils/table';
+import {
+  groupByLatestBestGrade,
+  predictedGradesErrorCheck,
+  predictGrades,
+  predictGradeTests,
+} from '../utils/table';
 
 // Define the shape of the context
 export type TableContextProps = {
@@ -89,7 +94,7 @@ export type RowError =
       };
     }
   | {
-      type: 'InvalidPredictedGrade';
+      type: 'InvalidPredictedGrade' | 'OutOfRangePredictedGrade';
       message: string;
       info: {
         columnId: string;
@@ -195,27 +200,15 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
           ...row,
           // keep the same structure of predictedGrades but only show result for the student
           predictedFinalGrades: studentPredictedGrades,
-          errors: Object.entries(studentPredictedGrades).reduce(
-            (errorsArray, [modelId, grade]) => {
-              if (grade.finalGrade < 0 || grade.finalGrade > 5) {
-                errorsArray.push({
-                  message: 'The predicted grade is out of range',
-                  type: 'InvalidPredictedGrade',
-                  info: {
-                    columnId: 'predictedFinalGrades',
-                    modelId: modelId,
-                  },
-                });
-              }
-              return errorsArray;
-            },
-            [] as RowError[]
+          errors: predictedGradesErrorCheck(
+            studentPredictedGrades,
+            course.data?.gradingScale ?? GradingScale.Numerical
           ),
         };
       }),
       gradeSelectOption
     );
-  }, [gradingModels, props.data, gradeSelectOption]);
+  }, [gradingModels, props.data, gradeSelectOption, course.data?.gradingScale]);
 
   // const [globalFilter, setGlobalFilter] = useState('');
 

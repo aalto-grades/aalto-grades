@@ -41,16 +41,20 @@ const PredictedGradeCell = ({
     >
       {row.errors?.some(
         error =>
-          error.type === 'InvalidPredictedGrade' &&
+          ('InvalidPredictedGrade' === error.type ||
+            'OutOfRangePredictedGrade' === error.type) &&
           gradingModelIds?.includes(Number(error.info.modelId))
       ) && (
         <Box sx={{position: 'absolute', top: 0}}>
           <Tooltip
-            title={
-              gradingModelIds?.length === 1
-                ? 'Predicted grade is out of range'
-                : 'One of the predicted grades is out of range'
-            }
+            title={row.errors
+              .filter(
+                e =>
+                  e.info.columnId === 'predictedFinalGrades' &&
+                  gradingModelIds?.includes(Number(e.info.modelId ?? 0))
+              )
+              .map(e => e.message)
+              .join('\n')}
             placement="top"
             disableInteractive
           >
