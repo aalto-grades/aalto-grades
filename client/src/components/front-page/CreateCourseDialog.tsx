@@ -37,7 +37,7 @@ import {
 } from '@/common/types';
 import {useAddCourse} from '../../hooks/useApi';
 import {convertToClientGradingScale} from '../../utils/textFormat';
-import {sisuLanguageOptions} from '../../utils/utils';
+import {departments, sisuLanguageOptions} from '../../utils/utils';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import FormField from '../shared/FormikField';
 import FormLanguagesField from '../shared/FormikLanguageField';
@@ -55,24 +55,13 @@ const ValidationSchema = z
     languageOfInstruction: z.nativeEnum(Language),
     teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
     assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
-    departmentEn: z
-      .string({
-        required_error:
-          'Please input the organizing department of the course in English',
-      })
-      .min(1),
-    departmentFi: z
-      .string({
-        required_error:
-          'Please input the organizing department of the course in Finnish',
-      })
-      .min(1),
-    departmentSv: z
-      .string({
-        required_error:
-          'Please input the organizing department of the course in Swedish',
-      })
-      .min(1),
+    department: z
+      .number()
+      .min(0, 'Please select the organizing department of the course')
+      .max(
+        departments.length - 1,
+        'Please select the organizing department of the course'
+      ),
     nameEn: z
       .string({required_error: 'Please input a valid course name in English'})
       .min(1),
@@ -95,9 +84,7 @@ type FormData = {
   gradingScale: GradingScale;
   teacherEmail: string;
   assistantEmail: string;
-  departmentEn: string;
-  departmentFi: string;
-  departmentSv: string;
+  department: number;
   languageOfInstruction: Language;
   nameEn: string;
   nameFi: string;
@@ -112,9 +99,7 @@ const initialValues = {
   languageOfInstruction: Language.English,
   teacherEmail: '',
   assistantEmail: '',
-  departmentEn: '',
-  departmentFi: '',
-  departmentSv: '',
+  department: -1,
   nameEn: '',
   nameFi: '',
   nameSv: '',
@@ -148,9 +133,9 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
       gradingScale: values.gradingScale,
       languageOfInstruction: values.languageOfInstruction,
       department: {
-        fi: values.departmentFi,
-        sv: values.departmentSv,
-        en: values.departmentEn,
+        fi: departments[values.department].fi,
+        sv: departments[values.department].sv,
+        en: departments[values.department].en,
       },
       name: {
         fi: values.nameFi,
@@ -213,12 +198,19 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                 labelFormat="Course name in %*"
                 helperTextFormat="Give the name of the course in %."
               />
-              <FormLanguagesField
+              <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
-                valueFormat="department%"
-                labelFormat="Organizing department in %*"
-                helperTextFormat="Give the organizing department of the new course in %."
-              />
+                value="department"
+                label="Organizing department*"
+                helperText="Select the organizing department of the new course"
+                select
+              >
+                {departments.map((department, i) => (
+                  <MenuItem key={i} value={i}>
+                    {department.en}
+                  </MenuItem>
+                ))}
+              </FormField>
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="minCredits"
