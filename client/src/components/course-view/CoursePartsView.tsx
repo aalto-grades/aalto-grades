@@ -164,8 +164,10 @@ const CoursePartsView = (): JSX.Element => {
   const handleSubmit = async (): Promise<void> => {
     const newCourseParts: NewCoursePartData[] = [];
     const deletedCourseParts: number[] = [];
-    const editedCourseParts: ({coursePartsId: number} & EditCoursePartData)[] =
-      [];
+    const editedCourseParts: {
+      coursePartsId: number;
+      coursePart: EditCoursePartData;
+    }[] = [];
 
     for (const row of rows) {
       if (row.coursePartId === -1) {
@@ -176,9 +178,11 @@ const CoursePartsView = (): JSX.Element => {
       } else {
         editedCourseParts.push({
           coursePartsId: row.coursePartId,
-          name: row.name,
-          daysValid: row.daysValid,
-          archived: row.archived,
+          coursePart: {
+            name: row.name,
+            daysValid: row.daysValid,
+            archived: row.archived,
+          },
         });
       }
     }
@@ -196,10 +200,10 @@ const CoursePartsView = (): JSX.Element => {
       ...deletedCourseParts.map(coursePartId =>
         deleteCoursePart.mutateAsync(coursePartId)
       ),
-      ...editedCourseParts.map(coursePart =>
+      ...editedCourseParts.map(coursePartData =>
         editCoursePart.mutateAsync({
-          coursePartId: coursePart.coursePartsId,
-          coursePart: coursePart,
+          coursePartId: coursePartData.coursePartsId,
+          coursePart: coursePartData.coursePart,
         })
       ),
     ]);

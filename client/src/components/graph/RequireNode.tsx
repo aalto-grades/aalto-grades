@@ -182,7 +182,9 @@ const RequireNode = (props: NodeProps): JSX.Element => {
                   {numFail > settings.numFail ||
                   nodeValue.values[key] === 'fail'
                     ? nodeValue.values[key]
-                    : Math.round(nodeValue.values[key] * 100) / 100}
+                    : Math.round(
+                        (nodeValue.values[key] as number) * 100 // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+                      ) / 100}
                 </td>
               </tr>
             ))}

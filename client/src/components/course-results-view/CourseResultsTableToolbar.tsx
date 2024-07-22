@@ -440,14 +440,14 @@ const CourseResultsTableToolbar = (): JSX.Element => {
     if (model === undefined || course.data === undefined) return false;
 
     enqueueSnackbar('Calculating final grades...', {variant: 'info'});
-
     const finalGrades = batchCalculateGraph(
       model.graphStructure,
       selectedRows.map(selectedRow => ({
         userId: selectedRow.user.id,
         courseParts: selectedRow.courseParts.map(coursePart => ({
           coursePartId: coursePart.coursePartId,
-          grade: findBestGrade(coursePart.grades, {gradeSelectOption})!.grade, // TODO: Manage expired course parts
+          grade:
+            findBestGrade(coursePart.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Manage expired course parts
         })),
       }))
     );
