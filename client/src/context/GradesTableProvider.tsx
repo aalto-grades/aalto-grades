@@ -384,7 +384,10 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       header: 'Errors',
       id: 'errors',
       enableHiding: true,
-      filterFn: (row, columnId, filterValue) => {
+      // The column only filter, for other type of filtering write another filterFn
+      filterFn: row => {
+        // Not sure which solution is the best one, for now i keep both
+        // return getErrorCount([row.original], selectedGradingModel) > 0;
         return (row.original.errors?.length ?? 0) > 0;
       },
     }),

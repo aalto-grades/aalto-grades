@@ -9,7 +9,6 @@ import {
   Box,
   Button,
   ButtonBase,
-  Chip,
   Divider,
   Fade,
   Menu,
@@ -211,6 +210,7 @@ const AssesmentFilterButton = forwardRef<HTMLSpanElement>(
   (props, ref): JSX.Element => {
     const {courseId} = useParams() as {courseId: string};
     const theme = useTheme();
+    const {table} = useTableContext();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLElement>): void => {
@@ -330,6 +330,7 @@ const AssesmentFilterButton = forwardRef<HTMLSpanElement>(
             <MenuItem
               key={model.id}
               onClick={() => {
+                table.resetColumnFilters();
                 setSelectedGradingModel(model.id);
                 handleClose();
               }}
@@ -632,7 +633,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
           </Tooltip>
         )}
 
-        <Chip variant="outlined" label="Filters" />
+        {/* <Chip variant="outlined" label="Filters" /> */}
 
         <input
           style={{
@@ -654,7 +655,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
           placeholder={'Search...'}
           className="w-36 border shadow rounded"
         />
-        <Box sx={{display: 'flex', alignItems: 'center'}}>
+        <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
           Showing: {table.getFilteredRowModel().rows.length} rows
           <Fade
             in={

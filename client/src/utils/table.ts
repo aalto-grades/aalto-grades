@@ -94,7 +94,7 @@ export const predictGrades = (
 export const predictedGradesErrorCheck = (
   studentPredictedGrades: {[k: string]: {finalGrade: number}},
   courseScale: GradingScale
-) => {
+): RowError[] => {
   return Object.entries(studentPredictedGrades).reduce(
     (errorsArray, [modelId, grade]) => {
       // if grade is a float
@@ -113,7 +113,9 @@ export const predictedGradesErrorCheck = (
         (courseScale === GradingScale.Numerical &&
           !(grade.finalGrade >= 0 && grade.finalGrade <= 5)) ||
         (courseScale === GradingScale.PassFail &&
-          !(grade.finalGrade >= 0 && grade.finalGrade <= 1))
+          !(grade.finalGrade >= 0 && grade.finalGrade <= 1)) ||
+        (courseScale === GradingScale.SecondNationalLanguage &&
+          !(grade.finalGrade >= 0 && grade.finalGrade <= 2))
       ) {
         errorsArray.push({
           message: 'The predicted grade is out of range',
@@ -142,23 +144,33 @@ export const predictedGradesErrorCheck = (
 export const getErrorCount = (
   rowModel: GroupedStudentRow[],
   selectedGradingModel: 'any' | number
-) => {
-  return rowModel.reduce((acc, row) => {
-    return (
-      acc +
-      (row.errors?.reduce((acc, error) => {
+): number => {
+  let totalErrors = 0;
+
+  for (const row of rowModel) {
+    let rowErrorCount = 0;
+
+    if (row.errors) {
+      for (const error of row.errors) {
         switch (error.type) {
           case 'OutOfRangePredictedGrade':
           case 'InvalidPredictedGrade':
-            return selectedGradingModel === 'any' ||
+            if (
+              selectedGradingModel === 'any' ||
               selectedGradingModel === Number(error.info.modelId)
-              ? acc + 1
-              : acc;
+            ) {
+              rowErrorCount += 1;
+            }
+            break;
 
           default:
-            return acc;
+            break;
         }
-      }, 0) ?? 0)
-    );
-  }, 0);
+      }
+    }
+
+    totalErrors += rowErrorCount;
+  }
+
+  return totalErrors;
 };
