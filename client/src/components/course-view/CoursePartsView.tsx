@@ -76,7 +76,6 @@ const CoursePartsView = (): JSX.Element => {
   const [aplusGradeSources, setAplusGradeSources] = useState<
     AplusGradeSourceData[]
   >([]);
-  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState<boolean>(false);
 
   const coursePartsWithGrades = useMemo(() => {
     const withGrades = new Set<number>();
@@ -332,6 +331,12 @@ const CoursePartsView = (): JSX.Element => {
       : []),
   ];
 
+  const confirmDiscard = async (): Promise<void> => {
+    if (await AsyncConfirmationModal({confirmNavigate: true})) {
+      setRows(structuredClone(initRows));
+    }
+  };
+
   return (
     <>
       <AddCoursePartDialog
@@ -359,15 +364,8 @@ const CoursePartsView = (): JSX.Element => {
         aplusGradeSources={aplusGradeSources}
       />
       <UnsavedChangesDialog
-        open={unsavedDialogOpen || blocker.state === 'blocked'}
-        onClose={() => {
-          setUnsavedDialogOpen(false);
-          if (blocker.state === 'blocked') blocker.reset();
-        }}
-        handleDiscard={() => {
-          setRows(structuredClone(initRows));
-          if (blocker.state === 'blocked') blocker.proceed();
-        }}
+        blocker={blocker}
+        handleDiscard={() => setRows(structuredClone(initRows))}
       />
 
       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
@@ -376,7 +374,7 @@ const CoursePartsView = (): JSX.Element => {
         </Typography>
         <SaveBar
           show={editRights && unsavedChanges}
-          handleDiscard={() => setUnsavedDialogOpen(true)}
+          handleDiscard={confirmDiscard}
           handleSave={handleSubmit}
           disabled={editing}
           // loading={form.isSubmitting}

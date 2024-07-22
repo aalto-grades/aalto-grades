@@ -13,14 +13,19 @@ import {
 import {JSX} from 'react';
 import {IModalProps} from 'react-global-modal';
 
-type ActionButton = {title: string; onClick: () => void};
+type PropsType = IModalProps & {
+  confirmNavigate: boolean;
+  confirmDelete: boolean;
+};
 export const ConfirmDialog = ({
   open,
   title,
   children,
   actions,
+  confirmNavigate,
   confirmDelete,
-}: IModalProps & {confirmDelete: boolean}): JSX.Element => {
+}: PropsType): JSX.Element => {
+  type ActionButton = {title: string; onClick: () => void};
   const cancelButton = actions!.find(
     (el: ActionButton) => el.title === 'Cancel'
   ) as ActionButton;
@@ -28,7 +33,15 @@ export const ConfirmDialog = ({
     (el: ActionButton) => el.title === 'Confirm'
   ) as ActionButton;
 
+  if (confirmNavigate && title === undefined) title = 'Unsaved changes';
+  if (confirmNavigate && children === undefined)
+    children = (
+      <div>
+        You have unsaved changes. Data you have entered will not be saved
+      </div>
+    );
   const childrenProp = children as {props: {message: string}};
+
   return (
     <Dialog open={open!} onClose={cancelButton.onClick} fullWidth maxWidth="xs">
       <DialogTitle>{title}</DialogTitle>
@@ -36,13 +49,19 @@ export const ConfirmDialog = ({
         <DialogContentText>{childrenProp.props.message}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={cancelButton.onClick}>Cancel</Button>
+        <Button onClick={cancelButton.onClick}>
+          {confirmNavigate ? 'Stay on this page' : 'Cancel'}
+        </Button>
         <Button
           onClick={confirmButton.onClick}
           variant="contained"
-          color={confirmDelete ? 'error' : 'primary'}
+          color={confirmNavigate || confirmDelete ? 'error' : 'primary'}
         >
-          {confirmDelete ? 'Delete' : 'Confirm'}
+          {confirmNavigate
+            ? 'Discard changes'
+            : confirmDelete
+              ? 'Delete'
+              : 'Confirm'}
         </Button>
       </DialogActions>
     </Dialog>

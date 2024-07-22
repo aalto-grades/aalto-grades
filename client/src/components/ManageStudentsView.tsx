@@ -137,15 +137,7 @@ const ManageStudentsView = (): JSX.Element => {
 
   return (
     <>
-      <UnsavedChangesDialog
-        open={blocker.state === 'blocked'}
-        onClose={() => {
-          if (blocker.state === 'blocked') blocker.reset();
-        }}
-        handleDiscard={() => {
-          if (blocker.state === 'blocked') blocker.proceed();
-        }}
-      />
+      <UnsavedChangesDialog blocker={blocker} />
 
       <Typography variant="h2" sx={{pb: 2}}>
         Manage students

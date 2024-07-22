@@ -548,12 +548,7 @@ const Graph = ({
   );
   return (
     <>
-      <UnsavedChangesDialog
-        open={blocker.state === 'blocked'}
-        onClose={blocker.reset ?? (() => {})}
-        handleDiscard={blocker.proceed ?? (() => {})}
-        dontCloseOnDiscard
-      />
+      <UnsavedChangesDialog blocker={blocker} />
       <SelectCoursePartsDialog
         nodes={nodes}
         courseParts={courseParts}

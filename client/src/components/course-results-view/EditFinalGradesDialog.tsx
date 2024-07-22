@@ -21,6 +21,7 @@ import {
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
+import {AsyncConfirmationModal} from 'react-global-modal';
 import {useBlocker, useParams} from 'react-router-dom';
 import {z} from 'zod';
 
@@ -78,7 +79,6 @@ const EditFinalGradesDialog = ({
 
   const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
-  const [unsavedOpen, setUnsavedOpen] = useState<boolean>(false);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
 
@@ -285,27 +285,27 @@ const EditFinalGradesDialog = ({
     setInitRows(structuredClone(rows));
   };
 
+  const confirmDiscard = async (): Promise<void> => {
+    if (await AsyncConfirmationModal({confirmNavigate: true})) {
+      onClose();
+      setRows(structuredClone(initRows));
+    }
+  };
+
   return (
     <>
       <UnsavedChangesDialog
-        open={unsavedOpen || blocker.state === 'blocked'}
-        onClose={() => {
-          setUnsavedOpen(false);
-          if (blocker.state === 'blocked') blocker.reset();
-        }}
+        blocker={blocker}
         handleDiscard={() => {
           onClose();
           setRows(structuredClone(initRows));
-          if (blocker.state === 'blocked') {
-            blocker.proceed();
-          }
         }}
       />
 
       <Dialog
         open={open}
         onClose={() => {
-          if (changes) setUnsavedOpen(true);
+          if (changes) confirmDiscard();
           else onClose();
         }}
         fullWidth
@@ -361,7 +361,7 @@ const EditFinalGradesDialog = ({
         <DialogActions>
           <Button
             onClick={() => {
-              if (changes) setUnsavedOpen(true);
+              if (changes) confirmDiscard();
               else onClose();
             }}
           >

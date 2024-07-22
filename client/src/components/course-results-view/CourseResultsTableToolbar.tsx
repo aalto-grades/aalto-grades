@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, forwardRef, useEffect, useMemo, useState} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 
 import {StudentRow, SystemRole} from '@/common/types';
@@ -36,7 +36,6 @@ import useAuth from '../../hooks/useAuth';
 import {findBestGrade} from '../../utils/bestGrade';
 import {findLatestGrade} from '../../utils/table';
 import {getMaxFinalGrade} from '../../utils/utils';
-import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import UploadDialog from '../course-view/UploadDialog';
 
 /**
@@ -348,7 +347,6 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
   const {table, gradeSelectOption} = useTableContext();
-  const navigate = useNavigate();
   const theme = useTheme();
 
   const allGradingModels = useGetAllGradingModels(courseId);
@@ -359,7 +357,6 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   const [showCalculateDialog, setShowCalculateDialog] =
     useState<boolean>(false);
   const [showSisuDialog, setShowSisuDialog] = useState<boolean>(false);
-  const [showDialog, setShowDialog] = useState<boolean>(false);
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
 
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
@@ -659,11 +656,6 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         </FormControl>
       </Box> */}
       <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} />
-      <UnsavedChangesDialog
-        open={showDialog}
-        onClose={() => setShowDialog(false)}
-        handleDiscard={() => navigate(-1)}
-      />
       <CalculateFinalGradesDialog
         open={showCalculateDialog}
         onClose={() => setShowCalculateDialog(false)}
