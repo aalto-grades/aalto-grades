@@ -13,6 +13,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import {AsyncConfirmationModal} from 'react-global-modal';
 import {useBlocker} from 'react-router-dom';
 import {
   ReactFlow,
@@ -63,7 +64,6 @@ import {
   NodeValuesContext,
 } from '../../context/GraphProvider';
 import {GradeSelectOption, findBestGrade} from '../../utils/bestGrade';
-import SaveConfirmDialog from '../alerts/SaveConfirmDialog';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 const nodeTypesMap = {
@@ -133,7 +133,7 @@ const Graph = ({
   courseParts,
   userGrades,
   gradeSelectOption,
-  onSave,
+  onSave: onParentSave,
   readOnly = false,
   modelHasFinalGrades = false,
 }: GraphProps): JSX.Element => {
@@ -162,7 +162,6 @@ const Graph = ({
     useState<boolean>(false);
   const [coursePartValuesOpen, setCoursePartValuesOpen] =
     useState<boolean>(false);
-  const [saveConfirmOpen, setSaveConfirmOpen] = useState<boolean>(false);
   // Course part nodes that the user is allowed to delete
   const [delCourseParts, setDelCourseParts] = useState<string[]>([]);
   const [originalGraphStructure, setOriginalGraphStructure] =
@@ -364,6 +363,27 @@ const Graph = ({
     if (change) setNodeValues(newNodeValues);
   }, [gradeSelectOption, loading, nodeValues, userGrades]);
 
+  const onSave = async (): Promise<void> => {
+    if (onParentSave === undefined) return;
+
+    let confirmation = true;
+    if (modelHasFinalGrades) {
+      confirmation = await AsyncConfirmationModal({
+        title: 'Saving model',
+        message:
+          'There are final grades using this model. Editing it might cause ' +
+          'accidentally overwriting old final grades',
+      });
+    }
+    if (confirmation) {
+      enqueueSnackbar('Saving model.', {variant: 'info'});
+      await onParentSave({nodes, edges, nodeData});
+      enqueueSnackbar('Model saved successfully.', {variant: 'success'});
+      setOriginalGraphStructure(structuredClone({nodes, edges, nodeData}));
+      setUnsaved(false);
+    }
+  };
+
   const onConnect = useCallback(
     (params: Connection) => {
       setEdges(oldEdges => addEdge(params, oldEdges));
@@ -541,24 +561,6 @@ const Graph = ({
         handleCoursePartSelect={handleCoursePartSelect}
         onClose={() => setCoursePartsSelectOpen(false)}
       />
-      <SaveConfirmDialog
-        open={saveConfirmOpen}
-        onClose={() => setSaveConfirmOpen(false)}
-        onSave={async () => {
-          if (onSave === undefined) return;
-          setSaveConfirmOpen(false);
-
-          enqueueSnackbar('Saving model.', {variant: 'info'});
-          await onSave({nodes, edges, nodeData});
-          enqueueSnackbar('Model saved successfully.', {variant: 'success'});
-          setOriginalGraphStructure(structuredClone({nodes, edges, nodeData}));
-          setUnsaved(false);
-        }}
-        text={
-          'There are final grades using this model. Editing it might cause ' +
-          'accidentally overwriting old final grades.'
-        }
-      />
       <div style={{position: 'relative'}}>
         {unsaved && (
           <Alert
@@ -686,7 +688,7 @@ const Graph = ({
                 />
               </ReactFlow>
             </div>
-            {!readOnly && onSave !== undefined && (
+            {!readOnly && onParentSave !== undefined && (
               <>
                 <div style={{marginBottom: '5px'}}>
                   {dragAndDropNodes.map(dragAndDropNode => (
@@ -739,21 +741,7 @@ const Graph = ({
                   )}
                   <Button
                     variant={unsaved ? 'contained' : 'text'}
-                    onClick={async () => {
-                      if (modelHasFinalGrades) {
-                        setSaveConfirmOpen(true);
-                        return;
-                      }
-                      enqueueSnackbar('Saving model.', {variant: 'info'});
-                      await onSave({nodes, edges, nodeData});
-                      enqueueSnackbar('Model saved successfully.', {
-                        variant: 'success',
-                      });
-                      setOriginalGraphStructure(
-                        structuredClone({nodes, edges, nodeData})
-                      );
-                      setUnsaved(false);
-                    }}
+                    onClick={onSave}
                     sx={{float: 'right'}}
                   >
                     Save

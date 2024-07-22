@@ -10,32 +10,41 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@mui/material';
+import {JSX} from 'react';
 import {IModalProps} from 'react-global-modal';
 
+type ActionButton = {title: string; onClick: () => void};
 export const ConfirmDialog = ({
   open,
-  onModalClose,
   title,
   children,
   actions,
   confirmDelete,
-}: IModalProps & {confirmDelete: boolean}): JSX.Element => (
-  <Dialog open={open!} onClose={onModalClose} fullWidth maxWidth="xs">
-    <DialogTitle>{title}</DialogTitle>
-    <DialogContent>
-      <DialogContentText>{children}</DialogContentText>
-    </DialogContent>
-    <DialogActions>
-      {actions!.toReversed().map((el: {title: string; onClick: () => void}) => (
+}: IModalProps & {confirmDelete: boolean}): JSX.Element => {
+  const cancelButton = actions!.find(
+    (el: ActionButton) => el.title === 'Cancel'
+  ) as ActionButton;
+  const confirmButton = actions!.find(
+    (el: ActionButton) => el.title === 'Confirm'
+  ) as ActionButton;
+
+  const childrenProp = children as {props: {message: string}};
+  return (
+    <Dialog open={open!} onClose={cancelButton.onClick} fullWidth maxWidth="xs">
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>{childrenProp.props.message}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={cancelButton.onClick}>Cancel</Button>
         <Button
-          key={el.title}
-          onClick={el.onClick}
-          variant={el.title === 'Confirm' ? 'contained' : 'text'}
-          color={el.title === 'Confirm' && confirmDelete ? 'error' : 'primary'}
+          onClick={confirmButton.onClick}
+          variant="contained"
+          color={confirmDelete ? 'error' : 'primary'}
         >
-          {el.title === 'Confirm' && confirmDelete ? 'Delete' : el.title}
+          {confirmDelete ? 'Delete' : 'Confirm'}
         </Button>
-      ))}
-    </DialogActions>
-  </Dialog>
-);
+      </DialogActions>
+    </Dialog>
+  );
+};

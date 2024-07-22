@@ -19,6 +19,7 @@ import {
 import {grey} from '@mui/material/colors';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useCallback, useEffect, useMemo, useState} from 'react';
+import {AsyncConfirmationModal} from 'react-global-modal';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {
@@ -192,8 +193,15 @@ const ModelsView = (): JSX.Element => {
       gradingModel: {archived},
     });
   };
-  const handleDelModel = (gradingModelId: number): void => {
-    delModel.mutate({courseId, gradingModelId: gradingModelId});
+  const handleDelModel = async (gradingModelId: number): Promise<void> => {
+    const confirmation = await AsyncConfirmationModal({
+      title: 'Delete model',
+      message: 'Are you sure that you want to delete this model',
+      confirmDelete: true,
+    });
+    if (confirmation) {
+      delModel.mutate({courseId, gradingModelId: gradingModelId});
+    }
   };
 
   const onSave = async (graphStructure: GraphStructure): Promise<void> => {
@@ -317,7 +325,14 @@ const ModelsView = (): JSX.Element => {
                           {model.archived ? <Unarchive /> : <Archive />}
                         </IconButton>
                       </Tooltip>
-                      <Tooltip placement="top" title="Delete grading model">
+                      <Tooltip
+                        placement="top"
+                        title={
+                          modelsWithFinalGrades.has(model.id)
+                            ? 'Cannot delete a model with final grades'
+                            : 'Delete grading model'
+                        }
+                      >
                         {/* The span is necessary because tooltips don't like disabled buttons*/}
                         <span>
                           <IconButton

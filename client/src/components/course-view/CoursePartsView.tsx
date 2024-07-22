@@ -13,6 +13,7 @@ import {
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
+import {AsyncConfirmationModal} from 'react-global-modal';
 import {useBlocker, useParams} from 'react-router-dom';
 
 import {
@@ -268,11 +269,19 @@ const CoursePartsView = (): JSX.Element => {
         <GridActionsCellItem
           icon={<Delete />}
           label="Delete"
-          onClick={() => {
+          onClick={async () => {
+            let confirmation = true;
             if (coursePartsWithModels.has(params.row.coursePartId)) {
-              // TODO: Show confirm
+              confirmation = await AsyncConfirmationModal({
+                title: 'Delete course part',
+                message:
+                  'Some models are using this course part. Are you sure you want to delete it?',
+                confirmDelete: true,
+              });
             }
-            setRows(oldRows => oldRows.filter(row => row.id !== params.id));
+            if (confirmation) {
+              setRows(oldRows => oldRows.filter(row => row.id !== params.id));
+            }
           }}
         />
       );

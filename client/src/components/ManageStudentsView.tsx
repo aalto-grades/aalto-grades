@@ -2,15 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Typography,
-} from '@mui/material';
+import {Button, Typography} from '@mui/material';
 import {
   DataGrid,
   GridColDef,
@@ -19,6 +11,7 @@ import {
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
+import {AsyncConfirmationModal} from 'react-global-modal';
 import {useBlocker} from 'react-router-dom';
 
 import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
@@ -76,7 +69,6 @@ const ManageStudentsView = (): JSX.Element => {
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rowSelectionModel, setRowSelectionModel] =
     useState<GridRowSelectionModel>([]);
-  const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
 
   const changes = useMemo(
     () =>
@@ -127,11 +119,20 @@ const ManageStudentsView = (): JSX.Element => {
     setData();
   }, [students.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const plural = rowSelectionModel.length > 1 ? 's' : '';
   const handleDelete = async (): Promise<void> => {
-    await deleteUsers.mutateAsync(rowSelectionModel.map(row => Number(row)));
-    enqueueSnackbar('Students deleted', {variant: 'success'});
-    setConfirmOpen(false);
-    setRowSelectionModel([]);
+    const confirmation = await AsyncConfirmationModal({
+      title: `Delete student${plural}`,
+      message:
+        `All of the data of the student${plural} ` +
+        'will be deleted permanently!',
+      confirmDelete: true,
+    });
+    if (confirmation) {
+      await deleteUsers.mutateAsync(rowSelectionModel.map(row => Number(row)));
+      enqueueSnackbar('Students deleted', {variant: 'success'});
+      setRowSelectionModel([]);
+    }
   };
 
   return (
@@ -146,38 +147,16 @@ const ManageStudentsView = (): JSX.Element => {
         }}
       />
 
-      <Dialog
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        fullWidth
-        maxWidth="xs"
-      >
-        <DialogTitle>Delete student</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            All of the data of the student
-            {rowSelectionModel.length > 1 ? 's' : ''} will be deleted
-            permanently!
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
-          <Button onClick={handleDelete} variant="contained" color="error">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       <Typography variant="h2" sx={{pb: 2}}>
         Manage students
       </Typography>
       <Button
-        onClick={() => setConfirmOpen(true)}
+        onClick={handleDelete}
         disabled={rowSelectionModel.length === 0}
         variant="contained"
         color="error"
       >
-        Delete student{rowSelectionModel.length > 1 ? 's' : ''}
+        Delete student{plural}
       </Button>
       <div style={{height: '30vh'}}>
         <DataGrid
