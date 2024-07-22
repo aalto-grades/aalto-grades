@@ -12,15 +12,24 @@ import {
   waitFor,
 } from '@testing-library/react';
 import {userEvent} from '@testing-library/user-event';
-import {MemoryRouter, Route, Routes} from 'react-router-dom';
+import {createMemoryRouter, RouterProvider} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
 import CourseResultsView from '../components/CourseResultsView';
 import AuthContext from '../context/AuthProvider';
 
 describe('Tests for CourseResultsView components', () => {
-  const renderCourseResultsView = (): RenderResult =>
-    render(
+  const renderCourseResultsView = (): RenderResult => {
+    const router = createMemoryRouter(
+      [
+        {
+          path: ':courseId/course-results/:gradingModelId',
+          element: <CourseResultsView />,
+        },
+      ],
+      {initialEntries: ['/1/course-results/1']}
+    );
+    return render(
       <CssVarsProvider>
         <QueryClientProvider client={new QueryClient()}>
           <AuthContext.Provider
@@ -37,18 +46,12 @@ describe('Tests for CourseResultsView components', () => {
               isAssistant: false,
             }}
           >
-            <MemoryRouter initialEntries={['/1/course-results/1']}>
-              <Routes>
-                <Route
-                  path=":courseId/course-results/:gradingModelId"
-                  element={<CourseResultsView />}
-                />
-              </Routes>
-            </MemoryRouter>
+            <RouterProvider router={router} />
           </AuthContext.Provider>
         </QueryClientProvider>
       </CssVarsProvider>
     );
+  };
 
   beforeEach(() => {
     // Tests will fail without this
