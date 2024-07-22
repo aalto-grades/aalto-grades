@@ -79,16 +79,45 @@ const nodeTypesMap = {
   substitute: SubstituteNode,
 };
 
-const dragAndDropNodes: {type: DropInNodes; title: string}[] = [
-  {type: 'addition', title: 'Addition'},
-  {type: 'average', title: 'Average'},
-  {type: 'stepper', title: 'Stepper'},
-  {type: 'minpoints', title: 'Require minimum points'},
-  {type: 'max', title: 'Maximum'},
-  {type: 'require', title: 'Require passing values'},
-  {type: 'round', title: 'Round'},
-  {type: 'substitute', title: 'Substitute'},
-];
+const dragAndDropNodes: {type: DropInNodes; title: string; tooltip: string}[] =
+  [
+    {
+      type: 'addition',
+      title: 'Addition',
+      tooltip: 'Add multiple values together',
+    },
+    {
+      type: 'average',
+      title: 'Average',
+      tooltip: 'Take the (weighted) average of multiple values',
+    },
+    {
+      type: 'stepper',
+      title: 'Stepper',
+      tooltip: 'Map a continuous value into some specific value', // TODO: Better explanation
+    },
+    {
+      type: 'minpoints',
+      title: 'Require minimum points',
+      tooltip: 'Require minimum value and otherwise output fail or fail course',
+    },
+    {
+      type: 'max',
+      title: 'Maximum',
+      tooltip: 'Take the maximum of multiple values and one custom value',
+    },
+    {
+      type: 'require',
+      title: 'Require passing values',
+      tooltip: 'Require some number of non-fail values',
+    },
+    {type: 'round', title: 'Round', tooltip: 'Round value'},
+    {
+      type: 'substitute',
+      title: 'Substitute',
+      tooltip: 'Substitute failing values',
+    },
+  ];
 
 type GraphProps = {
   initGraph: GraphStructure;
@@ -661,16 +690,18 @@ const Graph = ({
               <>
                 <div style={{marginBottom: '5px'}}>
                   {dragAndDropNodes.map(dragAndDropNode => (
-                    <div
-                      key={dragAndDropNode.type}
-                      className="dndnode"
-                      onDragStart={event =>
-                        onDragStart(event, dragAndDropNode.type)
-                      }
-                      draggable
-                    >
-                      {dragAndDropNode.title}
-                    </div>
+                    <Tooltip title={dragAndDropNode.tooltip} placement="top">
+                      <div
+                        key={dragAndDropNode.type}
+                        className="dndnode"
+                        onDragStart={event =>
+                          onDragStart(event, dragAndDropNode.type)
+                        }
+                        draggable
+                      >
+                        {dragAndDropNode.title}
+                      </div>
+                    </Tooltip>
                   ))}
                 </div>
                 <Divider sx={{my: 1}} />
