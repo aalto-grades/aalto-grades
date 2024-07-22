@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+import 'react-global-modal/dist/style.css';
+
 import {
   Experimental_CssVarsProvider as CssVarsProvider,
   CssVarsTheme,
@@ -15,7 +17,8 @@ import {
 } from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
 import {enqueueSnackbar} from 'notistack';
-import {CSSProperties, JSX} from 'react';
+import {CSSProperties, JSX, Ref, useEffect} from 'react';
+import {GlobalModal, GlobalModalWrapper} from 'react-global-modal';
 import {RouterProvider, createBrowserRouter} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
@@ -26,6 +29,7 @@ import FrontPage from './components/FrontPage';
 import ManageStudentsView from './components/ManageStudentsView';
 import NotFound from './components/NotFound';
 import StudentsView from './components/StudentsView';
+import {ConfirmDialog} from './components/alerts/ConfirmDialog';
 import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
 import ResetPassword from './components/auth/ResetPassword';
@@ -189,8 +193,13 @@ const muiTheme: CssVarsTheme = extendTheme({
   },
 });
 
+let globalModalRef: GlobalModalWrapper | null = null;
+
 const Root = (): JSX.Element => {
   // const {enqueueSnackbar} = useSnackbar();
+  useEffect(() => {
+    GlobalModal.setUpModal(globalModalRef as Ref<GlobalModalWrapper | null>);
+  }, []);
 
   const handleError = (error: Error): void => {
     enqueueSnackbar(error.message, {variant: 'error'});
@@ -209,6 +218,10 @@ const Root = (): JSX.Element => {
   return (
     <CssVarsProvider theme={muiTheme}>
       <NotistackWrapper />
+      <GlobalModalWrapper
+        customModal={ConfirmDialog}
+        ref={el => (globalModalRef = el)}
+      />
       <QueryClientProvider client={queryClient}>
         <AppView />
         {/* Query debug tool */}
