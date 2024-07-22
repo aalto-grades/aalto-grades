@@ -133,12 +133,12 @@ export const predictedGradesErrorCheck = (
 };
 
 /**
- * Calculates the total count of errors in the given row model based on the
- * selected grading model.
+ * Calculates the total count of errors in the given row model and selected
+ * grading model.
  *
  * @param rowModel - The array of grouped student rows.
  * @param selectedGradingModel - The selected grading model. Can be 'any' or a
- *   number.
+ *   number (modelId).
  * @returns The total count of errors.
  */
 export const getErrorCount = (
@@ -148,8 +148,6 @@ export const getErrorCount = (
   let totalErrors = 0;
 
   for (const row of rowModel) {
-    let rowErrorCount = 0;
-
     if (row.errors) {
       for (const error of row.errors) {
         switch (error.type) {
@@ -159,17 +157,15 @@ export const getErrorCount = (
               selectedGradingModel === 'any' ||
               selectedGradingModel === Number(error.info.modelId)
             ) {
-              rowErrorCount += 1;
+              totalErrors += 1;
             }
             break;
-
           default:
+            totalErrors += 1;
             break;
         }
       }
     }
-
-    totalErrors += rowErrorCount;
   }
 
   return totalErrors;
