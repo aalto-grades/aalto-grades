@@ -8,6 +8,7 @@ import {
   GroupingState,
   RowData,
   SortingState,
+  VisibilityState,
   createColumnHelper,
   getCoreRowModel,
   getExpandedRowModel,
@@ -25,7 +26,6 @@ import {
   useCallback,
   useMemo,
   useState,
-  useTransition,
 } from 'react';
 import {useParams} from 'react-router-dom';
 
@@ -46,7 +46,11 @@ import {
   useGetCourseParts,
 } from '../hooks/useApi';
 import {findBestFinalGrade} from '../utils/bestGrade';
-import {groupByLatestBestGrade, predictGrades} from '../utils/table';
+import {
+  groupByLatestBestGrade,
+  predictedGradesErrorCheck,
+  predictGrades,
+} from '../utils/table';
 
 // Define the shape of the context
 export type TableContextProps = {
@@ -79,8 +83,27 @@ export type GroupedStudentRow = {
   latestBestGrade: string;
 } & ExtendedStudentRow;
 
+export type RowError =
+  | {
+      type: 'Error';
+      message: string;
+      columnId: string;
+      info: {
+        columnId: string;
+      };
+    }
+  | {
+      type: 'InvalidPredictedGrade' | 'OutOfRangePredictedGrade';
+      message: string;
+      info: {
+        columnId: string;
+        modelId: string;
+      };
+    };
+
 export type ExtendedStudentRow = StudentRow & {
   predictedFinalGrades?: {[key: number]: {finalGrade: number}};
+  errors?: RowError[];
 };
 
 /**
@@ -120,10 +143,12 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   const courseParts = useGetCourseParts(courseId);
   const allGradingModels = useGetAllGradingModels(courseId);
 
-  const [_isPending, startTransition] = useTransition();
   const [rowSelection, setRowSelection] = useState({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [grouping, setGrouping] = useState<GroupingState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    errors: false,
+  });
   const [sorting, setSorting] = useState<SortingState>([]);
   const [userGraphOpen, setUserGraphOpen] = useState<boolean>(false);
   const [userGraphData, setUserGraphData] = useState<GroupedStudentRow | null>(
@@ -146,34 +171,43 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     [allGradingModels.data]
   );
 
-  // Row are always grouped, toggling grouping just add the grouping column to the table
+  // Some grouping options require infering data not readly available so we create these columns in advance here
+  // TanTable groups by value of the column, so we toggle on the column if the grouping is required
   const groupedData = useMemo(() => {
+    // Here we predict the grades for the students
     let predictedGrades: ReturnType<typeof predictGrades> = [];
     if (gradingModels) {
-      startTransition(() => {
-        predictedGrades = predictGrades(
-          props.data,
-          gradingModels,
-          gradeSelectOption
-        );
-        console.log(predictedGrades);
-      });
+      predictedGrades = predictGrades(
+        props.data,
+        gradingModels,
+        gradeSelectOption
+      );
+      console.log(predictedGrades);
     }
 
+    // Add all ausiliary columns to the data
     return groupByLatestBestGrade(
-      props.data.map(row => ({
-        ...row,
-        // keep the same structure of predictedGrades but only show result for the student
-        predictedFinalGrades: Object.fromEntries(
+      // Creating the extended rows
+      props.data.map(row => {
+        const studentPredictedGrades = Object.fromEntries(
           Object.entries(predictedGrades).map(([key, value]) => [
             key,
             value[row.user.id],
           ])
-        ),
-      })),
+        );
+        return {
+          ...row,
+          // keep the same structure of predictedGrades but only show result for the student
+          predictedFinalGrades: studentPredictedGrades,
+          errors: predictedGradesErrorCheck(
+            studentPredictedGrades,
+            course.data?.gradingScale ?? GradingScale.Numerical
+          ),
+        };
+      }),
       gradeSelectOption
     );
-  }, [gradingModels, props.data, gradeSelectOption]);
+  }, [gradingModels, props.data, gradeSelectOption, course.data?.gradingScale]);
 
   // const [globalFilter, setGlobalFilter] = useState('');
 
@@ -346,6 +380,17 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         />
       ),
     }),
+    columnHelper.accessor(row => row.errors, {
+      header: 'Errors',
+      id: 'errors',
+      enableHiding: true,
+      // The column only filter, for other type of filtering write another filterFn
+      filterFn: row => {
+        // Not sure which solution is the best one, for now i keep both
+        // return getErrorCount([row.original], selectedGradingModel) > 0;
+        return (row.original.errors?.length ?? 0) > 0;
+      },
+    }),
     columnHelper.accessor('user.studentNumber', {
       header: 'Student number',
       meta: {PrettyChipPosition: 'first'},
@@ -462,10 +507,12 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     onGroupingChange: setGrouping,
     onExpandedChange: setExpanded,
     onSortingChange: setSorting,
+    onColumnVisibilityChange: setColumnVisibility,
     enableGrouping: true,
     enableSorting: true,
     autoResetExpanded: false,
     state: {
+      columnVisibility,
       rowSelection,
       expanded,
       grouping,
@@ -479,6 +526,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     getFilteredRowModel: getFilteredRowModel(),
     // debugAll: true,
   });
+
   return (
     <GradesTableContext.Provider
       value={{
