@@ -2,9 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Typography, useTheme} from '@mui/material';
+import {Box, Typography} from '@mui/material';
 import {JSX} from 'react';
-import {unstable_useViewTransitionState, useParams} from 'react-router-dom';
+import {
+  unstable_useViewTransitionState as useViewTransitionState,
+  useParams,
+} from 'react-router-dom';
 
 import CourseResultsTable from './course-results-view/CourseResultsTable';
 import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
@@ -14,8 +17,7 @@ import {useGetGrades} from '../hooks/useApi';
 
 const CourseResultsView = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const isTransitioning = unstable_useViewTransitionState('');
-  const theme = useTheme();
+  const isTransitioning = useViewTransitionState('');
   const gradesQuery = useGetGrades(courseId);
 
   return (
