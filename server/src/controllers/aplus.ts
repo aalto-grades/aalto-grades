@@ -254,7 +254,7 @@ export const fetchAplusGrades = async (
           continue;
         }
 
-        let grade: number | undefined;
+        let grade: number | null = null;
         switch (gradeSource.sourceType) {
           case AplusGradeSourceType.FullPoints:
             grade = student.points;
@@ -273,7 +273,7 @@ export const fetchAplusGrades = async (
                 break;
               }
             }
-            if (grade === undefined) {
+            if (grade === null) {
               throw new ApiError(
                 `A+ course with ID ${aplusCourseId} has no module with ID ${gradeSource.moduleId}`,
                 HttpCode.InternalServerError
@@ -295,7 +295,7 @@ export const fetchAplusGrades = async (
                 }
               }
             }
-            if (grade === undefined) {
+            if (grade === null) {
               throw new ApiError(
                 `A+ course with ID ${aplusCourseId} has no exercise with ID ${gradeSource.exerciseId}`,
                 HttpCode.InternalServerError
