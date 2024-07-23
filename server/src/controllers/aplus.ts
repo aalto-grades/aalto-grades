@@ -10,6 +10,7 @@ import {TypedRequestBody} from 'zod-express-middleware';
 import {
   AplusCourseData,
   AplusExerciseData,
+  AplusGradeSourceData,
   AplusGradeSourceType,
   HttpCode,
   IdSchema,
@@ -226,7 +227,7 @@ export const fetchAplusGrades = async (
 
     const gradeSources = await AplusGradeSource.findAll({
       where: {coursePartId: coursePart.id},
-    });
+    }) as (AplusGradeSourceData & {date: Date})[];
 
     if (gradeSources.length === 0) {
       throw new ApiError(
@@ -261,12 +262,6 @@ export const fetchAplusGrades = async (
             break;
 
           case AplusGradeSourceType.Module:
-            if (!gradeSource.moduleId) {
-              throw new ApiError(
-                `grade source with ID ${gradeSource.id} has module type but does not define moduleId`,
-                HttpCode.InternalServerError
-              );
-            }
             for (const module of student.modules) {
               if (module.id === gradeSource.moduleId) {
                 grade = module.points;
@@ -282,12 +277,6 @@ export const fetchAplusGrades = async (
             break;
 
           case AplusGradeSourceType.Exercise:
-            if (!gradeSource.exerciseId) {
-              throw new ApiError(
-                `grade source with ID ${gradeSource.id} has exercise type but does not define exerciseId`,
-                HttpCode.InternalServerError
-              );
-            }
             for (const module of student.modules) {
               for (const exercise of module.exercises) {
                 if (exercise.id === gradeSource.exerciseId) {
@@ -304,12 +293,6 @@ export const fetchAplusGrades = async (
             break;
 
           case AplusGradeSourceType.Difficulty:
-            if (!gradeSource.difficulty) {
-              throw new ApiError(
-                `grade source with ID ${gradeSource.id} has difficulty type but does not define difficulty`,
-                HttpCode.InternalServerError
-              );
-            }
             grade = student.points_by_difficulty[gradeSource.difficulty] ?? 0;
             break;
         }
