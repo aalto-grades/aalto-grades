@@ -11,6 +11,7 @@ export const CoursePartDataSchema = z.strictObject({
   courseId: z.number().int(),
   name: z.string().min(1),
   daysValid: z.number().int().nonnegative(),
+  maxGrade: z.number().nullable(),
   archived: z.boolean(),
   aplusGradeSources: z.array(AplusGradeSourceDataSchema),
 });

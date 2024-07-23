@@ -44,6 +44,7 @@ export const findCoursePartByCourseId = async (
       courseId: coursePart.courseId,
       name: coursePart.name,
       daysValid: coursePart.daysValid,
+      maxGrade: coursePart.maxGrade,
       archived: coursePart.archived,
       aplusGradeSources: coursePart.AplusGradeSources.map(gradeSource =>
         parseAplusGradeSource(gradeSource)
