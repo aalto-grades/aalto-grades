@@ -365,6 +365,7 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
           sourceType === AplusGradeSourceType.Difficulty
             ? gradeSource.difficulty
             : null,
+        date: date,
       },
     });
 
