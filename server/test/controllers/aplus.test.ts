@@ -120,6 +120,7 @@ afterAll(async () => {
 
 describe('Test GET /v1/aplus/courses - get A+ courses', () => {
   it('should respond with correct data', async () => {
+    expect(true).toBe(false);
     mockedAxios.get.mockResolvedValueOnce({
       /* eslint-disable camelcase */
       data: {
