@@ -223,111 +223,112 @@ export const fetchAplusGrades = async (
       String(coursePartId)
     );
 
-    // TODO: There can be multiple sources
-    const gradeSource = await AplusGradeSource.findOne({
+    const gradeSources = await AplusGradeSource.findAll({
       where: {coursePartId: coursePart.id},
     });
 
-    if (!gradeSource) {
+    if (gradeSources.length === 0) {
       throw new ApiError(
         `Course part with ID ${coursePart.id} has no A+ grade sources`,
         HttpCode.NotFound
       );
     }
 
-    const aplusCourseId = gradeSource.aplusCourse.id;
+    for (const gradeSource of gradeSources) {
+      const aplusCourseId = gradeSource.aplusCourse.id;
 
-    if (!(aplusCourseId in pointsResCache)) {
-      const pointsRes = await fetchFromAplus<AplusPointsRes>(
-        `${APLUS_API_URL}/courses/${aplusCourseId}/points?format=json`,
-        aplusToken
-      );
+      if (!(aplusCourseId in pointsResCache)) {
+        const pointsRes = await fetchFromAplus<AplusPointsRes>(
+          `${APLUS_API_URL}/courses/${aplusCourseId}/points?format=json`,
+          aplusToken
+        );
 
-      pointsResCache[aplusCourseId] = pointsRes.data.results;
-    }
-
-    const points = pointsResCache[aplusCourseId];
-    for (const student of points) {
-      // TODO: https://github.com/aalto-grades/base-repository/issues/747
-      if (!student.student_id) {
-        continue;
+        pointsResCache[aplusCourseId] = pointsRes.data.results;
       }
 
-      let grade: number | undefined;
-      switch (gradeSource.sourceType) {
-        case AplusGradeSourceType.FullPoints:
-          grade = student.points;
-          break;
+      const points = pointsResCache[aplusCourseId];
+      for (const student of points) {
+        // TODO: https://github.com/aalto-grades/base-repository/issues/747
+        if (!student.student_id) {
+          continue;
+        }
 
-        case AplusGradeSourceType.Module:
-          if (!gradeSource.moduleId) {
-            throw new ApiError(
-              `grade source with ID ${gradeSource.id} has module type but does not define moduleId`,
-              HttpCode.InternalServerError
-            );
-          }
-          for (const module of student.modules) {
-            if (module.id === gradeSource.moduleId) {
-              grade = module.points;
-              break;
+        let grade: number | undefined;
+        switch (gradeSource.sourceType) {
+          case AplusGradeSourceType.FullPoints:
+            grade = student.points;
+            break;
+
+          case AplusGradeSourceType.Module:
+            if (!gradeSource.moduleId) {
+              throw new ApiError(
+                `grade source with ID ${gradeSource.id} has module type but does not define moduleId`,
+                HttpCode.InternalServerError
+              );
             }
-          }
-          if (grade === undefined) {
-            throw new ApiError(
-              `A+ course with ID ${aplusCourseId} has no module with ID ${gradeSource.moduleId}`,
-              HttpCode.InternalServerError
-            );
-          }
-          break;
-
-        case AplusGradeSourceType.Exercise:
-          if (!gradeSource.exerciseId) {
-            throw new ApiError(
-              `grade source with ID ${gradeSource.id} has exercise type but does not define exerciseId`,
-              HttpCode.InternalServerError
-            );
-          }
-          for (const module of student.modules) {
-            for (const exercise of module.exercises) {
-              if (exercise.id === gradeSource.exerciseId) {
-                grade = exercise.points;
+            for (const module of student.modules) {
+              if (module.id === gradeSource.moduleId) {
+                grade = module.points;
+                break;
               }
             }
-          }
-          if (grade === undefined) {
-            throw new ApiError(
-              `A+ course with ID ${aplusCourseId} has no exercise with ID ${gradeSource.exerciseId}`,
-              HttpCode.InternalServerError
-            );
-          }
-          break;
+            if (grade === undefined) {
+              throw new ApiError(
+                `A+ course with ID ${aplusCourseId} has no module with ID ${gradeSource.moduleId}`,
+                HttpCode.InternalServerError
+              );
+            }
+            break;
 
-        case AplusGradeSourceType.Difficulty:
-          if (!gradeSource.difficulty) {
-            throw new ApiError(
-              `grade source with ID ${gradeSource.id} has difficulty type but does not define difficulty`,
-              HttpCode.InternalServerError
-            );
-          }
-          grade = student.points_by_difficulty[gradeSource.difficulty] ?? 0;
-          break;
+          case AplusGradeSourceType.Exercise:
+            if (!gradeSource.exerciseId) {
+              throw new ApiError(
+                `grade source with ID ${gradeSource.id} has exercise type but does not define exerciseId`,
+                HttpCode.InternalServerError
+              );
+            }
+            for (const module of student.modules) {
+              for (const exercise of module.exercises) {
+                if (exercise.id === gradeSource.exerciseId) {
+                  grade = exercise.points;
+                }
+              }
+            }
+            if (grade === undefined) {
+              throw new ApiError(
+                `A+ course with ID ${aplusCourseId} has no exercise with ID ${gradeSource.exerciseId}`,
+                HttpCode.InternalServerError
+              );
+            }
+            break;
+
+          case AplusGradeSourceType.Difficulty:
+            if (!gradeSource.difficulty) {
+              throw new ApiError(
+                `grade source with ID ${gradeSource.id} has difficulty type but does not define difficulty`,
+                HttpCode.InternalServerError
+              );
+            }
+            grade = student.points_by_difficulty[gradeSource.difficulty] ?? 0;
+            break;
+        }
+
+        // TODO: Proper dates
+        // Related: https://github.com/apluslms/a-plus/issues/1361
+        const date = new Date();
+        const expiryDate = new Date(date);
+        expiryDate.setDate(date.getDate() + coursePart.daysValid);
+
+        newGrades.push({
+          studentNumber: student.student_id,
+          coursePartId: coursePart.id,
+          aplusGradeSourceId: gradeSource.id,
+          grade: grade,
+          date: date,
+          expiryDate: expiryDate,
+          comment: null,
+        });
       }
-
-      // TODO: Proper dates
-      // Related: https://github.com/apluslms/a-plus/issues/1361
-      const date = new Date();
-      const expiryDate = new Date(date);
-      expiryDate.setDate(date.getDate() + coursePart.daysValid);
-
-      newGrades.push({
-        studentNumber: student.student_id,
-        coursePartId: coursePart.id,
-        aplusGradeSourceId: gradeSource.id,
-        grade: grade,
-        date: date,
-        expiryDate: expiryDate,
-        comment: null,
-      });
     }
   }
 
