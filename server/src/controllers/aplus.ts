@@ -225,9 +225,9 @@ export const fetchAplusGrades = async (
       String(coursePartId)
     );
 
-    const gradeSources = await AplusGradeSource.findAll({
+    const gradeSources = (await AplusGradeSource.findAll({
       where: {coursePartId: coursePart.id},
-    }) as (AplusGradeSourceData & {date: Date})[];
+    })) as (AplusGradeSourceData & {date: Date})[];
 
     if (gradeSources.length === 0) {
       throw new ApiError(
