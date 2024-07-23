@@ -242,12 +242,16 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
                 <td>
                   {nodeValue.sources[key].value === 'fail'
                     ? nodeValue.sources[key].value
-                    : Math.round(nodeValue.sources[key].value * 100) / 100}
+                    : Math.round(
+                        (nodeValue.sources[key].value as number) * 100 // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+                      ) / 100}
                 </td>
                 <td>
                   {nodeValue.values[key] === 'fail'
                     ? nodeValue.values[key]
-                    : Math.round(nodeValue.values[key] * 100) / 100}
+                    : Math.round(
+                        (nodeValue.values[key] as number) * 100 // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+                      ) / 100}
                 </td>
               </tr>
             ))}
@@ -284,7 +288,9 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
                 <td>
                   {nodeValue.sources[key].value === 'fail'
                     ? nodeValue.sources[key].value
-                    : Math.round(nodeValue.sources[key].value * 100) / 100}
+                    : Math.round(
+                        (nodeValue.sources[key].value as number) * 100 // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+                      ) / 100}
                 </td>
                 <td>
                   <input

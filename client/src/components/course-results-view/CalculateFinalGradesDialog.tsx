@@ -26,13 +26,15 @@ import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 
 import {GradingModelData, StudentRow} from '@/common/types';
+import {GroupedStudentRow} from '../../context/GradesTableProvider';
 import {useGetAllGradingModels} from '../../hooks/useApi';
 import {GradeSelectOption} from '../../utils/bestGrade';
+import {getErrorCount} from '../../utils/table';
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
-  selectedRows: StudentRow[];
+  selectedRows: GroupedStudentRow[];
   gradeSelectOption: GradeSelectOption;
   calculateFinalGrades: (
     selectedRows: StudentRow[],
@@ -51,6 +53,7 @@ const CalculateFinalGradesDialog = ({
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const allGradingModels = useGetAllGradingModels(courseId);
+  // TODO: Auto select the model used in the table view
 
   const [dateOverride, setDateOverride] = useState<boolean>(false);
   const [gradingDate, setGradingDate] = useState<Dayjs>(dayjs());
@@ -65,6 +68,11 @@ const CalculateFinalGradesDialog = ({
         ? allGradingModels.data.filter(model => !model.archived)
         : [],
     [allGradingModels.data]
+  );
+
+  const errorCount = useMemo(
+    () => getErrorCount(selectedRows, selectedModel?.id ?? 'any'),
+    [selectedRows, selectedModel]
   );
 
   useEffect(() => {
@@ -154,6 +162,13 @@ const CalculateFinalGradesDialog = ({
             {getWarning(selectedModel)}
           </Alert>
         </Collapse>
+        <Collapse in={!!errorCount}>
+          <Alert sx={{mt: 1}} severity="error">
+            {
+              'Some final grades will have invalid values, check if the correct grading model is being used'
+            }
+          </Alert>
+        </Collapse>
         <FormControlLabel
           sx={{mt: 1}}
           control={
@@ -181,7 +196,11 @@ const CalculateFinalGradesDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSubmit} variant="contained">
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          disabled={!!errorCount}
+        >
           Confirm
         </Button>
       </DialogActions>
