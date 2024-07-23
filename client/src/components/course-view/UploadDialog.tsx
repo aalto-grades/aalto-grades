@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Delete} from '@mui/icons-material';
-import {Button, Dialog, DialogActions} from '@mui/material';
+import {Button, Dialog, DialogActions, Tooltip} from '@mui/material';
 import {GridActionsCellItem, GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import dayjs, {Dayjs} from 'dayjs';
 import {enqueueSnackbar} from 'notistack';
@@ -26,11 +26,6 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const courseParts = useGetCourseParts(courseId!, {enabled: !!courseId});
   const addGrades = useAddGrades(courseId!);
 
-  const coursePartData = useMemo(
-    () => courseParts.data?.filter(coursePart => !coursePart.archived) ?? [],
-    [courseParts.data]
-  );
-
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [uploadExpanded, setUploadExpanded] = useState<'' | 'upload' | 'edit'>(
     'upload'
@@ -43,6 +38,33 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const [dates, setDates] = useState<
     {coursePartName: string; completionDate: Dayjs; expirationDate: Dayjs}[]
   >([]);
+
+  const coursePartData = useMemo(
+    () => courseParts.data?.filter(coursePart => !coursePart.archived) ?? [],
+    [courseParts.data]
+  );
+
+  const maxGrades = useMemo(
+    () =>
+      Object.fromEntries(
+        coursePartData.map(coursePart => [coursePart.name, coursePart.maxGrade])
+      ),
+    [coursePartData]
+  );
+
+  const invalidValues = useMemo(() => {
+    if (currentStep !== 1 || confirmExpanded !== 'confirm') return false;
+    for (const row of rows) {
+      for (const coursePart of coursePartData) {
+        const grade = row[coursePart.name];
+        if (!(coursePart.name in row) || grade === null) continue; // Skip empty cells
+
+        if (coursePart.maxGrade !== null && grade > coursePart.maxGrade)
+          return true;
+      }
+    }
+    return false;
+  }, [confirmExpanded, coursePartData, currentStep, rows]);
 
   useEffect(() => {
     if (coursePartData.length === dates.length) return;
@@ -153,6 +175,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
           <UploadDialogUpload
             columns={columns}
             rows={rows}
+            maxGrades={maxGrades}
             setRows={setRows}
             setReady={setReady}
             expanded={uploadExpanded}
@@ -162,6 +185,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
           <UploadDialogConfirm
             columns={readOnlycolumns}
             rows={rows}
+            maxGrades={maxGrades}
             dates={dates}
             setDates={setDates}
             setReady={setReady}
@@ -195,7 +219,22 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
             </Button>
           )}
           {currentStep === 1 && confirmExpanded === 'confirm' && (
-            <Button onClick={onSubmit}>Submit</Button>
+            <>
+              {invalidValues ? (
+                <Tooltip
+                  title="Some grades have invalid values"
+                  placement="top"
+                >
+                  <span>
+                    <Button onClick={onSubmit} disabled>
+                      Submit
+                    </Button>
+                  </span>
+                </Tooltip>
+              ) : (
+                <Button onClick={onSubmit}>Submit</Button>
+              )}
+            </>
           )}
         </DialogActions>
       </Dialog>
