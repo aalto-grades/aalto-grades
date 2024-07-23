@@ -90,7 +90,7 @@ AplusGradeSource.init(
 );
 
 CoursePart.hasMany(AplusGradeSource, {
-  onDelete: 'RESTRICT',
+  onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });
 AplusGradeSource.belongsTo(CoursePart, {foreignKey: 'coursePartId'});
