@@ -636,6 +636,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
         url: 'https://plus.cs.aalto.fi',
       },
       sourceType: AplusGradeSourceType.FullPoints,
+      date: new Date(),
     });
 
     await successTest([coursePartId]);
