@@ -24,6 +24,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import {Form, Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useRef, useState} from 'react';
+import {AsyncConfirmationModal} from 'react-global-modal';
 import {useBlocker, useParams} from 'react-router-dom';
 import {z} from 'zod';
 
@@ -110,7 +111,6 @@ const EditCourseView = (): JSX.Element => {
   const [initialValues, setInitialValues] = useState<FormData | null>(null);
 
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
-  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState<boolean>(false);
 
   const formRef = useRef<FormikProps<FormData>>(null);
 
@@ -246,6 +246,16 @@ const EditCourseView = (): JSX.Element => {
     setUnsavedChanges(changed());
   }, [assistants, teachersInCharge, initTeachersInCharge, initAssistants]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const confirmDiscard = async ({
+    resetForm,
+  }: FormikHelpers<FormData>): Promise<void> => {
+    if (await AsyncConfirmationModal({confirmNavigate: true})) {
+      resetForm();
+      setTeachersInCharge(initTeachersInCharge);
+      setAssistants(initAssistants);
+    }
+  };
+
   if (!initialValues || finalGrades.data === undefined)
     return <Typography>Loading</Typography>;
 
@@ -266,25 +276,17 @@ const EditCourseView = (): JSX.Element => {
                 </Typography>
                 <SaveBar
                   show={unsavedChanges}
-                  handleDiscard={() => setUnsavedDialogOpen(true)}
+                  handleDiscard={() => confirmDiscard(form)}
                   loading={form.isSubmitting}
                   disabled={!form.isValid}
                 />
               </div>
               <UnsavedChangesDialog
-                open={unsavedDialogOpen || blocker.state === 'blocked'}
-                onClose={() => {
-                  setUnsavedDialogOpen(false);
-                  if (blocker.state === 'blocked') blocker.reset();
-                }}
+                blocker={blocker}
                 handleDiscard={() => {
                   form.resetForm();
                   setTeachersInCharge(initTeachersInCharge);
                   setAssistants(initAssistants);
-
-                  if (blocker.state === 'blocked') {
-                    blocker.proceed();
-                  }
                 }}
               />
 

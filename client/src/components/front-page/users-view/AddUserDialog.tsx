@@ -20,10 +20,10 @@ import {
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
+import {AsyncConfirmationModal} from 'react-global-modal';
 
 import {NewUserSchema} from '@/common/types';
 import {useAddUser} from '../../../hooks/useApi';
-import UnsavedChangesDialog from '../../alerts/UnsavedChangesDialog';
 import FormField from '../../shared/FormikField';
 
 type FormData = {
@@ -42,7 +42,6 @@ type NewUserData = FormData & {temporaryPassword: string};
 type PropsType = {open: boolean; onClose: () => void};
 const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
   const addUser = useAddUser();
-  const [showUnsavedDialog, setShowUnsavedDialog] = useState<boolean>(false);
   const [userData, setUserData] = useState<NewUserData | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
 
@@ -163,6 +162,15 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
     </Grid>
   );
 
+  const confirmDiscard = async ({
+    resetForm,
+  }: FormikHelpers<FormData>): Promise<void> => {
+    if (await AsyncConfirmationModal({confirmNavigate: true})) {
+      onClose();
+      resetForm();
+    }
+  };
+
   return (
     <Formik
       initialValues={initialValues}
@@ -170,67 +178,52 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
       onSubmit={submitAddUser}
     >
       {form => (
-        <>
-          <UnsavedChangesDialog
-            open={showUnsavedDialog}
-            onClose={() => setShowUnsavedDialog(false)}
-            handleDiscard={() => {
-              onClose();
+        <Dialog
+          open={open}
+          onClose={() => {
+            onClose();
+            if (userData !== null) {
+              setUserData(null);
               form.resetForm();
-            }}
-          />
-
-          <Dialog
-            open={open}
-            onClose={() => {
-              onClose();
-              if (userData !== null) {
-                setUserData(null);
-                form.resetForm();
-              }
-            }}
-            fullWidth
-            maxWidth="xs"
-          >
-            <DialogTitle>
-              {userData === null ? 'Add a user' : 'Admin added'}
-            </DialogTitle>
-            <DialogContent>
-              {userData === null ? (
-                <FormContent form={form} />
-              ) : (
-                <UserContent />
-              )}
-            </DialogContent>
-            <DialogActions>
-              {userData === null && (
-                <Button
-                  variant="outlined"
-                  onClick={() => setShowUnsavedDialog(true)}
-                  disabled={form.isSubmitting}
-                >
-                  Cancel
-                </Button>
-              )}
+            }
+          }}
+          fullWidth
+          maxWidth="xs"
+        >
+          <DialogTitle>
+            {userData === null ? 'Add a user' : 'Admin added'}
+          </DialogTitle>
+          <DialogContent>
+            {userData === null ? <FormContent form={form} /> : <UserContent />}
+          </DialogContent>
+          <DialogActions>
+            {userData === null && (
               <Button
-                id="add-user"
-                variant="contained"
-                onClick={() => {
-                  if (userData === null) {
-                    form.submitForm();
-                  } else {
-                    form.resetForm();
-                    onClose();
-                    setUserData(null);
-                  }
-                }}
+                variant="outlined"
+                onClick={() => confirmDiscard(form)}
                 disabled={form.isSubmitting}
               >
-                {userData === null ? 'Add user' : 'Close'}
+                Cancel
               </Button>
-            </DialogActions>
-          </Dialog>
-        </>
+            )}
+            <Button
+              id="add-user"
+              variant="contained"
+              onClick={() => {
+                if (userData === null) {
+                  form.submitForm();
+                } else {
+                  form.resetForm();
+                  onClose();
+                  setUserData(null);
+                }
+              }}
+              disabled={form.isSubmitting}
+            >
+              {userData === null ? 'Add user' : 'Close'}
+            </Button>
+          </DialogActions>
+        </Dialog>
       )}
     </Formik>
   );

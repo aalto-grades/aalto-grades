@@ -16,12 +16,13 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import {enqueueSnackbar} from 'notistack';
 import {JSX, useMemo, useState} from 'react';
+import {AsyncConfirmationModal} from 'react-global-modal';
 
 import {SystemRole, UserData} from '@/common/types';
-import DeleteUserDialog from './DeleteUserDialog';
 import ResetPasswordDialog from './resetPasswordDialog';
-import {useGetUsers} from '../../../hooks/useApi';
+import {useDeleteUser, useGetUsers} from '../../../hooks/useApi';
 import {HeadCellData} from '../../../types';
 
 const headCells: HeadCellData[] = [
@@ -31,8 +32,8 @@ const headCells: HeadCellData[] = [
 
 const UsersTable = (): JSX.Element => {
   const users = useGetUsers();
+  const deleteUser = useDeleteUser();
   const [tab, setTab] = useState<number>(0);
-  const [toBeDeleted, setToBeDeleted] = useState<UserData | null>(null);
   const [toBeReset, setToBeReset] = useState<UserData | null>(null);
 
   const shownUsers = useMemo(() => {
@@ -42,15 +43,22 @@ const UsersTable = (): JSX.Element => {
     return users.data.filter(user => user.role === SystemRole.Admin);
   }, [tab, users.data]);
 
+  const handleDeleteUser = async (user: UserData): Promise<void> => {
+    const confirmation = await AsyncConfirmationModal({
+      title: 'Delete user',
+      message: `Are you sure you want to delete the user ${user.email}?`,
+      confirmDelete: true,
+    });
+    if (confirmation) {
+      await deleteUser.mutateAsync(user.id);
+      enqueueSnackbar('User deleted successfully', {variant: 'success'});
+    }
+  };
+
   if (users.data?.length === 0 && users.isFetched) return <>No users found</>;
 
   return (
     <>
-      <DeleteUserDialog
-        open={toBeDeleted !== null}
-        onClose={() => setToBeDeleted(null)}
-        user={toBeDeleted}
-      />
       <ResetPasswordDialog
         open={toBeReset !== null}
         onClose={() => setToBeReset(null)}
@@ -98,7 +106,7 @@ const UsersTable = (): JSX.Element => {
                     <span>
                       <IconButton
                         aria-label="delete"
-                        onClick={() => setToBeDeleted(user)}
+                        onClick={() => handleDeleteUser(user)}
                       >
                         <Delete />
                       </IconButton>
