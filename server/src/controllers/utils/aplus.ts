@@ -125,6 +125,7 @@ export const parseAplusGradeSource = (
     exerciseId: aplusGradeSource.exerciseId ?? undefined,
     exerciseName: aplusGradeSource.exerciseName ?? undefined,
     difficulty: aplusGradeSource.difficulty ?? undefined,
+    date: new Date(aplusGradeSource.date),
   }) as AplusGradeSourceData;
 
 /**

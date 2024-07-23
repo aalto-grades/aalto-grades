@@ -71,6 +71,7 @@ const ViewAplusGradeSourcesDialog = ({
                 <TableCell>Course instance</TableCell>
                 <TableCell>Course URL</TableCell>
                 <TableCell>Source name</TableCell>
+                <TableCell>Date</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -85,6 +86,7 @@ const ViewAplusGradeSourcesDialog = ({
                     </Link>
                   </TableCell>
                   <TableCell>{getSourceName(source)}</TableCell>
+                  <TableCell>{source.date.toDateString()}</TableCell>
                   <TableCell>
                     <Tooltip placement="top" title="Delete A+ grade source">
                       <IconButton onClick={() => handleDelete(source.id)}>
