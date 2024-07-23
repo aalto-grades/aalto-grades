@@ -4,6 +4,7 @@
 
 import {
   AplusCourseData,
+  AplusExerciseData,
   AplusGradeSourceType,
   AuthData,
   CourseData,
@@ -224,8 +225,16 @@ export const setAplusToken = (token: string): void =>
 export const getAplusToken = (): string | null =>
   localStorage.getItem('Aplus-Token');
 
+export const getLatestAplusModuleDate = (
+  aplusExerciseData: AplusExerciseData
+): Date =>
+  aplusExerciseData.modules.sort(
+    (a, b) => b.closingDate.getTime() - a.closingDate.getTime()
+  )[0].closingDate;
+
 export const newAplusGradeSource = (
   aplusCourse: AplusCourseData,
+  date: Date,
   {
     module,
     exercise,
@@ -242,7 +251,7 @@ export const newAplusGradeSource = (
     difficulty?: string;
   }
 ): NewAplusGradeSourceData => {
-  const base = {coursePartId: -1, aplusCourse: aplusCourse};
+  const base = {coursePartId: -1, aplusCourse: aplusCourse, date: date};
 
   if (module !== undefined) {
     return {

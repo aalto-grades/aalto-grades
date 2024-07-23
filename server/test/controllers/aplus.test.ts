@@ -204,6 +204,7 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
           {
             id: 1,
             display_name: 'First',
+            closing_time: new Date(),
             exercises: [
               {id: 1, display_name: '1.1 First', difficulty: 'A'},
               {id: 2, display_name: '1.2 Second', difficulty: ''},
@@ -212,6 +213,7 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
           {
             id: 2,
             display_name: 'Second',
+            closing_time: new Date(),
             exercises: [{id: 3, display_name: '2.1 Third', difficulty: ''}],
           },
         ],
@@ -277,7 +279,10 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
     exerciseId?: number;
     exerciseName?: string;
     difficulty?: string;
+    date: Date;
   };
+
+  const date = new Date();
 
   const getGradeSource = (
     sourceType: AplusGradeSourceType,
@@ -302,6 +307,7 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
     exerciseId: withExerciseId ? 1 : undefined,
     exerciseName: withExerciseId ? 'Exercise Name' : undefined,
     difficulty: withDifficulty ? 'A' : undefined,
+    date: date,
   });
 
   const getFullPoints = (coursePartId?: number): NewAplusGradeSourceData =>
@@ -356,6 +362,7 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
           sourceType === AplusGradeSourceType.Difficulty
             ? gradeSource.difficulty
             : null,
+        date: date,
       },
     });
 

@@ -16,7 +16,7 @@ import {JSX} from 'react';
 import {AplusCourseData, NewAplusGradeSourceData} from '@/common/types';
 import {aplusGradeSourcesEqual} from '@/common/util/aplus';
 import {useFetchAplusExerciseData} from '../../hooks/useApi';
-import {newAplusGradeSource} from '../../utils/utils';
+import {getLatestAplusModuleDate, newAplusGradeSource} from '../../utils/utils';
 
 type PropsType = {
   aplusCourse: AplusCourseData;
@@ -56,12 +56,22 @@ const SelectAplusGradeSources = ({
           <FormControlLabel
             control={
               <Checkbox
-                defaultChecked={isChecked(newAplusGradeSource(aplusCourse, {}))}
+                defaultChecked={isChecked(
+                  newAplusGradeSource(
+                    aplusCourse,
+                    getLatestAplusModuleDate(aplusExerciseData.data),
+                    {}
+                  )
+                )}
                 onChange={e =>
                   handleChange(
                     e.target.checked,
                     `A+ Course: ${aplusCourse.name}`,
-                    newAplusGradeSource(aplusCourse, {})
+                    newAplusGradeSource(
+                      aplusCourse,
+                      getLatestAplusModuleDate(aplusExerciseData.data),
+                      {}
+                    )
                   )
                 }
               />
@@ -81,13 +91,17 @@ const SelectAplusGradeSources = ({
                 control={
                   <Checkbox
                     defaultChecked={isChecked(
-                      newAplusGradeSource(aplusCourse, {module})
+                      newAplusGradeSource(aplusCourse, module.closingDate, {
+                        module,
+                      })
                     )}
                     onChange={e =>
                       handleChange(
                         e.target.checked,
                         `A+ Module: ${module.name}`,
-                        newAplusGradeSource(aplusCourse, {module})
+                        newAplusGradeSource(aplusCourse, module.closingDate, {
+                          module,
+                        })
                       )
                     }
                   />
@@ -110,13 +124,17 @@ const SelectAplusGradeSources = ({
                   control={
                     <Checkbox
                       defaultChecked={isChecked(
-                        newAplusGradeSource(aplusCourse, {exercise})
+                        newAplusGradeSource(aplusCourse, module.closingDate, {
+                          exercise,
+                        })
                       )}
                       onChange={e =>
                         handleChange(
                           e.target.checked,
                           `A+ Exercise: ${exercise.name}`,
-                          newAplusGradeSource(aplusCourse, {exercise})
+                          newAplusGradeSource(aplusCourse, module.closingDate, {
+                            exercise,
+                          })
                         )
                       }
                     />
@@ -140,13 +158,21 @@ const SelectAplusGradeSources = ({
                   control={
                     <Checkbox
                       defaultChecked={isChecked(
-                        newAplusGradeSource(aplusCourse, {difficulty})
+                        newAplusGradeSource(
+                          aplusCourse,
+                          getLatestAplusModuleDate(aplusExerciseData.data),
+                          {difficulty}
+                        )
                       )}
                       onChange={e =>
                         handleChange(
                           e.target.checked,
                           `A+ Difficulty: ${difficulty}`,
-                          newAplusGradeSource(aplusCourse, {difficulty})
+                          newAplusGradeSource(
+                            aplusCourse,
+                            getLatestAplusModuleDate(aplusExerciseData.data),
+                            {difficulty}
+                          )
                         )
                       }
                     />

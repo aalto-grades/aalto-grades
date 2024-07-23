@@ -98,6 +98,7 @@ export const fetchAplusExerciseData = async (
     modules: exercisesRes.data.results.map(module => ({
       id: module.id,
       name: module.display_name,
+      closingDate: module.closing_time,
       exercises: module.exercises.map(exercise => ({
         id: exercise.id,
         name: exercise.display_name,
@@ -313,10 +314,8 @@ export const fetchAplusGrades = async (
             break;
         }
 
-        // TODO: Proper dates
-        // Related: https://github.com/apluslms/a-plus/issues/1361
-        const date = new Date();
-        const expiryDate = new Date(date);
+        const date = new Date(gradeSource.date);
+        const expiryDate = new Date(gradeSource.date);
         expiryDate.setDate(date.getDate() + coursePart.daysValid);
 
         newGrades.push({

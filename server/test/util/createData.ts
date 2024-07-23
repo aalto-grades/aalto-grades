@@ -146,6 +146,7 @@ class CreateData {
       coursePartId: fullPointsCoursePart.id,
       aplusCourse: aplusCourse,
       sourceType: AplusGradeSourceType.FullPoints,
+      date: new Date(),
     });
 
     const moduleCoursePart = await this.createCoursePart(courseId);
@@ -155,6 +156,7 @@ class CreateData {
       sourceType: AplusGradeSourceType.Module,
       moduleId: 1,
       moduleName: 'Module Name',
+      date: new Date(),
     });
 
     const exerciseCoursePart = await this.createCoursePart(courseId);
@@ -164,6 +166,7 @@ class CreateData {
       sourceType: AplusGradeSourceType.Exercise,
       exerciseId: 1,
       exerciseName: 'Exercise Name',
+      date: new Date(),
     });
 
     const difficultyCoursePart = await this.createCoursePart(courseId);
@@ -172,6 +175,7 @@ class CreateData {
       aplusCourse: aplusCourse,
       sourceType: AplusGradeSourceType.Difficulty,
       difficulty: 'A',
+      date: new Date(),
     });
 
     return [

@@ -16,6 +16,7 @@ export type AplusExercisesRes = {
   results: {
     id: number;
     display_name: string;
+    closing_time: Date;
     exercises: {
       id: number;
       display_name: string;
