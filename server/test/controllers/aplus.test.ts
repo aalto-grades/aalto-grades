@@ -16,7 +16,6 @@ import {
   NewGradeArraySchema,
 } from '@/common/types';
 import {app} from '../../src/app';
-import {APLUS_API_URL} from '../../src/configs/environment';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
@@ -81,10 +80,8 @@ beforeAll(async () => {
 
   // eslint-disable-next-line @typescript-eslint/require-await
   mockedAxios.get.mockImplementation(async url => {
-    const urlPoints = `${APLUS_API_URL}/courses/1/points?format=json`;
-
     /* eslint-disable camelcase */
-    if (url === urlPoints) {
+    if (url.endsWith('/points?format=json')) {
       return {
         data: {
           results: [
@@ -625,6 +622,24 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
       exerciseCoursePartId,
       difficultyCoursePartId,
     ]);
+  });
+
+  it('should fetch grades from multiple sources', async () => {
+    const [[coursePartId]] = await createData.createAplusGradeSources(courseId);
+    await AplusGradeSource.create({
+      coursePartId,
+      aplusCourse: {
+        id: 2,
+        courseCode: 'CS-123',
+        name: 'The Name',
+        instance: '1970',
+        url: 'https://plus.cs.aalto.fi',
+      },
+      sourceType: AplusGradeSourceType.FullPoints,
+      date: new Date(),
+    });
+
+    await successTest([coursePartId]);
   });
 
   it('should respond with 400 if A+ token parsing fails', async () => {
