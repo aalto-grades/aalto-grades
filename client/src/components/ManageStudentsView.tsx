@@ -130,7 +130,7 @@ const ManageStudentsView = (): JSX.Element => {
     });
     if (confirmation) {
       await deleteUsers.mutateAsync(rowSelectionModel.map(row => Number(row)));
-      enqueueSnackbar('Students deleted', {variant: 'success'});
+      enqueueSnackbar(`Student${plural} deleted`, {variant: 'success'});
       setRowSelectionModel([]);
     }
   };
