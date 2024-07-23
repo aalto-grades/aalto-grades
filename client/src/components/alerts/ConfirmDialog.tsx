@@ -33,20 +33,20 @@ export const ConfirmDialog = ({
     (el: ActionButton) => el.title === 'Confirm'
   ) as ActionButton;
 
-  if (confirmNavigate && title === undefined) title = 'Unsaved changes';
-  if (confirmNavigate && children === undefined)
-    children = (
-      <div>
-        You have unsaved changes. Data you have entered will not be saved
-      </div>
-    );
   const childrenProp = children as {props: {message: string}};
+  let body = childrenProp.props.message;
+
+  const defaultTitle = 'AsyncConfirmation Modal Title';
+  const defaultBody = 'AsynConfirmation Modal message';
+  if (confirmNavigate && title === defaultTitle) title = 'Unsaved changes';
+  if (confirmNavigate && body === defaultBody)
+    body = 'You have unsaved changes. Data you have entered will not be saved';
 
   return (
     <Dialog open={open!} onClose={cancelButton.onClick} fullWidth maxWidth="xs">
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText>{childrenProp.props.message}</DialogContentText>
+        <DialogContentText>{body}</DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={cancelButton.onClick}>
