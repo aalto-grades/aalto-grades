@@ -84,6 +84,12 @@ const muiTheme: CssVarsTheme = extendTheme({
           dark: '#519657',
           contrastText: '#000',
         },
+        // error: {
+        //   light: '#FFEBEE',
+        //   main: '#F44336',
+        //   dark: '#D32F2F',
+        //   contrastText: '#FFF',
+        // },
         // info: {
         //   light: '#FFC046',
         //   main: '#FF8F00',
@@ -144,6 +150,13 @@ const muiTheme: CssVarsTheme = extendTheme({
       styleOverrides: {
         root: {
           minWidth: '48px',
+        },
+      },
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          borderRadius: '8px',
         },
       },
     },

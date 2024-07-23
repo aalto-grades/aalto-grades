@@ -28,6 +28,7 @@ export default class AplusGradeSource extends Model<
   declare exerciseId: CreationOptional<number | null>;
   declare exerciseName: CreationOptional<string | null>;
   declare difficulty: CreationOptional<string | null>;
+  declare date: Date | string;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -74,6 +75,10 @@ AplusGradeSource.init(
     difficulty: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

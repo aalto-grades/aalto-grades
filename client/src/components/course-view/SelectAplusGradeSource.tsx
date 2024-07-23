@@ -19,7 +19,7 @@ import {
 } from '@/common/types';
 import {aplusGradeSourcesEqual} from '@/common/util/aplus';
 import {useFetchAplusExerciseData} from '../../hooks/useApi';
-import {newAplusGradeSource} from '../../utils/utils';
+import {getLatestAplusModuleDate, newAplusGradeSource} from '../../utils/utils';
 
 type PropsType = {
   aplusCourse: AplusCourseData;
@@ -53,8 +53,22 @@ const SelectAplusGradeSource = ({
         </AccordionSummary>
         <AccordionDetails>
           <Button
-            disabled={isDisabled(newAplusGradeSource(aplusCourse, {}))}
-            onClick={() => handleSelect(newAplusGradeSource(aplusCourse, {}))}
+            disabled={isDisabled(
+              newAplusGradeSource(
+                aplusCourse,
+                getLatestAplusModuleDate(aplusExerciseData.data),
+                {}
+              )
+            )}
+            onClick={() =>
+              handleSelect(
+                newAplusGradeSource(
+                  aplusCourse,
+                  getLatestAplusModuleDate(aplusExerciseData.data),
+                  {}
+                )
+              )
+            }
           >
             Full points
           </Button>
@@ -69,10 +83,14 @@ const SelectAplusGradeSource = ({
             {aplusExerciseData.data.modules.map(module => (
               <Button
                 disabled={isDisabled(
-                  newAplusGradeSource(aplusCourse, {module})
+                  newAplusGradeSource(aplusCourse, module.closingDate, {module})
                 )}
                 onClick={() =>
-                  handleSelect(newAplusGradeSource(aplusCourse, {module}))
+                  handleSelect(
+                    newAplusGradeSource(aplusCourse, module.closingDate, {
+                      module,
+                    })
+                  )
                 }
               >
                 {module.name}
@@ -91,10 +109,16 @@ const SelectAplusGradeSource = ({
               module.exercises.map(exercise => (
                 <Button
                   disabled={isDisabled(
-                    newAplusGradeSource(aplusCourse, {exercise})
+                    newAplusGradeSource(aplusCourse, module.closingDate, {
+                      exercise,
+                    })
                   )}
                   onClick={() =>
-                    handleSelect(newAplusGradeSource(aplusCourse, {exercise}))
+                    handleSelect(
+                      newAplusGradeSource(aplusCourse, module.closingDate, {
+                        exercise,
+                      })
+                    )
                   }
                 >
                   {exercise.name}
@@ -114,10 +138,20 @@ const SelectAplusGradeSource = ({
               {aplusExerciseData.data.difficulties.map(difficulty => (
                 <Button
                   disabled={isDisabled(
-                    newAplusGradeSource(aplusCourse, {difficulty})
+                    newAplusGradeSource(
+                      aplusCourse,
+                      getLatestAplusModuleDate(aplusExerciseData.data),
+                      {difficulty}
+                    )
                   )}
                   onClick={() =>
-                    handleSelect(newAplusGradeSource(aplusCourse, {difficulty}))
+                    handleSelect(
+                      newAplusGradeSource(
+                        aplusCourse,
+                        getLatestAplusModuleDate(aplusExerciseData.data),
+                        {difficulty}
+                      )
+                    )
                   }
                 >
                   {difficulty}
