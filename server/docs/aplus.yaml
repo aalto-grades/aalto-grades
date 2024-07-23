@@ -81,6 +81,11 @@ definitions:
               $ref: '#/definitions/AplusModuleId'
             name:
               $ref: '#/definitions/AplusModuleName'
+            closingDate:
+              type: string
+              format: date
+              description: The time when the A+ module closes.
+              example: 2024-05-01T00:00:00.000Z
             exercises:
               type: array
               items:
@@ -107,7 +112,7 @@ definitions:
 
   AplusGradeSourceData:
     type: object
-    description: Information about an A+ grade source..
+    description: Information about an A+ grade source.
     properties:
       aplusCourse:
         $ref: '#/definitions/AplusCourseData'
@@ -148,6 +153,11 @@ definitions:
         $ref: '#/definitions/AplusExerciseName'
       difficulty:
         $ref: '#/definitions/AplusDifficulty'
+      date:
+        type: string
+        format: date
+        description: Date associated with grades from this source.
+        example: 2024-05-01T00:00:00.000Z
     required:
       - coursePartId
       - aplusCourse
