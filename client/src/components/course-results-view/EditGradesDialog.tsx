@@ -11,13 +11,14 @@ import {
   DialogTitle,
 } from '@mui/material';
 import {
-  DataGrid,
   GridActionsCellItem,
   GridCellParams,
   GridColDef,
+  GridRowClassNameParams,
   GridRowModel,
   GridRowsProp,
   GridToolbarContainer,
+  GridValidRowModel,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
@@ -29,6 +30,10 @@ import {useTableContext} from '../../context/useTableContext';
 import {useAddGrades, useDeleteGrade, useEditGrade} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import {findBestGrade} from '../../utils/bestGrade';
+import StyledDataGrid, {
+  GetRowClassName,
+  ProcessRowUpdate,
+} from '../StyledDataGrid';
 import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 
 type ColTypes = {
@@ -49,6 +54,7 @@ type PropsType = {
   onClose: () => void;
   studentNumber: string;
   coursePartId: number;
+  maxGrade: number | null;
   title: string;
   grades: GradeData[];
 };
@@ -57,6 +63,7 @@ const EditGradesDialog = ({
   onClose,
   studentNumber,
   coursePartId,
+  maxGrade,
   title,
   grades,
 }: PropsType): JSX.Element => {
@@ -269,13 +276,41 @@ const EditGradesDialog = ({
     setInitRows(structuredClone(rows));
   };
 
+  type RowType = GridRowModel<ColTypes>;
+  const processRowUpdate = (newRow: RowType, oldRow: RowType): RowType => {
+    const diff = newRow.date.getTime() - oldRow.date.getTime(); // Diff to update expiration date with
+
+    if (
+      diff !== 0 &&
+      newRow.expiryDate.getTime() === oldRow.expiryDate.getTime()
+    ) {
+      newRow.expiryDate = new Date(newRow.expiryDate.getTime() + diff);
+    }
+
+    setRows((oldRows: GridRowsProp<ColTypes>) =>
+      oldRows.map(row => (row.id === newRow.id ? newRow : row))
+    );
+
+    if (newRow.expiryDate < newRow.date)
+      throw new Error('Expiry date cannot be before date');
+
+    setError(false);
+    return newRow;
+  };
+
+  const getRowClassName = (
+    params: GridRowClassNameParams<ColTypes>
+  ): string => {
+    const invalidValue = maxGrade !== null && params.row.grade > maxGrade;
+    return invalidValue ? 'invalid-value-data-grid' : '';
+  };
+
   const confirmDiscard = async (): Promise<void> => {
     if (await AsyncConfirmationModal({confirmNavigate: true})) {
       onClose();
       setRows(structuredClone(initRows));
     }
   };
-
   return (
     <>
       <UnsavedChangesDialog
@@ -298,9 +333,9 @@ const EditGradesDialog = ({
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
           <div style={{height: '30vh'}}>
-            <DataGrid
+            <StyledDataGrid
               rows={rows}
-              columns={columns}
+              columns={columns as GridColDef<GridValidRowModel>[]}
               rowHeight={25}
               editMode="row"
               rowSelection={false}
@@ -315,38 +350,12 @@ const EditGradesDialog = ({
               isCellEditable={(params: GridCellParams<ColTypes>) =>
                 !(params.row.aplusGrade && params.field === 'grade')
               }
-              processRowUpdate={(
-                updatedRow: GridRowModel<ColTypes>,
-                oldRow: GridRowModel<ColTypes>
-              ) => {
-                const diff = updatedRow.date.getTime() - oldRow.date.getTime(); // Diff to update expiration date with
-
-                if (
-                  diff !== 0 &&
-                  updatedRow.expiryDate.getTime() ===
-                    oldRow.expiryDate.getTime()
-                ) {
-                  updatedRow.expiryDate = new Date(
-                    updatedRow.expiryDate.getTime() + diff
-                  );
-                }
-
-                setRows((oldRows: GridRowsProp<ColTypes>) =>
-                  oldRows.map(row =>
-                    row.id === updatedRow.id ? updatedRow : row
-                  )
-                );
-
-                if (updatedRow.expiryDate < updatedRow.date)
-                  throw new Error('Expiry date cannot be before date');
-
-                setError(false);
-                return updatedRow;
-              }}
+              processRowUpdate={processRowUpdate as unknown as ProcessRowUpdate}
               onProcessRowUpdateError={(rowError: Error) => {
                 setError(true);
                 enqueueSnackbar(rowError.message, {variant: 'error'});
               }}
+              getRowClassName={getRowClassName as unknown as GetRowClassName}
             />
           </div>
         </DialogContent>

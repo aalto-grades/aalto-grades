@@ -1,5 +1,22 @@
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {darken, lighten, styled} from '@mui/material';
-import {DataGrid} from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridRowClassNameParams,
+  GridValidRowModel,
+} from '@mui/x-data-grid';
+
+export type ProcessRowUpdate = (
+  newRow: GridValidRowModel,
+  oldRow: GridValidRowModel
+) => GridValidRowModel;
+
+export type GetRowClassName = (
+  params: GridRowClassNameParams<GridValidRowModel>
+) => string;
 
 const getBackgroundColor = (color: string, mode: string): string =>
   mode === 'dark' ? darken(color, 0.7) : lighten(color, 0.7);

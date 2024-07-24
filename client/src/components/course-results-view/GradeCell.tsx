@@ -2,10 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {EventBusyOutlined, MoreVert} from '@mui/icons-material';
+import {
+  EventBusyOutlined,
+  MoreVert,
+  WarningAmberOutlined,
+} from '@mui/icons-material';
 import {Box, IconButton, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import {JSX, useState} from 'react';
+import {JSX, useMemo, useState} from 'react';
 
 import {CoursePartGradesData} from '@/common/types';
 import EditGradesDialog from './EditGradesDialog';
@@ -15,16 +19,23 @@ import {findBestGrade, gradeIsExpired} from '../../utils/bestGrade';
 type GradeCellProps = {
   studentNumber: string;
   coursePartResults?: CoursePartGradesData;
+  maxGrade: number | null;
 };
 const GradeCell = ({
   studentNumber,
   coursePartResults,
+  maxGrade,
 }: GradeCellProps): JSX.Element => {
   const {gradeSelectOption} = useTableContext();
   const theme = useTheme();
 
   const [hover, setHover] = useState<boolean>(false);
   const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
+
+  const hasInvalidValue = useMemo(() => {
+    if (maxGrade === null || coursePartResults === undefined) return false;
+    return coursePartResults.grades.some(grade => grade.grade > maxGrade);
+  }, [coursePartResults, maxGrade]);
 
   const bestGrade = findBestGrade(coursePartResults?.grades ?? [], {
     expiredOption: 'prefer_non_expired',
@@ -40,14 +51,16 @@ const GradeCell = ({
         position: 'relative',
         minWidth: '100px',
         height: '100%',
-        color: isGradeExpired ? 'error.main' : 'inherit',
-        bgcolor: isGradeExpired
-          ? `rgba(${theme.vars.palette.error.mainChannel} / 0.1)`
-          : 'inherit',
-        borderLeft: isGradeExpired
-          ? `1px solid rgba(${theme.vars.palette.error.mainChannel} / 0.3)`
-          : 'inherit',
-        // borderRight: isGradeExpired
+        color: hasInvalidValue || isGradeExpired ? 'error.main' : 'inherit',
+        bgcolor:
+          hasInvalidValue || isGradeExpired
+            ? `rgba(${theme.vars.palette.error.mainChannel} / 0.1)`
+            : 'inherit',
+        borderLeft:
+          hasInvalidValue || isGradeExpired
+            ? `1px solid rgba(${theme.vars.palette.error.mainChannel} / 0.3)`
+            : 'inherit',
+        // borderRight: hasInvalidValue || isGradeExpired
         //   ? `1px solid rgba(${theme.vars.palette.error.mainChannel} / 0.3)`
         //   : 'inherit',
         fontSize: '0.85rem',
@@ -90,6 +103,7 @@ const GradeCell = ({
           onClose={() => setGradeDialogOpen(false)}
           studentNumber={studentNumber}
           coursePartId={coursePartResults.coursePartId}
+          maxGrade={maxGrade}
           title={`Grades of ${studentNumber} for ${coursePartResults.coursePartName}`}
           grades={coursePartResults.grades}
         />
@@ -109,6 +123,35 @@ const GradeCell = ({
                   }}
                 > */}
             <EventBusyOutlined
+              sx={{
+                position: 'absolute',
+                float: 'left',
+                top: '-5%',
+                left: '1%',
+                width: '15px',
+                // transform: 'translate(-50%, -50%)',
+                color: `rgba(${theme.vars.palette.error.mainChannel} / 0.7)`,
+                // When over color is 100%
+                '&:hover': {
+                  color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
+                },
+              }}
+            />
+            {/* </IconButton> */}
+          </Tooltip>
+        </>
+      )}
+      {hasInvalidValue && (
+        <>
+          <Tooltip placement="top" title={'Invalid grades'}>
+            {/* <IconButton
+                  size='small'
+                  color='error'
+                  style={{
+                    position: 'relative',
+                  }}
+                > */}
+            <WarningAmberOutlined
               sx={{
                 position: 'absolute',
                 float: 'left',
