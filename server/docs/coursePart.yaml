@@ -30,6 +30,11 @@ definitions:
         decription: Number of days valid.
         minimum: 1
         example: 365
+      maxGrade:
+        type: number
+        description: Grade max value
+        example: 25
+        nullable: true
       archived:
         type: boolean
         description: If course part has been archived
@@ -44,6 +49,7 @@ definitions:
       - courseId
       - name
       - daysValid
+      - maxGrade
       - archived
 
   NewCoursePart:
@@ -57,9 +63,15 @@ definitions:
         decription: Number of days valid.
         minimum: 1
         example: 365
+      maxGrade:
+        type: number
+        description: Grade max value
+        example: 25
+        nullable: true
     required:
       - name
       - daysValid
+      - maxGrade
 
   EditCoursePart:
     description: Course part information.
@@ -72,6 +84,11 @@ definitions:
         decription: Number of days valid.
         minimum: 1
         example: 365
+      maxGrade:
+        type: number
+        description: Grade max value
+        example: 25
+        nullable: true
       archived:
         type: boolean
         description: If course part has been archived
