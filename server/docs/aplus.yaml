@@ -40,6 +40,11 @@ definitions:
     enum: [FULL_POINTS, MODULE, DIFFICULTY]
     description: A+ grade source type.
     example: MODULE
+  AplusDate:
+    type: string
+    format: date
+    description: Date associated with grades from this source.
+    example: 2024-05-01T00:00:00.000Z
 
   AplusCourseData:
     type: object
@@ -128,6 +133,8 @@ definitions:
         $ref: '#/definitions/AplusExerciseName'
       difficulty:
         $ref: '#/definitions/AplusDifficulty'
+      date:
+        $ref: '#/definitions/AplusDate'
     required:
       - coursePartId
       - aplusCourse
@@ -154,10 +161,7 @@ definitions:
       difficulty:
         $ref: '#/definitions/AplusDifficulty'
       date:
-        type: string
-        format: date
-        description: Date associated with grades from this source.
-        example: 2024-05-01T00:00:00.000Z
+        $ref: '#/definitions/AplusDate'
     required:
       - coursePartId
       - aplusCourse
