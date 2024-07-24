@@ -62,6 +62,7 @@ const difficultyBase = {
 const GradeSourceBase = z.strictObject({
   id: IdSchema,
   aplusCourse: AplusCourseDataSchema,
+  date: DateSchema,
 });
 export const AplusGradeSourceDataSchema = z.discriminatedUnion('sourceType', [
   GradeSourceBase.extend(fullPointsBase).strict(),
