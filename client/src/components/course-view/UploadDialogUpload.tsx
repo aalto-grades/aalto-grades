@@ -10,6 +10,7 @@ import {
   Alert,
   Button,
   ButtonGroup,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -42,6 +43,7 @@ type PropsType = {
   setReady: Dispatch<SetStateAction<boolean>>;
   expanded: '' | 'upload' | 'edit';
   setExpanded: Dispatch<SetStateAction<'' | 'upload' | 'edit'>>;
+  invalidValues: boolean;
 };
 const UploadDialogUpload = ({
   columns,
@@ -51,6 +53,7 @@ const UploadDialogUpload = ({
   setReady,
   expanded,
   setExpanded,
+  invalidValues,
 }: PropsType): JSX.Element => {
   const [textFieldText, setTextFieldText] = useState<string>('');
   const [textFieldOpen, setTextFieldOpen] = useState<boolean>(false);
@@ -258,6 +261,12 @@ const UploadDialogUpload = ({
       />
 
       <DialogContent sx={{minHeight: 500}}>
+        <Collapse in={invalidValues}>
+          <Alert severity="warning" sx={{mb: 2}}>
+            Some grades are higher than the maximum allowed values
+          </Alert>
+        </Collapse>
+
         <Snackbar
           open={snackbar !== null}
           autoHideDuration={3000}

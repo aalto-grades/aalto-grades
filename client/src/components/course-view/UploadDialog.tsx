@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Delete} from '@mui/icons-material';
-import {Button, Dialog, DialogActions, Tooltip} from '@mui/material';
+import {Button, Dialog, DialogActions} from '@mui/material';
 import {GridActionsCellItem, GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import dayjs, {Dayjs} from 'dayjs';
 import {enqueueSnackbar} from 'notistack';
@@ -53,7 +53,6 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   );
 
   const invalidValues = useMemo(() => {
-    if (currentStep !== 1 || confirmExpanded !== 'confirm') return false;
     for (const row of rows) {
       for (const coursePart of coursePartData) {
         const grade = row[coursePart.name];
@@ -64,7 +63,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       }
     }
     return false;
-  }, [confirmExpanded, coursePartData, currentStep, rows]);
+  }, [coursePartData, rows]);
 
   useEffect(() => {
     if (coursePartData.length === dates.length) return;
@@ -168,6 +167,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     onClose();
   };
 
+  console.log(invalidValues);
   return (
     <>
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
@@ -180,6 +180,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
             setReady={setReady}
             expanded={uploadExpanded}
             setExpanded={setUploadExpanded}
+            invalidValues={invalidValues}
           />
         ) : (
           <UploadDialogConfirm
@@ -191,6 +192,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
             setReady={setReady}
             expanded={confirmExpanded}
             setExpanded={setConfirmExpanded}
+            invalidValues={invalidValues}
           />
         )}
         <DialogActions>
@@ -219,22 +221,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
             </Button>
           )}
           {currentStep === 1 && confirmExpanded === 'confirm' && (
-            <>
-              {invalidValues ? (
-                <Tooltip
-                  title="Some grades have invalid values"
-                  placement="top"
-                >
-                  <span>
-                    <Button onClick={onSubmit} disabled>
-                      Submit
-                    </Button>
-                  </span>
-                </Tooltip>
-              ) : (
-                <Button onClick={onSubmit}>Submit</Button>
-              )}
-            </>
+            <Button onClick={onSubmit}>Submit</Button>
           )}
         </DialogActions>
       </Dialog>

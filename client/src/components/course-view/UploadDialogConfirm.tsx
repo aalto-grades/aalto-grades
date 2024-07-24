@@ -53,6 +53,7 @@ type PropsType = {
   setDates: Dispatch<SetStateAction<DateType[]>>;
   expanded: '' | 'date' | 'confirm';
   setExpanded: Dispatch<SetStateAction<'' | 'date' | 'confirm'>>;
+  invalidValues: boolean;
 };
 
 const UploadDialogConfirm = ({
@@ -64,6 +65,7 @@ const UploadDialogConfirm = ({
   setDates,
   expanded,
   setExpanded,
+  invalidValues,
 }: PropsType): JSX.Element => {
   const [error, setError] = useState<boolean>(false);
 
@@ -131,6 +133,12 @@ const UploadDialogConfirm = ({
     <>
       <DialogTitle>Confirm</DialogTitle>
       <DialogContent>
+        {invalidValues && (
+          <Alert severity="warning" sx={{mb: 2}}>
+            Some grades are higher than the maximum allowed values
+          </Alert>
+        )}
+
         <Accordion
           expanded={expanded === 'date'}
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'date' : '')}
