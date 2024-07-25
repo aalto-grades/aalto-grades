@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 # This is a Docker Compose configuration for deploying Aalto Grades to a
-# virtual machine. Requires correct setup work to be done on the VM.
-# Documentation for deployment is available in the VM's root user's deployment
-# folder.
+# virtual machine from the main branch. Requires correct setup work to be done
+# on the VM. Documentation for deployment is available in the VM's root user's
+# deployment folder.
 ---
 
 version: "3.7"
