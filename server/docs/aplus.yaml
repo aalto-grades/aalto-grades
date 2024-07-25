@@ -77,6 +77,11 @@ definitions:
     type: object
     description: Information about exercises of an A+ course.
     properties:
+      maxGrade:
+        type: number
+        description: Max grade of the course.
+        format: int32
+        example: 500
       modules:
         type: array
         items:
@@ -91,6 +96,11 @@ definitions:
               format: date
               description: The time when the A+ module closes.
               example: 2024-05-01T00:00:00.000Z
+            maxGrade:
+              type: number
+              description: Max grade of the module.
+              format: int32
+              example: 100
             exercises:
               type: array
               items:
@@ -100,18 +110,38 @@ definitions:
                     $ref: '#/definitions/AplusExerciseId'
                   name:
                     $ref: '#/definitions/AplusExerciseName'
+                  maxGrade:
+                    type: number
+                    description: Max grade of the exercise.
+                    format: int32
+                    example: 20
                 required:
                   - id
                   - name
+                  - maxGrade
           required:
             - id
             - name
+            - closingDate
+            - maxGrade
             - exercises
       difficulties:
         type: array
         items:
-          $ref: '#/definitions/AplusDifficulty'
+          type: object
+          properties:
+            difficulty:
+              $ref: '#/definitions/AplusDifficulty'
+            maxGrade:
+              type: number
+              description: Max grade of the difficulty.
+              format: int32
+              example: 300
+          required:
+            - difficulty
+            - maxGrade
     required:
+      - maxGrade
       - modules
       - difficulties
 
@@ -139,6 +169,7 @@ definitions:
       - coursePartId
       - aplusCourse
       - sourceType
+      - date
 
   NewAplusGradeSourceData:
     type: object
@@ -166,6 +197,7 @@ definitions:
       - coursePartId
       - aplusCourse
       - sourceType
+      - date
 
 /v1/aplus/courses:
   get:
