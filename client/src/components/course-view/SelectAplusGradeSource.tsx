@@ -154,7 +154,7 @@ const SelectAplusGradeSource = ({
                     )
                   }
                 >
-                  {difficulty}
+                  {difficulty.difficulty}
                 </Button>
               ))}
             </FormGroup>

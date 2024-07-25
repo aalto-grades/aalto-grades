@@ -104,7 +104,7 @@ const NewAplusCoursePartsDialog = ({
     coursePartEdit: {
       name?: string;
       daysValid?: number;
-      maxGrade?: number | null;
+      maxGrade?: number;
     }
   ): void => {
     setCoursePartsWithSource(
