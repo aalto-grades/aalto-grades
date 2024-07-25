@@ -47,8 +47,8 @@ import {
 } from '../hooks/useApi';
 import {findBestFinalGrade} from '../utils/bestGrade';
 import {
+  getRowErrors,
   groupByLatestBestGrade,
-  predictedGradesErrorCheck,
   predictGrades,
 } from '../utils/table';
 
@@ -87,10 +87,14 @@ export type RowError =
   | {
       type: 'Error';
       message: string;
-      columnId: string;
       info: {
         columnId: string;
       };
+    }
+  | {
+      type: 'InvalidGrade';
+      message: string;
+      info: {columnId: string};
     }
   | {
       type: 'InvalidPredictedGrade' | 'OutOfRangePredictedGrade';
@@ -100,6 +104,7 @@ export type RowError =
         modelId: string;
       };
     };
+export type RowErrorType = RowError['type'];
 
 export type ExtendedStudentRow = StudentRow & {
   predictedFinalGrades?: {[key: number]: {finalGrade: number}};
@@ -199,7 +204,9 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
           ...row,
           // keep the same structure of predictedGrades but only show result for the student
           predictedFinalGrades: studentPredictedGrades,
-          errors: predictedGradesErrorCheck(
+          errors: getRowErrors(
+            row,
+            courseParts.data ?? [],
             studentPredictedGrades,
             course.data?.gradingScale ?? GradingScale.Numerical
           ),
@@ -207,7 +214,13 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       }),
       gradeSelectOption
     );
-  }, [gradingModels, props.data, gradeSelectOption, course.data?.gradingScale]);
+  }, [
+    gradingModels,
+    props.data,
+    gradeSelectOption,
+    courseParts.data,
+    course.data?.gradingScale,
+  ]);
 
   // const [globalFilter, setGlobalFilter] = useState('');
 
@@ -263,6 +276,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
             <GradeCell
               studentNumber={row.original.user.studentNumber ?? 'N/A'}
               coursePartResults={getValue()}
+              maxGrade={coursePart.maxGrade}
             />
           ),
           footer: coursePart.name,

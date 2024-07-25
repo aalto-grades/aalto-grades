@@ -50,7 +50,10 @@ const NewAplusCoursePartsDialog = ({
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
   const [coursePartsWithSource, setCoursePartsWithSource] = useState<
-    [{name: string; daysValid: number}, NewAplusGradeSourceData][]
+    [
+      {name: string; daysValid: number; maxGrade: number | null},
+      NewAplusGradeSourceData,
+    ][]
   >([]);
 
   useEffect(() => {
@@ -72,7 +75,7 @@ const NewAplusCoursePartsDialog = ({
     if (checked) {
       setCoursePartsWithSource([
         ...coursePartsWithSource,
-        [{name: name, daysValid: 365}, source],
+        [{name: name, daysValid: 365, maxGrade: null}, source],
       ]);
     } else {
       setCoursePartsWithSource(
@@ -97,20 +100,24 @@ const NewAplusCoursePartsDialog = ({
 
   const handleCoursePartChange = (
     index: number,
-    coursePart: {name?: string; daysValid?: number}
+    coursePart: {name?: string; daysValid?: number; maxGrade?: number | null}
   ): void => {
     setCoursePartsWithSource(
-      coursePartsWithSource.map(([a, s], i) => {
+      coursePartsWithSource.map(([coursePartWithSource, source], i) => {
         if (i === index) {
           return [
             {
-              name: coursePart.name ?? a.name,
-              daysValid: coursePart.daysValid ?? a.daysValid,
+              name: coursePart.name ?? coursePartWithSource.name,
+              daysValid: coursePart.daysValid ?? coursePartWithSource.daysValid,
+              maxGrade:
+                coursePart.maxGrade !== undefined
+                  ? coursePart.maxGrade
+                  : coursePartWithSource.maxGrade,
             },
-            s,
+            source,
           ];
         }
-        return [a, s];
+        return [coursePartWithSource, source];
       })
     );
   };

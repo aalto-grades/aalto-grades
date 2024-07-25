@@ -29,7 +29,7 @@ import {GradingModelData, StudentRow} from '@/common/types';
 import {GroupedStudentRow} from '../../context/GradesTableProvider';
 import {useGetAllGradingModels} from '../../hooks/useApi';
 import {GradeSelectOption} from '../../utils/bestGrade';
-import {getErrorCount} from '../../utils/table';
+import {getErrorTypes} from '../../utils/table';
 
 type PropsType = {
   open: boolean;
@@ -70,8 +70,8 @@ const CalculateFinalGradesDialog = ({
     [allGradingModels.data]
   );
 
-  const errorCount = useMemo(
-    () => getErrorCount(selectedRows, selectedModel?.id ?? 'any'),
+  const errors = useMemo(
+    () => getErrorTypes(selectedRows, selectedModel?.id ?? 'any'),
     [selectedRows, selectedModel]
   );
 
@@ -126,12 +126,38 @@ const CalculateFinalGradesDialog = ({
             ? 'Calculating final grade for 1 student'
             : `Calculating final grades for ${selectedRows.length} students`}
         </Typography>
+
+        {/* Warnings */}
         {gradeSelectOption === 'latest' && (
-          <Alert sx={{mb: 2}} severity="info">
+          <Alert sx={{mb: 2, mt: -1}} severity="info">
             You are using latest grades instead of the best grades to calculate
             the final grades.
           </Alert>
         )}
+        <Collapse in={errors.InvalidGrade}>
+          <Alert sx={{mb: 2, mt: -1}} severity="warning">
+            Some of the selected grades are invalid.
+          </Alert>
+        </Collapse>
+        <Collapse
+          in={
+            selectedModel?.hasDeletedCourseParts ||
+            selectedModel?.hasArchivedCourseParts
+          }
+        >
+          <Alert sx={{mb: 2, mt: -1}} severity="warning">
+            {getWarning(selectedModel)}
+          </Alert>
+        </Collapse>
+        <Collapse
+          in={errors.InvalidPredictedGrade || errors.OutOfRangePredictedGrade}
+        >
+          <Alert sx={{mb: 2, mt: -1}} severity="error">
+            Some final grades will have invalid values, check if the correct
+            grading model is being used
+          </Alert>
+        </Collapse>
+
         <FormControl sx={{display: 'block'}}>
           <InputLabel id="calculate-grades-select">Grading model</InputLabel>
           <Select
@@ -152,23 +178,6 @@ const CalculateFinalGradesDialog = ({
             ))}
           </Select>
         </FormControl>
-        <Collapse
-          in={
-            selectedModel?.hasDeletedCourseParts ||
-            selectedModel?.hasArchivedCourseParts
-          }
-        >
-          <Alert sx={{mt: 1}} severity="warning">
-            {getWarning(selectedModel)}
-          </Alert>
-        </Collapse>
-        <Collapse in={!!errorCount}>
-          <Alert sx={{mt: 1}} severity="error">
-            {
-              'Some final grades will have invalid values, check if the correct grading model is being used'
-            }
-          </Alert>
-        </Collapse>
         <FormControlLabel
           sx={{mt: 1}}
           control={
@@ -199,7 +208,9 @@ const CalculateFinalGradesDialog = ({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={!!errorCount}
+          disabled={
+            errors.InvalidPredictedGrade || errors.OutOfRangePredictedGrade
+          }
         >
           Confirm
         </Button>

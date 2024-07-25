@@ -17,7 +17,12 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import {DataGrid, GridColDef, GridRowsProp} from '@mui/x-data-grid';
+import {
+  GridColDef,
+  GridRowClassNameParams,
+  GridRowsProp,
+  GridValidRowModel,
+} from '@mui/x-data-grid';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {Dayjs} from 'dayjs';
@@ -32,6 +37,7 @@ import {
 } from 'react';
 
 import {GradeUploadColTypes} from './UploadDialog';
+import StyledDataGrid from '../StyledDataGrid';
 
 type DateType = {
   coursePartName: string;
@@ -41,21 +47,25 @@ type DateType = {
 type PropsType = {
   columns: GridColDef[];
   rows: GridRowsProp<GradeUploadColTypes>;
+  maxGrades: {[key: string]: number | null};
   setReady: Dispatch<SetStateAction<boolean>>;
   dates: DateType[];
   setDates: Dispatch<SetStateAction<DateType[]>>;
   expanded: '' | 'date' | 'confirm';
   setExpanded: Dispatch<SetStateAction<'' | 'date' | 'confirm'>>;
+  invalidValues: boolean;
 };
 
 const UploadDialogConfirm = ({
   columns,
   rows,
+  maxGrades,
   setReady,
   dates,
   setDates,
   expanded,
   setExpanded,
+  invalidValues,
 }: PropsType): JSX.Element => {
   const [error, setError] = useState<boolean>(false);
 
@@ -104,10 +114,31 @@ const UploadDialogConfirm = ({
     );
   };
 
+  const getRowClassName = (
+    params: GridRowClassNameParams<GridValidRowModel>
+  ): string => {
+    const hasInvalid = Object.entries(params.row).some(([key, value]) => {
+      const maxGrade = maxGrades[key] as number | undefined | null;
+      return (
+        maxGrade !== undefined &&
+        maxGrade !== null &&
+        value &&
+        (value as number) > maxGrade
+      );
+    });
+    return hasInvalid ? 'invalid-value-data-grid' : '';
+  };
+
   return (
     <>
       <DialogTitle>Confirm</DialogTitle>
       <DialogContent>
+        {invalidValues && (
+          <Alert severity="warning" sx={{mb: 2}}>
+            Some grades are higher than the maximum allowed values
+          </Alert>
+        )}
+
         <Accordion
           expanded={expanded === 'date'}
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'date' : '')}
@@ -201,12 +232,13 @@ const UploadDialogConfirm = ({
           </AccordionSummary>
           <AccordionDetails>
             <div style={{height: '70vh'}}>
-              <DataGrid
+              <StyledDataGrid
                 rows={rows}
                 columns={columns}
                 rowHeight={25}
                 rowSelection={false}
                 disableColumnSelector
+                getRowClassName={getRowClassName}
               />
             </div>
           </AccordionDetails>

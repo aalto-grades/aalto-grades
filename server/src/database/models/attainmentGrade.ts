@@ -30,8 +30,8 @@ export default class AttainmentGrade extends Model<
   declare grade: number;
   declare sisuExportDate: CreationOptional<Date | null>;
   // Date when course part is completed (e.g., deadline or exam date)
-  declare date: Date | string; // Database outputs yyyy-mm-dd but inserting date is allowed
-  declare expiryDate: Date | string; // Database outputs yyyy-mm-dd but inserting date is allowed
+  declare date: Date | string; // Database outputs 'yyyy-mm-dd' but inserting date is allowed
+  declare expiryDate: Date | string; // Database outputs 'yyyy-mm-dd' but inserting date is allowed
   declare comment: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;

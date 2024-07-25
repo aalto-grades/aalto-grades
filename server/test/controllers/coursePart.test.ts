@@ -123,7 +123,11 @@ describe('Test POST /v1/courses/:courseId/parts - add a course part', () => {
     let i = 0;
 
     for (const cookie of testCookies) {
-      const coursePart = {name: `coursepart-${++i}`, daysValid: 350};
+      const coursePart = {
+        name: `coursepart-${++i}`,
+        daysValid: 350,
+        maxGrade: null,
+      };
       const res = await request
         .post(`/v1/courses/${courseId}/parts`)
         .send(coursePart)
@@ -139,19 +143,19 @@ describe('Test POST /v1/courses/:courseId/parts - add a course part', () => {
 
   it('should respond with 400 if validation fails', async () => {
     const url = `/v1/courses/${courseId}/parts`;
-    const data = {name: 'not added', daysValid: -1};
+    const data = {name: 'not added', daysValid: -1, maxGrade: 1};
     await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
   });
 
   it('should respond with 400 if id is invalid', async () => {
     const url = `/v1/courses/${'bad'}/parts`;
-    const data = {name: 'not added', daysValid: 365};
+    const data = {name: 'not added', daysValid: 365, maxGrade: 5};
     await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
     let url = `/v1/courses/${courseId}/parts`;
-    const data = {name: 'not added', daysValid: 365};
+    const data = {name: 'not added', daysValid: 365, maxGrade: 5};
     await responseTests.testUnauthorized(url).post(data);
 
     await responseTests
@@ -170,13 +174,13 @@ describe('Test POST /v1/courses/:courseId/parts - add a course part', () => {
 
   it('should respond with 404 if not found', async () => {
     const url = `/v1/courses/${nonExistentId}/parts`;
-    const data = {name: 'not added', daysValid: 365};
+    const data = {name: 'not added', daysValid: 365, maxGrade: 5};
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
   it('should respond with 409 if trying to create a course part with duplicate name', async () => {
     const url = `/v1/courses/${courseId}/parts`;
-    const data = {name: 'coursepart-1', daysValid: 365};
+    const data = {name: 'coursepart-1', daysValid: 365, maxGrade: 5};
     await responseTests.testConflict(url, cookies.adminCookie).post(data);
   });
 });
