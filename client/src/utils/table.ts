@@ -133,7 +133,7 @@ export const predictedGradesErrorCheck = (
   for (const [modelId, grade] of Object.entries(studentPredictedGrades)) {
     if (grade.finalGrade % 1 !== 0) {
       errors.push({
-        message: 'The predicted grade is not an integer',
+        message: 'The predicted final grade is not an integer',
         type: 'InvalidPredictedGrade',
         info: {
           columnId: 'predictedFinalGrades',
@@ -151,7 +151,7 @@ export const predictedGradesErrorCheck = (
         !(grade.finalGrade >= 0 && grade.finalGrade <= 2))
     ) {
       errors.push({
-        message: 'The predicted grade is out of range',
+        message: 'The predicted final grade is out of range',
         type: 'OutOfRangePredictedGrade',
         info: {
           columnId: 'predictedFinalGrades',

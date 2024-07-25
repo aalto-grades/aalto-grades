@@ -167,7 +167,6 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     onClose();
   };
 
-  console.log(invalidValues);
   return (
     <>
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">

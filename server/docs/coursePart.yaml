@@ -9,11 +9,20 @@ definitions:
     format: int32
     minimum: 1
     example: 1
-
   CoursePartName:
     type: string
     decription: Name of the course part.
     example: Exam
+  CoursePartDaysValid:
+    type: number
+    decription: Number of days valid.
+    minimum: 1
+    example: 365
+  CoursePartMaxGrade:
+    type: number
+    description: Grade max value
+    example: 25
+    nullable: true
 
   CoursePart:
     description: Course part information.
@@ -26,15 +35,9 @@ definitions:
       name:
         $ref: '#/definitions/CoursePartName'
       daysValid:
-        type: number
-        decription: Number of days valid.
-        minimum: 1
-        example: 365
+        $ref: '#/definitions/CoursePartDaysValid'
       maxGrade:
-        type: number
-        description: Grade max value
-        example: 25
-        nullable: true
+        $ref: '#/definitions/CoursePartMaxGrade'
       archived:
         type: boolean
         description: If course part has been archived
@@ -59,15 +62,9 @@ definitions:
       name:
         $ref: '#/definitions/CoursePartName'
       daysValid:
-        type: number
-        decription: Number of days valid.
-        minimum: 1
-        example: 365
+        $ref: '#/definitions/CoursePartDaysValid'
       maxGrade:
-        type: number
-        description: Grade max value
-        example: 25
-        nullable: true
+        $ref: '#/definitions/CoursePartMaxGrade'
     required:
       - name
       - daysValid
@@ -80,15 +77,9 @@ definitions:
       name:
         $ref: '#/definitions/CoursePartName'
       daysValid:
-        type: number
-        decription: Number of days valid.
-        minimum: 1
-        example: 365
+        $ref: '#/definitions/CoursePartDaysValid'
       maxGrade:
-        type: number
-        description: Grade max value
-        example: 25
-        nullable: true
+        $ref: '#/definitions/CoursePartMaxGrade'
       archived:
         type: boolean
         description: If course part has been archived
