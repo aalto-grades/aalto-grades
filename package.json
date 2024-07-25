@@ -1,5 +1,6 @@
 {
   "name": "aalto-grades",
+  "version": "replace",
   "author": "The Aalto Grades Developers",
   "license": "Expat (MIT)",
   "engines": {

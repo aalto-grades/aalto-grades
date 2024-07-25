@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Link, Tooltip} from '@mui/material';
+import {Box, Link, Tooltip, Typography} from '@mui/material';
 import {JSX} from 'react';
 
 const Footer = (): JSX.Element => {
@@ -11,6 +11,8 @@ const Footer = (): JSX.Element => {
       component="footer"
       sx={{
         backgroundColor: 'primary.light',
+        display: 'flex',
+        alignItems: 'center',
         padding: 2,
         textAlign: 'left',
         marginTop: 'auto',
@@ -30,14 +32,9 @@ const Footer = (): JSX.Element => {
       </Link>
       <Tooltip title="Source code opens in a new tab">
         <Link
-          /*
-           * TODO: Linking the repository directly is helpful, but not enough
-           * because the code in the main branch may not be the corresponding
-           * source to the actual software being ran.
-           *
-           * Include a direct download button or link a release tag?
-           */
-          href="https://github.com/aalto-grades/base-repository"
+          // TODO: Once we have releases and employ a versioning scheme, link the version tag
+          // href={`https://github.com/aalto-grades/aalto-grades/tree/${AALTO_GRADES_VERSION}`}
+          href="https://github.com/aalto-grades/aalto-grades"
           rel="noreferrer"
           target="_blank"
           underline="none"
@@ -52,10 +49,12 @@ const Footer = (): JSX.Element => {
           rel="noreferrer"
           target="_blank"
           underline="none"
+          sx={{mr: 3}}
         >
           Feedback
         </Link>
       </Tooltip>
+      <Typography>Aalto Grades {AALTO_GRADES_VERSION}</Typography>
     </Box>
   );
 };

@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 # This is a Docker Compose configuration for deploying Aalto Grades to a
-# virtual machine. Requires correct setup work to be done on the VM.
-# Documentation for deployment is available in the VM's root user's deployment
-# folder.
+# virtual machine from the dev branch. Requires correct setup work to be done
+# on the VM. Documentation for deployment is available in the VM's root user's
+# deployment folder.
 ---
 
 version: "3.7"
@@ -13,62 +13,27 @@ version: "3.7"
 services:
 
   reverse-proxy:
-    build:
-      context: ./reverse-proxy
-      args:
-        CERT_FILE: "${CERT_FILE}"
-        CERT_KEY_FILE: "${CERT_KEY_FILE}"
-    restart: always
-    container_name: reverse-proxy
-    ports:
-      - 443:443
-      - 80:80
-    networks:
-      - local
+    extends:
+      file: ./docker-compose-from-images.yaml
+      service: reverse-proxy
 
   frontend:
     extends:
-      file: ./common-services.yaml
-      service: frontend-minimum
+      file: ./docker-compose-from-images.yaml
+      service: frontend
     image: ghcr.io/aalto-grades/aalto-grades-frontend-dev:dev
-    container_name: frontend-server
 
   backend:
     extends:
-      file: ./common-services.yaml
-      service: backend-minimum
+      file: ./docker-compose-from-images.yaml
+      service: backend
     build:
-      context: .
       dockerfile: ./server/dockerfiles/Dockerfile.prod.run.dev
-      args:
-        SAML_DECRYPTION_PVK_FILE: "${SAML_DECRYPTION_PVK_FILE}"
-        SAML_PRIVATE_KEY_FILE: "${SAML_PRIVATE_KEY_FILE}"
-        SAML_SP_CERT_FILE: "${SAML_SP_CERT_FILE}"
-    container_name: backend-server
-    environment:
-      AALTO_GRADES_BACKEND_PORT: "${AALTO_GRADES_BACKEND_PORT}"
-      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "${AALTO_GRADES_FRONTEND_CORS_ORIGIN}"
-      AALTO_GRADES_JWT_SECRET: "${AALTO_GRADES_JWT_SECRET}"
-      APLUS_API_URL: "${APLUS_API_URL}"
-      SAML_CALLBACK: "${SAML_CALLBACK}"
-      SAML_ENTRYPOINT: "${SAML_ENTRYPOINT}"
-      SAML_ISSUER: "${SAML_ISSUER}"
-      SAML_METADATA_URL: "${SAML_METADATA_URL}"
-      NODE_ENV: "production"
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://localhost:601"
-        tag: "aalto-grades"
 
   database:
     extends:
-      file: ./common-services.yaml
-      service: database
-    environment:
-      PGDATA: "/var/lib/postgresql/data/pgdata"
-    volumes:
-      - ${POSTGRES_MOUNTDIR}:/var/lib/postgresql/data
+      file: ./docker-compose-from-images.yaml
+      servics: database
 
 networks:
   local:
