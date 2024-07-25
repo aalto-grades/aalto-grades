@@ -25,20 +25,28 @@ export const AplusCourseDataArraySchema = z.array(AplusCourseDataSchema);
 export const AplusGradeSourceTypeSchema = z.nativeEnum(AplusGradeSourceType);
 
 export const AplusExerciseDataSchema = z.strictObject({
+  maxGrade: z.number().int(),
   modules: z.array(
     z.strictObject({
       id: z.number().int(),
       name: z.string(),
       closingDate: DateSchema,
+      maxGrade: z.number().int(),
       exercises: z.array(
         z.strictObject({
           id: z.number().int(),
           name: z.string(),
+          maxGrade: z.number().int(),
         })
       ),
     })
   ),
-  difficulties: z.array(z.string()),
+  difficulties: z.array(
+    z.strictObject({
+      difficulty: z.string(),
+      maxGrade: z.number().int(),
+    })
+  ),
 });
 
 const fullPointsBase = {
