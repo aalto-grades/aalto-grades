@@ -6,6 +6,7 @@
 FROM node:18-alpine AS build
 
 WORKDIR /app
+COPY package.json ./
 RUN mkdir common client
 
 ARG VITE_APP_BACKEND_URL="https://aalto-grades.cs.aalto.fi"

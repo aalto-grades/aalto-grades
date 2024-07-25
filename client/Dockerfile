@@ -6,6 +6,7 @@
 FROM node:18-alpine AS build
 
 WORKDIR /app
+COPY package.json ./
 RUN mkdir common client
 
 # Install packages first to make following builds faster
