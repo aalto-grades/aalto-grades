@@ -656,10 +656,10 @@ const CourseResultsTableToolbar = (): JSX.Element => {
           Showing: {table.getFilteredRowModel().rows.length} rows
           <Fade
             in={
-              !!getErrorCount(
+              getErrorCount(
                 table.getFilteredRowModel().rows.map(e => e.original),
                 selectedGradingModel
-              )
+              ) > 0
             }
           >
             <Button

@@ -2,13 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {GradingModelData, GradingScale, StudentRow} from '@/common/types';
+import {
+  CoursePartData,
+  GradingModelData,
+  GradingScale,
+  StudentRow,
+} from '@/common/types';
 import {batchCalculateGraph} from '@/common/util/calculateGraph';
 import {GradeSelectOption, findBestGrade} from './bestGrade';
 import {
   ExtendedStudentRow,
   GroupedStudentRow,
   RowError,
+  RowErrorType,
 } from '../context/GradesTableProvider';
 
 /**
@@ -91,45 +97,127 @@ export const predictGrades = (
   return result;
 };
 
+export const invalidGradesCheck = (
+  row: StudentRow,
+  courseParts: CoursePartData[]
+): RowError[] => {
+  const errors: RowError[] = [];
+  const maxGrades = Object.fromEntries(
+    courseParts.map(coursePart => [coursePart.id, coursePart.maxGrade])
+  );
+
+  for (const coursePart of row.courseParts) {
+    const maxGrade = maxGrades[coursePart.coursePartId];
+    if (
+      coursePart.coursePartId in maxGrades &&
+      maxGrade !== null &&
+      coursePart.grades.some(grade => grade.grade > maxGrade)
+    )
+      errors.push({
+        message: 'Grade is higher than maximum allowed value',
+        type: 'InvalidGrade',
+        info: {
+          columnId: coursePart.coursePartName,
+        },
+      });
+  }
+
+  return errors;
+};
+
 export const predictedGradesErrorCheck = (
   studentPredictedGrades: {[k: string]: {finalGrade: number}},
   courseScale: GradingScale
 ): RowError[] => {
-  return Object.entries(studentPredictedGrades).reduce(
-    (errorsArray, [modelId, grade]) => {
-      // if grade is a float
-      if (grade.finalGrade % 1 !== 0) {
-        errorsArray.push({
-          message: 'The predicted grade is not an integer',
-          type: 'InvalidPredictedGrade',
-          info: {
-            columnId: 'predictedFinalGrades',
-            modelId: modelId,
-          },
-        });
-      }
-      // if grade is out of range
-      if (
-        (courseScale === GradingScale.Numerical &&
-          !(grade.finalGrade >= 0 && grade.finalGrade <= 5)) ||
-        (courseScale === GradingScale.PassFail &&
-          !(grade.finalGrade >= 0 && grade.finalGrade <= 1)) ||
-        (courseScale === GradingScale.SecondNationalLanguage &&
-          !(grade.finalGrade >= 0 && grade.finalGrade <= 2))
-      ) {
-        errorsArray.push({
-          message: 'The predicted grade is out of range',
-          type: 'OutOfRangePredictedGrade',
-          info: {
-            columnId: 'predictedFinalGrades',
-            modelId: modelId,
-          },
-        });
-      }
-      return errorsArray;
-    },
-    [] as RowError[]
+  const errors: RowError[] = [];
+  for (const [modelId, grade] of Object.entries(studentPredictedGrades)) {
+    if (grade.finalGrade % 1 !== 0) {
+      errors.push({
+        message: 'The predicted final grade is not an integer',
+        type: 'InvalidPredictedGrade',
+        info: {
+          columnId: 'predictedFinalGrades',
+          modelId: modelId,
+        },
+      });
+    }
+    // if grade is out of range
+    if (
+      (courseScale === GradingScale.Numerical &&
+        !(grade.finalGrade >= 0 && grade.finalGrade <= 5)) ||
+      (courseScale === GradingScale.PassFail &&
+        !(grade.finalGrade >= 0 && grade.finalGrade <= 1)) ||
+      (courseScale === GradingScale.SecondNationalLanguage &&
+        !(grade.finalGrade >= 0 && grade.finalGrade <= 2))
+    ) {
+      errors.push({
+        message: 'The predicted final grade is out of range',
+        type: 'OutOfRangePredictedGrade',
+        info: {
+          columnId: 'predictedFinalGrades',
+          modelId: modelId,
+        },
+      });
+    }
+  }
+  return errors;
+};
+
+export const getRowErrors = (
+  row: StudentRow,
+  courseParts: CoursePartData[],
+  studentPredictedGrades: {[k: string]: {finalGrade: number}},
+  courseScale: GradingScale
+): RowError[] => {
+  const predictedGradeErrors = predictedGradesErrorCheck(
+    studentPredictedGrades,
+    courseScale
   );
+  const invalidGradeErrors = invalidGradesCheck(row, courseParts);
+  return [...predictedGradeErrors, ...invalidGradeErrors];
+};
+
+/**
+ * Returns the types of errors that occurred
+ *
+ * @param rowModel - The array of grouped student rows.
+ * @param selectedGradingModel - The selected grading model. Can be 'any' or a
+ *   number (modelId).
+ * @returns The types of errors that occurred.
+ */
+export const getErrorTypes = (
+  rowModel: GroupedStudentRow[],
+  selectedGradingModel: 'any' | number
+): Record<RowErrorType, boolean> => {
+  const errorTypes: Record<RowErrorType, boolean> = {
+    Error: false,
+    InvalidGrade: false,
+    InvalidPredictedGrade: false,
+    OutOfRangePredictedGrade: false,
+  };
+
+  for (const row of rowModel) {
+    if (row.errors) {
+      for (const error of row.errors) {
+        switch (error.type) {
+          case 'OutOfRangePredictedGrade':
+          case 'InvalidPredictedGrade':
+            if (
+              selectedGradingModel === 'any' ||
+              selectedGradingModel === Number(error.info.modelId)
+            ) {
+              errorTypes[error.type] = true;
+            }
+            break;
+          default:
+            errorTypes[error.type] = true;
+            break;
+        }
+      }
+    }
+  }
+
+  return errorTypes;
 };
 
 /**

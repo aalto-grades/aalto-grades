@@ -56,6 +56,7 @@ export const addCoursePart = async (
     defaults: {
       name: req.body.name,
       daysValid: req.body.daysValid,
+      maxGrade: req.body.maxGrade,
     },
   });
 
@@ -84,6 +85,10 @@ export const editCoursePart = async (
       .set({
         name: req.body.name ?? coursePart.name,
         daysValid: req.body.daysValid ?? coursePart.daysValid,
+        maxGrade:
+          req.body.maxGrade !== undefined
+            ? req.body.maxGrade
+            : coursePart.maxGrade,
         archived: req.body.archived ?? coursePart.archived,
       })
       .save();

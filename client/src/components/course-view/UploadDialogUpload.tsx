@@ -10,6 +10,7 @@ import {
   Alert,
   Button,
   ButtonGroup,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -18,11 +19,12 @@ import {
   TextField,
 } from '@mui/material';
 import {
-  DataGrid,
   GridColDef,
+  GridRowClassNameParams,
   GridRowModel,
   GridRowsProp,
   GridToolbarContainer,
+  GridValidRowModel,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {ParseResult, parse, unparse} from 'papaparse';
@@ -31,23 +33,27 @@ import {Dispatch, JSX, SetStateAction, useEffect, useState} from 'react';
 import AplusImportDialog from './AplusImportDialog';
 import {GradeUploadColTypes} from './UploadDialog';
 import MismatchDialog, {MismatchData} from './UploadDialogMismatchDialog';
+import StyledDataGrid from '../StyledDataGrid';
 
 type PropsType = {
   columns: GridColDef[];
   rows: GridRowsProp<GradeUploadColTypes>;
+  maxGrades: {[key: string]: number | null};
   setRows: Dispatch<SetStateAction<GridRowsProp<GradeUploadColTypes>>>;
   setReady: Dispatch<SetStateAction<boolean>>;
   expanded: '' | 'upload' | 'edit';
   setExpanded: Dispatch<SetStateAction<'' | 'upload' | 'edit'>>;
+  invalidValues: boolean;
 };
-
 const UploadDialogUpload = ({
   columns,
   rows,
+  maxGrades,
   setRows,
   setReady,
   expanded,
   setExpanded,
+  invalidValues,
 }: PropsType): JSX.Element => {
   const [textFieldText, setTextFieldText] = useState<string>('');
   const [textFieldOpen, setTextFieldOpen] = useState<boolean>(false);
@@ -187,6 +193,21 @@ const UploadDialogUpload = ({
     });
   };
 
+  const getRowClassName = (
+    params: GridRowClassNameParams<GridValidRowModel>
+  ): string => {
+    const hasInvalid = Object.entries(params.row).some(([key, value]) => {
+      const maxGrade = maxGrades[key] as number | undefined | null;
+      return (
+        maxGrade !== undefined &&
+        maxGrade !== null &&
+        value &&
+        (value as number) > maxGrade
+      );
+    });
+    return hasInvalid ? 'invalid-value-data-grid' : '';
+  };
+
   return (
     <>
       <DialogTitle>Upload grades</DialogTitle>
@@ -240,6 +261,12 @@ const UploadDialogUpload = ({
       />
 
       <DialogContent sx={{minHeight: 500}}>
+        <Collapse in={invalidValues}>
+          <Alert severity="warning" sx={{mb: 2}}>
+            Some grades are higher than the maximum allowed values
+          </Alert>
+        </Collapse>
+
         <Snackbar
           open={snackbar !== null}
           autoHideDuration={3000}
@@ -299,7 +326,7 @@ const UploadDialogUpload = ({
           </AccordionSummary>
           <AccordionDetails>
             <div style={{height: '40vh'}}>
-              <DataGrid
+              <StyledDataGrid
                 // autoHeight
                 rows={rows}
                 columns={columns}
@@ -310,12 +337,13 @@ const UploadDialogUpload = ({
                 slots={{toolbar: dataGridToolbar}}
                 onRowEditStart={() => setEditing(true)}
                 onRowEditStop={() => setEditing(false)}
-                processRowUpdate={(
-                  updatedRow: GridRowModel<GradeUploadColTypes>
-                ) => {
+                getRowClassName={getRowClassName}
+                processRowUpdate={updatedRow => {
                   setRows(oldRows =>
                     oldRows.map(row =>
-                      row.id === updatedRow.id ? updatedRow : row
+                      row.id === updatedRow.id
+                        ? (updatedRow as GradeUploadColTypes)
+                        : row
                     )
                   );
 

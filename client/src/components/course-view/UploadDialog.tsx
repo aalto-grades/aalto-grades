@@ -26,11 +26,6 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const courseParts = useGetCourseParts(courseId!, {enabled: !!courseId});
   const addGrades = useAddGrades(courseId!);
 
-  const coursePartData = useMemo(
-    () => courseParts.data?.filter(coursePart => !coursePart.archived) ?? [],
-    [courseParts.data]
-  );
-
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [uploadExpanded, setUploadExpanded] = useState<'' | 'upload' | 'edit'>(
     'upload'
@@ -43,6 +38,32 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const [dates, setDates] = useState<
     {coursePartName: string; completionDate: Dayjs; expirationDate: Dayjs}[]
   >([]);
+
+  const coursePartData = useMemo(
+    () => courseParts.data?.filter(coursePart => !coursePart.archived) ?? [],
+    [courseParts.data]
+  );
+
+  const maxGrades = useMemo(
+    () =>
+      Object.fromEntries(
+        coursePartData.map(coursePart => [coursePart.name, coursePart.maxGrade])
+      ),
+    [coursePartData]
+  );
+
+  const invalidValues = useMemo(() => {
+    for (const row of rows) {
+      for (const coursePart of coursePartData) {
+        const grade = row[coursePart.name];
+        if (!(coursePart.name in row) || grade === null) continue; // Skip empty cells
+
+        if (coursePart.maxGrade !== null && grade > coursePart.maxGrade)
+          return true;
+      }
+    }
+    return false;
+  }, [coursePartData, rows]);
 
   useEffect(() => {
     if (coursePartData.length === dates.length) return;
@@ -153,20 +174,24 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
           <UploadDialogUpload
             columns={columns}
             rows={rows}
+            maxGrades={maxGrades}
             setRows={setRows}
             setReady={setReady}
             expanded={uploadExpanded}
             setExpanded={setUploadExpanded}
+            invalidValues={invalidValues}
           />
         ) : (
           <UploadDialogConfirm
             columns={readOnlycolumns}
             rows={rows}
+            maxGrades={maxGrades}
             dates={dates}
             setDates={setDates}
             setReady={setReady}
             expanded={confirmExpanded}
             setExpanded={setConfirmExpanded}
+            invalidValues={invalidValues}
           />
         )}
         <DialogActions>

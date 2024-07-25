@@ -23,6 +23,7 @@ export default class CoursePart extends Model<
   declare name: string;
   // Default value, expiry date in grade takes precedence
   declare daysValid: number;
+  declare maxGrade: number | null;
   declare archived: CreationOptional<boolean>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -51,6 +52,10 @@ CoursePart.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 365,
+    },
+    maxGrade: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
     },
     archived: {
       type: DataTypes.BOOLEAN,

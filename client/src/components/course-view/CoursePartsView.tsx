@@ -43,6 +43,7 @@ type ColTypes = {
   coursePartId: number;
   name: string;
   daysValid: number;
+  maxGrade: number | null;
   validUntil: Date | null;
   aplusGradeSources: AplusGradeSourceData[];
   archived: boolean;
@@ -124,6 +125,7 @@ const CoursePartsView = (): JSX.Element => {
       coursePartId: coursePart.id,
       name: coursePart.name,
       daysValid: coursePart.daysValid,
+      maxGrade: coursePart.maxGrade,
       validUntil: null,
       aplusGradeSources: coursePart.aplusGradeSources,
       archived: coursePart.archived,
@@ -145,7 +147,11 @@ const CoursePartsView = (): JSX.Element => {
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [unsavedChanges]);
 
-  const handleAddCoursePart = (name: string, daysValid: number): void => {
+  const handleAddCoursePart = (
+    name: string,
+    daysValid: number,
+    maxGrade: number | null
+  ): void => {
     setRows(oldRows => {
       const freeId =
         oldRows.reduce((mxVal, row) => Math.max(mxVal, row.id), 0) + 1;
@@ -154,6 +160,7 @@ const CoursePartsView = (): JSX.Element => {
         coursePartId: -1,
         name,
         daysValid,
+        maxGrade,
         validUntil: null,
         aplusGradeSources: [],
         archived: false,
@@ -174,6 +181,7 @@ const CoursePartsView = (): JSX.Element => {
         newCourseParts.push({
           name: row.name,
           daysValid: row.daysValid,
+          maxGrade: row.maxGrade,
         });
       } else {
         editedCourseParts.push({
@@ -181,6 +189,7 @@ const CoursePartsView = (): JSX.Element => {
           coursePart: {
             name: row.name,
             daysValid: row.daysValid,
+            maxGrade: row.maxGrade,
             archived: row.archived,
           },
         });
@@ -303,6 +312,12 @@ const CoursePartsView = (): JSX.Element => {
       editable: true,
     },
     {
+      field: 'maxGrade',
+      headerName: 'Max grade',
+      type: 'number',
+      editable: true,
+    },
+    {
       field: 'validUntil',
       headerName: 'Valid until',
       type: 'date',
@@ -340,7 +355,7 @@ const CoursePartsView = (): JSX.Element => {
   return (
     <>
       <AddCoursePartDialog
-        handleClose={() => setAddDialogOpen(false)}
+        onClose={() => setAddDialogOpen(false)}
         open={addDialogOpen}
         onSave={handleAddCoursePart}
       />

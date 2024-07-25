@@ -102,6 +102,7 @@ class CreateData {
       courseId: newCoursePart.courseId,
       name: newCoursePart.name,
       daysValid: newCoursePart.daysValid,
+      maxGrade: newCoursePart.maxGrade,
       archived: newCoursePart.archived,
       aplusGradeSources: [],
     };
@@ -121,6 +122,7 @@ class CreateData {
         courseId: newCoursePart.courseId,
         name: newCoursePart.name,
         daysValid: newCoursePart.daysValid,
+        maxGrade: newCoursePart.maxGrade,
         archived: newCoursePart.archived,
         aplusGradeSources: [],
       });
