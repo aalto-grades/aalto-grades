@@ -361,12 +361,12 @@ export const calculateNewNodeValues = (
       const sourceValue =
         sourceNodeValue.type === 'require' ||
         sourceNodeValue.type === 'substitute'
-          ? sourceNodeValue.values[
+          ? (sourceNodeValue.values[
               edge
                 .sourceHandle!.replace('-substitute-source', '')
                 .replace('-exercise-source', '')
                 .replace('-source', '')
-            ] ?? 0
+            ] ?? 0)
           : sourceNodeValue.value;
 
       nodeSources[edge.target].delete(sourceId);
@@ -497,12 +497,12 @@ export const batchCalculateGraph = (
         const sourceValue =
           sourceNodeValue.type === 'require' ||
           sourceNodeValue.type === 'substitute'
-            ? sourceNodeValue.values[
+            ? (sourceNodeValue.values[
                 edge
                   .sourceHandle!.replace('-substitute-source', '')
                   .replace('-exercise-source', '')
                   .replace('-source', '')
-              ] ?? 0
+              ] ?? 0)
             : sourceNodeValue.value;
 
         const nodeValue = nodeValues[student.userId][edge.target];

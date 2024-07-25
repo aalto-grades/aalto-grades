@@ -10,7 +10,6 @@
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.3",
     "@mui/types": "^7.2.4",
-    "@mui/utils": "^5.15.6",
     "@mui/x-data-grid": "^7.3.0",
     "@mui/x-date-pickers": "^7.2.0",
     "@tanstack/react-query": "^5.18.0",
@@ -32,7 +31,6 @@
     "react-router-dom": "^6.11.2",
     "reactflow": "^11.10.3",
     "styled-components": "^6.1.8",
-    "web-vitals": "^3.5.2",
     "zod": "^3.22.4"
   },
   "scripts": {
@@ -64,7 +62,6 @@
     "@testing-library/jest-dom": "^6.2.0",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
-    "@types/jest": "^29.5.11",
     "@types/papaparse": "^5.3.14",
     "@types/react": "^18.2.8",
     "@types/react-dom": "^18.2.4",

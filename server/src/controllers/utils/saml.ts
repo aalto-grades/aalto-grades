@@ -7,9 +7,9 @@ import {
   Strategy as SamlStrategy,
   VerifiedCallback as SamlVerifiedCallback,
 } from '@node-saml/passport-saml';
+import {DOMParser} from '@xmldom/xmldom';
 import axios from 'axios';
 import {Request} from 'express';
-import {DOMParser} from 'xmldom';
 import {SelectReturnType, isArrayOfNodes, useNamespaces} from 'xpath';
 
 import {HttpCode, SystemRole} from '@/common/types';

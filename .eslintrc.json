@@ -49,6 +49,7 @@
         "pathGroupsExcludedImportTypes": ["builtin", "object"]
       }
     ],
+    "n/no-unpublished-import": "off",
 
     "@typescript-eslint/explicit-function-return-type": [
       "warn",
