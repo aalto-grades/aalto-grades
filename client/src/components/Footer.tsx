@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Link, Tooltip} from '@mui/material';
+import {Box, Link, Tooltip, Typography} from '@mui/material';
 import {JSX} from 'react';
 
 const Footer = (): JSX.Element => {
@@ -11,6 +11,8 @@ const Footer = (): JSX.Element => {
       component="footer"
       sx={{
         backgroundColor: 'primary.light',
+        display: 'flex',
+        alignItems: 'center',
         padding: 2,
         textAlign: 'left',
         marginTop: 'auto',
@@ -37,7 +39,7 @@ const Footer = (): JSX.Element => {
            *
            * Include a direct download button or link a release tag?
            */
-          href="https://github.com/aalto-grades/base-repository"
+          href="https://github.com/aalto-grades/aalto-grades"
           rel="noreferrer"
           target="_blank"
           underline="none"
@@ -52,10 +54,12 @@ const Footer = (): JSX.Element => {
           rel="noreferrer"
           target="_blank"
           underline="none"
+          sx={{mr: 3}}
         >
           Feedback
         </Link>
       </Tooltip>
+      <Typography>Aalto Grades {AALTO_GRADES_VERSION}</Typography>
     </Box>
   );
 };
