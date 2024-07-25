@@ -9,7 +9,7 @@ import {NewAplusGradeSourceData} from '@/common/types';
 
 type CreateAplusCoursePartsProps = {
   coursePartsWithSource: [
-    {name: string; daysValid: number},
+    {name: string; daysValid: number; maxGrade: number},
     NewAplusGradeSourceData,
   ][];
   handleChange: (
@@ -30,6 +30,7 @@ const CreateAplusCourseParts = ({
             {/* In case the teacher changes the course part's name, this is intended
                 to show which source the course part was initially created from. */}
             <Typography>{coursePart.name}</Typography>
+            <Typography>Max grade: {coursePart.maxGrade}</Typography>
             <TextField
               sx={{mt: 1}}
               label="Name"

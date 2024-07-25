@@ -248,7 +248,9 @@ export const newAplusGradeSource = (
       id: number;
       name: string;
     };
-    difficulty?: string;
+    difficulty?: {
+      difficulty: string;
+    };
   }
 ): NewAplusGradeSourceData => {
   const base = {coursePartId: -1, aplusCourse: aplusCourse, date: date};
@@ -275,7 +277,7 @@ export const newAplusGradeSource = (
     return {
       ...base,
       sourceType: AplusGradeSourceType.Difficulty,
-      difficulty: difficulty,
+      difficulty: difficulty.difficulty,
     };
   }
 
