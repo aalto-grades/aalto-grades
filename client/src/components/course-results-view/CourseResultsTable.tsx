@@ -88,8 +88,8 @@ const CourseResultsTable = (): JSX.Element => {
                           header.column.columnDef.meta?.PrettyChipPosition ===
                           'alone'
                             ? undefined
-                            : header.column.columnDef.meta
-                                ?.PrettyChipPosition ?? 'middle'
+                            : (header.column.columnDef.meta
+                                ?.PrettyChipPosition ?? 'middle')
                         }
                         style={{
                           fontWeight: 'bold',
