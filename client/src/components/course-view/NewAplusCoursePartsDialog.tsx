@@ -51,7 +51,7 @@ const NewAplusCoursePartsDialog = ({
 
   const [coursePartsWithSource, setCoursePartsWithSource] = useState<
     [
-      {name: string; daysValid: number; maxGrade: number | null},
+      {name: string; daysValid: number; maxGrade: number},
       NewAplusGradeSourceData,
     ][]
   >([]);
@@ -70,12 +70,13 @@ const NewAplusCoursePartsDialog = ({
   const handleSelectionChange = (
     checked: boolean,
     name: string,
+    maxGrade: number,
     source: NewAplusGradeSourceData
   ): void => {
     if (checked) {
       setCoursePartsWithSource([
         ...coursePartsWithSource,
-        [{name: name, daysValid: 365, maxGrade: null}, source],
+        [{name: name, daysValid: 365, maxGrade: maxGrade}, source],
       ]);
     } else {
       setCoursePartsWithSource(
@@ -100,24 +101,28 @@ const NewAplusCoursePartsDialog = ({
 
   const handleCoursePartChange = (
     index: number,
-    coursePart: {name?: string; daysValid?: number; maxGrade?: number | null}
+    coursePartEdit: {
+      name?: string;
+      daysValid?: number;
+      maxGrade?: number;
+    }
   ): void => {
     setCoursePartsWithSource(
-      coursePartsWithSource.map(([coursePartWithSource, source], i) => {
+      coursePartsWithSource.map(([coursePart, source], i) => {
         if (i === index) {
           return [
             {
-              name: coursePart.name ?? coursePartWithSource.name,
-              daysValid: coursePart.daysValid ?? coursePartWithSource.daysValid,
+              name: coursePartEdit.name ?? coursePart.name,
+              daysValid: coursePartEdit.daysValid ?? coursePart.daysValid,
               maxGrade:
-                coursePart.maxGrade !== undefined
-                  ? coursePart.maxGrade
-                  : coursePartWithSource.maxGrade,
+                coursePartEdit.maxGrade !== undefined
+                  ? coursePartEdit.maxGrade
+                  : coursePart.maxGrade,
             },
             source,
           ];
         }
-        return [coursePartWithSource, source];
+        return [coursePart, source];
       })
     );
   };

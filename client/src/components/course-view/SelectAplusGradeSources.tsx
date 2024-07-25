@@ -24,6 +24,7 @@ type PropsType = {
   handleChange: (
     checked: boolean,
     name: string,
+    maxGrade: number,
     source: NewAplusGradeSourceData
   ) => void;
 };
@@ -67,6 +68,7 @@ const SelectAplusGradeSources = ({
                   handleChange(
                     e.target.checked,
                     `A+ Course: ${aplusCourse.name}`,
+                    aplusExerciseData.data.maxGrade,
                     newAplusGradeSource(
                       aplusCourse,
                       getLatestAplusModuleDate(aplusExerciseData.data),
@@ -99,6 +101,7 @@ const SelectAplusGradeSources = ({
                       handleChange(
                         e.target.checked,
                         `A+ Module: ${module.name}`,
+                        module.maxGrade,
                         newAplusGradeSource(aplusCourse, module.closingDate, {
                           module,
                         })
@@ -132,6 +135,7 @@ const SelectAplusGradeSources = ({
                         handleChange(
                           e.target.checked,
                           `A+ Exercise: ${exercise.name}`,
+                          exercise.maxGrade,
                           newAplusGradeSource(aplusCourse, module.closingDate, {
                             exercise,
                           })
@@ -167,7 +171,8 @@ const SelectAplusGradeSources = ({
                       onChange={e =>
                         handleChange(
                           e.target.checked,
-                          `A+ Difficulty: ${difficulty}`,
+                          `A+ Difficulty: ${difficulty.difficulty}`,
+                          difficulty.maxGrade,
                           newAplusGradeSource(
                             aplusCourse,
                             getLatestAplusModuleDate(aplusExerciseData.data),
@@ -177,7 +182,7 @@ const SelectAplusGradeSources = ({
                       }
                     />
                   }
-                  label={difficulty}
+                  label={difficulty.difficulty}
                 />
               ))}
             </FormGroup>

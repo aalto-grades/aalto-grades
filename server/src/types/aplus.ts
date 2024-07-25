@@ -20,6 +20,7 @@ export type AplusExercisesRes = {
     exercises: {
       id: number;
       display_name: string;
+      max_points: number;
       difficulty: string;
     }[];
   }[];

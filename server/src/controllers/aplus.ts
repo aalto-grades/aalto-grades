@@ -85,28 +85,54 @@ export const fetchAplusExerciseData = async (
     aplusToken
   );
 
+  // Map from exercise IDs to difficulties
+  const exerciseDifficulties: {[key: number]: string | null} = {};
+
   // There doesn't appear to be a better way to get difficulties
   const difficulties = new Set<string>();
   for (const module of exercisesRes.data.results) {
     for (const exercise of module.exercises) {
       if (exercise.difficulty) {
         difficulties.add(exercise.difficulty);
+        exerciseDifficulties[exercise.id] = exercise.difficulty;
+      } else {
+        exerciseDifficulties[exercise.id] = null;
       }
     }
   }
 
   const exerciseData: AplusExerciseData = {
+    maxGrade: 0,
     modules: exercisesRes.data.results.map(module => ({
       id: module.id,
       name: module.display_name,
       closingDate: module.closing_time,
+      maxGrade: 0,
       exercises: module.exercises.map(exercise => ({
         id: exercise.id,
         name: exercise.display_name,
+        maxGrade: exercise.max_points,
       })),
     })),
-    difficulties: Array.from(difficulties),
+    difficulties: Array.from(difficulties).map(difficulty => ({
+      difficulty,
+      maxGrade: 0,
+    })),
   };
+
+  for (const module of exerciseData.modules) {
+    for (const exercise of module.exercises) {
+      exerciseData.maxGrade += exercise.maxGrade;
+      module.maxGrade += exercise.maxGrade;
+
+      const difficulty = exerciseData.difficulties.find(
+        d => d.difficulty === exerciseDifficulties[exercise.id]
+      );
+      if (difficulty) {
+        difficulty.maxGrade += exercise.maxGrade;
+      }
+    }
+  }
 
   res.json(exerciseData);
 };
