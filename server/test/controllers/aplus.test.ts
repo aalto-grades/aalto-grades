@@ -206,15 +206,32 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
             display_name: 'First',
             closing_time: new Date(),
             exercises: [
-              {id: 1, display_name: '1.1 First', difficulty: 'A'},
-              {id: 2, display_name: '1.2 Second', difficulty: ''},
+              {
+                id: 1,
+                display_name: '1.1 First',
+                max_points: 5,
+                difficulty: 'A',
+              },
+              {
+                id: 2,
+                display_name: '1.2 Second',
+                max_points: 20,
+                difficulty: '',
+              },
             ],
           },
           {
             id: 2,
             display_name: 'Second',
             closing_time: new Date(),
-            exercises: [{id: 3, display_name: '2.1 Third', difficulty: ''}],
+            exercises: [
+              {
+                id: 3,
+                display_name: '2.1 Third',
+                max_points: 10,
+                difficulty: '',
+              },
+            ],
           },
         ],
       },
