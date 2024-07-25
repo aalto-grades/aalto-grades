@@ -32,13 +32,8 @@ const Footer = (): JSX.Element => {
       </Link>
       <Tooltip title="Source code opens in a new tab">
         <Link
-          /*
-           * TODO: Linking the repository directly is helpful, but not enough
-           * because the code in the main branch may not be the corresponding
-           * source to the actual software being ran.
-           *
-           * Include a direct download button or link a release tag?
-           */
+          // TODO: Once we have releases and employ a versioning scheme, link the version tag
+          // href={`https://github.com/aalto-grades/aalto-grades/tree/${AALTO_GRADES_VERSION}`}
           href="https://github.com/aalto-grades/aalto-grades"
           rel="noreferrer"
           target="_blank"
