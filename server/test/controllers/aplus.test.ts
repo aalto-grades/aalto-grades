@@ -17,6 +17,11 @@ import {
 } from '@/common/types';
 import {app} from '../../src/app';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
+import {
+  AplusCoursesRes,
+  AplusExercisesRes,
+  AplusPointsRes,
+} from '../../src/types/aplus';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
 import {Cookies, getCookies} from '../util/getCookies';
@@ -80,34 +85,34 @@ beforeAll(async () => {
 
   // eslint-disable-next-line @typescript-eslint/require-await
   mockedAxios.get.mockImplementation(async url => {
-    /* eslint-disable camelcase */
     if (url.endsWith('/points?format=json')) {
-      return {
-        data: {
-          results: [
-            {
-              student_id: '123456',
-              points: 50,
-              points_by_difficulty: {A: 30},
-              modules: [
-                {id: 1, points: 10, exercises: [{id: 1, points: 5}]},
-                {id: 2, points: 40, exercises: []},
-              ],
-            },
-            {
-              student_id: '654321',
-              points: 40,
-              points_by_difficulty: {A: 25},
-              modules: [
-                {id: 1, points: 7, exercises: [{id: 1, points: 5}]},
-                {id: 2, points: 33, exercises: []},
-              ],
-            },
-          ],
-        },
+      /* eslint-disable camelcase */
+      const data: AplusPointsRes = {
+        results: [
+          {
+            student_id: '123456',
+            points: 50,
+            points_by_difficulty: {A: 30},
+            modules: [
+              {id: 1, points: 10, exercises: [{id: 1, points: 5}]},
+              {id: 2, points: 40, exercises: []},
+            ],
+          },
+          {
+            student_id: '654321',
+            points: 40,
+            points_by_difficulty: {A: 25},
+            modules: [
+              {id: 1, points: 7, exercises: [{id: 1, points: 5}]},
+              {id: 2, points: 33, exercises: []},
+            ],
+          },
+        ],
       };
+      /* eslint-enable camelcase */
+
+      return {data};
     }
-    /* eslint-enable camelcase */
   });
 });
 
@@ -117,28 +122,27 @@ afterAll(async () => {
 
 describe('Test GET /v1/aplus/courses - get A+ courses', () => {
   it('should respond with correct data', async () => {
-    mockedAxios.get.mockResolvedValueOnce({
-      /* eslint-disable camelcase */
-      data: {
-        staff_courses: [
-          {
-            id: 1,
-            code: 'CS-ABC',
-            name: 'Course 1',
-            instance_name: '2024',
-            html_url: 'https://plus.cs.aalto.fi',
-          },
-          {
-            id: 2,
-            code: 'ELEC-XYZ',
-            name: 'Course 2',
-            instance_name: '2025',
-            html_url: 'https://plus.cs.aalto.fi',
-          },
-        ],
-      },
-      /* eslint-enable camelcase */
-    });
+    /* eslint-disable camelcase */
+    const data: AplusCoursesRes = {
+      staff_courses: [
+        {
+          id: 1,
+          code: 'CS-ABC',
+          name: 'Course 1',
+          instance_name: '2024',
+          html_url: 'https://plus.cs.aalto.fi',
+        },
+        {
+          id: 2,
+          code: 'ELEC-XYZ',
+          name: 'Course 2',
+          instance_name: '2025',
+          html_url: 'https://plus.cs.aalto.fi',
+        },
+      ],
+    };
+    /* eslint-enable camelcase */
+    mockedAxios.get.mockResolvedValueOnce({data});
 
     const res = await request
       .get('/v1/aplus/courses')
@@ -197,46 +201,45 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
 
 describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () => {
   it('should respond with correct data', async () => {
-    mockedAxios.get.mockResolvedValueOnce({
-      /* eslint-disable camelcase */
-      data: {
-        results: [
-          {
-            id: 1,
-            display_name: 'First',
-            closing_time: new Date(),
-            exercises: [
-              {
-                id: 1,
-                display_name: '1.1 First',
-                max_points: 5,
-                difficulty: 'A',
-              },
-              {
-                id: 2,
-                display_name: '1.2 Second',
-                max_points: 20,
-                difficulty: '',
-              },
-            ],
-          },
-          {
-            id: 2,
-            display_name: 'Second',
-            closing_time: new Date(),
-            exercises: [
-              {
-                id: 3,
-                display_name: '2.1 Third',
-                max_points: 10,
-                difficulty: '',
-              },
-            ],
-          },
-        ],
-      },
-      /* eslint-enable camelcase */
-    });
+    /* eslint-disable camelcase */
+    const data: AplusExercisesRes = {
+      results: [
+        {
+          id: 1,
+          display_name: 'First',
+          closing_time: new Date(),
+          exercises: [
+            {
+              id: 1,
+              display_name: '1.1 First',
+              max_points: 5,
+              difficulty: 'A',
+            },
+            {
+              id: 2,
+              display_name: '1.2 Second',
+              max_points: 20,
+              difficulty: '',
+            },
+          ],
+        },
+        {
+          id: 2,
+          display_name: 'Second',
+          closing_time: new Date(),
+          exercises: [
+            {
+              id: 3,
+              display_name: '2.1 Third',
+              max_points: 10,
+              difficulty: '',
+            },
+          ],
+        },
+      ],
+    };
+    /* eslint-enable camelcase */
+    mockedAxios.get.mockResolvedValueOnce({data});
 
     const res = await request
       .get('/v1/aplus/courses/1')
