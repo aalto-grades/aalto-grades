@@ -4,25 +4,22 @@
 
 # This is a Docker Compose configuration for deploying Aalto Grades to a
 # virtual machine from the main branch. Requires correct setup work to be done
-# on the VM. Documentation for deployment is available in the VM's root user's
-# deployment folder.
+# on the VM. Documentation for deployment is available in the aalto wiki.
 ---
-
-version: "3.7"
+version: '3.7'
 
 services:
-
   reverse-proxy:
-    build:
-      context: ./reverse-proxy
-      args:
-        CERT_FILE: "${CERT_FILE}"
-        CERT_KEY_FILE: "${CERT_KEY_FILE}"
+    image: nginx:1.27-alpine
     restart: always
     container_name: reverse-proxy
     ports:
       - 443:443
       - 80:80
+    volumes:
+      - ${CERT_FILE}:/etc/ssl/certs/aalto-grades.cs.aalto.fi.crt
+      - ${CERT_KEY_FILE}:/etc/ssl/private/aalto-grades.cs.aalto.fi.key
+      - ./reverse-proxy.conf:/etc/nginx/conf.d/default.conf
     networks:
       - local
 
@@ -37,36 +34,34 @@ services:
     extends:
       file: ./common-services.yaml
       service: backend-minimum
-    build:
-      context: .
-      dockerfile: ./server/dockerfiles/Dockerfile.prod.run
-      args:
-        SAML_DECRYPTION_PVK_FILE: "${SAML_DECRYPTION_PVK_FILE}"
-        SAML_PRIVATE_KEY_FILE: "${SAML_PRIVATE_KEY_FILE}"
-        SAML_SP_CERT_FILE: "${SAML_SP_CERT_FILE}"
+    image: ghcr.io/aalto-grades/aalto-grades-backend:main
     container_name: backend-server
     environment:
-      AALTO_GRADES_BACKEND_PORT: "${AALTO_GRADES_BACKEND_PORT}"
-      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "${AALTO_GRADES_FRONTEND_CORS_ORIGIN}"
-      AALTO_GRADES_JWT_SECRET: "${AALTO_GRADES_JWT_SECRET}"
-      APLUS_API_URL: "${APLUS_API_URL}"
-      SAML_CALLBACK: "${SAML_CALLBACK}"
-      SAML_ENTRYPOINT: "${SAML_ENTRYPOINT}"
-      SAML_ISSUER: "${SAML_ISSUER}"
-      SAML_METADATA_URL: "${SAML_METADATA_URL}"
-      NODE_ENV: "production"
+      AALTO_GRADES_BACKEND_PORT: '${AALTO_GRADES_BACKEND_PORT}'
+      AALTO_GRADES_FRONTEND_CORS_ORIGIN: '${AALTO_GRADES_FRONTEND_CORS_ORIGIN}'
+      AALTO_GRADES_JWT_SECRET: '${AALTO_GRADES_JWT_SECRET}'
+      APLUS_API_URL: '${APLUS_API_URL}'
+      SAML_CALLBACK: '${SAML_CALLBACK}'
+      SAML_ENTRYPOINT: '${SAML_ENTRYPOINT}'
+      SAML_ISSUER: '${SAML_ISSUER}'
+      SAML_METADATA_URL: '${SAML_METADATA_URL}'
+      NODE_ENV: 'production'
+    volumes:
+      - ${SAML_DECRYPTION_PVK_FILE}:/keys/saml-decryption-key.pem
+      - ${SAML_PRIVATE_KEY_FILE}:/keys/saml-private-key.pem
+      - ${SAML_SP_CERT_FILE}:/keys/saml-sp-cert.pem
     logging:
       driver: syslog
       options:
-        syslog-address: "tcp://localhost:601"
-        tag: "aalto-grades"
+        syslog-address: 'tcp://localhost:601'
+        tag: 'aalto-grades'
 
   database:
     extends:
       file: ./common-services.yaml
       service: database
     environment:
-      PGDATA: "/var/lib/postgresql/data/pgdata"
+      PGDATA: '/var/lib/postgresql/data/pgdata'
     volumes:
       - ${POSTGRES_MOUNTDIR}:/var/lib/postgresql/data
 

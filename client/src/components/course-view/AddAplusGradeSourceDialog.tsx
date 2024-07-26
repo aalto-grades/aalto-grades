@@ -38,7 +38,9 @@ const AddAplusGradeSourceDialog = ({
   aplusGradeSources,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const aplusCourses = useFetchAplusCourses({enabled: !!getAplusToken()});
+  const aplusCourses = useFetchAplusCourses({
+    enabled: Boolean(getAplusToken()),
+  });
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
   const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =

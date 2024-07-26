@@ -11,7 +11,7 @@ import {useGetCourse} from '../hooks/useApi';
 const Header = (): JSX.Element => {
   const theme = useTheme();
   const {courseId} = useParams<{courseId: string}>();
-  const course = useGetCourse(courseId ?? '', {enabled: !!courseId});
+  const course = useGetCourse(courseId ?? '', {enabled: Boolean(courseId)});
 
   return (
     <>

@@ -4,14 +4,11 @@
 
 # This is a Docker Compose configuration for deploying Aalto Grades to a
 # virtual machine from the dev branch. Requires correct setup work to be done
-# on the VM. Documentation for deployment is available in the VM's root user's
-# deployment folder.
+# on the VM. Documentation for deployment is available in the aalto wiki.
 ---
-
-version: "3.7"
+version: '3.7'
 
 services:
-
   reverse-proxy:
     extends:
       file: ./docker-compose-from-images.yaml
@@ -27,13 +24,12 @@ services:
     extends:
       file: ./docker-compose-from-images.yaml
       service: backend
-    build:
-      dockerfile: ./server/dockerfiles/Dockerfile.prod.run.dev
+    image: ghcr.io/aalto-grades/aalto-grades-backend-dev:dev
 
   database:
     extends:
       file: ./docker-compose-from-images.yaml
-      servics: database
+      service: database
 
 networks:
   local:

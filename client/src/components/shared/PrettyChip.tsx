@@ -28,7 +28,7 @@ const PrettyChip: FC<PropsType & ButtonProps> = props => {
     >
       <ButtonBase
         {...props}
-        disableRipple={props.onClick === undefined ? true : false}
+        disableRipple={props.onClick === undefined}
         style={{
           ...{
             cursor: props.onClick === undefined ? 'default' : 'pointer',

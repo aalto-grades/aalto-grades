@@ -16,7 +16,7 @@ const CourseView = (): JSX.Element => {
   const theme = useTheme();
   const {courseId}: Params = useParams();
   const course: UseQueryResult<CourseData> = useGetCourse(courseId!, {
-    enabled: !!courseId,
+    enabled: Boolean(courseId),
   });
   const {auth, setIsTeacherInCharge, setIsAssistant}: AuthContextType =
     useAuth();

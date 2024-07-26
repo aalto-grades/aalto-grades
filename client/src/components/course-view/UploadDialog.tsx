@@ -23,7 +23,9 @@ export type GradeUploadColTypes = {[key: string]: number | null} & {
 type PropsType = {open: boolean; onClose: () => void};
 const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const {courseId} = useParams();
-  const courseParts = useGetCourseParts(courseId!, {enabled: !!courseId});
+  const courseParts = useGetCourseParts(courseId!, {
+    enabled: Boolean(courseId),
+  });
   const addGrades = useAddGrades(courseId!);
 
   const [currentStep, setCurrentStep] = useState<number>(0);

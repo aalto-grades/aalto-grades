@@ -40,6 +40,7 @@ RUN npm ci --omit=dev && npm cache clean --force
 
 COPY server/.sequelizerc ./
 COPY server/mock-data ./mock-data
+COPY server/docs ./docs
 COPY --from=build /app/server/build ./build
 
 USER node

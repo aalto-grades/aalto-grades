@@ -73,5 +73,4 @@ export const errorHandler = (
   res.status(HttpCode.InternalServerError).send({
     errors: ['internal server error'],
   });
-  return;
 };

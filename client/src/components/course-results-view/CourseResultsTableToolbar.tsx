@@ -233,7 +233,7 @@ const AssesmentFilterButton = forwardRef<HTMLSpanElement>(
     );
 
     const isActive = useMemo<boolean>(
-      () => !!selectedGradingModel && selectedGradingModel !== 'any',
+      () => Boolean(selectedGradingModel) && selectedGradingModel !== 'any',
       [selectedGradingModel]
     );
 
