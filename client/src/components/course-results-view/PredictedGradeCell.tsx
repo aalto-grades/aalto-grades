@@ -41,8 +41,8 @@ const PredictedGradeCell = ({
     >
       {row.errors?.some(
         error =>
-          ('InvalidPredictedGrade' === error.type ||
-            'OutOfRangePredictedGrade' === error.type) &&
+          (error.type === 'InvalidPredictedGrade' ||
+            error.type === 'OutOfRangePredictedGrade') &&
           gradingModelIds?.includes(Number(error.info.modelId))
       ) && (
         <Box sx={{position: 'absolute', top: 0}}>
@@ -50,8 +50,8 @@ const PredictedGradeCell = ({
             title={row.errors
               .filter(
                 e =>
-                  ('InvalidPredictedGrade' === e.type ||
-                    'OutOfRangePredictedGrade' === e.type) &&
+                  (e.type === 'InvalidPredictedGrade' ||
+                    e.type === 'OutOfRangePredictedGrade') &&
                   gradingModelIds?.includes(Number(e.info.modelId))
               )
               .map(e => e.message)

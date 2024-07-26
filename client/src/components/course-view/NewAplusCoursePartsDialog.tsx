@@ -40,7 +40,9 @@ const NewAplusCoursePartsDialog = ({
   open,
 }: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
-  const aplusCourses = useFetchAplusCourses({enabled: !!getAplusToken()});
+  const aplusCourses = useFetchAplusCourses({
+    enabled: Boolean(getAplusToken()),
+  });
   const addCoursePart = useAddCoursePart(courseId);
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
