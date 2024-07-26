@@ -96,7 +96,7 @@ export const validateAplusGradeSourcePath = async (
 /**
  * Validates that an A+ grade source exists and belongs to a course part.
  *
- * @throws ApiError(404|409) if A+ grade soruce is not found or doesn't belong
+ * @throws ApiError(404|409) if A+ grade source is not found or doesn't belong
  *   to the course part.
  */
 export const validateAplusGradeSourceBelongsToCoursePart = async (

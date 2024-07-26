@@ -25,7 +25,7 @@ const GradeNode = (props: NodeProps): JSX.Element => {
         isConnectable={isConnectable}
       />
 
-      <p className="outputvalue">
+      <p className="output-value">
         Final grade: {Math.round(nodeValue.value * 100) / 100}
       </p>
     </BaseNode>

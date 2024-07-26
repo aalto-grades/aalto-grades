@@ -97,7 +97,7 @@ export const validateCoursePartBelongsToCourse = async (
  * Finds the course and the grading model by url param ids and also validates
  * the url params.
  *
- * @throws ApiError(400|404|409) if either not found or invald or if the course
+ * @throws ApiError(400|404|409) if either not found or invalid or if the course
  *   part does not belong to the course.
  */
 export const validateCoursePartPath = async (

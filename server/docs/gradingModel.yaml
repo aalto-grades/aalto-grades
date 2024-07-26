@@ -20,7 +20,7 @@ definitions:
         $ref: '#/definitions/CourseId'
       name:
         type: string
-        decription: Name of the grading model.
+        description: Name of the grading model.
         example: Main model
       graphStructure:
         type: object
@@ -53,7 +53,7 @@ definitions:
     properties:
       name:
         type: string
-        decription: Name of the grading model.
+        description: Name of the grading model.
         example: Main model
       graphStructure:
         type: object
@@ -69,7 +69,7 @@ definitions:
     properties:
       name:
         type: string
-        decription: Name of the grading model.
+        description: Name of the grading model.
         example: Main model
       graphStructure:
         type: object
@@ -110,7 +110,7 @@ definitions:
     tags: [Grading Model]
     description: >
       Edit specified grading model.
-      Available only to admin users and teacers of the course.
+      Available only to admin users and teachers of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
       - $ref: '#/components/parameters/gradingModelId'
@@ -138,7 +138,7 @@ definitions:
     tags: [Grading Model]
     description: >
       Deletes specified grading model.
-      Available only to admin users and teacers of the course.
+      Available only to admin users and teachers of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
       - $ref: '#/components/parameters/gradingModelId'
@@ -163,7 +163,7 @@ definitions:
     tags: [Grading Model]
     description: >
       Get all the grading models of a course.
-      Available only to admin users and teacers and assistants of the course.
+      Available only to admin users and teachers and assistants of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
     responses:
@@ -189,7 +189,7 @@ definitions:
     tags: [Grading Model]
     description: >
       Add a grading model to a course.
-      Available only to admin users and teacers of the course.
+      Available only to admin users and teachers of the course.
     parameters:
       - $ref: '#/components/parameters/courseId'
     requestBody:

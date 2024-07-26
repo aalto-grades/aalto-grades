@@ -124,7 +124,7 @@ describe('Test POST /v1/courses/:courseId/parts - add a course part', () => {
 
     for (const cookie of testCookies) {
       const coursePart = {
-        name: `coursepart-${++i}`,
+        name: `coursePart-${++i}`,
         daysValid: 350,
         maxGrade: null,
       };
@@ -180,7 +180,7 @@ describe('Test POST /v1/courses/:courseId/parts - add a course part', () => {
 
   it('should respond with 409 if trying to create a course part with duplicate name', async () => {
     const url = `/v1/courses/${courseId}/parts`;
-    const data = {name: 'coursepart-1', daysValid: 365, maxGrade: 5};
+    const data = {name: 'coursePart-1', daysValid: 365, maxGrade: 5};
     await responseTests.testConflict(url, cookies.adminCookie).post(data);
   });
 });
@@ -270,7 +270,7 @@ describe('Test PUT /v1/courses/:courseId/parts/:coursePartId - edit a course par
 
   it('should respond with 409 when trying to edit duplicate course part name', async () => {
     const url = `/v1/courses/${courseId}/parts/${editCoursePartId}`;
-    const data = {name: 'coursepart-1', daysValid: 365};
+    const data = {name: 'coursePart-1', daysValid: 365};
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
 });

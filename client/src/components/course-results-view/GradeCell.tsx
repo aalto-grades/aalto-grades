@@ -174,7 +174,7 @@ const GradeCell = ({
           </Tooltip>
         </>
       )}
-      {/* Multiple grades (more perfomance than showing button) TODO: Better solution */}
+      {/* Multiple grades (more performance than showing button) TODO: Better solution */}
       {!hasInvalidGrade &&
         !isGradeExpired &&
         coursePartResults &&

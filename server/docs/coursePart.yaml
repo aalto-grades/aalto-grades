@@ -11,11 +11,11 @@ definitions:
     example: 1
   CoursePartName:
     type: string
-    decription: Name of the course part.
+    description: Name of the course part.
     example: Exam
   CoursePartDaysValid:
     type: number
-    decription: Number of days valid.
+    description: Number of days valid.
     minimum: 1
     example: 365
   CoursePartMaxGrade:

@@ -72,12 +72,12 @@ const StepperNode = (props: NodeProps): JSX.Element => {
   }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (
-    type: 'middlepoint' | 'outputvalue',
+    type: 'middlePoint' | 'outputValue',
     index: number,
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
     const newLocalSettings = {...localSettings};
-    if (type === 'middlepoint') {
+    if (type === 'middlePoint') {
       newLocalSettings.middlePoints[index] = event.target.value;
     } else {
       newLocalSettings.outputValues[index] = event.target.value;
@@ -184,7 +184,7 @@ const StepperNode = (props: NodeProps): JSX.Element => {
                     type="number"
                     value={localSettings.middlePoints[index]}
                     onChange={event =>
-                      handleChange('middlepoint', index, event)
+                      handleChange('middlePoint', index, event)
                     }
                   />
                 )}
@@ -193,7 +193,7 @@ const StepperNode = (props: NodeProps): JSX.Element => {
                 <input
                   style={{width: '40px'}}
                   value={localSettings.outputValues[index]}
-                  onChange={event => handleChange('outputvalue', index, event)}
+                  onChange={event => handleChange('outputValue', index, event)}
                 />
               </td>
             </tr>

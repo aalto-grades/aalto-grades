@@ -176,7 +176,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     [allGradingModels.data]
   );
 
-  // Some grouping options require infering data not readly available so we create these columns in advance here
+  // Some grouping options require infering data not readily available so we create these columns in advance here
   // TanTable groups by value of the column, so we toggle on the column if the grouping is required
   const groupedData = useMemo(() => {
     // Here we predict the grades for the students
@@ -190,7 +190,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       console.log(predictedGrades);
     }
 
-    // Add all ausiliary columns to the data
+    // Add all auxiliary columns to the data
     return groupByLatestBestGrade(
       // Creating the extended rows
       props.data.map(row => {
@@ -227,7 +227,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   //   useEffect(() => {
   //     props.setSelectedStudents(_ => {
   //       return table?.getSelectedRowModel().rows.map(row => {
-  //         // Setting selectedStudnets
+  //         // Setting selectedStudents
   //         return row.original;
   //       });
   //     });
@@ -345,7 +345,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
                       subRow.getToggleSelectedHandler()(subRow);
                   });
                 } else {
-                  // All rows are selected, deselect all (and viceversa)
+                  // All rows are selected, deselect all (and vice versa)
                   row.subRows.map(subRow =>
                     subRow.getToggleSelectedHandler()(subRow)
                   );

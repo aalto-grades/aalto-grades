@@ -99,7 +99,7 @@ const MinPointsNode = (props: NodeProps): JSX.Element => {
           <option value="fail">Output fail</option>
         </select>
       </div>
-      <p className="outputvalue">
+      <p className="output-value">
         Output:{' '}
         {nodeValue.value === 'fail'
           ? 'fail'

@@ -469,8 +469,8 @@ const Graph = ({
 
     for (const coursePart of removedCourseParts) {
       const nodeId = `coursepart-${coursePart.id}`;
-      newNodes = newNodes.filter(nnode => nnode.id !== nodeId);
-      newEdges = newEdges.filter(edge => edge.source !== nodeId);
+      newNodes = newNodes.filter(newNode => newNode.id !== nodeId);
+      newEdges = newEdges.filter(newEdge => newEdge.source !== nodeId);
     }
 
     setNodes(newNodes);

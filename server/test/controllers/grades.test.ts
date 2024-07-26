@@ -364,7 +364,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
   });
 
   it(
-    'should process big json succesfully (5 000 x 3 x 2 = 90 000 individual grades)',
+    'should process big json successfully (5 000 x 3 x 2 = 90 000 individual grades)',
     async () => {
       const data: NewGrade[] = [];
       for (let i = 10000; i < 15000; i++) {

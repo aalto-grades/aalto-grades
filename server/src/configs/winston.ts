@@ -38,7 +38,7 @@ const format =
  * managers, etc.):
  * https://github.com/winstonjs/winston/blob/master/docs/transports.md
  *
- * Currently both loggers log to the cli indentically but some separation might
+ * Currently both loggers log to the cli identically but some separation might
  * be added later
  */
 
