@@ -7,9 +7,6 @@ node_modules
 .pnp
 .pnp.js
 
-# Keys (Will be changed in the future but works until then)
-reverse-proxy/keys
-
 # Random files
 .DS_Store
 

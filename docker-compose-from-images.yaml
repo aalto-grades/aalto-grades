@@ -4,8 +4,7 @@
 
 # This is a Docker Compose configuration for deploying Aalto Grades to a
 # virtual machine from the main branch. Requires correct setup work to be done
-# on the VM. Documentation for deployment is available in the VM's root user's
-# deployment folder.
+# on the VM. Documentation for deployment is available in the aalto wiki.
 ---
 version: '3.7'
 
@@ -20,7 +19,7 @@ services:
     volumes:
       - ${CERT_FILE}:/etc/ssl/certs/aalto-grades.cs.aalto.fi.crt
       - ${CERT_KEY_FILE}:/etc/ssl/private/aalto-grades.cs.aalto.fi.key
-      - reverse-proxy/reverse-proxy.conf:/etc/nginx/conf.d/default.conf
+      - ./reverse-proxy.conf:/etc/nginx/conf.d/default.conf
     networks:
       - local
 
