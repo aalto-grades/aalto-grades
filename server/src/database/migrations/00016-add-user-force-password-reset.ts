@@ -18,7 +18,6 @@ export default {
         {
           type: DataTypes.BOOLEAN,
           allowNull: true,
-          defaultValue: null,
         },
         {transaction}
       );

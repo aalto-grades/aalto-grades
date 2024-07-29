@@ -3,11 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 import {AxiosError} from 'axios';
-import {NextFunction, Request, RequestHandler, Response} from 'express';
+import {NextFunction, Request, Response} from 'express';
 
 import {HttpCode} from '@/common/types';
 import httpLogger from '../configs/winston';
-import {ApiError} from '../types';
+import {ApiError, AsyncEndpoint, Endpoint} from '../types';
+
+/* eslint @typescript-eslint/no-explicit-any: off */
 
 /**
  * Creates a RequestHandler wrapper function that executes a given handler and
@@ -20,13 +22,13 @@ import {ApiError} from '../types';
  *   // Wrap your async controller with `controllerDispatcher`:
  *   app.post('/v1/course', controllerDispatcher(async (req, res, next) => { ... }));
  */
-export function controllerDispatcher(
-  handler: (req: Request, res: Response, next: NextFunction) => Promise<unknown>
-): RequestHandler {
-  return (req: Request, res: Response, next: NextFunction) => {
+export const controllerDispatcher = (
+  handler: AsyncEndpoint<any, any>
+): Endpoint<any, any> => {
+  return (req, res, next) => {
     handler(req, res, next).catch(next);
   };
-}
+};
 
 /**
  * Centralized error handling middleware. This middleware checks the type of

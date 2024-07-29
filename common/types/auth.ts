@@ -46,23 +46,27 @@ export const LoginDataSchema = z.strictObject({
   email: z.string(),
   password: z.string(),
 });
-export const LoginResultSchema = z.discriminatedUnion('resetPassword', [
+export const LoginResultSchema = z.discriminatedUnion('redirect', [
   z.strictObject({
-    resetPassword: z.literal(true),
+    redirect: z.literal(true),
+    resetPassword: z.boolean(),
+    resetMfa: z.boolean(),
   }),
   z.strictObject({
-    resetPassword: z.literal(false),
+    redirect: z.literal(false),
     id: z.number().int(),
     name: z.string(),
     role: SystemRoleSchema,
   }),
 ]);
 
-export const ResetPasswordDataSchema = z.strictObject({
+export const ResetAuthDataSchema = z.strictObject({
   email: z.string(),
   password: z.string(),
-  newPassword: z.string(),
+  newPassword: z.string().nullable(),
 });
+export const ResetAuthResponseSchema = z.string().nullable();
+
 export const ResetPasswordResultSchema = z.strictObject({
   temporaryPassword: z.string(),
 });
@@ -74,6 +78,7 @@ export const ChangePasswordDataSchema = z.strictObject({
 export type AuthData = z.infer<typeof AuthDataSchema>;
 export type LoginData = z.infer<typeof LoginDataSchema>;
 export type LoginResult = z.infer<typeof LoginResultSchema>;
-export type ResetPasswordData = z.infer<typeof ResetPasswordDataSchema>;
+export type ResetAuthData = z.infer<typeof ResetAuthDataSchema>;
+export type ResetAuthResponse = z.infer<typeof ResetAuthResponseSchema>;
 export type ChangePasswordData = z.infer<typeof ChangePasswordDataSchema>;
 export type ResetPasswordResult = z.infer<typeof ResetPasswordResultSchema>;

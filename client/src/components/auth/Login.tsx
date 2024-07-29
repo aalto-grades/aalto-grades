@@ -24,8 +24,15 @@ const Login = (): JSX.Element => {
     event.preventDefault();
     const auth = await logIn.mutateAsync({email, password});
 
-    if (auth.resetPassword)
-      return navigate('/reset-password', {state: {email, password}});
+    if (auth.redirect)
+      return navigate('/reset-password', {
+        state: {
+          email,
+          password,
+          resetPassword: auth.resetPassword,
+          resetMfa: auth.resetMfa,
+        },
+      });
     setAuth(auth);
     navigate('/', {replace: true});
   };

@@ -10,7 +10,7 @@ import {processRequestBody} from 'zod-express-middleware';
 import {
   ChangePasswordDataSchema,
   LoginDataSchema,
-  ResetPasswordDataSchema,
+  ResetAuthDataSchema,
   SystemRole,
 } from '@/common/types';
 import {
@@ -57,7 +57,7 @@ router.post(
   '/v1/auth/reset-password',
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(ResetPasswordDataSchema),
+  processRequestBody(ResetAuthDataSchema),
   rateLimiterMemoryMiddleware,
   authResetOwnPassword
 );

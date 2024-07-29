@@ -41,7 +41,7 @@ const testLogin = async (
   const result = LoginResultSchema.safeParse(res.body);
   expect(result.success).toBeTruthy();
   if (result.success) {
-    expect(result.data.resetPassword).toEqual(forcePasswordReset);
+    expect(result.data.redirect).toEqual(forcePasswordReset);
   }
 };
 

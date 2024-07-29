@@ -13,18 +13,9 @@ export default {
     const transaction = await queryInterface.sequelize.transaction();
     try {
       await queryInterface.addColumn(
-        'attainment_grade',
-        'aplus_grade_source_id',
-        {
-          type: DataTypes.INTEGER,
-          allowNull: true,
-          references: {
-            model: 'aplus_grade_source',
-            key: 'id',
-          },
-          onDelete: 'RESTRICT',
-          onUpdate: 'CASCADE',
-        },
+        'user',
+        'mfa_secret',
+        {type: DataTypes.STRING, allowNull: true},
         {transaction}
       );
 
@@ -37,11 +28,9 @@ export default {
   down: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.removeColumn(
-        'attainment_grade',
-        'aplus_grade_source_id',
-        {transaction}
-      );
+      await queryInterface.removeColumn('user', 'mfa_secret', {
+        transaction,
+      });
 
       await transaction.commit();
     } catch (error) {

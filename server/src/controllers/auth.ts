@@ -3,25 +3,25 @@
 // SPDX-License-Identifier: MIT
 
 import * as argon from 'argon2';
-import {NextFunction, Request, RequestHandler, Response} from 'express';
+import {Request, RequestHandler} from 'express';
 import {readFileSync} from 'fs';
 import generator from 'generate-password';
 import jwt from 'jsonwebtoken';
+import {authenticator} from 'otplib';
 import passport from 'passport';
 import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';
 import {IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
-import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   AuthData,
-  ChangePasswordDataSchema,
+  ChangePasswordData,
   HttpCode,
-  LoginDataSchema,
+  LoginData,
   LoginResult,
   PasswordSchema,
-  ResetPasswordDataSchema,
+  ResetAuthData,
+  ResetAuthResponse,
   ResetPasswordResult,
-  SystemRole,
 } from '@/common/types';
 import {validateLogin} from './utils/auth';
 import {getSamlStrategy} from './utils/saml';
@@ -30,14 +30,21 @@ import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
 import {JWT_SECRET, NODE_ENV, SAML_SP_CERT_FILE} from '../configs/environment';
 import httpLogger from '../configs/winston';
 import User from '../database/models/user';
-import {ApiError, FullLoginResult, JwtClaims} from '../types';
+import {
+  ApiError,
+  AsyncEndpoint,
+  Endpoint,
+  FullLoginResult,
+  JwtClaims,
+  LoginCallback,
+} from '../types';
 
 /**
- * Responds with AuthData
+ * () => AuthData
  *
  * @throws ApiError(404)
  */
-export const selfInfo = async (req: Request, res: Response): Promise<void> => {
+export const selfInfo: AsyncEndpoint<void, AuthData> = async (req, res) => {
   const user = req.user as JwtClaims;
   const userFromDb = await findUserById(user.id);
 
@@ -49,186 +56,156 @@ export const selfInfo = async (req: Request, res: Response): Promise<void> => {
     );
   }
 
-  const auth: AuthData = {
+  res.json({
     id: userFromDb.id,
-    role: userFromDb.role as SystemRole,
+    role: userFromDb.role,
     name: userFromDb.name,
-  };
-
-  res.json(auth);
+  });
 };
 
 /**
- * Responds with LoginResult
+ * (LoginData) => LoginResult
  *
  * @throws ApiError(401)
  */
-export const authLogin = (
-  req: TypedRequestBody<typeof LoginDataSchema>,
-  res: Response,
-  next: NextFunction
-): void => {
-  (
-    passport.authenticate(
-      'login',
-      (error: unknown, loginResult: FullLoginResult | false) => {
-        if (error) return next(error);
+export const authLogin: Endpoint<LoginData, LoginResult> = (req, res, next) => {
+  const login: LoginCallback = (error, loginResult) => {
+    if (error) return next(error);
+    if (!loginResult)
+      return res.status(HttpCode.Unauthorized).send({
+        errors: ['Incorrect email or password'],
+      });
 
-        if (typeof loginResult === 'boolean') {
-          return res.status(HttpCode.Unauthorized).send({
-            errors: ['Incorrect email or password'],
-          });
-        }
+    // TODO: if only reset mfa just send the mfa token?
+    if (loginResult.resetPassword || loginResult.resetMfa) {
+      return res.json({
+        redirect: true,
+        resetPassword: loginResult.resetPassword,
+        resetMfa: loginResult.resetMfa,
+      });
+    }
 
-        req.login(loginResult, {session: false}, loginError => {
-          if (loginError) return next(loginError);
+    const body: JwtClaims = {id: loginResult.id, role: loginResult.role};
+    const token = jwt.sign(body, JWT_SECRET, {expiresIn: JWT_EXPIRY_SECONDS});
 
-          if (loginResult.forcePasswordReset) {
-            return res.json({resetPassword: true});
-          }
+    res
+      .cookie('jwt', token, {
+        httpOnly: true,
+        secure: NODE_ENV !== 'test',
+        sameSite: 'none',
+        maxAge: JWT_COOKIE_EXPIRY_MS,
+      })
+      .json({
+        redirect: false,
+        id: loginResult.id,
+        name: loginResult.name,
+        role: loginResult.role,
+      });
+  };
 
-          const body: JwtClaims = {
-            id: loginResult.id,
-            role: loginResult.role,
-          };
-
-          const token = jwt.sign(body, JWT_SECRET, {
-            expiresIn: JWT_EXPIRY_SECONDS,
-          });
-
-          res.cookie('jwt', token, {
-            httpOnly: true,
-            secure: NODE_ENV !== 'test',
-            sameSite: 'none',
-            maxAge: JWT_COOKIE_EXPIRY_MS,
-          });
-
-          const result: LoginResult = {
-            resetPassword: false,
-            id: loginResult.id,
-            name: loginResult.name,
-            role: loginResult.role,
-          };
-          return res.json(result);
-        });
-      }
-    ) as RequestHandler
-  )(req, res, next);
+  const authenticate = passport.authenticate('login', login) as RequestHandler;
+  authenticate(req, res, next);
 };
 
-export const authLogout = (_req: Request, res: Response): void => {
+/** ()=>void */
+export const authLogout: Endpoint<void, void> = (_req, res) => {
   res.clearCookie('jwt', {httpOnly: true});
   res.sendStatus(HttpCode.Ok);
 };
 
 /**
- * Responds with AuthData
+ * (ResetAuthData) => ResetAuthResponse
  *
  * @throws ApiError(401)
  */
-export const authResetOwnPassword = (
-  req: TypedRequestBody<typeof ResetPasswordDataSchema>,
-  res: Response,
-  next: NextFunction
-): void => {
-  (
-    passport.authenticate(
-      'login',
-      (error: unknown, loginResult: FullLoginResult | false) => {
-        if (error) return next(error);
+export const authResetOwnPassword: Endpoint<
+  ResetAuthData,
+  ResetAuthResponse
+> = (req, res, next) => {
+  const resetOwnPassword: LoginCallback = async (error, loginResult) => {
+    if (error) return next(error);
+    if (!loginResult)
+      return res.status(HttpCode.Unauthorized).send({
+        errors: ['Incorrect email or password'],
+      });
 
-        if (typeof loginResult === 'boolean') {
-          return res.status(HttpCode.Unauthorized).send({
-            errors: ['Incorrect email or password'],
-          });
-        }
+    const user = await User.findByEmail(req.body.email);
+    if (user === null) {
+      httpLogger.error(
+        `User ${req.body.email} not found after validating credentials`
+      );
+      throw new ApiError(
+        'User not found after validating credentials',
+        HttpCode.InternalServerError
+      );
+    }
 
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        req.login(loginResult, {session: false}, async loginError => {
-          if (loginError) return next(loginError);
-
-          // Validate password strength
-          const passwordResult = PasswordSchema.safeParse(req.body.newPassword);
-          if (!passwordResult.success) {
-            return res.status(HttpCode.BadRequest).send({
-              errors: [passwordResult.error.errors[0].message],
-            });
-          }
-
-          if (req.body.password === req.body.newPassword) {
-            return res.status(HttpCode.BadRequest).send({
-              errors: ['New password cannot be the same as the old one'],
-            });
-          }
-
-          const user = await User.findByEmail(req.body.email);
-          if (user === null) {
-            httpLogger.error(
-              `User ${req.body.email} not found after validating credentials`
-            );
-            throw new ApiError(
-              'User not found after validating credentials',
-              HttpCode.InternalServerError
-            );
-          }
-
-          // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
-          await user
-            .set({
-              password: await argon.hash(req.body.newPassword, {
-                type: argon.argon2id,
-                memoryCost: 19456,
-                parallelism: 1,
-                timeCost: 2,
-              }),
-              forcePasswordReset: false,
-            })
-            .save();
-
-          const body: JwtClaims = {
-            id: loginResult.id,
-            role: loginResult.role,
-          };
-
-          const token = jwt.sign(body, JWT_SECRET, {
-            expiresIn: JWT_EXPIRY_SECONDS,
-          });
-
-          res.cookie('jwt', token, {
-            httpOnly: true,
-            secure: NODE_ENV !== 'test',
-            sameSite: 'none',
-            maxAge: JWT_COOKIE_EXPIRY_MS,
-          });
-
-          const result: AuthData = {
-            id: loginResult.id,
-            name: loginResult.name,
-            role: loginResult.role,
-          };
-          return res.json(result);
+    // Password reset / logging in for the first time
+    if (user.forcePasswordReset) {
+      if (req.body.newPassword === null) {
+        return res.status(HttpCode.BadRequest).send({
+          errors: ['newPassword field missing'],
         });
       }
-    ) as RequestHandler
-  )(req, res, next);
+      if (req.body.password === req.body.newPassword) {
+        return res.status(HttpCode.BadRequest).send({
+          errors: ['New password cannot be the same as the old one'],
+        });
+      }
+
+      // Validate password strength
+      const passwordResult = PasswordSchema.safeParse(req.body.newPassword);
+      if (!passwordResult.success) {
+        return res.status(HttpCode.BadRequest).send({
+          errors: [passwordResult.error.errors[0].message],
+        });
+      }
+
+      // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+      await user
+        .set({
+          password: await argon.hash(req.body.newPassword, {
+            type: argon.argon2id,
+            memoryCost: 19456,
+            parallelism: 1,
+            timeCost: 2,
+          }),
+          forcePasswordReset: false,
+        })
+        .save();
+    }
+
+    // Mfa reset / logging in for the first time
+    if (user.mfaSecret === null) {
+      const mfaSecret = authenticator.generateSecret();
+      await user.set({mfaSecret}).save();
+      return res.json(mfaSecret);
+    }
+    res.json(null);
+  };
+
+  const authenticate = passport.authenticate(
+    'login',
+    resetOwnPassword
+  ) as RequestHandler;
+  authenticate(req, res, next);
 };
 
 /**
- * Responds with ResetPasswordResult
+ * () => ResetPasswordResult
  *
  * @throws ApiError(400|404)
  */
-export const resetPassword = async (
-  req: Request,
-  res: Response
-): Promise<Response | void> => {
+export const resetPassword: AsyncEndpoint<void, ResetPasswordResult> = async (
+  req,
+  res
+) => {
   const user = await findAndValidateUserId(req.params.userId);
 
   const temporaryPassword = generator.generate({
     length: 16,
     numbers: true,
   });
-
   // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
   await user
     .set({
@@ -242,14 +219,14 @@ export const resetPassword = async (
     })
     .save();
 
-  const resData: ResetPasswordResult = {temporaryPassword};
-  res.json(resData);
+  res.json({temporaryPassword});
 };
 
-export const changePassword = async (
-  req: TypedRequestBody<typeof ChangePasswordDataSchema>,
-  res: Response
-): Promise<Response | void> => {
+/** (ChangePasswordData) => void */
+export const changePassword: AsyncEndpoint<ChangePasswordData, void> = async (
+  req,
+  res
+) => {
   const user = req.user as JwtClaims;
 
   const dbUser = await User.findByPk(user.id);
@@ -276,56 +253,48 @@ export const changePassword = async (
   res.sendStatus(HttpCode.Ok);
 };
 
-/** @throws ApiError(401) */
-export const authSamlLogin = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  (
-    passport.authenticate(
-      'saml',
-      (error: Error | null, loginResult: FullLoginResult | undefined) => {
-        if (error) return next(error);
-
-        if (loginResult === undefined) {
-          return res.status(HttpCode.Unauthorized).send({
-            errors: ['Authentication failed'],
-          });
-        }
-
-        req.login(loginResult, {session: false}, (loginError: unknown) => {
-          if (loginError) return next(loginError);
-
-          const body: JwtClaims = {id: loginResult.id, role: loginResult.role};
-
-          const token = jwt.sign(body, JWT_SECRET, {
-            expiresIn: JWT_EXPIRY_SECONDS,
-          });
-
-          res.cookie('jwt', token, {
-            httpOnly: true,
-            secure: NODE_ENV !== 'test',
-            sameSite: 'none',
-            maxAge: JWT_COOKIE_EXPIRY_MS,
-          });
-
-          return res.redirect('/');
-        });
-      }
-    ) as RequestHandler
-  )(req, res, next);
-};
-
 /**
- * Responds with application/xml
+ * () => void
  *
  * @throws ApiError(401)
  */
-export const samlMetadata = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const authSamlLogin: Endpoint<void, void> = (req, res, next) => {
+  const samlLogin: LoginCallback = (error, loginResult) => {
+    if (error) return next(error);
+    if (!loginResult)
+      return res.status(HttpCode.Unauthorized).send({
+        errors: ['Authentication failed'],
+      });
+
+    const body: JwtClaims = {id: loginResult.id, role: loginResult.role};
+
+    const token = jwt.sign(body, JWT_SECRET, {
+      expiresIn: JWT_EXPIRY_SECONDS,
+    });
+
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: NODE_ENV !== 'test',
+      sameSite: 'none',
+      maxAge: JWT_COOKIE_EXPIRY_MS,
+    });
+
+    return res.redirect('/');
+  };
+
+  const authenticate = passport.authenticate(
+    'saml',
+    samlLogin
+  ) as RequestHandler;
+  authenticate(req, res, next);
+};
+
+/**
+ * () => string (application/xml)
+ *
+ * @throws ApiError(401)
+ */
+export const samlMetadata: AsyncEndpoint<void, string> = async (req, res) => {
   const cert = readFileSync(SAML_SP_CERT_FILE, 'utf8');
   res
     .type('application/xml')
@@ -353,8 +322,8 @@ passport.use(
       ) => void
     ) => {
       try {
-        const role = await validateLogin(email, password);
-        return done(null, role, {message: 'success'});
+        const loginResult = await validateLogin(email, password);
+        return done(null, loginResult, {message: 'success'});
       } catch (error) {
         if (error instanceof ApiError) {
           return done(null, false, {message: error.message});
@@ -374,13 +343,7 @@ passport.use(
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         req?.cookies ? (req.cookies.jwt as string) : null,
     },
-    (token: JwtClaims, done: VerifiedCallback) => {
-      try {
-        return done(null, token);
-      } catch (error) {
-        return done(error, false);
-      }
-    }
+    (token: JwtClaims, done: VerifiedCallback) => done(null, token)
   )
 );
 
@@ -389,4 +352,5 @@ const useSamlStrategy = async (): Promise<void> => {
   passport.use('saml', await getSamlStrategy());
 };
 
+// Cannot use top level await so must call separately...
 useSamlStrategy(); // eslint-disable-line @typescript-eslint/no-floating-promises

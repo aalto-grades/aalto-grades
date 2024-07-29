@@ -12,7 +12,6 @@ import {z} from 'zod';
 import {AaltoEmailSchema, PasswordSchema} from '@/common/types';
 import BaseShowPasswordButton from './ShowPasswordButton';
 import {useResetOwnPassword} from '../../hooks/useApi';
-import useAuth from '../../hooks/useAuth';
 import FormField from '../shared/FormikField';
 
 const ValidationSchema = z
@@ -44,10 +43,14 @@ type ShowPassword = {
 };
 const ResetPassword = (): JSX.Element => {
   const navigate = useNavigate();
-  const {setAuth} = useAuth();
   const resetPassword = useResetOwnPassword();
   const {state} = useLocation() as {
-    state: {email: string; password: string} | null;
+    state: {
+      email: string;
+      password: string;
+      resetPassword: boolean;
+      resetMfa: boolean;
+    } | null;
   };
 
   const [showPassword, setShowPassword] = useState<ShowPassword>({
@@ -67,21 +70,20 @@ const ResetPassword = (): JSX.Element => {
     values: FormData,
     {resetForm, setSubmitting}: FormikHelpers<FormData>
   ): Promise<void> => {
-    const auth = await resetPassword
+    const mfaSecret = await resetPassword
       .mutateAsync({
         email: values.email,
         password: values.oldPassword,
         newPassword: values.newPassword,
       })
       .catch(() => setSubmitting(false));
-    if (auth === undefined) return;
+    if (mfaSecret === undefined) return;
 
     enqueueSnackbar('Password reset successfully', {variant: 'success'});
     setSubmitting(false);
     resetForm();
 
-    setAuth(auth);
-    navigate('/', {replace: true});
+    navigate('/login', {replace: true});
   };
 
   const validateForm = (

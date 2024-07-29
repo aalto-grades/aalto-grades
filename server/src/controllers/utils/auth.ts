@@ -42,6 +42,7 @@ export const validateLogin = async (
     id: user.id,
     role: user.role as SystemRole,
     name: user.name,
-    forcePasswordReset: user.forcePasswordReset,
+    resetPassword: user.forcePasswordReset ?? false,
+    resetMfa: user.mfaSecret === null,
   };
 };
