@@ -32,8 +32,8 @@ import httpLogger from '../configs/winston';
 import User from '../database/models/user';
 import {
   ApiError,
-  AsyncEndpoint,
   Endpoint,
+  SyncEndpoint,
   FullLoginResult,
   JwtClaims,
   LoginCallback,
@@ -44,7 +44,7 @@ import {
  *
  * @throws ApiError(404)
  */
-export const selfInfo: AsyncEndpoint<void, AuthData> = async (req, res) => {
+export const selfInfo: Endpoint<void, AuthData> = async (req, res) => {
   const user = req.user as JwtClaims;
   const userFromDb = await findUserById(user.id);
 
@@ -68,7 +68,11 @@ export const selfInfo: AsyncEndpoint<void, AuthData> = async (req, res) => {
  *
  * @throws ApiError(401)
  */
-export const authLogin: Endpoint<LoginData, LoginResult> = (req, res, next) => {
+export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
+  req,
+  res,
+  next
+) => {
   const login: LoginCallback = (error, loginResult) => {
     if (error) return next(error);
     if (!loginResult)
@@ -108,7 +112,7 @@ export const authLogin: Endpoint<LoginData, LoginResult> = (req, res, next) => {
 };
 
 /** ()=>void */
-export const authLogout: Endpoint<void, void> = (_req, res) => {
+export const authLogout: SyncEndpoint<void, void> = (_req, res) => {
   res.clearCookie('jwt', {httpOnly: true});
   res.sendStatus(HttpCode.Ok);
 };
@@ -118,7 +122,7 @@ export const authLogout: Endpoint<void, void> = (_req, res) => {
  *
  * @throws ApiError(401)
  */
-export const authResetOwnPassword: Endpoint<
+export const authResetOwnPassword: SyncEndpoint<
   ResetAuthData,
   ResetAuthResponse
 > = (req, res, next) => {
@@ -196,7 +200,7 @@ export const authResetOwnPassword: Endpoint<
  *
  * @throws ApiError(400|404)
  */
-export const resetPassword: AsyncEndpoint<void, ResetPasswordResult> = async (
+export const resetPassword: Endpoint<void, ResetPasswordResult> = async (
   req,
   res
 ) => {
@@ -223,7 +227,7 @@ export const resetPassword: AsyncEndpoint<void, ResetPasswordResult> = async (
 };
 
 /** (ChangePasswordData) => void */
-export const changePassword: AsyncEndpoint<ChangePasswordData, void> = async (
+export const changePassword: Endpoint<ChangePasswordData, void> = async (
   req,
   res
 ) => {
@@ -258,7 +262,7 @@ export const changePassword: AsyncEndpoint<ChangePasswordData, void> = async (
  *
  * @throws ApiError(401)
  */
-export const authSamlLogin: Endpoint<void, void> = (req, res, next) => {
+export const authSamlLogin: SyncEndpoint<void, void> = (req, res, next) => {
   const samlLogin: LoginCallback = (error, loginResult) => {
     if (error) return next(error);
     if (!loginResult)
@@ -294,7 +298,7 @@ export const authSamlLogin: Endpoint<void, void> = (req, res, next) => {
  *
  * @throws ApiError(401)
  */
-export const samlMetadata: AsyncEndpoint<void, string> = async (req, res) => {
+export const samlMetadata: Endpoint<void, string> = async (req, res) => {
   const cert = readFileSync(SAML_SP_CERT_FILE, 'utf8');
   res
     .type('application/xml')

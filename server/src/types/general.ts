@@ -10,6 +10,25 @@ import Course from '../database/models/course';
 import CourseTranslation from '../database/models/courseTranslation';
 import User from '../database/models/user';
 
+// Endpoint types
+interface TypedRequestBody<T> extends Request {
+  body: T;
+  // user?: JwtClaims;
+}
+
+export type SyncEndpoint<T, E> = (
+  req: TypedRequestBody<T>,
+  res: Response<E | {errors: string[]}>,
+  next: NextFunction
+) => void | Response;
+
+export type Endpoint<T, E> = (
+  req: TypedRequestBody<T>,
+  res: Response<E | {errors: string[]}>,
+  next: NextFunction
+) => Promise<void | Response>;
+
+// Other
 export const stringToIdSchema = z
   .string()
   .regex(/^\d+$/)
@@ -22,19 +41,3 @@ export type CourseFull = Course & {
   CourseTranslations: CourseTranslation[];
   Users: UserWithRole[];
 };
-
-interface TypedRequestBody<T> extends Request {
-  body: T;
-  // user: JwtClaims;
-}
-export type Endpoint<T = unknown, E = void> = (
-  req: TypedRequestBody<T>,
-  res: Response<E | {errors: string[]}>,
-  next: NextFunction
-) => void | Response;
-
-export type AsyncEndpoint<T = unknown, E = void> = (
-  req: TypedRequestBody<T>,
-  res: Response<E | {errors: string[]}>,
-  next: NextFunction
-) => Promise<void | Response>;

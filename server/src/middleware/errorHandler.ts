@@ -7,7 +7,7 @@ import {NextFunction, Request, Response} from 'express';
 
 import {HttpCode} from '@/common/types';
 import httpLogger from '../configs/winston';
-import {ApiError, AsyncEndpoint, Endpoint} from '../types';
+import {ApiError, Endpoint, SyncEndpoint} from '../types';
 
 /* eslint @typescript-eslint/no-explicit-any: off */
 
@@ -23,8 +23,8 @@ import {ApiError, AsyncEndpoint, Endpoint} from '../types';
  *   app.post('/v1/course', controllerDispatcher(async (req, res, next) => { ... }));
  */
 export const controllerDispatcher = (
-  handler: AsyncEndpoint<any, any>
-): Endpoint<any, any> => {
+  handler: Endpoint<any, any>
+): SyncEndpoint<any, any> => {
   return (req, res, next) => {
     handler(req, res, next).catch(next);
   };

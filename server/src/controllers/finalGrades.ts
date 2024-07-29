@@ -1,15 +1,13 @@
 // SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
-import {Request, Response} from 'express';
-import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
-  EditFinalGradeSchema,
+  EditFinalGrade,
   FinalGradeData,
   GradingScale,
   HttpCode,
-  NewFinalGradeArraySchema,
+  NewFinalGrade,
 } from '@/common/types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {findAndValidateFinalGradePath} from './utils/finalGrade';
@@ -17,17 +15,17 @@ import {validateUserAndGrader} from './utils/grades';
 import {validateGradingModelBelongsToCourse} from './utils/gradingModel';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
-import {ApiError, JwtClaims, NewDbFinalGradeData} from '../types';
+import {ApiError, Endpoint, JwtClaims, NewDbFinalGradeData} from '../types';
 
 /**
- * Responds with FinalGradeData[]
+ * () => FinalGradeData[]
  *
  * @throws ApiError(400|404)
  */
-export const getFinalGrades = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const getFinalGrades: Endpoint<void, FinalGradeData[]> = async (
+  req,
+  res
+) => {
   const courseId = await validateCourseId(req.params.courseId);
 
   const dbFinalGrades = await FinalGrade.findAll({
@@ -42,7 +40,7 @@ export const getFinalGrades = async (
     ],
   });
 
-  const finalGrades: FinalGradeData[] = [];
+  const finalGrades = [];
   for (const finalGrade of dbFinalGrades) {
     const [user, grader] = validateUserAndGrader(finalGrade);
     finalGrades.push({
@@ -61,11 +59,15 @@ export const getFinalGrades = async (
   return res.json(finalGrades);
 };
 
-/** @throws ApiError(400|404|409) */
-export const addFinalGrades = async (
-  req: TypedRequestBody<typeof NewFinalGradeArraySchema>,
-  res: Response
-): Promise<Response> => {
+/**
+ * (NewFinalGrade[]) => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const addFinalGrades: Endpoint<NewFinalGrade[], void> = async (
+  req,
+  res
+) => {
   const grader = req.user as JwtClaims;
   const course = await findAndValidateCourseId(req.params.courseId);
 
@@ -116,11 +118,15 @@ export const addFinalGrades = async (
   return res.sendStatus(HttpCode.Created);
 };
 
-/** @throws ApiError(400|404|409) */
-export const editFinalGrade = async (
-  req: TypedRequestBody<typeof EditFinalGradeSchema>,
-  res: Response
-): Promise<void> => {
+/**
+ * (EditFinalGrade) => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const editFinalGrade: Endpoint<EditFinalGrade, void> = async (
+  req,
+  res
+) => {
   const grader = req.user as JwtClaims;
   const [, finalGrade] = await findAndValidateFinalGradePath(
     req.params.courseId,
@@ -158,11 +164,12 @@ export const editFinalGrade = async (
   res.sendStatus(HttpCode.Ok);
 };
 
-/** @throws ApiError(400|404|409) */
-export const deleteFinalGrade = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+/**
+ * () => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const deleteFinalGrade: Endpoint<void, void> = async (req, res) => {
   const [, finalGrade] = await findAndValidateFinalGradePath(
     req.params.courseId,
     req.params.finalGradeId
