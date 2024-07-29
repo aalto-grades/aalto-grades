@@ -45,15 +45,23 @@ export const AuthDataSchema = z.strictObject({
 export const LoginDataSchema = z.strictObject({
   email: z.string(),
   password: z.string(),
+  otp: z.string().nullable(),
 });
-export const LoginResultSchema = z.discriminatedUnion('redirect', [
+export const LoginResultSchema = z.discriminatedUnion('status', [
   z.strictObject({
-    redirect: z.literal(true),
+    status: z.literal('resetMfa'),
+    otpAuth: z.string(),
+  }),
+  z.strictObject({
+    status: z.literal('resetPassword'),
     resetPassword: z.boolean(),
     resetMfa: z.boolean(),
   }),
   z.strictObject({
-    redirect: z.literal(false),
+    status: z.literal('enterMfa'),
+  }),
+  z.strictObject({
+    status: z.literal('ok'),
     id: z.number().int(),
     name: z.string(),
     role: SystemRoleSchema,
@@ -63,7 +71,7 @@ export const LoginResultSchema = z.discriminatedUnion('redirect', [
 export const ResetAuthDataSchema = z.strictObject({
   email: z.string(),
   password: z.string(),
-  newPassword: z.string().nullable(),
+  newPassword: z.string(),
 });
 export const ResetAuthResponseSchema = z.string().nullable();
 

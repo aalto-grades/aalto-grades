@@ -73,19 +73,52 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
   res,
   next
 ) => {
-  const login: LoginCallback = (error, loginResult) => {
+  const login: LoginCallback = async (error, loginResult) => {
     if (error) return next(error);
     if (!loginResult)
       return res.status(HttpCode.Unauthorized).send({
         errors: ['Incorrect email or password'],
       });
 
-    // TODO: if only reset mfa just send the mfa token?
-    if (loginResult.resetPassword || loginResult.resetMfa) {
+    const user = await User.findByEmail(req.body.email);
+    if (user === null) {
+      httpLogger.error(
+        `User ${req.body.email} not found after validating credentials`
+      );
+      throw new ApiError(
+        'User not found after validating credentials',
+        HttpCode.InternalServerError
+      );
+    }
+
+    if (!loginResult.resetPassword && loginResult.resetMfa) {
+      const mfaSecret = authenticator.generateSecret(64);
+      await user.set({mfaSecret}).save();
+      const otpAuth = authenticator.keyuri(
+        req.body.email,
+        'Aalto Grades',
+        mfaSecret
+      );
+
+      return res.json({status: 'resetMfa', otpAuth});
+    } else if (loginResult.resetPassword) {
       return res.json({
-        redirect: true,
+        status: 'resetPassword',
         resetPassword: loginResult.resetPassword,
         resetMfa: loginResult.resetMfa,
+      });
+    } else if (req.body.otp === null) {
+      return res.json({status: 'enterMfa'});
+    }
+
+    if (
+      !authenticator.verify({
+        token: req.body.otp,
+        secret: user.mfaSecret as string,
+      })
+    ) {
+      return res.status(HttpCode.Unauthorized).send({
+        errors: ['Incorrect otp'],
       });
     }
 
@@ -100,7 +133,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
         maxAge: JWT_COOKIE_EXPIRY_MS,
       })
       .json({
-        redirect: false,
+        status: 'ok',
         id: loginResult.id,
         name: loginResult.name,
         role: loginResult.role,
@@ -146,11 +179,6 @@ export const authResetOwnPassword: SyncEndpoint<
 
     // Password reset / logging in for the first time
     if (user.forcePasswordReset) {
-      if (req.body.newPassword === null) {
-        return res.status(HttpCode.BadRequest).send({
-          errors: ['newPassword field missing'],
-        });
-      }
       if (req.body.password === req.body.newPassword) {
         return res.status(HttpCode.BadRequest).send({
           errors: ['New password cannot be the same as the old one'],
@@ -181,9 +209,14 @@ export const authResetOwnPassword: SyncEndpoint<
 
     // Mfa reset / logging in for the first time
     if (user.mfaSecret === null) {
-      const mfaSecret = authenticator.generateSecret();
+      const mfaSecret = authenticator.generateSecret(64);
       await user.set({mfaSecret}).save();
-      return res.json(mfaSecret);
+      const otpAuth = authenticator.keyuri(
+        req.body.email,
+        'Aalto Grades',
+        mfaSecret
+      );
+      return res.json(otpAuth);
     }
     res.json(null);
   };

@@ -50,7 +50,7 @@ describe('Tests for Login and LoginForm components', () => {
 
     const logIn = vi.fn();
     const loginData: LoginResult = {
-      redirect: false,
+      status: 'ok',
       id: 5,
       name: 'Terry Tester',
       role: SystemRole.User,
