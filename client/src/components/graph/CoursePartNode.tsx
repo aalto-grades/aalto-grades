@@ -106,7 +106,7 @@ const CoursePartNode = (props: NodeProps): JSX.Element => {
           </select>
         </div>
       )}
-      <p className="outputvalue">
+      <p className="output-value">
         Output:{' '}
         {nodeValue.value === 'fail'
           ? 'fail'

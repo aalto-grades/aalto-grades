@@ -4,19 +4,19 @@
 
 import {Client} from 'pg';
 
-const pghost = process.env.POSTGRES_URL || 'localhost';
-const pguser = process.env.POSTGRES_USER || 'postgres';
-const pgpass = process.env.POSTGRES_PASSWORD || 'postgres';
-const pgdb = process.env.POSTGRES_DATABASE || 'postgres';
-const pgport = process.env.POSTGRES_PORT
+const pgHost = process.env.POSTGRES_URL || 'localhost';
+const pgUser = process.env.POSTGRES_USER || 'postgres';
+const pgPass = process.env.POSTGRES_PASSWORD || 'postgres';
+const pgDb = process.env.POSTGRES_DATABASE || 'postgres';
+const pgPort = process.env.POSTGRES_PORT
   ? Number(process.env.POSTGRES_PORT)
   : 5432;
 
 const dbConfigClean = {
-  host: pghost,
-  port: pgport,
-  user: pguser,
-  password: pgpass,
+  host: pgHost,
+  port: pgPort,
+  user: pgUser,
+  password: pgPass,
   database: 'postgres_copy',
 };
 
@@ -27,13 +27,13 @@ export const resetDb = async (): Promise<void> => {
 
   // Remove current database and replace with copy
   const dbQuery = await client.query(
-    `SELECT FROM pg_database WHERE datname = '${pgdb}'`
+    `SELECT FROM pg_database WHERE datname = '${pgDb}'`
   );
   if (dbQuery.rowCount !== 0) {
-    await client.query(`DROP DATABASE ${pgdb} WITH (FORCE)`);
+    await client.query(`DROP DATABASE ${pgDb} WITH (FORCE)`);
   }
   await client.query(
-    `CREATE DATABASE ${pgdb} WITH TEMPLATE postgres_copy OWNER ${pguser}`
+    `CREATE DATABASE ${pgDb} WITH TEMPLATE postgres_copy OWNER ${pgUser}`
   );
   await client.end();
 };

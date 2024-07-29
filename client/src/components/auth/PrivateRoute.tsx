@@ -32,7 +32,7 @@ const PrivateRoute = ({children, roles}: PropsType): JSX.Element | null => {
   // If auth is not null -> token exists
   if (auth === null) return <Navigate to="/login" />;
 
-  // Check if role is in the list of authorised roles or teacher in charge.
+  // Check if role is in the list of authorized roles or teacher in charge.
   if (!roles.includes(auth.role) && !isTeacherInCharge)
     return <Navigate to="/" />;
 

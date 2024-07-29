@@ -14,7 +14,7 @@ export type AuthContextType = {
   auth: AuthData | null;
   setAuth: (auth: AuthData | null) => void;
   isTeacherInCharge: boolean;
-  setIsTeacherInCharge: (isTeacherIncharge: boolean) => void;
+  setIsTeacherInCharge: (isTeacherInCharge: boolean) => void;
   isAssistant: boolean;
   setIsAssistant: (isAssistant: boolean) => void;
 };

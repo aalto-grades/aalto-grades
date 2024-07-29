@@ -37,7 +37,7 @@ export const ConfirmDialog = ({
   let body = childrenProp.props.message;
 
   const defaultTitle = 'AsyncConfirmation Modal Title';
-  const defaultBody = 'AsynConfirmation Modal message';
+  const defaultBody = 'AsynConfirmation Modal message'; // Default body has typo lol
   if (confirmNavigate && title === defaultTitle) title = 'Unsaved changes';
   if (confirmNavigate && body === defaultBody)
     body = 'You have unsaved changes. Data you have entered will not be saved';

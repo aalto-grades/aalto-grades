@@ -429,7 +429,7 @@ export const batchCalculateGraph = (
   }[]
 ): {[key: number]: {finalGrade: number}} => {
   const {nodes, edges, nodeData} = graphStructure;
-  const nodeValues: {[key: string]: {[key: string]: NodeValue}} = {}; // {userId: {nodeId: nodeval, ...}, ...}
+  const nodeValues: {[key: string]: {[key: string]: NodeValue}} = {}; // {userId: {nodeId: nodeVal, ...}, ...}
 
   const nodeSources: {[key: string]: Set<string>} = {};
   const nodeTargets: {[key: string]: Edge[]} = {};

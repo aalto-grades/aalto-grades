@@ -443,7 +443,7 @@ export const getSisuFormattedGradingCSV = async (
   for (const finalGrade of finalGrades) {
     if (finalGrade.User === undefined) {
       httpLogger.error(
-        `Final grade ${finalGrade.id} user was undefined even though student nubmers were validated`
+        `Final grade ${finalGrade.id} user was undefined even though student numbers were validated`
       );
       throw new ApiError(
         'Final grade user was undefined',
@@ -452,7 +452,7 @@ export const getSisuFormattedGradingCSV = async (
     }
     if (finalGrade.User.studentNumber === null) {
       httpLogger.error(
-        `Final grade ${finalGrade.id} user student number was null even though student nubmers were validated`
+        `Final grade ${finalGrade.id} user student number was null even though student numbers were validated`
       );
       throw new ApiError(
         'Final grade user student number was null',

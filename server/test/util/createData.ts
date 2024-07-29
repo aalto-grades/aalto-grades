@@ -49,7 +49,7 @@ class CreateData {
 
   async createUser(user?: Partial<UserData>): Promise<UserData> {
     const newUser = await User.create({
-      email: user?.email ?? `testuser${this.freeUserId}@aalto.fi`,
+      email: user?.email ?? `testUser${this.freeUserId}@aalto.fi`,
       name: user?.name ?? `test user${this.freeUserId}`,
       studentNumber: user?.studentNumber ?? `12345${this.freeUserId}`,
       role: SystemRole.User,
@@ -74,7 +74,7 @@ class CreateData {
     });
 
     const newUser = await User.create({
-      email: user?.email ?? `testuser${this.freeUserId}@aalto.fi`,
+      email: user?.email ?? `testUser${this.freeUserId}@aalto.fi`,
       name: user?.name ?? `test user${this.freeUserId}`,
       studentNumber: user?.studentNumber ?? `12345${this.freeUserId}`,
       role: SystemRole.Admin,

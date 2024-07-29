@@ -38,7 +38,7 @@ export const IdSchema = z.number().int();
 export const DateSchema = z
   .string()
   .datetime()
-  .pipe(z.coerce.date()) as unknown as z.ZodDate; // To fix ts compatability with zod-middleware
+  .pipe(z.coerce.date()) as unknown as z.ZodDate; // To fix ts compatibility with zod-middleware
 export const AaltoEmailSchema = z
   .string({required_error: 'Email is required'})
   .email()

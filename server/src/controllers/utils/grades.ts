@@ -48,7 +48,7 @@ export const getDateOfLatestGrade = async (
 /**
  * Validates that all student numbers in the array exist
  *
- * @throws Apierror(404) If a student number is not found in the database
+ * @throws ApiError(404) If a student number is not found in the database
  */
 export const studentNumbersExist = async (
   studentNumbers: string[]

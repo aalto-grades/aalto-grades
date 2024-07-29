@@ -67,7 +67,7 @@ const CourseView = (): JSX.Element => {
 
         <Box
           sx={{
-            // gridArea: courseId ? 'inherith' : 'content',
+            // gridArea: courseId ? 'inherit' : 'content',
 
             width: '100%',
             overflow: 'auto',
