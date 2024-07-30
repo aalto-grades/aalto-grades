@@ -7,6 +7,7 @@ import {useState} from 'react';
 import {NavLink, useParams} from 'react-router-dom';
 
 import UserButton from './auth/UserButton';
+import LanguageSelectButton from './shared/LanguageSelectButton';
 import {useGetCourse} from '../hooks/useApi';
 
 const Header = (): JSX.Element => {
@@ -227,6 +228,7 @@ const Header = (): JSX.Element => {
           </>
         )}
         <Box sx={{flexGrow: 1}} />
+        <LanguageSelectButton />
         <UserButton />
       </AppBar>
     </>
