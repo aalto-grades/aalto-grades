@@ -11,7 +11,7 @@ import {
   AuthDataSchema,
   HttpCode,
   LoginResultSchema,
-  ResetPasswordResultSchema,
+  ResetAuthResultSchema,
   UserData,
 } from '@/common/types';
 import {app} from '../../src/app';
@@ -41,7 +41,7 @@ const testLogin = async (
   const result = LoginResultSchema.safeParse(res.body);
   expect(result.success).toBeTruthy();
   if (result.success) {
-    expect(result.data.redirect).toEqual(forcePasswordReset);
+    expect(result.data.status).toEqual(forcePasswordReset);
   }
 };
 
@@ -234,12 +234,12 @@ describe("Test POST /v1/auth/reset-password/:userId - reset other admin's passwo
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);
 
-    const result = ResetPasswordResultSchema.safeParse(res.body);
+    const result = ResetAuthResultSchema.safeParse(res.body);
     expect(result.success).toBeTruthy();
     if (result.success)
       await testLogin(
         user.email as string,
-        result.data.temporaryPassword,
+        result.data.temporaryPassword as string,
         true
       );
   });

@@ -14,14 +14,16 @@ import {IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
 
 import {
   AuthData,
-  ChangePasswordData,
+  ChangeOwnAuthData,
+  ChangeOwnAuthResponse,
   HttpCode,
   LoginData,
   LoginResult,
   PasswordSchema,
   ResetAuthData,
-  ResetAuthResponse,
-  ResetPasswordResult,
+  ResetAuthResult,
+  ResetOwnPasswordData,
+  ResetOwnPasswordResponse,
 } from '@/common/types';
 import {validateLogin} from './utils/auth';
 import {getSamlStrategy} from './utils/saml';
@@ -151,13 +153,13 @@ export const authLogout: SyncEndpoint<void, void> = (_req, res) => {
 };
 
 /**
- * (ResetAuthData) => ResetAuthResponse
+ * (ResetOwnPasswordData) => ResetOwnPasswordResponse
  *
  * @throws ApiError(401)
  */
 export const authResetOwnPassword: SyncEndpoint<
-  ResetAuthData,
-  ResetAuthResponse
+  ResetOwnPasswordData,
+  ResetOwnPasswordResponse
 > = (req, res, next) => {
   const resetOwnPassword: LoginCallback = async (error, loginResult) => {
     if (error) return next(error);
@@ -212,13 +214,13 @@ export const authResetOwnPassword: SyncEndpoint<
       const mfaSecret = authenticator.generateSecret(64);
       await user.set({mfaSecret}).save();
       const otpAuth = authenticator.keyuri(
-        req.body.email,
+        user.email as string,
         'Aalto Grades',
         mfaSecret
       );
-      return res.json(otpAuth);
+      return res.json({otpAuth});
     }
-    res.json(null);
+    res.json({otpAuth: null});
   };
 
   const authenticate = passport.authenticate(
@@ -229,41 +231,47 @@ export const authResetOwnPassword: SyncEndpoint<
 };
 
 /**
- * () => ResetPasswordResult
+ * (ResetAuthData) => ResetAuthResult
  *
  * @throws ApiError(400|404)
  */
-export const resetPassword: Endpoint<void, ResetPasswordResult> = async (
+export const resetAuth: Endpoint<ResetAuthData, ResetAuthResult> = async (
   req,
   res
 ) => {
   const user = await findAndValidateUserId(req.params.userId);
 
-  const temporaryPassword = generator.generate({
-    length: 16,
-    numbers: true,
-  });
-  // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
-  await user
-    .set({
-      password: await argon.hash(temporaryPassword, {
-        type: argon.argon2id,
-        memoryCost: 19456,
-        parallelism: 1,
-        timeCost: 2,
-      }),
-      forcePasswordReset: true,
-    })
-    .save();
+  let temporaryPassword = null;
+  if (req.body.resetPassword) {
+    temporaryPassword = generator.generate({
+      length: 16,
+      numbers: true,
+    });
+    // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+    await user
+      .set({
+        password: await argon.hash(temporaryPassword, {
+          type: argon.argon2id,
+          memoryCost: 19456,
+          parallelism: 1,
+          timeCost: 2,
+        }),
+        forcePasswordReset: true,
+      })
+      .save();
+  }
+  if (req.body.resetMfa) {
+    await user.set({mfaSecret: null}).save();
+  }
 
   res.json({temporaryPassword});
 };
 
-/** (ChangePasswordData) => void */
-export const changePassword: Endpoint<ChangePasswordData, void> = async (
-  req,
-  res
-) => {
+/** (ChangeOwnAuthData) => ChangeOwnAuthResponse */
+export const changeOwnAuth: Endpoint<
+  ChangeOwnAuthData,
+  ChangeOwnAuthResponse
+> = async (req, res) => {
   const user = req.user as JwtClaims;
 
   const dbUser = await User.findByPk(user.id);
@@ -275,19 +283,31 @@ export const changePassword: Endpoint<ChangePasswordData, void> = async (
     );
   }
 
-  // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
-  await dbUser
-    .set({
-      password: await argon.hash(req.body.newPassword, {
-        type: argon.argon2id,
-        memoryCost: 19456,
-        parallelism: 1,
-        timeCost: 2,
-      }),
-    })
-    .save();
+  if (req.body.resetPassword) {
+    // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+    await dbUser
+      .set({
+        password: await argon.hash(req.body.newPassword, {
+          type: argon.argon2id,
+          memoryCost: 19456,
+          parallelism: 1,
+          timeCost: 2,
+        }),
+      })
+      .save();
+  }
 
-  res.sendStatus(HttpCode.Ok);
+  if (req.body.resetMfa) {
+    const mfaSecret = authenticator.generateSecret(64);
+    await dbUser.set({mfaSecret}).save();
+    const otpAuth = authenticator.keyuri(
+      dbUser.email as string,
+      'Aalto Grades',
+      mfaSecret
+    );
+    return res.json({otpAuth});
+  }
+  res.json({otpAuth: null});
 };
 
 /**
@@ -331,7 +351,7 @@ export const authSamlLogin: SyncEndpoint<void, void> = (req, res, next) => {
  *
  * @throws ApiError(401)
  */
-export const samlMetadata: Endpoint<void, string> = async (req, res) => {
+export const samlMetadata: Endpoint<void, string> = async (_req, res) => {
   const cert = readFileSync(SAML_SP_CERT_FILE, 'utf8');
   res
     .type('application/xml')

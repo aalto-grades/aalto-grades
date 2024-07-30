@@ -16,15 +16,15 @@ interface TypedRequestBody<T> extends Request {
   // user?: JwtClaims;
 }
 
-export type SyncEndpoint<T, E> = (
+export type SyncEndpoint<T, U> = (
   req: TypedRequestBody<T>,
-  res: Response<E | {errors: string[]}>,
+  res: Response<U | {errors: string[]}>,
   next: NextFunction
 ) => void | Response;
 
-export type Endpoint<T, E> = (
+export type Endpoint<T, U> = (
   req: TypedRequestBody<T>,
-  res: Response<E | {errors: string[]}>,
+  res: Response<U | {errors: string[]}>,
   next: NextFunction
 ) => Promise<void | Response>;
 

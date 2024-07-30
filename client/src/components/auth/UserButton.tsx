@@ -7,11 +7,13 @@ import PersonIcon from '@mui/icons-material/Person';
 import {Box, Button, Menu, MenuItem} from '@mui/material';
 import {useQueryClient} from '@tanstack/react-query';
 import {JSX, useState} from 'react';
+import {AsyncConfirmationModal} from 'react-global-modal';
 import {useNavigate} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
 import ChangePasswordDialog from './ChangePasswordDialog';
-import {useLogOut} from '../../hooks/useApi';
+import OtpAuthDialog from './OtpAuthDialog';
+import {useLogOut, useResetOwnAuth} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import AplusTokenDialog from '../shared/AplusTokenDialog';
 
@@ -20,6 +22,7 @@ const UserButton = (): JSX.Element => {
   const {auth, setAuth} = useAuth();
   const queryClient = useQueryClient();
   const logOut = useLogOut();
+  const resetOwnAuth = useResetOwnAuth();
 
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [anchorWidth, setAnchorWidth] = useState<number | null>(null);
@@ -27,6 +30,7 @@ const UserButton = (): JSX.Element => {
     useState<boolean>(false);
   const [changePasswordDialogOpen, setChangePasswordDialogOpen] =
     useState<boolean>(false);
+  const [otpAuth, setOtpAuth] = useState<string | null>(null);
 
   const handleLogOut = async (): Promise<void> => {
     await logOut.mutateAsync(null);
@@ -34,6 +38,21 @@ const UserButton = (): JSX.Element => {
     setAnchorEl(null);
     queryClient.clear();
     navigate('/login', {replace: true});
+  };
+
+  const handleResetMfa = async (): Promise<void> => {
+    setAnchorEl(null);
+    const confirmation = await AsyncConfirmationModal({
+      title: 'Reset MFA secret',
+      message: 'Are you sure you want to reset your MFA secret',
+    });
+    if (!confirmation) return;
+
+    const otpAuthRes = await resetOwnAuth.mutateAsync({
+      resetPassword: false,
+      resetMfa: true,
+    });
+    setOtpAuth(otpAuthRes.otpAuth as string);
   };
 
   const menuOpen = Boolean(anchorEl);
@@ -50,10 +69,17 @@ const UserButton = (): JSX.Element => {
         open={aplusTokenDialogOpen}
       />
       {auth.role === SystemRole.Admin && (
-        <ChangePasswordDialog
-          onClose={() => setChangePasswordDialogOpen(false)}
-          open={changePasswordDialogOpen}
-        />
+        <>
+          <ChangePasswordDialog
+            onClose={() => setChangePasswordDialogOpen(false)}
+            open={changePasswordDialogOpen}
+          />
+          <OtpAuthDialog
+            otpAuth={otpAuth}
+            onClose={() => setOtpAuth(null)}
+            closeText={'Close'}
+          />
+        </>
       )}
 
       <Button
@@ -90,14 +116,17 @@ const UserButton = (): JSX.Element => {
           A+ Token
         </MenuItem>
         {auth.role === SystemRole.Admin && (
-          <MenuItem
-            onClick={() => {
-              setAnchorEl(null);
-              setChangePasswordDialogOpen(true);
-            }}
-          >
-            Change password
-          </MenuItem>
+          <>
+            <MenuItem
+              onClick={() => {
+                setAnchorEl(null);
+                setChangePasswordDialogOpen(true);
+              }}
+            >
+              Change password
+            </MenuItem>
+            <MenuItem onClick={handleResetMfa}>Reset MFA</MenuItem>
+          </>
         )}
         <MenuItem onClick={handleLogOut}>Logout</MenuItem>
       </Menu>

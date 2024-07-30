@@ -15,7 +15,7 @@ import {JSX, SyntheticEvent, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 import ExternalAuth from './ExternalAuth';
-import MfaDialog from './MfaDialog';
+import OtpAuthDialog from './OtpAuthDialog';
 import ShowPasswordButton from './ShowPasswordButton';
 import {useLogIn} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
@@ -69,7 +69,7 @@ const Login = (): JSX.Element => {
 
   return (
     <>
-      <MfaDialog
+      <OtpAuthDialog
         otpAuth={otpAuth}
         onClose={() => {
           setOtpAuth(null);

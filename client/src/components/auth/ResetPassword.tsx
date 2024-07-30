@@ -10,7 +10,7 @@ import {Navigate, useLocation, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
 import {AaltoEmailSchema, PasswordSchema} from '@/common/types';
-import MfaDialog from './MfaDialog';
+import OtpAuthDialog from './OtpAuthDialog';
 import BaseShowPasswordButton from './ShowPasswordButton';
 import {useResetOwnPassword} from '../../hooks/useApi';
 import FormField from '../shared/FormikField';
@@ -91,7 +91,7 @@ const ResetPassword = (): JSX.Element => {
     resetForm();
     if (!state?.resetMfa) return navigate('/login', {replace: true});
 
-    setOtpAuth(otpAuthRes);
+    setOtpAuth(otpAuthRes.otpAuth);
   };
 
   const validateForm = (
@@ -124,7 +124,7 @@ const ResetPassword = (): JSX.Element => {
 
   return (
     <>
-      <MfaDialog
+      <OtpAuthDialog
         otpAuth={otpAuth}
         onClose={() => {
           setOtpAuth(null);

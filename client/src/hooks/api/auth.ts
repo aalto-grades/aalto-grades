@@ -14,15 +14,18 @@ import {
 import {
   AuthData,
   AuthDataSchema,
-  ChangePasswordData,
+  ChangeOwnAuthData,
   LoginData,
   LoginResult,
   LoginResultSchema,
+  ResetOwnPasswordData,
+  ResetOwnPasswordResponse,
+  ResetOwnPasswordResponseSchema,
+  ResetAuthResult,
+  ResetAuthResultSchema,
   ResetAuthData,
-  ResetAuthResponse,
-  ResetAuthResponseSchema,
-  ResetPasswordResult,
-  ResetPasswordResultSchema,
+  ChangeOwnAuthResponse,
+  ChangeOwnAuthResponseSchema,
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
@@ -60,32 +63,48 @@ export const useLogOut = (
   });
 
 export const useResetOwnPassword = (
-  options?: UseMutationOptions<ResetAuthResponse, unknown, ResetAuthData>
-): UseMutationResult<ResetAuthResponse, unknown, ResetAuthData> =>
+  options?: UseMutationOptions<
+    ResetOwnPasswordResponse,
+    unknown,
+    ResetOwnPasswordData
+  >
+): UseMutationResult<ResetOwnPasswordResponse, unknown, ResetOwnPasswordData> =>
   useMutation({
-    mutationFn: async (credentials: ResetAuthData) =>
-      ResetAuthResponseSchema.parse(
+    mutationFn: async (credentials: ResetOwnPasswordData) =>
+      ResetOwnPasswordResponseSchema.parse(
         (await axios.post('/v1/auth/reset-password', credentials)).data
       ),
     ...options,
   });
 
-export const useResetPassword = (
-  options?: UseMutationOptions<ResetPasswordResult, unknown, Numeric>
-): UseMutationResult<ResetPasswordResult, unknown, Numeric> =>
+type ResetAuthVars = {userId: Numeric; resetData: ResetAuthData};
+export const useResetAuth = (
+  options?: UseMutationOptions<ResetAuthResult, unknown, ResetAuthVars>
+): UseMutationResult<ResetAuthResult, unknown, ResetAuthVars> =>
   useMutation({
-    mutationFn: async (userId: Numeric) =>
-      ResetPasswordResultSchema.parse(
-        (await axios.post(`/v1/auth/reset-password/${userId}`)).data
+    mutationFn: async (vars: ResetAuthVars) =>
+      ResetAuthResultSchema.parse(
+        (
+          await axios.post(
+            `/v1/auth/reset-password/${vars.userId}`,
+            vars.resetData
+          )
+        ).data
       ),
     ...options,
   });
 
-export const useChangePassword = (
-  options?: UseMutationOptions<unknown, unknown, ChangePasswordData>
-): UseMutationResult<unknown, unknown, ChangePasswordData> =>
+export const useResetOwnAuth = (
+  options?: UseMutationOptions<
+    ChangeOwnAuthResponse,
+    unknown,
+    ChangeOwnAuthData
+  >
+): UseMutationResult<ChangeOwnAuthResponse, unknown, ChangeOwnAuthData> =>
   useMutation({
-    mutationFn: (credentials: ChangePasswordData) =>
-      axios.post('/v1/auth/change-password', credentials),
+    mutationFn: async (data: ChangeOwnAuthData) =>
+      ChangeOwnAuthResponseSchema.parse(
+        (await axios.post('/v1/auth/change-password', data)).data
+      ),
     ...options,
   });

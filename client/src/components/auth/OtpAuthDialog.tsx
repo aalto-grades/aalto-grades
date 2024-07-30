@@ -8,8 +8,16 @@ import {
 import {JSX} from 'react';
 import QRCode from 'react-qr-code';
 
-type PropsType = {otpAuth: string | null; onClose: () => void};
-const MfaDialog = ({otpAuth, onClose}: PropsType): JSX.Element => (
+type PropsType = {
+  otpAuth: string | null;
+  onClose: () => void;
+  closeText?: string;
+};
+const OtpAuthDialog = ({
+  otpAuth,
+  onClose,
+  closeText = 'Back to login',
+}: PropsType): JSX.Element => (
   <Dialog open={otpAuth !== null} onClose={onClose}>
     <DialogTitle>MFA QR code</DialogTitle>
     <DialogContent>
@@ -17,10 +25,10 @@ const MfaDialog = ({otpAuth, onClose}: PropsType): JSX.Element => (
     </DialogContent>
     <DialogActions>
       <Button variant="contained" onClick={onClose}>
-        Back to login
+        {closeText}
       </Button>
     </DialogActions>
   </Dialog>
 );
 
-export default MfaDialog;
+export default OtpAuthDialog;

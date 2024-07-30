@@ -21,7 +21,7 @@ import {JSX, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 
 import {SystemRole, UserData} from '@/common/types';
-import ResetPasswordDialog from './resetPasswordDialog';
+import ResetAuthDialog from './resetAuthDialog';
 import {useDeleteUser, useGetUsers} from '../../../hooks/useApi';
 import {HeadCellData} from '../../../types';
 
@@ -59,7 +59,7 @@ const UsersTable = (): JSX.Element => {
 
   return (
     <>
-      <ResetPasswordDialog
+      <ResetAuthDialog
         open={toBeReset !== null}
         onClose={() => setToBeReset(null)}
         user={toBeReset}
@@ -91,7 +91,7 @@ const UsersTable = (): JSX.Element => {
               <TableRow key={user.email} hover={true}>
                 <TableCell sx={{width: '75%'}}>{user.email}</TableCell>
                 <TableCell>
-                  <Tooltip title="Reset password" placement="top">
+                  <Tooltip title="Reset password / MFA" placement="top">
                     <span>
                       <IconButton
                         disabled={tab === 0}

@@ -5,7 +5,7 @@
 import {RateLimiterMemory} from 'rate-limiter-flexible';
 
 import {HttpCode} from '@/common/types';
-import {LoginData} from '@/common/types/auth';
+import {LoginData, ResetOwnPasswordData} from '@/common/types/auth';
 import logger from '../configs/winston';
 import {SyncEndpoint} from '../types';
 
@@ -16,11 +16,10 @@ const rateLimiter = new RateLimiterMemory({
   blockDuration: 15,
 });
 
-export const rateLimiterMemoryMiddleware: SyncEndpoint<LoginData, void> = (
-  req,
-  res,
-  next
-) => {
+export const rateLimiterMemoryMiddleware: SyncEndpoint<
+  LoginData | ResetOwnPasswordData,
+  void
+> = (req, res, next) => {
   // Override res.send
   const originalSend = res.send;
   res.send = function (body) {

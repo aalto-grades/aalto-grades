@@ -22,9 +22,9 @@ import {ApiError, Endpoint, SyncEndpoint} from '../types';
  *   // Wrap your async controller with `controllerDispatcher`:
  *   app.post('/v1/course', controllerDispatcher(async (req, res, next) => { ... }));
  */
-export const controllerDispatcher = (
-  handler: Endpoint<any, any>
-): SyncEndpoint<any, any> => {
+export const controllerDispatcher = <T, U>(
+  handler: Endpoint<T, U>
+): SyncEndpoint<T, U> => {
   return (req, res, next) => {
     handler(req, res, next).catch(next);
   };
