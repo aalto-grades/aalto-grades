@@ -55,7 +55,7 @@ router.post(
 
 // Dispatchers not needed, because not async
 router.post(
-  '/v1/auth/reset-password',
+  '/v1/auth/reset-own-password',
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(ResetOwnPasswordDataSchema),
@@ -64,7 +64,7 @@ router.post(
 );
 
 router.post(
-  '/v1/auth/reset-password/:userId',
+  '/v1/auth/reset-auth/:userId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   authorization([SystemRole.Admin]),
   express.json(),
@@ -74,7 +74,7 @@ router.post(
 );
 
 router.post(
-  '/v1/auth/change-password',
+  '/v1/auth/change-own-auth',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   authorization([SystemRole.Admin]),
   express.json(),

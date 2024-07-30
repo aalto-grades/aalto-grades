@@ -72,7 +72,7 @@ export const useResetOwnPassword = (
   useMutation({
     mutationFn: async credentials =>
       ResetOwnPasswordResponseSchema.parse(
-        (await axios.post('/v1/auth/reset-password', credentials)).data
+        (await axios.post('/v1/auth/reset-own-password', credentials)).data
       ),
     ...options,
   });
@@ -84,12 +84,8 @@ export const useResetAuth = (
   useMutation({
     mutationFn: async vars =>
       ResetAuthResultSchema.parse(
-        (
-          await axios.post(
-            `/v1/auth/reset-password/${vars.userId}`,
-            vars.resetData
-          )
-        ).data
+        (await axios.post(`/v1/auth/reset-auth/${vars.userId}`, vars.resetData))
+          .data
       ),
     ...options,
   });
@@ -104,7 +100,7 @@ export const useResetOwnAuth = (
   useMutation({
     mutationFn: async data =>
       ChangeOwnAuthResponseSchema.parse(
-        (await axios.post('/v1/auth/change-password', data)).data
+        (await axios.post('/v1/auth/change-own-auth', data)).data
       ),
     ...options,
   });

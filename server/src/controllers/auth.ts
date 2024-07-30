@@ -120,7 +120,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
       })
     ) {
       return res.status(HttpCode.Unauthorized).send({
-        errors: ['Incorrect otp'],
+        errors: ['Incorrect TOTP token'],
       });
     }
 
