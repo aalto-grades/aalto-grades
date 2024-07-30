@@ -69,7 +69,7 @@ $ export POSTGRES_PASSWORD=XXXX
 $ docker-compose up
 ```
 
-When developing or demonstrating the system, you may use one of the premade
+When developing or demonstrating the system, you may use one of the pre-made
 user accounts for this purpose. There are two such accounts, an admin account
 and a teacher account.
 

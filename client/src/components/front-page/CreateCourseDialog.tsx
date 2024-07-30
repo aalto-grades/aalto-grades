@@ -334,7 +334,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               helperText={
                 form.errors.assistantEmail ??
                 (assistants.length === 0
-                  ? 'Input the email address of at least one assitant of the course'
+                  ? 'Input the email address of at least one assistant of the course'
                   : assistants.includes(form.values.assistantEmail)
                     ? 'Email already on list.'
                     : 'Add emails of the teachers in charge of the course.')

@@ -266,7 +266,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
         <tbody>
           <tr>
             <th style={{width: '50%'}}>in</th>
-            <th>subval</th>
+            <th>subVal</th>
           </tr>
           {exerciseHandles
             .filter(key => nodeValue.sources[key].isConnected)

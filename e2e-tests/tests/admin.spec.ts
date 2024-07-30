@@ -65,11 +65,11 @@ test.describe('Test courses as admin', () => {
   test('Add course', async ({page}) => {
     await page.getByRole('button', {name: 'Create new course'}).click();
     await page.getByLabel('Course code*').click();
-    await page.getByLabel('Course code*').fill('cs-testcourse123');
+    await page.getByLabel('Course code*').fill('cs-testCourse123');
     await page.getByLabel('Course code*').press('Tab');
-    await page.getByLabel('Course name in English*').fill('testcourse');
+    await page.getByLabel('Course name in English*').fill('testCourse');
     await page.getByLabel('Course name in Finnish*').click();
-    await page.getByLabel('Course name in Finnish*').fill('testikurssi');
+    await page.getByLabel('Course name in Finnish*').fill('testiKurssi');
     await page.getByLabel('Course name in Finnish*').press('Tab');
     await page.getByLabel('Course name in Swedish*').fill('...');
     await page.getByLabel('Course name in Swedish*').press('Tab');
@@ -91,10 +91,10 @@ test.describe('Test courses as admin', () => {
     await page.getByLabel('Assistants*').fill('assistant@aalto.fi');
     await page.getByRole('button', {name: 'Add'}).nth(1).click();
     await page.getByRole('button', {name: 'Submit'}).click();
-    await expect(page.getByRole('heading', {name: 'testcourse'})).toBeVisible();
+    await expect(page.getByRole('heading', {name: 'testCourse'})).toBeVisible();
     await page.getByRole('link', {name: 'A! Grades'}).click();
     await expect(
-      page.getByRole('cell', {name: 'testcourse'}).nth(1)
+      page.getByRole('cell', {name: 'testCourse'}).nth(1)
     ).toBeVisible();
   });
 

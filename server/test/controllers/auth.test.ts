@@ -137,7 +137,7 @@ describe('Test POST /v1/auth/login and expiry', () => {
     const jwt = agent.jar.getCookie('jwt', CookieAccessInfo.All);
     if (!jwt) throw new Error('jwt not available');
 
-    // Simulate situtation where the browser does not properly expire the cookie
+    // Simulate situation where the browser does not properly expire the cookie
     mockdate.set(
       realDate.setMilliseconds(
         realDate.getMilliseconds() + JWT_COOKIE_EXPIRY_MS + 1

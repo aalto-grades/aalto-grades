@@ -238,7 +238,7 @@ const AverageNode = (props: NodeProps): JSX.Element => {
           Sum {Math.round(percentageSum * 10) / 10} %
         </p>
       )}
-      <p className="outputvalue" style={{marginTop: '5px'}}>
+      <p className="output-value" style={{marginTop: '5px'}}>
         Average: {Math.round(nodeValue.value * 100) / 100}
       </p>
 

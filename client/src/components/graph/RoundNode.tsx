@@ -59,7 +59,7 @@ const RoundNode = (props: NodeProps): JSX.Element => {
         <option value="round-closest">Round to closest</option>
         <option value="round-down">Round down</option>
       </select>
-      <p className="outputvalue">
+      <p className="output-value">
         Output: {Math.round(nodeValue.value * 100) / 100}
       </p>
 

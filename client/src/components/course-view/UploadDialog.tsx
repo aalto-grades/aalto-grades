@@ -108,7 +108,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       ],
     },
   ];
-  const readOnlycolumns: GridColDef<GradeUploadColTypes>[] = [
+  const readOnlyColumns: GridColDef<GradeUploadColTypes>[] = [
     {
       field: 'studentNo',
       headerName: 'Student number',
@@ -185,7 +185,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
           />
         ) : (
           <UploadDialogConfirm
-            columns={readOnlycolumns}
+            columns={readOnlyColumns}
             rows={rows}
             maxGrades={maxGrades}
             dates={dates}

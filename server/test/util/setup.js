@@ -7,20 +7,20 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pg = require('pg');
 
-const pghost = process.env.POSTGRES_URL || 'localhost';
-const pguser = process.env.POSTGRES_USER || 'postgres';
-const pgpass = process.env.POSTGRES_PASSWORD || 'postgres';
-const pgdb = process.env.POSTGRES_DATABASE || 'postgres';
-const pgport = process.env.POSTGRES_PORT
+const pgHost = process.env.POSTGRES_URL || 'localhost';
+const pgUser = process.env.POSTGRES_USER || 'postgres';
+const pgPass = process.env.POSTGRES_PASSWORD || 'postgres';
+const pgDb = process.env.POSTGRES_DATABASE || 'postgres';
+const pgPort = process.env.POSTGRES_PORT
   ? Number(process.env.POSTGRES_PORT)
   : 5432;
 
 const dbConfig = {
-  host: pghost,
-  port: pgport,
-  user: pguser,
-  password: pgpass,
-  database: pgdb,
+  host: pgHost,
+  port: pgPort,
+  user: pgUser,
+  password: pgPass,
+  database: pgDb,
 };
 
 /** Creates a copy of the current database. */
@@ -39,7 +39,7 @@ const setup = async () => {
 
   // Create new copy
   await client.query(
-    `CREATE DATABASE postgres_copy WITH TEMPLATE postgres OWNER ${pguser}`
+    `CREATE DATABASE postgres_copy WITH TEMPLATE postgres OWNER ${pgUser}`
   );
 
   await client.end();

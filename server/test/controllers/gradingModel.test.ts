@@ -32,7 +32,7 @@ let courseParts: CoursePartData[] = [];
 let gradingModId = -1;
 let testStructure: GraphStructure = {} as GraphStructure;
 
-let NoModelscourseId = -1;
+let noModelsCourseId = -1;
 let noRoleCourseId = -1;
 let noRoleModelId = -1;
 const nonExistentId = 1000000;
@@ -46,7 +46,7 @@ beforeAll(async () => {
   await createData.createGradingModel(courseId, courseParts);
   testStructure = initGraph('addition', courseParts);
 
-  [NoModelscourseId] = await createData.createCourse({
+  [noModelsCourseId] = await createData.createCourse({
     createGradingModel: false,
   });
 
@@ -162,7 +162,7 @@ describe('Test GET /v1/courses/:courseId/grading-models - get all grading models
 
   it('should get the grading models when no grading models exist', async () => {
     const res = await request
-      .get(`/v1/courses/${NoModelscourseId}/grading-models`)
+      .get(`/v1/courses/${noModelsCourseId}/grading-models`)
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'application/json')
       .expect(HttpCode.Ok);

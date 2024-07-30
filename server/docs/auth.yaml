@@ -235,7 +235,7 @@ definitions:
             $ref: '#/definitions/ChangePasswordData'
     responses:
       200:
-        description: Password changed succesfully
+        description: Password changed successfully
       401:
         $ref: '#/components/responses/Unauthorized'
       403:

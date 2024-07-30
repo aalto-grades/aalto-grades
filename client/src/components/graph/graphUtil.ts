@@ -172,10 +172,10 @@ export const formatGraph = async (
   };
 
   const newNodes = (await elk.layout(graph)).children!;
-  return newNodes.map((node): Node => {
+  return newNodes.map((newNode): Node => {
     return {
-      ...nodes.find(onode => onode.id === node.id)!,
-      position: {x: node.x!, y: node.y!},
+      ...nodes.find(node => node.id === newNode.id)!,
+      position: {x: newNode.x!, y: newNode.y!},
     };
   });
 };

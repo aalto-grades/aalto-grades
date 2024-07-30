@@ -62,7 +62,7 @@ router.delete(
   controllerDispatcher(deleteGrade)
 );
 
-// Actually gets the data but the requirest type must be post to be able to use request.body
+// Actually gets the data but the request type must be post to be able to use request.body
 router.post(
   '/v1/latest-grades',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
@@ -73,7 +73,7 @@ router.post(
   controllerDispatcher(getLatestGrades)
 );
 
-// Actually gets the csv but the requirest type must be post to be able to use request.body
+// Actually gets the csv but the request type must be post to be able to use request.body
 router.post(
   '/v1/courses/:courseId/grades/csv/sisu',
   passport.authenticate('jwt', {session: false}) as RequestHandler,

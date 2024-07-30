@@ -283,13 +283,13 @@ definitions:
 /v1/courses/{courseId}/aplus-sources/{aplusGradeSourceId}:
   delete:
     tags: [A+]
-    descripton: Delete A+ grade source.
+    description: Delete A+ grade source.
     parameters:
       - $ref: '#/components/parameters/courseId'
       - $ref: '#/components/parameters/aplusGradeSourceId'
     responses:
       200:
-        descrption: A+ grade source deleted.
+        description: A+ grade source deleted.
       400:
         $ref: '#/components/responses/BadRequest'
       401:

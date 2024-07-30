@@ -205,7 +205,7 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
   );
 });
 
-const AssesmentFilterButton = forwardRef<HTMLSpanElement>(
+const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
   (props, ref): JSX.Element => {
     const {courseId} = useParams() as {courseId: string};
     const theme = useTheme();
@@ -403,7 +403,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   }, [table.getSelectedRowModel().rows]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // // If asking for a refetch then it also update the selectedRows
-  // // Refresh selectedRows for updating childrens state
+  // // Refresh selectedRows for updating children's state
   // const refreshFinalGrades = (): void => {
   //   getFinalGrades.refetch().then(newFinalGrades => {
   //     if (!newFinalGrades.data) return;
@@ -614,7 +614,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         }}
       >
         <Tooltip
-          title="Group rows based on other colums"
+          title="Group rows based on other columns"
           placement="top"
           disableInteractive
         >
@@ -626,7 +626,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
             placement="top"
             disableInteractive
           >
-            <AssesmentFilterButton />
+            <AssessmentFilterButton />
           </Tooltip>
         )}
 
