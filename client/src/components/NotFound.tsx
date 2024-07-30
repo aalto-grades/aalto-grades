@@ -4,9 +4,12 @@
 
 import {Box, Typography} from '@mui/material';
 import {JSX} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
 
 const NotFound = (): JSX.Element => {
+  const {t} = useTranslation();
+
   return (
     <Box
       sx={{
@@ -17,12 +20,12 @@ const NotFound = (): JSX.Element => {
       }}
     >
       <Typography variant="h4" sx={{my: 4}}>
-        404 - Not found
+        {t('not-found.title')}
       </Typography>
       <Typography variant="body1" sx={{mb: 5}}>
-        The page you’re looking for doesn’t exist.
+        {t('not-found.body')}
       </Typography>
-      <Link to="/">Go back to main page</Link>
+      <Link to="/">{t('not-found.back')}</Link>
     </Box>
   );
 };

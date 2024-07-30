@@ -9,8 +9,10 @@ import {NavLink, useParams} from 'react-router-dom';
 import UserButton from './auth/UserButton';
 import LanguageSelectButton from './shared/LanguageSelectButton';
 import {useGetCourse} from '../hooks/useApi';
+import {useLocalize} from '../hooks/useLocalize';
 
 const Header = (): JSX.Element => {
+  const localize = useLocalize();
   const theme = useTheme();
   const {courseId} = useParams<{courseId: string}>();
   const course = useGetCourse(courseId ?? '', {enabled: Boolean(courseId)});
@@ -214,7 +216,7 @@ const Header = (): JSX.Element => {
                     maxWidth: '300px',
                   }}
                 >
-                  {course.data.name.en}
+                  {localize(course.data.name)}
                 </Typography>
                 {/* <Typography
                     align="left"

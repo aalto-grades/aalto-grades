@@ -4,6 +4,7 @@
 
 import {Box, Button, Typography, useTheme} from '@mui/material';
 import {JSX, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 
 import {SystemRole} from '@/common/types';
 import CourseTable from './front-page/CourseTable';
@@ -13,6 +14,7 @@ import {useGetAllCourses, useGetOwnCourses} from '../hooks/useApi';
 import useAuth from '../hooks/useAuth';
 
 const FrontPage = (): JSX.Element => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const {auth} = useAuth();
   const courses = useGetAllCourses({
@@ -35,7 +37,7 @@ const FrontPage = (): JSX.Element => {
             }}
           >
             <Typography variant="h2" align="left" sx={{flexGrow: 1}}>
-              Your courses
+              {t('front-page.your-courses')}
             </Typography>
           </Box>
           {coursesOfUser.data && coursesOfUser.data.length > 0 ? (
@@ -48,10 +50,7 @@ const FrontPage = (): JSX.Element => {
                 mt: 1,
               }}
             >
-              <Typography>
-                You have no courses. Please contact support to have your course
-                added.
-              </Typography>
+              <Typography>{t('front-page.no-courses')}</Typography>
             </Box>
           )}
         </>
@@ -72,7 +71,7 @@ const FrontPage = (): JSX.Element => {
             }}
           >
             <Typography variant="h2" align="left" sx={{flexGrow: 1}}>
-              Courses
+              {t('front-page.courses')}
             </Typography>
             <Button
               id="ag-new-course-btn"
@@ -81,7 +80,7 @@ const FrontPage = (): JSX.Element => {
               onClick={() => setCreateDialogOpen(true)}
               sx={{mb: -11.25}} // Align with search
             >
-              Create new course
+              {t('front-page.create-course')}
             </Button>
           </Box>
           {courses.data && <CourseTable courses={courses.data} />}

@@ -1,3 +1,53 @@
 {
-  "login": "Log in to Aalto Grades"
+  "login": "Log in to Aalto Grades",
+  "footer": {
+    "privacy": "Privacy notice",
+    "accessibility": "Accessibility statement",
+    "support": "Support",
+    "licenses": "JavaScript licenses",
+    "source": {
+      "tooltip": "Source code opens in a new tab",
+      "text": "Source code"
+    },
+    "feedback": {
+      "tooltip": "Feedback form opens in a new tab",
+      "text": "Feedback"
+    }
+  },
+  "front-page": {
+    "your-courses": "Your courses",
+    "no-courses": "You have no courses. Please contact support to have your course added.",
+    "courses": "Courses",
+    "create-course": "Create new course"
+  },
+  "manage-students": {
+    "title": "Manage students",
+    "name": "Name",
+    "student-number": "Student number",
+    "email": "Email",
+    "latest-grade": "Latest grade",
+    "delete": {
+      "singular": "Delete student",
+      "plural": "Delete students"
+    },
+    "delete-message": {
+      "singular": "All of the data of the student will be deleted permanently!",
+      "plural": "All of the data of the students will be deleted permanently!"
+    },
+    "delete-success": {
+      "singular": "Student deleted",
+      "plural": "Students deleted"
+    }
+  },
+  "not-found": {
+    "title": "404 - Not found",
+    "body": "The page you’re looking for doesn't exist.",
+    "back": "Go back to main page"
+  },
+  "students": {
+    "select": "Select student",
+    "viewing-grades": "Viewing grades for {0}",
+    "course": "Course",
+    "final-grades": "Final grades"
+  }
 }

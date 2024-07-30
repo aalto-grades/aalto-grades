@@ -12,6 +12,7 @@ import {
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 import {useBlocker} from 'react-router-dom';
 
 import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
@@ -29,38 +30,8 @@ type ColTypes = {
   latestGrade: Date | null;
 };
 
-const columns: GridColDef<ColTypes>[] = [
-  {
-    field: 'name',
-    headerName: 'Name',
-    type: 'string',
-    editable: false,
-    width: 200,
-  },
-  {
-    field: 'studentNumber',
-    headerName: 'Student number',
-    type: 'string',
-    editable: false,
-    width: 120,
-  },
-  {
-    field: 'email',
-    headerName: 'Email',
-    type: 'string',
-    editable: false,
-    width: 150,
-  },
-  {
-    field: 'latestGrade',
-    headerName: 'Latest grade',
-    type: 'date',
-    editable: false,
-    width: 150,
-  },
-];
-
 const ManageStudentsView = (): JSX.Element => {
+  const {t} = useTranslation();
   const students = useGetStudents();
   const deleteUsers = useDeleteUsers();
   const getLatestGrades = useGetLatestGrades();
@@ -81,6 +52,37 @@ const ManageStudentsView = (): JSX.Element => {
     ({currentLocation, nextLocation}) =>
       changes && currentLocation.pathname !== nextLocation.pathname
   );
+
+  const columns: GridColDef<ColTypes>[] = [
+    {
+      field: 'name',
+      headerName: t('manage-students.name'),
+      type: 'string',
+      editable: false,
+      width: 200,
+    },
+    {
+      field: 'studentNumber',
+      headerName: t('manage-students.student-number'),
+      type: 'string',
+      editable: false,
+      width: 120,
+    },
+    {
+      field: 'email',
+      headerName: t('manage-students.email'),
+      type: 'string',
+      editable: false,
+      width: 150,
+    },
+    {
+      field: 'latestGrade',
+      headerName: t('manage-students.latest-grade'),
+      type: 'date',
+      editable: false,
+      width: 150,
+    },
+  ];
 
   // Warning if leaving with unsaved
   useEffect(() => {
@@ -119,18 +121,25 @@ const ManageStudentsView = (): JSX.Element => {
     setData();
   }, [students.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const plural = rowSelectionModel.length > 1 ? 's' : '';
+  const plural = rowSelectionModel.length > 1 ? true : false;
   const handleDelete = async (): Promise<void> => {
     const confirmation = await AsyncConfirmationModal({
-      title: `Delete student${plural}`,
-      message:
-        `All of the data of the student${plural} ` +
-        'will be deleted permanently!',
+      title: plural
+        ? t('manage-students.delete.plural')
+        : t('manage-students.delete.singular'),
+      message: plural
+        ? t('manage-students.delete-message.plural')
+        : t('manage-students.delete-message.singular'),
       confirmDelete: true,
     });
     if (confirmation) {
       await deleteUsers.mutateAsync(rowSelectionModel.map(row => Number(row)));
-      enqueueSnackbar(`Student${plural} deleted`, {variant: 'success'});
+      enqueueSnackbar(
+        plural
+          ? t('manage-students.delete-success.plural')
+          : t('manage-students.delete-success.singular'),
+        {variant: 'success'}
+      );
       setRowSelectionModel([]);
     }
   };
@@ -140,7 +149,7 @@ const ManageStudentsView = (): JSX.Element => {
       <UnsavedChangesDialog blocker={blocker} />
 
       <Typography variant="h2" sx={{pb: 2}}>
-        Manage students
+        {t('manage-students.title')}
       </Typography>
       <Button
         onClick={handleDelete}
@@ -148,7 +157,9 @@ const ManageStudentsView = (): JSX.Element => {
         variant="contained"
         color="error"
       >
-        Delete student{plural}
+        {plural
+          ? t('manage-students.delete.plural')
+          : t('manage-students.delete.singular')}
       </Button>
       <div style={{height: '30vh'}}>
         <DataGrid
