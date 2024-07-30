@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {AppBar, Box, Typography, useTheme} from '@mui/material';
+import {useState} from 'react';
 import {NavLink, useParams} from 'react-router-dom';
 
 import UserButton from './auth/UserButton';
@@ -12,6 +13,12 @@ const Header = (): JSX.Element => {
   const theme = useTheme();
   const {courseId} = useParams<{courseId: string}>();
   const course = useGetCourse(courseId ?? '', {enabled: Boolean(courseId)});
+
+  // The logo variants are intended to be used randomly, so why not?
+  // https://brand.aalto.fi/visual-identity/about/logo/
+  const [logoVariant] = useState(
+    ['!', '?', '”'][Math.floor(Math.random() * 3)]
+  );
 
   return (
     <>
@@ -43,7 +50,7 @@ const Header = (): JSX.Element => {
           }}
           unstable_viewTransition
         >
-          A! Grades
+          A{logoVariant} Grades
         </Typography>
         {/* <Box
             sx={{
