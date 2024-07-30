@@ -21,7 +21,7 @@ import {JSX, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 
 import {SystemRole, UserData} from '@/common/types';
-import ResetPasswordDialog from './resetPasswordDialog';
+import ResetPasswordDialog from './ResetPasswordDialog';
 import {useDeleteUser, useGetUsers} from '../../../hooks/useApi';
 import {HeadCellData} from '../../../types';
 
