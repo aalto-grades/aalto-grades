@@ -8,12 +8,13 @@ import {createGlobalStyle} from 'styled-components';
 
 import App from './App';
 import {AuthProvider} from './context/AuthProvider';
+import './i18n';
 
 const rootElement = document.getElementById('root');
 
 if (rootElement) {
   const GlobalStyles = createGlobalStyle`
-  
+
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
   body {

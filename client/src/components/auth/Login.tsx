@@ -4,6 +4,7 @@
 
 import {Box, Button, Grid, TextField, Typography} from '@mui/material';
 import {JSX, SyntheticEvent, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
 import ExternalAuth from './ExternalAuth';
@@ -12,6 +13,7 @@ import {useLogIn} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 
 const Login = (): JSX.Element => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
   const {setAuth} = useAuth();
   const logIn = useLogIn();
@@ -37,7 +39,7 @@ const Login = (): JSX.Element => {
       alignItems="center"
       justifyContent="center"
     >
-      <Typography variant="h2">Log in to Aalto Grades</Typography>
+      <Typography variant="h2">{t('login')}</Typography>
       <ExternalAuth />
       <Box
         sx={{
