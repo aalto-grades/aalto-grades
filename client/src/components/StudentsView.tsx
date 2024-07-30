@@ -91,7 +91,7 @@ const StudentsView = (): JSX.Element => {
                 <TableRow>
                   <TableCell>{t('students.course')}</TableCell>
                   <TableCell align="right">
-                    {t('students.final-grades')}
+                    {t('general.final-grades.plural')}
                   </TableCell>
                 </TableRow>
               </TableHead>

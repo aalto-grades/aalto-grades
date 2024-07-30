@@ -63,7 +63,7 @@ const ManageStudentsView = (): JSX.Element => {
     },
     {
       field: 'studentNumber',
-      headerName: t('manage-students.student-number'),
+      headerName: t('general.student-number'),
       type: 'string',
       editable: false,
       width: 120,

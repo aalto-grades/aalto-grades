@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+// TODO: Translations are broken
+
 import {Badge, Checkbox} from '@mui/material';
 import {
   ExpandedState,
@@ -27,6 +29,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {
@@ -142,6 +145,7 @@ const columnHelper = createColumnHelper<GroupedStudentRow>();
 
 // Create a provider component
 export const GradesTableProvider = (props: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
 
   const course = useGetCourse(courseId);
@@ -187,7 +191,6 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         gradingModels,
         gradeSelectOption
       );
-      console.log(predictedGrades);
     }
 
     // Add all auxiliary columns to the data
@@ -295,7 +298,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         id: 'latestBestGrade',
         meta: {PrettyChipPosition: 'first'},
         header: () => {
-          return 'Latest part date';
+          return t('context.grades-table.latest-grade');
         },
         cell: prop => prop.getValue(),
       }),
@@ -395,7 +398,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       ),
     }),
     columnHelper.accessor(row => row.errors, {
-      header: 'Errors',
+      header: t('context.grades-table.errors'),
       id: 'errors',
       enableHiding: true,
       // The column only filter, for other type of filtering write another filterFn
@@ -406,11 +409,11 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       },
     }),
     columnHelper.accessor('user.studentNumber', {
-      header: 'Student number',
+      header: t('general.student-number'),
       meta: {PrettyChipPosition: 'first'},
     }),
     columnHelper.accessor(row => row.finalGrades ?? [], {
-      header: 'Final grade',
+      header: t('general.final-grade.singular'),
       id: 'finalGrade',
       enableSorting: false,
       getGroupingValue: row => findBestFinalGrade(row.finalGrades ?? [])?.grade,
@@ -424,7 +427,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       ),
     }),
     columnHelper.accessor(row => row, {
-      header: 'Grade preview',
+      header: t('context.grades-table.preview'),
       meta: {PrettyChipPosition: 'middle'},
       sortingFn: (a, b, columnId) => {
         const modelId =
@@ -483,7 +486,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       },
 
       {
-        header: 'Exported to Sisu',
+        header: t('context.grades-table.exported'),
         meta: {PrettyChipPosition: 'last'},
         cell: info => info.getValue(),
         aggregatedCell: () => null,

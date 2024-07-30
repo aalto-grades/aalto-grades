@@ -1,5 +1,19 @@
 {
-  "login": "Log in to Aalto Grades",
+  "general": {
+    "student-number": "Student number",
+    "final-grade": {
+      "singular": "Final grade",
+      "plural": "Final grades"
+    },
+  },
+  "context": {
+    "grades-table": {
+      "latest-grade": "Latest part grade",
+      "errors": "Errors",
+      "preview": "Grade preview",
+      "exported": "Exported to Sisu"
+    }
+  },
   "footer": {
     "privacy": "Privacy notice",
     "accessibility": "Accessibility statement",
@@ -23,7 +37,6 @@
   "manage-students": {
     "title": "Manage students",
     "name": "Name",
-    "student-number": "Student number",
     "email": "Email",
     "latest-grade": "Latest grade",
     "delete": {
@@ -47,7 +60,6 @@
   "students": {
     "select": "Select student",
     "viewing-grades": "Viewing grades for {0}",
-    "course": "Course",
-    "final-grades": "Final grades"
+    "course": "Course"
   }
 }
