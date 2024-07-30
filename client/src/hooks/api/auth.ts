@@ -47,7 +47,7 @@ export const useLogIn = (
   options?: UseMutationOptions<LoginResult, unknown, LoginData>
 ): UseMutationResult<LoginResult, unknown, LoginData> =>
   useMutation({
-    mutationFn: async (credentials: LoginData) =>
+    mutationFn: async credentials =>
       LoginResultSchema.parse(
         (await axios.post('/v1/auth/login', credentials)).data
       ),
@@ -55,8 +55,8 @@ export const useLogIn = (
   });
 
 export const useLogOut = (
-  options?: UseMutationOptions<unknown, unknown, unknown>
-): UseMutationResult<unknown, unknown, unknown> =>
+  options?: UseMutationOptions<void, unknown, void>
+): UseMutationResult<void, unknown, void> =>
   useMutation({
     mutationFn: () => axios.post('/v1/auth/logout'),
     ...options,
@@ -70,7 +70,7 @@ export const useResetOwnPassword = (
   >
 ): UseMutationResult<ResetOwnPasswordResponse, unknown, ResetOwnPasswordData> =>
   useMutation({
-    mutationFn: async (credentials: ResetOwnPasswordData) =>
+    mutationFn: async credentials =>
       ResetOwnPasswordResponseSchema.parse(
         (await axios.post('/v1/auth/reset-password', credentials)).data
       ),
@@ -82,7 +82,7 @@ export const useResetAuth = (
   options?: UseMutationOptions<ResetAuthResult, unknown, ResetAuthVars>
 ): UseMutationResult<ResetAuthResult, unknown, ResetAuthVars> =>
   useMutation({
-    mutationFn: async (vars: ResetAuthVars) =>
+    mutationFn: async vars =>
       ResetAuthResultSchema.parse(
         (
           await axios.post(
@@ -102,7 +102,7 @@ export const useResetOwnAuth = (
   >
 ): UseMutationResult<ChangeOwnAuthResponse, unknown, ChangeOwnAuthData> =>
   useMutation({
-    mutationFn: async (data: ChangeOwnAuthData) =>
+    mutationFn: async data =>
       ChangeOwnAuthResponseSchema.parse(
         (await axios.post('/v1/auth/change-password', data)).data
       ),

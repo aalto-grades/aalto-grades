@@ -27,9 +27,7 @@ import {Numeric} from '../../types';
 import {getAplusToken} from '../../utils/utils';
 
 const getHeaders = (): AxiosRequestConfig => ({
-  headers: {
-    Authorization: `Aplus-Token ${getAplusToken()}`,
-  },
+  headers: {Authorization: `Aplus-Token ${getAplusToken()}`},
 });
 
 export const useFetchAplusCourses = (
@@ -65,26 +63,26 @@ export const useAddAplusGradeSources = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (gradeSources: NewAplusGradeSourceData[]) =>
+    mutationFn: gradeSources =>
       axios.post(`/v1/courses/${courseId}/aplus-sources`, gradeSources),
 
-    onSuccess: () =>
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['course-parts', courseId],
-      }),
-
+      });
+    },
     ...options,
   });
 };
 
 export const useDeleteAplusGradeSource = (
   courseId: Numeric,
-  options?: UseMutationOptions<unknown, unknown, Numeric>
-): UseMutationResult<unknown, unknown, Numeric> => {
+  options?: UseMutationOptions<void, unknown, Numeric>
+): UseMutationResult<void, unknown, Numeric> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (aplusGradeSourceId: Numeric) =>
+    mutationFn: aplusGradeSourceId =>
       axios.delete(
         `/v1/courses/${courseId}/aplus-sources/${aplusGradeSourceId}`
       ),

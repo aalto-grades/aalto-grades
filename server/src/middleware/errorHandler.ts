@@ -9,8 +9,6 @@ import {HttpCode} from '@/common/types';
 import httpLogger from '../configs/winston';
 import {ApiError, Endpoint, SyncEndpoint} from '../types';
 
-/* eslint @typescript-eslint/no-explicit-any: off */
-
 /**
  * Creates a RequestHandler wrapper function that executes a given handler and
  * automatically catches any errors. This utility function can be used to avoid
@@ -22,9 +20,9 @@ import {ApiError, Endpoint, SyncEndpoint} from '../types';
  *   // Wrap your async controller with `controllerDispatcher`:
  *   app.post('/v1/course', controllerDispatcher(async (req, res, next) => { ... }));
  */
-export const controllerDispatcher = <T, U>(
-  handler: Endpoint<T, U>
-): SyncEndpoint<T, U> => {
+export const controllerDispatcher = <ReqType, ResType>(
+  handler: Endpoint<ReqType, ResType>
+): SyncEndpoint<ReqType, ResType> => {
   return (req, res, next) => {
     handler(req, res, next).catch(next);
   };

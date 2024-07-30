@@ -33,7 +33,7 @@ const UserButton = (): JSX.Element => {
   const [otpAuth, setOtpAuth] = useState<string | null>(null);
 
   const handleLogOut = async (): Promise<void> => {
-    await logOut.mutateAsync(null);
+    await logOut.mutateAsync();
     setAuth(null);
     setAnchorEl(null);
     queryClient.clear();

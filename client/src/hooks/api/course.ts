@@ -50,7 +50,7 @@ export const useAddCourse = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (course: NewCourseData) =>
+    mutationFn: async course =>
       IdSchema.parse((await axios.post('/v1/courses', course)).data),
 
     onSuccess: () => {
@@ -62,13 +62,12 @@ export const useAddCourse = (
 
 type EditCourseVars = {courseId: Numeric; course: EditCourseData};
 export const useEditCourse = (
-  options?: UseMutationOptions<unknown, unknown, EditCourseVars>
-): UseMutationResult<unknown, unknown, EditCourseVars> => {
+  options?: UseMutationOptions<void, unknown, EditCourseVars>
+): UseMutationResult<void, unknown, EditCourseVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (vars: EditCourseVars) =>
-      axios.put(`/v1/courses/${vars.courseId}`, vars.course),
+    mutationFn: vars => axios.put(`/v1/courses/${vars.courseId}`, vars.course),
 
     onSuccess: (_data: unknown, vars: EditCourseVars) => {
       queryClient.invalidateQueries({queryKey: ['course', vars.courseId]});
