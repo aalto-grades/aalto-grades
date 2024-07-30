@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '@mui/material';
 import {JSX} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Blocker} from 'react-router-dom';
 
 const UnsavedChangesDialog = ({
@@ -19,6 +20,8 @@ const UnsavedChangesDialog = ({
   blocker: Blocker | undefined;
   handleDiscard?: () => void;
 }): JSX.Element => {
+  const {t} = useTranslation();
+
   const onClose = (): void => {
     if (blocker !== undefined && blocker.state === 'blocked') blocker.reset();
   };
@@ -31,13 +34,11 @@ const UnsavedChangesDialog = ({
       aria-labelledby="unsaved-changes"
       aria-describedby="dialog-for-unsaved-changes"
     >
-      <DialogTitle>Unsaved changes</DialogTitle>
-      <DialogContent>
-        You have unsaved changes. Data you have entered will not be saved.
-      </DialogContent>
+      <DialogTitle>{t('alerts.unsaved-changes.title')}</DialogTitle>
+      <DialogContent>{t('alerts.unsaved-changes.body')}</DialogContent>
       <DialogActions>
         <Button variant="outlined" onClick={onClose}>
-          Stay on this page
+          {t('alerts.unsaved-changes.stay')}
         </Button>
         <Button
           variant="contained"
@@ -49,7 +50,7 @@ const UnsavedChangesDialog = ({
               blocker.proceed();
           }}
         >
-          Discard changes
+          {t('alerts.unsaved-changes.discard')}
         </Button>
       </DialogActions>
     </Dialog>

@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-// TODO: Translations are broken
-
 import {Badge, Checkbox} from '@mui/material';
 import {
   ExpandedState,

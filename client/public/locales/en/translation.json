@@ -4,7 +4,7 @@
     "final-grade": {
       "singular": "Final grade",
       "plural": "Final grades"
-    },
+    }
   },
   "context": {
     "grades-table": {
@@ -12,6 +12,17 @@
       "errors": "Errors",
       "preview": "Grade preview",
       "exported": "Exported to Sisu"
+    }
+  },
+  "alerts": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "unsaved-changes": {
+      "title": "Unsaved changes",
+      "body": "You have unsaved changes. Data you have entered will not be saved.",
+      "stay": "Stay on this page",
+      "discard": "Discard changes"
     }
   },
   "footer": {
