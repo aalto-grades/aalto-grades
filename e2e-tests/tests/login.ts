@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {HashAlgorithms} from '@otplib/core/';
 import {Page} from '@playwright/test';
 import {authenticator} from 'otplib';
