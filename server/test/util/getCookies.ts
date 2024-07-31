@@ -25,22 +25,28 @@ const users: UserCredentials[] = [
   {id: 4, email: 'student@aalto.fi', password: 'password'},
 ];
 
-/** Generate mfa tokens for all users by logging in once */
-const generateMfaToken = async (user: UserCredentials): Promise<string> => {
-  await request
-    .post('/v1/auth/login')
-    .set('Accept', 'application/json')
-    .send({email: user.email, password: user.password, otp: null});
-
+/** Generate a TOTP token for given user */
+const getUserToken = async (user: UserCredentials): Promise<string> => {
   const dbUser = await User.findByPk(user.id);
   const secret = dbUser?.mfaSecret as string;
   return authenticator.generate(secret);
 };
 
+/** Generate mfa token for a user by logging in once */
+const generateMfaToken = async (user: UserCredentials): Promise<void> => {
+  await request
+    .post('/v1/auth/login')
+    .set('Accept', 'application/json')
+    .send({email: user.email, password: user.password, otp: null});
+};
+
+/** Get cookie for user */
 const getCookie = async (user: UserCredentials): Promise<[string]> => {
+  await generateMfaToken(user);
+
   // Try multiple times in case token happens to become invalid just before login.
   for (let attempt = 0; attempt < 3; attempt++) {
-    const token = await generateMfaToken(user);
+    const token = await getUserToken(user);
     const res = await request
       .post('/v1/auth/login')
       .set('Accept', 'application/json')

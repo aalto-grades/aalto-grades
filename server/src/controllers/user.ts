@@ -148,7 +148,7 @@ export const getCoursesOfUser: Endpoint<void, CourseWithFinalGrades[]> = async (
   res.json(userGrades);
 };
 
-/** () => User[] */
+/** () => UserData[] */
 export const getStudents: Endpoint<void, UserData[]> = async (req, res) => {
   const requester = req.user as JwtClaims;
 
