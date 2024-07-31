@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {HashAlgorithms} from '@otplib/core/';
 import * as argon from 'argon2';
 import {Request, RequestHandler} from 'express';
 import {readFileSync} from 'fs';
@@ -40,6 +41,9 @@ import {
   JwtClaims,
   LoginCallback,
 } from '../types';
+
+// Set totp codes to use sha512 instead of sha1
+authenticator.options = {algorithm: HashAlgorithms.SHA512, digits: 6};
 
 /**
  * () => AuthData

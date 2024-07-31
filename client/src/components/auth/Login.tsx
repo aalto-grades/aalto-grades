@@ -133,6 +133,7 @@ const Login = (): JSX.Element => {
               <Typography sx={{mt: 1}}>Enter otp</Typography>
               {showOtpPrompt && (
                 <MuiOtpInput
+                  data-testid="mfa-input"
                   title="Mfa code"
                   sx={{my: 1}}
                   length={6}

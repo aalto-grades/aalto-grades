@@ -5,22 +5,14 @@
 import {expect, test} from '@playwright/test';
 
 import {cleanDb, setupDb} from './helper';
+import {login} from './login';
 
 test.beforeAll(async () => {
   await setupDb();
 });
 
 test.beforeEach(async ({page}) => {
-  await page.goto('/login');
-  await page.getByLabel('Email').click();
-  await page.getByLabel('Email').fill('admin@aalto.fi');
-  await page.getByLabel('Email').press('Tab');
-  await page.getByLabel('Password', {exact: true}).fill('password');
-  await page.getByLabel('Password', {exact: true}).press('Enter');
-  await expect(
-    page.getByRole('heading', {name: 'Log in to Aalto Grades'})
-  ).toBeHidden();
-  await expect(page.getByRole('heading', {name: 'Courses'})).toBeVisible();
+  await login('admin', page);
 });
 
 test.afterEach(async ({page}) => {

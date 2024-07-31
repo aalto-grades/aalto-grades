@@ -72,11 +72,6 @@ const ResetPassword = (): JSX.Element => {
     values: FormData,
     {resetForm, setSubmitting}: FormikHelpers<FormData>
   ): Promise<void> => {
-    console.log({
-      email: values.email,
-      password: values.oldPassword,
-      newPassword: values.newPassword,
-    });
     const otpAuthRes = await resetPassword
       .mutateAsync({
         email: values.email,
