@@ -2,15 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Request, Response} from 'express';
 import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
-import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
+  EditGradingModelData,
   GradingModelData,
-  EditGradingModelDataSchema,
   HttpCode,
-  NewGradingModelDataSchema,
+  NewGradingModelData,
 } from '@/common/types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {findCoursePartByCourseId} from './utils/coursePart';
@@ -19,44 +17,42 @@ import {
   validateGradingModelPath,
 } from './utils/gradingModel';
 import GradingModel from '../database/models/gradingModel';
-import {ApiError} from '../types';
+import {ApiError, Endpoint} from '../types';
 
 /**
- * Responds with GradingModelData
+ * () => GradingModelData
  *
  * @throws ApiError(400|404|409)
  */
-export const getGradingModel = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getGradingModel: Endpoint<void, GradingModelData> = async (
+  req,
+  res
+) => {
   const [course, gradingModel] = await validateGradingModelPath(
     req.params.courseId,
     req.params.gradingModelId
   );
   const coursePartData = await findCoursePartByCourseId(course.id);
 
-  const gradingModelData: GradingModelData = {
+  res.json({
     id: gradingModel.id,
     courseId: gradingModel.courseId,
     name: gradingModel.name,
     graphStructure: gradingModel.graphStructure,
     archived: gradingModel.archived,
     ...checkGradingModelCourseParts(gradingModel, coursePartData),
-  };
-
-  res.json(gradingModelData);
+  });
 };
 
 /**
- * Responds with GradingModelData[]
+ * () => GradingModelData[]
  *
  * @throws ApiError(400|404)
  */
-export const getAllGradingModels = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getAllGradingModels: Endpoint<void, GradingModelData[]> = async (
+  req,
+  res
+) => {
   const course = await findAndValidateCourseId(req.params.courseId);
   const coursePartData = await findCoursePartByCourseId(course.id);
 
@@ -64,8 +60,7 @@ export const getAllGradingModels = async (
     where: {courseId: course.id},
   });
 
-  const gradingModelsData: GradingModelData[] = [];
-
+  const gradingModelsData = [];
   for (const gradingModel of gradingModels) {
     gradingModelsData.push({
       id: gradingModel.id,
@@ -81,14 +76,14 @@ export const getAllGradingModels = async (
 };
 
 /**
- * Responds with number
+ * (NewGradingModelData) => number
  *
  * @throws ApiError(400|404|409)
  */
-export const addGradingModel = async (
-  req: TypedRequestBody<typeof NewGradingModelDataSchema>,
-  res: Response
-): Promise<void> => {
+export const addGradingModel: Endpoint<NewGradingModelData, number> = async (
+  req,
+  res
+) => {
   const courseId = await validateCourseId(req.params.courseId);
 
   // Find or create new grading model based on name and course ID.
@@ -113,11 +108,15 @@ export const addGradingModel = async (
   res.status(HttpCode.Created).json(gradingModel.id);
 };
 
-/** @throws ApiError(400|404|409) */
-export const editGradingModel = async (
-  req: TypedRequestBody<typeof EditGradingModelDataSchema>,
-  res: Response
-): Promise<void> => {
+/**
+ * (EditGradingModelData) => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const editGradingModel: Endpoint<EditGradingModelData, void> = async (
+  req,
+  res
+) => {
   const [, gradingModel] = await validateGradingModelPath(
     req.params.courseId,
     req.params.gradingModelId
@@ -146,11 +145,12 @@ export const editGradingModel = async (
   res.sendStatus(HttpCode.Ok);
 };
 
-/** @throws ApiError(400|404|409) */
-export const deleteGradingModel = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+/**
+ * () => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const deleteGradingModel: Endpoint<void, void> = async (req, res) => {
   const [, gradingModel] = await validateGradingModelPath(
     req.params.courseId,
     req.params.gradingModelId

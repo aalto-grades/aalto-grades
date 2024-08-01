@@ -17,7 +17,7 @@ import {z} from 'zod';
 
 import {PasswordSchema} from '@/common/types';
 import BaseShowPasswordButton from './ShowPasswordButton';
-import {useChangePassword} from '../../hooks/useApi';
+import {useResetOwnAuth} from '../../hooks/useApi';
 import FormField from '../shared/FormikField';
 
 const ValidationSchema = z
@@ -42,7 +42,7 @@ type ShowPassword = {
 
 type PropsType = {open: boolean; onClose: () => void};
 const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
-  const changePassword = useChangePassword();
+  const resetOwnAuth = useResetOwnAuth();
 
   const [showPassword, setShowPassword] = useState<ShowPassword>({
     new: false,
@@ -54,7 +54,11 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
     {resetForm, setSubmitting}: FormikHelpers<FormData>
   ): Promise<void> => {
     try {
-      await changePassword.mutateAsync({newPassword: values.newPassword});
+      await resetOwnAuth.mutateAsync({
+        resetPassword: true,
+        resetMfa: false,
+        newPassword: values.newPassword,
+      });
     } catch (e) {
       setSubmitting(false);
       return;

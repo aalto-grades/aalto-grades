@@ -2,23 +2,21 @@
 //
 // SPDX-License-Identifier: MIT
 import {stringify} from 'csv-stringify';
-import {Request, Response} from 'express';
 import {Op} from 'sequelize';
-import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   CourseRoleType,
-  EditGradeDataSchema,
+  EditGradeData,
   FinalGradeData,
   GradeData,
   GradingScale,
   HttpCode,
   LatestGrades,
-  NewGradeArraySchema,
-  SisuCsvUploadSchema,
+  NewGrade,
+  SisuCsvUpload,
   StudentRow,
   UserData,
-  UserIdArraySchema,
+  UserIdArray,
 } from '@/common/types';
 import {
   parseAplusGradeSource,
@@ -41,14 +39,14 @@ import CoursePart from '../database/models/coursePart';
 import CourseRole from '../database/models/courseRole';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
-import {ApiError, JwtClaims, NewDbGradeData} from '../types';
+import {ApiError, Endpoint, JwtClaims, NewDbGradeData} from '../types';
 
 /**
- * Responds with StudentRow[]
+ * () => StudentRow[]
  *
  * @throws ApiError(400|404)
  */
-export const getGrades = async (req: Request, res: Response): Promise<void> => {
+export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
   const courseId = await validateCourseId(req.params.courseId);
 
   // Get all course parts for the course
@@ -143,7 +141,7 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
     });
   }
 
-  const result: StudentRow[] = Object.keys(userGrades).map(
+  const studentRows = Object.keys(userGrades).map(
     (userId): StudentRow => ({
       user: usersDict[userId],
       finalGrades: finalGradesDict[userId],
@@ -156,14 +154,15 @@ export const getGrades = async (req: Request, res: Response): Promise<void> => {
     })
   );
 
-  res.json(result);
+  res.json(studentRows);
 };
 
-/** @throws ApiError(400|404|409) */
-export const addGrades = async (
-  req: TypedRequestBody<typeof NewGradeArraySchema>,
-  res: Response
-): Promise<Response> => {
+/**
+ * (NewGrade[]) => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const addGrades: Endpoint<NewGrade[], void> = async (req, res) => {
   const grader = req.user as JwtClaims;
   const courseId = await validateCourseId(req.params.courseId);
 
@@ -295,11 +294,12 @@ export const addGrades = async (
   return res.sendStatus(HttpCode.Created);
 };
 
-/** @throws ApiError(400|404|409) */
-export const editGrade = async (
-  req: TypedRequestBody<typeof EditGradeDataSchema>,
-  res: Response
-): Promise<void> => {
+/**
+ * (EditGradeData) => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const editGrade: Endpoint<EditGradeData, void> = async (req, res) => {
   const grader = req.user as JwtClaims;
   const [, gradeData] = await findAndValidateGradePath(
     req.params.courseId,
@@ -350,30 +350,30 @@ export const editGrade = async (
   res.sendStatus(HttpCode.Ok);
 };
 
-/** @throws ApiError(400|404|409) */
-export const deleteGrade = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+/**
+ * () => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const deleteGrade: Endpoint<void, void> = async (req, res) => {
   const [, grade] = await findAndValidateGradePath(
     req.params.courseId,
     req.params.gradeId
   );
-
   await grade.destroy();
 
   res.sendStatus(HttpCode.Ok);
 };
 
 /**
- * Responds with LatestGrades
+ * (UserIdArray) => LatestGrades
  *
  * @throws ApiError(404)
  */
-export const getLatestGrades = async (
-  req: TypedRequestBody<typeof UserIdArraySchema>,
-  res: Response
-): Promise<void> => {
+export const getLatestGrades: Endpoint<UserIdArray, LatestGrades> = async (
+  req,
+  res
+) => {
   const dbUsers = await User.findAll({where: {id: req.body}});
   if (dbUsers.length < req.body.length)
     throw new ApiError('Some user ids not found', HttpCode.NotFound);
@@ -387,18 +387,18 @@ export const getLatestGrades = async (
     ],
     raw: true,
   });
-  const latestItems: LatestGrades = dbGrades.map(item => ({
+  const latestGrades: LatestGrades = dbGrades.map(item => ({
     userId: item.userId,
     date: new Date(item.date),
   }));
 
   const missingStudents = new Set<number>(req.body);
-  for (const item of latestItems) missingStudents.delete(item.userId);
+  for (const grade of latestGrades) missingStudents.delete(grade.userId);
   for (const userId of missingStudents) {
-    latestItems.push({userId: userId, date: null});
+    latestGrades.push({userId: userId, date: null});
   }
 
-  res.json(latestItems);
+  res.json(latestGrades);
 };
 
 /**
@@ -406,14 +406,14 @@ export const getLatestGrades = async (
  * Sisu. Documentation and requirements for Sisu CSV file structure available at
  * https://wiki.aalto.fi/display/SISEN/Assessment+of+implementations
  *
- * Responds with text/csv
+ * (SisuCsvUpload) => string (text/csv)
  *
  * @throws ApiError(400|404)
  */
-export const getSisuFormattedGradingCSV = async (
-  req: TypedRequestBody<typeof SisuCsvUploadSchema>,
-  res: Response
-): Promise<void> => {
+export const getSisuFormattedGradingCSV: Endpoint<
+  SisuCsvUpload,
+  string
+> = async (req, res) => {
   const course = await findAndValidateCourseId(req.params.courseId);
   await studentNumbersExist(req.body.studentNumbers);
 

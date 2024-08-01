@@ -24,18 +24,15 @@ export default {
             type: new DataTypes.STRING(),
             unique: true,
             allowNull: true,
-            defaultValue: null,
           },
           student_number: {
             type: new DataTypes.STRING(),
             unique: true,
             allowNull: true,
-            defaultValue: null,
           },
           name: {
             type: new DataTypes.STRING(),
             allowNull: true,
-            defaultValue: null,
           },
           role: {
             type: DataTypes.ENUM('USER', 'ADMIN'),
@@ -45,7 +42,6 @@ export default {
           email: {
             type: new DataTypes.STRING(255),
             allowNull: true,
-            defaultValue: null,
             unique: true,
             validate: {
               isEmail: true,
@@ -54,7 +50,6 @@ export default {
           password: {
             type: new DataTypes.CHAR(255),
             allowNull: true,
-            defaultValue: null,
           },
           created_at: DataTypes.DATE,
           updated_at: DataTypes.DATE,
@@ -369,16 +364,8 @@ export default {
             type: DataTypes.DATE,
             allowNull: true,
           },
-          created_at: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: new Date(),
-          },
-          updated_at: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: new Date(),
-          },
+          created_at: DataTypes.DATE,
+          updated_at: DataTypes.DATE,
         },
         {transaction}
       );

@@ -3,22 +3,20 @@
 // SPDX-License-Identifier: MIT
 
 import * as argon from 'argon2';
-import {Request, Response} from 'express';
 import generator from 'generate-password';
 import {Op} from 'sequelize';
-import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   CourseData,
   CourseRoleType,
   CourseWithFinalGrades,
-  UserIdArraySchema,
+  FullUserData,
   HttpCode,
+  NewUser,
   NewUserResponse,
-  NewUserSchema,
   SystemRole,
   UserData,
-  FullUserData,
+  UserIdArray,
 } from '@/common/types';
 import {parseCourseFull} from './utils/course';
 import {validateUserAndGrader} from './utils/grades';
@@ -28,13 +26,10 @@ import CourseRole from '../database/models/courseRole';
 import CourseTranslation from '../database/models/courseTranslation';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
-import {ApiError, CourseFull, JwtClaims} from '../types';
+import {ApiError, CourseFull, Endpoint, JwtClaims} from '../types';
 
-/** Responds with CourseData[] */
-export const getOwnCourses = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+/** () => CourseData[] */
+export const getOwnCourses: Endpoint<void, CourseData[]> = async (req, res) => {
   const user = req.user as JwtClaims;
 
   const courses: CourseFull[] = (await Course.findAll({
@@ -48,7 +43,7 @@ export const getOwnCourses = async (
     ],
   })) as CourseFull[];
 
-  const courseData: CourseData[] = [];
+  const courseData = [];
   for (const course of courses) {
     courseData.push(parseCourseFull(course));
   }
@@ -57,14 +52,14 @@ export const getOwnCourses = async (
 };
 
 /**
- * Responds with CourseWithFinalGrades[]
+ * () => CourseWithFinalGrades[]
  *
  * @throws ApiError(400|404)
  */
-export const getCoursesOfUser = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getCoursesOfUser: Endpoint<void, CourseWithFinalGrades[]> = async (
+  req,
+  res
+) => {
   const userId = await validateUserId(req.params.userId);
   const requester = req.user as JwtClaims;
 
@@ -153,11 +148,8 @@ export const getCoursesOfUser = async (
   res.json(userGrades);
 };
 
-/** Responds with User[] */
-export const getStudents = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+/** () => UserData[] */
+export const getStudents: Endpoint<void, UserData[]> = async (req, res) => {
   const requester = req.user as JwtClaims;
 
   type DBData = Course & {
@@ -221,10 +213,10 @@ export const getStudents = async (
   res.json(Array.from(users.values()));
 };
 
-/** Responds with FullUserData[] */
-export const getUsers = async (req: Request, res: Response): Promise<void> => {
+/** () => FullUserData[] */
+export const getUsers: Endpoint<void, FullUserData[]> = async (_req, res) => {
   const dbUsers = await User.findAll();
-  const users: FullUserData[] = dbUsers.map(user => ({
+  const users = dbUsers.map(user => ({
     id: user.id,
     email: user.email,
     name: user.name,
@@ -237,14 +229,11 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
- * Responds with NewUserResponse
+ * (NewUser) => NewUserResponse
  *
  * @throws ApiError(409)
  */
-export const addUser = async (
-  req: TypedRequestBody<typeof NewUserSchema>,
-  res: Response
-): Promise<Response | void> => {
+export const addUser: Endpoint<NewUser, NewUserResponse> = async (req, res) => {
   const email = req.body.email;
 
   const existingUser = await User.findByEmail(email);
@@ -279,25 +268,26 @@ export const addUser = async (
     forcePasswordReset: true,
   });
 
-  const resData: NewUserResponse = {temporaryPassword};
-  return res.status(HttpCode.Created).json(resData);
+  return res.status(HttpCode.Created).json({temporaryPassword});
 };
 
-/** @throws ApiError(400|404) */
-export const deleteUser = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+/**
+ * () => void
+ *
+ * @throws ApiError(400|404)
+ */
+export const deleteUser: Endpoint<void, void> = async (req, res) => {
   const user = await findAndValidateUserId(req.params.userId);
   await user.destroy();
   res.sendStatus(HttpCode.Ok);
 };
 
-/** @throws ApiError(404) */
-export const deleteUsers = async (
-  req: TypedRequestBody<typeof UserIdArraySchema>,
-  res: Response
-): Promise<void> => {
+/**
+ * (UserIdArray) => void
+ *
+ * @throws ApiError(404)
+ */
+export const deleteUsers: Endpoint<UserIdArray, void> = async (req, res) => {
   const dbUsers = await User.findAll({where: {id: req.body}});
   if (dbUsers.length < req.body.length)
     throw new ApiError('Some users not found', HttpCode.NotFound);

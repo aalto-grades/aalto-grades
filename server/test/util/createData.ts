@@ -64,7 +64,13 @@ class CreateData {
   }
 
   async createAuthUser(
-    user?: Partial<UserData & {password: string; forcePasswordReset: boolean}>
+    user?: Partial<
+      UserData & {
+        password: string;
+        forcePasswordReset: boolean;
+        mfaSecret: string;
+      }
+    >
   ): Promise<UserData> {
     const password = await argon.hash(user?.password ?? 'password', {
       type: argon.argon2id,
@@ -80,6 +86,7 @@ class CreateData {
       role: SystemRole.Admin,
       password: password,
       forcePasswordReset: user?.forcePasswordReset ?? false,
+      mfaSecret: user?.mfaSecret ?? null,
     });
     this.freeUserId += 1;
     return {

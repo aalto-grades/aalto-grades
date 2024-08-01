@@ -36,12 +36,12 @@ export const useGetFinalGrades = (
 
 export const useAddFinalGrades = (
   courseId: Numeric,
-  options?: UseMutationOptions<unknown, unknown, NewFinalGrade[]>
-): UseMutationResult<unknown, unknown, NewFinalGrade[]> => {
+  options?: UseMutationOptions<void, unknown, NewFinalGrade[]>
+): UseMutationResult<void, unknown, NewFinalGrade[]> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newFinalGrades: NewFinalGrade[]) =>
+    mutationFn: newFinalGrades =>
       axios.post(`/v1/courses/${courseId}/final-grades`, newFinalGrades),
 
     onSuccess: () => {
@@ -59,10 +59,10 @@ export const useAddFinalGrades = (
 type EditFinalGradeVars = {finalGradeId: Numeric; data: EditFinalGrade};
 export const useEditFinalGrade = (
   courseId: Numeric,
-  options?: UseMutationOptions<unknown, unknown, EditFinalGradeVars>
-): UseMutationResult<unknown, unknown, EditFinalGradeVars> =>
+  options?: UseMutationOptions<void, unknown, EditFinalGradeVars>
+): UseMutationResult<void, unknown, EditFinalGradeVars> =>
   useMutation({
-    mutationFn: (vars: EditFinalGradeVars) =>
+    mutationFn: vars =>
       axios.put(
         `/v1/courses/${courseId}/final-grades/${vars.finalGradeId}`,
         vars.data
@@ -72,12 +72,12 @@ export const useEditFinalGrade = (
 
 export const useDeleteFinalGrade = (
   courseId: Numeric,
-  options?: UseMutationOptions<unknown, unknown, Numeric>
-): UseMutationResult<unknown, unknown, Numeric> => {
+  options?: UseMutationOptions<void, unknown, Numeric>
+): UseMutationResult<void, unknown, Numeric> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (finalGradeId: Numeric) =>
+    mutationFn: finalGradeId =>
       axios.delete(`/v1/courses/${courseId}/final-grades/${finalGradeId}`),
 
     onSuccess: () => {

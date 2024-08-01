@@ -175,7 +175,7 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/auth/reset-password:
+/v1/auth/reset-own-password:
   post:
     tags: [Auth]
     description: Reset own password
@@ -199,7 +199,7 @@ definitions:
       404:
         $ref: '#/components/responses/NotFound'
 
-/v1/auth/reset-password/{userId}:
+/v1/auth/reset-auth/{userId}:
   post:
     tags: [Auth]
     description: Reset other admin's password. Only available to admins.
@@ -223,7 +223,7 @@ definitions:
     security:
       - cookieAuth: []
 
-/v1/auth/change-password:
+/v1/auth/change-own-auth:
   post:
     tags: [Auth]
     description: Change own password after logging in

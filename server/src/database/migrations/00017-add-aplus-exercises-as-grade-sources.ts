@@ -17,7 +17,6 @@ export default {
         'exercise_id',
         {
           type: DataTypes.INTEGER,
-          defaultValue: null,
           allowNull: true,
         },
         {transaction}
@@ -28,7 +27,6 @@ export default {
         'exercise_name',
         {
           type: DataTypes.STRING,
-          defaultValue: null,
           allowNull: true,
         },
         {transaction}

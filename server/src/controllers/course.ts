@@ -2,17 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Request, Response} from 'express';
 import {Transaction, UniqueConstraintError} from 'sequelize';
-import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   CourseData,
   CourseRoleType,
-  EditCourseDataSchema,
+  EditCourseData,
   HttpCode,
   Language,
-  NewCourseDataSchema,
+  NewCourseData,
   SystemRole,
 } from '@/common/types';
 import {
@@ -29,34 +27,30 @@ import CourseRole from '../database/models/courseRole';
 import CourseTranslation from '../database/models/courseTranslation';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
-import {ApiError, CourseFull, JwtClaims} from '../types';
+import {ApiError, Endpoint, CourseFull, JwtClaims} from '../types';
 
 /**
- * Responds with CourseData
+ * () => CourseData
  *
  * @throws ApiError(400|404)
  */
-export const getCourse = async (req: Request, res: Response): Promise<void> => {
+export const getCourse: Endpoint<void, CourseData> = async (req, res) => {
   const courseId = await validateCourseId(req.params.courseId);
-
-  const courseData: CourseData = parseCourseFull(
-    await findCourseFullById(courseId)
-  );
+  const courseData = parseCourseFull(await findCourseFullById(courseId));
 
   res.json(courseData);
 };
 
-/** Responds with CourseData[] */
-export const getAllCourses = async (
-  _req: Request,
-  res: Response
-): Promise<void> => {
+/** () => CourseData[] */
+export const getAllCourses: Endpoint<void, CourseData[]> = async (
+  _req,
+  res
+) => {
   const courses = (await Course.findAll({
     include: [{model: CourseTranslation}, {model: User, as: 'Users'}],
   })) as CourseFull[];
 
-  const coursesData: CourseData[] = [];
-
+  const coursesData = [];
   for (const course of courses) {
     coursesData.push(parseCourseFull(course));
   }
@@ -65,14 +59,11 @@ export const getAllCourses = async (
 };
 
 /**
- * Responds with number
+ * (NewCourseData) => number
  *
  * @throws ApiError(404|409|422)
  */
-export const addCourse = async (
-  req: TypedRequestBody<typeof NewCourseDataSchema>,
-  res: Response
-): Promise<void> => {
+export const addCourse: Endpoint<NewCourseData, number> = async (req, res) => {
   const teachers = await validateEmailList(req.body.teachersInCharge);
   const assistants = await validateEmailList(req.body.assistants);
 
@@ -152,11 +143,12 @@ export const addCourse = async (
   res.status(HttpCode.Created).json(course.id);
 };
 
-/** @throws ApiError(400|404|409|422) */
-export const editCourse = async (
-  req: TypedRequestBody<typeof EditCourseDataSchema>,
-  res: Response
-): Promise<Response | undefined> => {
+/**
+ * (EditCourseData) => void
+ *
+ * @throws ApiError(400|404|409|422)
+ */
+export const editCourse: Endpoint<EditCourseData, void> = async (req, res) => {
   const course = await findAndValidateCourseId(req.params.courseId);
   const finalGrade = await FinalGrade.findOne({where: {courseId: course.id}});
   const user = req.user as JwtClaims;

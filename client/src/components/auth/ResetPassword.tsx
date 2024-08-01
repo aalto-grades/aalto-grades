@@ -10,9 +10,9 @@ import {Navigate, useLocation, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
 import {AaltoEmailSchema, PasswordSchema} from '@/common/types';
+import OtpAuthDialog from './OtpAuthDialog';
 import BaseShowPasswordButton from './ShowPasswordButton';
 import {useResetOwnPassword} from '../../hooks/useApi';
-import useAuth from '../../hooks/useAuth';
 import FormField from '../shared/FormikField';
 
 const ValidationSchema = z
@@ -44,10 +44,14 @@ type ShowPassword = {
 };
 const ResetPassword = (): JSX.Element => {
   const navigate = useNavigate();
-  const {setAuth} = useAuth();
   const resetPassword = useResetOwnPassword();
   const {state} = useLocation() as {
-    state: {email: string; password: string} | null;
+    state: {
+      email: string;
+      password: string;
+      resetPassword: boolean;
+      resetMfa: boolean;
+    } | null;
   };
 
   const [showPassword, setShowPassword] = useState<ShowPassword>({
@@ -55,6 +59,7 @@ const ResetPassword = (): JSX.Element => {
     new: false,
     repeat: false,
   });
+  const [otpAuth, setOtpAuth] = useState<string | null>(null);
 
   const initialValues = {
     email: state?.email ?? '',
@@ -63,25 +68,25 @@ const ResetPassword = (): JSX.Element => {
     repeatPassword: '',
   };
 
-  const handleSubmit = async (
+  const handleResetPassword = async (
     values: FormData,
     {resetForm, setSubmitting}: FormikHelpers<FormData>
   ): Promise<void> => {
-    const auth = await resetPassword
+    const otpAuthRes = await resetPassword
       .mutateAsync({
         email: values.email,
         password: values.oldPassword,
         newPassword: values.newPassword,
       })
       .catch(() => setSubmitting(false));
-    if (auth === undefined) return;
+    if (otpAuthRes === undefined) return;
 
     enqueueSnackbar('Password reset successfully', {variant: 'success'});
     setSubmitting(false);
     resetForm();
+    if (!state?.resetMfa) return navigate('/login', {replace: true});
 
-    setAuth(auth);
-    navigate('/', {replace: true});
+    setOtpAuth(otpAuthRes.otpAuth);
   };
 
   const validateForm = (
@@ -113,74 +118,87 @@ const ResetPassword = (): JSX.Element => {
   if (state === null) return <Navigate to="/login" />;
 
   return (
-    <Grid
-      container
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-    >
-      <Typography variant="h2">Reset password</Typography>
-      <Box
-        sx={{
-          width: 1 / 2,
-          border: 1,
-          borderRadius: '8px',
-          borderColor: 'gray',
-          p: 2,
-          mt: 1,
+    <>
+      <OtpAuthDialog
+        otpAuth={otpAuth}
+        onClose={() => {
+          setOtpAuth(null);
+          navigate('/login', {replace: true});
         }}
+      />
+      <Grid
+        container
+        direction="column"
+        alignItems="center"
+        justifyContent="center"
       >
-        <Formik
-          initialValues={initialValues}
-          validate={validateForm}
-          onSubmit={handleSubmit}
+        <Typography variant="h2">Reset password</Typography>
+        <Box
+          sx={{
+            width: 1 / 2,
+            border: 1,
+            borderRadius: '8px',
+            borderColor: 'gray',
+            p: 2,
+            mt: 1,
+          }}
         >
-          {form => (
-            <>
-              <FormField
-                form={form as unknown as FormikProps<{[key: string]: unknown}>}
-                value="newPassword"
-                label="New Password*"
-                helperText="New password"
-                type={showPassword.new ? 'text' : 'password'}
-                InputProps={{endAdornment: <ShowPasswordButton type="new" />}}
-              />
-              <FormField
-                form={form as unknown as FormikProps<{[key: string]: unknown}>}
-                value="repeatPassword"
-                label="Repeat Password*"
-                helperText="Repeat password"
-                type={showPassword.repeat ? 'text' : 'password'}
-                InputProps={{
-                  endAdornment: <ShowPasswordButton type="repeat" />,
-                }}
-              />
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-end',
-                }}
-              >
-                <Link
-                  href="https://www.aalto.fi/en/services/password-guidelines"
-                  target="_blank"
+          <Formik
+            initialValues={initialValues}
+            validate={validateForm}
+            onSubmit={handleResetPassword}
+          >
+            {form => (
+              <>
+                <FormField
+                  form={
+                    form as unknown as FormikProps<{[key: string]: unknown}>
+                  }
+                  value="newPassword"
+                  label="New Password*"
+                  helperText="New password"
+                  type={showPassword.new ? 'text' : 'password'}
+                  InputProps={{endAdornment: <ShowPasswordButton type="new" />}}
+                />
+                <FormField
+                  form={
+                    form as unknown as FormikProps<{[key: string]: unknown}>
+                  }
+                  value="repeatPassword"
+                  label="Repeat Password*"
+                  helperText="Repeat password"
+                  type={showPassword.repeat ? 'text' : 'password'}
+                  InputProps={{
+                    endAdornment: <ShowPasswordButton type="repeat" />,
+                  }}
+                />
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-end',
+                  }}
                 >
-                  Aalto password requirements
-                </Link>
-                <Button
-                  variant="contained"
-                  onClick={form.submitForm}
-                  disabled={form.isSubmitting}
-                >
-                  Reset password
-                </Button>
-              </Box>
-            </>
-          )}
-        </Formik>
-      </Box>
-    </Grid>
+                  <Link
+                    href="https://www.aalto.fi/en/services/password-guidelines"
+                    target="_blank"
+                  >
+                    Aalto password requirements
+                  </Link>
+                  <Button
+                    variant="contained"
+                    onClick={form.submitForm}
+                    disabled={form.isSubmitting}
+                  >
+                    Reset password
+                  </Button>
+                </Box>
+              </>
+            )}
+          </Formik>
+        </Box>
+      </Grid>
+    </>
   );
 };
 export default ResetPassword;

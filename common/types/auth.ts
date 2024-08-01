@@ -45,35 +45,69 @@ export const AuthDataSchema = z.strictObject({
 export const LoginDataSchema = z.strictObject({
   email: z.string(),
   password: z.string(),
+  otp: z.string().nullable(),
 });
-export const LoginResultSchema = z.discriminatedUnion('resetPassword', [
+export const LoginResultSchema = z.discriminatedUnion('status', [
   z.strictObject({
-    resetPassword: z.literal(true),
+    status: z.literal('resetMfa'),
+    otpAuth: z.string(),
   }),
   z.strictObject({
-    resetPassword: z.literal(false),
+    status: z.literal('resetPassword'),
+    resetPassword: z.boolean(),
+    resetMfa: z.boolean(),
+  }),
+  z.strictObject({
+    status: z.literal('enterMfa'),
+  }),
+  z.strictObject({
+    status: z.literal('ok'),
     id: z.number().int(),
     name: z.string(),
     role: SystemRoleSchema,
   }),
 ]);
 
-export const ResetPasswordDataSchema = z.strictObject({
+export const ResetOwnPasswordDataSchema = z.strictObject({
   email: z.string(),
   password: z.string(),
   newPassword: z.string(),
 });
-export const ResetPasswordResultSchema = z.strictObject({
-  temporaryPassword: z.string(),
+export const ResetOwnPasswordResponseSchema = z.strictObject({
+  otpAuth: z.string().nullable(),
 });
 
-export const ChangePasswordDataSchema = z.strictObject({
-  newPassword: PasswordSchema,
+export const ResetAuthDataSchema = z.strictObject({
+  resetPassword: z.boolean(),
+  resetMfa: z.boolean(),
+});
+export const ResetAuthResultSchema = z.strictObject({
+  temporaryPassword: z.string().nullable(),
+});
+
+export const ChangeOwnAuthDataSchema = z.discriminatedUnion('resetPassword', [
+  z.strictObject({
+    resetPassword: z.literal(true),
+    resetMfa: z.literal(false),
+    newPassword: PasswordSchema,
+  }),
+  z.strictObject({
+    resetPassword: z.literal(false),
+    resetMfa: z.literal(true),
+  }),
+]);
+export const ChangeOwnAuthResponseSchema = z.strictObject({
+  otpAuth: z.string().nullable(),
 });
 
 export type AuthData = z.infer<typeof AuthDataSchema>;
 export type LoginData = z.infer<typeof LoginDataSchema>;
 export type LoginResult = z.infer<typeof LoginResultSchema>;
-export type ResetPasswordData = z.infer<typeof ResetPasswordDataSchema>;
-export type ChangePasswordData = z.infer<typeof ChangePasswordDataSchema>;
-export type ResetPasswordResult = z.infer<typeof ResetPasswordResultSchema>;
+export type ResetOwnPasswordData = z.infer<typeof ResetOwnPasswordDataSchema>;
+export type ResetOwnPasswordResponse = z.infer<
+  typeof ResetOwnPasswordResponseSchema
+>;
+export type ResetAuthData = z.infer<typeof ResetAuthDataSchema>;
+export type ResetAuthResult = z.infer<typeof ResetAuthResultSchema>;
+export type ChangeOwnAuthData = z.infer<typeof ChangeOwnAuthDataSchema>;
+export type ChangeOwnAuthResponse = z.infer<typeof ChangeOwnAuthResponseSchema>;

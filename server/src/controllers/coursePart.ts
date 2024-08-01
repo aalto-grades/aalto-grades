@@ -2,15 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Request, Response} from 'express';
 import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
-import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   CoursePartData,
-  EditCoursePartDataSchema,
+  EditCoursePartData,
   HttpCode,
-  NewCoursePartDataSchema,
+  NewCoursePartData,
 } from '@/common/types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
@@ -18,34 +16,32 @@ import {
   validateCoursePartPath,
 } from './utils/coursePart';
 import CoursePart from '../database/models/coursePart';
-import {ApiError} from '../types';
+import {ApiError, Endpoint} from '../types';
 
 /**
- * Responds with CoursePartData[]
+ * () => CoursePartData[]
  *
  * @throws ApiError(400|404)
  */
-export const getCourseParts = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getCourseParts: Endpoint<void, CoursePartData[]> = async (
+  req,
+  res
+) => {
   const course = await findAndValidateCourseId(req.params.courseId);
-  const coursePartData: CoursePartData[] = await findCoursePartByCourseId(
-    course.id
-  );
+  const coursePartData = await findCoursePartByCourseId(course.id);
 
   res.json(coursePartData);
 };
 
 /**
- * Responds with number
+ * (NewCoursePartData) => number
  *
  * @throws ApiError(400|404|409)
  */
-export const addCoursePart = async (
-  req: TypedRequestBody<typeof NewCoursePartDataSchema>,
-  res: Response
-): Promise<void> => {
+export const addCoursePart: Endpoint<NewCoursePartData, number> = async (
+  req,
+  res
+) => {
   const courseId = await validateCourseId(req.params.courseId);
 
   const [coursePart, created] = await CoursePart.findOrCreate({
@@ -70,11 +66,15 @@ export const addCoursePart = async (
   res.status(HttpCode.Created).json(coursePart.id);
 };
 
-/** @throws ApiError(400|404|409) */
-export const editCoursePart = async (
-  req: TypedRequestBody<typeof EditCoursePartDataSchema>,
-  res: Response
-): Promise<void> => {
+/**
+ * (EditCoursePartData) => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const editCoursePart: Endpoint<EditCoursePartData, void> = async (
+  req,
+  res
+) => {
   const [, coursePart] = await validateCoursePartPath(
     req.params.courseId,
     req.params.coursePartId
@@ -108,11 +108,12 @@ export const editCoursePart = async (
   res.sendStatus(HttpCode.Ok);
 };
 
-/** @throws ApiError(400|404|409) */
-export const deleteCoursePart = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+/**
+ * () => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const deleteCoursePart: Endpoint<void, void> = async (req, res) => {
   const [, coursePart] = await validateCoursePartPath(
     req.params.courseId,
     req.params.coursePartId
