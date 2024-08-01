@@ -91,7 +91,7 @@ const SelectCoursePartsDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Select course parts</DialogTitle>
+      <DialogTitle>{t('graph.select-parts')}</DialogTitle>
 
       <DialogContent>
         <FormGroup>
@@ -116,10 +116,10 @@ const SelectCoursePartsDialog = ({
             setSelected(startSelected);
           }}
         >
-          Cancel
+          {t('general.cancel')}
         </Button>
         <Button variant="contained" onClick={onSubmit}>
-          Done
+          {t('general.done')}
         </Button>
       </DialogActions>
     </Dialog>

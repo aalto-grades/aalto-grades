@@ -107,7 +107,7 @@ const CoursePartValuesDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Set test course part values</DialogTitle>
+      <DialogTitle>{t('graph.set-test-values')}</DialogTitle>
 
       <DialogContent>
         {coursePartNodeIds.map(coursePartId => (
@@ -128,10 +128,10 @@ const CoursePartValuesDialog = ({
             setValues(startValues);
           }}
         >
-          Cancel
+          {t('general.cancel')}
         </Button>
         <Button variant="contained" onClick={onSubmit} disabled={error}>
-          Done
+          {t('general.done')}
         </Button>
       </DialogActions>
     </Dialog>
