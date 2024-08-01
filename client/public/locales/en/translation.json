@@ -1,6 +1,40 @@
 {
   "general": {
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "save": "Save",
+    "back": "Back",
+    "next": "Next",
+    "date": "Date",
+    "name": "Name",
     "student-number": "Student number",
+    "delete": "Delete",
+    "course": {
+      "singular": "Course",
+      "plural": "Courses"
+    },
+    "course-code": "Course code",
+    "instance": "Instance",
+    "grading-models": "Grading models",
+    "course-parts": "Course parts",
+    "days-valid": "Days valid",
+    "max-grade": "Max grade",
+    "a+-courses": "A+ courses",
+    "a+-sources": "A+ grade sources",
+    "full-points": "Full points",
+    "module": {
+      "singular": "Module",
+      "plural": "Modules"
+    },
+    "exercise": {
+      "singular": "Exercise",
+      "plural": "Exercises"
+    },
+    "difficulty": {
+      "singular": "Difficulty",
+      "plural": "Difficulties"
+    },
+    "grades": "Grades",
     "final-grade": {
       "singular": "Final grade",
       "plural": "Final grades"
@@ -15,7 +49,6 @@
     }
   },
   "alerts": {
-    "cancel": "Cancel",
     "delete": "Delete",
     "confirm": "Confirm",
     "unsaved-changes": {
@@ -23,6 +56,54 @@
       "body": "You have unsaved changes. Data you have entered will not be saved.",
       "stay": "Stay on this page",
       "discard": "Discard changes"
+    }
+  },
+  "course": {
+    "list": "Course list",
+    "edit": "Edit course",
+    "rename-model": {
+      "title": "Rename grading model",
+      "saved": "Grading model saved"
+    },
+    "create-model": {
+      "title": "Create grading model",
+      "select-template": "Select template",
+      "none": "None",
+      "addition": "Addition",
+      "average": "Average"
+    },
+    "create-part": {
+      "title": "Create new course part",
+      "name-help": "Course part name",
+      "days-valid-help": "How long the grades should stay valid for",
+      "set-max-grade": "Set maximum allowed grade",
+      "max-grade-help": "Maximum allowed grade for course part"
+    },
+    "parts": {
+      "saved": "Course parts saved successfully",
+      "add-a+-source": "Add A+ grade source",
+      "view-a+-sources": "View A+ grade sources",
+      "archive": "Archive",
+      "unarchive": "Unarchive",
+      "delete": "Delete course part",
+      "delete-message": "Some models are using this course part. Are you sure you want to delete it?",
+      "valid-until": "Valid until",
+      "archived": "Archived",
+      "add-new": "Add new",
+      "add-from-a+": "Add from A+"
+    },
+    "a+": {
+      "select-grade-source": {
+        "singular": "Select grade source",
+        "plural": "Select grade sources"
+      },
+      "create-parts": "Create course parts"
+    },
+    "view-a+-source": {
+      "course-name": "Course name",
+      "url": "Course URL",
+      "source-name": "Source name",
+      "delete": "Delete A+ grade source"
     }
   },
   "footer": {
@@ -42,12 +123,10 @@
   "front-page": {
     "your-courses": "Your courses",
     "no-courses": "You have no courses. Please contact support to have your course added.",
-    "courses": "Courses",
     "create-course": "Create new course"
   },
   "manage-students": {
     "title": "Manage students",
-    "name": "Name",
     "email": "Email",
     "latest-grade": "Latest grade",
     "delete": {
@@ -70,7 +149,6 @@
   },
   "students": {
     "select": "Select student",
-    "viewing-grades": "Viewing grades for {0}",
-    "course": "Course"
+    "viewing-grades": "Viewing grades for {0}"
   }
 }

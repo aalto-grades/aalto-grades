@@ -27,6 +27,7 @@ import {
 } from '@mui/material';
 import {OverridableComponent} from '@mui/types';
 import {JSX} from 'react';
+import {useTranslation} from 'react-i18next';
 import {NavLink, useParams} from 'react-router-dom';
 
 import {CourseRoleType, SystemRole} from '@/common/types';
@@ -89,6 +90,7 @@ const SideMenuButton = ({
 );
 
 const SideMenu = (): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams();
   const {auth} = useAuth();
 
@@ -110,7 +112,7 @@ const SideMenu = (): JSX.Element => {
     >
       <List>
         <SideMenuButton
-          text="Courses list"
+          text={t('course.list')}
           to={'/'}
           Icon={HomeMaxRounded}
           IconOutlined={ArrowBack}
@@ -118,19 +120,19 @@ const SideMenu = (): JSX.Element => {
         />
         <Divider sx={{my: 2}} />
         <SideMenuButton
-          text="Grades"
+          text={t('general.grades')}
           to={`/${courseId}/course-results`}
           Icon={FlagCircle}
           IconOutlined={FlagCircleOutlined}
         />
         <SideMenuButton
-          text="Grading models"
+          text={t('general.grading-models')}
           to={`/${courseId}/models`}
           Icon={AccountTree}
           IconOutlined={AccountTreeOutlined}
         />
         <SideMenuButton
-          text="Course parts"
+          text={t('general.course-parts')}
           to={`/${courseId}/course-parts`}
           Icon={Widgets}
           IconOutlined={WidgetsOutlined}
@@ -140,7 +142,7 @@ const SideMenu = (): JSX.Element => {
           <>
             <Divider sx={{my: 2}} />
             <SideMenuButton
-              text="Edit course"
+              text={t('course.edit')}
               to={`/${courseId}/edit`}
               Icon={Edit}
               IconOutlined={EditOutlined}

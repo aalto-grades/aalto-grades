@@ -56,7 +56,7 @@ const ManageStudentsView = (): JSX.Element => {
   const columns: GridColDef<ColTypes>[] = [
     {
       field: 'name',
-      headerName: t('manage-students.name'),
+      headerName: t('general.name'),
       type: 'string',
       editable: false,
       width: 200,

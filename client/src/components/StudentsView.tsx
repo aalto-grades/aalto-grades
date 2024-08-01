@@ -89,7 +89,7 @@ const StudentsView = (): JSX.Element => {
             <Table sx={{minWidth: 650}} aria-label="simple table">
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('students.course')}</TableCell>
+                  <TableCell>{t('general.course.singular')}</TableCell>
                   <TableCell align="right">
                     {t('general.final-grade.plural')}
                   </TableCell>

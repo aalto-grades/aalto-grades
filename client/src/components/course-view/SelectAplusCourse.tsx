@@ -4,6 +4,7 @@
 
 import {Autocomplete, Box, TextField} from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {AplusCourseData} from '@/common/types';
@@ -20,6 +21,7 @@ const SelectAplusCourse = ({
   selectedAplusCourse,
   setAplusCourse,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const course = useGetCourse(courseId);
 
@@ -90,7 +92,9 @@ const SelectAplusCourse = ({
           );
         }}
         options={courseOptions}
-        renderInput={params => <TextField {...params} label="Course" />}
+        renderInput={params => (
+          <TextField {...params} label={t('general.course.singular')} />
+        )}
         defaultValue={defaultCourse}
       />
       <Autocomplete
@@ -102,7 +106,9 @@ const SelectAplusCourse = ({
           )
         }
         options={instanceOptions}
-        renderInput={params => <TextField {...params} label="Instance" />}
+        renderInput={params => (
+          <TextField {...params} label={t('general.instance')} />
+        )}
         value={
           // We must return null instead of undefined, otherwise this
           // Autocomplete is considered uncontrolled and our logic breaks

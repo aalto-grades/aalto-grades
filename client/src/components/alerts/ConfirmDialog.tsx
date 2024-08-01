@@ -30,7 +30,7 @@ export const ConfirmDialog = ({
 
   type ActionButton = {title: string; onClick: () => void};
   const cancelButton = actions!.find(
-    (el: ActionButton) => el.title === t('alerts.cancel')
+    (el: ActionButton) => el.title === t('general.cancel')
   ) as ActionButton;
   const confirmButton = actions!.find(
     (el: ActionButton) => el.title === t('alerts.confirm')
@@ -56,7 +56,7 @@ export const ConfirmDialog = ({
         <Button onClick={cancelButton.onClick}>
           {confirmNavigate
             ? t('alerts.unsaved-changes.stay')
-            : t('alerts.cancel')}
+            : t('general.cancel')}
         </Button>
         <Button
           onClick={confirmButton.onClick}
@@ -66,7 +66,7 @@ export const ConfirmDialog = ({
           {confirmNavigate
             ? t('alerts.unsaved-changes.discard')
             : confirmDelete
-              ? t('alerts.delete')
+              ? t('general.delete')
               : t('alerts.confirm')}
         </Button>
       </DialogActions>

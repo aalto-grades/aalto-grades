@@ -21,6 +21,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import {JSX} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {AplusGradeSourceData, AplusGradeSourceType} from '@/common/types';
@@ -37,13 +38,14 @@ const ViewAplusGradeSourcesDialog = ({
   open,
   aplusGradeSources,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const deleteAplusGradeSource = useDeleteAplusGradeSource(courseId);
 
   const getSourceName = (source: AplusGradeSourceData): string => {
     switch (source.sourceType) {
       case AplusGradeSourceType.FullPoints:
-        return 'Full points';
+        return t('general.full-points');
       case AplusGradeSourceType.Module:
         return source.moduleName;
       case AplusGradeSourceType.Exercise:
@@ -60,18 +62,18 @@ const ViewAplusGradeSourcesDialog = ({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="lg">
-      <DialogTitle>A+ grade sources</DialogTitle>
+      <DialogTitle>{t('general.a+-sources')}</DialogTitle>
       <DialogContent>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Course code</TableCell>
-                <TableCell>Course name</TableCell>
-                <TableCell>Course instance</TableCell>
-                <TableCell>Course URL</TableCell>
-                <TableCell>Source name</TableCell>
-                <TableCell>Date</TableCell>
+                <TableCell>{t('general.course-code')}</TableCell>
+                <TableCell>{t('course.view-a+-source.course-name')}</TableCell>
+                <TableCell>{t('general.instance')}</TableCell>
+                <TableCell>{t('course.view-a+-source.url')}</TableCell>
+                <TableCell>{t('course.view-a+-source.source-name')}</TableCell>
+                <TableCell>{t('general.date')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -88,7 +90,10 @@ const ViewAplusGradeSourcesDialog = ({
                   <TableCell>{getSourceName(source)}</TableCell>
                   <TableCell>{source.date.toDateString()}</TableCell>
                   <TableCell>
-                    <Tooltip placement="top" title="Delete A+ grade source">
+                    <Tooltip
+                      placement="top"
+                      title={t('course.view-a+-source.delete')}
+                    >
                       <IconButton onClick={() => handleDelete(source.id)}>
                         <Delete />
                       </IconButton>

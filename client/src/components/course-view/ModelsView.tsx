@@ -20,6 +20,7 @@ import {grey} from '@mui/material/colors';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useCallback, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {
@@ -30,7 +31,7 @@ import {
 } from '@/common/types';
 import {GraphStructure} from '@/common/types/graph';
 import CreateGradingModelDialog from './CreateGradingModelDialog';
-import EditGradingModelDialog from './EditGradingModelDialog';
+import RenameGradingModelDialog from './RenameGradingModelDialog';
 import {useGetFinalGrades} from '../../hooks/api/finalGrade';
 import {
   useDeleteGradingModel,
@@ -46,6 +47,7 @@ import Graph from '../graph/Graph';
 
 type ParamsType = {courseId: string; modelId?: string; userId?: string};
 const ModelsView = (): JSX.Element => {
+  const {t} = useTranslation();
   const {auth, isTeacherInCharge} = useAuth();
   const {courseId, modelId, userId} = useParams() as ParamsType;
   const navigate = useNavigate();
@@ -251,7 +253,7 @@ const ModelsView = (): JSX.Element => {
         }}
       />
 
-      <EditGradingModelDialog
+      <RenameGradingModelDialog
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
         gradingModelId={editDialogModel?.id ?? null}
@@ -299,7 +301,10 @@ const ModelsView = (): JSX.Element => {
                 secondaryAction={
                   editRights ? (
                     <>
-                      <Tooltip placement="top" title="Rename grading model">
+                      <Tooltip
+                        placement="top"
+                        title={t('course.rename-model.title')}
+                      >
                         <IconButton
                           onClick={() => {
                             setEditDialogModel(model);

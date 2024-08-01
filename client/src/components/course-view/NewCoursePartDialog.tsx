@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 
 import {NewCoursePartDataSchema} from '@/common/types';
 import FormField from '../shared/FormikField';
@@ -32,6 +33,7 @@ const AddCoursePartDialog = ({
   onClose,
   onSave,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const [showMaxGrade, setShowMaxGrade] = useState<boolean>(false);
 
   const onSubmit = (
@@ -76,20 +78,20 @@ const AddCoursePartDialog = ({
           fullWidth
           maxWidth="xs"
         >
-          <DialogTitle>Create new course part</DialogTitle>
+          <DialogTitle>{t('course.create-part.title')}</DialogTitle>
           <DialogContent>
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               value="name"
-              label="Name*"
-              helperText="Course part name"
+              label={`${t('general.name')}*`}
+              helperText={t('course.create-part.name-help')}
               type="string"
             />
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               value="daysValid"
-              label="Days valid*"
-              helperText="How long the grades should stay valid for"
+              label={`${t('general.days-valid')}*`}
+              helperText={t('course.create-part.days-valid-help')}
               type="number"
             />
             <FormControlLabel
@@ -99,14 +101,14 @@ const AddCoursePartDialog = ({
                   onChange={e => setShowMaxGrade(e.target.checked)}
                 />
               }
-              label="Set maximum allowed grade"
+              label={t('course.create-part.set-max-grade')}
             />
             <Collapse in={showMaxGrade}>
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="maxGrade"
-                label="Maximum grade"
-                helperText="Maximum allowed grade for course part"
+                label={`${t('general.max-grade')}*`}
+                helperText={t('course.create-part.max-grade-help')}
                 type="number"
               />
             </Collapse>
@@ -121,14 +123,14 @@ const AddCoursePartDialog = ({
                 setShowMaxGrade(false);
               }}
             >
-              Cancel
+              {t('general.cancel')}
             </Button>
             <Button
               variant="contained"
               disabled={form.isSubmitting}
               onClick={form.submitForm}
             >
-              Save
+              {t('general.save')}
             </Button>
           </DialogActions>
         </Dialog>
