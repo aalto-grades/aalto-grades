@@ -14,6 +14,7 @@ import {
   useState,
 } from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 import {useBlocker} from 'react-router-dom';
 import {
   ReactFlow,
@@ -94,7 +95,7 @@ const dragAndDropNodes: {type: DropInNodes; title: string; tooltip: string}[] =
     {
       type: 'stepper',
       title: 'Stepper',
-      tooltip: 'Map a continuous value into some specific value', // TODO: Better explanation
+      tooltip: 'Map ranges of values into specific values',
     },
     {
       type: 'minpoints',
@@ -137,6 +138,7 @@ const Graph = ({
   readOnly = false,
   modelHasFinalGrades = false,
 }: GraphProps): JSX.Element => {
+  const {t} = useTranslation();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [nodeData, setNodeData] = useState<FullNodeData>({});

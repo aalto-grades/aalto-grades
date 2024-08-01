@@ -11,6 +11,7 @@ import {
   TextField,
 } from '@mui/material';
 import {ChangeEvent, JSX, useEffect, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Node} from 'reactflow';
 
 import {NodeValues} from '@/common/types/graph';
@@ -34,6 +35,7 @@ const CoursePartValuesDialog = ({
     [key: number]: number;
   }) => void;
 }): JSX.Element => {
+  const {t} = useTranslation();
   const coursePartNodeIds = useMemo(
     () =>
       nodes

@@ -13,6 +13,7 @@ import {
   FormGroup,
 } from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Node} from 'reactflow';
 
 import {CoursePartData} from '@/common/types';
@@ -33,6 +34,7 @@ const SelectCoursePartsDialog = ({
     removedCourseParts: CoursePartData[]
   ) => void;
 }): JSX.Element => {
+  const {t} = useTranslation();
   const coursePartNodeIds: number[] = nodes
     .filter(node => node.type === 'coursepart')
     .map(node => parseInt(node.id.split('-')[1]));
