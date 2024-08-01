@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position} from 'reactflow';
 
 import {MinPointsNodeSettings, MinPointsNodeValue} from '@/common/types/graph';
@@ -17,6 +18,7 @@ const initialSettings: LocalSettings = {
 };
 
 const MinPointsNode = (props: NodeProps): JSX.Element => {
+  const {t} = useTranslation();
   const {id, isConnectable} = props;
 
   const {nodeValues} = useContext(NodeValuesContext);
@@ -81,7 +83,7 @@ const MinPointsNode = (props: NodeProps): JSX.Element => {
       />
 
       <div>
-        <label>Minimum points: </label>
+        <label>{t('graph.min-points')}: </label>
         <input
           style={{width: '70px'}}
           onChange={handleChange}
@@ -90,17 +92,17 @@ const MinPointsNode = (props: NodeProps): JSX.Element => {
         />
       </div>
       <div style={{textAlign: 'left'}}>
-        <label>On fail: </label>
+        <label>{t('graph.on-fail')}: </label>
         <select
           onChange={handleSelectChange}
           value={localSettings.onFailSetting}
         >
-          <option value="coursefail">Fail course</option>
-          <option value="fail">Output fail</option>
+          <option value="coursefail">{t('graph.fail-course')}</option>
+          <option value="fail">{t('graph.output-fail')}</option>
         </select>
       </div>
       <p className="output-value">
-        Output:{' '}
+        {t('graph.output')}:{' '}
         {nodeValue.value === 'fail'
           ? 'fail'
           : Math.round(nodeValue.value * 100) / 100}

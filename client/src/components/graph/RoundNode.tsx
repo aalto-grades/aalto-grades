@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position} from 'reactflow';
 
 import {RoundNodeSettings, RoundNodeValue} from '@/common/types/graph';
@@ -14,6 +15,7 @@ type LocalSettings = {roundingSetting: RoundSetting};
 const initialSettings: LocalSettings = {roundingSetting: 'round-closest'};
 
 const RoundNode = (props: NodeProps): JSX.Element => {
+  const {t} = useTranslation();
   const {id, isConnectable} = props;
 
   const {nodeValues} = useContext(NodeValuesContext);
@@ -55,12 +57,12 @@ const RoundNode = (props: NodeProps): JSX.Element => {
         onChange={handleSelectChange}
         value={localSettings.roundingSetting}
       >
-        <option value="round-up">Round up</option>
-        <option value="round-closest">Round to closest</option>
-        <option value="round-down">Round down</option>
+        <option value="round-up">{t('graph.round-up')}</option>
+        <option value="round-closest">{t('graph.round-closest')}</option>
+        <option value="round-down">{t('graph.round-down')}</option>
       </select>
       <p className="output-value">
-        Output: {Math.round(nodeValue.value * 100) / 100}
+        {t('graph.output')}: {Math.round(nodeValue.value * 100) / 100}
       </p>
 
       <Handle

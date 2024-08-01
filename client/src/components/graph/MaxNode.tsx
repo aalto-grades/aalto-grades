@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {JSX, useContext, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 
 import {MaxNodeSettings, MaxNodeValue} from '@/common/types/graph';
@@ -16,6 +17,7 @@ const handleStartHeight = 83 + 33.9;
 const rowHeight = 33.9;
 
 const MaxNode = (props: NodeProps): JSX.Element => {
+  const {t} = useTranslation();
   const {id, isConnectable} = props;
 
   const updateNodeInternals = useUpdateNodeInternals();
@@ -117,7 +119,7 @@ const MaxNode = (props: NodeProps): JSX.Element => {
       <table style={{width: '100%', margin: '5px 0px'}}>
         <tbody>
           <tr>
-            <th>value</th>
+            <th>{t('graph.value')}</th>
           </tr>
           <tr
             style={{

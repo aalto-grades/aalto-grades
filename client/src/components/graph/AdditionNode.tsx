@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {JSX, useContext, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -14,6 +15,7 @@ const handleStartHeight = 45.5 + 30;
 const rowHeight = 30;
 
 const AdditionNode = (props: NodeProps): JSX.Element => {
+  const {t} = useTranslation();
   const {id, isConnectable} = props;
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeValues} = useContext(NodeValuesContext);
@@ -76,7 +78,7 @@ const AdditionNode = (props: NodeProps): JSX.Element => {
       <table style={{width: '100%', minWidth: '60px'}}>
         <tbody>
           <tr>
-            <th>Inputs</th>
+            <th>{t('graph.inputs')}</th>
           </tr>
           {Object.entries(nodeValue.sources)
             .filter(([, source]) => source.isConnected)

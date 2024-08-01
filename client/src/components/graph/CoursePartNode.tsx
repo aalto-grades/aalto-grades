@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position} from 'reactflow';
 
 import {
@@ -20,6 +21,7 @@ const initialSettings: LocalSettings = {
 };
 
 const CoursePartNode = (props: NodeProps): JSX.Element => {
+  const {t} = useTranslation();
   const {id, isConnectable} = props;
 
   const {nodeValues} = useContext(NodeValuesContext);
@@ -86,7 +88,7 @@ const CoursePartNode = (props: NodeProps): JSX.Element => {
   return (
     <BaseNode {...props} error={error} courseFail={nodeValue.courseFail}>
       <div>
-        <label>Minimum points: </label>
+        <label>{t('graph.min-points')}: </label>
         <input
           style={{width: '70px'}}
           onChange={handleChange}
@@ -101,13 +103,13 @@ const CoursePartNode = (props: NodeProps): JSX.Element => {
             onChange={handleSelectChange}
             value={localSettings.onFailSetting}
           >
-            <option value="coursefail">Fail course</option>
-            <option value="fail">Output fail</option>
+            <option value="coursefail">{t('graph.fail-course')}</option>
+            <option value="fail">{t('graph.output-fail')}</option>
           </select>
         </div>
       )}
       <p className="output-value">
-        Output:{' '}
+        {t('graph.output')}:{' '}
         {nodeValue.value === 'fail'
           ? 'fail'
           : Math.round(nodeValue.value * 100) / 100}
