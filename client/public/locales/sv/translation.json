@@ -1,1 +1,7 @@
-{}
+{
+  "general": {
+    "english": "Engelska",
+    "finnish": "Finska",
+    "swedish": "Svenska"
+  }
+}

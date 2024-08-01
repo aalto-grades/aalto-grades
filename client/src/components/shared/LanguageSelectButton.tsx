@@ -7,6 +7,8 @@ import {Box, Button, Menu, MenuItem} from '@mui/material';
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
+// This component is intentionally untranslated to avoid any potential confusion
+// when changing to a language the user doesn't understand
 const LanguageSelectButton = (): JSX.Element => {
   const {i18n} = useTranslation();
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);

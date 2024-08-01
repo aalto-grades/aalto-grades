@@ -34,7 +34,7 @@ const UnsavedChangesDialog = ({
       aria-labelledby="unsaved-changes"
       aria-describedby="dialog-for-unsaved-changes"
     >
-      <DialogTitle>{t('alerts.unsaved-changes.title')}</DialogTitle>
+      <DialogTitle>{t('general.unsaved-changes')}</DialogTitle>
       <DialogContent>{t('alerts.unsaved-changes.body')}</DialogContent>
       <DialogActions>
         <Button variant="outlined" onClick={onClose}>

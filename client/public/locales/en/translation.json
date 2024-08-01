@@ -1,11 +1,17 @@
 {
   "general": {
+    "english": "English",
+    "finnish": "Finnish",
+    "swedish": "Swedish",
     "cancel": "Cancel",
     "submit": "Submit",
     "save": "Save",
+    "discard": "Discard",
     "back": "Back",
     "next": "Next",
     "date": "Date",
+    "unsaved-changes": "Unsaved changes",
+    "saving": "Saving",
     "name": "Name",
     "student-number": "Student number",
     "delete": "Delete",
@@ -52,7 +58,6 @@
     "delete": "Delete",
     "confirm": "Confirm",
     "unsaved-changes": {
-      "title": "Unsaved changes",
       "body": "You have unsaved changes. Data you have entered will not be saved.",
       "stay": "Stay on this page",
       "discard": "Discard changes"
@@ -146,6 +151,16 @@
     "title": "404 - Not found",
     "body": "The page you’re looking for doesn't exist.",
     "back": "Go back to main page"
+  },
+  "shared": {
+    "a+-token": {
+      "title": "A+ API token",
+      "body": "You can find your API token by logging in to A+ and navigating to",
+      "label": "API Token",
+      "current": "Your current token",
+      "invalid": "The token you have entered is invalid, please make sure your token is correct.",
+      "length": "The token should be 40 characters long."
+    }
   },
   "students": {
     "select": "Select student",

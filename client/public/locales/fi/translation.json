@@ -1,1 +1,7 @@
-{}
+{
+  "general": {
+    "english": "Englanti",
+    "finnish": "Suomi",
+    "swedish": "Ruotsi"
+  }
+}

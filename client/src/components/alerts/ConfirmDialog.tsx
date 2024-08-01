@@ -42,7 +42,7 @@ export const ConfirmDialog = ({
   const defaultTitle = 'AsyncConfirmation Modal Title';
   const defaultBody = 'AsynConfirmation Modal message'; // Default body has typo lol
   if (confirmNavigate && title === defaultTitle)
-    title = t('alerts.unsaved-changes.title');
+    title = t('general.unsaved-changes');
   if (confirmNavigate && body === defaultBody)
     body = t('alerts.unsaved-changes.body');
 
