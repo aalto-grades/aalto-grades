@@ -18,7 +18,10 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.response.use(response => {
-  const resData = response.data as {errors: string[]} | {errors: ZodError}[]; // Type is missing non-error states
+  const resData = response.data as
+    | {errors: string[]}
+    | {errors: ZodError}[]
+    | null; // Type is missing non-error states
 
   // Zod error
   if (response.status === 400 && Array.isArray(resData)) {
@@ -32,7 +35,7 @@ axiosInstance.interceptors.response.use(response => {
   }
 
   // Other errors
-  if (typeof resData === 'object' && 'errors' in resData) {
+  if (resData !== null && typeof resData === 'object' && 'errors' in resData) {
     throw new Error(
       `${response.status} - ${response.statusText}: ` +
         resData.errors.join(', ')

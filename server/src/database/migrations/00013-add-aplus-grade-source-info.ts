@@ -32,7 +32,7 @@ export default {
       await queryInterface.addColumn(
         'aplus_grade_source',
         'module_name',
-        {type: DataTypes.STRING, defaultValue: null, allowNull: true},
+        {type: DataTypes.STRING, allowNull: true},
         {transaction}
       );
 

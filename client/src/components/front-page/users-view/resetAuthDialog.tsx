@@ -10,8 +10,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControlLabel,
+  FormGroup,
   Grid,
   IconButton,
+  Switch,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -19,24 +22,36 @@ import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
 
 import {UserData} from '@/common/types';
-import {useResetPassword} from '../../../hooks/useApi';
+import {useResetAuth} from '../../../hooks/useApi';
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
   user: UserData | null;
 };
-const ResetPasswordDialog = ({open, onClose, user}: PropsType): JSX.Element => {
-  const resetPassword = useResetPassword();
+const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
+  const resetAuth = useResetAuth();
+  const [resetPassword, setResetPassword] = useState<boolean>(true);
+  const [resetMfa, setResetMfa] = useState<boolean>(false);
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(
     null
   );
   const [copied, setCopied] = useState<boolean>(false);
 
   const onReset = async (): Promise<void> => {
-    const res = await resetPassword.mutateAsync(user!.id);
-    enqueueSnackbar('Password reset successfully', {variant: 'success'});
-    setTemporaryPassword(res.temporaryPassword);
+    const res = await resetAuth.mutateAsync({
+      userId: user!.id,
+      resetData: {resetPassword, resetMfa},
+    });
+    if (resetPassword && resetMfa)
+      enqueueSnackbar('Auth reset successfully', {variant: 'success'});
+    else if (resetMfa)
+      enqueueSnackbar('MFA reset successfully', {variant: 'success'});
+    else if (resetPassword)
+      enqueueSnackbar('Password reset successfully', {variant: 'success'});
+
+    if (resetPassword) setTemporaryPassword(res.temporaryPassword as string);
+    else onClose();
   };
 
   return (
@@ -51,12 +66,34 @@ const ResetPasswordDialog = ({open, onClose, user}: PropsType): JSX.Element => {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">Reset password</DialogTitle>
+      <DialogTitle id="alert-dialog-title">Reset auth</DialogTitle>
       <DialogContent>
         {temporaryPassword === null ? (
-          <DialogContentText id="alert-dialog-description">
-            Resetting password for {user?.name}
-          </DialogContentText>
+          <>
+            <DialogContentText id="alert-dialog-description">
+              Resetting password for {user?.name}
+            </DialogContentText>
+            <FormGroup sx={{mt: 1}}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={resetPassword}
+                    onClick={() => setResetPassword(oldVal => !oldVal)}
+                  />
+                }
+                label="Reset password"
+              />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={resetMfa}
+                    onClick={() => setResetMfa(oldVal => !oldVal)}
+                  />
+                }
+                label="Reset MFA"
+              />
+            </FormGroup>
+          </>
         ) : (
           <Grid container spacing={2}>
             <Grid item xs={6}>
@@ -123,12 +160,13 @@ const ResetPasswordDialog = ({open, onClose, user}: PropsType): JSX.Element => {
               onReset();
             }
           }}
+          disabled={!resetPassword && !resetMfa}
         >
-          {temporaryPassword === null ? 'Reset password' : 'Close'}
+          {temporaryPassword === null ? 'Reset auth' : 'Close'}
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default ResetPasswordDialog;
+export default ResetAuthDialog;

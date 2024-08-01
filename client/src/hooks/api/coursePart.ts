@@ -42,7 +42,7 @@ export const useAddCoursePart = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (coursePart: NewCoursePartData) =>
+    mutationFn: async coursePart =>
       IdSchema.parse(
         (await axios.post(`/v1/courses/${courseId}/parts`, coursePart)).data
       ),
@@ -62,12 +62,12 @@ type EditCoursePartVars = {
 };
 export const useEditCoursePart = (
   courseId: Numeric,
-  options?: UseMutationOptions<unknown, unknown, EditCoursePartVars>
-): UseMutationResult<unknown, unknown, EditCoursePartVars> => {
+  options?: UseMutationOptions<void, unknown, EditCoursePartVars>
+): UseMutationResult<void, unknown, EditCoursePartVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (vars: EditCoursePartVars) =>
+    mutationFn: vars =>
       axios.put(
         `/v1/courses/${courseId}/parts/${vars.coursePartId}`,
         vars.coursePart
@@ -88,12 +88,12 @@ export const useEditCoursePart = (
 
 export const useDeleteCoursePart = (
   courseId: Numeric,
-  options?: UseMutationOptions<unknown, unknown, Numeric>
-): UseMutationResult<unknown, unknown, Numeric> => {
+  options?: UseMutationOptions<void, unknown, Numeric>
+): UseMutationResult<void, unknown, Numeric> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (coursePartId: Numeric) =>
+    mutationFn: coursePartId =>
       axios.delete(`/v1/courses/${courseId}/parts/${coursePartId}`),
 
     onSuccess: () => {

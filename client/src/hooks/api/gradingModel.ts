@@ -59,12 +59,12 @@ type AddGradingModelVars = {
   gradingModel: NewGradingModelData;
 };
 export const useAddGradingModel = (
-  options?: UseMutationOptions<number, unknown, unknown>
+  options?: UseMutationOptions<number, unknown, AddGradingModelVars>
 ): UseMutationResult<number, unknown, AddGradingModelVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: AddGradingModelVars) =>
+    mutationFn: async vars =>
       IdSchema.parse(
         (
           await axios.post(
@@ -74,7 +74,7 @@ export const useAddGradingModel = (
         ).data
       ),
 
-    onSuccess: (_data: number, vars: AddGradingModelVars) => {
+    onSuccess: (_data, vars) => {
       queryClient.invalidateQueries({
         queryKey: ['all-grading-models', vars.courseId],
       });
@@ -89,18 +89,18 @@ type EditGradingModelVars = {
   gradingModel: EditGradingModelData;
 };
 export const useEditGradingModel = (
-  options?: UseMutationOptions<unknown, unknown, unknown>
-): UseMutationResult<unknown, unknown, EditGradingModelVars> => {
+  options?: UseMutationOptions<void, unknown, EditGradingModelVars>
+): UseMutationResult<void, unknown, EditGradingModelVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (vars: EditGradingModelVars) =>
+    mutationFn: vars =>
       axios.put(
         `/v1/courses/${vars.courseId}/grading-models/${vars.gradingModelId}`,
         vars.gradingModel
       ),
 
-    onSuccess: (_data: unknown, vars: EditGradingModelVars) => {
+    onSuccess: (_data, vars) => {
       queryClient.invalidateQueries({
         queryKey: ['grading-model', vars.courseId, vars.gradingModelId],
       });
@@ -118,17 +118,17 @@ type DeleteGradingModelVars = {
   gradingModelId: Numeric;
 };
 export const useDeleteGradingModel = (
-  options?: UseMutationOptions<unknown, unknown, unknown>
-): UseMutationResult<unknown, unknown, DeleteGradingModelVars> => {
+  options?: UseMutationOptions<void, unknown, DeleteGradingModelVars>
+): UseMutationResult<void, unknown, DeleteGradingModelVars> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (vars: DeleteGradingModelVars) =>
+    mutationFn: vars =>
       axios.delete(
         `/v1/courses/${vars.courseId}/grading-models/${vars.gradingModelId}`
       ),
 
-    onSuccess: (_data: unknown, vars: DeleteGradingModelVars) => {
+    onSuccess: (_data, vars) => {
       queryClient.invalidateQueries({
         queryKey: ['grading-model', vars.courseId],
       });

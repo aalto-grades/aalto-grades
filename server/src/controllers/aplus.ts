@@ -2,10 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Request, Response} from 'express';
 import {ForeignKeyConstraintError} from 'sequelize';
 import {z} from 'zod';
-import {TypedRequestBody} from 'zod-express-middleware';
 
 import {
   AplusCourseData,
@@ -14,7 +12,6 @@ import {
   AplusGradeSourceType,
   HttpCode,
   IdSchema,
-  NewAplusGradeSourceArraySchema,
   NewAplusGradeSourceData,
   NewGrade,
 } from '@/common/types';
@@ -35,17 +32,18 @@ import {
   AplusExercisesRes,
   AplusPointsRes,
   AplusStudentPoints,
+  Endpoint,
 } from '../types';
 
 /**
- * Responds with AplusCourseData[]
+ * () => AplusCourseData[]
  *
  * @throws ApiError(502)
  */
-export const fetchAplusCourses = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const fetchAplusCourses: Endpoint<void, AplusCourseData[]> = async (
+  req,
+  res
+) => {
   const aplusToken = parseAplusToken(req);
   const coursesRes = await fetchFromAplus<AplusCoursesRes>(
     `${APLUS_API_URL}/users/me`,
@@ -69,14 +67,14 @@ export const fetchAplusCourses = async (
 };
 
 /**
- * Responds with AplusExerciseData
+ * () => AplusExerciseData
  *
  * @throws ApiError(400|502)
  */
-export const fetchAplusExerciseData = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const fetchAplusExerciseData: Endpoint<void, AplusExerciseData> = async (
+  req,
+  res
+) => {
   const aplusToken = parseAplusToken(req);
   const aplusCourseId = validateAplusCourseId(req.params.aplusCourseId);
 
@@ -137,11 +135,15 @@ export const fetchAplusExerciseData = async (
   res.json(exerciseData);
 };
 
-/** @throws ApiError(400|404|409) */
-export const addAplusGradeSources = async (
-  req: TypedRequestBody<typeof NewAplusGradeSourceArraySchema>,
-  res: Response
-): Promise<void> => {
+/**
+ * (NewAplusGradeSourceData[]) => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const addAplusGradeSources: Endpoint<
+  NewAplusGradeSourceData[],
+  void
+> = async (req, res) => {
   const partGradeSourcesById: {[key: number]: AplusGradeSource[]} = {};
   const newGradeSources: NewAplusGradeSourceData[] = req.body;
 
@@ -185,11 +187,15 @@ export const addAplusGradeSources = async (
   res.sendStatus(HttpCode.Created);
 };
 
-/** @throws ApiError(400|404|409) */
-export const deleteAplusGradeSource = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+/**
+ * () => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const deleteAplusGradeSource: Endpoint<void, void> = async (
+  req,
+  res
+) => {
   const [_, aplusGradeSource] = await validateAplusGradeSourcePath(
     req.params.courseId,
     req.params.aplusGradeSourceId
@@ -215,14 +221,14 @@ export const deleteAplusGradeSource = async (
 };
 
 /**
- * Responds with NewGrade[]
+ * () => NewGrade[]
  *
  * @throws ApiError(400|404|409|502)
  */
-export const fetchAplusGrades = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const fetchAplusGrades: Endpoint<void, NewGrade[]> = async (
+  req,
+  res
+) => {
   const aplusToken = parseAplusToken(req);
   let coursePartIds: number[] = [];
 

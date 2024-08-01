@@ -8,9 +8,10 @@ import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 
 import {
-  ChangePasswordDataSchema,
+  ChangeOwnAuthDataSchema,
   LoginDataSchema,
-  ResetPasswordDataSchema,
+  ResetAuthDataSchema,
+  ResetOwnPasswordDataSchema,
   SystemRole,
 } from '@/common/types';
 import {
@@ -18,8 +19,8 @@ import {
   authLogout,
   authResetOwnPassword,
   authSamlLogin,
-  changePassword,
-  resetPassword,
+  changeOwnAuth,
+  resetAuth,
   samlMetadata,
   selfInfo,
 } from '../controllers/auth';
@@ -54,29 +55,32 @@ router.post(
 
 // Dispatchers not needed, because not async
 router.post(
-  '/v1/auth/reset-password',
+  '/v1/auth/reset-own-password',
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(ResetPasswordDataSchema),
+  processRequestBody(ResetOwnPasswordDataSchema),
   rateLimiterMemoryMiddleware,
   authResetOwnPassword
 );
 
 router.post(
-  '/v1/auth/reset-password/:userId',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authorization([SystemRole.Admin]),
-  controllerDispatcher(resetPassword)
-);
-
-router.post(
-  '/v1/auth/change-password',
+  '/v1/auth/reset-auth/:userId',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(ChangePasswordDataSchema),
-  controllerDispatcher(changePassword)
+  processRequestBody(ResetAuthDataSchema),
+  controllerDispatcher(resetAuth)
+);
+
+router.post(
+  '/v1/auth/change-own-auth',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authorization([SystemRole.Admin]),
+  express.json(),
+  handleInvalidRequestJson,
+  processRequestBody(ChangeOwnAuthDataSchema),
+  controllerDispatcher(changeOwnAuth)
 );
 
 router.get(
@@ -86,14 +90,14 @@ router.get(
     failureFlash: true,
     session: false,
   }) as RequestHandler,
-  (req, res) => res.redirect('/')
+  (_req, res) => res.redirect('/')
 );
 
 router.post(
   '/v1/auth/login-idp/callback',
   bodyParser.urlencoded({extended: false}),
   authSamlLogin,
-  (req, res) => res.redirect('/')
+  (_req, res) => res.redirect('/')
 );
 
 router.get('/v1/auth/saml/metadata', controllerDispatcher(samlMetadata));

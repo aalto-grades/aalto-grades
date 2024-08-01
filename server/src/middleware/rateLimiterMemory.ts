@@ -2,13 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {NextFunction, Response} from 'express';
 import {RateLimiterMemory} from 'rate-limiter-flexible';
-import {TypedRequestBody} from 'zod-express-middleware';
 
 import {HttpCode} from '@/common/types';
-import {LoginDataSchema} from '@/common/types/auth';
+import {LoginData, ResetOwnPasswordData} from '@/common/types/auth';
 import logger from '../configs/winston';
+import {SyncEndpoint} from '../types';
 
 const rateLimiter = new RateLimiterMemory({
   keyPrefix: 'ip_',
@@ -17,11 +16,10 @@ const rateLimiter = new RateLimiterMemory({
   blockDuration: 15,
 });
 
-export const rateLimiterMemoryMiddleware = (
-  req: TypedRequestBody<typeof LoginDataSchema>,
-  res: Response,
-  next: NextFunction
-): void => {
+export const rateLimiterMemoryMiddleware: SyncEndpoint<
+  LoginData | ResetOwnPasswordData,
+  void
+> = (req, res, next) => {
   // Override res.send
   const originalSend = res.send;
   res.send = function (body) {

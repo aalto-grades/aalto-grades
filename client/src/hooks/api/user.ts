@@ -89,11 +89,12 @@ export const useAddUser = (
 };
 
 export const useDeleteUser = (
-  options?: UseMutationOptions<unknown, unknown, number>
-): UseMutationResult<unknown, unknown, number> => {
+  options?: UseMutationOptions<void, unknown, number>
+): UseMutationResult<void, unknown, number> => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: userId => axios.delete(`/v1/users/${userId}`),
+
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['users']});
       queryClient.invalidateQueries({queryKey: ['students']});
@@ -103,11 +104,12 @@ export const useDeleteUser = (
 };
 
 export const useDeleteUsers = (
-  options?: UseMutationOptions<unknown, unknown, UserIdArray>
-): UseMutationResult<unknown, unknown, UserIdArray> => {
+  options?: UseMutationOptions<void, unknown, UserIdArray>
+): UseMutationResult<void, unknown, UserIdArray> => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: userIds => axios.post('/v1/users/delete', userIds),
+
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['users']});
       queryClient.invalidateQueries({queryKey: ['students']});

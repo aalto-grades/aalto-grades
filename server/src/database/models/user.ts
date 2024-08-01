@@ -26,6 +26,7 @@ export default class User extends Model<
   declare email: CreationOptional<string | null>;
   declare password: CreationOptional<string | null>;
   declare forcePasswordReset: CreationOptional<boolean | null>;
+  declare mfaSecret: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   static findByEmail: (email: string) => Promise<User | null>;
@@ -45,18 +46,15 @@ User.init(
       type: new DataTypes.STRING(),
       unique: true,
       allowNull: true,
-      defaultValue: null,
     },
     studentNumber: {
       type: new DataTypes.STRING(),
       unique: true,
       allowNull: true,
-      defaultValue: null,
     },
     name: {
       type: new DataTypes.STRING(),
       allowNull: true,
-      defaultValue: null,
     },
     role: {
       type: DataTypes.ENUM('USER', 'ADMIN'),
@@ -66,7 +64,6 @@ User.init(
     email: {
       type: new DataTypes.STRING(255),
       allowNull: true,
-      defaultValue: null,
       unique: true,
       validate: {
         isEmail: true,
@@ -75,12 +72,14 @@ User.init(
     password: {
       type: new DataTypes.CHAR(255),
       allowNull: true,
-      defaultValue: null,
     },
     forcePasswordReset: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
-      defaultValue: null,
+    },
+    mfaSecret: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

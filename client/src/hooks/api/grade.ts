@@ -40,12 +40,12 @@ export const useGetGrades = (
 
 export const useAddGrades = (
   courseId: Numeric,
-  options?: UseMutationOptions<unknown, unknown, NewGrade[]>
-): UseMutationResult<unknown, unknown, NewGrade[]> => {
+  options?: UseMutationOptions<void, unknown, NewGrade[]>
+): UseMutationResult<void, unknown, NewGrade[]> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newGrades: NewGrade[]) =>
+    mutationFn: newGrades =>
       axios.post(`/v1/courses/${courseId}/grades`, newGrades),
 
     onSuccess: () => {
@@ -60,22 +60,22 @@ export const useAddGrades = (
 type EditGradeVars = {gradeId: Numeric; data: EditGradeData};
 export const useEditGrade = (
   courseId: Numeric,
-  options?: UseMutationOptions<unknown, unknown, EditGradeVars>
-): UseMutationResult<unknown, unknown, EditGradeVars> =>
+  options?: UseMutationOptions<void, unknown, EditGradeVars>
+): UseMutationResult<void, unknown, EditGradeVars> =>
   useMutation({
-    mutationFn: (vars: EditGradeVars) =>
+    mutationFn: vars =>
       axios.put(`/v1/courses/${courseId}/grades/${vars.gradeId}`, vars.data),
     ...options,
   });
 
 export const useDeleteGrade = (
   courseId: Numeric,
-  options?: UseMutationOptions<unknown, unknown, Numeric>
-): UseMutationResult<unknown, unknown, Numeric> => {
+  options?: UseMutationOptions<void, unknown, Numeric>
+): UseMutationResult<void, unknown, Numeric> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (gradeId: Numeric) =>
+    mutationFn: gradeId =>
       axios.delete(`/v1/courses/${courseId}/grades/${gradeId}`),
 
     onSuccess: () => {
