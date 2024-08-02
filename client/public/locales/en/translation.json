@@ -222,6 +222,6 @@
   },
   "students": {
     "select": "Select student",
-    "viewing-grades": "Viewing grades for {0}"
+    "viewing-grades": "Viewing grades for {{user}}"
   }
 }

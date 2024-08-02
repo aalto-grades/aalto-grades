@@ -80,10 +80,7 @@ const StudentsView = (): JSX.Element => {
         <>
           <Divider sx={{my: 2}} />
           <Typography variant="h2" sx={{pb: 2}}>
-            {t('students.viewing-grades').replace(
-              '{0}',
-              selectedStudent?.name ?? selectedStudent?.studentNumber ?? ''
-            )}
+            {t('students.viewing-grades', {user: selectedStudent?.name ?? selectedStudent?.studentNumber ?? ''})}
           </Typography>
           <TableContainer component={Paper}>
             <Table sx={{minWidth: 650}} aria-label="simple table">
