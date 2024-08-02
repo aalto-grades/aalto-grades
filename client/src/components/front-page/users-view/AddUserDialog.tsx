@@ -20,6 +20,7 @@ import {
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {AsyncConfirmationModal} from 'react-global-modal';
 
 import {NewUserSchema} from '@/common/types';
@@ -41,6 +42,7 @@ type NewUserData = FormData & {temporaryPassword: string};
 
 type PropsType = {open: boolean; onClose: () => void};
 const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const addUser = useAddUser();
   const [userData, setUserData] = useState<NewUserData | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
@@ -60,7 +62,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
       });
     if (res === undefined) return;
 
-    enqueueSnackbar('User added successfully', {variant: 'success'});
+    enqueueSnackbar(t('front-page.user-added'), {variant: 'success'});
     setSubmitting(false);
     if (!values.admin) {
       resetForm();
@@ -94,21 +96,21 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
             onChange={form.handleChange}
           />
         }
-        label="Admin"
+        label={t('general.admin')}
       />
       <FormField
         form={form as unknown as FormikProps<{[key: string]: unknown}>}
         value="email"
-        label="Email*"
-        helperText="Aalto email e.g. firstname.lastname@aalto.fi."
+        label={`${t('general.email')}*`}
+        helperText={t('front-page.email-help')}
         type="email"
       />
       <Collapse in={form.values.admin}>
         <FormField
           form={form as unknown as FormikProps<{[key: string]: unknown}>}
           value="name"
-          label="Name*"
-          helperText="Name of the admin"
+          label={`${t('general.name')}*`}
+          helperText={t('front-page.admin-name-help')}
           type="string"
         />
       </Collapse>
@@ -117,33 +119,33 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
   const UserContent = (): JSX.Element => (
     <Grid container spacing={2}>
       <Grid item xs={6}>
-        <Typography>Email</Typography>
+        <Typography>{t('general.email')}</Typography>
       </Grid>
       <Grid item xs={6}>
         <Typography>{userData!.email}</Typography>
       </Grid>
 
       <Grid item xs={6}>
-        <Typography>Name</Typography>
+        <Typography>{t('general.name')}</Typography>
       </Grid>
       <Grid item xs={6}>
         <Typography>{userData!.name}</Typography>
       </Grid>
 
       <Grid item xs={6}>
-        <Typography>Temporary password</Typography>
+        <Typography>{t('front-page.temporary-password')}</Typography>
       </Grid>
       <Grid item xs={6}>
         <Typography sx={{display: 'inline'}}>
           {userData!.temporaryPassword}
         </Typography>
-        <Tooltip title="Copy" placement="top" sx={{my: -1, ml: 1, mr: -2}}>
+        <Tooltip title={t('general.copy')} placement="top" sx={{my: -1, ml: 1, mr: -2}}>
           <IconButton
             size="small"
             onClick={() => {
               navigator.clipboard.writeText(userData!.temporaryPassword);
               setCopied(true);
-              enqueueSnackbar('Password copied to clipboard', {
+              enqueueSnackbar(t('front-page.password-copied'), {
                 variant: 'success',
               });
               setTimeout(() => {
@@ -191,7 +193,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
           maxWidth="xs"
         >
           <DialogTitle>
-            {userData === null ? 'Add a user' : 'Admin added'}
+            {userData === null ? t('front-page.add-user') : t('front-page.admin-added')}
           </DialogTitle>
           <DialogContent>
             {userData === null ? <FormContent form={form} /> : <UserContent />}
@@ -203,7 +205,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
                 onClick={() => confirmDiscard(form)}
                 disabled={form.isSubmitting}
               >
-                Cancel
+                {t('general.cancel')}
               </Button>
             )}
             <Button
@@ -220,7 +222,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
               }}
               disabled={form.isSubmitting}
             >
-              {userData === null ? 'Add user' : 'Close'}
+              {userData === null ? t('front-page.add-user') : t('general.close')}
             </Button>
           </DialogActions>
         </Dialog>

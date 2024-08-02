@@ -4,6 +4,7 @@
 
 import {Box, Button, Typography} from '@mui/material';
 import {JSX, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
 import AddUserDialog from './AddUserDialog';
@@ -11,6 +12,7 @@ import UsersTable from './UsersTable';
 
 // Assumes admin validation is already done
 const UsersView = (): JSX.Element => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
   const [addOpen, setAddOpen] = useState<boolean>(false);
 
@@ -28,7 +30,7 @@ const UsersView = (): JSX.Element => {
         }}
       >
         <Typography variant="h2" align="left" sx={{flexGrow: 1}}>
-          Users
+          {t('general.users')}
         </Typography>
         <Box sx={{mb: -10 /* Align with tabs */}}>
           <Button
@@ -38,7 +40,7 @@ const UsersView = (): JSX.Element => {
             variant="contained"
             onClick={() => navigate('/manage-students')}
           >
-            Manage users
+            {t('front-page.manage-users')}
           </Button>
           <Button
             id="ag-new-user-btn"
@@ -46,7 +48,7 @@ const UsersView = (): JSX.Element => {
             variant="contained"
             onClick={() => setAddOpen(true)}
           >
-            Add user
+            {t('front-page.add-user')}
           </Button>
         </Box>
       </Box>

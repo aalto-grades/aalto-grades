@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 
 import {UserData} from '@/common/types';
 import {useResetAuth} from '../../../hooks/useApi';
@@ -30,6 +31,7 @@ type PropsType = {
   user: UserData | null;
 };
 const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const resetAuth = useResetAuth();
   const [resetPassword, setResetPassword] = useState<boolean>(true);
   const [resetMfa, setResetMfa] = useState<boolean>(false);
@@ -44,11 +46,11 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
       resetData: {resetPassword, resetMfa},
     });
     if (resetPassword && resetMfa)
-      enqueueSnackbar('Auth reset successfully', {variant: 'success'});
+      enqueueSnackbar(t('front-page.auth-reset'), {variant: 'success'});
     else if (resetMfa)
-      enqueueSnackbar('MFA reset successfully', {variant: 'success'});
+      enqueueSnackbar(t('front-page.mfa-reset'), {variant: 'success'});
     else if (resetPassword)
-      enqueueSnackbar('Password reset successfully', {variant: 'success'});
+      enqueueSnackbar(t('auth.password.reset-done'), {variant: 'success'});
 
     if (resetPassword) setTemporaryPassword(res.temporaryPassword as string);
     else onClose();
@@ -66,12 +68,12 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">Reset auth</DialogTitle>
+      <DialogTitle id="alert-dialog-title">{t('front-page.reset-auth')}</DialogTitle>
       <DialogContent>
         {temporaryPassword === null ? (
           <>
             <DialogContentText id="alert-dialog-description">
-              Resetting password for {user?.name}
+              {t('front-page.resetting-password-for', {user: user?.name})}
             </DialogContentText>
             <FormGroup sx={{mt: 1}}>
               <FormControlLabel
@@ -81,7 +83,7 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
                     onClick={() => setResetPassword(oldVal => !oldVal)}
                   />
                 }
-                label="Reset password"
+                label={t('auth.password.reset')}
               />
               <FormControlLabel
                 control={
@@ -90,35 +92,35 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
                     onClick={() => setResetMfa(oldVal => !oldVal)}
                   />
                 }
-                label="Reset MFA"
+                label={t('auth.reset-mfa')}
               />
             </FormGroup>
           </>
         ) : (
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <Typography>Email</Typography>
+              <Typography>{t('general.email')}</Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography>{user?.email}</Typography>
             </Grid>
 
             <Grid item xs={6}>
-              <Typography>Name</Typography>
+              <Typography>{t('general.name')}</Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography>{user?.name}</Typography>
             </Grid>
 
             <Grid item xs={6}>
-              <Typography>Temporary password</Typography>
+              <Typography>{t('front-page.temporary-password')}</Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography sx={{display: 'inline'}}>
                 {temporaryPassword}
               </Typography>
               <Tooltip
-                title="Copy"
+                title={t('general.copy')}
                 placement="top"
                 sx={{my: -1, ml: 1, mr: -2}}
               >
@@ -127,7 +129,7 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
                   onClick={() => {
                     navigator.clipboard.writeText(temporaryPassword);
                     setCopied(true);
-                    enqueueSnackbar('Password copied to clipboard', {
+                    enqueueSnackbar(t('front-page.password-copied'), {
                       variant: 'success',
                     });
                     setTimeout(() => {
@@ -148,7 +150,7 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
       </DialogContent>
       <DialogActions>
         {temporaryPassword === null && (
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose}>{t('general.cancel')}</Button>
         )}
         <Button
           variant="contained"
@@ -162,7 +164,7 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
           }}
           disabled={!resetPassword && !resetMfa}
         >
-          {temporaryPassword === null ? 'Reset auth' : 'Close'}
+          {temporaryPassword === null ? t('front-page.reset-auth') : t('general.close')}
         </Button>
       </DialogActions>
     </Dialog>
