@@ -48,7 +48,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
         case CourseRoleType.Teacher:
           return t('general.teacher');
         case CourseRoleType.Assistant:
-          return t('general.assistant');
+          return t('general.assistant.singular');
         case CourseRoleType.Student:
           return t('general.student');
       }

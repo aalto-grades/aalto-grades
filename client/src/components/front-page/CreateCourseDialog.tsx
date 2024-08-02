@@ -27,6 +27,7 @@ import {
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {JSX, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
@@ -41,41 +42,6 @@ import {convertToClientGradingScale} from '../../utils/textFormat';
 import {departments, sisuLanguageOptions} from '../../utils/utils';
 import FormField from '../shared/FormikField';
 import FormLanguagesField from '../shared/FormikLanguageField';
-
-const ValidationSchema = z
-  .object({
-    courseCode: z
-      .string({required_error: 'Course code is required (e.g. CS-A1111)'})
-      .min(1),
-    minCredits: z
-      .number({required_error: 'Minimum credits is required'})
-      .min(0, 'Minimum credits cannot be negative'),
-    maxCredits: z.number({required_error: 'Maximum credits is required'}),
-    gradingScale: z.nativeEnum(GradingScale),
-    languageOfInstruction: z.nativeEnum(Language),
-    teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
-    assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
-    department: z
-      .number()
-      .min(0, 'Please select the organizing department of the course')
-      .max(
-        departments.length - 1,
-        'Please select the organizing department of the course'
-      ),
-    nameEn: z
-      .string({required_error: 'Please input a valid course name in English'})
-      .min(1),
-    nameFi: z
-      .string({required_error: 'Please input a valid course name in Finnish'})
-      .min(1),
-    nameSv: z
-      .string({required_error: 'Please input a valid course name in Swedish'})
-      .min(1),
-  })
-  .refine(val => val.maxCredits >= val.minCredits, {
-    path: ['maxCredits'],
-    message: 'Maximum credits cannot be lower than minimum credits',
-  });
 
 type FormData = {
   courseCode: string;
@@ -107,11 +73,47 @@ const initialValues = {
 
 type PropsType = {open: boolean; onClose: () => void};
 const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
   const addCourse = useAddCourse();
 
   const [teachersInCharge, setTeachersInCharge] = useState<string[]>([]);
   const [assistants, setAssistants] = useState<string[]>([]);
+
+  const ValidationSchema = z
+    .object({
+      courseCode: z
+        .string({required_error: t('front-page.create-course.course-code-required')})
+        .min(1),
+      minCredits: z
+        .number({required_error: t('front-page.create-course.min-credits-required')})
+        .min(0, t('front-page.create-course.min-credits-negative')),
+      maxCredits: z.number({required_error: t('front-page.create-course.max-credits-required')}),
+      gradingScale: z.nativeEnum(GradingScale),
+      languageOfInstruction: z.nativeEnum(Language),
+      teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
+      assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
+      department: z
+        .number()
+        .min(0, t('front-page.create-course.department-select'))
+        .max(
+          departments.length - 1,
+          t('front-page.create-course.department-select')
+        ),
+      nameEn: z
+        .string({required_error: t('front-page.create-course.name-english')})
+        .min(1),
+      nameFi: z
+        .string({required_error: t('front-page.create-course.name-finnish')})
+        .min(1),
+      nameSv: z
+        .string({required_error: t('front-page.create-course.name-swedish')})
+        .min(1),
+    })
+    .refine(val => val.maxCredits >= val.minCredits, {
+      path: ['maxCredits'],
+      message: t('front-page.create-course.max-below-min'),
+    });
 
   const removeTeacher = (value: string): void => {
     setTeachersInCharge(teachersInCharge.filter(teacher => teacher !== value));
@@ -188,8 +190,8 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               value="courseCode"
-              label="Course code*"
-              helperText="Give code for the new course."
+              label={`${t('general.course-code')}*`}
+              helperText={t('front-page.create-course.course-code-help')}
             />
             <FormLanguagesField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
@@ -200,8 +202,8 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               value="department"
-              label="Organizing department*"
-              helperText="Select the organizing department of the new course"
+              label={`${t('general.organizing-department')}*`}
+              helperText={t('front-page.create-course.organizing-department-help')}
               select
             >
               {departments.map((department, i) => (
@@ -213,22 +215,22 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               value="minCredits"
-              label="Minimum course credits (ECTS)*"
-              helperText="Input minimum credits."
+              label={`${t('front-page.create-course.min-credits')}*`}
+              helperText={t('front-page.create-course.min-credits-help')}
               type="number"
             />
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               value="maxCredits"
-              label="Maximum course credits (ECTS)*"
-              helperText="Input maximum credits."
+              label={`${t('front-page.create-course.max-credits')}*`}
+              helperText={t('front-page.create-course.max-credits-help')}
               type="number"
             />
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               value="gradingScale"
-              label="Grading scale*"
-              helperText="Grading scale of the course, e.g., 0-5 or pass/fail."
+              label={`${t('front-page.create-course.grading-scale')}*`}
+              helperText={t('front-page.create-course.grading-scale-help')}
               select
             >
               {Object.values(GradingScale).map(value => (
@@ -240,8 +242,8 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               value="languageOfInstruction"
-              label="Course language*"
-              helperText="Language in which the course will be conducted."
+              label={`${t('front-page.create-course.language')}*`}
+              helperText={t('front-page.create-course.language-help')}
               select
             >
               {sisuLanguageOptions.map(option => (
@@ -256,16 +258,16 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               fullWidth
               value={form.values.teacherEmail}
               disabled={form.isSubmitting}
-              label="Teachers in charge*"
+              label={`${t('front-page.create-course.teachers-in-charge')}*`}
               margin="normal"
               InputLabelProps={{shrink: true}}
               helperText={
                 form.errors.teacherEmail ??
                 (teachersInCharge.length === 0
-                  ? 'Input the email address of at least one teacher in charge of the course'
+                  ? t('front-page.create-course.input-at-least-one-teacher')
                   : teachersInCharge.includes(form.values.teacherEmail)
-                    ? 'Email already on list.'
-                    : 'Add emails of the teachers in charge of the course.')
+                    ? t('front-page.create-course.email-in-list')
+                    : t('front-page.create-course.add-teacher-emails'))
               }
               error={
                 form.touched.teacherEmail &&
@@ -294,7 +296,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
             </Button>
             <Box sx={{mt: 3, mb: 2}}>
               {teachersInCharge.length === 0 ? (
-                'Add at least one teacher in charge to the course'
+                t('front-page.create-course.add-at-least-one-teacher')
               ) : (
                 <List dense>
                   {teachersInCharge.map(teacherEmail => (
@@ -328,16 +330,16 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               fullWidth
               value={form.values.assistantEmail}
               disabled={form.isSubmitting}
-              label="Assistants*"
+              label={`${t('general.assistant.plural')}*`}
               margin="normal"
               InputLabelProps={{shrink: true}}
               helperText={
                 form.errors.assistantEmail ??
-                (assistants.length === 0
-                  ? 'Input the email address of at least one assistant of the course'
-                  : assistants.includes(form.values.assistantEmail)
-                    ? 'Email already on list.'
-                    : 'Add emails of the teachers in charge of the course.')
+                  (assistants.length === 0
+                    ? t('front-page.create-course.input-at-least-one-assistant')
+                    : assistants.includes(form.values.assistantEmail)
+                      ? t('front-page.create-course.email-in-list')
+                      : t('front-page.create-course.add-assistant-emails'))
               }
               error={
                 form.touched.assistantEmail &&
@@ -366,7 +368,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
             </Button>
             <Box sx={{mt: 3, mb: 2}}>
               {assistants.length === 0 ? (
-                'No assistants in the course'
+                t('front-page.create-course.no-assistants')
               ) : (
                 <List dense={true}>
                   {assistants.map((emailAssistant: string) => (
@@ -424,7 +426,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               onClick={form.submitForm}
               disabled={form.isSubmitting}
             >
-              Submit
+              {t('general.submit')}
               {form.isSubmitting && (
                 <CircularProgress
                   size={24}

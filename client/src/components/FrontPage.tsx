@@ -80,7 +80,7 @@ const FrontPage = (): JSX.Element => {
               onClick={() => setCreateDialogOpen(true)}
               sx={{mb: -11.25}} // Align with search
             >
-              {t('front-page.create-course')}
+              {t('front-page.create-new-course')}
             </Button>
           </Box>
           {courses.data && <CourseTable courses={courses.data} />}

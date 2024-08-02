@@ -21,7 +21,10 @@
       "plural": "Admins"
     },
     "teacher": "Teacher",
-    "assistant": "Assistant",
+    "assistant": {
+      "singular": "Assistant",
+      "plural": "Assistants"
+    },
     "student": "Student",
     "users": "Users",
     "name": "Name",
@@ -182,7 +185,7 @@
   "front-page": {
     "your-courses": "Your courses",
     "no-courses": "You have no courses. Please contact support to have your course added.",
-    "create-course": "Create new course",
+    "create-new-course": "Create new course",
     "not-logged-in": "Not logged in",
     "search": "search",
     "manage-users": "Manage users",
@@ -201,7 +204,36 @@
     "auth-reset": "Auth reset successfully",
     "mfa-reset": "MFA reset successfully",
     "reset-auth": "Reset auth",
-    "resetting-password-for": "Resetting password for {{user}}"
+    "resetting-password-for": "Resetting password for {{user}}",
+    "create-course": {
+      "course-code-required": "Course code is required (e.g. CS-A1111)",
+      "min-credits-required": "Minimum credits is required",
+      "min-credits-negative": "Minimum credits cannot be negative",
+      "max-credits-required": "Maximum credits is required",
+      "max-below-min": "Maximum credits cannot be lower than minimum credits",
+      "department-select": "Please select the organizing department of the course",
+      "name-english": "Please input a valid course name in English",
+      "name-finnish": "Please input a valid course name in Finnish",
+      "name-swedish": "Please input a valid course name in Swedish",
+      "course-code-help": "Give code for the new course.",
+      "organizing-department-help": "Select the organizing department of the new course",
+      "min-credits": "Minimum course credits (ECTS)",
+      "min-credits-help": "Input minimum credits.",
+      "max-credits": "Maximum course credits (ECTS)",
+      "max-credits-help": "Input maximum credits.",
+      "grading-scale": "Grading scale",
+      "grading-scale-help": "Grading scale of the course, e.g., 0-5 or pass/fail.",
+      "language": "Course language",
+      "language-help": "Language in which the course will be conducted.",
+      "teachers-in-charge": "Teachers in charge",
+      "input-at-least-one-teacher": "Input the email address of at least one teacher in charge of the course",
+      "email-in-list": "Email already on list.",
+      "add-teacher-emails": "Add emails of the teachers in charge of the course.",
+      "add-at-least-one-teacher": "Add at least one teacher in charge to the course",
+      "input-at-least-one-assistant": "Input the email address of at least one assistant of the course",
+      "add-assistant-emails": "Add emails of the assistants of the course.",
+      "no-assistants": "No assistants in the course"
+    }
   },
   "graph": {
     "inputs": "Inputs",
