@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from '@mui/material';
 import {JSX, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import QRCode from 'react-qr-code';
 
 const splitString = (str: string | null, chunkSize: number): string => {
@@ -33,18 +34,19 @@ type PropsType = {
 const OtpAuthDialog = ({
   otpAuth,
   onClose,
-  closeText = 'Back to login',
+  closeText = undefined,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const [showSecret, setShowSecret] = useState<boolean>(false);
 
   const secret =
     otpAuth === null ? null : otpAuth.split('secret=')[1].split('&')[0];
   return (
     <Dialog open={otpAuth !== null} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>MFA QR code</DialogTitle>
+      <DialogTitle>{t('auth.mfa-qr.title')}</DialogTitle>
       <DialogContent>
         <DialogContentText sx={{textAlign: 'center'}}>
-          Scan the QR code in your MFA application
+          {t('auth.mfa-qr.scan')}
         </DialogContentText>
         {otpAuth !== null && (
           <Box sx={{my: 2}} style={{display: 'flex', justifyContent: 'center'}}>
@@ -54,7 +56,7 @@ const OtpAuthDialog = ({
 
         <Box style={{display: 'flex', justifyContent: 'center'}}>
           <Button onClick={() => setShowSecret(oldVal => !oldVal)}>
-            Or manually enter the secret
+            {t('auth.mfa-qr.manual')}
           </Button>
         </Box>
         <Collapse in={showSecret}>
@@ -68,7 +70,7 @@ const OtpAuthDialog = ({
       </DialogContent>
       <DialogActions>
         <Button variant="contained" onClick={onClose}>
-          {closeText}
+          {closeText ?? t('auth.mfa-qr.close')}
         </Button>
       </DialogActions>
     </Dialog>

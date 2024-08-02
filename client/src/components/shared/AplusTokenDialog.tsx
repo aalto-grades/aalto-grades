@@ -36,7 +36,7 @@ const AplusTokenDialog = ({
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>{t('shared.a+-token.title')}</DialogTitle>
+      <DialogTitle>{t('general.a+-token')}</DialogTitle>
       <DialogContent>
         <Typography>
           {t('shared.a+-token.body')}:{' '}

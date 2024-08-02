@@ -70,7 +70,7 @@ const ManageStudentsView = (): JSX.Element => {
     },
     {
       field: 'email',
-      headerName: t('manage-students.email'),
+      headerName: t('general.email'),
       type: 'string',
       editable: false,
       width: 150,

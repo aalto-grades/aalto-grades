@@ -14,6 +14,8 @@
     "unsaved-changes": "Unsaved changes",
     "saving": "Saving",
     "name": "Name",
+    "email": "Email",
+    "password": "Password",
     "student-number": "Student number",
     "delete": "Delete",
     "course": {
@@ -26,6 +28,7 @@
     "course-parts": "Course parts",
     "days-valid": "Days valid",
     "max-grade": "Max grade",
+    "a+-token": "A+ API token",
     "a+-courses": "A+ courses",
     "a+-sources": "A+ grade sources",
     "full-points": "Full points",
@@ -62,6 +65,43 @@
       "body": "You have unsaved changes. Data you have entered will not be saved.",
       "stay": "Stay on this page",
       "discard": "Discard changes"
+    }
+  },
+  "auth": {
+    "login-title": "Log in to Aalto Grades",
+    "show-password": "Click to show password",
+    "hide-password": "Click to hide password from view",
+    "change-password": "Change password",
+    "reset-mfa": "Reset MFA",
+    "reset-mfa-secret": "Reset MFA secret",
+    "reset-mfa-secret-message": "Are you sure you want to reset your MFA secret",
+    "log-out": "Log out",
+    "external": {
+      "title": "Aalto University users",
+      "body": "Log in with your Aalto University user account by clicking on the button below.",
+      "button": "Log in with Aalto account"
+    },
+    "local": {
+      "title": "Log in to Aalto Grades",
+      "body": "If you have been provided with credentials specifically for Aalto Grades, use this login.",
+      "button": "Log in",
+      "enter-otp": "Enter OTP"
+    },
+    "mfa-qr": {
+      "title": "MFA QR code",
+      "scan": "Scan the QR code in your MFA application",
+      "manual": "Or manually enter the secret",
+      "close": "Back to login"
+    },
+    "password": {
+      "new": "New password",
+      "repeat": "Repeat password",
+      "requirements": "Aalto password requirements",
+      "reset": "Reset password",
+      "changed": "Password changed successfully",
+      "reset-done": "Password reset successfully",
+      "match": "Passwords must match",
+      "old": "New password cannot be the same as the old password"
     }
   },
   "course": {
@@ -190,7 +230,6 @@
   },
   "manage-students": {
     "title": "Manage students",
-    "email": "Email",
     "latest-grade": "Latest grade",
     "delete": {
       "singular": "Delete student",
@@ -212,9 +251,8 @@
   },
   "shared": {
     "a+-token": {
-      "title": "A+ API token",
       "body": "You can find your API token by logging in to A+ and navigating to",
-      "label": "API Token",
+      "label": "API token",
       "current": "Your current token",
       "invalid": "The token you have entered is invalid, please make sure your token is correct.",
       "length": "The token should be 40 characters long."

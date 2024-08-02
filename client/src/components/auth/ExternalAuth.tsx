@@ -3,9 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import {Box, Button, Typography} from '@mui/material';
-import React, {JSX} from 'react';
+import {JSX} from 'react';
+import {useTranslation} from 'react-i18next';
 
 const ExternalAuth = (): JSX.Element => {
+  const {t} = useTranslation();
+
   return (
     <Box
       sx={{
@@ -18,11 +21,10 @@ const ExternalAuth = (): JSX.Element => {
       }}
     >
       <Typography variant="h3" sx={{mb: 1}}>
-        Aalto University users
+        {t('auth.external.title')}
       </Typography>
       <Typography variant="body2" sx={{mb: 1}}>
-        Log in with your Aalto University user account by clicking on the button
-        below.
+        {t('auth.external.body')}
       </Typography>
       <Button
         id="ag-sso-login-btn"
@@ -32,7 +34,7 @@ const ExternalAuth = (): JSX.Element => {
         sx={{mt: 1}}
         href="/v1/auth/login-idp"
       >
-        Log in with Aalto account
+        {t('auth.external.button')}
       </Button>
     </Box>
   );

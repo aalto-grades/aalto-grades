@@ -6,6 +6,7 @@ import {Box, Button, Grid, Link, Typography} from '@mui/material';
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Navigate, useLocation, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
@@ -15,21 +16,6 @@ import BaseShowPasswordButton from './ShowPasswordButton';
 import {useResetOwnPassword} from '../../hooks/useApi';
 import FormField from '../shared/FormikField';
 
-const ValidationSchema = z
-  .object({
-    email: AaltoEmailSchema,
-    oldPassword: z.string(),
-    newPassword: PasswordSchema,
-    repeatPassword: PasswordSchema,
-  })
-  .refine(val => val.newPassword === val.repeatPassword, {
-    path: ['repeatPassword'],
-    message: 'Passwords must match',
-  })
-  .refine(val => val.oldPassword !== val.newPassword, {
-    path: ['newPassword'],
-    message: 'New password cannot be the same as the old password',
-  });
 type FormData = {
   email: string;
   oldPassword: string;
@@ -43,6 +29,7 @@ type ShowPassword = {
   repeat: boolean;
 };
 const ResetPassword = (): JSX.Element => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
   const resetPassword = useResetOwnPassword();
   const {state} = useLocation() as {
@@ -60,6 +47,22 @@ const ResetPassword = (): JSX.Element => {
     repeat: false,
   });
   const [otpAuth, setOtpAuth] = useState<string | null>(null);
+
+  const ValidationSchema = z
+    .object({
+      email: AaltoEmailSchema,
+      oldPassword: z.string(),
+      newPassword: PasswordSchema,
+      repeatPassword: PasswordSchema,
+    })
+    .refine(val => val.newPassword === val.repeatPassword, {
+      path: ['repeatPassword'],
+      message: t('auth.password.match'),
+    })
+    .refine(val => val.oldPassword !== val.newPassword, {
+      path: ['newPassword'],
+      message: t('auth.password.old'),
+    });
 
   const initialValues = {
     email: state?.email ?? '',
@@ -81,7 +84,7 @@ const ResetPassword = (): JSX.Element => {
       .catch(() => setSubmitting(false));
     if (otpAuthRes === undefined) return;
 
-    enqueueSnackbar('Password reset successfully', {variant: 'success'});
+    enqueueSnackbar(t('auth.password.reset-done'), {variant: 'success'});
     setSubmitting(false);
     resetForm();
     if (!state?.resetMfa) return navigate('/login', {replace: true});
@@ -132,7 +135,7 @@ const ResetPassword = (): JSX.Element => {
         alignItems="center"
         justifyContent="center"
       >
-        <Typography variant="h2">Reset password</Typography>
+        <Typography variant="h2">{t('auth.password.reset')}</Typography>
         <Box
           sx={{
             width: 1 / 2,
@@ -155,8 +158,7 @@ const ResetPassword = (): JSX.Element => {
                     form as unknown as FormikProps<{[key: string]: unknown}>
                   }
                   value="newPassword"
-                  label="New Password*"
-                  helperText="New password"
+                  label={`${t('auth.password.new')}*`}
                   type={showPassword.new ? 'text' : 'password'}
                   InputProps={{endAdornment: <ShowPasswordButton type="new" />}}
                 />
@@ -165,8 +167,7 @@ const ResetPassword = (): JSX.Element => {
                     form as unknown as FormikProps<{[key: string]: unknown}>
                   }
                   value="repeatPassword"
-                  label="Repeat Password*"
-                  helperText="Repeat password"
+                  label={`${t('auth.password.repeat')}*`}
                   type={showPassword.repeat ? 'text' : 'password'}
                   InputProps={{
                     endAdornment: <ShowPasswordButton type="repeat" />,
@@ -183,14 +184,14 @@ const ResetPassword = (): JSX.Element => {
                     href="https://www.aalto.fi/en/services/password-guidelines"
                     target="_blank"
                   >
-                    Aalto password requirements
+                    {t('auth.password.requirements')}
                   </Link>
                   <Button
                     variant="contained"
                     onClick={form.submitForm}
                     disabled={form.isSubmitting}
                   >
-                    Reset password
+                    {t('auth.password.reset')}
                   </Button>
                 </Box>
               </>
