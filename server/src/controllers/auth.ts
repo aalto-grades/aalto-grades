@@ -118,6 +118,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
     }
 
     if (
+      NODE_ENV !== 'development' &&
       !authenticator.verify({
         token: req.body.otp,
         secret: user.mfaSecret as string,
