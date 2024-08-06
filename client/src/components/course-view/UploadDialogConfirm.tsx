@@ -163,8 +163,12 @@ const UploadDialogConfirm = ({
                   <TableHead>
                     <TableRow>
                       <TableCell>{t('general.course-part.singular')}</TableCell>
-                      <TableCell>{t('course.upload.completion-date')}</TableCell>
-                      <TableCell>{t('course.upload.expiration-date')}</TableCell>
+                      <TableCell>
+                        {t('course.upload.completion-date')}
+                      </TableCell>
+                      <TableCell>
+                        {t('course.upload.expiration-date')}
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -196,7 +200,9 @@ const UploadDialogConfirm = ({
                                     date.expirationDate <= date.completionDate,
                                   helperText:
                                     date.expirationDate <= date.completionDate
-                                      ? t('course.upload.expiration-after-completion')
+                                      ? t(
+                                          'course.upload.expiration-after-completion'
+                                        )
                                       : '',
                                 },
                               }}

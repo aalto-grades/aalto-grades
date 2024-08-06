@@ -83,15 +83,17 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
 
   return (
     <Dialog open={open} onClose={handleResetAndClose}>
-      {step === 0 && <DialogTitle>{t('course.a+.select-course-parts')}</DialogTitle>}
-      {step === 1 && <DialogTitle>{t('course.a+.fetching-grades')}</DialogTitle>}
+      {step === 0 && (
+        <DialogTitle>{t('course.a+.select-course-parts')}</DialogTitle>
+      )}
+      {step === 1 && (
+        <DialogTitle>{t('course.a+.fetching-grades')}</DialogTitle>
+      )}
       {step === 2 && <DialogTitle>{t('general.confirm')}</DialogTitle>}
       <DialogContent>
         {step === 0 && (
           <>
-            <Typography>
-              {t('course.a+.select-for-fetching')}
-            </Typography>
+            <Typography>{t('course.a+.select-for-fetching')}</Typography>
             <FormGroup>
               {courseParts.data &&
                 courseParts.data
@@ -120,9 +122,7 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
               open={aplusTokenDialogOpen}
               error={aplusGrades.isError}
             />
-            <Typography>
-              {t('course.a+.fetching-grades-wait')}
-            </Typography>
+            <Typography>{t('course.a+.fetching-grades-wait')}</Typography>
             <LinearProgress sx={{mt: 2}} />
           </>
         )}
