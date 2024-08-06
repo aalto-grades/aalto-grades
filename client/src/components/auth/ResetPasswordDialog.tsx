@@ -176,7 +176,6 @@ const ResetPasswordDialog = ({
                     Aalto password requirements
                   </Link>
                 </Box>
-                {/* </Box> */}
               </Grid>
             </DialogContent>
             <DialogActions>
