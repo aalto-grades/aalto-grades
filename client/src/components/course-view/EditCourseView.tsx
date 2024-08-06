@@ -322,8 +322,8 @@ const EditCourseView = (): JSX.Element => {
                     }
                     disabled={auth?.role !== SystemRole.Admin}
                     valueFormat="name%"
-                    labelFormat="Course name in %*"
-                    helperTextFormat="Give the name of the course in %."
+                    labelFormat={`${t('front-page.create-course.course-name-in-format')}*`}
+                    helperTextFormat={t('front-page.create-course.course-name-in-help-format')}
                   />
                   <FormField
                     form={

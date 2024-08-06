@@ -16,7 +16,6 @@ type PropsType = {
   disabled?: boolean;
 };
 
-// TODO: The logic of this component does not work well with (at least) Finnish grammar
 const FormLanguagesField = ({
   form,
   valueFormat,
@@ -27,9 +26,9 @@ const FormLanguagesField = ({
   const {t} = useTranslation();
 
   const languages = [
-    {value: 'En', name: t('general.english')},
-    {value: 'Fi', name: t('general.finnish')},
-    {value: 'Sv', name: t('general.swedish')},
+    {value: 'En', name: t('general.in-english')},
+    {value: 'Fi', name: t('general.in-finnish')},
+    {value: 'Sv', name: t('general.in-swedish')},
   ];
 
   return (
