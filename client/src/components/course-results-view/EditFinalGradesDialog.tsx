@@ -161,7 +161,7 @@ const EditFinalGradesDialog = ({
     },
     {
       field: 'grade',
-      headerName: t('general.grade'),
+      headerName: t('general.grade.singular'),
       type: 'number',
       editable: true,
     },

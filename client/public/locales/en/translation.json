@@ -76,6 +76,7 @@
     "code": "Code",
     "role": "Role",
     "admin": {
+      "singular": "Admin",
       "plural": "Admins"
     },
     "teacher": "Teacher",

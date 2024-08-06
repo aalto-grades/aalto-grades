@@ -76,6 +76,7 @@
     "code": "UNTRANSLATED",
     "role": "UNTRANSLATED",
     "admin": {
+      "singular": "UNTRANSLATED",
       "plural": "UNTRANSLATED"
     },
     "teacher": "UNTRANSLATED",
