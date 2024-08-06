@@ -30,6 +30,8 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
   const showSecretButton = page.getByRole('button', {
     name: 'Or manually enter the secret',
   });
+
+  // Login when mfa qr code is shown
   if (await showSecretButton.isVisible()) {
     await showSecretButton.click();
 
@@ -37,13 +39,35 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
     const secret = secretText.replaceAll('\n', '').replaceAll(' ', '');
     mfaSecrets[user] = secret;
 
-    await page.getByRole('button', {name: 'Back to login'}).click();
-  }
-
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const token = authenticator.generate(mfaSecrets[user]);
     const mfaLocator = page.getByTestId('mfa-input');
     const inputFields = await mfaLocator.locator('input').elementHandles();
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const token = authenticator.generate(mfaSecrets[user]);
+
+      for (let i = 0; i < inputFields.length; i++) {
+        await inputFields[i].fill(token[i]);
+      }
+
+      // Wait for the login to go through
+      await page.waitForTimeout(100);
+
+      const success = await page
+        .getByRole('heading', {name: 'Courses'})
+        .isVisible();
+      if (success) return;
+
+      for (let i = inputFields.length - 1; i >= 0; i--) {
+        await inputFields[i].fill('');
+      }
+    }
+    throw new Error('Failed to log in');
+  }
+
+  // Login when mfa qr code is not shown
+  const mfaLocator = page.getByTestId('mfa-input');
+  const inputFields = await mfaLocator.locator('input').elementHandles();
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const token = authenticator.generate(mfaSecrets[user]);
 
     for (let i = 0; i < inputFields.length; i++) {
       await inputFields[i].fill(token[i]);
