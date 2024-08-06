@@ -122,6 +122,7 @@ describe('Test POST /v1/auth/login - log in with an existing user', () => {
     const user = await createData.createAuthUser({
       forcePasswordReset: true,
       mfaSecret: secret,
+      mfaConfirmed: true,
     });
 
     const result = await testLogin(user.email as string, 'password', user.id);
@@ -231,13 +232,17 @@ describe('Test POST /v1/auth/login and expiry', () => {
 
 describe('Test POST /v1/auth/reset-own-password - reset own password', () => {
   it('should reset own password', async () => {
-    const user = await createData.createAuthUser({forcePasswordReset: true});
+    const secret = authenticator.generateSecret(64);
+    const user = await createData.createAuthUser({
+      forcePasswordReset: true,
+      mfaSecret: secret,
+      mfaConfirmed: true,
+    });
     const newPassword = '¹X)1Õ,ì?¨ã$Z©N3Ú°jM¤ëÊyf';
 
     const res = await request
       .post('/v1/auth/reset-own-password')
       .send({email: user.email, password: 'password', newPassword: newPassword})
-      .expect('Content-Type', /json/)
       .expect(HttpCode.Ok);
 
     expect(JSON.stringify(res.body)).toBe('{}');
@@ -250,28 +255,19 @@ describe('Test POST /v1/auth/reset-own-password - reset own password', () => {
     expect(loginResult.status).toBe('ok');
   });
 
-  it('should reset own password when mfa is set', async () => {
-    const secret = authenticator.generateSecret(64);
-    const user = await createData.createAuthUser({
-      forcePasswordReset: true,
-      mfaSecret: secret,
-    });
+  it('should reset own password when mfa is not set', async () => {
+    const user = await createData.createAuthUser({forcePasswordReset: true});
     const newPassword = '¹X)1Õ,ì?¨ã$Z©N3Ú°jM¤ëÊyf';
 
     const res = await request
       .post('/v1/auth/reset-own-password')
       .send({email: user.email, password: 'password', newPassword: newPassword})
-      .expect('Content-Type', /json/)
       .expect(HttpCode.Ok);
 
     expect(JSON.stringify(res.body)).toBe('{}');
 
-    const loginResult = await testLogin(
-      user.email as string,
-      newPassword,
-      user.id
-    );
-    expect(loginResult.status).toBe('ok');
+    const loginResult = await testLogin(user.email as string, newPassword);
+    expect(loginResult.status).toBe('showMfa');
   });
 
   it('should respond with 400 if too weak password', async () => {

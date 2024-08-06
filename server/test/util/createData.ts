@@ -69,6 +69,7 @@ class CreateData {
         password: string;
         forcePasswordReset: boolean;
         mfaSecret: string;
+        mfaConfirmed: boolean;
       }
     >
   ): Promise<UserData> {
@@ -87,6 +88,7 @@ class CreateData {
       password: password,
       forcePasswordReset: user?.forcePasswordReset ?? false,
       mfaSecret: user?.mfaSecret ?? null,
+      mfaConfirmed: user?.mfaConfirmed ?? false,
     });
     this.freeUserId += 1;
     return {
