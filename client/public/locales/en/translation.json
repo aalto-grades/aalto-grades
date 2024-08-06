@@ -77,7 +77,7 @@
       "singular": "Difficulty",
       "plural": "Difficulties"
     },
-    "grades": {
+    "grade": {
       "singular": "Grade",
       "plural": "Grades"
     },

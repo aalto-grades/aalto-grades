@@ -271,7 +271,7 @@ const ModelsView = (): JSX.Element => {
                 variant="outlined"
                 onClick={() => setCreateDialogOpen(true)}
               >
-                {t('general.grading-model.create-new')}
+                {t('course.models.create-new')}
               </Button>
             </Tooltip>
           )}
