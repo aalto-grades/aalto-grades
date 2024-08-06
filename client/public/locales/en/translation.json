@@ -22,6 +22,7 @@
     "unsaved-changes": "Unsaved changes",
     "saving": "Saving",
     "download": "Download",
+    "loading": "Loading",
     "idp-users": "IDP-Users",
     "role": "Role",
     "admin": {
@@ -153,6 +154,22 @@
       "set-max-grade": "Set maximum allowed grade",
       "max-grade-help": "Maximum allowed grade for course part"
     },
+    "models": {
+      "could-not-find-model": "Couldn't find grading model with ID {{model}}",
+      "could-not-find-grade": "Couldn't find grades for user with ID {{user}}",
+      "delete-model": "Delete model",
+      "delete-model-message": "Are you sure that you want to delete this model",
+      "save-null": "Tried to save null model",
+      "has-deleted-and-archived": "Contains deleted & archived course parts",
+      "has-archived": "Contains archived course parts",
+      "has-deleted": "Contains deleted course parts",
+      "create-new": "Create new",
+      "new-model": "New grading model",
+      "back": "Back to models",
+      "no-models": "No models",
+      "delete-grading-model": "Delete grading model",
+      "cannot-delete-with-final": "Cannot delete a model with final grades"
+    },
     "parts": {
       "saved": "Course parts saved successfully",
       "add-a+-source": "Add A+ grade source",
@@ -164,9 +181,17 @@
       "valid-until": "Valid until",
       "archived": "Archived",
       "add-new": "Add new",
-      "add-from-a+": "Add from A+"
+      "add-from-a+": "Add from A+",
+      "archive": "Archive grading model",
+      "unarchive": "Unarchive grading model"
     },
     "a+": {
+      "select-course-parts": "Select course parts",
+      "fetching-grades": "Fetching grades",
+      "select-for-fetching": "Select the course parts you want to fetch grades for from A+.",
+      "fetching-grades-wait": "Fetching grades from A+, this may take a few minutes...",
+      "part-id": "Course part ID",
+      "source-id": "A+ grade source ID",
       "select-grade-source": {
         "singular": "Select grade source",
         "plural": "Select grade sources"
@@ -201,7 +226,6 @@
     "n-errors": "{{n}} errors",
     "view-graph": "View graph",
     "data-undefined": "Data is undefined",
-    "loading": "Loading",
     "edit-final": "Edit final grades",
     "multiple-final": "Multiple final grades, click to show",
     "final-on-date": "Final grade obtained on {{date}}",

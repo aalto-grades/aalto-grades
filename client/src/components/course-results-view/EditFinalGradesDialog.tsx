@@ -130,7 +130,7 @@ const EditFinalGradesDialog = ({
   useEffect(() => {
     const getModelName = (modelId: number | null): string | null => {
       if (modelId === null) return null;
-      if (gradingModels.data === undefined) return t('course-results.loading');
+      if (gradingModels.data === undefined) return t('general.loading');
       const model = gradingModels.data.find(mod => mod.id === modelId);
       return model?.name ?? t('course-results.not-found');
     };

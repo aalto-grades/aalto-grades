@@ -56,7 +56,7 @@ const UserGraphDialog = ({
         {row === null ? (
           <>{t('course-results.data-undefined')}</>
         ) : selectedModel === null || courseParts.data === undefined ? (
-          <>{t('course-results.loading')}</>
+          <>{t('general.loading')}</>
         ) : (
           <Graph
             initGraph={selectedModel.graphStructure}
