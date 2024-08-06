@@ -17,7 +17,7 @@ import {
   AuthData,
   ChangeOwnAuthData,
   ChangeOwnAuthResponse,
-  ConfirmMfa,
+  ConfirmMfaData,
   HttpCode,
   LoginData,
   LoginResult,
@@ -313,8 +313,8 @@ export const changeOwnAuth: Endpoint<
   res.json({otpAuth: null});
 };
 
-/** (ConfirmMfa) => void */
-export const confirmMfa: Endpoint<ConfirmMfa, void> = async (req, res) => {
+/** (ConfirmMfaData) => void */
+export const confirmMfa: Endpoint<ConfirmMfaData, void> = async (req, res) => {
   const user = req.user as JwtClaims;
 
   const dbUser = await User.findByPk(user.id);

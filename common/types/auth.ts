@@ -95,7 +95,7 @@ export const ChangeOwnAuthResponseSchema = z.strictObject({
   otpAuth: z.string().nullable(),
 });
 
-export const ConfirmMfaSchema = z.strictObject({otp: z.string()});
+export const ConfirmMfaDataSchema = z.strictObject({otp: z.string()});
 
 export type AuthData = z.infer<typeof AuthDataSchema>;
 export type LoginData = z.infer<typeof LoginDataSchema>;
@@ -105,4 +105,4 @@ export type ResetAuthData = z.infer<typeof ResetAuthDataSchema>;
 export type ResetAuthResult = z.infer<typeof ResetAuthResultSchema>;
 export type ChangeOwnAuthData = z.infer<typeof ChangeOwnAuthDataSchema>;
 export type ChangeOwnAuthResponse = z.infer<typeof ChangeOwnAuthResponseSchema>;
-export type ConfirmMfa = z.infer<typeof ConfirmMfaSchema>;
+export type ConfirmMfaData = z.infer<typeof ConfirmMfaDataSchema>;

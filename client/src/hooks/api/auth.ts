@@ -24,7 +24,7 @@ import {
   ResetAuthData,
   ChangeOwnAuthResponse,
   ChangeOwnAuthResponseSchema,
-  ConfirmMfa,
+  ConfirmMfaData,
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
@@ -99,8 +99,8 @@ export const useResetOwnAuth = (
   });
 
 export const useConfirmMfa = (
-  options?: UseMutationOptions<void, unknown, ConfirmMfa>
-): UseMutationResult<void, unknown, ConfirmMfa> =>
+  options?: UseMutationOptions<void, unknown, ConfirmMfaData>
+): UseMutationResult<void, unknown, ConfirmMfaData> =>
   useMutation({
     mutationFn: async data => axios.post('/v1/auth/confirm-mfa', data),
     ...options,

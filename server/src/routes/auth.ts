@@ -9,7 +9,7 @@ import {processRequestBody} from 'zod-express-middleware';
 
 import {
   ChangeOwnAuthDataSchema,
-  ConfirmMfaSchema,
+  ConfirmMfaDataSchema,
   LoginDataSchema,
   ResetAuthDataSchema,
   ResetOwnPasswordDataSchema,
@@ -91,7 +91,7 @@ router.post(
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(ConfirmMfaSchema),
+  processRequestBody(ConfirmMfaDataSchema),
   controllerDispatcher(confirmMfa)
 );
 
