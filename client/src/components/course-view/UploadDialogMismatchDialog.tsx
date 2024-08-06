@@ -21,6 +21,7 @@ import {
   TableRow,
 } from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 
 export type MismatchData = {
   fields: string[];
@@ -39,6 +40,7 @@ const MismatchDialog = ({
   onClose: () => void;
   mismatchData: MismatchData;
 }): JSX.Element => {
+  const {t} = useTranslation();
   const [selections, setSelections] = useState<{[key: string]: string}>({});
   const [error, setError] = useState<MismatchError>('');
   const [duplicate, setDuplicate] = useState<string>('');
@@ -88,19 +90,19 @@ const MismatchDialog = ({
   const getErrorText = (): string => {
     switch (error) {
       case '':
-        return 'All done!';
+        return t('course.upload.all-done');
       case 'duplicate':
-        return 'The same "Import as" value cannot appear twice';
+        return t('course.upload.import-as-twice');
       case 'empty':
-        return '"Import as" field cannot be empty';
+        return t('course.upload.import-as-empty');
       case 'noStudentNo':
-        return 'Student number must be specified';
+        return t('course.upload.no-student-number');
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle>Mismatching columns found</DialogTitle>
+      <DialogTitle>{t('course.upload.mismatch')}</DialogTitle>
       <DialogContent>
         <Alert severity={error !== '' ? 'error' : 'success'} sx={{mb: 2}}>
           {getErrorText()}
@@ -109,8 +111,8 @@ const MismatchDialog = ({
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>CSV column</TableCell>
-                <TableCell>Import as</TableCell>
+                <TableCell>{t('course.upload.csv-column')}</TableCell>
+                <TableCell>{t('course.upload.import-as')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -132,11 +134,11 @@ const MismatchDialog = ({
                       }
                     >
                       <InputLabel id={`mismatch-select-${key}`}>
-                        Import as
+                        {t('course.upload.import-as')}
                       </InputLabel>
                       <Select
                         labelId={`mismatch-select-${key}`}
-                        label="Import as"
+                        label={t('course.upload.import-as')}
                         size="small"
                         value={selections[key] ?? ''}
                         onChange={e =>
@@ -159,8 +161,8 @@ const MismatchDialog = ({
                             {field}
                           </MenuItem>
                         ))}
-                        <MenuItem key="ignoreColumn" value="Ignore column">
-                          Ignore column
+                        <MenuItem key="ignoreColumn" value={t('course.upload.ignore-column')}>
+                          {t('course.upload.ignore-column')}
                         </MenuItem>
                       </Select>
                     </FormControl>
@@ -172,13 +174,13 @@ const MismatchDialog = ({
         </TableContainer>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t('general.cancel')}</Button>
         <Button
           onClick={() => mismatchData.onImport(selections)}
           variant="contained"
           disabled={error !== ''}
         >
-          Import
+          {t('general.import')}
         </Button>
       </DialogActions>
     </Dialog>

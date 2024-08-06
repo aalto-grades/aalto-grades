@@ -12,6 +12,7 @@
     "back": "Back",
     "next": "Next",
     "date": "Date",
+    "edit": "Edit",
     "grader": "Grader",
     "grading-model-name": "Grading model name",
     "export-date": "Export date",
@@ -22,6 +23,7 @@
     "unsaved-changes": "Unsaved changes",
     "saving": "Saving",
     "download": "Download",
+    "import": "Import",
     "loading": "Loading",
     "idp-users": "IDP-Users",
     "role": "Role",
@@ -53,7 +55,10 @@
       "singular": "Grading model",
       "plural": "Grading models"
     },
-    "course-parts": "Course parts",
+    "course-part": {
+      "singular": "Course part",
+      "plural": "Course parts"
+    },
     "days-valid": "Days valid",
     "max-grade": "Max grade",
     "a+-token": "A+ API token",
@@ -183,7 +188,33 @@
       "add-new": "Add new",
       "add-from-a+": "Add from A+",
       "archive": "Archive grading model",
-      "unarchive": "Unarchive grading model"
+      "unarchive": "Unarchive grading model",
+      "dates": "Completion and expiration dates",
+      "hidden": "Some course parts are hidden due to not having any data"
+    },
+    "upload": {
+      "missing-grades": "Some students have missing grades",
+      "upload-grades": "Upload grades",
+      "paste-text": "Paste text",
+      "higher-than-max": "Some grades are higher than the maximum allowed values",
+      "upload-csv": "Upload CSV",
+      "download-template": "Download CSV template",
+      "a+-import": "Import from A+",
+      "add-manually": "Or add them manually",
+      "student-number-empty": "Student number cannot be empty",
+      "grades-added": "Grades added successfully",
+      "completion-date": "Completion date",
+      "expiration-date": "Expiration date",
+      "expiry-after-completion": "Expiry date must be after completion date",
+      "confirm-data": "Confirm data",
+      "all-done": "All done!",
+      "import-as-twice": "The same \"Import as\" value cannot appear twice",
+      "import-as-empty": "\"Import as\" field cannot be empty",
+      "no-student-number": "Student number must be specified",
+      "mismatch": "Mismatching columns found",
+      "csv-column": "CSV column",
+      "import-as": "Import as",
+      "ignore-column": "Ignore column"
     },
     "a+": {
       "select-course-parts": "Select course parts",

@@ -132,7 +132,7 @@ const SideMenu = (): JSX.Element => {
           IconOutlined={AccountTreeOutlined}
         />
         <SideMenuButton
-          text={t('general.course-parts')}
+          text={t('general.course-part.plural')}
           to={`/${courseId}/course-parts`}
           Icon={Widgets}
           IconOutlined={WidgetsOutlined}

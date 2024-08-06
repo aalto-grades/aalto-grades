@@ -390,7 +390,7 @@ const CoursePartsView = (): JSX.Element => {
 
       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
         <Typography width={'fit-content'} variant="h2">
-          {t('general.course-parts')}
+          {t('general.course-part.plural')}
         </Typography>
         <SaveBar
           show={editRights && unsavedChanges}
