@@ -137,42 +137,42 @@ const Graph = ({
     {
       type: 'addition',
       title: t('graph.node.add'),
-      tooltip: t('graph.node.add-toolip'),
+      tooltip: t('graph.node.add-tooltip'),
     },
     {
       type: 'average',
       title: t('graph.node.average'),
-      tooltip: t('graph.node.average-toolip'),
+      tooltip: t('graph.node.average-tooltip'),
     },
     {
       type: 'stepper',
       title: t('graph.node.stepper'),
-      tooltip: t('graph.node.stepper-toolip'),
+      tooltip: t('graph.node.stepper-tooltip'),
     },
     {
       type: 'minpoints',
       title: t('graph.node.min'),
-      tooltip: t('graph.node.min-toolip'),
+      tooltip: t('graph.node.min-tooltip'),
     },
     {
       type: 'max',
       title: t('graph.node.max'),
-      tooltip: t('graph.node.max-toolip'),
+      tooltip: t('graph.node.max-tooltip'),
     },
     {
       type: 'require',
       title: t('graph.node.require'),
-      tooltip: t('graph.node.require-toolip'),
+      tooltip: t('graph.node.require-tooltip'),
     },
     {
       type: 'round',
       title: t('graph.node.round'),
-      tooltip: t('graph.node.round-toolip'),
+      tooltip: t('graph.node.round-tooltip'),
     },
     {
       type: 'substitute',
       title: t('graph.node.substitute'),
-      tooltip: t('graph.node.substitute-toolip'),
+      tooltip: t('graph.node.substitute-tooltip'),
     },
   ];
 
@@ -629,8 +629,8 @@ const Graph = ({
             }}
           >
             {selected.length > 1
-              ? t('graph.delete-nodes.plural')
-              : t('graph.delete-nodes.singular')}
+              ? t('graph.delete-node.plural')
+              : t('graph.delete-node.singular')}
           </Button>
         )}
       </div>

@@ -47,6 +47,7 @@
     "vitest-preview": "vitest-preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --fix",
+    "parse-trans": "npx i18next 'src/**/*.{ts,tsx}' -c i18next-parser.config.js -o 'public/locales/$LOCALE/$NAMESPACE.json'",
     "prod-licenses": "npx license-checker-rseidelsohn --excludePrivatePackages --production --summary"
   },
   "engines": {
@@ -77,6 +78,7 @@
     "eslint": "^8.27.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "i18next-parser": "^9.0.1",
     "jsdom": "^24.0.0",
     "license-checker-rseidelsohn": "^4.2.6",
     "rollup-plugin-license": "^3.2.0",

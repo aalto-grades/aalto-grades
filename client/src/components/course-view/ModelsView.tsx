@@ -289,7 +289,7 @@ const ModelsView = (): JSX.Element => {
       <Collapse in={!graphOpen}>
         {models.length === 0 ? (
           <Typography textAlign="left" sx={{p: 2}}>
-            {t('course.model.no-models')}
+            {t('course.models.no-models')}
           </Typography>
         ) : (
           <List sx={{width: 400}} disablePadding>
