@@ -11,6 +11,7 @@ import {
 import {Box, IconButton, Tooltip, Typography, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import {JSX, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 
 import {CoursePartGradesData} from '@/common/types';
 import EditGradesDialog from './EditGradesDialog';
@@ -27,6 +28,7 @@ const GradeCell = ({
   coursePartResults,
   maxGrade,
 }: GradeCellProps): JSX.Element => {
+  const {t} = useTranslation();
   const {gradeSelectOption} = useTableContext();
   const theme = useTheme();
 
@@ -80,8 +82,8 @@ const GradeCell = ({
             placement="top"
             title={
               coursePartResults.grades.length <= 1
-                ? 'Edit grades'
-                : 'Multiple grades, click to show'
+                ? t('course-results.edit-grade')
+                : t('course-results.multiple-grade')
             }
           >
             <IconButton
@@ -105,7 +107,10 @@ const GradeCell = ({
           studentNumber={studentNumber}
           coursePartId={coursePartResults.coursePartId}
           maxGrade={maxGrade}
-          title={`Grades of ${studentNumber} for ${coursePartResults.coursePartName}`}
+          title={t('course-results.grade-of-for', {
+            user: studentNumber,
+            part: coursePartResults.coursePartName,
+          })}
           grades={coursePartResults.grades}
         />
       )}
@@ -146,7 +151,9 @@ const GradeCell = ({
         <>
           <Tooltip
             placement="top"
-            title={`Grade expired on ${bestGrade?.expiryDate.toString()}`}
+            title={t('course-results.grade-expired-on', {
+              date: bestGrade?.expiryDate.toString(),
+            })}
           >
             {/* <IconButton
                   size='small'

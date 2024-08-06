@@ -23,6 +23,7 @@ import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, {Dayjs} from 'dayjs';
 import 'dayjs/locale/en-gb';
 import {useEffect, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {GradingModelData, StudentRow} from '@/common/types';
@@ -51,6 +52,7 @@ const CalculateFinalGradesDialog = ({
   gradeSelectOption,
   calculateFinalGrades,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const allGradingModels = useGetAllGradingModels(courseId);
   // TODO: Auto select the model used in the table view
@@ -109,34 +111,33 @@ const CalculateFinalGradesDialog = ({
   const getWarning = (model: GradingModelData | null): string => {
     if (model === null) return '';
     if (model.hasArchivedCourseParts && model.hasDeletedCourseParts)
-      return 'Grading model contains deleted & archived course parts';
+      return t('course-results.model-has-deleted-and-archived');
     if (model.hasArchivedCourseParts)
-      return 'Grading model contains archived course parts';
+      return t('course-results.model-has-archived');
     if (model.hasDeletedCourseParts)
-      return 'Grading model contains deleted course parts';
+      return t('course-results.model-has-deleted');
     return '';
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Calculate final grades</DialogTitle>
+      <DialogTitle>{t('course-results.calculate-final')}</DialogTitle>
       <DialogContent>
         <Typography sx={{mb: 2}}>
           {selectedRows.length === 1
-            ? 'Calculating final grade for 1 student'
-            : `Calculating final grades for ${selectedRows.length} students`}
+            ? t('course-results.calculating-for-1')
+            : t('course-results.calculating-for-n', {n: selectedRows.length})}
         </Typography>
 
         {/* Warnings */}
         {gradeSelectOption === 'latest' && (
           <Alert sx={{mb: 2, mt: -1}} severity="info">
-            You are using latest grades instead of the best grades to calculate
-            the final grades.
+            {t('course-results.using-latest')}
           </Alert>
         )}
         <Collapse in={errors.InvalidGrade}>
           <Alert sx={{mb: 2, mt: -1}} severity="warning">
-            Some of the selected grades are invalid.
+            {t('course-results.some-grade-invalid')}
           </Alert>
         </Collapse>
         <Collapse
@@ -153,13 +154,14 @@ const CalculateFinalGradesDialog = ({
           in={errors.InvalidPredictedGrade || errors.OutOfRangePredictedGrade}
         >
           <Alert sx={{mb: 2, mt: -1}} severity="error">
-            Some final grades will have invalid values, check if the correct
-            grading model is being used
+            {t('course-results.some-final-invalid')}
           </Alert>
         </Collapse>
 
         <FormControl sx={{display: 'block'}}>
-          <InputLabel id="calculate-grades-select">Grading model</InputLabel>
+          <InputLabel id="calculate-grades-select">
+            {t('general.grading-model.singular')}
+          </InputLabel>
           <Select
             labelId="calculate-grades-select"
             sx={{width: '100%'}}
@@ -169,7 +171,7 @@ const CalculateFinalGradesDialog = ({
                 modelList.find(model => model.name === e.target.value)!
               );
             }}
-            label="Grading model"
+            label={t('general.grading-model.singular')}
           >
             {modelList.map(model => (
               <MenuItem key={model.id} value={model.name}>
@@ -186,7 +188,7 @@ const CalculateFinalGradesDialog = ({
               onChange={e => setDateOverride(e.target.checked)}
             />
           }
-          label="Override grading date for all students"
+          label={t('course-results.override-date')}
         />
         <Collapse in={dateOverride}>
           <LocalizationProvider
@@ -194,7 +196,7 @@ const CalculateFinalGradesDialog = ({
             adapterLocale="en-gb"
           >
             <DatePicker
-              label="Grading date"
+              label={t('general.grading-date')}
               sx={{width: '100%', mt: 2}}
               format="DD.MM.YYYY"
               value={gradingDate}
@@ -204,7 +206,7 @@ const CalculateFinalGradesDialog = ({
         </Collapse>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t('general.cancel')}</Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
@@ -212,7 +214,7 @@ const CalculateFinalGradesDialog = ({
             errors.InvalidPredictedGrade || errors.OutOfRangePredictedGrade
           }
         >
-          Confirm
+          {t('general.confirm')}
         </Button>
       </DialogActions>
     </Dialog>

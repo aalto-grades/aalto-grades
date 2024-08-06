@@ -20,8 +20,8 @@ import {
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
-import {useTranslation} from 'react-i18next';
 import {AsyncConfirmationModal} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 
 import {NewUserSchema} from '@/common/types';
 import {useAddUser} from '../../../hooks/useApi';
@@ -139,7 +139,11 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
         <Typography sx={{display: 'inline'}}>
           {userData!.temporaryPassword}
         </Typography>
-        <Tooltip title={t('general.copy')} placement="top" sx={{my: -1, ml: 1, mr: -2}}>
+        <Tooltip
+          title={t('general.copy')}
+          placement="top"
+          sx={{my: -1, ml: 1, mr: -2}}
+        >
           <IconButton
             size="small"
             onClick={() => {
@@ -193,7 +197,9 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
           maxWidth="xs"
         >
           <DialogTitle>
-            {userData === null ? t('front-page.add-user') : t('front-page.admin-added')}
+            {userData === null
+              ? t('front-page.add-user')
+              : t('front-page.admin-added')}
           </DialogTitle>
           <DialogContent>
             {userData === null ? <FormContent form={form} /> : <UserContent />}
@@ -222,7 +228,9 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
               }}
               disabled={form.isSubmitting}
             >
-              {userData === null ? t('front-page.add-user') : t('general.close')}
+              {userData === null
+                ? t('front-page.add-user')
+                : t('general.close')}
             </Button>
           </DialogActions>
         </Dialog>

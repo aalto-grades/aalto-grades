@@ -33,7 +33,7 @@ export const ConfirmDialog = ({
     (el: ActionButton) => el.title === t('general.cancel')
   ) as ActionButton;
   const confirmButton = actions!.find(
-    (el: ActionButton) => el.title === t('alerts.confirm')
+    (el: ActionButton) => el.title === t('general.confirm')
   ) as ActionButton;
 
   const childrenProp = children as {props: {message: string}};
@@ -67,7 +67,7 @@ export const ConfirmDialog = ({
             ? t('alerts.unsaved-changes.discard')
             : confirmDelete
               ? t('general.delete')
-              : t('alerts.confirm')}
+              : t('general.confirm')}
         </Button>
       </DialogActions>
     </Dialog>

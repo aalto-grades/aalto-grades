@@ -18,8 +18,8 @@ import {
 } from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useMemo, useState} from 'react';
-import {useTranslation} from 'react-i18next';
 import {AsyncConfirmationModal} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 
 import {SystemRole, UserData} from '@/common/types';
 import ResetAuthDialog from './ResetAuthDialog';
@@ -57,7 +57,8 @@ const UsersTable = (): JSX.Element => {
     }
   };
 
-  if (users.data?.length === 0 && users.isFetched) return <>{t('front-page.no-users')}</>;
+  if (users.data?.length === 0 && users.isFetched)
+    return <>{t('front-page.no-users')}</>;
 
   return (
     <>
@@ -93,7 +94,10 @@ const UsersTable = (): JSX.Element => {
               <TableRow key={user.email} hover={true}>
                 <TableCell sx={{width: '75%'}}>{user.email}</TableCell>
                 <TableCell>
-                  <Tooltip title={t('front-page.reset-password-mfa')} placement="top">
+                  <Tooltip
+                    title={t('front-page.reset-password-mfa')}
+                    placement="top"
+                  >
                     <span>
                       <IconButton
                         disabled={tab === 0}

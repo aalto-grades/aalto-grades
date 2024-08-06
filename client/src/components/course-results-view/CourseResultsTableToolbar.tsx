@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, forwardRef, useEffect, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 
@@ -50,6 +51,7 @@ const toggleString = (arr: string[], str: string): string[] => {
   return arr;
 };
 const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -64,11 +66,11 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
     [
       {
         id: 'latestBestGrade',
-        name: 'Latest part date',
-        info: 'Group by the latest obtainment date of all course parts',
+        name: t('context.grades-table.latest-grade'),
+        info: t('course-results.group-by-latest-grade'),
       },
-      {id: 'Exported to Sisu', name: 'Exported to Sisu'},
-      {id: 'finalGrade', name: 'Final grade'},
+      {id: 'Exported to Sisu', name: t('context.grades-table.exported')},
+      {id: 'finalGrade', name: t('general.final-grade.singular')},
     ],
     [
       ...table
@@ -119,12 +121,13 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
               width: 'max-content',
             }}
           >
-            Group by{' '}
-            {groupByElements
-              .flat()
-              .filter(el => table.getState().grouping.includes(el.id))
-              .map(el => el.name)
-              .join(', ')}
+            {t('course-results.group-by', {
+              grouping: groupByElements
+                .flat()
+                .filter(el => table.getState().grouping.includes(el.id))
+                .map(el => el.name)
+                .join(', '),
+            })}
           </div>
 
           {!isActive && (
@@ -207,6 +210,7 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
 
 const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
   (props, ref): JSX.Element => {
+    const {t} = useTranslation();
     const {courseId} = useParams() as {courseId: string};
     const theme = useTheme();
     const {table} = useTableContext();
@@ -276,7 +280,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
                 ? gradingModels?.filter(
                     ass => ass.id === selectedGradingModel
                   )[0]?.name
-                : 'Grading model'}
+                : t('general.grading-model.singular')}
             </div>
 
             {!isActive && (
@@ -346,6 +350,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
 );
 
 const CourseResultsTableToolbar = (): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
   const {table, gradeSelectOption, selectedGradingModel} = useTableContext();
@@ -438,7 +443,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
     );
     if (model === undefined || course.data === undefined) return false;
 
-    enqueueSnackbar('Calculating final grades...', {variant: 'info'});
+    enqueueSnackbar(t('course-results.calculating-final'), {variant: 'info'});
     const finalGrades = batchCalculateGraph(
       model.graphStructure,
       selectedRows.map(selectedRow => ({
@@ -455,9 +460,12 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       const Schema = z.number().int().min(0).max(maxFinalGrade);
       const result = Schema.safeParse(grade.finalGrade);
       if (!result.success) {
-        enqueueSnackbar(`Invalid final grade ${grade.finalGrade}`, {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          t('course-results.invalid-final', {grade: grade.finalGrade}),
+          {
+            variant: 'error',
+          }
+        );
         return false;
       }
     }
@@ -470,7 +478,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         comment: null,
       }))
     );
-    enqueueSnackbar('Final grades calculated successfully.', {
+    enqueueSnackbar(t('course-results.final-calculated'), {
       variant: 'success',
     });
     // refreshFinalGrades();
@@ -500,7 +508,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
             startIcon={<Add />}
             color="primary"
           >
-            Add grades
+            {t('course-results.add-grades')}
           </Button>
         </Box>
       ) : (
@@ -548,8 +556,8 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                   <Tooltip
                     title={
                       table.getSelectedRowModel().rows.length === 0
-                        ? 'Select at least one student number for grade calculation.'
-                        : 'Calculate course final grades for selected students.'
+                        ? t('course-results.select-one-student-calculation')
+                        : t('course-results.calculate-final-for-selected')
                     }
                     placement="top"
                   >
@@ -566,18 +574,17 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                       id="calculate-final-grades"
                     >
                       {missingFinalGrades
-                        ? 'Calculate final grades'
-                        : 'Re-calculate final grades'}
+                        ? t('course-results.calculate-final')
+                        : t('course-results.recalculate-final')}
                     </Button>
                   </Tooltip>
                   <Tooltip
                     title={
                       table.getSelectedRowModel().rows.length === 0
-                        ? 'Select at least one student number for downloading grades.'
+                        ? t('course-results.select-one-student-download')
                         : missingFinalGrades
-                          ? 'Grades with status "PENDING" cannot be downloaded, ' +
-                            'unselect or calculate grades for these.'
-                          : 'Download final course grades as a Sisu compatible CSV file.'
+                          ? t('course-results.pending-download')
+                          : t('course-results.download-as-sisu-compat-csv')
                     }
                     placement="top"
                   >
@@ -594,7 +601,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                         missingFinalGrades
                       }
                     >
-                      Download Sisu CSV
+                      {t('course-results.download-sisu-csv')}
                     </Button>
                   </Tooltip>
                 </Box>
@@ -614,7 +621,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         }}
       >
         <Tooltip
-          title="Group rows based on other columns"
+          title={t('course-results.group-columns')}
           placement="top"
           disableInteractive
         >
@@ -622,7 +629,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         </Tooltip>
         {(gradingModels?.length ?? 0) > 1 && (
           <Tooltip
-            title="Show only course parts used in the model"
+            title={t('course-results.show-model-parts')}
             placement="top"
             disableInteractive
           >
@@ -653,7 +660,9 @@ const CourseResultsTableToolbar = (): JSX.Element => {
           className="w-36 border shadow rounded"
         />
         <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
-          Showing: {table.getFilteredRowModel().rows.length} rows
+          {t('course-results.showing-n-rows', {
+            n: table.getFilteredRowModel().rows.length,
+          })}
           <Fade
             in={
               getErrorCount(
@@ -695,11 +704,12 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                 }
               }}
             >
-              {getErrorCount(
-                table.getFilteredRowModel().rows.map(e => e.original),
-                selectedGradingModel
-              )}
-              {' errors'}
+              {t('course-results.n-errors', {
+                n: getErrorCount(
+                  table.getFilteredRowModel().rows.map(e => e.original),
+                  selectedGradingModel
+                ),
+              })}
             </Button>
           </Fade>
         </Box>

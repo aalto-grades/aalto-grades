@@ -6,6 +6,7 @@ import {MoreVert} from '@mui/icons-material';
 import {Box, IconButton, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import {JSX, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 
 import {FinalGradeData, GradingScale} from '@/common/types';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
@@ -24,6 +25,7 @@ const FinalGradeCell = ({
   finalGrades,
   gradingScale,
 }: FinalGradeCellProps): JSX.Element => {
+  const {t} = useTranslation();
   const theme = useTheme();
 
   const [hover, setHover] = useState<boolean>(false);
@@ -58,8 +60,8 @@ const FinalGradeCell = ({
             placement="top"
             title={
               finalGrades.length <= 1
-                ? 'Edit final grades'
-                : 'Multiple final grades, click to show'
+                ? t('course-results.edit-final')
+                : t('course-results.multiple-final')
             }
           >
             <IconButton
@@ -82,13 +84,15 @@ const FinalGradeCell = ({
           onClose={() => setGradeDialogOpen(false)}
           userId={userId}
           finalGrades={finalGrades}
-          title={`Final grades of ${studentNumber}`}
+          title={t('course-results.final-of', {user: studentNumber})}
         />
       }
       {bestFinalGrade?.date && (
         <Tooltip
           placement="top"
-          title={`Final grade obtained on ${bestFinalGrade.date.toString()}`}
+          title={t('course-results.final-on-date', {
+            date: bestFinalGrade.date.toString(),
+          })}
           disableInteractive
         >
           <Box

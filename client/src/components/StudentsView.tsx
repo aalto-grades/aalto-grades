@@ -42,8 +42,8 @@ const StudentsView = (): JSX.Element => {
   const urlStudent = useMemo(
     () =>
       userId
-        ? students.data?.find(student => student.id.toString() === userId) ??
-          null
+        ? (students.data?.find(student => student.id.toString() === userId) ??
+          null)
         : null,
     [students.data, userId]
   );
@@ -80,7 +80,10 @@ const StudentsView = (): JSX.Element => {
         <>
           <Divider sx={{my: 2}} />
           <Typography variant="h2" sx={{pb: 2}}>
-            {t('students.viewing-grades', {user: selectedStudent?.name ?? selectedStudent?.studentNumber ?? ''})}
+            {t('students.viewing-grades', {
+              user:
+                selectedStudent?.name ?? selectedStudent?.studentNumber ?? '',
+            })}
           </Typography>
           <TableContainer component={Paper}>
             <Table sx={{minWidth: 650}} aria-label="simple table">

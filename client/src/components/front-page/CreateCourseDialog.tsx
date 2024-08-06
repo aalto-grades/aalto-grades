@@ -83,12 +83,18 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
   const ValidationSchema = z
     .object({
       courseCode: z
-        .string({required_error: t('front-page.create-course.course-code-required')})
+        .string({
+          required_error: t('front-page.create-course.course-code-required'),
+        })
         .min(1),
       minCredits: z
-        .number({required_error: t('front-page.create-course.min-credits-required')})
+        .number({
+          required_error: t('front-page.create-course.min-credits-required'),
+        })
         .min(0, t('front-page.create-course.min-credits-negative')),
-      maxCredits: z.number({required_error: t('front-page.create-course.max-credits-required')}),
+      maxCredits: z.number({
+        required_error: t('front-page.create-course.max-credits-required'),
+      }),
       gradingScale: z.nativeEnum(GradingScale),
       languageOfInstruction: z.nativeEnum(Language),
       teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
@@ -203,7 +209,9 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               value="department"
               label={`${t('general.organizing-department')}*`}
-              helperText={t('front-page.create-course.organizing-department-help')}
+              helperText={t(
+                'front-page.create-course.organizing-department-help'
+              )}
               select
             >
               {departments.map((department, i) => (
@@ -335,11 +343,11 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               InputLabelProps={{shrink: true}}
               helperText={
                 form.errors.assistantEmail ??
-                  (assistants.length === 0
-                    ? t('front-page.create-course.input-at-least-one-assistant')
-                    : assistants.includes(form.values.assistantEmail)
-                      ? t('front-page.create-course.email-in-list')
-                      : t('front-page.create-course.add-assistant-emails'))
+                (assistants.length === 0
+                  ? t('front-page.create-course.input-at-least-one-assistant')
+                  : assistants.includes(form.values.assistantEmail)
+                    ? t('front-page.create-course.email-in-list')
+                    : t('front-page.create-course.add-assistant-emails'))
               }
               error={
                 form.touched.assistantEmail &&

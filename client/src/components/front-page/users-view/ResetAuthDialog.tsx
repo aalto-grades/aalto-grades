@@ -68,7 +68,9 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">{t('front-page.reset-auth')}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">
+        {t('front-page.reset-auth')}
+      </DialogTitle>
       <DialogContent>
         {temporaryPassword === null ? (
           <>
@@ -164,7 +166,9 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
           }}
           disabled={!resetPassword && !resetMfa}
         >
-          {temporaryPassword === null ? t('front-page.reset-auth') : t('general.close')}
+          {temporaryPassword === null
+            ? t('front-page.reset-auth')
+            : t('general.close')}
         </Button>
       </DialogActions>
     </Dialog>
