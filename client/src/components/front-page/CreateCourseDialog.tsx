@@ -38,6 +38,7 @@ import {
   NewCourseData,
 } from '@/common/types';
 import {useAddCourse} from '../../hooks/useApi';
+import {useLocalize} from '../../hooks/useLocalize';
 import {convertToClientGradingScale} from '../../utils/textFormat';
 import {departments, sisuLanguageOptions} from '../../utils/utils';
 import FormField from '../shared/FormikField';
@@ -74,6 +75,7 @@ const initialValues = {
 type PropsType = {open: boolean; onClose: () => void};
 const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
   const {t} = useTranslation();
+  const localize = useLocalize();
   const navigate = useNavigate();
   const addCourse = useAddCourse();
 
@@ -191,7 +193,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
     >
       {form => (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-          <DialogTitle>Create a new course</DialogTitle>
+          <DialogTitle>{t('front-page.create-course.title')}</DialogTitle>
           <DialogContent dividers>
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
@@ -216,7 +218,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
             >
               {departments.map((department, i) => (
                 <MenuItem key={i} value={i}>
-                  {department.en}
+                  {localize(department)}
                 </MenuItem>
               ))}
             </FormField>
@@ -372,7 +374,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               }}
               sx={{mt: 1}}
             >
-              Add
+              {t('general.add')}
             </Button>
             <Box sx={{mt: 3, mb: 2}}>
               {assistants.length === 0 ? (

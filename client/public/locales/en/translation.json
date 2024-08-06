@@ -8,6 +8,7 @@
     "save": "Save",
     "discard": "Discard",
     "confirm": "Confirm",
+    "add": "Add",
     "done": "Done",
     "back": "Back",
     "next": "Next",
@@ -141,6 +142,9 @@
   "course": {
     "list": "Course list",
     "edit": "Edit course",
+    "edit-course": {
+      "saved": "Course details saved."
+    },
     "rename-model": {
       "title": "Rename grading model",
       "saved": "Grading model saved"
@@ -334,6 +338,7 @@
     "reset-auth": "Reset auth",
     "resetting-password-for": "Resetting password for {{user}}",
     "create-course": {
+      "title": "Create a new course",
       "course-code-required": "Course code is required (e.g. CS-A1111)",
       "min-credits-required": "Minimum credits is required",
       "min-credits-negative": "Minimum credits cannot be negative",
