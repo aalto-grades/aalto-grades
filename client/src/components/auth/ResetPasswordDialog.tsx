@@ -181,8 +181,7 @@ const ResetPasswordDialog = ({
             </DialogContent>
             <DialogActions>
               <Button
-                color="error"
-                variant="contained"
+                variant="outlined"
                 onClick={onCancel}
                 disabled={form.isSubmitting}
               >

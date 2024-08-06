@@ -92,7 +92,10 @@ const UserButton = (): JSX.Element => {
               setShowMfaDialog(false);
               setOtpAuth(null);
             }}
-            onSubmit={handleConfirmResetMfa}
+            onSubmit={async (otp: string) => {
+              await handleConfirmResetMfa(otp);
+              return true;
+            }}
           />
         </>
       )}

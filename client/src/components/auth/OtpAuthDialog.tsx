@@ -31,7 +31,7 @@ type PropsType = {
   otpAuth: string | null;
   cancelText?: string;
   onCancel: () => void;
-  onSubmit: (otp: string) => void;
+  onSubmit: (otp: string) => Promise<boolean>;
 };
 const OtpAuthDialog = ({
   open,
@@ -85,12 +85,15 @@ const OtpAuthDialog = ({
           autoFocus
           onChange={newOtp => setOtp(newOtp)}
           validateChar={(c: string) => /\d/.test(c)}
-          onComplete={fullOtp => onSubmit(fullOtp)}
+          onComplete={async fullOtp => {
+            const res = await onSubmit(fullOtp);
+            if (res) setOtp('');
+          }}
         />
       </DialogContent>
       <DialogActions>
         <Button
-          variant="contained"
+          variant="outlined"
           onClick={() => {
             setOtp('');
             onCancel();

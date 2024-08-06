@@ -92,7 +92,10 @@ const Login = (): JSX.Element => {
           setEmail('');
           setPassword('');
         }}
-        onSubmit={(fullOtp: string) => handleSubmit(null, fullOtp)}
+        onSubmit={async (fullOtp: string) => {
+          await handleSubmit(null, fullOtp);
+          return true;
+        }}
       />
       <Grid
         container
