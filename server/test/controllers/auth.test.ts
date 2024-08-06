@@ -16,7 +16,6 @@ import {
   LoginResult,
   LoginResultSchema,
   ResetAuthResultSchema,
-  ResetOwnPasswordResponseSchema,
   UserData,
 } from '@/common/types';
 import {app} from '../../src/app';
@@ -148,7 +147,7 @@ describe('Test POST /v1/auth/login - log in with an existing user', () => {
       undefined,
       null
     );
-    expect(result.status).toBe('resetMfa');
+    expect(result.status).toBe('showMfa');
   });
 
   it('should respond with 401 when logging in with invalid credentials', async () => {
@@ -241,9 +240,7 @@ describe('Test POST /v1/auth/reset-own-password - reset own password', () => {
       .expect('Content-Type', /json/)
       .expect(HttpCode.Ok);
 
-    const result = ResetOwnPasswordResponseSchema.safeParse(res.body);
-    expect(result.success).toBeTruthy();
-    expect(result.data?.otpAuth).toBeTruthy();
+    expect(JSON.stringify(res.body)).toBe('{}');
 
     const loginResult = await testLogin(
       user.email as string,
@@ -267,9 +264,7 @@ describe('Test POST /v1/auth/reset-own-password - reset own password', () => {
       .expect('Content-Type', /json/)
       .expect(HttpCode.Ok);
 
-    const result = ResetOwnPasswordResponseSchema.safeParse(res.body);
-    expect(result.success).toBeTruthy();
-    expect(result.data?.otpAuth).toBeNull();
+    expect(JSON.stringify(res.body)).toBe('{}');
 
     const loginResult = await testLogin(
       user.email as string,
@@ -363,7 +358,7 @@ describe("Test POST /v1/auth/reset-auth/:userId - reset other admin's auth detai
     const result = ResetAuthResultSchema.safeParse(res.body);
     expect(result.success).toBeTruthy();
     const loginResult = await testLogin(user.email as string, 'password');
-    expect(loginResult.status).toBe('resetMfa');
+    expect(loginResult.status).toBe('showMfa');
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {

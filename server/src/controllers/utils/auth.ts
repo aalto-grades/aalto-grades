@@ -4,16 +4,16 @@
 
 import argon from 'argon2';
 
-import {HttpCode, SystemRole} from '@/common/types';
+import {AuthData, HttpCode, SystemRole} from '@/common/types';
 import httpLogger from '../../configs/winston';
 import User from '../../database/models/user';
-import {ApiError, FullLoginResult} from '../../types';
+import {ApiError} from '../../types';
 
 /** @throws ApiError(401) */
 export const validateLogin = async (
   email: string,
   password: string
-): Promise<FullLoginResult> => {
+): Promise<AuthData> => {
   const user = await User.findByEmail(email);
 
   if (user === null) {
@@ -42,7 +42,5 @@ export const validateLogin = async (
     id: user.id,
     role: user.role as SystemRole,
     name: user.name,
-    resetPassword: user.forcePasswordReset ?? false,
-    resetMfa: user.mfaSecret === null,
   };
 };

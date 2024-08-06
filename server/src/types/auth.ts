@@ -8,10 +8,5 @@ import {AuthData} from '@/common/types';
 
 export type LoginCallback = (
   error: unknown,
-  loginResult?: FullLoginResult | false
+  loginResult?: AuthData | false
 ) => (void | Response) | Promise<void | Response>;
-
-export type FullLoginResult = AuthData & {
-  resetPassword: boolean;
-  resetMfa: boolean;
-};

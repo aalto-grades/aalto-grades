@@ -49,13 +49,11 @@ export const LoginDataSchema = z.strictObject({
 });
 export const LoginResultSchema = z.discriminatedUnion('status', [
   z.strictObject({
-    status: z.literal('resetMfa'),
-    otpAuth: z.string(),
+    status: z.literal('resetPassword'),
   }),
   z.strictObject({
-    status: z.literal('resetPassword'),
-    resetPassword: z.boolean(),
-    resetMfa: z.boolean(),
+    status: z.literal('showMfa'),
+    otpAuth: z.string(),
   }),
   z.strictObject({
     status: z.literal('enterMfa'),
@@ -72,9 +70,6 @@ export const ResetOwnPasswordDataSchema = z.strictObject({
   email: z.string(),
   password: z.string(),
   newPassword: z.string(),
-});
-export const ResetOwnPasswordResponseSchema = z.strictObject({
-  otpAuth: z.string().nullable(),
 });
 
 export const ResetAuthDataSchema = z.strictObject({
@@ -100,14 +95,14 @@ export const ChangeOwnAuthResponseSchema = z.strictObject({
   otpAuth: z.string().nullable(),
 });
 
+export const ConfirmMfaSchema = z.strictObject({otp: z.string()});
+
 export type AuthData = z.infer<typeof AuthDataSchema>;
 export type LoginData = z.infer<typeof LoginDataSchema>;
 export type LoginResult = z.infer<typeof LoginResultSchema>;
 export type ResetOwnPasswordData = z.infer<typeof ResetOwnPasswordDataSchema>;
-export type ResetOwnPasswordResponse = z.infer<
-  typeof ResetOwnPasswordResponseSchema
->;
 export type ResetAuthData = z.infer<typeof ResetAuthDataSchema>;
 export type ResetAuthResult = z.infer<typeof ResetAuthResultSchema>;
 export type ChangeOwnAuthData = z.infer<typeof ChangeOwnAuthDataSchema>;
 export type ChangeOwnAuthResponse = z.infer<typeof ChangeOwnAuthResponseSchema>;
+export type ConfirmMfa = z.infer<typeof ConfirmMfaSchema>;
