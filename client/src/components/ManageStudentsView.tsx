@@ -121,7 +121,7 @@ const ManageStudentsView = (): JSX.Element => {
     setData();
   }, [students.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const plural = rowSelectionModel.length > 1 ? true : false;
+  const plural = rowSelectionModel.length > 1;
   const handleDelete = async (): Promise<void> => {
     const confirmation = await AsyncConfirmationModal({
       title: plural
