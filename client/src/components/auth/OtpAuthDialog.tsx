@@ -95,17 +95,17 @@ const OtpAuthDialog = ({
         <Button
           variant="outlined"
           onClick={() => {
-            setOtp('');
             onCancel();
+            setOtp('');
           }}
         >
           {cancelText}
         </Button>
         <Button
           variant="contained"
-          onClick={() => {
-            setOtp('');
-            onSubmit(otp);
+          onClick={async () => {
+            const res = await onSubmit(otp);
+            if (res) setOtp('');
           }}
           disabled={otp.length !== 6}
         >
