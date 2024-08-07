@@ -96,7 +96,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
       );
     }
 
-    // Get mfa secret
+    // Get MFA secret
     let mfaSecret = user.mfaSecret;
     if (mfaSecret === null) {
       mfaSecret = authenticator.generateSecret(64);
@@ -111,7 +111,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
     // Force password reset
     if (user.forcePasswordReset) return res.json({status: 'resetPassword'});
 
-    // Show mfa
+    // Show MFA
     if (
       user.mfaSecret === null ||
       (!user.mfaConfirmed && req.body.otp === null)
@@ -119,7 +119,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
       return res.json({status: 'showMfa', otpAuth});
     }
 
-    // Enter mfa
+    // Enter MFA
     if (req.body.otp === null) {
       return res.json({status: 'enterMfa'});
     }
@@ -132,7 +132,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
       })
     ) {
       return res.status(HttpCode.Unauthorized).send({
-        errors: ['Incorrect TOTP token'],
+        errors: ['Incorrect TOTP code'],
       });
     }
 
@@ -333,7 +333,7 @@ export const confirmMfa: Endpoint<ConfirmMfaData, void> = async (req, res) => {
       secret: dbUser.mfaSecret as string,
     })
   ) {
-    throw new ApiError('Incorrect TOTP token', HttpCode.Unauthorized);
+    throw new ApiError('Incorrect TOTP code', HttpCode.Unauthorized);
   }
 
   await dbUser.set({mfaConfirmed: true}).save();

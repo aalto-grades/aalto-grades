@@ -6,7 +6,7 @@ import {HashAlgorithms} from '@otplib/core/';
 import {Page} from '@playwright/test';
 import {authenticator} from 'otplib';
 
-// Set totp codes to use sha512 instead of sha1
+// Set TOTP codes to use sha512 instead of sha1
 authenticator.options = {algorithm: HashAlgorithms.SHA512, digits: 6};
 
 type UserType = 'admin' | 'teacher' | 'assistant' | 'student';
@@ -25,13 +25,13 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
   await page.getByLabel('Password', {exact: true}).fill('password');
   await page.getByLabel('Password', {exact: true}).press('Enter');
 
-  // Wait for the mfa prompt to appear (if it ever does)
+  // Wait for the MFA prompt to appear (if it ever does)
   await page.waitForTimeout(100);
   const showSecretButton = page.getByRole('button', {
     name: 'Or manually enter the secret',
   });
 
-  // Login when mfa qr code is shown
+  // Login when MFA qr code is shown
   if (await showSecretButton.isVisible()) {
     await showSecretButton.click();
 

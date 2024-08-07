@@ -68,7 +68,7 @@ definitions:
           - status
       - title: Show MFA
         type: object
-        description: The mfa qr code should be shown to the user
+        description: The MFA qr code should be shown to the user
         properties:
           status:
             type: string
@@ -83,7 +83,7 @@ definitions:
           - otpAuth
       - title: Enter MFA
         type: object
-        description: The user should enter their otp
+        description: The user should enter their TOTP code
         properties:
           status:
             type: string
@@ -135,7 +135,7 @@ definitions:
         example: true
       resetMfa:
         type: boolean
-        description: If user mfa should be reset
+        description: If user MFA should be reset
         example: false
     required:
       - resetPassword
@@ -293,7 +293,7 @@ definitions:
     parameters:
       - $ref: '#/definitions/UserId'
     requestBody:
-      description: If mfa and/or password should be reset.
+      description: If MFA and/or password should be reset.
       content:
         application/json:
           schema:
@@ -319,7 +319,7 @@ definitions:
 /v1/auth/change-own-auth:
   post:
     tags: [Auth]
-    description: Change own password / mfa when logging in
+    description: Change own password / MFA when logging in
     requestBody:
       description: What data to reset.
       content:
@@ -328,7 +328,7 @@ definitions:
             $ref: '#/definitions/ChangeOwnAuthData'
     responses:
       200:
-        description: Password / mfa reset successfully
+        description: Password / MFA reset successfully
         content:
           application/json:
             schema:
@@ -343,9 +343,9 @@ definitions:
 /v1/auth/confirm-mfa:
   post:
     tags: [Auth]
-    description: Confirm new mfa by submitting an otp.
+    description: Confirm new MFA by submitting a TOTP code.
     requestBody:
-      description: Otp.
+      description: TOTP code.
       content:
         application/json:
           schema:

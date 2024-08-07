@@ -185,7 +185,7 @@ const ResetPasswordDialog = ({
                 onClick={onCancel}
                 disabled={form.isSubmitting}
               >
-                Cancel
+                {t('general.cancel')}
               </Button>
               <Button
                 variant="contained"

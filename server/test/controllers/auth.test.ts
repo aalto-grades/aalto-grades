@@ -129,7 +129,7 @@ describe('Test POST /v1/auth/login - log in with an existing user', () => {
     expect(result.status).toBe('resetPassword');
   });
 
-  it('should ask for mfa', async () => {
+  it('should ask for MFA', async () => {
     const result = await testLogin(
       'admin@aalto.fi',
       'password',
@@ -139,7 +139,7 @@ describe('Test POST /v1/auth/login - log in with an existing user', () => {
     expect(result.status).toBe('enterMfa');
   });
 
-  it('should ask to reset mfa', async () => {
+  it('should ask to reset MFA', async () => {
     const user = await createData.createAuthUser();
 
     const result = await testLogin(
@@ -171,10 +171,10 @@ describe('Test POST /v1/auth/login - log in with an existing user', () => {
     });
   });
 
-  it('should respond with 401 when logging in with invalid totp token', async () => {
+  it('should respond with 401 when logging in with an invalid TOTP code', async () => {
     const badCreds = responseTests.testUnauthorized(
       '/v1/auth/login',
-      '{"errors":["Incorrect TOTP token"]}'
+      '{"errors":["Incorrect TOTP code"]}'
     );
 
     // Can theoretically succeed :P
@@ -255,7 +255,7 @@ describe('Test POST /v1/auth/reset-own-password - reset own password', () => {
     expect(loginResult.status).toBe('ok');
   });
 
-  it('should reset own password when mfa is not set', async () => {
+  it('should reset own password when MFA is not set', async () => {
     const user = await createData.createAuthUser({forcePasswordReset: true});
     const newPassword = '¹X)1Õ,ì?¨ã$Z©N3Ú°jM¤ëÊyf';
 
@@ -341,7 +341,7 @@ describe("Test POST /v1/auth/reset-auth/:userId - reset other admin's auth detai
     expect(loginResult.status).toBe('resetPassword');
   });
 
-  it("Should reset other admin's mfa", async () => {
+  it("Should reset other admin's MFA", async () => {
     const user = await createData.createAuthUser();
 
     const res = await request
@@ -407,7 +407,7 @@ describe('Test POST /v1/auth/change-own-auth - change own auth', () => {
     expect(loginResult.status).toBe('enterMfa');
   });
 
-  it('Should reset own mfa', async () => {
+  it('Should reset own MFA', async () => {
     const [, cookie] = await createUser();
 
     const res = await request

@@ -117,14 +117,14 @@
     "local": {
       "title": "Log in to Aalto Grades",
       "body": "If you have been provided with credentials specifically for Aalto Grades, use this login.",
-      "enter-otp": "Enter OTP",
+      "enter-otp": "Enter TOTP code",
       "button": "Log in"
     },
     "mfa-qr": {
       "title": "MFA QR code",
       "scan": "Scan the QR code in your MFA application",
       "manual": "Or manually enter the secret",
-      "enter-otp": "Enter OTP",
+      "enter-otp": "Enter TOTP code",
       "cancel": "Back to login",
       "close-without-confirm": "Cancel without confirming"
     },
