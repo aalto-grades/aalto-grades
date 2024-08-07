@@ -37,7 +37,7 @@ type PropsType = {
 const OtpAuthDialog = ({
   open,
   otpAuth,
-  cancelText = 'Back to login',
+  cancelText = undefined,
   onCancel,
   onSubmit,
 }: PropsType): JSX.Element => {
@@ -75,7 +75,7 @@ const OtpAuthDialog = ({
           </DialogContentText>
         </Collapse>
         <DialogContentText sx={{mt: 2, textAlign: 'center'}}>
-          Enter otp
+          {t('auth.mfa-qr.enter-otp')}
         </DialogContentText>
         <MuiOtpInput
           data-testid="mfa-input"
@@ -100,7 +100,7 @@ const OtpAuthDialog = ({
             setOtp('');
           }}
         >
-          {cancelText}
+          {cancelText ?? t('auth.mfa-qr.cancel')}
         </Button>
         <Button
           variant="contained"
@@ -110,7 +110,7 @@ const OtpAuthDialog = ({
           }}
           disabled={otp.length !== 6}
         >
-          Submit
+          {t('general.confirm')}
         </Button>
       </DialogActions>
     </Dialog>

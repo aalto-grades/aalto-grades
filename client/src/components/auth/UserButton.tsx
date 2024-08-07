@@ -89,7 +89,7 @@ const UserButton = (): JSX.Element => {
           <OtpAuthDialog
             open={showMfaDialog}
             otpAuth={otpAuth}
-            cancelText="Close without confirming"
+            cancelText={t('auth.mfa-qr.close-without-confirm')}
             onCancel={() => {
               setShowMfaDialog(false);
               setOtpAuth(null);

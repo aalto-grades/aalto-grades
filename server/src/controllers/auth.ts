@@ -41,7 +41,7 @@ import {
   LoginCallback,
 } from '../types';
 
-// Set totp codes to use sha512 instead of sha1
+// Set TOTP codes to use sha512 instead of sha1
 authenticator.options = {algorithm: HashAlgorithms.SHA512, digits: 6};
 
 /**
