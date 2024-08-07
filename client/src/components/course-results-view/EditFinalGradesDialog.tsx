@@ -22,6 +22,7 @@ import {
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 import {useBlocker, useParams} from 'react-router-dom';
 import {z} from 'zod';
 
@@ -68,6 +69,7 @@ const EditFinalGradesDialog = ({
   title,
   finalGrades,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const {auth} = useAuth();
   const {courseId} = useParams() as {courseId: string};
 
@@ -128,9 +130,9 @@ const EditFinalGradesDialog = ({
   useEffect(() => {
     const getModelName = (modelId: number | null): string | null => {
       if (modelId === null) return null;
-      if (gradingModels.data === undefined) return 'Loading...';
+      if (gradingModels.data === undefined) return t('general.loading');
       const model = gradingModels.data.find(mod => mod.id === modelId);
-      return model?.name ?? 'Not found';
+      return model?.name ?? t('course-results.not-found');
     };
 
     const newRows = finalGrades.map((finalGrade, finalGradeId) => ({
@@ -146,46 +148,46 @@ const EditFinalGradesDialog = ({
     }));
     setRows(newRows);
     setInitRows(structuredClone(newRows));
-  }, [gradingModels.data, finalGrades]);
+  }, [gradingModels.data, finalGrades, t]);
 
-  if (!auth) return <>Not permitted</>; // Not needed?
+  if (!auth) return <>{t('course-results.not-permitted')}</>; // Not needed?
 
   const columns: GridColDef<ColTypes>[] = [
     {
       field: 'grader',
-      headerName: 'Grader',
+      headerName: t('general.grader'),
       type: 'string',
       editable: false,
     },
     {
       field: 'grade',
-      headerName: 'Grade',
+      headerName: t('general.grade.singular'),
       type: 'number',
       editable: true,
     },
     {
       field: 'date',
-      headerName: 'Date',
+      headerName: t('general.date'),
       type: 'date',
       editable: true,
       width: 110, // Enough width to fit the calendar icon
     },
     {
       field: 'gradingModel',
-      headerName: 'Grading model name',
+      headerName: t('general.grading-model-name'),
       type: 'string',
       editable: false,
     },
     {
       field: 'exportDate',
-      headerName: 'Export date',
+      headerName: t('general.export-date'),
       type: 'date',
       editable: true,
       width: 110, // Enough width to fit the calendar icon
     },
     {
       field: 'comment',
-      headerName: 'Comment',
+      headerName: t('general.comment'),
       type: 'string',
       editable: true,
     },
@@ -195,7 +197,7 @@ const EditFinalGradesDialog = ({
       getActions: params => [
         <GridActionsCellItem
           icon={<Delete />}
-          label="Delete"
+          label={t('general.delete')}
           onClick={() =>
             setRows(oldRows => oldRows.filter(row => row.id !== params.id))
           }
@@ -232,7 +234,7 @@ const EditFinalGradesDialog = ({
     return (
       <GridToolbarContainer>
         <Button startIcon={<Add />} onClick={addFinalGrade}>
-          Add final grade
+          {t('course-results.add-final')}
         </Button>
       </GridToolbarContainer>
     );
@@ -281,7 +283,7 @@ const EditFinalGradesDialog = ({
     ]);
 
     onClose();
-    enqueueSnackbar('Grades saved successfully', {variant: 'success'});
+    enqueueSnackbar(t('course-results.grades-saved'), {variant: 'success'});
     setInitRows(structuredClone(rows));
   };
 
@@ -365,7 +367,7 @@ const EditFinalGradesDialog = ({
               else onClose();
             }}
           >
-            {changes ? 'Discard' : 'Close'}
+            {changes ? t('general.discard') : t('general.close')}
           </Button>
           <Button
             onClick={() => {
@@ -375,7 +377,7 @@ const EditFinalGradesDialog = ({
             variant={changes ? 'contained' : 'text'}
             disabled={error || editing}
           >
-            Save
+            {t('general.save')}
           </Button>
         </DialogActions>
       </Dialog>

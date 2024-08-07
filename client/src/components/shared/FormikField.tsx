@@ -15,7 +15,7 @@ type PropsType = {
   form: FormikProps<{[key: string]: unknown}>;
   value: string;
   label: string;
-  helperText: string;
+  helperText?: string;
   select?: boolean;
   type?: HTMLInputTypeAttribute;
   disabled?: boolean;

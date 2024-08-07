@@ -13,6 +13,7 @@ import {
   FormGroup,
 } from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Node} from 'reactflow';
 
 import {CoursePartData} from '@/common/types';
@@ -33,6 +34,7 @@ const SelectCoursePartsDialog = ({
     removedCourseParts: CoursePartData[]
   ) => void;
 }): JSX.Element => {
+  const {t} = useTranslation();
   const coursePartNodeIds: number[] = nodes
     .filter(node => node.type === 'coursepart')
     .map(node => parseInt(node.id.split('-')[1]));
@@ -89,7 +91,7 @@ const SelectCoursePartsDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Select course parts</DialogTitle>
+      <DialogTitle>{t('graph.select-parts')}</DialogTitle>
 
       <DialogContent>
         <FormGroup>
@@ -114,10 +116,10 @@ const SelectCoursePartsDialog = ({
             setSelected(startSelected);
           }}
         >
-          Cancel
+          {t('general.cancel')}
         </Button>
         <Button variant="contained" onClick={onSubmit}>
-          Done
+          {t('general.done')}
         </Button>
       </DialogActions>
     </Dialog>

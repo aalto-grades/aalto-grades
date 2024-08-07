@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {
@@ -39,6 +40,7 @@ const NewAplusCoursePartsDialog = ({
   handleClose,
   open,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const aplusCourses = useFetchAplusCourses({
     enabled: Boolean(getAplusToken()),
@@ -144,9 +146,11 @@ const NewAplusCoursePartsDialog = ({
   return (
     <>
       <Dialog open={open} onClose={handleResetAndClose} maxWidth="md">
-        {step === 0 && <DialogTitle>A+ courses</DialogTitle>}
-        {step === 1 && <DialogTitle>Select grade sources</DialogTitle>}
-        {step === 2 && <DialogTitle>Create course parts</DialogTitle>}
+        {step === 0 && <DialogTitle>{t('general.a+-courses')}</DialogTitle>}
+        {step === 1 && (
+          <DialogTitle>{t('course.a+.select-grade-source.plural')}</DialogTitle>
+        )}
+        {step === 2 && <DialogTitle>{t('course.a+.create-parts')}</DialogTitle>}
         <DialogContent>
           {step === 0 && aplusCourses.data && (
             <SelectAplusCourse
@@ -175,7 +179,7 @@ const NewAplusCoursePartsDialog = ({
         <DialogActions>
           {step > 0 && (
             <Button onClick={() => setStep(step - 1)} sx={{mr: 'auto'}}>
-              Back
+              {t('general.back')}
             </Button>
           )}
           {step <= 1 && (
@@ -185,7 +189,7 @@ const NewAplusCoursePartsDialog = ({
               }
               onClick={() => setStep(step + 1)}
             >
-              Next
+              {t('general.next')}
             </Button>
           )}
           {step === 2 && (
@@ -195,7 +199,7 @@ const NewAplusCoursePartsDialog = ({
                 handleResetAndClose();
               }}
             >
-              Submit
+              {t('general.submit')}
             </Button>
           )}
         </DialogActions>

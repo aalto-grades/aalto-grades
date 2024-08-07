@@ -15,6 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import {JSX, useCallback, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
 import {CourseData, CourseRoleType, SystemRole} from '@/common/types';
@@ -22,36 +23,37 @@ import useAuth from '../../hooks/useAuth';
 import {HeadCellData} from '../../types';
 import {getCourseRole} from '../../utils/utils';
 
-const headCells: HeadCellData[] = [
-  {id: 'code', label: 'Code'},
-  {id: 'name', label: 'Name'},
-  {id: 'department', label: 'Organizing department'},
-  {id: 'role', label: 'Role'},
-];
-
 const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
   const {auth} = useAuth();
   const [page, setPage] = useState<number>(1);
   const [searchText, setSearchText] = useState<string>('');
 
+  const headCells: HeadCellData[] = [
+    {id: 'code', label: t('general.code')},
+    {id: 'name', label: t('general.name')},
+    {id: 'department', label: t('general.organizing-department')},
+    {id: 'role', label: t('general.role')},
+  ];
+
   const getCourseRoleString = useCallback(
     (course: CourseData): string => {
-      if (auth === null) return 'Not logged in';
-      if (auth.role === SystemRole.Admin) return 'Admin';
+      if (auth === null) return t('front-page.not-logged-in');
+      if (auth.role === SystemRole.Admin) return t('general.admin.singular');
 
       const courseRole = getCourseRole(course, auth);
 
       switch (courseRole) {
         case CourseRoleType.Teacher:
-          return 'Teacher';
+          return t('general.teacher');
         case CourseRoleType.Assistant:
-          return 'Assistant';
+          return t('general.assistant.singular');
         case CourseRoleType.Student:
-          return 'Student';
+          return t('general.student');
       }
     },
-    [auth]
+    [auth, t]
   );
 
   const filteredCourses = useMemo(
@@ -82,7 +84,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
         <TextField
           sx={{minWidth: 300}}
           size="small"
-          label="search"
+          label={t('front-page.search')}
           value={searchText}
           onChange={e => {
             setSearchText(e.target.value);

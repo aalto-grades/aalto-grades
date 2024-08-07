@@ -4,6 +4,7 @@
 
 /build
 /.vitest-preview
+public/locales/*/*_old.json
 
 # Vite extra env files
 .env.local

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {JSX, useContext, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 
 import {
@@ -45,6 +46,7 @@ const convertFromLocalSettings = (
 });
 
 const SubstituteNode = (props: NodeProps): JSX.Element => {
+  const {t} = useTranslation();
   const {id, isConnectable} = props;
 
   const updateNodeInternals = useUpdateNodeInternals();
@@ -211,20 +213,20 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
         isConnectable={isConnectable}
       />
 
-      <label>Number of substitutions</label>
+      <label>{t('graph.substitution-num')}</label>
       <input
         style={{width: '180px', display: 'block'}}
         type="number"
         onChange={handleNumChange}
         value={localSettings.maxSubstitutions}
       />
-      <label>Substitutes</label>
+      <label>{t('graph.substitutes')}</label>
 
       <table style={{width: '200px', margin: '5px 0px'}}>
         <tbody>
           <tr>
-            <th style={{width: '50%'}}>in</th>
-            <th>out</th>
+            <th style={{width: '50%'}}>{t('graph.in')}</th>
+            <th>{t('graph.out')}</th>
           </tr>
           {substituteHandles
             .filter(key => nodeValue.sources[key].isConnected)
@@ -261,12 +263,12 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
           </tr>
         </tbody>
       </table>
-      <label>Exercises</label>
+      <label>{t('general.exercise.plural')}</label>
       <table style={{width: '200px', margin: '5px 0px'}}>
         <tbody>
           <tr>
-            <th style={{width: '50%'}}>in</th>
-            <th>subVal</th>
+            <th style={{width: '50%'}}>{t('graph.in')}</th>
+            <th>{t('graph.substitution-value')}</th>
           </tr>
           {exerciseHandles
             .filter(key => nodeValue.sources[key].isConnected)

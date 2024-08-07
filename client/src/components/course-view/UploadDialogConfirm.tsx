@@ -35,6 +35,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import {useTranslation} from 'react-i18next';
 
 import {GradeUploadColTypes} from './UploadDialog';
 import StyledDataGrid from '../StyledDataGrid';
@@ -67,6 +68,7 @@ const UploadDialogConfirm = ({
   setExpanded,
   invalidValues,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const [error, setError] = useState<boolean>(false);
 
   const nonEmptyCols = useMemo(() => {
@@ -135,7 +137,7 @@ const UploadDialogConfirm = ({
       <DialogContent>
         {invalidValues && (
           <Alert severity="warning" sx={{mb: 2}}>
-            Some grades are higher than the maximum allowed values
+            {t('course.upload.higher-than-max')}
           </Alert>
         )}
 
@@ -144,12 +146,12 @@ const UploadDialogConfirm = ({
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'date' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            Completion and expiration dates
+            {t('course.upload.dates')}
           </AccordionSummary>
           <AccordionDetails>
             {dates.length > nonEmptyCols.length && (
               <Alert severity="info" sx={{mb: 1}}>
-                Some course parts are hidden due to not having any data
+                {t('course.upload.hidden')}
               </Alert>
             )}
             <LocalizationProvider
@@ -160,9 +162,13 @@ const UploadDialogConfirm = ({
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Course part</TableCell>
-                      <TableCell>Completion date</TableCell>
-                      <TableCell>Expiration date</TableCell>
+                      <TableCell>{t('general.course-part.singular')}</TableCell>
+                      <TableCell>
+                        {t('course.upload.completion-date')}
+                      </TableCell>
+                      <TableCell>
+                        {t('course.upload.expiration-date')}
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -194,7 +200,9 @@ const UploadDialogConfirm = ({
                                     date.expirationDate <= date.completionDate,
                                   helperText:
                                     date.expirationDate <= date.completionDate
-                                      ? 'Expiry date must be after completion date'
+                                      ? t(
+                                          'course.upload.expiration-after-completion'
+                                        )
                                       : '',
                                 },
                               }}
@@ -228,7 +236,7 @@ const UploadDialogConfirm = ({
           disabled={error}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            Confirm data
+            {t('course.upload.confirm-data')}
           </AccordionSummary>
           <AccordionDetails>
             <div style={{height: '70vh'}}>

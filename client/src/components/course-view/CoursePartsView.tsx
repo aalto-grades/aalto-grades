@@ -14,6 +14,7 @@ import {
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 import {useBlocker, useParams} from 'react-router-dom';
 
 import {
@@ -50,6 +51,7 @@ type ColTypes = {
 };
 
 const CoursePartsView = (): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
 
@@ -217,7 +219,7 @@ const CoursePartsView = (): JSX.Element => {
       ),
     ]);
 
-    enqueueSnackbar('Course parts saved successfully', {variant: 'success'});
+    enqueueSnackbar(t('course.parts.saved'), {variant: 'success'});
     setInitRows(structuredClone(rows));
   };
 
@@ -227,7 +229,7 @@ const CoursePartsView = (): JSX.Element => {
     elements.push(
       <GridActionsCellItem
         icon={<AddCircle />}
-        label="Add A+ grade source"
+        label={t('course.parts.add-a+-source')}
         onClick={() =>
           setAddAplusSourcesTo({
             coursePartId: params.row.id,
@@ -241,7 +243,7 @@ const CoursePartsView = (): JSX.Element => {
       elements.push(
         <GridActionsCellItem
           icon={<More />}
-          label="View A+ grade sources"
+          label={t('course.parts.view-a+-sources')}
           onClick={() => {
             setAplusGradeSources(params.row.aplusGradeSources);
             setViewAplusSourcesOpen(true);
@@ -259,7 +261,11 @@ const CoursePartsView = (): JSX.Element => {
       elements.push(
         <GridActionsCellItem
           icon={params.row.archived ? <Unarchive /> : <Archive />}
-          label={params.row.archived ? 'Unarchive' : 'Archive'}
+          label={
+            params.row.archived
+              ? t('course.parts.unarchive')
+              : t('course.parts.archive')
+          }
           onClick={() =>
             setRows(oldRows =>
               oldRows.map(row =>
@@ -276,14 +282,13 @@ const CoursePartsView = (): JSX.Element => {
       elements.push(
         <GridActionsCellItem
           icon={<Delete />}
-          label="Delete"
+          label={t('general.delete')}
           onClick={async () => {
             let confirmation = true;
             if (coursePartsWithModels.has(params.row.coursePartId)) {
               confirmation = await AsyncConfirmationModal({
-                title: 'Delete course part',
-                message:
-                  'Some models are using this course part. Are you sure you want to delete it?',
+                title: t('course.parts.delete'),
+                message: t('course.parts.delete-message'),
                 confirmDelete: true,
               });
             }
@@ -301,37 +306,37 @@ const CoursePartsView = (): JSX.Element => {
   const columns: GridColDef<ColTypes>[] = [
     {
       field: 'name',
-      headerName: 'Name',
+      headerName: t('general.name'),
       type: 'string',
       editable: true,
     },
     {
       field: 'daysValid',
-      headerName: 'Days valid',
+      headerName: t('general.days-valid'),
       type: 'number',
       editable: true,
     },
     {
       field: 'maxGrade',
-      headerName: 'Max grade',
+      headerName: t('general.max-grade'),
       type: 'number',
       editable: true,
     },
     {
       field: 'validUntil',
-      headerName: 'Valid until',
+      headerName: t('course.parts.valid-until'),
       type: 'date',
       editable: true,
     },
     {
       field: 'aplusGradeSources',
-      headerName: 'A+ grade sources',
+      headerName: t('general.a+-sources'),
       type: 'actions',
       getActions: getAplusActions,
     },
     {
       field: 'archived',
-      headerName: 'Archived',
+      headerName: t('course.parts.archived'),
       type: 'boolean',
       editable: false,
     },
@@ -385,7 +390,7 @@ const CoursePartsView = (): JSX.Element => {
 
       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
         <Typography width={'fit-content'} variant="h2">
-          Course parts
+          {t('general.course-part.plural')}
         </Typography>
         <SaveBar
           show={editRights && unsavedChanges}
@@ -400,10 +405,10 @@ const CoursePartsView = (): JSX.Element => {
         {editRights && (
           <>
             <Button variant="outlined" onClick={() => setAddDialogOpen(true)}>
-              Add new
+              {t('course.parts.add-new')}
             </Button>
             <Button variant="outlined" onClick={() => setAplusDialogOpen(true)}>
-              Add from A+
+              {t('course.parts.add-from-a+')}
             </Button>
           </>
         )}

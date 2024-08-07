@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {useEditGradingModel} from '../../hooks/useApi';
@@ -23,12 +24,13 @@ type PropsType = {
   onClose: () => void;
   open: boolean;
 };
-const EditGradingModelDialog = ({
+const RenameGradingModelDialog = ({
   gradingModelId,
   name,
   onClose,
   open,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const editGradingModel = useEditGradingModel();
 
@@ -46,17 +48,17 @@ const EditGradingModelDialog = ({
       gradingModel: {name: newName},
     });
 
-    enqueueSnackbar('Grading model saved', {variant: 'success'});
+    enqueueSnackbar(t('course.rename-model.saved'), {variant: 'success'});
     onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Edit grading model</DialogTitle>
+      <DialogTitle>{t('course.rename-model.title')}</DialogTitle>
       <DialogContent>
         <TextField
           sx={{mt: 1}}
-          label="Name"
+          label={t('general.name')}
           required
           fullWidth
           value={newName}
@@ -70,7 +72,7 @@ const EditGradingModelDialog = ({
           onClick={onClose}
           disabled={editGradingModel.isPending}
         >
-          Cancel
+          {t('general.cancel')}
         </Button>
         <Button
           onClick={handleSave}
@@ -78,7 +80,7 @@ const EditGradingModelDialog = ({
           type="submit"
           disabled={newName.length === 0 || editGradingModel.isPending}
         >
-          Save
+          {t('general.save')}
           {editGradingModel.isPending && (
             <CircularProgress
               size={24}
@@ -97,4 +99,4 @@ const EditGradingModelDialog = ({
   );
 };
 
-export default EditGradingModelDialog;
+export default RenameGradingModelDialog;

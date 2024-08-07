@@ -29,6 +29,7 @@ import {
 import {enqueueSnackbar} from 'notistack';
 import {ParseResult, parse, unparse} from 'papaparse';
 import {Dispatch, JSX, SetStateAction, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 
 import AplusImportDialog from './AplusImportDialog';
 import {GradeUploadColTypes} from './UploadDialog';
@@ -55,6 +56,7 @@ const UploadDialogUpload = ({
   setExpanded,
   invalidValues,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const [textFieldText, setTextFieldText] = useState<string>('');
   const [textFieldOpen, setTextFieldOpen] = useState<boolean>(false);
   const [mismatchDialogOpen, setMismatchDialogOpen] = useState<boolean>(false);
@@ -144,7 +146,7 @@ const UploadDialogUpload = ({
       newRows.push(rowData);
     }
     if (missingData) {
-      enqueueSnackbar('Some students have missing grades', {
+      enqueueSnackbar(t('course.upload.missing-grades'), {
         variant: 'warning',
       });
     }
@@ -210,13 +212,13 @@ const UploadDialogUpload = ({
 
   return (
     <>
-      <DialogTitle>Upload grades</DialogTitle>
+      <DialogTitle>{t('course.upload.upload-grades')}</DialogTitle>
       <Dialog
         open={textFieldOpen}
         fullWidth
         onClose={() => setTextFieldOpen(false)}
       >
-        <DialogTitle>Paste text</DialogTitle>
+        <DialogTitle>{t('course.upload.paste-text')}</DialogTitle>
         <DialogContent>
           <TextField
             multiline
@@ -233,7 +235,7 @@ const UploadDialogUpload = ({
               setTextFieldText('');
             }}
           >
-            Cancel
+            {t('general.cancel')}
           </Button>
           <Button
             variant="contained"
@@ -242,7 +244,7 @@ const UploadDialogUpload = ({
               loadCsv(textFieldText);
             }}
           >
-            Import
+            {t('general.import')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -263,7 +265,7 @@ const UploadDialogUpload = ({
       <DialogContent sx={{minHeight: 500}}>
         <Collapse in={invalidValues}>
           <Alert severity="warning" sx={{mb: 2}}>
-            Some grades are higher than the maximum allowed values
+            {t('course.upload.higher-than-max')}
           </Alert>
         </Collapse>
 
@@ -286,12 +288,12 @@ const UploadDialogUpload = ({
           }
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            Upload grades
+            {t('course.upload.upload-grades')}
           </AccordionSummary>
           <AccordionDetails>
             <ButtonGroup>
               <Button component="label" variant="outlined">
-                Upload CSV
+                {t('course.upload.upload-csv')}
                 <input
                   type="file"
                   accept=".csv"
@@ -302,17 +304,17 @@ const UploadDialogUpload = ({
                 />
               </Button>
               <Button variant="outlined" onClick={downloadTemplate}>
-                Download CSV template
+                {t('course.upload.download-template')}
               </Button>
               <Button
                 variant="outlined"
                 onClick={() => setAplusImportDialogOpen(true)}
               >
-                Import from A+
+                {t('course.upload.a+-import')}
               </Button>
               <Button variant="outlined">Import from MyCourses</Button>
               <Button variant="outlined" onClick={() => setTextFieldOpen(true)}>
-                Paste text
+                {t('course.upload.paste-text')}
               </Button>
             </ButtonGroup>
           </AccordionDetails>
@@ -322,7 +324,7 @@ const UploadDialogUpload = ({
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'edit' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            {editText ? 'Edit' : 'Or add them manually'}
+            {editText ? t('general.edit') : t('course.upload.add-manually')}
           </AccordionSummary>
           <AccordionDetails>
             <div style={{height: '40vh'}}>
@@ -348,7 +350,7 @@ const UploadDialogUpload = ({
                   );
 
                   if (updatedRow.studentNo === '')
-                    throw new Error('Student number cannot be empty');
+                    throw new Error(t('course.upload.student-number-empty'));
 
                   setError(false);
                   return updatedRow;

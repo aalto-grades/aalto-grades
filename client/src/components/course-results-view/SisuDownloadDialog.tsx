@@ -27,6 +27,7 @@ import dayjs, {Dayjs} from 'dayjs';
 import 'dayjs/locale/en-gb';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {FinalGradeData, Language, StudentRow} from '@/common/types';
@@ -46,6 +47,7 @@ const SisuDownloadDialog = ({
   handleExited: () => void;
   selectedRows: StudentRow[];
 }): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
 
   const downloadSisuGradeCsv = useDownloadSisuGradeCsv({
@@ -59,10 +61,9 @@ const SisuDownloadDialog = ({
       linkElement.click();
       document.body.removeChild(linkElement);
 
-      enqueueSnackbar(
-        'Final grades downloaded in the Sisu CSV format successfully.',
-        {variant: 'success'}
-      );
+      enqueueSnackbar(t('course-results.final-downloaded'), {
+        variant: 'success',
+      });
     },
   });
 
@@ -95,7 +96,7 @@ const SisuDownloadDialog = ({
   const handleDownloadSisuGradeCsv = async (): Promise<void> => {
     if (!courseId) return;
 
-    enqueueSnackbar('Fetching Sisu CSV...', {variant: 'info'});
+    enqueueSnackbar(t('course-results.fetching-sisu-csv'), {variant: 'info'});
 
     let studentNumbers: string[] = [];
     switch (downloadOption) {
@@ -114,7 +115,7 @@ const SisuDownloadDialog = ({
         break;
     }
     if (studentNumbers.length === 0) {
-      enqueueSnackbar('You must download data for at least one student.', {
+      enqueueSnackbar(t('course-results.download-at-least-one'), {
         variant: 'warning',
       });
       return;
@@ -142,17 +143,19 @@ const SisuDownloadDialog = ({
       TransitionProps={{onExited: handleExited}}
       fullWidth
     >
-      <DialogTitle>Download final grades as Sisu CSV</DialogTitle>
+      <DialogTitle>
+        {t('course-results.download-final-as-sisu-csv')}
+      </DialogTitle>
       <DialogContent sx={{pb: 0}}>
         <DialogContentText sx={{mb: 3, color: 'black'}}>
-          Grading date defaults to the latest submission of the student.
+          {t('course-results.grading-date-default')}
         </DialogContentText>
         <TextField
           id="select-grading-completion-language"
           select
           fullWidth
           margin="normal"
-          label="Completion language"
+          label={t('course-results.completion-language')}
           value={completionLanguage ?? 'default'}
           onChange={e => {
             if (e.target.value === 'default') {
@@ -162,7 +165,9 @@ const SisuDownloadDialog = ({
             }
           }}
         >
-          <MenuItem value="default">Use course language</MenuItem>
+          <MenuItem value="default">
+            {t('course-results.use-course-language')}
+          </MenuItem>
           {sisuLanguageOptions.map(option => (
             <MenuItem key={option.id} value={option.id}>
               {option.language}
@@ -176,7 +181,7 @@ const SisuDownloadDialog = ({
               onChange={e => setDateOverride(e.target.checked)}
             />
           }
-          label="Override grading date for all students"
+          label={t('course-results.override-date')}
         />
         <Collapse in={dateOverride}>
           <LocalizationProvider
@@ -185,7 +190,7 @@ const SisuDownloadDialog = ({
           >
             <DatePicker
               sx={{mt: 2}}
-              label="Assessment date"
+              label={t('course-results.assessment-date')}
               value={assessmentDate}
               onChange={newDate => newDate && setAssessmentDate(newDate)}
             />
@@ -194,13 +199,10 @@ const SisuDownloadDialog = ({
         {exportedValuesInList && (
           <Box sx={{my: 2}}>
             <Typography variant="body2" sx={{color: 'red'}}>
-              The list of students includes students who have already been
-              included in a Sisu CSV previously. Please select a download option
-              from the drop-down menu.
+              {t('course-results.included-before')}
             </Typography>
             <Typography variant="body2" sx={{mt: 1, color: 'red'}}>
-              This dialog will NOT close after downloading a CSV file. You may
-              download multiple CSV files with different options
+              {t('course-results.will-not-close')}
             </Typography>
             <TextField
               id="export-option"
@@ -213,29 +215,29 @@ const SisuDownloadDialog = ({
               }
             >
               <MenuItem value="all">
-                Download all selected grades in a single CSV
+                {t('course-results.download-all-selected')}
               </MenuItem>
               <MenuItem value="unexported">
-                Only download unexported grades
+                {t('course-results.download-unexported')}
               </MenuItem>
               <MenuItem value="exported">
-                Only download previously exported grades
+                {t('course-results.download-exported')}
               </MenuItem>
             </TextField>
           </Box>
         )}
         <Typography variant="h6" sx={{mt: 1}}>
-          Selected students
+          {t('course-results.selected-students')}
         </Typography>
         <Paper sx={{maxHeight: 200, overflow: 'auto', my: 1}}>
           <List dense>
             {selectedRows.map(row => (
               <ListItem key={row.user.studentNumber}>
                 <ListItemText
-                  primary={`Student number: ${row.user.studentNumber}`}
+                  primary={`${t('general.student-number')}: ${row.user.studentNumber}`}
                   secondary={
                     userGradeAlreadyExported(row.finalGrades ?? [])
-                      ? 'User grade has been exported to Sisu already.'
+                      ? t('course-results.exported-already')
                       : ''
                   }
                 />
@@ -246,14 +248,14 @@ const SisuDownloadDialog = ({
       </DialogContent>
       <DialogActions>
         <Button variant="outlined" onClick={handleClose}>
-          Cancel
+          {t('general.cancel')}
         </Button>
         <Button
           id="ag-confirm-file-upload-btn"
           variant="contained"
           onClick={handleDownloadSisuGradeCsv}
         >
-          Download
+          {t('general.download')}
         </Button>
       </DialogActions>
     </Dialog>

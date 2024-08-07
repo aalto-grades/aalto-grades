@@ -14,6 +14,7 @@ import {
   Select,
 } from '@mui/material';
 import {JSX, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {GradingModelData} from '@/common/types';
@@ -34,6 +35,7 @@ const UserGraphDialog = ({
   gradingModels,
   row,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const {gradeSelectOption} = useTableContext();
   const courseParts = useGetCourseParts(courseId);
@@ -52,9 +54,9 @@ const UserGraphDialog = ({
       <DialogTitle>Final grade preview</DialogTitle>
       <DialogContent>
         {row === null ? (
-          <>Data is undefined</>
+          <>{t('course-results.data-undefined')}</>
         ) : selectedModel === null || courseParts.data === undefined ? (
-          <>Loading</>
+          <>{t('general.loading')}</>
         ) : (
           <Graph
             initGraph={selectedModel.graphStructure}
@@ -76,7 +78,7 @@ const UserGraphDialog = ({
         {gradingModels !== undefined && gradingModels.length > 0 && (
           <FormControl size="small">
             <InputLabel id="grading-model-select-label">
-              Grading model
+              {t('general.grading-model.singular')}
             </InputLabel>
             <Select
               labelId="grading-model-select-label"
@@ -98,7 +100,7 @@ const UserGraphDialog = ({
           </FormControl>
         )}
         <Button onClick={onClose} variant="contained">
-          Close
+          {t('general.close')}
         </Button>
       </DialogActions>
     </Dialog>

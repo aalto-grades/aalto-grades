@@ -22,6 +22,9 @@
     "dayjs": "^1.11.10",
     "elkjs": "^0.9.1",
     "formik": "^2.4.2",
+    "i18next": "^23.12.2",
+    "i18next-browser-languagedetector": "^8.0.0",
+    "i18next-http-backend": "^2.5.2",
     "msw": "^2.0.13",
     "mui-one-time-password-input": "^2.0.3",
     "notistack": "^3.0.1",
@@ -29,6 +32,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-global-modal": "^0.0.27",
+    "react-i18next": "^15.0.0",
     "react-qr-code": "^2.0.15",
     "react-router-dom": "^6.11.2",
     "reactflow": "^11.10.3",
@@ -43,6 +47,7 @@
     "vitest-preview": "vitest-preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --fix",
+    "parse-trans": "npx i18next 'src/**/*.{ts,tsx}' -c i18next-parser.config.js -o 'public/locales/$LOCALE/$NAMESPACE.json'",
     "prod-licenses": "npx license-checker-rseidelsohn --excludePrivatePackages --production --summary"
   },
   "engines": {
@@ -73,6 +78,7 @@
     "eslint": "^8.27.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "i18next-parser": "^9.0.1",
     "jsdom": "^24.0.0",
     "license-checker-rseidelsohn": "^4.2.6",
     "rollup-plugin-license": "^3.2.0",

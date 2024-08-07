@@ -22,6 +22,7 @@ import {
   Typography,
 } from '@mui/material';
 import {ChangeEvent, JSX, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {
@@ -38,6 +39,7 @@ type PropsType = {
 };
 
 const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const courseParts = useGetCourseParts(courseId);
 
@@ -81,15 +83,17 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
 
   return (
     <Dialog open={open} onClose={handleResetAndClose}>
-      {step === 0 && <DialogTitle>Select course parts</DialogTitle>}
-      {step === 1 && <DialogTitle>Fetching grades</DialogTitle>}
-      {step === 2 && <DialogTitle>Confirm</DialogTitle>}
+      {step === 0 && (
+        <DialogTitle>{t('course.a+.select-course-parts')}</DialogTitle>
+      )}
+      {step === 1 && (
+        <DialogTitle>{t('course.a+.fetching-grades')}</DialogTitle>
+      )}
+      {step === 2 && <DialogTitle>{t('general.confirm')}</DialogTitle>}
       <DialogContent>
         {step === 0 && (
           <>
-            <Typography>
-              Select the course parts you want to fetch grades for from A+.
-            </Typography>
+            <Typography>{t('course.a+.select-for-fetching')}</Typography>
             <FormGroup>
               {courseParts.data &&
                 courseParts.data
@@ -118,9 +122,7 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
               open={aplusTokenDialogOpen}
               error={aplusGrades.isError}
             />
-            <Typography>
-              Fetching grades from A+, this may take a few minutes...
-            </Typography>
+            <Typography>{t('course.a+.fetching-grades-wait')}</Typography>
             <LinearProgress sx={{mt: 2}} />
           </>
         )}
@@ -132,12 +134,12 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Student number</TableCell>
-                  <TableCell>Course part ID</TableCell>
-                  <TableCell>A+ grade source ID</TableCell>
-                  <TableCell>Grade</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Expiry date</TableCell>
+                  <TableCell>{t('general.student-number')}</TableCell>
+                  <TableCell>{t('course.a+.part-id')}</TableCell>
+                  <TableCell>{t('course.a+.source-id')}</TableCell>
+                  <TableCell>{t('general.grade.singular')}</TableCell>
+                  <TableCell>{t('general.date')}</TableCell>
+                  <TableCell>{t('general.expiry-date')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -168,7 +170,7 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
             }}
             disabled={coursePartIds.length === 0}
           >
-            Next
+            {t('general.next')}
           </Button>
         )}
         {step === 2 && (
@@ -178,7 +180,7 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
               handleResetAndClose();
             }}
           >
-            Submit
+            {t('general.submit')}
           </Button>
         )}
       </DialogActions>

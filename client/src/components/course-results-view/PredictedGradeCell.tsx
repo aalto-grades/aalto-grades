@@ -5,6 +5,7 @@
 import {AccountTreeRounded, Error} from '@mui/icons-material';
 import {Box, IconButton, Tooltip} from '@mui/material';
 import {JSX, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {GradingScale} from '@/common/types';
@@ -24,6 +25,7 @@ const PredictedGradeCell = ({
   onClick,
   gradingScale,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const [hover, setHover] = useState<boolean>(false);
   const {courseId} = useParams() as {courseId: string};
   const gradingModels = useGetAllGradingModels(courseId);
@@ -87,7 +89,11 @@ const PredictedGradeCell = ({
         </p>
       </Tooltip>
       {gradingModelIds !== undefined && gradingModelIds.length > 0 && hover && (
-        <Tooltip title="View graph" placement="top" disableInteractive>
+        <Tooltip
+          title={t('course-results.view-graph')}
+          placement="top"
+          disableInteractive
+        >
           <IconButton
             sx={{position: 'absolute', right: '0px', top: 'calc(50% - 20px)'}}
             onClick={onClick}

@@ -8,6 +8,7 @@ import {GridActionsCellItem, GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import dayjs, {Dayjs} from 'dayjs';
 import {enqueueSnackbar} from 'notistack';
 import {useEffect, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {NewGrade} from '@/common/types';
@@ -22,6 +23,7 @@ export type GradeUploadColTypes = {[key: string]: number | null} & {
 
 type PropsType = {open: boolean; onClose: () => void};
 const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams();
   const courseParts = useGetCourseParts(courseId!, {
     enabled: Boolean(courseId),
@@ -81,7 +83,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const columns: GridColDef<GradeUploadColTypes>[] = [
     {
       field: 'studentNo',
-      headerName: 'Student number',
+      headerName: t('general.student-number'),
       type: 'string',
       width: 120,
       editable: true,
@@ -100,7 +102,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       getActions: params => [
         <GridActionsCellItem
           icon={<Delete />}
-          label="Delete"
+          label={t('general.delete')}
           onClick={() =>
             setRows(oldRows => oldRows.filter(row => row.id !== params.id))
           }
@@ -111,7 +113,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const readOnlyColumns: GridColDef<GradeUploadColTypes>[] = [
     {
       field: 'studentNo',
-      headerName: 'Student number',
+      headerName: t('general.student-number'),
       type: 'string',
     },
     ...coursePartData.map(
@@ -151,7 +153,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
 
     await addGrades.mutateAsync(gradeData);
 
-    enqueueSnackbar('Grades added successfully.', {
+    enqueueSnackbar(t('course.upload.grades-added'), {
       variant: 'success',
     });
 
@@ -202,7 +204,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
               onClick={() => setCurrentStep(cur => cur - 1)}
               sx={{mr: 'auto'}}
             >
-              Back
+              {t('general.back')}
             </Button>
           )}
           {currentStep === 0 && (
@@ -210,7 +212,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
               onClick={() => setCurrentStep(cur => cur + 1)}
               disabled={!ready || rows.length === 0}
             >
-              Next
+              {t('general.next')}
             </Button>
           )}
           {currentStep === 1 && confirmExpanded === 'date' && (
@@ -218,11 +220,11 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
               onClick={() => setConfirmExpanded('confirm')}
               disabled={!ready}
             >
-              Confirm
+              {t('general.confirm')}
             </Button>
           )}
           {currentStep === 1 && confirmExpanded === 'confirm' && (
-            <Button onClick={onSubmit}>Submit</Button>
+            <Button onClick={onSubmit}>{t('general.submit')}</Button>
           )}
         </DialogActions>
       </Dialog>

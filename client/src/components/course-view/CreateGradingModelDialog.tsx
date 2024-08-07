@@ -16,6 +16,7 @@ import {
   TextField,
 } from '@mui/material';
 import {JSX, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {GraphTemplate, initGraph} from '@/common/util/initGraph';
@@ -30,6 +31,7 @@ const CreateGradingModelDialog = ({
   open: boolean;
   onSubmit: (id: number) => void;
 }): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const courseParts = useGetCourseParts(courseId);
   const addGradingModel = useAddGradingModel();
@@ -63,11 +65,11 @@ const CreateGradingModelDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Create grading model</DialogTitle>
+      <DialogTitle>{t('course.create-model.title')}</DialogTitle>
       <DialogContent>
         <TextField
           sx={{mt: 1}}
-          label="Name"
+          label={t('general.name')}
           required
           fullWidth
           value={name}
@@ -79,16 +81,22 @@ const CreateGradingModelDialog = ({
           sx={{mt: 2}}
           disabled={addGradingModel.isPending}
         >
-          <InputLabel id="select-model-template">Select template</InputLabel>
+          <InputLabel id="select-model-template">
+            {t('course.create-model.select-template')}
+          </InputLabel>
           <Select
             labelId="select-model-template"
             value={template}
-            label="Select template"
+            label={t('course.create-model.select-template')}
             onChange={e => setTemplate(e.target.value as GraphTemplate)}
           >
-            <MenuItem value={'none'}>None</MenuItem>
-            <MenuItem value={'addition'}>Addition</MenuItem>
-            <MenuItem value={'average'}>Average</MenuItem>
+            <MenuItem value={'none'}>{t('course.create-model.none')}</MenuItem>
+            <MenuItem value={'addition'}>
+              {t('course.create-model.addition')}
+            </MenuItem>
+            <MenuItem value={'average'}>
+              {t('course.create-model.average')}
+            </MenuItem>
           </Select>
         </FormControl>
       </DialogContent>
@@ -98,7 +106,7 @@ const CreateGradingModelDialog = ({
           onClick={onClose}
           disabled={addGradingModel.isPending}
         >
-          Cancel
+          {t('general.cancel')}
         </Button>
         <Button
           onClick={handleSubmit}
@@ -106,7 +114,7 @@ const CreateGradingModelDialog = ({
           type="submit"
           disabled={name.length === 0 || addGradingModel.isPending}
         >
-          Submit
+          {t('general.submit')}
           {addGradingModel.isPending && (
             <CircularProgress
               size={24}

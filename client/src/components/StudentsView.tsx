@@ -18,10 +18,12 @@ import {
   createFilterOptions,
 } from '@mui/material';
 import {JSX, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {UserData} from '@/common/types';
 import {useGetCoursesOfStudent, useGetStudents} from '../hooks/useApi';
+import {useLocalize} from '../hooks/useLocalize';
 
 const getString = (student: UserData): string => {
   let string = student.studentNumber!.toString();
@@ -31,6 +33,8 @@ const getString = (student: UserData): string => {
 };
 
 const StudentsView = (): JSX.Element => {
+  const {t} = useTranslation();
+  const localize = useLocalize();
   const {userId} = useParams();
   const navigate = useNavigate();
   const students = useGetStudents();
@@ -53,7 +57,7 @@ const StudentsView = (): JSX.Element => {
   return (
     <>
       <Typography variant="h2" sx={{pb: 2}}>
-        Select student
+        {t('students.select')}
       </Typography>
       <Autocomplete
         options={students.data ?? []}
@@ -76,15 +80,19 @@ const StudentsView = (): JSX.Element => {
         <>
           <Divider sx={{my: 2}} />
           <Typography variant="h2" sx={{pb: 2}}>
-            Viewing grades for{' '}
-            {selectedStudent?.name ?? selectedStudent?.studentNumber ?? ''}
+            {t('students.viewing-grades', {
+              user:
+                selectedStudent?.name ?? selectedStudent?.studentNumber ?? '',
+            })}
           </Typography>
           <TableContainer component={Paper}>
             <Table sx={{minWidth: 650}} aria-label="simple table">
               <TableHead>
                 <TableRow>
-                  <TableCell>Course</TableCell>
-                  <TableCell align="right">Final grades</TableCell>
+                  <TableCell>{t('general.course.singular')}</TableCell>
+                  <TableCell align="right">
+                    {t('general.final-grade.plural')}
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -94,7 +102,7 @@ const StudentsView = (): JSX.Element => {
                     hover
                     onClick={() => navigate(`/${course.id}/course-results`)}
                   >
-                    <TableCell>{course.name.en}</TableCell>
+                    <TableCell>{localize(course.name)}</TableCell>
                     <TableCell align="right">
                       {course.finalGrades
                         .map(finalGrade => finalGrade.grade)
