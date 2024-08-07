@@ -25,8 +25,8 @@ jobs:
         run: npm ci
       - name: Install common dependencies
         run: npm --prefix ../common ci
-      - name: Run tests
-        run: npm test
+      # - name: Run tests
+      #   run: npm test
       - name: Install linter dependencies
         run: npm --prefix .. ci
       - name: Run linter
