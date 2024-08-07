@@ -8,6 +8,7 @@ import {Box, Button, Menu, MenuItem} from '@mui/material';
 import {useQueryClient} from '@tanstack/react-query';
 import {JSX, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
@@ -18,6 +19,7 @@ import useAuth from '../../hooks/useAuth';
 import AplusTokenDialog from '../shared/AplusTokenDialog';
 
 const UserButton = (): JSX.Element => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
   const {auth, setAuth} = useAuth();
   const queryClient = useQueryClient();
@@ -45,8 +47,8 @@ const UserButton = (): JSX.Element => {
   const handleResetMfa = async (): Promise<void> => {
     setAnchorEl(null);
     const confirmation = await AsyncConfirmationModal({
-      title: 'Reset MFA secret',
-      message: 'Are you sure you want to reset your MFA secret',
+      title: t('auth.reset-mfa-secret'),
+      message: t('auth.reset-mfa-secret-message'),
     });
     if (!confirmation) return;
 
@@ -131,7 +133,7 @@ const UserButton = (): JSX.Element => {
             setAplusTokenDialogOpen(true);
           }}
         >
-          A+ Token
+          {t('general.a+-token')}
         </MenuItem>
         {auth.role === SystemRole.Admin && (
           <>
@@ -141,12 +143,12 @@ const UserButton = (): JSX.Element => {
                 setChangePasswordDialogOpen(true);
               }}
             >
-              Change password
+              {t('auth.change-password')}
             </MenuItem>
-            <MenuItem onClick={handleResetMfa}>Reset MFA</MenuItem>
+            <MenuItem onClick={handleResetMfa}>{t('auth.reset-mfa')}</MenuItem>
           </>
         )}
-        <MenuItem onClick={handleLogOut}>Logout</MenuItem>
+        <MenuItem onClick={handleLogOut}>{t('auth.log-out')}</MenuItem>
       </Menu>
     </>
   );

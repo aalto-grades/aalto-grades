@@ -5,6 +5,7 @@
 import {ClearRounded, SaveOutlined} from '@mui/icons-material';
 import {Box, Button, Fade, Typography, useTheme} from '@mui/material';
 import {JSX} from 'react';
+import {useTranslation} from 'react-i18next';
 
 const SaveBar = ({
   show,
@@ -19,6 +20,7 @@ const SaveBar = ({
   handleSave?: () => void;
   handleDiscard: () => void;
 }): JSX.Element => {
+  const {t} = useTranslation();
   const theme = useTheme();
   return (
     <Fade in={show}>
@@ -38,11 +40,11 @@ const SaveBar = ({
       >
         {/* // TODO: fix flickering when saving with loading text enabled */}
         {/* {loading ? (
-            <Typography variant="body2">Saving...</Typography>
+            <Typography variant="body2">{t('general.saving')}...</Typography>
           ) : (
-            <Typography variant="body2">Unsaved changes</Typography>
+            <Typography variant="body2">{t('general.unsaved-changes')}</Typography>
             )}{' '}   */}
-        <Typography variant="body2">Unsaved changes</Typography>
+        <Typography variant="body2">{t('general.unsaved-changes')}</Typography>
         <Button
           id="ag-save-course-btn"
           // variant="outlined"
@@ -57,7 +59,7 @@ const SaveBar = ({
             }
           }}
         >
-          Save
+          {t('general.save')}
         </Button>
         <Button
           // variant="tonal"
@@ -68,7 +70,7 @@ const SaveBar = ({
           onClick={handleDiscard}
           startIcon={<ClearRounded />}
         >
-          Discard
+          {t('general.discard')}
         </Button>
       </Box>
     </Fade>

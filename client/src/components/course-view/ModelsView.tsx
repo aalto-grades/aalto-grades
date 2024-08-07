@@ -20,6 +20,7 @@ import {grey} from '@mui/material/colors';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useCallback, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {
@@ -30,7 +31,7 @@ import {
 } from '@/common/types';
 import {GraphStructure} from '@/common/types/graph';
 import CreateGradingModelDialog from './CreateGradingModelDialog';
-import EditGradingModelDialog from './EditGradingModelDialog';
+import RenameGradingModelDialog from './RenameGradingModelDialog';
 import {useGetFinalGrades} from '../../hooks/api/finalGrade';
 import {
   useDeleteGradingModel,
@@ -46,6 +47,7 @@ import Graph from '../graph/Graph';
 
 type ParamsType = {courseId: string; modelId?: string; userId?: string};
 const ModelsView = (): JSX.Element => {
+  const {t} = useTranslation();
   const {auth, isTeacherInCharge} = useAuth();
   const {courseId, modelId, userId} = useParams() as ParamsType;
   const navigate = useNavigate();
@@ -159,7 +161,7 @@ const ModelsView = (): JSX.Element => {
         return;
       }
     }
-    enqueueSnackbar(`Couldn't find grading model with id ${modelId}`, {
+    enqueueSnackbar(t('course.models.could-not-find-model', {model: modelId}), {
       variant: 'error',
     });
     navigate(`/${courseId}/models`);
@@ -177,7 +179,7 @@ const ModelsView = (): JSX.Element => {
         return;
       }
     }
-    enqueueSnackbar(`Couldn't find user grades for user with id ${userId}`, {
+    enqueueSnackbar(t('course.models.could-not-find-grade', {user: userId}), {
       variant: 'error',
     });
     navigate(`/${courseId}/models/${modelId}`);
@@ -195,8 +197,8 @@ const ModelsView = (): JSX.Element => {
   };
   const handleDelModel = async (gradingModelId: number): Promise<void> => {
     const confirmation = await AsyncConfirmationModal({
-      title: 'Delete model',
-      message: 'Are you sure that you want to delete this model',
+      title: t('course.models.delete-model'),
+      message: t('course.models.delete-model-message'),
       confirmDelete: true,
     });
     if (confirmation) {
@@ -205,7 +207,7 @@ const ModelsView = (): JSX.Element => {
   };
 
   const onSave = async (graphStructure: GraphStructure): Promise<void> => {
-    if (currentModel === null) throw new Error('Tried to save null model');
+    if (currentModel === null) throw new Error(t('course.models.save-null'));
 
     const simplifiedGraphStructure = structuredClone(graphStructure);
     // Remove unnecessary keys from data.
@@ -230,13 +232,13 @@ const ModelsView = (): JSX.Element => {
   };
 
   if (models === undefined || courseParts.data === undefined)
-    return <>Loading</>;
+    return <>{t('general.loading')}</>;
 
   const getWarning = (model: GradingModelData): string => {
     if (model.hasArchivedCourseParts && model.hasDeletedCourseParts)
-      return 'Contains deleted & archived course parts';
-    if (model.hasArchivedCourseParts) return 'Contains archived course parts';
-    if (model.hasDeletedCourseParts) return 'Contains deleted course parts';
+      return t('course.models.has-deleted-and-archived');
+    if (model.hasArchivedCourseParts) return t('course.models.has-archived');
+    if (model.hasDeletedCourseParts) return t('course.models.has-deleted');
     return '';
   };
 
@@ -251,25 +253,25 @@ const ModelsView = (): JSX.Element => {
         }}
       />
 
-      <EditGradingModelDialog
+      <RenameGradingModelDialog
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
         gradingModelId={editDialogModel?.id ?? null}
         name={editDialogModel?.name ?? null}
       />
       <Typography width={'fit-content'} variant="h2">
-        Grading models
+        {t('general.grading-model.plural')}
       </Typography>
       <Box sx={{display: 'flex', mb: 1}}>
         {(auth?.role === SystemRole.Admin || isTeacherInCharge) &&
           !graphOpen && (
-            <Tooltip title="New grading model" placement="top">
+            <Tooltip title={t('course.models.new-model')} placement="top">
               <Button
                 sx={{mt: 1}}
                 variant="outlined"
                 onClick={() => setCreateDialogOpen(true)}
               >
-                Create new
+                {t('course.models.create-new')}
               </Button>
             </Tooltip>
           )}
@@ -279,7 +281,7 @@ const ModelsView = (): JSX.Element => {
             variant="outlined"
             onClick={() => navigate(`/${courseId}/models`)}
           >
-            Back to models
+            {t('course.models.back')}
           </Button>
         )}
       </Box>
@@ -287,7 +289,7 @@ const ModelsView = (): JSX.Element => {
       <Collapse in={!graphOpen}>
         {models.length === 0 ? (
           <Typography textAlign="left" sx={{p: 2}}>
-            No models
+            {t('course.models.no-models')}
           </Typography>
         ) : (
           <List sx={{width: 400}} disablePadding>
@@ -299,7 +301,10 @@ const ModelsView = (): JSX.Element => {
                 secondaryAction={
                   editRights ? (
                     <>
-                      <Tooltip placement="top" title="Rename grading model">
+                      <Tooltip
+                        placement="top"
+                        title={t('course.rename-model.title')}
+                      >
                         <IconButton
                           onClick={() => {
                             setEditDialogModel(model);
@@ -313,8 +318,8 @@ const ModelsView = (): JSX.Element => {
                         placement="top"
                         title={
                           model.archived
-                            ? 'Unarchive grading model'
-                            : 'Archive grading model'
+                            ? t('course.models.unarchive')
+                            : t('course.models.archive')
                         }
                       >
                         <IconButton
@@ -329,8 +334,8 @@ const ModelsView = (): JSX.Element => {
                         placement="top"
                         title={
                           modelsWithFinalGrades.has(model.id)
-                            ? 'Cannot delete a model with final grades'
-                            : 'Delete grading model'
+                            ? t('course.models.cannot-delete-with-final')
+                            : t('course.models.delete-grading-model')
                         }
                       >
                         {/* The span is necessary because tooltips don't like disabled buttons*/}

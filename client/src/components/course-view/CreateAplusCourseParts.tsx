@@ -12,6 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import {JSX} from 'react';
+import {useTranslation} from 'react-i18next';
 
 import {NewAplusGradeSourceData} from '@/common/types';
 
@@ -30,6 +31,8 @@ const CreateAplusCourseParts = ({
   coursePartsWithSource,
   handleChange,
 }: CreateAplusCoursePartsProps): JSX.Element => {
+  const {t} = useTranslation();
+
   return (
     <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
       {coursePartsWithSource.map(([coursePart, _], index) => (
@@ -39,13 +42,13 @@ const CreateAplusCourseParts = ({
           >
             <TextField
               sx={{mt: 2}}
-              label="Name"
+              label={t('general.name')}
               value={coursePart.name}
               onChange={e => handleChange(index, {name: e.target.value})}
             />
             <TextField
               sx={{mt: 2}}
-              label="Days valid"
+              label={t('general.days-valid')}
               type="number"
               value={coursePart.daysValid}
               onChange={e =>
@@ -60,7 +63,9 @@ const CreateAplusCourseParts = ({
                 justifyContent: 'space-between',
               }}
             >
-              <Typography>Max grade: {coursePart.maxGrade}</Typography>
+              <Typography>
+                {t('general.max-grade')}: {coursePart.maxGrade}
+              </Typography>
               {/* In case the teacher changes the course part's name, this is intended
                   to show which source the course part was initially created from. */}
               <Tooltip title={coursePart.name}>

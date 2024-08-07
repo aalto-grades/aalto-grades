@@ -13,6 +13,7 @@ import {
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {z} from 'zod';
 
 import {PasswordSchema} from '@/common/types';
@@ -20,15 +21,6 @@ import BaseShowPasswordButton from './ShowPasswordButton';
 import {useResetOwnAuth} from '../../hooks/useApi';
 import FormField from '../shared/FormikField';
 
-const ValidationSchema = z
-  .object({
-    newPassword: PasswordSchema,
-    repeatPassword: PasswordSchema,
-  })
-  .refine(val => val.newPassword === val.repeatPassword, {
-    path: ['repeatPassword'],
-    message: 'Passwords must match',
-  });
 type FormData = {
   newPassword: string;
   repeatPassword: string;
@@ -42,12 +34,23 @@ type ShowPassword = {
 
 type PropsType = {open: boolean; onClose: () => void};
 const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const resetOwnAuth = useResetOwnAuth();
 
   const [showPassword, setShowPassword] = useState<ShowPassword>({
     new: false,
     repeat: false,
   });
+
+  const ValidationSchema = z
+    .object({
+      newPassword: PasswordSchema,
+      repeatPassword: PasswordSchema,
+    })
+    .refine(val => val.newPassword === val.repeatPassword, {
+      path: ['repeatPassword'],
+      message: t('auth.password.match'),
+    });
 
   const handleSubmit = async (
     values: FormData,
@@ -63,7 +66,7 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
       setSubmitting(false);
       return;
     }
-    enqueueSnackbar('Password changed successfully', {variant: 'success'});
+    enqueueSnackbar(t('auth.password.changed'), {variant: 'success'});
     setSubmitting(false);
     resetForm();
     onClose();
@@ -103,21 +106,19 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
       >
         {form => (
           <>
-            <DialogTitle>Change password</DialogTitle>
+            <DialogTitle>{t('auth.change-password')}</DialogTitle>
             <DialogContent>
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="newPassword"
-                label="New Password*"
-                helperText="New password"
+                label={`${t('auth.password.new')}*`}
                 type={showPassword.new ? 'text' : 'password'}
                 InputProps={{endAdornment: <ShowPasswordButton type="new" />}}
               />
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="repeatPassword"
-                label="Repeat Password*"
-                helperText="Repeat password"
+                label={`${t('auth.password.repeat')}*`}
                 type={showPassword.repeat ? 'text' : 'password'}
                 InputProps={{
                   endAdornment: <ShowPasswordButton type="repeat" />,
@@ -135,14 +136,14 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
                 href="https://www.aalto.fi/en/services/password-guidelines"
                 target="_blank"
               >
-                Aalto password requirements
+                {t('auth.password.requirements')}
               </Link>
               <Button
                 variant="contained"
                 onClick={form.submitForm}
                 disabled={form.isSubmitting}
               >
-                Reset password
+                {t('auth.password.reset')}
               </Button>
             </DialogActions>
           </>

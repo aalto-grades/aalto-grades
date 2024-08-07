@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 
 import {AverageNodeSettings, AverageNodeValue} from '@/common/types/graph';
@@ -49,6 +50,7 @@ const checkError = (settings: LocalSettings): boolean => {
 };
 
 const AverageNode = (props: NodeProps): JSX.Element => {
+  const {t} = useTranslation();
   const {id, isConnectable} = props;
 
   const updateNodeInternals = useUpdateNodeInternals();
@@ -187,13 +189,13 @@ const AverageNode = (props: NodeProps): JSX.Element => {
         onChange={handleCheck}
         checked={localSettings.percentageMode}
       />
-      <label htmlFor={`percentage-${id}`}>Percentage mode</label>
+      <label htmlFor={`percentage-${id}`}>{t('graph.percentage-mode')}</label>
 
       <table style={{width: '100%', margin: '5px 0px 0px 0px'}}>
         <tbody>
           <tr>
-            <th>Weight</th>
-            <th>value</th>
+            <th>{t('graph.weight')}</th>
+            <th>{t('graph.value')}</th>
           </tr>
           {Object.entries(localSettings.weights).map(([key, weight]) => (
             <tr key={key}>
@@ -239,7 +241,7 @@ const AverageNode = (props: NodeProps): JSX.Element => {
         </p>
       )}
       <p className="output-value" style={{marginTop: '5px'}}>
-        Average: {Math.round(nodeValue.value * 100) / 100}
+        {t('graph.average')}: {Math.round(nodeValue.value * 100) / 100}
       </p>
 
       <Handle

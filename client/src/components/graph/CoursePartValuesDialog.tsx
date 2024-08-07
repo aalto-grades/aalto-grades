@@ -11,6 +11,7 @@ import {
   TextField,
 } from '@mui/material';
 import {ChangeEvent, JSX, useEffect, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Node} from 'reactflow';
 
 import {NodeValues} from '@/common/types/graph';
@@ -34,6 +35,7 @@ const CoursePartValuesDialog = ({
     [key: number]: number;
   }) => void;
 }): JSX.Element => {
+  const {t} = useTranslation();
   const coursePartNodeIds = useMemo(
     () =>
       nodes
@@ -105,7 +107,7 @@ const CoursePartValuesDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>Set test course part values</DialogTitle>
+      <DialogTitle>{t('graph.set-test-values')}</DialogTitle>
 
       <DialogContent>
         {coursePartNodeIds.map(coursePartId => (
@@ -126,10 +128,10 @@ const CoursePartValuesDialog = ({
             setValues(startValues);
           }}
         >
-          Cancel
+          {t('general.cancel')}
         </Button>
         <Button variant="contained" onClick={onSubmit} disabled={error}>
-          Done
+          {t('general.done')}
         </Button>
       </DialogActions>
     </Dialog>

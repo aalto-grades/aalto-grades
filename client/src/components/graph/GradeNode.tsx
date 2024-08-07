@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {JSX, useContext} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position} from 'reactflow';
 
 import {GradeNodeValue} from '@/common/types/graph';
@@ -10,6 +11,7 @@ import BaseNode from './BaseNode';
 import {NodeValuesContext} from '../../context/GraphProvider';
 
 const GradeNode = (props: NodeProps): JSX.Element => {
+  const {t} = useTranslation();
   const {id, isConnectable} = props;
 
   const {nodeValues} = useContext(NodeValuesContext);
@@ -26,7 +28,8 @@ const GradeNode = (props: NodeProps): JSX.Element => {
       />
 
       <p className="output-value">
-        Final grade: {Math.round(nodeValue.value * 100) / 100}
+        {t('general.final-grade.singular')}:{' '}
+        {Math.round(nodeValue.value * 100) / 100}
       </p>
     </BaseNode>
   );

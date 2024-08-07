@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import {MuiOtpInput} from 'mui-one-time-password-input';
 import {JSX, SyntheticEvent, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
 import ExternalAuth from './ExternalAuth';
@@ -22,6 +23,7 @@ import {useLogIn} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 
 const Login = (): JSX.Element => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
   const {setAuth} = useAuth();
   const logIn = useLogIn();
@@ -103,7 +105,7 @@ const Login = (): JSX.Element => {
         alignItems="center"
         justifyContent="center"
       >
-        <Typography variant="h2">Log in to Aalto Grades</Typography>
+        <Typography variant="h2">{t('auth.login-title')}</Typography>
         <ExternalAuth />
         <Box
           sx={{
@@ -115,18 +117,17 @@ const Login = (): JSX.Element => {
           }}
         >
           <Typography variant="h3" sx={{mb: 1}}>
-            Local users
+            {t('auth.local.title')}
           </Typography>
           <Typography variant="body2" sx={{mb: 1}}>
-            If you have been provided with credentials specifically for Aalto
-            Grades, use this login.
+            {t('auth.local.body')}
           </Typography>
           <form onSubmit={handleSubmit}>
             <TextField
               type="email"
               value={email}
               name="email"
-              label="Email"
+              label={t('general.email')}
               fullWidth
               onChange={e => setEmail(e.target.value)}
               InputLabelProps={{shrink: true}}
@@ -136,7 +137,7 @@ const Login = (): JSX.Element => {
               type={showPassword ? 'text' : 'password'}
               value={password}
               name="password"
-              label="Password"
+              label={t('general.password')}
               fullWidth
               onChange={e => setPassword(e.target.value)}
               InputLabelProps={{shrink: true}}
@@ -151,7 +152,7 @@ const Login = (): JSX.Element => {
               margin="normal"
             />
             <Collapse in={showOtpPrompt}>
-              <Typography sx={{mt: 1}}>Enter otp</Typography>
+              <Typography sx={{mt: 1}}>{t('auth.local.enter-otp')}</Typography>
               {showOtpPrompt && (
                 <MuiOtpInput
                   data-testid="mfa-input"
@@ -173,7 +174,7 @@ const Login = (): JSX.Element => {
               sx={{mt: 1}}
               disabled={email === '' || password === ''}
             >
-              Log in
+              {t('auth.local.button')}
             </Button>
           </form>
         </Box>

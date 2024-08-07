@@ -11,6 +11,7 @@ import {
   FormGroup,
 } from '@mui/material';
 import {JSX} from 'react';
+import {useTranslation} from 'react-i18next';
 
 import {
   AplusCourseData,
@@ -32,6 +33,7 @@ const SelectAplusGradeSource = ({
   aplusGradeSources,
   handleSelect,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const aplusExerciseData = useFetchAplusExerciseData(aplusCourse.id);
 
   const isDisabled = (newSource: NewAplusGradeSourceData): boolean => {
@@ -49,7 +51,7 @@ const SelectAplusGradeSource = ({
     <>
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ArrowDropDown />}>
-          Course
+          {t('general.course.singular')}
         </AccordionSummary>
         <AccordionDetails>
           <Button
@@ -70,13 +72,13 @@ const SelectAplusGradeSource = ({
               )
             }
           >
-            Full points
+            {t('general.full-points')}
           </Button>
         </AccordionDetails>
       </Accordion>
       <Accordion>
         <AccordionSummary expandIcon={<ArrowDropDown />}>
-          Modules
+          {t('general.module.plural')}
         </AccordionSummary>
         <AccordionDetails>
           <FormGroup>
@@ -101,7 +103,7 @@ const SelectAplusGradeSource = ({
       </Accordion>
       <Accordion>
         <AccordionSummary expandIcon={<ArrowDropDown />}>
-          Exercises
+          {t('general.exercise.plural')}
         </AccordionSummary>
         <AccordionDetails>
           <FormGroup>
@@ -131,7 +133,7 @@ const SelectAplusGradeSource = ({
       {aplusExerciseData.data.difficulties.length > 0 && (
         <Accordion>
           <AccordionSummary expandIcon={<ArrowDropDown />}>
-            Difficulties
+            {t('general.difficulty.plural')}
           </AccordionSummary>
           <AccordionDetails>
             <FormGroup>

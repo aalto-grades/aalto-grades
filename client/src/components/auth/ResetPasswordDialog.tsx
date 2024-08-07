@@ -15,6 +15,8 @@ import {
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {Navigate, useLocation, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
 import {PasswordSchema} from '@/common/types';
@@ -22,20 +24,6 @@ import BaseShowPasswordButton from './ShowPasswordButton';
 import {useResetOwnPassword} from '../../hooks/useApi';
 import FormField from '../shared/FormikField';
 
-const ValidationSchema = z
-  .object({
-    oldPassword: z.string(),
-    newPassword: PasswordSchema,
-    repeatPassword: PasswordSchema,
-  })
-  .refine(val => val.newPassword === val.repeatPassword, {
-    path: ['repeatPassword'],
-    message: 'Passwords must match',
-  })
-  .refine(val => val.oldPassword !== val.newPassword, {
-    path: ['newPassword'],
-    message: 'New password cannot be the same as the old password',
-  });
 type FormData = {
   newPassword: string;
   repeatPassword: string;
@@ -60,12 +48,28 @@ const ResetPasswordDialog = ({
   onCancel,
   onReset,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const resetPassword = useResetOwnPassword();
 
   const [showPassword, setShowPassword] = useState<ShowPassword>({
     new: false,
     repeat: false,
   });
+
+  const ValidationSchema = z
+    .object({
+      oldPassword: z.string(),
+      newPassword: PasswordSchema,
+      repeatPassword: PasswordSchema,
+    })
+    .refine(val => val.newPassword === val.repeatPassword, {
+      path: ['repeatPassword'],
+      message: t('auth.password.match'),
+    })
+    .refine(val => val.oldPassword !== val.newPassword, {
+      path: ['newPassword'],
+      message: t('auth.password.old'),
+    });
 
   const initialValues = {
     newPassword: '',
@@ -87,7 +91,7 @@ const ResetPasswordDialog = ({
       return;
     }
 
-    enqueueSnackbar('Password reset successfully', {variant: 'success'});
+    enqueueSnackbar(t('auth.password.reset-done'), {variant: 'success'});
     onReset(values.newPassword);
     resetForm();
   };
@@ -123,7 +127,7 @@ const ResetPasswordDialog = ({
   return (
     // No onClose on purpose to make accidental closing harder
     <Dialog open={open} fullWidth maxWidth="xs">
-      <DialogTitle>Reset password</DialogTitle>
+      <DialogTitle>{t('auth.password.reset')}</DialogTitle>
       <Formik
         initialValues={initialValues}
         validate={validateForm}
@@ -143,8 +147,7 @@ const ResetPasswordDialog = ({
                     form as unknown as FormikProps<{[key: string]: unknown}>
                   }
                   value="newPassword"
-                  label="New Password*"
-                  helperText="New password"
+                  label={`${t('auth.password.new')}*`}
                   type={showPassword.new ? 'text' : 'password'}
                   InputProps={{
                     endAdornment: <ShowPasswordButton type="new" />,
@@ -155,8 +158,7 @@ const ResetPasswordDialog = ({
                     form as unknown as FormikProps<{[key: string]: unknown}>
                   }
                   value="repeatPassword"
-                  label="Repeat Password*"
-                  helperText="Repeat password"
+                  label={`${t('auth.password.repeat')}*`}
                   type={showPassword.repeat ? 'text' : 'password'}
                   InputProps={{
                     endAdornment: <ShowPasswordButton type="repeat" />,
@@ -173,7 +175,7 @@ const ResetPasswordDialog = ({
                     href="https://www.aalto.fi/en/services/password-guidelines"
                     target="_blank"
                   >
-                    Aalto password requirements
+                    {t('auth.password.requirements')}
                   </Link>
                 </Box>
               </Grid>
@@ -191,7 +193,7 @@ const ResetPasswordDialog = ({
                 onClick={form.submitForm}
                 disabled={form.isSubmitting}
               >
-                Reset password
+                {t('auth.password.reset')}
               </Button>
             </DialogActions>
           </>

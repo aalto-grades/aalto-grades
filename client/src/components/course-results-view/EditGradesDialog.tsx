@@ -23,6 +23,7 @@ import {
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 import {useBlocker, useParams} from 'react-router-dom';
 
 import {EditGradeData, GradeData, NewGrade} from '@/common/types';
@@ -67,6 +68,7 @@ const EditGradesDialog = ({
   title,
   grades,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const {auth} = useAuth();
   const {courseId} = useParams() as {courseId: string};
   const {gradeSelectOption} = useTableContext();
@@ -143,39 +145,39 @@ const EditGradesDialog = ({
   const columns: GridColDef<ColTypes>[] = [
     {
       field: 'grader',
-      headerName: 'Grader',
+      headerName: t('general.grader'),
       type: 'string',
       editable: false,
     },
     {
       field: 'grade',
-      headerName: 'Grade',
+      headerName: t('general.grade.singular'),
       type: 'number',
       editable: true,
     },
     {
       field: 'date',
-      headerName: 'Date',
+      headerName: t('general.date'),
       type: 'date',
       editable: true,
       width: 120,
     },
     {
       field: 'expiryDate',
-      headerName: 'Expiry date',
+      headerName: t('general.expiry-date'),
       type: 'date',
       editable: true,
       width: 120,
     },
     {
       field: 'exported',
-      headerName: 'Exported',
+      headerName: t('general.exported'),
       type: 'boolean',
       editable: false,
     },
     {
       field: 'comment',
-      headerName: 'Comment',
+      headerName: t('general.comment'),
       type: 'string',
       editable: true,
     },
@@ -185,7 +187,7 @@ const EditGradesDialog = ({
       getActions: params => [
         <GridActionsCellItem
           icon={<Delete />}
-          label="Delete"
+          label={t('general.delete')}
           onClick={() =>
             setRows(oldRows => oldRows.filter(row => row.id !== params.id))
           }
@@ -225,7 +227,7 @@ const EditGradesDialog = ({
     return (
       <GridToolbarContainer>
         <Button startIcon={<Add />} onClick={handleClick}>
-          Add grade
+          {t('course-results.add-grade')}
         </Button>
       </GridToolbarContainer>
     );
@@ -272,7 +274,7 @@ const EditGradesDialog = ({
     ]);
 
     onClose();
-    enqueueSnackbar('Grades saved successfully', {variant: 'success'});
+    enqueueSnackbar(t('general.grades-saved'), {variant: 'success'});
     setInitRows(structuredClone(rows));
   };
 
@@ -292,7 +294,7 @@ const EditGradesDialog = ({
     );
 
     if (newRow.expiryDate < newRow.date)
-      throw new Error('Expiry date cannot be before date');
+      throw new Error(t('course-results.expiry-before'));
 
     setError(false);
     return newRow;
@@ -366,7 +368,7 @@ const EditGradesDialog = ({
               else onClose();
             }}
           >
-            {changes ? 'Discard' : 'Close'}
+            {changes ? t('general.discard') : t('general.close')}
           </Button>
           <Button
             onClick={() => {
@@ -376,7 +378,7 @@ const EditGradesDialog = ({
             variant={changes ? 'contained' : 'text'}
             disabled={error || editing}
           >
-            Save
+            {t('general.save')}
           </Button>
         </DialogActions>
       </Dialog>

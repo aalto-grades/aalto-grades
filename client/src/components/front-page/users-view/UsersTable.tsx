@@ -19,22 +19,24 @@ import {
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 
 import {SystemRole, UserData} from '@/common/types';
-import ResetAuthDialog from './resetAuthDialog';
+import ResetAuthDialog from './ResetAuthDialog';
 import {useDeleteUser, useGetUsers} from '../../../hooks/useApi';
 import {HeadCellData} from '../../../types';
 
-const headCells: HeadCellData[] = [
-  {id: 'email', label: 'Email'},
-  {id: 'actions', label: ''},
-];
-
 const UsersTable = (): JSX.Element => {
+  const {t} = useTranslation();
   const users = useGetUsers();
   const deleteUser = useDeleteUser();
   const [tab, setTab] = useState<number>(0);
   const [toBeReset, setToBeReset] = useState<UserData | null>(null);
+
+  const headCells: HeadCellData[] = [
+    {id: 'email', label: t('general.email')},
+    {id: 'actions', label: ''},
+  ];
 
   const shownUsers = useMemo(() => {
     if (users.data === undefined) return [];
@@ -45,17 +47,18 @@ const UsersTable = (): JSX.Element => {
 
   const handleDeleteUser = async (user: UserData): Promise<void> => {
     const confirmation = await AsyncConfirmationModal({
-      title: 'Delete user',
-      message: `Are you sure you want to delete the user ${user.email}?`,
+      title: t('front-page.delete-user'),
+      message: t('front-page.delete-user-message', {user: user.email}),
       confirmDelete: true,
     });
     if (confirmation) {
       await deleteUser.mutateAsync(user.id);
-      enqueueSnackbar('User deleted successfully', {variant: 'success'});
+      enqueueSnackbar(t('front-page.user-deleted'), {variant: 'success'});
     }
   };
 
-  if (users.data?.length === 0 && users.isFetched) return <>No users found</>;
+  if (users.data?.length === 0 && users.isFetched)
+    return <>{t('front-page.no-users')}</>;
 
   return (
     <>
@@ -70,8 +73,8 @@ const UsersTable = (): JSX.Element => {
         onChange={(_, newTab: number) => setTab(newTab)}
         sx={{width: 'fit-content' /* Fix buttons not being clickable */}}
       >
-        <Tab label="IDP-Users" sx={{textTransform: 'none'}} />
-        <Tab label="Admins" sx={{textTransform: 'none'}} />
+        <Tab label={t('general.idp-users')} sx={{textTransform: 'none'}} />
+        <Tab label={t('general.admin.plural')} sx={{textTransform: 'none'}} />
       </Tabs>
       <Box sx={{px: 1}}>
         <Table>
@@ -91,7 +94,10 @@ const UsersTable = (): JSX.Element => {
               <TableRow key={user.email} hover={true}>
                 <TableCell sx={{width: '75%'}}>{user.email}</TableCell>
                 <TableCell>
-                  <Tooltip title="Reset password / MFA" placement="top">
+                  <Tooltip
+                    title={t('front-page.reset-password-mfa')}
+                    placement="top"
+                  >
                     <span>
                       <IconButton
                         disabled={tab === 0}
@@ -102,7 +108,7 @@ const UsersTable = (): JSX.Element => {
                       </IconButton>
                     </span>
                   </Tooltip>
-                  <Tooltip title="Delete user" placement="top">
+                  <Tooltip title={t('front-page.delete-user')} placement="top">
                     <span>
                       <IconButton
                         aria-label="delete"

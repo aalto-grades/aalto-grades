@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import {JSX} from 'react';
 import {IModalProps} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 
 type PropsType = IModalProps & {
   confirmNavigate: boolean;
@@ -25,12 +26,14 @@ export const ConfirmDialog = ({
   confirmNavigate,
   confirmDelete,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
+
   type ActionButton = {title: string; onClick: () => void};
   const cancelButton = actions!.find(
-    (el: ActionButton) => el.title === 'Cancel'
+    (el: ActionButton) => el.title === t('general.cancel')
   ) as ActionButton;
   const confirmButton = actions!.find(
-    (el: ActionButton) => el.title === 'Confirm'
+    (el: ActionButton) => el.title === t('general.confirm')
   ) as ActionButton;
 
   const childrenProp = children as {props: {message: string}};
@@ -38,9 +41,10 @@ export const ConfirmDialog = ({
 
   const defaultTitle = 'AsyncConfirmation Modal Title';
   const defaultBody = 'AsynConfirmation Modal message'; // Default body has typo lol
-  if (confirmNavigate && title === defaultTitle) title = 'Unsaved changes';
+  if (confirmNavigate && title === defaultTitle)
+    title = t('general.unsaved-changes');
   if (confirmNavigate && body === defaultBody)
-    body = 'You have unsaved changes. Data you have entered will not be saved';
+    body = t('alerts.unsaved-changes.body');
 
   return (
     <Dialog open={open!} onClose={cancelButton.onClick} fullWidth maxWidth="xs">
@@ -50,7 +54,9 @@ export const ConfirmDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={cancelButton.onClick}>
-          {confirmNavigate ? 'Stay on this page' : 'Cancel'}
+          {confirmNavigate
+            ? t('alerts.unsaved-changes.stay')
+            : t('general.cancel')}
         </Button>
         <Button
           onClick={confirmButton.onClick}
@@ -58,10 +64,10 @@ export const ConfirmDialog = ({
           color={confirmNavigate || confirmDelete ? 'error' : 'primary'}
         >
           {confirmNavigate
-            ? 'Discard changes'
+            ? t('alerts.unsaved-changes.discard')
             : confirmDelete
-              ? 'Delete'
-              : 'Confirm'}
+              ? t('general.delete')
+              : t('general.confirm')}
         </Button>
       </DialogActions>
     </Dialog>

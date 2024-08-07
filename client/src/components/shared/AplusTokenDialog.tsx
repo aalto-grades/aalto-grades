@@ -13,6 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import {JSX, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 
 import {getAplusToken, setAplusToken} from '../../utils/utils';
 
@@ -29,15 +30,16 @@ const AplusTokenDialog = ({
   open,
   error = false,
 }: PropsType): JSX.Element => {
+  const {t} = useTranslation();
   const currentToken = getAplusToken();
   const [token, setToken] = useState<string>('');
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>A+ API token</DialogTitle>
+      <DialogTitle>{t('general.a+-token')}</DialogTitle>
       <DialogContent>
         <Typography>
-          You can find your API token by logging in to A+ and navigating to:{' '}
+          {t('shared.a+-token.body')}:{' '}
           <Link
             href="https://plus.cs.aalto.fi/accounts/accounts/"
             target="_blank"
@@ -47,12 +49,12 @@ const AplusTokenDialog = ({
         </Typography>
         {currentToken && (
           <Typography sx={{mt: 1}}>
-            Your current token: {currentToken}
+            {t('shared.a+-token.current')}: {currentToken}
           </Typography>
         )}
         <TextField
           sx={{mt: 2, width: 1}}
-          label="API token"
+          label={t('shared.a+-token.label')}
           value={token}
           onChange={e => setToken(e.target.value)}
           required={true}
@@ -62,9 +64,9 @@ const AplusTokenDialog = ({
           }
           helperText={
             error && !token
-              ? 'The token you have entered is invalid, please make sure your token is correct.'
+              ? t('shared.a+-token.invalid')
               : token.length > 0 && token.length !== 40
-                ? 'The token should be 40 characters long.'
+                ? t('shared.a+-token.length')
                 : ''
           }
         />
@@ -79,7 +81,7 @@ const AplusTokenDialog = ({
             handleSubmit();
           }}
         >
-          OK
+          {t('general.submit')}
         </Button>
       </DialogActions>
     </Dialog>

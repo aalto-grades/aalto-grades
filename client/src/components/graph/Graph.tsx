@@ -14,6 +14,7 @@ import {
   useState,
 } from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
+import {useTranslation} from 'react-i18next';
 import {useBlocker} from 'react-router-dom';
 import {
   ReactFlow,
@@ -79,46 +80,6 @@ const nodeTypesMap = {
   substitute: SubstituteNode,
 };
 
-const dragAndDropNodes: {type: DropInNodes; title: string; tooltip: string}[] =
-  [
-    {
-      type: 'addition',
-      title: 'Addition',
-      tooltip: 'Add multiple values together',
-    },
-    {
-      type: 'average',
-      title: 'Average',
-      tooltip: 'Take the (weighted) average of multiple values',
-    },
-    {
-      type: 'stepper',
-      title: 'Stepper',
-      tooltip: 'Map a continuous value into some specific value', // TODO: Better explanation
-    },
-    {
-      type: 'minpoints',
-      title: 'Require minimum points',
-      tooltip: 'Require minimum value and otherwise output fail or fail course',
-    },
-    {
-      type: 'max',
-      title: 'Maximum',
-      tooltip: 'Take the maximum of multiple values and one custom value',
-    },
-    {
-      type: 'require',
-      title: 'Require passing values',
-      tooltip: 'Require some number of non-fail values',
-    },
-    {type: 'round', title: 'Round', tooltip: 'Round value'},
-    {
-      type: 'substitute',
-      title: 'Substitute',
-      tooltip: 'Substitute failing values',
-    },
-  ];
-
 type GraphProps = {
   initGraph: GraphStructure;
   courseParts: {id: number; name: string; archived: boolean}[];
@@ -137,6 +98,7 @@ const Graph = ({
   readOnly = false,
   modelHasFinalGrades = false,
 }: GraphProps): JSX.Element => {
+  const {t} = useTranslation();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [nodeData, setNodeData] = useState<FullNodeData>({});
@@ -166,6 +128,53 @@ const Graph = ({
   const [delCourseParts, setDelCourseParts] = useState<string[]>([]);
   const [originalGraphStructure, setOriginalGraphStructure] =
     useState<GraphStructure>({nodes: [], edges: [], nodeData: {}});
+
+  const dragAndDropNodes: {
+    type: DropInNodes;
+    title: string;
+    tooltip: string;
+  }[] = [
+    {
+      type: 'addition',
+      title: t('graph.node.add'),
+      tooltip: t('graph.node.add-tooltip'),
+    },
+    {
+      type: 'average',
+      title: t('graph.node.average'),
+      tooltip: t('graph.node.average-tooltip'),
+    },
+    {
+      type: 'stepper',
+      title: t('graph.node.stepper'),
+      tooltip: t('graph.node.stepper-tooltip'),
+    },
+    {
+      type: 'minpoints',
+      title: t('graph.node.min'),
+      tooltip: t('graph.node.min-tooltip'),
+    },
+    {
+      type: 'max',
+      title: t('graph.node.max'),
+      tooltip: t('graph.node.max-tooltip'),
+    },
+    {
+      type: 'require',
+      title: t('graph.node.require'),
+      tooltip: t('graph.node.require-tooltip'),
+    },
+    {
+      type: 'round',
+      title: t('graph.node.round'),
+      tooltip: t('graph.node.round-tooltip'),
+    },
+    {
+      type: 'substitute',
+      title: t('graph.node.substitute'),
+      tooltip: t('graph.node.substitute-tooltip'),
+    },
+  ];
 
   const nodeMap = useMemo<{[key: string]: Node}>(() => {
     const newMap: {[key: string]: Node} = {};
@@ -300,7 +309,7 @@ const Graph = ({
             ...oldExtraNodeData,
             [node.id]: {
               ...oldExtraNodeData[node.id],
-              warning: 'Course part has been deleted',
+              warning: t('graph.part-deleted'),
             },
           }));
           setDelCourseParts(oldDelCourseParts =>
@@ -311,7 +320,7 @@ const Graph = ({
             ...oldExtraNodeData,
             [node.id]: {
               ...oldExtraNodeData[node.id],
-              warning: 'Course part is archived',
+              warning: t('graph.part-archived'),
             },
           }));
           setDelCourseParts(oldArchivedCourseParts =>
@@ -369,16 +378,14 @@ const Graph = ({
     let confirmation = true;
     if (modelHasFinalGrades) {
       confirmation = await AsyncConfirmationModal({
-        title: 'Saving model',
-        message:
-          'There are final grades using this model. Editing it might cause ' +
-          'accidentally overwriting old final grades',
+        title: t('graph.saving'),
+        message: t('graph.has-final-grades-message'),
       });
     }
     if (confirmation) {
-      enqueueSnackbar('Saving model.', {variant: 'info'});
+      enqueueSnackbar(t('graph.saving'), {variant: 'info'});
       await onParentSave({nodes, edges, nodeData});
-      enqueueSnackbar('Model saved successfully.', {variant: 'success'});
+      enqueueSnackbar(t('graph.saved'), {variant: 'success'});
       setOriginalGraphStructure(structuredClone({nodes, edges, nodeData}));
       setUnsaved(false);
     }
@@ -572,12 +579,7 @@ const Graph = ({
           </Alert>
         )}
         {unsaved && modelHasFinalGrades && (
-          <Tooltip
-            title={
-              'There are final grades using this model. Editing it might cause ' +
-              'accidentally overwriting old final grades.'
-            }
-          >
+          <Tooltip title={t('graph.has-final-grades-message')}>
             <Alert
               sx={{
                 position: 'absolute',
@@ -587,7 +589,7 @@ const Graph = ({
               }}
               severity="warning"
             >
-              Model has final grades
+              {t('graph.has-final-grades')}
             </Alert>
           </Tooltip>
         )}
@@ -605,7 +607,7 @@ const Graph = ({
             severity="warning"
             // variant="outlined"
           >
-            Course failed
+            {t('graph.course-failed')}
           </Alert>
         )}
       </div>
@@ -626,7 +628,9 @@ const Graph = ({
               zIndex: 1,
             }}
           >
-            Delete node{selected.length > 1 && 's'}
+            {selected.length > 1
+              ? t('graph.delete-node.plural')
+              : t('graph.delete-node.singular')}
           </Button>
         )}
       </div>
@@ -707,17 +711,17 @@ const Graph = ({
                     onClick={() => setCoursePartsSelectOpen(true)}
                     variant="outlined"
                   >
-                    Select course parts
+                    {t('graph.select-parts')}
                   </Button>
                   <Button
                     onClick={() => setCoursePartValuesOpen(true)}
                     variant="outlined"
                     sx={{ml: 1}}
                   >
-                    Test values
+                    {t('graph.test-values')}
                   </Button>
                   <Button onClick={format} variant="outlined" sx={{ml: 1}}>
-                    Format
+                    {t('graph.format')}
                   </Button>
                 </div>
                 <div
@@ -731,7 +735,7 @@ const Graph = ({
                     <Typography
                       sx={{display: 'inline', alignSelf: 'center', mr: 1}}
                     >
-                      Unsaved changes
+                      {t('general.unsaved-changes')}
                     </Typography>
                   )}
                   <Button
@@ -739,7 +743,7 @@ const Graph = ({
                     onClick={onSave}
                     sx={{float: 'right'}}
                   >
-                    Save
+                    {t('general.save')}
                   </Button>
                 </div>
               </>

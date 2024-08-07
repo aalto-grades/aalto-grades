@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {JSX, useContext, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position} from 'reactflow';
 
 import {StepperNodeSettings, StepperNodeValue} from '@/common/types/graph';
@@ -48,6 +49,7 @@ const checkError = (settings: LocalSettings): boolean => {
 };
 
 const StepperNode = (props: NodeProps): JSX.Element => {
+  const {t} = useTranslation();
   const {id, isConnectable} = props;
 
   const {nodeValues} = useContext(NodeValuesContext);
@@ -159,8 +161,8 @@ const StepperNode = (props: NodeProps): JSX.Element => {
       <table style={{width: '100%', margin: '5px 0px'}}>
         <tbody>
           <tr>
-            <th>Range</th>
-            <th>Output</th>
+            <th>{t('graph.range')}</th>
+            <th>{t('graph.output')}</th>
           </tr>
           {new Array(localSettings.numSteps).fill(0).map((_, index) => (
             <tr
@@ -201,14 +203,14 @@ const StepperNode = (props: NodeProps): JSX.Element => {
         </tbody>
       </table>
       <button style={{float: 'left', marginRight: '5px'}} onClick={handleAdd}>
-        New row
+        {t('graph.new-row')}
       </button>
       <button
         style={{float: 'right'}}
         disabled={localSettings.numSteps === 1}
         onClick={handleRemove}
       >
-        Remove row
+        {t('graph.remove-row')}
       </button>
 
       <Handle
