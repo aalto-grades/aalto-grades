@@ -135,19 +135,20 @@ const UserButton = (): JSX.Element => {
         >
           {t('general.a+-token')}
         </MenuItem>
-        {auth.role === SystemRole.Admin && (
-          <>
-            <MenuItem
-              onClick={() => {
-                setAnchorEl(null);
-                setChangePasswordDialogOpen(true);
-              }}
-            >
-              {t('auth.change-password')}
-            </MenuItem>
-            <MenuItem onClick={handleResetMfa}>{t('auth.reset-mfa')}</MenuItem>
-          </>
-        )}
+        {auth.role === SystemRole.Admin && [
+          <MenuItem
+            key="change-password"
+            onClick={() => {
+              setAnchorEl(null);
+              setChangePasswordDialogOpen(true);
+            }}
+          >
+            {t('auth.change-password')}
+          </MenuItem>,
+          <MenuItem key="reset-mfa" onClick={handleResetMfa}>
+            {t('auth.reset-mfa')}
+          </MenuItem>,
+        ]}
         <MenuItem onClick={handleLogOut}>{t('auth.log-out')}</MenuItem>
       </Menu>
     </>
