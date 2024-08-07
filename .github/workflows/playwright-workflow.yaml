@@ -30,13 +30,13 @@ jobs:
         run: npm ci
       - name: Docker compose down
         working-directory: ./
-        run: docker-compose down --volumes --remove-orphans
+        run: docker compose down --volumes --remove-orphans
       - name: Docker compose build
         working-directory: ./
-        run: docker-compose build --no-cache
+        run: docker compose build --no-cache
       - name: Run app
         working-directory: ./
-        run: docker-compose up -d
+        run: docker compose up -d
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
