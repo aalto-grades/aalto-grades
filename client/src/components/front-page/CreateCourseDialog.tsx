@@ -205,7 +205,9 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               valueFormat="name%"
               labelFormat={`${t('front-page.create-course.course-name-in-format')}*`}
-              helperTextFormat={t('front-page.create-course.course-name-in-help-format')}
+              helperTextFormat={t(
+                'front-page.create-course.course-name-in-help-format'
+              )}
             />
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
