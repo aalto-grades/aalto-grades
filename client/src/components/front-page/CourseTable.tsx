@@ -53,7 +53,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
           return t('general.student');
       }
     },
-    [auth]
+    [auth, t]
   );
 
   const filteredCourses = useMemo(

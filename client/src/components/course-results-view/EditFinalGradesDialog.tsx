@@ -148,7 +148,7 @@ const EditFinalGradesDialog = ({
     }));
     setRows(newRows);
     setInitRows(structuredClone(newRows));
-  }, [gradingModels.data, finalGrades]);
+  }, [gradingModels.data, finalGrades, t]);
 
   if (!auth) return <>{t('course-results.not-permitted')}</>; // Not needed?
 
