@@ -63,7 +63,7 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
     throw new Error('Failed to log in');
   }
 
-  // Login when mfa qr code is not shown
+  // Login when MFA qr code is not shown
   const mfaLocator = page.getByTestId('mfa-input');
   const inputFields = await mfaLocator.locator('input').elementHandles();
   for (let attempt = 0; attempt < 3; attempt++) {
