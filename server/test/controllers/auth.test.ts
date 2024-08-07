@@ -16,7 +16,6 @@ import {
   LoginResult,
   LoginResultSchema,
   ResetAuthResultSchema,
-  ResetOwnPasswordResponseSchema,
   UserData,
 } from '@/common/types';
 import {app} from '../../src/app';
@@ -123,13 +122,14 @@ describe('Test POST /v1/auth/login - log in with an existing user', () => {
     const user = await createData.createAuthUser({
       forcePasswordReset: true,
       mfaSecret: secret,
+      mfaConfirmed: true,
     });
 
     const result = await testLogin(user.email as string, 'password', user.id);
     expect(result.status).toBe('resetPassword');
   });
 
-  it('should ask for mfa', async () => {
+  it('should ask for MFA', async () => {
     const result = await testLogin(
       'admin@aalto.fi',
       'password',
@@ -139,7 +139,7 @@ describe('Test POST /v1/auth/login - log in with an existing user', () => {
     expect(result.status).toBe('enterMfa');
   });
 
-  it('should ask to reset mfa', async () => {
+  it('should ask to reset MFA', async () => {
     const user = await createData.createAuthUser();
 
     const result = await testLogin(
@@ -148,7 +148,7 @@ describe('Test POST /v1/auth/login - log in with an existing user', () => {
       undefined,
       null
     );
-    expect(result.status).toBe('resetMfa');
+    expect(result.status).toBe('showMfa');
   });
 
   it('should respond with 401 when logging in with invalid credentials', async () => {
@@ -171,10 +171,10 @@ describe('Test POST /v1/auth/login - log in with an existing user', () => {
     });
   });
 
-  it('should respond with 401 when logging in with invalid totp token', async () => {
+  it('should respond with 401 when logging in with an invalid TOTP code', async () => {
     const badCreds = responseTests.testUnauthorized(
       '/v1/auth/login',
-      '{"errors":["Incorrect TOTP token"]}'
+      '{"errors":["Incorrect TOTP code"]}'
     );
 
     // Can theoretically succeed :P
@@ -232,18 +232,20 @@ describe('Test POST /v1/auth/login and expiry', () => {
 
 describe('Test POST /v1/auth/reset-own-password - reset own password', () => {
   it('should reset own password', async () => {
-    const user = await createData.createAuthUser({forcePasswordReset: true});
+    const secret = authenticator.generateSecret(64);
+    const user = await createData.createAuthUser({
+      forcePasswordReset: true,
+      mfaSecret: secret,
+      mfaConfirmed: true,
+    });
     const newPassword = '¹X)1Õ,ì?¨ã$Z©N3Ú°jM¤ëÊyf';
 
     const res = await request
       .post('/v1/auth/reset-own-password')
       .send({email: user.email, password: 'password', newPassword: newPassword})
-      .expect('Content-Type', /json/)
       .expect(HttpCode.Ok);
 
-    const result = ResetOwnPasswordResponseSchema.safeParse(res.body);
-    expect(result.success).toBeTruthy();
-    expect(result.data?.otpAuth).toBeTruthy();
+    expect(JSON.stringify(res.body)).toBe('{}');
 
     const loginResult = await testLogin(
       user.email as string,
@@ -253,30 +255,19 @@ describe('Test POST /v1/auth/reset-own-password - reset own password', () => {
     expect(loginResult.status).toBe('ok');
   });
 
-  it('should reset own password when mfa is set', async () => {
-    const secret = authenticator.generateSecret(64);
-    const user = await createData.createAuthUser({
-      forcePasswordReset: true,
-      mfaSecret: secret,
-    });
+  it('should reset own password when MFA is not set', async () => {
+    const user = await createData.createAuthUser({forcePasswordReset: true});
     const newPassword = '¹X)1Õ,ì?¨ã$Z©N3Ú°jM¤ëÊyf';
 
     const res = await request
       .post('/v1/auth/reset-own-password')
       .send({email: user.email, password: 'password', newPassword: newPassword})
-      .expect('Content-Type', /json/)
       .expect(HttpCode.Ok);
 
-    const result = ResetOwnPasswordResponseSchema.safeParse(res.body);
-    expect(result.success).toBeTruthy();
-    expect(result.data?.otpAuth).toBeNull();
+    expect(JSON.stringify(res.body)).toBe('{}');
 
-    const loginResult = await testLogin(
-      user.email as string,
-      newPassword,
-      user.id
-    );
-    expect(loginResult.status).toBe('ok');
+    const loginResult = await testLogin(user.email as string, newPassword);
+    expect(loginResult.status).toBe('showMfa');
   });
 
   it('should respond with 400 if too weak password', async () => {
@@ -350,7 +341,7 @@ describe("Test POST /v1/auth/reset-auth/:userId - reset other admin's auth detai
     expect(loginResult.status).toBe('resetPassword');
   });
 
-  it("Should reset other admin's mfa", async () => {
+  it("Should reset other admin's MFA", async () => {
     const user = await createData.createAuthUser();
 
     const res = await request
@@ -363,7 +354,7 @@ describe("Test POST /v1/auth/reset-auth/:userId - reset other admin's auth detai
     const result = ResetAuthResultSchema.safeParse(res.body);
     expect(result.success).toBeTruthy();
     const loginResult = await testLogin(user.email as string, 'password');
-    expect(loginResult.status).toBe('resetMfa');
+    expect(loginResult.status).toBe('showMfa');
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
@@ -416,7 +407,7 @@ describe('Test POST /v1/auth/change-own-auth - change own auth', () => {
     expect(loginResult.status).toBe('enterMfa');
   });
 
-  it('Should reset own mfa', async () => {
+  it('Should reset own MFA', async () => {
     const [, cookie] = await createUser();
 
     const res = await request

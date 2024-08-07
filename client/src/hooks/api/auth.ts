@@ -19,13 +19,12 @@ import {
   LoginResult,
   LoginResultSchema,
   ResetOwnPasswordData,
-  ResetOwnPasswordResponse,
-  ResetOwnPasswordResponseSchema,
   ResetAuthResult,
   ResetAuthResultSchema,
   ResetAuthData,
   ChangeOwnAuthResponse,
   ChangeOwnAuthResponseSchema,
+  ConfirmMfaData,
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';
@@ -63,17 +62,11 @@ export const useLogOut = (
   });
 
 export const useResetOwnPassword = (
-  options?: UseMutationOptions<
-    ResetOwnPasswordResponse,
-    unknown,
-    ResetOwnPasswordData
-  >
-): UseMutationResult<ResetOwnPasswordResponse, unknown, ResetOwnPasswordData> =>
+  options?: UseMutationOptions<void, unknown, ResetOwnPasswordData>
+): UseMutationResult<void, unknown, ResetOwnPasswordData> =>
   useMutation({
     mutationFn: async credentials =>
-      ResetOwnPasswordResponseSchema.parse(
-        (await axios.post('/v1/auth/reset-own-password', credentials)).data
-      ),
+      axios.post('/v1/auth/reset-own-password', credentials),
     ...options,
   });
 
@@ -102,5 +95,13 @@ export const useResetOwnAuth = (
       ChangeOwnAuthResponseSchema.parse(
         (await axios.post('/v1/auth/change-own-auth', data)).data
       ),
+    ...options,
+  });
+
+export const useConfirmMfa = (
+  options?: UseMutationOptions<void, unknown, ConfirmMfaData>
+): UseMutationResult<void, unknown, ConfirmMfaData> =>
+  useMutation({
+    mutationFn: async data => axios.post('/v1/auth/confirm-mfa', data),
     ...options,
   });

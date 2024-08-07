@@ -14,7 +14,7 @@ import {useNavigate} from 'react-router-dom';
 import {SystemRole} from '@/common/types';
 import ChangePasswordDialog from './ChangePasswordDialog';
 import OtpAuthDialog from './OtpAuthDialog';
-import {useLogOut, useResetOwnAuth} from '../../hooks/useApi';
+import {useConfirmMfa, useLogOut, useResetOwnAuth} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import AplusTokenDialog from '../shared/AplusTokenDialog';
 
@@ -25,6 +25,7 @@ const UserButton = (): JSX.Element => {
   const queryClient = useQueryClient();
   const logOut = useLogOut();
   const resetOwnAuth = useResetOwnAuth();
+  const confirmMfa = useConfirmMfa();
 
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [anchorWidth, setAnchorWidth] = useState<number | null>(null);
@@ -32,6 +33,7 @@ const UserButton = (): JSX.Element => {
     useState<boolean>(false);
   const [changePasswordDialogOpen, setChangePasswordDialogOpen] =
     useState<boolean>(false);
+  const [showMfaDialog, setShowMfaDialog] = useState<boolean>(false);
   const [otpAuth, setOtpAuth] = useState<string | null>(null);
 
   const handleLogOut = async (): Promise<void> => {
@@ -39,7 +41,7 @@ const UserButton = (): JSX.Element => {
     setAuth(null);
     setAnchorEl(null);
     queryClient.clear();
-    navigate('/login', {replace: true});
+    navigate('/login');
   };
 
   const handleResetMfa = async (): Promise<void> => {
@@ -54,7 +56,15 @@ const UserButton = (): JSX.Element => {
       resetPassword: false,
       resetMfa: true,
     });
+
     setOtpAuth(otpAuthRes.otpAuth as string);
+    setShowMfaDialog(true);
+  };
+
+  const handleConfirmResetMfa = async (otp: string): Promise<void> => {
+    await confirmMfa.mutateAsync({otp});
+    setShowMfaDialog(false);
+    setOtpAuth(null);
   };
 
   const menuOpen = Boolean(anchorEl);
@@ -77,9 +87,17 @@ const UserButton = (): JSX.Element => {
             open={changePasswordDialogOpen}
           />
           <OtpAuthDialog
+            open={showMfaDialog}
             otpAuth={otpAuth}
-            onClose={() => setOtpAuth(null)}
-            closeText={'Close'}
+            cancelText={t('auth.mfa-qr.close-without-confirm')}
+            onCancel={() => {
+              setShowMfaDialog(false);
+              setOtpAuth(null);
+            }}
+            onSubmit={async (otp: string) => {
+              await handleConfirmResetMfa(otp);
+              return true;
+            }}
           />
         </>
       )}

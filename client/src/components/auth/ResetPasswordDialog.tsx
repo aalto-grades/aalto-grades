@@ -1,56 +1,62 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Button, Grid, Link, Typography} from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  Link,
+} from '@mui/material';
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Navigate, useLocation, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
-import {AaltoEmailSchema, PasswordSchema} from '@/common/types';
-import OtpAuthDialog from './OtpAuthDialog';
+import {PasswordSchema} from '@/common/types';
 import BaseShowPasswordButton from './ShowPasswordButton';
 import {useResetOwnPassword} from '../../hooks/useApi';
 import FormField from '../shared/FormikField';
 
 type FormData = {
-  email: string;
-  oldPassword: string;
   newPassword: string;
   repeatPassword: string;
 };
 
 type ShowPassword = {
-  old: boolean;
   new: boolean;
   repeat: boolean;
 };
-const ResetPassword = (): JSX.Element => {
+
+type PropsType = {
+  open: boolean;
+  email: string;
+  password: string;
+  onCancel: () => void;
+  onReset: (newPassword: string) => void;
+};
+const ResetPasswordDialog = ({
+  open,
+  email,
+  password,
+  onCancel,
+  onReset,
+}: PropsType): JSX.Element => {
   const {t} = useTranslation();
-  const navigate = useNavigate();
   const resetPassword = useResetOwnPassword();
-  const {state} = useLocation() as {
-    state: {
-      email: string;
-      password: string;
-      resetPassword: boolean;
-      resetMfa: boolean;
-    } | null;
-  };
 
   const [showPassword, setShowPassword] = useState<ShowPassword>({
-    old: false,
     new: false,
     repeat: false,
   });
-  const [otpAuth, setOtpAuth] = useState<string | null>(null);
 
   const ValidationSchema = z
     .object({
-      email: AaltoEmailSchema,
       oldPassword: z.string(),
       newPassword: PasswordSchema,
       repeatPassword: PasswordSchema,
@@ -65,8 +71,6 @@ const ResetPassword = (): JSX.Element => {
     });
 
   const initialValues = {
-    email: state?.email ?? '',
-    oldPassword: state?.password ?? '',
     newPassword: '',
     repeatPassword: '',
   };
@@ -75,27 +79,29 @@ const ResetPassword = (): JSX.Element => {
     values: FormData,
     {resetForm, setSubmitting}: FormikHelpers<FormData>
   ): Promise<void> => {
-    const otpAuthRes = await resetPassword
-      .mutateAsync({
-        email: values.email,
-        password: values.oldPassword,
+    try {
+      await resetPassword.mutateAsync({
+        email: email,
+        password: password,
         newPassword: values.newPassword,
-      })
-      .catch(() => setSubmitting(false));
-    if (otpAuthRes === undefined) return;
+      });
+    } catch (e) {
+      setSubmitting(false);
+      return;
+    }
 
     enqueueSnackbar(t('auth.password.reset-done'), {variant: 'success'});
-    setSubmitting(false);
+    onReset(values.newPassword);
     resetForm();
-    if (!state?.resetMfa) return navigate('/login', {replace: true});
-
-    setOtpAuth(otpAuthRes.otpAuth);
   };
 
   const validateForm = (
     values: FormData
   ): {[key in keyof FormData]?: string[]} | undefined => {
-    const result = ValidationSchema.safeParse(values);
+    const result = ValidationSchema.safeParse({
+      ...values,
+      oldPassword: password,
+    });
     if (result.success) return;
 
     const fieldErrors = result.error.formErrors.fieldErrors;
@@ -104,8 +110,8 @@ const ResetPassword = (): JSX.Element => {
     );
   };
 
-  type PropsType = {type: keyof ShowPassword};
-  const ShowPasswordButton = ({type}: PropsType): JSX.Element => (
+  type ButtonPropsType = {type: keyof ShowPassword};
+  const ShowPasswordButton = ({type}: ButtonPropsType): JSX.Element => (
     <BaseShowPasswordButton
       shown={showPassword[type]}
       onClick={() =>
@@ -117,42 +123,24 @@ const ResetPassword = (): JSX.Element => {
     />
   );
 
-  // TODO: Redirect if no auth data
-  if (state === null) return <Navigate to="/login" />;
-
   return (
-    <>
-      <OtpAuthDialog
-        otpAuth={otpAuth}
-        onClose={() => {
-          setOtpAuth(null);
-          navigate('/login', {replace: true});
-        }}
-      />
-      <Grid
-        container
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
+    // No onClose on purpose to make accidental closing harder
+    <Dialog open={open} fullWidth maxWidth="xs">
+      <DialogTitle>{t('auth.password.reset')}</DialogTitle>
+      <Formik
+        initialValues={initialValues}
+        validate={validateForm}
+        onSubmit={handleResetPassword}
       >
-        <Typography variant="h2">{t('auth.password.reset')}</Typography>
-        <Box
-          sx={{
-            width: 1 / 2,
-            border: 1,
-            borderRadius: '8px',
-            borderColor: 'gray',
-            p: 2,
-            mt: 1,
-          }}
-        >
-          <Formik
-            initialValues={initialValues}
-            validate={validateForm}
-            onSubmit={handleResetPassword}
-          >
-            {form => (
-              <>
+        {form => (
+          <>
+            <DialogContent>
+              <Grid
+                container
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
+              >
                 <FormField
                   form={
                     form as unknown as FormikProps<{[key: string]: unknown}>
@@ -160,7 +148,9 @@ const ResetPassword = (): JSX.Element => {
                   value="newPassword"
                   label={`${t('auth.password.new')}*`}
                   type={showPassword.new ? 'text' : 'password'}
-                  InputProps={{endAdornment: <ShowPasswordButton type="new" />}}
+                  InputProps={{
+                    endAdornment: <ShowPasswordButton type="new" />,
+                  }}
                 />
                 <FormField
                   form={
@@ -186,20 +176,29 @@ const ResetPassword = (): JSX.Element => {
                   >
                     {t('auth.password.requirements')}
                   </Link>
-                  <Button
-                    variant="contained"
-                    onClick={form.submitForm}
-                    disabled={form.isSubmitting}
-                  >
-                    {t('auth.password.reset')}
-                  </Button>
                 </Box>
-              </>
-            )}
-          </Formik>
-        </Box>
-      </Grid>
-    </>
+              </Grid>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="outlined"
+                onClick={onCancel}
+                disabled={form.isSubmitting}
+              >
+                {t('general.cancel')}
+              </Button>
+              <Button
+                variant="contained"
+                onClick={form.submitForm}
+                disabled={form.isSubmitting}
+              >
+                {t('auth.password.reset')}
+              </Button>
+            </DialogActions>
+          </>
+        )}
+      </Formik>
+    </Dialog>
   );
 };
-export default ResetPassword;
+export default ResetPasswordDialog;

@@ -157,7 +157,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
 
     addCourse.mutate(courseData, {
       onSuccess: newCourseId => {
-        navigate(`/${newCourseId}`, {replace: true});
+        navigate(`/${newCourseId}`);
       },
       onError: () => setSubmitting(false),
     });

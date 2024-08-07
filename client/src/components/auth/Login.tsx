@@ -17,6 +17,7 @@ import {useNavigate} from 'react-router-dom';
 
 import ExternalAuth from './ExternalAuth';
 import OtpAuthDialog from './OtpAuthDialog';
+import ResetPasswordDialog from './ResetPasswordDialog';
 import ShowPasswordButton from './ShowPasswordButton';
 import {useLogIn} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
@@ -30,52 +31,72 @@ const Login = (): JSX.Element => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [otp, setOtp] = useState<string>('');
+  const [showResetPasswordDialog, setShowResetPasswordDialog] =
+    useState<boolean>(false);
+  const [showMfaDialog, setShowMfaDialog] = useState<boolean>(false);
   const [otpAuth, setOtpAuth] = useState<string | null>(null);
-  const [showOtpPrompt, setShowMfaPrompt] = useState<boolean>(false);
+  const [showOtpPrompt, setShowOtpPrompt] = useState<boolean>(false);
+  const [otp, setOtp] = useState<string>('');
 
   const handleSubmit = async (
     event: SyntheticEvent | null,
-    fullOtp: string | null = null
+    fullOtp: string | null = null,
+    newPassword: string | null = null
   ): Promise<void> => {
     if (event) event.preventDefault();
     const auth = await logIn.mutateAsync({
       email,
-      password,
+      password: newPassword ?? password,
       otp: fullOtp ?? (otp !== '' ? otp : null),
     });
 
     switch (auth.status) {
-      case 'resetMfa':
-        setOtpAuth(auth.otpAuth);
-        break;
       case 'resetPassword':
-        navigate('/reset-password', {
-          state: {
-            email,
-            password,
-            resetPassword: auth.resetPassword,
-            resetMfa: auth.resetMfa,
-          },
-        });
+        setShowResetPasswordDialog(true);
+        break;
+      case 'showMfa':
+        setOtpAuth(auth.otpAuth);
+        setShowMfaDialog(true);
         break;
       case 'enterMfa':
-        setShowMfaPrompt(true);
+        setShowOtpPrompt(true);
         break;
       case 'ok':
         setAuth({id: auth.id, name: auth.name, role: auth.role});
-        navigate('/', {replace: true});
+        navigate('/');
         break;
     }
   };
 
   return (
     <>
+      <ResetPasswordDialog
+        open={showResetPasswordDialog}
+        email={email}
+        password={password}
+        onCancel={() => {
+          setShowResetPasswordDialog(false);
+          setEmail('');
+          setPassword('');
+        }}
+        onReset={newPassword => {
+          setShowResetPasswordDialog(false);
+          setPassword(newPassword);
+          handleSubmit(null, null, newPassword);
+        }}
+      />
       <OtpAuthDialog
+        open={showMfaDialog}
         otpAuth={otpAuth}
-        onClose={() => {
+        onCancel={() => {
+          setShowMfaDialog(false);
           setOtpAuth(null);
-          setShowMfaPrompt(true);
+          setEmail('');
+          setPassword('');
+        }}
+        onSubmit={async (fullOtp: string) => {
+          await handleSubmit(null, fullOtp);
+          return true;
         }}
       />
       <Grid

@@ -117,14 +117,16 @@
     "local": {
       "title": "Log in to Aalto Grades",
       "body": "If you have been provided with credentials specifically for Aalto Grades, use this login.",
-      "enter-otp": "Enter OTP",
+      "enter-otp": "Enter TOTP code",
       "button": "Log in"
     },
     "mfa-qr": {
       "title": "MFA QR code",
       "scan": "Scan the QR code in your MFA application",
       "manual": "Or manually enter the secret",
-      "close": "Back to login"
+      "enter-otp": "Enter TOTP code",
+      "cancel": "Back to login",
+      "close-without-confirm": "Cancel without confirming"
     },
     "hide-password": "Click to hide password from view",
     "show-password": "Click to show password",
@@ -219,7 +221,7 @@
       "saved": "Course parts saved successfully",
       "add-a+-source": "Add A+ grade source",
       "view-a+-sources": "View A+ grade sources",
-      "unarchive": "Unarchive coruse part",
+      "unarchive": "Unarchive course part",
       "archive": "Archive course part",
       "delete": "Delete course part",
       "delete-message": "Some models are using this course part. Are you sure you want to delete it?",
@@ -349,7 +351,7 @@
     "reset-auth": "Reset auth",
     "resetting-password-for": "Resetting password for {{user}}",
     "delete-user": "Delete user",
-    "delete-user-message": "Are you usre you want to delete the user {{user}}?",
+    "delete-user-message": "Are you sure you want to delete the user {{user}}?",
     "user-deleted": "User deleted successfully",
     "no-users": "No users found",
     "reset-password-mfa": "Reset password / MFA",
@@ -447,7 +449,7 @@
   },
   "not-found": {
     "title": "404 - Not found",
-    "body": "The page you’re looking for doesn't exist.",
+    "body": "The page you're looking for doesn't exist.",
     "back": "Go back to main page"
   },
   "shared": {

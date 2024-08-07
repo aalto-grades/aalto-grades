@@ -17,6 +17,7 @@ import {
   AuthData,
   ChangeOwnAuthData,
   ChangeOwnAuthResponse,
+  ConfirmMfaData,
   HttpCode,
   LoginData,
   LoginResult,
@@ -24,7 +25,6 @@ import {
   ResetAuthData,
   ResetAuthResult,
   ResetOwnPasswordData,
-  ResetOwnPasswordResponse,
 } from '@/common/types';
 import {validateLogin} from './utils/auth';
 import {getSamlStrategy} from './utils/saml';
@@ -37,12 +37,11 @@ import {
   ApiError,
   Endpoint,
   SyncEndpoint,
-  FullLoginResult,
   JwtClaims,
   LoginCallback,
 } from '../types';
 
-// Set totp codes to use sha512 instead of sha1
+// Set TOTP codes to use sha512 instead of sha1
 authenticator.options = {algorithm: HashAlgorithms.SHA512, digits: 6};
 
 /**
@@ -97,36 +96,47 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
       );
     }
 
-    if (!loginResult.resetPassword && loginResult.resetMfa) {
-      const mfaSecret = authenticator.generateSecret(64);
-      await user.set({mfaSecret}).save();
-      const otpAuth = authenticator.keyuri(
-        req.body.email,
-        'Aalto Grades',
-        mfaSecret
-      );
+    // Get MFA secret
+    let mfaSecret = user.mfaSecret;
+    if (mfaSecret === null) {
+      mfaSecret = authenticator.generateSecret(64);
+      await user.set({mfaSecret, mfaConfirmed: false}).save();
+    }
+    const otpAuth = authenticator.keyuri(
+      req.body.email,
+      'Aalto Grades',
+      mfaSecret
+    );
 
-      return res.json({status: 'resetMfa', otpAuth});
-    } else if (loginResult.resetPassword) {
-      return res.json({
-        status: 'resetPassword',
-        resetPassword: loginResult.resetPassword,
-        resetMfa: loginResult.resetMfa,
-      });
-    } else if (req.body.otp === null) {
+    // Force password reset
+    if (user.forcePasswordReset) return res.json({status: 'resetPassword'});
+
+    // Show MFA
+    if (
+      user.mfaSecret === null ||
+      (!user.mfaConfirmed && req.body.otp === null)
+    ) {
+      return res.json({status: 'showMfa', otpAuth});
+    }
+
+    // Enter MFA
+    if (req.body.otp === null) {
       return res.json({status: 'enterMfa'});
     }
 
     if (
+      NODE_ENV !== 'development' &&
       !authenticator.verify({
         token: req.body.otp,
         secret: user.mfaSecret as string,
       })
     ) {
       return res.status(HttpCode.Unauthorized).send({
-        errors: ['Incorrect TOTP token'],
+        errors: ['Incorrect TOTP code'],
       });
     }
+
+    if (!user.mfaConfirmed) await user.set({mfaConfirmed: true}).save();
 
     const body: JwtClaims = {id: loginResult.id, role: loginResult.role};
     const token = jwt.sign(body, JWT_SECRET, {expiresIn: JWT_EXPIRY_SECONDS});
@@ -157,14 +167,15 @@ export const authLogout: SyncEndpoint<void, void> = (_req, res) => {
 };
 
 /**
- * (ResetOwnPasswordData) => ResetOwnPasswordResponse
+ * (ResetOwnPasswordData) => void
  *
  * @throws ApiError(401)
  */
-export const authResetOwnPassword: SyncEndpoint<
-  ResetOwnPasswordData,
-  ResetOwnPasswordResponse
-> = (req, res, next) => {
+export const authResetOwnPassword: SyncEndpoint<ResetOwnPasswordData, void> = (
+  req,
+  res,
+  next
+) => {
   const resetOwnPassword: LoginCallback = async (error, loginResult) => {
     if (error) return next(error);
     if (!loginResult)
@@ -212,19 +223,7 @@ export const authResetOwnPassword: SyncEndpoint<
         })
         .save();
     }
-
-    // Mfa reset / logging in for the first time
-    if (user.mfaSecret === null) {
-      const mfaSecret = authenticator.generateSecret(64);
-      await user.set({mfaSecret}).save();
-      const otpAuth = authenticator.keyuri(
-        user.email as string,
-        'Aalto Grades',
-        mfaSecret
-      );
-      return res.json({otpAuth});
-    }
-    res.json({otpAuth: null});
+    res.sendStatus(HttpCode.Ok);
   };
 
   const authenticate = passport.authenticate(
@@ -265,7 +264,7 @@ export const resetAuth: Endpoint<ResetAuthData, ResetAuthResult> = async (
       .save();
   }
   if (req.body.resetMfa) {
-    await user.set({mfaSecret: null}).save();
+    await user.set({mfaSecret: null, mfaConfirmed: false}).save();
   }
 
   res.json({temporaryPassword});
@@ -303,7 +302,7 @@ export const changeOwnAuth: Endpoint<
 
   if (req.body.resetMfa) {
     const mfaSecret = authenticator.generateSecret(64);
-    await dbUser.set({mfaSecret}).save();
+    await dbUser.set({mfaSecret, mfaConfirmed: false}).save();
     const otpAuth = authenticator.keyuri(
       dbUser.email as string,
       'Aalto Grades',
@@ -312,6 +311,34 @@ export const changeOwnAuth: Endpoint<
     return res.json({otpAuth});
   }
   res.json({otpAuth: null});
+};
+
+/** (ConfirmMfaData) => void */
+export const confirmMfa: Endpoint<ConfirmMfaData, void> = async (req, res) => {
+  const user = req.user as JwtClaims;
+
+  const dbUser = await User.findByPk(user.id);
+  if (dbUser === null) {
+    httpLogger.error(`User ${user.id} not found after validating credentials`);
+    throw new ApiError(
+      'User not found after validating credentials',
+      HttpCode.InternalServerError
+    );
+  }
+
+  if (
+    NODE_ENV !== 'development' &&
+    !authenticator.verify({
+      token: req.body.otp,
+      secret: dbUser.mfaSecret as string,
+    })
+  ) {
+    throw new ApiError('Incorrect TOTP code', HttpCode.Unauthorized);
+  }
+
+  await dbUser.set({mfaConfirmed: true}).save();
+
+  res.sendStatus(HttpCode.Ok);
 };
 
 /**
@@ -378,7 +405,7 @@ passport.use(
       password: string,
       done: (
         error: unknown,
-        user?: FullLoginResult | false,
+        user?: AuthData | false,
         options?: IVerifyOptions
       ) => void
     ) => {

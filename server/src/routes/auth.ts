@@ -9,6 +9,7 @@ import {processRequestBody} from 'zod-express-middleware';
 
 import {
   ChangeOwnAuthDataSchema,
+  ConfirmMfaDataSchema,
   LoginDataSchema,
   ResetAuthDataSchema,
   ResetOwnPasswordDataSchema,
@@ -20,6 +21,7 @@ import {
   authResetOwnPassword,
   authSamlLogin,
   changeOwnAuth,
+  confirmMfa,
   resetAuth,
   samlMetadata,
   selfInfo,
@@ -81,6 +83,16 @@ router.post(
   handleInvalidRequestJson,
   processRequestBody(ChangeOwnAuthDataSchema),
   controllerDispatcher(changeOwnAuth)
+);
+
+router.post(
+  '/v1/auth/confirm-mfa',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  authorization([SystemRole.Admin]),
+  express.json(),
+  handleInvalidRequestJson,
+  processRequestBody(ConfirmMfaDataSchema),
+  controllerDispatcher(confirmMfa)
 );
 
 router.get(

@@ -25,14 +25,14 @@ const users: UserCredentials[] = [
   {id: 4, email: 'student@aalto.fi', password: 'password'},
 ];
 
-/** Generate a TOTP token for given user */
+/** Generate a TOTP code for given user */
 const getUserToken = async (user: UserCredentials): Promise<string> => {
   const dbUser = await User.findByPk(user.id);
   const secret = dbUser?.mfaSecret as string;
   return authenticator.generate(secret);
 };
 
-/** Generate mfa token for a user by logging in once */
+/** Generate MFA token for a user by logging in once */
 const generateMfaToken = async (user: UserCredentials): Promise<void> => {
   await request
     .post('/v1/auth/login')

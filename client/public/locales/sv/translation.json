@@ -124,7 +124,9 @@
       "title": "UNTRANSLATED",
       "scan": "UNTRANSLATED",
       "manual": "UNTRANSLATED",
-      "close": "UNTRANSLATED"
+      "enter-otp": "UNTRANSLATED",
+      "cancel": "UNTRANSLATED",
+      "close-without-confirm": "UNTRANSLATED"
     },
     "hide-password": "UNTRANSLATED",
     "show-password": "UNTRANSLATED",

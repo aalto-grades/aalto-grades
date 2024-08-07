@@ -41,7 +41,7 @@ describe('Tests for Login and LoginForm components', () => {
     expect(screen.getByText('Log in')).toBeDefined();
   });
 
-  // Broken by mfa
+  // Broken by MFA
   // test('Login should allow a user to submit their credentials', async () => {
   //   renderLogin();
 
