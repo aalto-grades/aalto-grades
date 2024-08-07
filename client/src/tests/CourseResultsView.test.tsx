@@ -15,7 +15,7 @@ import {userEvent} from '@testing-library/user-event';
 import {createMemoryRouter, RouterProvider} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
-import CourseResultsView from '../components/CourseResultsView';
+import CourseResultsView from '../components/course/CourseResultsView';
 import AuthContext from '../context/AuthProvider';
 
 describe('Tests for CourseResultsView components', () => {

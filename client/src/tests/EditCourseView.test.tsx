@@ -10,7 +10,7 @@ import {RouterProvider, createMemoryRouter} from 'react-router-dom';
 
 import {GradingScale, Language} from '@/common/types';
 import {mockPostSuccess, server} from './mock-data/server';
-import EditCourseView from '../components/course-view/EditCourseView';
+import EditCourseView from '../components/course/EditCourseView';
 
 describe('Tests for EditCourseView components', () => {
   const router = createMemoryRouter(

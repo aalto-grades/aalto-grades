@@ -6,7 +6,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {RenderResult, render, screen} from '@testing-library/react';
 import {BrowserRouter} from 'react-router-dom';
 
-import Login from '../components/auth/Login';
+import LoginView from '../components/LoginView';
 import AuthContext from '../context/AuthProvider';
 
 describe('Tests for Login and LoginForm components', () => {
@@ -24,7 +24,7 @@ describe('Tests for Login and LoginForm components', () => {
           }}
         >
           <BrowserRouter>
-            <Login />
+            <LoginView />
           </BrowserRouter>
         </AuthContext.Provider>
       </QueryClientProvider>

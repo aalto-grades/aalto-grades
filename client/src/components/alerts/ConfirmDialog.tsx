@@ -18,7 +18,7 @@ type PropsType = IModalProps & {
   confirmNavigate: boolean;
   confirmDelete: boolean;
 };
-export const ConfirmDialog = ({
+const ConfirmDialog = ({
   open,
   title,
   children,
@@ -73,3 +73,5 @@ export const ConfirmDialog = ({
     </Dialog>
   );
 };
+
+export default ConfirmDialog;

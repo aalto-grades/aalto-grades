@@ -12,7 +12,7 @@ import {
 } from '@testing-library/react';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 
-import NotFound from '../components/NotFound';
+import NotFoundView from '../components/NotFoundView';
 
 afterEach(cleanup);
 
@@ -22,7 +22,7 @@ describe('Tests for NotFound component', () => {
       <QueryClientProvider client={new QueryClient()}>
         <MemoryRouter initialEntries={['/course-view/4/notfound']}>
           <Routes>
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<NotFoundView />} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>

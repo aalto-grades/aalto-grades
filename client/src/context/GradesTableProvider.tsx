@@ -36,10 +36,10 @@ import {
   GradingScale,
   StudentRow,
 } from '@/common/types';
-import FinalGradeCell from '../components/course-results-view/FinalGradeCell';
-import GradeCell from '../components/course-results-view/GradeCell';
-import PredictedGradeCell from '../components/course-results-view/PredictedGradeCell';
-import UserGraphDialog from '../components/course-results-view/UserGraphDialog';
+import FinalGradeCell from '../components/course/course-results-view/table/FinalGradeCell';
+import GradeCell from '../components/course/course-results-view/table/GradeCell';
+import PredictedGradeCell from '../components/course/course-results-view/table/PredictedGradeCell';
+import UserGraphDialog from '../components/course/course-results-view/table/UserGraphDialog';
 import PrettyChip from '../components/shared/PrettyChip';
 import {
   useGetAllGradingModels,
@@ -296,7 +296,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         id: 'latestBestGrade',
         meta: {PrettyChipPosition: 'first'},
         header: () => {
-          return t('context.grades-table.latest-grade');
+          return t('context.grades-table.latest-grade') as string; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
         },
         cell: prop => prop.getValue(),
       }),
