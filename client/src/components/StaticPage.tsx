@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {Box, Typography} from '@mui/material';
 import DOMPurify from 'dompurify';
 import React, {useState, useEffect} from 'react';
