@@ -5,8 +5,8 @@
 import {Box, Typography} from '@mui/material';
 import {JSX} from 'react';
 import {
-  unstable_useViewTransitionState as useViewTransitionState,
   useParams,
+  unstable_useViewTransitionState as useViewTransitionState,
 } from 'react-router-dom';
 
 import CourseResultsTable from './course-results-view/table/CourseResultsTable';

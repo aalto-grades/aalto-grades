@@ -15,16 +15,16 @@ import {
   AuthData,
   AuthDataSchema,
   ChangeOwnAuthData,
-  LoginData,
-  LoginResult,
-  LoginResultSchema,
-  ResetOwnPasswordData,
-  ResetAuthResult,
-  ResetAuthResultSchema,
-  ResetAuthData,
   ChangeOwnAuthResponse,
   ChangeOwnAuthResponseSchema,
   ConfirmMfaData,
+  LoginData,
+  LoginResult,
+  LoginResultSchema,
+  ResetAuthData,
+  ResetAuthResult,
+  ResetAuthResultSchema,
+  ResetOwnPasswordData,
 } from '@/common/types';
 import axios from './axios';
 import {Numeric} from '../../types';

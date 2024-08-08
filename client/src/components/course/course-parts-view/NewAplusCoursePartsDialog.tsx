@@ -15,8 +15,8 @@ import {useParams} from 'react-router-dom';
 
 import {
   AplusCourseData,
-  NewAplusGradeSourceData,
   AplusGradeSourceType,
+  NewAplusGradeSourceData,
 } from '@/common/types';
 import CreateAplusCourseParts from './CreateAplusCourseParts';
 import SelectAplusCourse from './SelectAplusCourse';

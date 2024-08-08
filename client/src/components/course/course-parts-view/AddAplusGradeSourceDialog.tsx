@@ -14,9 +14,9 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {
-  NewAplusGradeSourceData,
   AplusCourseData,
   AplusGradeSourceData,
+  NewAplusGradeSourceData,
 } from '@/common/types';
 import SelectAplusCourse from './SelectAplusCourse';
 import SelectAplusGradeSource from './SelectAplusGradeSource';

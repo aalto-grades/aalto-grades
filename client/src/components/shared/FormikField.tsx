@@ -9,7 +9,7 @@ import {
   TextField,
 } from '@mui/material';
 import {FormikProps} from 'formik';
-import {HTMLInputTypeAttribute, PropsWithChildren, JSX} from 'react';
+import {HTMLInputTypeAttribute, JSX, PropsWithChildren} from 'react';
 
 type PropsType = {
   form: FormikProps<{[key: string]: unknown}>;

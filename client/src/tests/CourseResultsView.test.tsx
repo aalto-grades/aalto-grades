@@ -12,7 +12,7 @@ import {
   waitFor,
 } from '@testing-library/react';
 import {userEvent} from '@testing-library/user-event';
-import {createMemoryRouter, RouterProvider} from 'react-router-dom';
+import {RouterProvider, createMemoryRouter} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
 import CourseResultsView from '../components/course/CourseResultsView';

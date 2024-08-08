@@ -13,10 +13,10 @@ import {
 } from '@tanstack/react-query';
 
 import {
+  EditGradingModelData,
   GradingModelData,
   GradingModelDataArraySchema,
   GradingModelDataSchema,
-  EditGradingModelData,
   IdSchema,
   NewGradingModelData,
 } from '@/common/types';

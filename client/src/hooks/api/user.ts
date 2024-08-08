@@ -17,13 +17,13 @@ import {
   CourseDataArraySchema,
   CourseWithFinalGrades,
   CourseWithFinalGradesArraySchema,
-  UserIdArray,
+  FullUserData,
   NewUser,
   NewUserResponse,
   NewUserResponseSchema,
   UserData,
   UserDataArraySchema,
-  FullUserData,
+  UserIdArray,
   UserWithRoleArraySchema,
 } from '@/common/types';
 import axios from './axios';
