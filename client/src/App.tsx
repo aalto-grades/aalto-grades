@@ -28,6 +28,7 @@ import LoginView from './components/LoginView';
 import ManageStudentsView from './components/ManageStudentsView';
 import NotFoundView from './components/NotFoundView';
 import PrivateRoute from './components/PrivateRoute';
+import StaticPage from './components/StaticPage';
 import StudentsView from './components/StudentsView';
 import CourseContainer from './components/course/CourseContainer';
 import CoursePartsView from './components/course/CoursePartsView';
@@ -249,6 +250,24 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       {path: '/login', element: <LoginView />},
+      ...['/licenses', '/licences'].map(path => ({
+        path,
+        element: <StaticPage url={'/javascript.html'} title="Licences" />,
+      })),
+      {
+        path: '/accessibility-statement',
+        element: <StaticPage url="/accessibility-statement.html" />,
+      },
+      {
+        path: '/privacy-notice',
+        element: <StaticPage url="/PrivacyNotice.html" />,
+      },
+      {
+        path: '/support',
+        element: (
+          <StaticPage url="/support.html" title="FAQ, Help and Support" />
+        ),
+      },
       {
         path: '/',
         element: (
