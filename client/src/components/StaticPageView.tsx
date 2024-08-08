@@ -4,14 +4,14 @@
 
 import {Box, Typography} from '@mui/material';
 import DOMPurify from 'dompurify';
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
 interface StaticPageProps {
   url: string;
   title?: string;
 }
 
-const StaticPage: React.FC<StaticPageProps> = ({url, title}) => {
+const StaticPageView: React.FC<StaticPageProps> = ({url, title}) => {
   const [htmlContent, setHtmlContent] = useState<string>('');
 
   useEffect(() => {
@@ -57,4 +57,4 @@ const StaticPage: React.FC<StaticPageProps> = ({url, title}) => {
   );
 };
 
-export default StaticPage;
+export default StaticPageView;
