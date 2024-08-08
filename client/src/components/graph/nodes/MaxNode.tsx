@@ -8,7 +8,10 @@ import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 
 import {MaxNodeSettings, MaxNodeValue} from '@/common/types/graph';
 import BaseNode from './BaseNode';
-import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
+import {
+  NodeDataContext,
+  NodeValuesContext,
+} from '../../../context/GraphProvider';
 
 type LocalSettings = {minValue: string};
 const initialSettings = {minValue: '0'};

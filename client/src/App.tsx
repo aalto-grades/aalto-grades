@@ -28,13 +28,13 @@ import LoginView from './components/LoginView';
 import ManageStudentsView from './components/ManageStudentsView';
 import NotFoundView from './components/NotFoundView';
 import StudentsView from './components/StudentsView';
-import ConfirmDialog from './components/alerts/ConfirmDialog';
 import PrivateRoute from './components/auth/PrivateRoute';
 import CourseContainer from './components/course/CourseContainer';
 import CoursePartsView from './components/course/CoursePartsView';
 import CourseResultsView from './components/course/CourseResultsView';
 import EditCourseView from './components/course/EditCourseView';
 import ModelsView from './components/course/ModelsView';
+import ConfirmDialog from './components/shared/ConfirmDialog';
 import NotistackWrapper from './context/NotistackWrapper';
 
 declare module '@mui/material/styles' {

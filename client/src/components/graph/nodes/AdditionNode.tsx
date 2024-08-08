@@ -9,7 +9,7 @@ import 'reactflow/dist/style.css';
 
 import {AdditionNodeValue} from '@/common/types/graph';
 import BaseNode from './BaseNode';
-import {NodeValuesContext} from '../../context/GraphProvider';
+import {NodeValuesContext} from '../../../context/GraphProvider';
 
 const handleStartHeight = 45.5 + 30;
 const rowHeight = 30;

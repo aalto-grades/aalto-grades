@@ -9,7 +9,7 @@ import {useTranslation} from 'react-i18next';
 import {SystemRole} from '@/common/types';
 import CourseTable from './front-page/CourseTable';
 import CreateCourseDialog from './front-page/CreateCourseDialog';
-import Users from './front-page/users/UsersView';
+import Users from './front-page/users/Users';
 import {useGetAllCourses, useGetOwnCourses} from '../hooks/useApi';
 import useAuth from '../hooks/useAuth';
 

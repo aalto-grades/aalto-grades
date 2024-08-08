@@ -35,11 +35,11 @@ import {
 } from '../../../../hooks/useApi';
 import useAuth from '../../../../hooks/useAuth';
 import {findBestGrade} from '../../../../utils/bestGrade';
-import UnsavedChangesDialog from '../../../alerts/UnsavedChangesDialog';
 import StyledDataGrid, {
   GetRowClassName,
   ProcessRowUpdate,
 } from '../../../shared/StyledDataGrid';
+import UnsavedChangesDialog from '../../../shared/UnsavedChangesDialog';
 
 type ColTypes = {
   id: number;

@@ -36,8 +36,8 @@ import {
   useGetGrades,
 } from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
-import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import SaveBar from '../shared/SaveBar';
+import UnsavedChangesDialog from '../shared/UnsavedChangesDialog';
 
 type ColTypes = {
   id: number;

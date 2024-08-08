@@ -17,7 +17,6 @@ import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker} from 'react-router-dom';
 import {
-  ReactFlow,
   Background,
   BackgroundVariant,
   Connection,
@@ -25,6 +24,7 @@ import {
   Edge,
   MiniMap,
   Node,
+  ReactFlow,
   ReactFlowInstance,
   addEdge,
   useEdgesState,
@@ -44,20 +44,20 @@ import {
   NodeValues,
 } from '@/common/types/graph';
 import {calculateNewNodeValues, initNode} from '@/common/util/calculateGraph';
-import AdditionNode from './AdditionNode';
-import AverageNode from './AverageNode';
-import CoursePartNode from './CoursePartNode';
 import CoursePartValuesDialog from './CoursePartValuesDialog';
-import GradeNode from './GradeNode';
-import MaxNode from './MaxNode';
-import MinPointsNode from './MinPointsNode';
-import RequireNode from './RequireNode';
-import RoundNode from './RoundNode';
 import SelectCoursePartsDialog from './SelectCoursePartsDialog';
-import StepperNode from './StepperNode';
-import SubstituteNode from './SubstituteNode';
 import './flow.scss';
 import {findDisconnectedEdges, formatGraph} from './graphUtil';
+import AdditionNode from './nodes/AdditionNode';
+import AverageNode from './nodes/AverageNode';
+import CoursePartNode from './nodes/CoursePartNode';
+import GradeNode from './nodes/GradeNode';
+import MaxNode from './nodes/MaxNode';
+import MinPointsNode from './nodes/MinPointsNode';
+import RequireNode from './nodes/RequireNode';
+import RoundNode from './nodes/RoundNode';
+import StepperNode from './nodes/StepperNode';
+import SubstituteNode from './nodes/SubstituteNode';
 import {
   ExtraNodeData,
   ExtraNodeDataContext,
@@ -65,7 +65,7 @@ import {
   NodeValuesContext,
 } from '../../context/GraphProvider';
 import {GradeSelectOption, findBestGrade} from '../../utils/bestGrade';
-import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
+import UnsavedChangesDialog from '../shared/UnsavedChangesDialog';
 
 const nodeTypesMap = {
   addition: AdditionNode,

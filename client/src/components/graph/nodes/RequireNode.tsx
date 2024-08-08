@@ -8,7 +8,10 @@ import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 
 import {RequireNodeSettings, RequireNodeValue} from '@/common/types/graph';
 import BaseNode from './BaseNode';
-import {NodeDataContext, NodeValuesContext} from '../../context/GraphProvider';
+import {
+  NodeDataContext,
+  NodeValuesContext,
+} from '../../../context/GraphProvider';
 
 type LocalSettings = {numFail: string; onFailSetting: 'coursefail' | 'fail'};
 const initialSettings: LocalSettings = {

@@ -42,10 +42,10 @@ import useAuth from '../../hooks/useAuth';
 import {useLocalize} from '../../hooks/useLocalize';
 import {convertToClientGradingScale} from '../../utils/textFormat';
 import {departments, sisuLanguageOptions} from '../../utils/utils';
-import UnsavedChangesDialog from '../alerts/UnsavedChangesDialog';
 import FormField from '../shared/FormikField';
 import FormLanguagesField from '../shared/FormikLanguageField';
 import SaveBar from '../shared/SaveBar';
+import UnsavedChangesDialog from '../shared/UnsavedChangesDialog';
 
 type FormData = {
   courseCode: string;

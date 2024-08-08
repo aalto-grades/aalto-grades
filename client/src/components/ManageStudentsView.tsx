@@ -15,7 +15,7 @@ import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker} from 'react-router-dom';
 
-import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
+import UnsavedChangesDialog from './shared/UnsavedChangesDialog';
 import {
   useDeleteUsers,
   useGetLatestGrades,

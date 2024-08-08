@@ -41,7 +41,7 @@ import {useGetAllGradingModels, useGetCourse} from '../../../../hooks/useApi';
 import useAuth from '../../../../hooks/useAuth';
 import {findBestFinalGrade} from '../../../../utils/bestGrade';
 import {getMaxFinalGrade} from '../../../../utils/utils';
-import UnsavedChangesDialog from '../../../alerts/UnsavedChangesDialog';
+import UnsavedChangesDialog from '../../../shared/UnsavedChangesDialog';
 
 type ColTypes = {
   id: number;

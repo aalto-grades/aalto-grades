@@ -10,7 +10,7 @@ import {NodeProps} from 'reactflow';
 import {
   ExtraNodeDataContext,
   NodeDataContext,
-} from '../../context/GraphProvider';
+} from '../../../context/GraphProvider';
 
 type PropsType = PropsWithChildren<
   NodeProps & {

@@ -6,8 +6,8 @@ import {Box, useTheme} from '@mui/material';
 import {JSX} from 'react';
 import {Outlet} from 'react-router-dom';
 
-import Footer from './Footer';
-import Header from './Header';
+import Footer from './app-container/Footer';
+import Header from './app-container/Header';
 
 const AppContainer = (): JSX.Element => {
   const theme = useTheme();

@@ -12,10 +12,10 @@ import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
-import ChangePasswordDialog from './ChangePasswordDialog';
-import OtpAuthDialog from './OtpAuthDialog';
 import {useConfirmMfa, useLogOut, useResetOwnAuth} from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
+import ChangePasswordDialog from '../auth/ChangePasswordDialog';
+import OtpAuthDialog from '../auth/OtpAuthDialog';
 import AplusTokenDialog from '../shared/AplusTokenDialog';
 
 const UserButton = (): JSX.Element => {
