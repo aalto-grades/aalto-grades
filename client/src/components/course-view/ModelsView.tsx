@@ -165,7 +165,7 @@ const ModelsView = (): JSX.Element => {
       variant: 'error',
     });
     navigate(`/${courseId}/models`);
-  }, [courseId, currentModel, loadGraph, modelId, models, navigate]);
+  }, [courseId, currentModel, loadGraph, modelId, models, navigate, t]);
 
   // Load userId url param
   useEffect(() => {
@@ -183,7 +183,7 @@ const ModelsView = (): JSX.Element => {
       variant: 'error',
     });
     navigate(`/${courseId}/models/${modelId}`);
-  }, [courseId, currentUserRow, grades.data, modelId, navigate, userId]);
+  }, [courseId, currentUserRow, grades.data, modelId, navigate, t, userId]);
 
   const handleArchiveModel = (
     gradingModelId: number,

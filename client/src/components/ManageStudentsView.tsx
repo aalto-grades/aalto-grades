@@ -133,7 +133,7 @@ const ManageStudentsView = (): JSX.Element => {
       confirmDelete: true,
     });
     if (confirmation) {
-      await deleteUsers.mutateAsync(rowSelectionModel.map(row => Number(row)));
+      await deleteUsers.mutateAsync(rowSelectionModel.map(Number));
       enqueueSnackbar(
         plural
           ? t('manage-students.delete-success.plural')

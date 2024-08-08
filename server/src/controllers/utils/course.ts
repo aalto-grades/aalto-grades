@@ -142,10 +142,8 @@ export const validateEmailList = async (
 
   // Check for non existent emails.
   if (emailList.length !== users.length) {
-    const userEmails = users.map(user => user.email);
-    const missingEmails = emailList.filter(
-      email => !userEmails.includes(email)
-    );
+    const userEmails = new Set(users.map(user => user.email));
+    const missingEmails = emailList.filter(email => !userEmails.has(email));
 
     throw new ApiError(
       missingEmails.map(

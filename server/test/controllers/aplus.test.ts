@@ -442,7 +442,7 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
               withDifficulty,
             ];
 
-            if (!valid.find(v => v.every((_, i) => v[i] === format[i]))) {
+            if (!valid.some(v => v.every((_, i) => v[i] === format[i]))) {
               await responseTests
                 .testBadRequest(url, cookies.adminCookie)
                 .post([

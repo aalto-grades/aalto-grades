@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import assert from 'assert';
+import assert from 'node:assert';
 import supertest from 'supertest';
 
 import {
@@ -184,7 +184,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
         coursePartId: courseParts[0].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
-        expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
+        expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         comment: '',
       },
       {
@@ -192,7 +192,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
         coursePartId: courseParts[1].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
-        expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
+        expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         comment: '',
       },
       {
@@ -200,7 +200,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
         coursePartId: courseParts[2].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
-        expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
+        expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         comment: '',
       },
       {
@@ -209,7 +209,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
         aplusGradeSourceId: aplusGradeSourceId,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
-        expiryDate: new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000),
+        expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         comment: '',
       },
     ];
@@ -370,9 +370,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       for (let i = 10000; i < 15000; i++) {
         for (let j = 0; j < 2; j++) {
           const newData = await genGrades(i.toString());
-          data.push(newData[0]);
-          data.push(newData[1]);
-          data.push(newData[2]);
+          data.push(newData[0], newData[1], newData[2]);
         }
       }
       const res = await request
@@ -398,7 +396,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
 
     await responseTests.testBadRequest(url, cookies.teacherCookie).post({
       ...data,
-      date: new Date(new Date().getTime() + 2 * 365 * 24 * 60 * 60 * 1000),
+      date: new Date(Date.now() + 2 * 365 * 24 * 60 * 60 * 1000),
     });
   });
 
@@ -434,7 +432,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
         coursePartId: noRoleCourseParts[0].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
-        expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),
+        expiryDate: new Date(Date.now() + 365 * 24 * 3600 * 1000),
         comment: '',
       },
     ];
@@ -452,7 +450,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
         aplusGradeSourceId: aplusGradeSourceId,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
-        expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),
+        expiryDate: new Date(Date.now() + 365 * 24 * 3600 * 1000),
         comment: '',
       },
     ];
@@ -474,7 +472,7 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
         .send({
           grade: Math.floor(Math.random() * 11),
           date: new Date(),
-          expiryDate: new Date(new Date().getTime() + 365 * 24 * 3600 * 1000),
+          expiryDate: new Date(Date.now() + 365 * 24 * 3600 * 1000),
           comment: `testing ${Math.random()}`,
         })
         .set('Cookie', cookie)

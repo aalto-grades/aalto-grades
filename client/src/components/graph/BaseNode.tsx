@@ -69,7 +69,7 @@ const BaseNode = ({
           style={{margin: 0}}
           contentEditable={type !== 'coursepart'}
           suppressContentEditableWarning
-          onBlur={e => setNodeTitle(id, e.target.innerText)}
+          onBlur={e => setNodeTitle(id, e.target.textContent!)}
         >
           {localTitle}
         </h4>

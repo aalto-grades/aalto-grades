@@ -409,18 +409,14 @@ const Graph = ({
           nodes.find(node => node.id === edge.target) as Node
         );
 
-        if (!connection.targetHandle && edge.target === connection.target) {
-          return false;
-        } else if (
-          edge.target === connection.target &&
-          edge.targetHandle &&
-          edge.targetHandle === connection.targetHandle
-        ) {
-          return false;
-        } else if (
-          edge.source === connection.source &&
-          edge.sourceHandle === connection.sourceHandle &&
-          edge.target === connection.target
+        if (
+          (!connection.targetHandle && edge.target === connection.target) ||
+          (edge.target === connection.target &&
+            edge.targetHandle &&
+            edge.targetHandle === connection.targetHandle) ||
+          (edge.source === connection.source &&
+            edge.sourceHandle === connection.sourceHandle &&
+            edge.target === connection.target)
         ) {
           return false;
         }

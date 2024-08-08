@@ -29,9 +29,7 @@ export const mockGrades: StudentRow[] = [
             grade: 10,
             exportedToSisu: null,
             date: new Date(),
-            expiryDate: new Date(
-              new Date().getTime() + 365 * 24 * 60 * 60 * 1000
-            ),
+            expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
             comment: null,
           },
         ],
@@ -52,9 +50,7 @@ export const mockGrades: StudentRow[] = [
             grade: 1,
             exportedToSisu: null,
             date: new Date(),
-            expiryDate: new Date(
-              new Date().getTime() + 365 * 24 * 60 * 60 * 1000
-            ),
+            expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
             comment: null,
           },
         ],
@@ -75,9 +71,7 @@ export const mockGrades: StudentRow[] = [
             grade: 9,
             exportedToSisu: null,
             date: new Date(),
-            expiryDate: new Date(
-              new Date().getTime() + 365 * 24 * 60 * 60 * 1000
-            ),
+            expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
             comment: null,
           },
         ],
@@ -131,9 +125,7 @@ export const mockGrades: StudentRow[] = [
             grade: 8,
             exportedToSisu: null,
             date: new Date(),
-            expiryDate: new Date(
-              new Date().getTime() + 365 * 24 * 60 * 60 * 1000
-            ),
+            expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
             comment: null,
           },
         ],
@@ -154,9 +146,7 @@ export const mockGrades: StudentRow[] = [
             grade: 3,
             exportedToSisu: null,
             date: new Date(),
-            expiryDate: new Date(
-              new Date().getTime() + 365 * 24 * 60 * 60 * 1000
-            ),
+            expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
             comment: null,
           },
         ],
@@ -177,9 +167,7 @@ export const mockGrades: StudentRow[] = [
             grade: 4,
             exportedToSisu: null,
             date: new Date(),
-            expiryDate: new Date(
-              new Date().getTime() + 365 * 24 * 60 * 60 * 1000
-            ),
+            expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
             comment: null,
           },
         ],

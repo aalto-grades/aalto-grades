@@ -72,16 +72,15 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
       {id: 'Exported to Sisu', name: t('context.grades-table.exported')},
       {id: 'finalGrade', name: t('general.final-grade.singular')},
     ],
-    [
-      ...table
-        .getAllColumns()
-        .filter(c => c.columnDef.meta?.coursePart)
-        .map(column => ({
-          id: column.id,
-          name: column.id,
-          info: column.id,
-        })),
-    ],
+
+    table
+      .getAllColumns()
+      .filter(c => c.columnDef.meta?.coursePart)
+      .map(column => ({
+        id: column.id,
+        name: column.id,
+        info: column.id,
+      })),
   ];
 
   const tableGrouping = table.getState().grouping;
@@ -92,20 +91,18 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
       <span {...props} style={{display: 'flex'}} ref={ref}>
         <ButtonBase
           style={{
-            ...{
-              display: 'flex',
-              borderRadius: '8px',
-              textAlign: 'center',
-              border: '1px solid black',
-              alignContent: 'center',
-              padding: '0px 8px',
-              fontSize: '14px',
-              alignItems: 'center',
-              lineHeight: '20px',
-              cursor: 'pointer',
-              position: 'relative',
-              backgroundColor: 'transparent',
-            },
+            display: 'flex',
+            borderRadius: '8px',
+            textAlign: 'center',
+            border: '1px solid black',
+            alignContent: 'center',
+            padding: '0px 8px',
+            fontSize: '14px',
+            alignItems: 'center',
+            lineHeight: '20px',
+            cursor: 'pointer',
+            position: 'relative',
+            backgroundColor: 'transparent',
             ...(isActive && {
               backgroundColor: theme.vars.palette.info.light,
               border: 'none',
@@ -140,21 +137,19 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
         {isActive && (
           <ButtonBase
             style={{
-              ...{
-                display: 'flex',
-                borderRadius: '0px 8px 8px 0',
-                textAlign: 'center',
-                // border: '1px solid black',
-                border: '0px 1px 1px 1px',
-                alignContent: 'center',
-                padding: '0px 8px',
-                fontSize: '14px',
-                alignItems: 'center',
-                lineHeight: '20px',
-                cursor: 'pointer',
-                position: 'relative',
-                backgroundColor: 'transparent',
-              },
+              display: 'flex',
+              borderRadius: '0px 8px 8px 0',
+              textAlign: 'center',
+              // border: '1px solid black',
+              // border: '0px 1px 1px 1px',
+              alignContent: 'center',
+              padding: '0px 8px',
+              fontSize: '14px',
+              alignItems: 'center',
+              lineHeight: '20px',
+              cursor: 'pointer',
+              position: 'relative',
+              // backgroundColor: 'transparent',
               // ...(isActive && {
               backgroundColor: theme.vars.palette.info.light,
               border: 'none',
@@ -199,9 +194,8 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
           )),
 
           // Only add divider between elements
-          ...[
-            i !== groupByElements.length - 1 ? [<Divider sx={{my: 0}} />] : [],
-          ],
+
+          i !== groupByElements.length - 1 ? [<Divider sx={{my: 0}} />] : [],
         ])}
       </Menu>
     </>
@@ -247,20 +241,18 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
           <ButtonBase
             id="select-grading-model-option"
             style={{
-              ...{
-                display: 'flex',
-                borderRadius: '8px',
-                textAlign: 'center',
-                border: '1px solid black',
-                alignContent: 'center',
-                padding: '0px 8px',
-                fontSize: '14px',
-                alignItems: 'center',
-                lineHeight: '20px',
-                cursor: 'pointer',
-                position: 'relative',
-                backgroundColor: 'transparent',
-              },
+              display: 'flex',
+              borderRadius: '8px',
+              textAlign: 'center',
+              border: '1px solid black',
+              alignContent: 'center',
+              padding: '0px 8px',
+              fontSize: '14px',
+              alignItems: 'center',
+              lineHeight: '20px',
+              cursor: 'pointer',
+              position: 'relative',
+              backgroundColor: 'transparent',
               ...(isActive && {
                 backgroundColor: theme.vars.palette.info.light,
                 border: 'none',
@@ -292,21 +284,19 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
           {isActive && (
             <ButtonBase
               style={{
-                ...{
-                  display: 'flex',
-                  borderRadius: '0px 8px 8px 0',
-                  textAlign: 'center',
-                  // border: '1px solid black',
-                  border: '0px 1px 1px 1px',
-                  alignContent: 'center',
-                  padding: '0px 8px',
-                  fontSize: '14px',
-                  alignItems: 'center',
-                  lineHeight: '20px',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  backgroundColor: 'transparent',
-                },
+                display: 'flex',
+                borderRadius: '0px 8px 8px 0',
+                textAlign: 'center',
+                // border: '1px solid black',
+                // border: '0px 1px 1px 1px',
+                alignContent: 'center',
+                padding: '0px 8px',
+                fontSize: '14px',
+                alignItems: 'center',
+                lineHeight: '20px',
+                cursor: 'pointer',
+                position: 'relative',
+                // backgroundColor: 'transparent',
                 // ...(isActive && {
                 backgroundColor: theme.vars.palette.info.light,
                 border: 'none',
@@ -385,15 +375,13 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   useEffect(() => {
     setMissingFinalGrades(
       // Prevent exporting sisu csv if students without final grades found
-      Boolean(
-        table
-          .getSelectedRowModel()
-          .rows.find(
-            selectedRow =>
-              selectedRow.original.finalGrades === undefined ||
-              selectedRow.original.finalGrades.length === 0
-          )
-      )
+      table
+        .getSelectedRowModel()
+        .rows.some(
+          selectedRow =>
+            selectedRow.original.finalGrades === undefined ||
+            selectedRow.original.finalGrades.length === 0
+        )
     );
     console.log('missingFinalGrades', missingFinalGrades);
     console.log(
@@ -512,7 +500,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
           </Button>
         </Box>
       ) : (
-        <Fade in={table.getSelectedRowModel().rows.length !== 0}>
+        <Fade in={table.getSelectedRowModel().rows.length > 0}>
           <Box
             sx={{
               // mx: 1,
@@ -597,7 +585,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                         }
                       }}
                       disabled={
-                        table.getSelectedRowModel().rows.length !== 0 &&
+                        table.getSelectedRowModel().rows.length > 0 &&
                         missingFinalGrades
                       }
                     >

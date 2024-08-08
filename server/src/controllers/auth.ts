@@ -5,9 +5,9 @@
 import {HashAlgorithms} from '@otplib/core/';
 import * as argon from 'argon2';
 import {Request, RequestHandler} from 'express';
-import {readFileSync} from 'fs';
 import generator from 'generate-password';
 import jwt from 'jsonwebtoken';
+import {readFileSync} from 'node:fs';
 import {authenticator} from 'otplib';
 import passport from 'passport';
 import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';

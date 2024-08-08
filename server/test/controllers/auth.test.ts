@@ -4,8 +4,8 @@
 
 import {HashAlgorithms} from '@otplib/core/';
 import {CookieAccessInfo} from 'cookiejar';
-import * as fs from 'fs';
 import mockdate from 'mockdate';
+import * as fs from 'node:fs';
 import {authenticator} from 'otplib';
 import supertest from 'supertest';
 
@@ -58,9 +58,9 @@ const testLogin = async (
   email: string,
   password: string,
   userId?: number,
-  otp?: string | null
+  otp: string | null = null
 ): Promise<LoginResult> => {
-  let otpToken = otp ?? null;
+  let otpToken = otp;
   if (userId !== undefined) otpToken = await getToken(userId);
 
   const res = await request

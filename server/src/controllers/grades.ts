@@ -189,9 +189,9 @@ export const addGrades: Endpoint<NewGrade[], void> = async (req, res) => {
       studentNumber: {[Op.in]: studentNumbers},
     },
   })) as (UserData & {studentNumber: string})[];
-  const foundStudents = students.map(student => student.studentNumber);
+  const foundStudents = new Set(students.map(student => student.studentNumber));
   const nonExistingStudents = studentNumbers.filter(
-    id => !foundStudents.includes(id)
+    id => !foundStudents.has(id)
   );
 
   await sequelize.transaction(async t => {
@@ -514,9 +514,8 @@ export const getSisuFormattedGradingCSV: Endpoint<
       // Assessment date must be in form dd.mm.yyyy.
       // HERE we want to find the latest completed grade for student
       const assessmentDate = (
-        req.body.assessmentDate
-          ? req.body.assessmentDate
-          : await getDateOfLatestGrade(finalGrade.userId, course.id)
+        req.body.assessmentDate ??
+        (await getDateOfLatestGrade(finalGrade.userId, course.id))
       ).toLocaleDateString('fi-FI');
 
       const completionLanguage = req.body.completionLanguage

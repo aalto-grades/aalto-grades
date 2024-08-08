@@ -35,9 +35,11 @@ const SelectCoursePartsDialog = ({
   ) => void;
 }): JSX.Element => {
   const {t} = useTranslation();
-  const coursePartNodeIds: number[] = nodes
-    .filter(node => node.type === 'coursepart')
-    .map(node => parseInt(node.id.split('-')[1]));
+  const coursePartNodeIds = new Set(
+    nodes
+      .filter(node => node.type === 'coursepart')
+      .map(node => parseInt(node.id.split('-')[1]))
+  );
 
   const initSelected: {[key: number]: boolean} = {};
   for (const coursePart of courseParts) initSelected[coursePart.id] = false;
@@ -52,7 +54,7 @@ const SelectCoursePartsDialog = ({
     if (!open) return;
     const newSelected: {[key: number]: boolean} = {};
     for (const coursePart of courseParts) {
-      newSelected[coursePart.id] = coursePartNodeIds.includes(coursePart.id);
+      newSelected[coursePart.id] = coursePartNodeIds.has(coursePart.id);
     }
     if (JSON.stringify(newSelected) === JSON.stringify(startSelected)) return;
 

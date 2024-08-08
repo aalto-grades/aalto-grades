@@ -26,12 +26,12 @@ const CourseView = (): JSX.Element => {
       const teacherInCharge = course.data.teachersInCharge.filter(
         teacher => teacher.id === auth.id
       );
-      setIsTeacherInCharge(teacherInCharge.length !== 0);
+      setIsTeacherInCharge(teacherInCharge.length > 0);
 
       const assistant = course.data.assistants.filter(
         user => user.id === auth.id
       );
-      setIsAssistant(assistant.length !== 0);
+      setIsAssistant(assistant.length > 0);
     }
   }, [auth, course.data, setIsTeacherInCharge, setIsAssistant]);
 

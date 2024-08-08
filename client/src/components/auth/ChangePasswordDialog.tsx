@@ -62,7 +62,7 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
         resetMfa: false,
         newPassword: values.newPassword,
       });
-    } catch (e) {
+    } catch {
       setSubmitting(false);
       return;
     }

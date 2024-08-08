@@ -255,7 +255,7 @@ describe('Test POST /v1/users/ - add a user', () => {
     const result = NewUserResponseSchema.safeParse(res.body);
     expect(result.success).toBeTruthy();
     if (result.success) {
-      const Schema = z.string().regex(/^[a-zA-Z\d]{16}$/);
+      const Schema = z.string().regex(/^[\dA-Za-z]{16}$/);
       const result2 = Schema.safeParse(result.data.temporaryPassword);
       expect(result2.success);
     }

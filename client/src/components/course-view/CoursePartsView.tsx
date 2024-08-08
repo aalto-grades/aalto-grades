@@ -155,8 +155,7 @@ const CoursePartsView = (): JSX.Element => {
     maxGrade: number | null
   ): void => {
     setRows(oldRows => {
-      const freeId =
-        oldRows.reduce((mxVal, row) => Math.max(mxVal, row.id), 0) + 1;
+      const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
       return oldRows.concat({
         id: freeId,
         coursePartId: -1,
@@ -198,9 +197,9 @@ const CoursePartsView = (): JSX.Element => {
       }
     }
 
-    const newAttIds = rows.map(row => row.coursePartId);
+    const newAttIds = new Set(rows.map(row => row.coursePartId));
     for (const initRow of initRows) {
-      if (!newAttIds.includes(initRow.coursePartId))
+      if (!newAttIds.has(initRow.coursePartId))
         deletedCourseParts.push(initRow.coursePartId);
     }
 

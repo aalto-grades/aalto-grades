@@ -5,7 +5,7 @@
 // This file reads all environment variables and defines their values as constants.
 
 import * as dotenv from 'dotenv';
-import {readFileSync} from 'fs';
+import {readFileSync} from 'node:fs';
 
 /** Mock key to use in development */
 const devSamlKey = `
@@ -167,9 +167,9 @@ let SAML_PRIVATE_KEY: string = devSamlKey;
 try {
   SAML_DECRYPTION_PVK = readFileSync(defaults.samlDecryptionKeyFile, 'utf8');
   SAML_PRIVATE_KEY = readFileSync(defaults.samlPrivateKeyFile, 'utf8');
-} catch (err: unknown) {
-  if (NODE_ENV === 'production') throw err as Error;
-  httpLogger.warn('SAML Private keys not read: ' + (err as Error).message);
+} catch (error) {
+  if (NODE_ENV === 'production') throw error as Error;
+  httpLogger.warn('SAML Private keys not read: ' + (error as Error).message);
 }
 export {SAML_DECRYPTION_PVK, SAML_PRIVATE_KEY};
 

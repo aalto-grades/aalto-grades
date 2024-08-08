@@ -47,7 +47,7 @@ const FormField = ({
     InputLabelProps={{shrink: true}}
     InputProps={InputProps}
     margin="normal"
-    helperText={form.errors[value] ? form.errors[value] : helperText}
+    helperText={form.errors[value] ?? helperText}
     error={form.touched[value] && form.errors[value] !== undefined}
     onChange={form.handleChange}
     select={select}

@@ -35,7 +35,7 @@ export const checkGradingModelCourseParts = (
   let hasDeleted = false;
   let hasArchived = false;
 
-  const coursePartIds = courseParts.map(coursePart => coursePart.id);
+  const coursePartIds = new Set(courseParts.map(coursePart => coursePart.id));
   const modelCoursePartIds = [];
   for (const node of gradingModel.graphStructure.nodes) {
     if (node.type !== 'coursepart') continue;
@@ -43,7 +43,7 @@ export const checkGradingModelCourseParts = (
   }
 
   for (const coursePartId of modelCoursePartIds) {
-    if (!coursePartIds.includes(coursePartId)) hasDeleted = true;
+    if (!coursePartIds.has(coursePartId)) hasDeleted = true;
   }
   for (const coursePart of courseParts) {
     if (modelCoursePartIds.includes(coursePart.id) && coursePart.archived)

@@ -32,15 +32,12 @@ const checkError = (settings: LocalSettings): boolean => {
 
   for (let i = 0; i < settings.numSteps - 1; i++) {
     if (
-      i + 1 < settings.numSteps - 1 &&
-      parseFloat(settings.middlePoints[i]) >=
-        parseFloat(settings.middlePoints[i + 1])
-    ) {
-      return true;
-    } else if (
-      i > 0 &&
-      parseFloat(settings.middlePoints[i]) <=
-        parseFloat(settings.middlePoints[i - 1])
+      (i + 1 < settings.numSteps - 1 &&
+        parseFloat(settings.middlePoints[i]) >=
+          parseFloat(settings.middlePoints[i + 1])) ||
+      (i > 0 &&
+        parseFloat(settings.middlePoints[i]) <=
+          parseFloat(settings.middlePoints[i - 1]))
     ) {
       return true;
     }

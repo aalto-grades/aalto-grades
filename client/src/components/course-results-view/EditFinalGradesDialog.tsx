@@ -215,8 +215,7 @@ const EditFinalGradesDialog = ({
   const dataGridToolbar = (): JSX.Element => {
     const addFinalGrade = (): void => {
       setRows(oldRows => {
-        const freeId =
-          oldRows.reduce((mxVal, row) => Math.max(mxVal, row.id), 0) + 1;
+        const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
         const newRow: ColTypes = {
           id: freeId,
           finalGradeId: -1,
@@ -265,9 +264,9 @@ const EditFinalGradesDialog = ({
       }
     }
 
-    const rowIds = rows.map(row => row.finalGradeId);
+    const rowIds = new Set(rows.map(row => row.finalGradeId));
     for (const initRow of initRows) {
-      if (!rowIds.includes(initRow.finalGradeId))
+      if (!rowIds.has(initRow.finalGradeId))
         deletedGrades.push(initRow.finalGradeId);
     }
 

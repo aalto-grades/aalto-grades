@@ -92,9 +92,9 @@ export const editCoursePart: Endpoint<EditCoursePartData, void> = async (
         archived: req.body.archived ?? coursePart.archived,
       })
       .save();
-  } catch (e) {
+  } catch (error) {
     // Duplicate name error
-    if (e instanceof UniqueConstraintError) {
+    if (error instanceof UniqueConstraintError) {
       throw new ApiError(
         'There cannot be two course parts with the same name',
         HttpCode.Conflict
@@ -102,7 +102,7 @@ export const editCoursePart: Endpoint<EditCoursePartData, void> = async (
     }
 
     // Other error
-    throw e;
+    throw error;
   }
 
   res.sendStatus(HttpCode.Ok);
@@ -121,11 +121,11 @@ export const deleteCoursePart: Endpoint<void, void> = async (req, res) => {
 
   try {
     await coursePart.destroy();
-  } catch (e) {
+  } catch (error) {
     // Catch deletion of course part with grades
     if (
-      e instanceof ForeignKeyConstraintError &&
-      e.index === 'attainment_grade_course_part_id_fkey'
+      error instanceof ForeignKeyConstraintError &&
+      error.index === 'attainment_grade_course_part_id_fkey'
     ) {
       throw new ApiError(
         'Tried to delete a course part with grades',
@@ -134,7 +134,7 @@ export const deleteCoursePart: Endpoint<void, void> = async (req, res) => {
     }
 
     // Other error
-    throw e;
+    throw error;
   }
 
   res.sendStatus(HttpCode.Ok);
