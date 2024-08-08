@@ -19,7 +19,7 @@ test.afterEach(async ({page}) => {
   await cleanDb();
   await page.goto('/');
   await page.getByRole('button', {name: 'Andy Admin'}).click();
-  await page.getByRole('menuitem', {name: 'Logout'}).click();
+  await page.getByRole('menuitem', {name: 'Log out'}).click();
 });
 
 test.describe('Manage users as admin', () => {
@@ -84,7 +84,7 @@ test.describe('Test courses as admin', () => {
     await page.getByRole('button', {name: 'Add'}).nth(1).click();
     await page.getByRole('button', {name: 'Submit'}).click();
     await expect(page.getByRole('heading', {name: 'testCourse'})).toBeVisible();
-    await page.getByRole('link', {name: 'A! Grades'}).click();
+    await page.getByTestId('a-grades-header-link').click();
     await expect(
       page.getByRole('cell', {name: 'testCourse'}).nth(1)
     ).toBeVisible();
@@ -118,7 +118,7 @@ test.describe('Test courses as admin', () => {
     await page.getByRole('option', {name: 'Chinese'}).click();
 
     await page.getByRole('button', {name: 'Save'}).click();
-    await page.getByRole('link', {name: 'A! Grades'}).click();
+    await page.getByTestId('a-grades-header-link').click();
     await page.getByRole('cell', {name: 'O1'}).click();
     await expect(page.getByText('CS-A1120 - edit')).toBeVisible();
     await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
@@ -139,7 +139,7 @@ test.describe('Test courses as admin', () => {
       page.locator('p').filter({hasText: 'Unsaved changes'})
     ).toBeVisible();
     await page.getByRole('button', {name: 'Save'}).click();
-    await expect(page.getByText('Model saved successfully.')).toBeVisible();
+    await expect(page.getByText('Model saved successfully')).toBeVisible();
     await page.getByRole('button', {name: 'Grades', exact: true}).click();
     await page.getByRole('button', {name: 'Grading models'}).click();
     await expect(page.getByRole('button', {name: 'Test model'})).toBeVisible();

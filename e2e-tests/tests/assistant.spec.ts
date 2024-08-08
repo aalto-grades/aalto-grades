@@ -19,7 +19,7 @@ test.afterEach(async ({page}) => {
   await cleanDb();
   await page.goto('/');
   await page.getByRole('button', {name: 'Alex Assistant'}).click();
-  await page.getByRole('menuitem', {name: 'Logout'}).click();
+  await page.getByRole('menuitem', {name: 'Log out'}).click();
 });
 
 test.describe('Test courses as Assistant', () => {
