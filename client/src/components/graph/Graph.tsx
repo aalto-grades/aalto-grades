@@ -694,7 +694,7 @@ const Graph = ({
                     <Tooltip title={dragAndDropNode.tooltip} placement="top">
                       <div
                         key={dragAndDropNode.type}
-                        className="dndnode"
+                        className="dnd-node"
                         onDragStart={event =>
                           onDragStart(event, dragAndDropNode.type)
                         }
