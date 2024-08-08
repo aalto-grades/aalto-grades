@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+/* eslint-disable no-restricted-imports */
+
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {RenderResult, render, screen, waitFor} from '@testing-library/react';
 import {userEvent} from '@testing-library/user-event';
@@ -9,8 +11,8 @@ import {http} from 'msw';
 import {RouterProvider, createMemoryRouter} from 'react-router-dom';
 
 import {GradingScale, Language} from '@/common/types';
+import EditCourseView from '@/components/course/EditCourseView';
 import {mockPostSuccess, server} from './mock-data/server';
-import EditCourseView from '../components/course/EditCourseView';
 
 describe('Tests for EditCourseView components', () => {
   const router = createMemoryRouter(

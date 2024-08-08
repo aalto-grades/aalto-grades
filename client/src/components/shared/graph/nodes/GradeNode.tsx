@@ -7,8 +7,8 @@ import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position} from 'reactflow';
 
 import {GradeNodeValue} from '@/common/types/graph';
+import {NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
-import {NodeValuesContext} from '../../../context/GraphProvider';
 
 const GradeNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();

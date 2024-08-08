@@ -12,9 +12,9 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {NewGrade} from '@/common/types';
+import {useAddGrades, useGetCourseParts} from '@/hooks/useApi';
 import UploadDialogConfirm from './UploadDialogConfirm';
 import UploadDialogUpload from './UploadDialogUpload';
-import {useAddGrades, useGetCourseParts} from '../../../../hooks/useApi';
 
 export type GradeUploadColTypes = {[key: string]: number | null} & {
   id: number;

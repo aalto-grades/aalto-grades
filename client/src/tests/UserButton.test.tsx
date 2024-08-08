@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+/* eslint-disable no-restricted-imports */
+
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {
   RenderResult,
@@ -14,8 +16,8 @@ import {userEvent} from '@testing-library/user-event';
 import {BrowserRouter} from 'react-router-dom';
 
 import {AuthData, SystemRole} from '@/common/types';
-import UserButton from '../components/app-container/UserButton';
-import AuthContext from '../context/AuthProvider';
+import UserButton from '@/components/app-container/UserButton';
+import AuthContext from '@/context/AuthProvider';
 
 afterEach(cleanup);
 

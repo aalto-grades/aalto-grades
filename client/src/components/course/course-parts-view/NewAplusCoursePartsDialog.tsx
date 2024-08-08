@@ -18,16 +18,16 @@ import {
   AplusGradeSourceType,
   NewAplusGradeSourceData,
 } from '@/common/types';
-import CreateAplusCourseParts from './CreateAplusCourseParts';
-import SelectAplusCourse from './SelectAplusCourse';
-import SelectAplusGradeSources from './SelectAplusGradeSources';
+import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
 import {
   useAddAplusGradeSources,
   useAddCoursePart,
   useFetchAplusCourses,
-} from '../../../hooks/useApi';
-import {getAplusToken} from '../../../utils/utils';
-import AplusTokenDialog from '../../shared/AplusTokenDialog';
+} from '@/hooks/useApi';
+import {getAplusToken} from '@/utils/utils';
+import CreateAplusCourseParts from './CreateAplusCourseParts';
+import SelectAplusCourse from './SelectAplusCourse';
+import SelectAplusGradeSources from './SelectAplusGradeSources';
 
 import Type = AplusGradeSourceType;
 

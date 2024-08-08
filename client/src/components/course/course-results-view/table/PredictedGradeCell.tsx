@@ -9,9 +9,9 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {GradingScale} from '@/common/types';
-import {GroupedStudentRow} from '../../../../context/GradesTableProvider';
-import {useGetAllGradingModels} from '../../../../hooks/useApi';
-import {getGradeString} from '../../../../utils/textFormat';
+import {GroupedStudentRow} from '@/context/GradesTableProvider';
+import {useGetAllGradingModels} from '@/hooks/useApi';
+import {getGradeString} from '@/utils/textFormat';
 
 type PropsType = {
   row: GroupedStudentRow;

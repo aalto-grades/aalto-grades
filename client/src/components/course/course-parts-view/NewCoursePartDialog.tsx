@@ -17,7 +17,7 @@ import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import {NewCoursePartDataSchema} from '@/common/types';
-import FormField from '../../shared/FormikField';
+import FormField from '@/components/shared/FormikField';
 
 type FormData = {name: string; daysValid: number; maxGrade: number};
 const ValidationSchema = NewCoursePartDataSchema;

@@ -25,7 +25,7 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {AplusGradeSourceData, AplusGradeSourceType} from '@/common/types';
-import {useDeleteAplusGradeSource} from '../../../hooks/useApi';
+import {useDeleteAplusGradeSource} from '@/hooks/useApi';
 
 type PropsType = {
   handleClose: () => void;

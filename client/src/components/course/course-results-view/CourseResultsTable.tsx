@@ -8,8 +8,8 @@ import {flexRender} from '@tanstack/react-table';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import {JSX, useRef} from 'react';
 
-import {useTableContext} from '../../../../context/useTableContext';
-import PrettyChip from '../../../shared/PrettyChip';
+import PrettyChip from '@/components/shared/PrettyChip';
+import {useTableContext} from '@/context/useTableContext';
 
 // TODO: Better column definitions
 // TODO: Better typing and freeze how to access data

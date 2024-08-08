@@ -30,9 +30,8 @@ import {
   SystemRole,
 } from '@/common/types';
 import {GraphStructure} from '@/common/types/graph';
-import CreateGradingModelDialog from './models-view/CreateGradingModelDialog';
-import RenameGradingModelDialog from './models-view/RenameGradingModelDialog';
-import {useGetFinalGrades} from '../../hooks/api/finalGrade';
+import Graph from '@/components/shared/graph/Graph';
+import {useGetFinalGrades} from '@/hooks/api/finalGrade';
 import {
   useDeleteGradingModel,
   useEditGradingModel,
@@ -40,10 +39,11 @@ import {
   useGetCourse,
   useGetCourseParts,
   useGetGrades,
-} from '../../hooks/useApi';
-import useAuth from '../../hooks/useAuth';
-import {getCourseRole} from '../../utils/utils';
-import Graph from '../graph/Graph';
+} from '@/hooks/useApi';
+import useAuth from '@/hooks/useAuth';
+import {getCourseRole} from '@/utils/utils';
+import CreateGradingModelDialog from './models-view/CreateGradingModelDialog';
+import RenameGradingModelDialog from './models-view/RenameGradingModelDialog';
 
 type ParamsType = {courseId: string; modelId?: string; userId?: string};
 const ModelsView = (): JSX.Element => {

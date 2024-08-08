@@ -8,9 +8,9 @@ import {JSX, useEffect} from 'react';
 import {Outlet, Params, useParams} from 'react-router-dom';
 
 import {CourseData} from '@/common/types';
+import {useGetCourse} from '@/hooks/useApi';
+import useAuth, {AuthContextType} from '@/hooks/useAuth';
 import SideMenu from './SideMenu';
-import {useGetCourse} from '../../hooks/useApi';
-import useAuth, {AuthContextType} from '../../hooks/useAuth';
 
 const CourseContainer = (): JSX.Element => {
   const theme = useTheme();

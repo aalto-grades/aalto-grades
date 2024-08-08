@@ -6,10 +6,10 @@ import {AppBar, Box, Typography, useTheme} from '@mui/material';
 import {useState} from 'react';
 import {NavLink, useParams} from 'react-router-dom';
 
+import {useGetCourse} from '@/hooks/useApi';
+import {useLocalize} from '@/hooks/useLocalize';
 import LanguageSelectButton from './LanguageSelectButton';
 import UserButton from './UserButton';
-import {useGetCourse} from '../../hooks/useApi';
-import {useLocalize} from '../../hooks/useLocalize';
 
 const Header = (): JSX.Element => {
   const localize = useLocalize();

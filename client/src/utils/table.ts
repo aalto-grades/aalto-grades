@@ -9,13 +9,13 @@ import {
   StudentRow,
 } from '@/common/types';
 import {batchCalculateGraph} from '@/common/util/calculateGraph';
-import {GradeSelectOption, findBestGrade} from './bestGrade';
 import {
   ExtendedStudentRow,
   GroupedStudentRow,
   RowError,
   RowErrorType,
-} from '../context/GradesTableProvider';
+} from '@/context/GradesTableProvider';
+import {GradeSelectOption, findBestGrade} from './bestGrade';
 
 /**
  * Groups the student rows by their latest best grade date.

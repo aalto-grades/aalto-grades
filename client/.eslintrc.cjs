@@ -20,7 +20,7 @@ module.exports = {
     // 'vite.config.ts',
   ],
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'react-refresh'],
+  plugins: ['@typescript-eslint', 'react-refresh', 'no-relative-import-paths'],
   settings: {
     'import/resolver': {
       typescript: {project: `${__dirname}/`}, // this loads <rootdir>/tsconfig.json to eslint
@@ -28,10 +28,34 @@ module.exports = {
   },
   rules: {
     camelcase: ['warn', {allow: ['required_error', 'unstable_viewTransition']}],
+    'no-restricted-imports': [
+      'warn',
+      {
+        patterns: [
+          // Broken :/
+          // {
+          //   regex: '@/components/(?!(api/enums$)).*',
+          //   message:
+          //     "Sideways component imports shouldn't be necessary outside from importing from shared",
+          // },
+          '@/components/app-container/*',
+          '@/components/course/*',
+          '@/components/front-page/*',
+          '@/components/login/*',
+        ],
+      },
+    ],
+
     'react-refresh/only-export-components': [
       'warn',
       {allowConstantExport: true},
     ],
+
+    'no-relative-import-paths/no-relative-import-paths': [
+      'warn',
+      {allowSameFolder: true},
+    ],
+
     '@typescript-eslint/no-floating-promises': 'off',
     '@typescript-eslint/no-misused-promises': [
       'warn',

@@ -22,8 +22,8 @@ import {useTranslation} from 'react-i18next';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {UserData} from '@/common/types';
-import {useGetCoursesOfStudent, useGetStudents} from '../hooks/useApi';
-import {useLocalize} from '../hooks/useLocalize';
+import {useGetCoursesOfStudent, useGetStudents} from '@/hooks/useApi';
+import {useLocalize} from '@/hooks/useLocalize';
 
 const getString = (student: UserData): string => {
   let string = student.studentNumber!.toString();

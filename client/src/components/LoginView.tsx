@@ -15,12 +15,12 @@ import {JSX, SyntheticEvent, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
-import ExternalAuth from './auth/ExternalAuth';
-import OtpAuthDialog from './auth/OtpAuthDialog';
-import ResetPasswordDialog from './auth/ResetPasswordDialog';
-import ShowPasswordButton from './auth/ShowPasswordButton';
-import {useLogIn} from '../hooks/useApi';
-import useAuth from '../hooks/useAuth';
+import {useLogIn} from '@/hooks/useApi';
+import useAuth from '@/hooks/useAuth';
+import ExternalAuth from './login/ExternalAuth';
+import ResetPasswordDialog from './login/ResetPasswordDialog';
+import OtpAuthDialog from './shared/auth/OtpAuthDialog';
+import ShowPasswordButton from './shared/auth/ShowPasswordButton';
 
 const LoginView = (): JSX.Element => {
   const {t} = useTranslation();

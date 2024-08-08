@@ -32,6 +32,7 @@ import {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
+import './flow.scss'; // Import styles
 import {CoursePartData, CoursePartGradesData} from '@/common/types';
 import {
   CoursePartNodeValue,
@@ -44,9 +45,16 @@ import {
   NodeValues,
 } from '@/common/types/graph';
 import {calculateNewNodeValues, initNode} from '@/common/util/calculateGraph';
+import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
+import {
+  ExtraNodeData,
+  ExtraNodeDataContext,
+  NodeDataContext,
+  NodeValuesContext,
+} from '@/context/GraphProvider';
+import {GradeSelectOption, findBestGrade} from '@/utils/bestGrade';
 import CoursePartValuesDialog from './CoursePartValuesDialog';
 import SelectCoursePartsDialog from './SelectCoursePartsDialog';
-import './flow.scss';
 import {findDisconnectedEdges, formatGraph} from './graphUtil';
 import AdditionNode from './nodes/AdditionNode';
 import AverageNode from './nodes/AverageNode';
@@ -58,14 +66,6 @@ import RequireNode from './nodes/RequireNode';
 import RoundNode from './nodes/RoundNode';
 import StepperNode from './nodes/StepperNode';
 import SubstituteNode from './nodes/SubstituteNode';
-import {
-  ExtraNodeData,
-  ExtraNodeDataContext,
-  NodeDataContext,
-  NodeValuesContext,
-} from '../../context/GraphProvider';
-import {GradeSelectOption, findBestGrade} from '../../utils/bestGrade';
-import UnsavedChangesDialog from '../shared/UnsavedChangesDialog';
 
 const nodeTypesMap = {
   addition: AdditionNode,

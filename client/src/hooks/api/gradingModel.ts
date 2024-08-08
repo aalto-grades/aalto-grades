@@ -20,8 +20,8 @@ import {
   IdSchema,
   NewGradingModelData,
 } from '@/common/types';
+import {Numeric} from '@/types';
 import axios from './axios';
-import {Numeric} from '../../types';
 
 export const useGetAllGradingModels = (
   courseId: Numeric,

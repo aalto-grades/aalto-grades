@@ -37,8 +37,8 @@ import {
 } from 'react';
 import {useTranslation} from 'react-i18next';
 
+import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import {GradeUploadColTypes} from './UploadDialog';
-import StyledDataGrid from '../../../shared/StyledDataGrid';
 
 type DateType = {
   coursePartName: string;

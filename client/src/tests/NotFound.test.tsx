@@ -12,7 +12,7 @@ import {
 } from '@testing-library/react';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 
-import NotFoundView from '../components/NotFoundView';
+import NotFoundView from '@/components/NotFoundView';
 
 afterEach(cleanup);
 

@@ -9,8 +9,8 @@ import {JSX, useEffect, useState} from 'react';
 import {Navigate, Outlet} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
-import {useGetRefreshToken} from '../../hooks/useApi';
-import useAuth from '../../hooks/useAuth';
+import {useGetRefreshToken} from '@/hooks/useApi';
+import useAuth from '@/hooks/useAuth';
 
 type PropsType = {children?: JSX.Element; roles: SystemRole[]};
 const PrivateRoute = ({children, roles}: PropsType): JSX.Element | null => {

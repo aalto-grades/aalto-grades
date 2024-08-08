@@ -32,16 +32,16 @@ import {
   GradingScale,
   NewFinalGrade,
 } from '@/common/types';
+import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
   useAddFinalGrades,
   useDeleteFinalGrade,
   useEditFinalGrade,
-} from '../../../../hooks/api/finalGrade';
-import {useGetAllGradingModels, useGetCourse} from '../../../../hooks/useApi';
-import useAuth from '../../../../hooks/useAuth';
-import {findBestFinalGrade} from '../../../../utils/bestGrade';
-import {getMaxFinalGrade} from '../../../../utils/utils';
-import UnsavedChangesDialog from '../../../shared/UnsavedChangesDialog';
+} from '@/hooks/api/finalGrade';
+import {useGetAllGradingModels, useGetCourse} from '@/hooks/useApi';
+import useAuth from '@/hooks/useAuth';
+import {findBestFinalGrade} from '@/utils/bestGrade';
+import {getMaxFinalGrade} from '@/utils/utils';
 
 type ColTypes = {
   id: number;

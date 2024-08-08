@@ -14,9 +14,9 @@ import {JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import {CoursePartGradesData} from '@/common/types';
+import {useTableContext} from '@/context/useTableContext';
+import {findBestGrade, gradeIsExpired} from '@/utils/bestGrade';
 import EditGradesDialog from './EditGradesDialog';
-import {useTableContext} from '../../../../context/useTableContext';
-import {findBestGrade, gradeIsExpired} from '../../../../utils/bestGrade';
 
 type GradeCellProps = {
   studentNumber: string;

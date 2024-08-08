@@ -18,14 +18,11 @@ import {
   AplusGradeSourceData,
   NewAplusGradeSourceData,
 } from '@/common/types';
+import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
+import {useAddAplusGradeSources, useFetchAplusCourses} from '@/hooks/useApi';
+import {getAplusToken} from '@/utils/utils';
 import SelectAplusCourse from './SelectAplusCourse';
 import SelectAplusGradeSource from './SelectAplusGradeSource';
-import {
-  useAddAplusGradeSources,
-  useFetchAplusCourses,
-} from '../../../hooks/useApi';
-import {getAplusToken} from '../../../utils/utils';
-import AplusTokenDialog from '../../shared/AplusTokenDialog';
 
 type PropsType = {
   handleClose: () => void;

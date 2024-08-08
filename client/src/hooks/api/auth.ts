@@ -26,8 +26,8 @@ import {
   ResetAuthResultSchema,
   ResetOwnPasswordData,
 } from '@/common/types';
+import {Numeric} from '@/types';
 import axios from './axios';
-import {Numeric} from '../../types';
 
 export const useGetRefreshToken = (
   options?: Partial<UseQueryOptions<AuthData | null>>

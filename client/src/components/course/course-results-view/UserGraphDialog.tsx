@@ -18,10 +18,10 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {GradingModelData} from '@/common/types';
-import {GroupedStudentRow} from '../../../../context/GradesTableProvider';
-import {useTableContext} from '../../../../context/useTableContext';
-import {useGetCourseParts} from '../../../../hooks/useApi';
-import Graph from '../../../graph/Graph';
+import Graph from '@/components/shared/graph/Graph';
+import {GroupedStudentRow} from '@/context/GradesTableProvider';
+import {useTableContext} from '@/context/useTableContext';
+import {useGetCourseParts} from '@/hooks/useApi';
 
 type PropsType = {
   open: boolean;

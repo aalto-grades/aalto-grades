@@ -24,20 +24,20 @@ import {z} from 'zod';
 
 import {StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateGraph} from '@/common/util/calculateGraph';
-import {useTableContext} from '../../../../context/useTableContext';
-import {useAddFinalGrades} from '../../../../hooks/api/finalGrade';
+import {useTableContext} from '@/context/useTableContext';
+import {useAddFinalGrades} from '@/hooks/api/finalGrade';
 import {
   useGetAllGradingModels,
   useGetCourse,
   useGetGrades,
-} from '../../../../hooks/useApi';
-import useAuth from '../../../../hooks/useAuth';
-import {findBestGrade} from '../../../../utils/bestGrade';
-import {findLatestGrade, getErrorCount} from '../../../../utils/table';
-import {getMaxFinalGrade} from '../../../../utils/utils';
-import CalculateFinalGradesDialog from '../CalculateFinalGradesDialog';
-import SisuDownloadDialog from '../SisuDownloadDialog';
-import UploadDialog from '../upload/UploadDialog';
+} from '@/hooks/useApi';
+import useAuth from '@/hooks/useAuth';
+import {findBestGrade} from '@/utils/bestGrade';
+import {findLatestGrade, getErrorCount} from '@/utils/table';
+import {getMaxFinalGrade} from '@/utils/utils';
+import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
+import SisuDownloadDialog from './SisuDownloadDialog';
+import UploadDialog from './upload/UploadDialog';
 
 /**
  * Toggle a string in an array: Adds it if not present, removes it if already

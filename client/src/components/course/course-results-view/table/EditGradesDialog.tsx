@@ -27,19 +27,15 @@ import {useTranslation} from 'react-i18next';
 import {useBlocker, useParams} from 'react-router-dom';
 
 import {EditGradeData, GradeData, NewGrade} from '@/common/types';
-import {useTableContext} from '../../../../context/useTableContext';
-import {
-  useAddGrades,
-  useDeleteGrade,
-  useEditGrade,
-} from '../../../../hooks/useApi';
-import useAuth from '../../../../hooks/useAuth';
-import {findBestGrade} from '../../../../utils/bestGrade';
 import StyledDataGrid, {
   GetRowClassName,
   ProcessRowUpdate,
-} from '../../../shared/StyledDataGrid';
-import UnsavedChangesDialog from '../../../shared/UnsavedChangesDialog';
+} from '@/components/shared/StyledDataGrid';
+import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
+import {useTableContext} from '@/context/useTableContext';
+import {useAddGrades, useDeleteGrade, useEditGrade} from '@/hooks/useApi';
+import useAuth from '@/hooks/useAuth';
+import {findBestGrade} from '@/utils/bestGrade';
 
 type ColTypes = {
   id: number;

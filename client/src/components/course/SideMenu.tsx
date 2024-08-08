@@ -31,9 +31,9 @@ import {useTranslation} from 'react-i18next';
 import {NavLink, useParams} from 'react-router-dom';
 
 import {CourseRoleType, SystemRole} from '@/common/types';
-import {useGetCourse} from '../../hooks/useApi';
-import useAuth from '../../hooks/useAuth';
-import {getCourseRole} from '../../utils/utils';
+import {useGetCourse} from '@/hooks/useApi';
+import useAuth from '@/hooks/useAuth';
+import {getCourseRole} from '@/utils/utils';
 
 const SideMenuButton = ({
   text,

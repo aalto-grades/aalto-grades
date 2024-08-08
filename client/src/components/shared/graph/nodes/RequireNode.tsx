@@ -7,11 +7,8 @@ import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 
 import {RequireNodeSettings, RequireNodeValue} from '@/common/types/graph';
+import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
-import {
-  NodeDataContext,
-  NodeValuesContext,
-} from '../../../context/GraphProvider';
 
 type LocalSettings = {numFail: string; onFailSetting: 'coursefail' | 'fail'};
 const initialSettings: LocalSettings = {

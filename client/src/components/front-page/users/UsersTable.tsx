@@ -22,9 +22,9 @@ import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 
 import {SystemRole, UserData} from '@/common/types';
+import {useDeleteUser, useGetUsers} from '@/hooks/useApi';
+import {HeadCellData} from '@/types';
 import ResetAuthDialog from './ResetAuthDialog';
-import {useDeleteUser, useGetUsers} from '../../../hooks/useApi';
-import {HeadCellData} from '../../../types';
 
 const UsersTable = (): JSX.Element => {
   const {t} = useTranslation();

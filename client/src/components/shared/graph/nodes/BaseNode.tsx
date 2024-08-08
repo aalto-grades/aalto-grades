@@ -7,10 +7,7 @@ import {Tooltip} from '@mui/material';
 import {JSX, PropsWithChildren, useContext, useEffect, useState} from 'react';
 import {NodeProps} from 'reactflow';
 
-import {
-  ExtraNodeDataContext,
-  NodeDataContext,
-} from '../../../context/GraphProvider';
+import {ExtraNodeDataContext, NodeDataContext} from '@/context/GraphProvider';
 
 type PropsType = PropsWithChildren<
   NodeProps & {

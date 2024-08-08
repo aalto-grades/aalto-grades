@@ -7,11 +7,11 @@ import {JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import {SystemRole} from '@/common/types';
+import {useGetAllCourses, useGetOwnCourses} from '@/hooks/useApi';
+import useAuth from '@/hooks/useAuth';
 import CourseTable from './front-page/CourseTable';
 import CreateCourseDialog from './front-page/CreateCourseDialog';
 import Users from './front-page/users/Users';
-import {useGetAllCourses, useGetOwnCourses} from '../hooks/useApi';
-import useAuth from '../hooks/useAuth';
 
 const FrontPageView = (): JSX.Element => {
   const {t} = useTranslation();

@@ -8,7 +8,7 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {AplusCourseData} from '@/common/types';
-import {useGetCourse} from '../../../hooks/useApi';
+import {useGetCourse} from '@/hooks/useApi';
 
 type PropsType = {
   aplusCourses: AplusCourseData[];

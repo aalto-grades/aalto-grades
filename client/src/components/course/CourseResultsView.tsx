@@ -9,11 +9,11 @@ import {
   unstable_useViewTransitionState as useViewTransitionState,
 } from 'react-router-dom';
 
-import CourseResultsTable from './course-results-view/table/CourseResultsTable';
-import CourseResultsTableToolbar from './course-results-view/table/CourseResultsTableToolbar';
-import {GradesTableProvider} from '../../context/GradesTableProvider';
-import {useGetGrades} from '../../hooks/useApi';
-import Delayed from '../shared/Delay';
+import Delayed from '@/components/shared/Delay';
+import {GradesTableProvider} from '@/context/GradesTableProvider';
+import {useGetGrades} from '@/hooks/useApi';
+import CourseResultsTable from './course-results-view/CourseResultsTable';
+import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
 
 const CourseResultsView = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};

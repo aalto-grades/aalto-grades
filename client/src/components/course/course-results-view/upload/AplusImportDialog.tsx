@@ -25,13 +25,13 @@ import {ChangeEvent, JSX, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
+import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
 import {
   useAddGrades,
   useFetchAplusGrades,
   useGetCourseParts,
-} from '../../../../hooks/useApi';
-import {getAplusToken} from '../../../../utils/utils';
-import AplusTokenDialog from '../../../shared/AplusTokenDialog';
+} from '@/hooks/useApi';
+import {getAplusToken} from '@/utils/utils';
 
 type PropsType = {
   handleClose: () => void;

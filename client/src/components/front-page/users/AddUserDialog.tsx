@@ -24,8 +24,8 @@ import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 
 import {NewUserSchema} from '@/common/types';
-import {useAddUser} from '../../../hooks/useApi';
-import FormField from '../../shared/FormikField';
+import FormField from '@/components/shared/FormikField';
+import {useAddUser} from '@/hooks/useApi';
 
 type FormData = {
   admin: boolean;

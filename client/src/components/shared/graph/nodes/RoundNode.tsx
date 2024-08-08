@@ -7,11 +7,8 @@ import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position} from 'reactflow';
 
 import {RoundNodeSettings, RoundNodeValue} from '@/common/types/graph';
+import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
-import {
-  NodeDataContext,
-  NodeValuesContext,
-} from '../../../context/GraphProvider';
 
 type RoundSetting = 'round-up' | 'round-closest' | 'round-down';
 type LocalSettings = {roundingSetting: RoundSetting};

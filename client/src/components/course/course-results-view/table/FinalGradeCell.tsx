@@ -9,9 +9,9 @@ import {JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import {FinalGradeData, GradingScale} from '@/common/types';
+import {findBestFinalGrade} from '@/utils/bestGrade';
+import {getGradeString} from '@/utils/textFormat';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
-import {findBestFinalGrade} from '../../../../utils/bestGrade';
-import {getGradeString} from '../../../../utils/textFormat';
 
 type FinalGradeCellProps = {
   userId: number;

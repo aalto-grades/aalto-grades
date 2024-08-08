@@ -20,7 +20,7 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {GraphTemplate, initGraph} from '@/common/util/initGraph';
-import {useAddGradingModel, useGetCourseParts} from '../../../hooks/useApi';
+import {useAddGradingModel, useGetCourseParts} from '@/hooks/useApi';
 
 const CreateGradingModelDialog = ({
   onClose,

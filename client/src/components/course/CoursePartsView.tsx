@@ -23,10 +23,8 @@ import {
   NewCoursePartData,
   SystemRole,
 } from '@/common/types';
-import AddAplusGradeSourceDialog from './course-parts-view/AddAplusGradeSourceDialog';
-import NewAplusCoursePartsDialog from './course-parts-view/NewAplusCoursePartsDialog';
-import AddCoursePartDialog from './course-parts-view/NewCoursePartDialog';
-import ViewAplusGradeSourcesDialog from './course-parts-view/ViewAplusGradeSourcesDialog';
+import SaveBar from '@/components/shared/SaveBar';
+import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
   useAddCoursePart,
   useDeleteCoursePart,
@@ -34,10 +32,12 @@ import {
   useGetAllGradingModels,
   useGetCourseParts,
   useGetGrades,
-} from '../../hooks/useApi';
-import useAuth from '../../hooks/useAuth';
-import SaveBar from '../shared/SaveBar';
-import UnsavedChangesDialog from '../shared/UnsavedChangesDialog';
+} from '@/hooks/useApi';
+import useAuth from '@/hooks/useAuth';
+import AddAplusGradeSourceDialog from './course-parts-view/AddAplusGradeSourceDialog';
+import NewAplusCoursePartsDialog from './course-parts-view/NewAplusCoursePartsDialog';
+import AddCoursePartDialog from './course-parts-view/NewCoursePartDialog';
+import ViewAplusGradeSourcesDialog from './course-parts-view/ViewAplusGradeSourcesDialog';
 
 type ColTypes = {
   id: number;

@@ -12,11 +12,11 @@ import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
-import {useConfirmMfa, useLogOut, useResetOwnAuth} from '../../hooks/useApi';
-import useAuth from '../../hooks/useAuth';
-import ChangePasswordDialog from '../auth/ChangePasswordDialog';
-import OtpAuthDialog from '../auth/OtpAuthDialog';
-import AplusTokenDialog from '../shared/AplusTokenDialog';
+import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
+import OtpAuthDialog from '@/components/shared/auth/OtpAuthDialog';
+import {useConfirmMfa, useLogOut, useResetOwnAuth} from '@/hooks/useApi';
+import useAuth from '@/hooks/useAuth';
+import ChangePasswordDialog from './ChangePasswordDialog';
 
 const UserButton = (): JSX.Element => {
   const {t} = useTranslation();

@@ -31,10 +31,10 @@ import {ParseResult, parse, unparse} from 'papaparse';
 import {Dispatch, JSX, SetStateAction, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
+import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import AplusImportDialog from './AplusImportDialog';
 import {GradeUploadColTypes} from './UploadDialog';
 import MismatchDialog, {MismatchData} from './UploadDialogMismatchDialog';
-import StyledDataGrid from '../../../shared/StyledDataGrid';
 
 type PropsType = {
   columns: GridColDef[];

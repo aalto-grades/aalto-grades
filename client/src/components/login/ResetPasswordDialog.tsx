@@ -19,9 +19,9 @@ import {useTranslation} from 'react-i18next';
 import {z} from 'zod';
 
 import {PasswordSchema} from '@/common/types';
-import BaseShowPasswordButton from './ShowPasswordButton';
-import {useResetOwnPassword} from '../../hooks/useApi';
-import FormField from '../shared/FormikField';
+import FormField from '@/components/shared/FormikField';
+import BaseShowPasswordButton from '@/components/shared/auth/ShowPasswordButton';
+import {useResetOwnPassword} from '@/hooks/useApi';
 
 type FormData = {
   newPassword: string;

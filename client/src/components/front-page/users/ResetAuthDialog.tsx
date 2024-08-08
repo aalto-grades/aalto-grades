@@ -23,7 +23,7 @@ import {JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import {UserData} from '@/common/types';
-import {useResetAuth} from '../../../hooks/useApi';
+import {useResetAuth} from '@/hooks/useApi';
 
 type PropsType = {
   open: boolean;
