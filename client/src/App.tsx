@@ -256,7 +256,7 @@ const router = createBrowserRouter([
       })),
       {
         path: '/accessibility-statement',
-        element: <StaticPage url="/AccessibilityStatement.html" />,
+        element: <StaticPage url="/accessibility-statement.html" />,
       },
       {
         path: '/privacy-notice',
