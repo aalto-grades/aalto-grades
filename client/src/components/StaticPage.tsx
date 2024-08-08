@@ -11,7 +11,7 @@ const StaticPage: React.FC<StaticPageProps> = ({url, title}) => {
   const [htmlContent, setHtmlContent] = useState<string>('');
 
   useEffect(() => {
-    const fetchHtmlContent = async () => {
+    const fetchHtmlContent = async (): Promise<void> => {
       try {
         const response = await fetch(url);
         const html = await response.text();
