@@ -28,6 +28,7 @@ import CourseView from './components/CourseView';
 import FrontPage from './components/FrontPage';
 import ManageStudentsView from './components/ManageStudentsView';
 import NotFound from './components/NotFound';
+import StaticPage from './components/StaticPage';
 import StudentsView from './components/StudentsView';
 import {ConfirmDialog} from './components/alerts/ConfirmDialog';
 import Login from './components/auth/Login';
@@ -249,6 +250,24 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       {path: '/login', element: <Login />},
+      ...['/licenses', '/licences'].map(path => ({
+        path,
+        element: <StaticPage url={'/javascript.html'} title="Licences" />,
+      })),
+      {
+        path: '/accessibility-statement',
+        element: <StaticPage url="/AccessibilityStatement.html" />,
+      },
+      {
+        path: '/privacy-notice',
+        element: <StaticPage url="/PrivacyNotice.html" />,
+      },
+      {
+        path: '/support',
+        element: (
+          <StaticPage url="/support.html" title="FAQ, Help and Support" />
+        ),
+      },
       {
         path: '/',
         element: (
