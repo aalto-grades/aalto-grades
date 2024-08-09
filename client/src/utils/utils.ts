@@ -14,7 +14,7 @@ import {
   LocalizedString,
   NewAplusGradeSourceData,
 } from '@/common/types';
-import {LanguageOption} from '../types';
+import {LanguageOption} from '@/types';
 
 export const getMaxFinalGrade = (gradingScale: GradingScale): number => {
   switch (gradingScale) {

@@ -22,21 +22,21 @@ import {GlobalModal, GlobalModalWrapper} from 'react-global-modal';
 import {RouterProvider, createBrowserRouter} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
-import AppView from './components/AppView';
-import CourseResultsView from './components/CourseResultsView';
-import CourseView from './components/CourseView';
-import FrontPage from './components/FrontPage';
+import AppContainer from './components/AppContainer';
+import FrontPageView from './components/FrontPageView';
+import LoginView from './components/LoginView';
 import ManageStudentsView from './components/ManageStudentsView';
-import NotFound from './components/NotFound';
-import StaticPage from './components/StaticPage';
+import NotFoundView from './components/NotFoundView';
+import PrivateRoute from './components/PrivateRoute';
+import StaticPageView from './components/StaticPageView';
 import StudentsView from './components/StudentsView';
-import {ConfirmDialog} from './components/alerts/ConfirmDialog';
-import Login from './components/auth/Login';
-import PrivateRoute from './components/auth/PrivateRoute';
-import CoursePartsView from './components/course-view/CoursePartsView';
-import EditCourseView from './components/course-view/EditCourseView';
-import ModelsView from './components/course-view/ModelsView';
-import NotistackWrapper from './context/NotistackProvider';
+import CourseContainer from './components/course/CourseContainer';
+import CoursePartsView from './components/course/CoursePartsView';
+import CourseResultsView from './components/course/CourseResultsView';
+import EditCourseView from './components/course/EditCourseView';
+import ModelsView from './components/course/ModelsView';
+import ConfirmDialog from './components/shared/ConfirmDialog';
+import NotistackWrapper from './context/NotistackWrapper';
 
 declare module '@mui/material/styles' {
   interface PaletteOptions {
@@ -236,7 +236,7 @@ const Root = (): JSX.Element => {
         ref={el => (globalModalRef = el)}
       />
       <QueryClientProvider client={queryClient}>
-        <AppView />
+        <AppContainer />
         {/* Query debug tool */}
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
@@ -249,37 +249,37 @@ const router = createBrowserRouter([
     path: '/',
     element: <Root />,
     children: [
-      {path: '/login', element: <Login />},
+      {path: '/login', element: <LoginView />},
       ...['/licenses', '/licences'].map(path => ({
         path,
-        element: <StaticPage url={'/javascript.html'} title="Licences" />,
+        element: <StaticPageView url={'/javascript.html'} title="Licences" />,
       })),
       {
         path: '/accessibility-statement',
-        element: <StaticPage url="/accessibility-statement.html" />,
+        element: <StaticPageView url="/accessibility-statement.html" />,
       },
       {
         path: '/privacy-notice',
-        element: <StaticPage url="/PrivacyNotice.html" />,
+        element: <StaticPageView url="/PrivacyNotice.html" />,
       },
       {
         path: '/support',
         element: (
-          <StaticPage url="/support.html" title="FAQ, Help and Support" />
+          <StaticPageView url="/support.html" title="FAQ, Help and Support" />
         ),
       },
       {
         path: '/',
         element: (
           <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]}>
-            <CourseView />
+            <CourseContainer />
           </PrivateRoute>
         ),
         children: [
           {
             index: true,
             path: '/',
-            element: <FrontPage />,
+            element: <FrontPageView />,
           },
           {
             path: '/students/:userId?',
@@ -324,7 +324,7 @@ const router = createBrowserRouter([
       },
       {
         path: '*',
-        element: <NotFound />,
+        element: <NotFoundView />,
       },
     ],
   },

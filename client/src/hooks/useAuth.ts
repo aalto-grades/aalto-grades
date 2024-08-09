@@ -4,7 +4,7 @@
 
 import {useContext, useDebugValue} from 'react';
 
-import AuthContext, {AuthContextType} from '../context/AuthProvider';
+import AuthContext, {AuthContextType} from '@/context/AuthProvider';
 
 // custom hook for using the authProvider context and for printing out debug information
 const useAuth = (): AuthContextType => {
@@ -16,4 +16,4 @@ const useAuth = (): AuthContextType => {
 };
 
 export default useAuth;
-export type {AuthContextType} from '../context/AuthProvider';
+export type {AuthContextType} from '@/context/AuthProvider';

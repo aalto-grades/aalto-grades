@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+/* eslint-disable no-restricted-imports */
+
 import {Badge, Checkbox} from '@mui/material';
 import {
   ExpandedState,
@@ -36,22 +38,22 @@ import {
   GradingScale,
   StudentRow,
 } from '@/common/types';
-import FinalGradeCell from '../components/course-results-view/FinalGradeCell';
-import GradeCell from '../components/course-results-view/GradeCell';
-import PredictedGradeCell from '../components/course-results-view/PredictedGradeCell';
-import UserGraphDialog from '../components/course-results-view/UserGraphDialog';
-import PrettyChip from '../components/shared/PrettyChip';
+import UserGraphDialog from '@/components/course/course-results-view/UserGraphDialog';
+import FinalGradeCell from '@/components/course/course-results-view/table/FinalGradeCell';
+import GradeCell from '@/components/course/course-results-view/table/GradeCell';
+import PredictedGradeCell from '@/components/course/course-results-view/table/PredictedGradeCell';
+import PrettyChip from '@/components/shared/PrettyChip';
 import {
   useGetAllGradingModels,
   useGetCourse,
   useGetCourseParts,
-} from '../hooks/useApi';
-import {findBestFinalGrade} from '../utils/bestGrade';
+} from '@/hooks/useApi';
+import {findBestFinalGrade} from '@/utils/bestGrade';
 import {
   getRowErrors,
   groupByLatestBestGrade,
   predictGrades,
-} from '../utils/table';
+} from '@/utils/table';
 
 // Define the shape of the context
 export type TableContextProps = {
@@ -296,7 +298,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         id: 'latestBestGrade',
         meta: {PrettyChipPosition: 'first'},
         header: () => {
-          return t('context.grades-table.latest-grade');
+          return t('context.grades-table.latest-grade') as string; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
         },
         cell: prop => prop.getValue(),
       }),

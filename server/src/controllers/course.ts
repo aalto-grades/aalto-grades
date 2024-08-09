@@ -27,7 +27,7 @@ import CourseRole from '../database/models/courseRole';
 import CourseTranslation from '../database/models/courseTranslation';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
-import {ApiError, Endpoint, CourseFull, JwtClaims} from '../types';
+import {ApiError, CourseFull, Endpoint, JwtClaims} from '../types';
 
 /**
  * () => CourseData

@@ -15,12 +15,12 @@ import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker} from 'react-router-dom';
 
-import UnsavedChangesDialog from './alerts/UnsavedChangesDialog';
 import {
   useDeleteUsers,
   useGetLatestGrades,
   useGetStudents,
-} from '../hooks/useApi';
+} from '@/hooks/useApi';
+import UnsavedChangesDialog from './shared/UnsavedChangesDialog';
 
 type ColTypes = {
   id: number;

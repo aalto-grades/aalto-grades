@@ -18,5 +18,9 @@
       "rule": "prettier/prettier",
       "severity": "off" // You can change it to warn or info
     }
+  ],
+  // Fix for preventing some missing warnings
+  "eslint.workingDirectories": [
+    {"mode": "auto"}
   ]
 }
