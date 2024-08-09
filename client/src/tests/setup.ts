@@ -6,7 +6,7 @@ import * as matchers from '@testing-library/jest-dom/matchers';
 import {cleanup} from '@testing-library/react';
 import {afterAll, afterEach, beforeAll} from 'vitest';
 
-import {server} from '../tests/mock-data/server';
+import {server} from './mock-data/server';
 
 expect.extend(matchers);
 

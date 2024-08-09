@@ -10,9 +10,9 @@ import {
   EditGradeData,
   GradingScale,
   HttpCode,
+  LatestGradesSchema,
   NewGrade,
   StudentRowArraySchema,
-  LatestGradesSchema,
 } from '@/common/types';
 import {app} from '../../src/app';
 import * as gradesUtil from '../../src/controllers/utils/grades';

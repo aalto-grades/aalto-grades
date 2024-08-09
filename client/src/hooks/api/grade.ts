@@ -22,8 +22,8 @@ import {
   StudentRowArraySchema,
   UserIdArray,
 } from '@/common/types';
+import {Numeric} from '@/types';
 import axios from './axios';
-import {Numeric} from '../../types';
 
 export const useGetGrades = (
   courseId: Numeric,

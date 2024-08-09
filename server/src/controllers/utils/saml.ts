@@ -14,14 +14,14 @@ import {SelectReturnType, isArrayOfNodes, useNamespaces} from 'xpath';
 
 import {HttpCode, SystemRole} from '@/common/types';
 import {
+  DEV_SAML_IDP_CERT,
+  NODE_ENV,
   SAML_CALLBACK,
   SAML_DECRYPTION_PVK,
-  SAML_ISSUER,
   SAML_ENTRYPOINT,
-  DEV_SAML_IDP_CERT,
+  SAML_ISSUER,
   SAML_METADATA_URL,
   SAML_PRIVATE_KEY,
-  NODE_ENV,
 } from '../../configs/environment';
 import httpLogger from '../../configs/winston';
 import User from '../../database/models/user';

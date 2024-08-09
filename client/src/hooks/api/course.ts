@@ -20,8 +20,8 @@ import {
   IdSchema,
   NewCourseData,
 } from '@/common/types';
+import {Numeric} from '@/types';
 import axios from './axios';
-import {Numeric} from '../../types';
 
 export const useGetCourse = (
   courseId: Numeric,

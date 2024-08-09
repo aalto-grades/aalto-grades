@@ -5,8 +5,8 @@
 import {Edge, Node} from 'reactflow';
 
 import {
-  CoursePartNodeSettings,
   AverageNodeSettings,
+  CoursePartNodeSettings,
   CustomNodeTypes,
   FullNodeData,
   GraphStructure,

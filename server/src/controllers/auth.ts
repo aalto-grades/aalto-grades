@@ -36,9 +36,9 @@ import User from '../database/models/user';
 import {
   ApiError,
   Endpoint,
-  SyncEndpoint,
   JwtClaims,
   LoginCallback,
+  SyncEndpoint,
 } from '../types';
 
 // Set TOTP codes to use sha512 instead of sha1

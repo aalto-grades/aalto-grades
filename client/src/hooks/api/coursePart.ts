@@ -19,8 +19,8 @@ import {
   EditCoursePartData,
   NewCoursePartData,
 } from '@/common/types/coursePart';
+import {Numeric} from '@/types';
 import axios from './axios';
-import {Numeric} from '../../types';
 
 export const useGetCourseParts = (
   courseId: Numeric,

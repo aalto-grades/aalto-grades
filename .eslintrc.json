@@ -19,11 +19,18 @@
 
     // Extra rules on top of gts
     "camelcase": "warn",
-    "no-constant-condition": ["warn", {"checkLoops": false}],
-    "spaced-comment": ["warn", "always", {"markers": ["/"]}],
-    "eqeqeq": "warn",
     "dot-notation": "warn",
+    "eqeqeq": "warn",
+    "no-constant-condition": ["warn", {"checkLoops": false}],
+    "no-unused-vars": "off", // Replaced by @typescript-eslint rule
+    "sort-imports": ["warn", {"ignoreDeclarationSort": true}],
+    "spaced-comment": ["warn", "always", {"markers": ["/"]}],
 
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {"ts": "never", "tsx": "never"}
+    ],
     "import/no-unresolved": "warn",
     "import/no-named-as-default-member": "off",
     "import/order": [

@@ -17,17 +17,17 @@ import {
   CourseDataArraySchema,
   CourseWithFinalGrades,
   CourseWithFinalGradesArraySchema,
-  UserIdArray,
+  FullUserData,
   NewUser,
   NewUserResponse,
   NewUserResponseSchema,
   UserData,
   UserDataArraySchema,
-  FullUserData,
+  UserIdArray,
   UserWithRoleArraySchema,
 } from '@/common/types';
+import {Numeric} from '@/types';
 import axios from './axios';
-import {Numeric} from '../../types';
 
 export const useGetOwnCourses = (
   options?: Partial<UseQueryOptions<CourseData[]>>
