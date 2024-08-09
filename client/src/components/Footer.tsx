@@ -30,7 +30,7 @@ const Footer = (): JSX.Element => {
       <Link href="/support" underline="none" sx={{mr: 3}}>
         {t('footer.support')}
       </Link>
-      <Link href="/javascript.html" underline="none" sx={{mr: 3}}>
+      <Link href="/licenses" underline="none" sx={{mr: 3}}>
         {t('footer.licenses')}
       </Link>
       <Tooltip title={t('footer.source.tooltip')}>

@@ -19,7 +19,7 @@ test.afterEach(async ({page}) => {
   await cleanDb();
   await page.goto('/');
   await page.getByRole('button', {name: 'Timmy Teacher'}).click();
-  await page.getByRole('menuitem', {name: 'Logout'}).click();
+  await page.getByRole('menuitem', {name: 'Log out'}).click();
 });
 
 test.describe('Test courses as teacher', () => {
@@ -51,7 +51,7 @@ test.describe('Test courses as teacher', () => {
       page.locator('p').filter({hasText: 'Unsaved changes'})
     ).toBeVisible();
     await page.getByRole('button', {name: 'Save'}).click();
-    await expect(page.getByText('Model saved successfully.')).toBeVisible();
+    await expect(page.getByText('Model saved successfully')).toBeVisible();
     await page.getByRole('button', {name: 'Grades', exact: true}).click();
     await page.getByRole('button', {name: 'Grading models'}).click();
     await expect(page.getByRole('button', {name: 'Test model'})).toBeVisible();
