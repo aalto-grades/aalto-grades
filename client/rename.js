@@ -22,29 +22,24 @@ function parseJsonEntries(file) {
   return Object.entries(t);
 }
 
-function checkDuplicateValues(oldEntries, newEntries) {
-  function inner(entries, name) {
-    const duplicates = {};
-    for (const [_, value] of entries) {
-      const filtered = entries.filter(([_, other]) => other === value);
+function checkDuplicateValues(entries, name) {
+  const duplicates = {};
+  for (const [_, value] of entries) {
+    const filtered = entries.filter(([_, other]) => other === value);
 
-      if (filtered.length > 1) {
-        duplicates[value] = filtered.map(([key, _]) => key);
-      }
-    }
-
-    const duplicateEntries = Object.entries(duplicates);
-    if (duplicateEntries.length > 0) {
-      console.error(`Found keys with duplicate values in ${name} entries, unable to proceed:`);
-      for (const [value, keys] of duplicateEntries) {
-        console.error(`  - ${JSON.stringify(keys)} have value "${value}"`);
-      }
-      process.exit();
+    if (filtered.length > 1) {
+      duplicates[value] = filtered.map(([key, _]) => key);
     }
   }
 
-  inner(oldEntries, 'old');
-  inner(newEntries, 'new')
+  const duplicateEntries = Object.entries(duplicates);
+  if (duplicateEntries.length > 0) {
+    console.error(`Found keys with duplicate values in ${name} entries, unable to proceed:`);
+    for (const [value, keys] of duplicateEntries) {
+      console.error(`  - ${JSON.stringify(keys)} have value "${value}"`);
+    }
+    process.exit();
+  }
 }
 
 function checkValueMatch(oldEntries, newEntries) {
@@ -89,31 +84,79 @@ function findFiles() {
   return files;
 }
 
-const oldFile = 'public/locales/en/translation.json';
-const newFile = 'translation.json';
+function updateSourceCode(oldEntries, newEntries) {
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions#escaping
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
 
-const oldEntries = parseJsonEntries(oldFile);
-const newEntries = parseJsonEntries(newFile);
+  const keyChanges = [];
+  const files = findFiles();
+  for (const [oldKey, oldValue] of oldEntries) {
+    const [newKey, _] = newEntries.find(([_, newValue]) => newValue === oldValue);
+    keyChanges.push([oldKey, newKey]);
 
-checkDuplicateValues(oldEntries, newEntries);
-checkValueMatch(oldEntries, newEntries);
+    if (newKey !== oldKey) {
+      for (const file of files) {
+        const data = fs.readFileSync(file, 'utf8');
 
-const files = findFiles();
-for (const [oldKey, oldValue] of oldEntries) {
-  const [newKey, _] = newEntries.find(([_, newValue]) => newValue === oldValue);
-
-  if (newKey !== oldKey) {
-    for (const file of files) {
-      const data = fs.readFileSync(file, 'utf8');
-
-      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions#escaping
-      function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const oldRegExp = new RegExp(`t\\(\\s*'${escapeRegExp(oldKey)}`)
+        const result = data.replace(oldRegExp, `t('${newKey}`);
+        fs.writeFileSync(file, result, 'utf8');
       }
-
-      const oldRegExp = new RegExp(`t\\(\\s*'${escapeRegExp(oldKey)}`)
-      const result = data.replace(oldRegExp, `t('${newKey}`);
-      fs.writeFileSync(file, result, 'utf8');
     }
   }
+
+  return keyChanges;
+}
+
+function updateTranslationJson(locale, keyChanges) {
+  const file = `public/locales/${locale}/translation.json`;
+
+  const backupDir = `public/locales/${locale}/backups`;
+  const backup = `${backupDir}/translation.json.${new Date().toISOString()}`;
+  if (!fs.existsSync(backupDir)) {
+    fs.mkdirSync(backupDir);
+  }
+  fs.copyFileSync(file, backup);
+
+  const object = JSON.parse(fs.readFileSync(file));
+  const updated = {};
+
+  for (const [oldKey, newKey] of keyChanges) {
+    const oldKeyParts = oldKey.split('.');
+    const newKeyParts = newKey.split('.');
+
+    let source = object;
+    oldKeyParts.forEach((keyPart) => source = source[keyPart]);
+
+    let destination = updated;
+    newKeyParts.forEach((keyPart, i) => {
+      let value = destination[keyPart];
+
+      if (i === newKeyParts.length - 1) {
+        destination[keyPart] = source;
+      } else {
+        if (value === undefined) {
+          value = {};
+          destination[keyPart] = value;
+        }
+        destination = value;
+      }
+    });
+  }
+
+  fs.writeFileSync(file, JSON.stringify(updated, null, 2));
+}
+
+const oldEntries = parseJsonEntries('public/locales/en/translation.json');
+const newEntries = parseJsonEntries('translation.json');
+
+checkDuplicateValues(oldEntries, 'old');
+checkDuplicateValues(newEntries, 'new');
+checkValueMatch(oldEntries, newEntries);
+
+const keyChanges = updateSourceCode(oldEntries, newEntries);
+for (const locale of ['en', 'fi', 'sv']) {
+  updateTranslationJson(locale, keyChanges);
 }
