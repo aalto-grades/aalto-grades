@@ -363,13 +363,14 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     expect(grades[0].grade).toEqual(data[0].grade);
   });
 
+  // If this test fails due to a timeout, it is most likely due to some unoptimized code.
   it(
     'should process big json successfully (5 000 x 3 x 2 = 90 000 individual grades)',
     async () => {
       const data: NewGrade[] = [];
-      for (let i = 10000; i < 15000; i++) {
-        for (let j = 0; j < 2; j++) {
-          const newData = await genGrades(i.toString());
+      for (let studentNum = 10000; studentNum < 15000; studentNum++) {
+        for (let submission = 0; submission < 2; submission++) {
+          const newData = await genGrades(studentNum.toString());
           data.push(newData[0], newData[1], newData[2]);
         }
       }
@@ -382,7 +383,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
 
       expect(JSON.stringify(res.body)).toBe('{}');
     },
-    120 * 1000 // 2min
+    20 * 1000 // 20 seconds should be enough
   );
 
   it('should respond with 400 if validation fails', async () => {
