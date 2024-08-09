@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {createContext, JSX, PropsWithChildren, useState} from 'react';
+import {JSX, PropsWithChildren, createContext, useState} from 'react';
 
 import {AuthData} from '@/common/types';
 

@@ -22,9 +22,9 @@ import {
   NewGrade,
   NewGradeArraySchema,
 } from '@/common/types';
+import {Numeric} from '@/types';
+import {getAplusToken} from '@/utils/utils';
 import axios from './axios';
-import {Numeric} from '../../types';
-import {getAplusToken} from '../../utils/utils';
 
 const getHeaders = (): AxiosRequestConfig => ({
   headers: {Authorization: `Aplus-Token ${getAplusToken()}`},

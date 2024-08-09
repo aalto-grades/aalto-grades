@@ -13,15 +13,15 @@ import {
 } from '@tanstack/react-query';
 
 import {
+  EditGradingModelData,
   GradingModelData,
   GradingModelDataArraySchema,
   GradingModelDataSchema,
-  EditGradingModelData,
   IdSchema,
   NewGradingModelData,
 } from '@/common/types';
+import {Numeric} from '@/types';
 import axios from './axios';
-import {Numeric} from '../../types';
 
 export const useGetAllGradingModels = (
   courseId: Numeric,

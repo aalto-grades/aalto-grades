@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+/* eslint-disable no-restricted-imports */
+
 import {Experimental_CssVarsProvider as CssVarsProvider} from '@mui/material';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {
@@ -12,11 +14,11 @@ import {
   waitFor,
 } from '@testing-library/react';
 import {userEvent} from '@testing-library/user-event';
-import {createMemoryRouter, RouterProvider} from 'react-router-dom';
+import {RouterProvider, createMemoryRouter} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
-import CourseResultsView from '../components/CourseResultsView';
-import AuthContext from '../context/AuthProvider';
+import CourseResultsView from '@/components/course/CourseResultsView';
+import AuthContext from '@/context/AuthProvider';
 
 describe('Tests for CourseResultsView components', () => {
   const renderCourseResultsView = (): RenderResult => {
