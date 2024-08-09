@@ -4,6 +4,7 @@
 
 /build
 /.vitest-preview
+translation.json
 public/locales/*/*_old.json
 public/locales/*/backups
 
