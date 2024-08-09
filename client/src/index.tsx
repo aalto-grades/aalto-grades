@@ -10,7 +10,7 @@ import App from './App';
 import {AuthProvider} from './context/AuthProvider';
 import './i18n';
 
-const rootElement = document.getElementById('root');
+const rootElement = document.querySelector('#root');
 
 if (rootElement) {
   const GlobalStyles = createGlobalStyle`

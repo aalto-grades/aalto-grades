@@ -230,17 +230,17 @@ export const editCourse: Endpoint<EditCourseData, void> = async (req, res) => {
           transaction: t,
         }
       );
-    } catch (e) {
+    } catch (error) {
       await t.rollback();
       // Duplicate name error
-      if (e instanceof UniqueConstraintError) {
+      if (error instanceof UniqueConstraintError) {
         throw new ApiError(
           `Course with course code ${courseCode} already exists`,
           HttpCode.Conflict
         );
       }
       // Other error
-      throw e;
+      throw error;
     }
 
     const updateTranslation = async (

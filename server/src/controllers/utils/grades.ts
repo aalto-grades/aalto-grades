@@ -93,7 +93,7 @@ export const getFinalGradesFor = async (
 
   // Conditionally add a where clause if student numbers are included in the
   // function call
-  if (studentNumbers.length !== 0) {
+  if (studentNumbers.length > 0) {
     userQueryOptions.where = {
       studentNumber: {
         [Op.in]: studentNumbers,

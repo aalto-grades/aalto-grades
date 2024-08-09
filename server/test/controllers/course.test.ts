@@ -64,7 +64,7 @@ beforeAll(async () => {
       email: `assistant${i}@aalto.fi`,
       name: `assistant${i}`,
     });
-    teachers.push(newUser as TeacherData);
+    assistants.push(newUser as TeacherData);
   }
 });
 

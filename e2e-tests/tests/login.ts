@@ -35,8 +35,8 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
   if (await showSecretButton.isVisible()) {
     await showSecretButton.click();
 
-    const secretText = await page.getByTestId('mfa-secret').innerText();
-    const secret = secretText.replaceAll('\n', '').replaceAll(' ', '');
+    const secretText = await page.getByTestId('mfa-secret').textContent();
+    const secret = secretText!.replaceAll('\n', '').replaceAll(' ', '');
     mfaSecrets[user] = secret;
 
     const mfaLocator = page.getByTestId('mfa-input');

@@ -65,7 +65,7 @@ export const courseAuthorization = (
       }
 
       return next();
-    } catch (e) {
+    } catch {
       return res.status(HttpCode.Forbidden).send({errors: ['Forbidden']});
     }
   };

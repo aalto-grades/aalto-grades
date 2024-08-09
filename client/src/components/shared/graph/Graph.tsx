@@ -401,23 +401,22 @@ const Graph = ({
 
   const isValidConnection = useCallback(
     (connection: Connection) => {
-      const target = nodes.find(node => node.id === connection.target) as Node;
-      const outgoers: {[key: string]: Node[]} = {};
+      // Check for conflicting edges
       for (const edge of edges) {
-        if (!(edge.source in outgoers)) outgoers[edge.source] = [];
-        outgoers[edge.source].push(
-          nodes.find(node => node.id === edge.target) as Node
-        );
-
-        if (!connection.targetHandle && edge.target === connection.target) {
+        // If connection doesn't have specific target handle and connection to the target already exists
+        if (!connection.targetHandle && edge.target === connection.target)
           return false;
-        } else if (
+
+        // If connection to target handle already exists
+        if (
           edge.target === connection.target &&
           edge.targetHandle &&
           edge.targetHandle === connection.targetHandle
-        ) {
+        )
           return false;
-        } else if (
+
+        // If connection from source handle to target node already exists
+        if (
           edge.source === connection.source &&
           edge.sourceHandle === connection.sourceHandle &&
           edge.target === connection.target
@@ -426,20 +425,33 @@ const Graph = ({
         }
       }
 
+      // Helper map for finding cycles
+      const nextNodes: {[key: string]: Node[]} = {};
+      for (const edge of edges) {
+        if (!(edge.source in nextNodes)) nextNodes[edge.source] = [];
+        nextNodes[edge.source].push(
+          nodes.find(node => node.id === edge.target) as Node
+        );
+      }
+
+      // Try to find route from target node back to source node
       const hasCycle = (node: Node, visited = new Set()): boolean => {
         if (visited.has(node.id)) return false;
         visited.add(node.id);
 
-        if (!(node.id in outgoers)) return false;
-        for (const outgoer of outgoers[node.id]) {
-          if (outgoer.id === connection.source) return true;
-          if (hasCycle(outgoer, visited)) return true;
+        if (!(node.id in nextNodes)) return false;
+        for (const nextNode of nextNodes[node.id]) {
+          if (nextNode.id === connection.source) return true;
+          if (hasCycle(nextNode, visited)) return true;
         }
         return false;
       };
 
-      if (target.id === connection.source) return false;
-      return !hasCycle(target);
+      const targetNode = nodes.find(node => node.id === connection.target)!;
+
+      // Don't allow connections from a node back to itself
+      if (targetNode.id === connection.source) return false;
+      return !hasCycle(targetNode);
     },
     [nodes, edges]
   );

@@ -233,8 +233,8 @@ const calculateNodeValue = (
           continue;
 
         const outputValue = settings.outputValues[i];
-        if (outputValue === 'same') nodeValue.value = nodeValue.source;
-        else nodeValue.value = outputValue;
+        nodeValue.value =
+          outputValue === 'same' ? nodeValue.source : outputValue;
         break;
       }
       break;

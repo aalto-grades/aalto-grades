@@ -57,9 +57,9 @@ const SisuDownloadDialog = ({
       const linkElement = document.createElement('a');
       linkElement.href = URL.createObjectURL(blob);
       linkElement.download = `grades_course_${courseId}.csv`;
-      document.body.appendChild(linkElement);
+      document.body.append(linkElement);
       linkElement.click();
-      document.body.removeChild(linkElement);
+      linkElement.remove();
 
       enqueueSnackbar(t('course-results.final-downloaded'), {
         variant: 'success',
@@ -82,7 +82,7 @@ const SisuDownloadDialog = ({
   }));
 
   const userGradeAlreadyExported = (grades: FinalGradeData[]): boolean =>
-    Boolean(grades.find(finalGrade => finalGrade.sisuExportDate !== null));
+    grades.some(finalGrade => finalGrade.sisuExportDate !== null);
 
   const exportedValuesInList = useMemo(() => {
     for (const row of selectedRows) {

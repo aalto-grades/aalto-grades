@@ -79,8 +79,7 @@ const UploadDialogUpload = ({
   const dataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
       setRows(oldRows => {
-        const freeId =
-          oldRows.reduce((mxVal, row) => Math.max(mxVal, row.id), 0) + 1;
+        const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
         const fieldValues: GradeUploadColTypes = {
           id: freeId,
         } as GradeUploadColTypes;
@@ -109,9 +108,9 @@ const UploadDialogUpload = ({
     const linkElement = document.createElement('a');
     linkElement.href = URL.createObjectURL(fileBlob);
     linkElement.download = 'template.csv';
-    document.body.appendChild(linkElement);
+    document.body.append(linkElement);
     linkElement.click();
-    document.body.removeChild(linkElement);
+    linkElement.remove();
   };
 
   /** Read data using csv key to course part key map */

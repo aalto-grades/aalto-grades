@@ -58,9 +58,9 @@ const testLogin = async (
   email: string,
   password: string,
   userId?: number,
-  otp?: string | null
+  otp: string | null = null
 ): Promise<LoginResult> => {
-  let otpToken = otp ?? null;
+  let otpToken = otp;
   if (userId !== undefined) otpToken = await getToken(userId);
 
   const res = await request

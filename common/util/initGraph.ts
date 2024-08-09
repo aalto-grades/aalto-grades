@@ -4,7 +4,7 @@
 
 import {Edge, Node} from 'reactflow';
 
-import {CoursePartData, FullNodeData, GraphStructure, NodeData} from '../types';
+import {CoursePartData, FullNodeData, GraphStructure} from '../types';
 
 export type GraphTemplate = 'none' | 'addition' | 'average';
 
@@ -47,13 +47,15 @@ export const initGraph = (
   const edges: Edge[] = [];
   const nodeData: FullNodeData = {
     'final-grade': {title: 'Final grade'},
-    ...courseParts.reduce((map: {[key: string]: NodeData}, coursePart) => {
-      map[`coursepart-${coursePart.id}`] = {
-        title: coursePart.name,
-        settings: {onFailSetting: 'coursefail', minPoints: null},
-      };
-      return map;
-    }, {}),
+    ...Object.fromEntries(
+      courseParts.map(coursePart => [
+        `coursepart-${coursePart.id}`,
+        {
+          title: coursePart.name,
+          settings: {onFailSetting: 'coursefail', minPoints: null},
+        },
+      ])
+    ),
   };
 
   if (template === 'addition' || template === 'average') {

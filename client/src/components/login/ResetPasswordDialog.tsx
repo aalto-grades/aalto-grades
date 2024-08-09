@@ -85,7 +85,7 @@ const ResetPasswordDialog = ({
         password: password,
         newPassword: values.newPassword,
       });
-    } catch (e) {
+    } catch {
       setSubmitting(false);
       return;
     }

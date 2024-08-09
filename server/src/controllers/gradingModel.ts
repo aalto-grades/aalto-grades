@@ -129,9 +129,9 @@ export const editGradingModel: Endpoint<EditGradingModelData, void> = async (
       graphStructure: req.body.graphStructure ?? gradingModel.graphStructure,
       archived: req.body.archived ?? gradingModel.archived,
     });
-  } catch (e) {
+  } catch (error) {
     // Duplicate name error
-    if (e instanceof UniqueConstraintError) {
+    if (error instanceof UniqueConstraintError) {
       throw new ApiError(
         'There cannot be two grading models with the same name',
         HttpCode.Conflict
@@ -139,7 +139,7 @@ export const editGradingModel: Endpoint<EditGradingModelData, void> = async (
     }
 
     // Other error
-    throw e;
+    throw error;
   }
 
   res.sendStatus(HttpCode.Ok);
@@ -158,11 +158,11 @@ export const deleteGradingModel: Endpoint<void, void> = async (req, res) => {
 
   try {
     await gradingModel.destroy();
-  } catch (e) {
+  } catch (error) {
     // Catch deletion of grading model with final grades
     if (
-      e instanceof ForeignKeyConstraintError &&
-      e.index === 'final_grade_grading_model_id_fkey'
+      error instanceof ForeignKeyConstraintError &&
+      error.index === 'final_grade_grading_model_id_fkey'
     ) {
       throw new ApiError(
         'Tried to delete grading model with final grades',
@@ -171,7 +171,7 @@ export const deleteGradingModel: Endpoint<void, void> = async (req, res) => {
     }
 
     // Other error
-    throw e;
+    throw error;
   }
 
   res.sendStatus(HttpCode.Ok);
