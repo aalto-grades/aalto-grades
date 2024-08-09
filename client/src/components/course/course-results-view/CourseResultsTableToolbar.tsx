@@ -194,8 +194,9 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
           )),
 
           // Only add divider between elements
-
-          i !== groupByElements.length - 1 ? [<Divider sx={{my: 0}} />] : [],
+          ...(i !== groupByElements.length - 1
+            ? [<Divider sx={{my: 0}} />]
+            : []),
         ])}
       </Menu>
     </>

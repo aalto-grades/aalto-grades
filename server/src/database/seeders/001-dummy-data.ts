@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import fs from 'node:fs';
-import path from 'node:path';
+import fs from 'fs';
+import path from 'path';
 import {QueryInterface} from 'sequelize';
 
 import {dbLogger} from '../../configs/winston';

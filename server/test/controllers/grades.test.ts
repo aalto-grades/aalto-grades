@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import assert from 'node:assert';
+import assert from 'assert';
 import supertest from 'supertest';
 
 import {
@@ -755,13 +755,19 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
     return data;
   };
 
-  jest
-    .spyOn(global.Date, 'now')
-    .mockImplementation(() => new Date('2023-06-21').getTime());
+  beforeEach(() => {
+    jest
+      .spyOn(global.Date, 'now')
+      .mockImplementation(() => new Date('2023-06-21').getTime());
+    jest
+      .spyOn(gradesUtil, 'getDateOfLatestGrade')
+      .mockImplementation(() => Promise.resolve(new Date('2023-06-21')));
+  });
 
-  jest
-    .spyOn(gradesUtil, 'getDateOfLatestGrade')
-    .mockImplementation(() => Promise.resolve(new Date('2023-06-21')));
+  afterEach(() => {
+    jest.spyOn(global.Date, 'now').mockRestore();
+    jest.spyOn(gradesUtil, 'getDateOfLatestGrade').mockRestore();
+  });
 
   it('should export CSV', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];

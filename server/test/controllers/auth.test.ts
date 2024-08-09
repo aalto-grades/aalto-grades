@@ -4,8 +4,8 @@
 
 import {HashAlgorithms} from '@otplib/core/';
 import {CookieAccessInfo} from 'cookiejar';
+import * as fs from 'fs';
 import mockdate from 'mockdate';
-import * as fs from 'node:fs';
 import {authenticator} from 'otplib';
 import supertest from 'supertest';
 

@@ -23,15 +23,15 @@ const CourseContainer = (): JSX.Element => {
 
   useEffect(() => {
     if (auth && course.data) {
-      const teacherInCharge = course.data.teachersInCharge.filter(
+      const isTeacherInCharge = course.data.teachersInCharge.some(
         teacher => teacher.id === auth.id
       );
-      setIsTeacherInCharge(teacherInCharge.length > 0);
+      setIsTeacherInCharge(isTeacherInCharge);
 
-      const assistant = course.data.assistants.filter(
+      const isAssistant = course.data.assistants.some(
         user => user.id === auth.id
       );
-      setIsAssistant(assistant.length > 0);
+      setIsAssistant(isAssistant);
     }
   }, [auth, course.data, setIsTeacherInCharge, setIsAssistant]);
 

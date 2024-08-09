@@ -442,7 +442,11 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
               withDifficulty,
             ];
 
-            if (!valid.some(v => v.every((_, i) => v[i] === format[i]))) {
+            // Check if the format matches some valid format
+            const isValid = valid.some(validFormat =>
+              validFormat.every((_, i) => format[i] === validFormat[i])
+            );
+            if (!isValid) {
               await responseTests
                 .testBadRequest(url, cookies.adminCookie)
                 .post([

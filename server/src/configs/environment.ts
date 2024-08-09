@@ -5,7 +5,7 @@
 // This file reads all environment variables and defines their values as constants.
 
 import * as dotenv from 'dotenv';
-import {readFileSync} from 'node:fs';
+import {readFileSync} from 'fs';
 
 /** Mock key to use in development */
 const devSamlKey = `
