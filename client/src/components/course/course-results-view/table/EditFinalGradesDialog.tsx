@@ -242,7 +242,7 @@ const EditFinalGradesDialog = ({
   const handleSubmit = async (): Promise<void> => {
     const newGrades: NewFinalGrade[] = [];
     const deletedGrades: number[] = [];
-    const editedGrades: ({finalGradeId: number} & EditFinalGrade)[] = [];
+    const editedGrades: {finalGradeId: number; data: EditFinalGrade}[] = [];
 
     for (const row of rows) {
       if (row.finalGradeId === -1) {
@@ -256,10 +256,12 @@ const EditFinalGradesDialog = ({
       } else {
         editedGrades.push({
           finalGradeId: row.finalGradeId,
-          grade: row.grade,
-          date: row.date,
-          sisuExportDate: row.exportDate,
-          comment: row.comment,
+          data: {
+            grade: row.grade,
+            date: row.date,
+            sisuExportDate: row.exportDate,
+            comment: row.comment,
+          },
         });
       }
     }
@@ -273,12 +275,7 @@ const EditFinalGradesDialog = ({
     await Promise.all([
       addFinalGrades.mutateAsync(newGrades),
       ...deletedGrades.map(fGradeId => deleteFinalGrade.mutateAsync(fGradeId)),
-      ...editedGrades.map(finalGrade =>
-        editFinalGrade.mutateAsync({
-          finalGradeId: finalGrade.finalGradeId,
-          data: finalGrade,
-        })
-      ),
+      ...editedGrades.map(editData => editFinalGrade.mutateAsync(editData)),
     ]);
 
     onClose();
