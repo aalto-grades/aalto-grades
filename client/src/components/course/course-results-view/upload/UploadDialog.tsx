@@ -38,7 +38,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     '' | 'date' | 'confirm'
   >('date');
   const [rows, setRows] = useState<GridRowsProp<GradeUploadColTypes>>([]);
-  const [ready, setReady] = useState<boolean>(false);
+  const [ready, setReady] = useState<boolean>(true);
   const [dates, setDates] = useState<
     {coursePartName: string; completionDate: Dayjs; expirationDate: Dayjs}[]
   >([]);

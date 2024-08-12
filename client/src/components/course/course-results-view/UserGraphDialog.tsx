@@ -59,6 +59,7 @@ const UserGraphDialog = ({
           <>{t('general.loading')}</>
         ) : (
           <Graph
+            key={selectedModel.id} // Reset graph for each model
             initGraph={selectedModel.graphStructure}
             courseParts={row.courseParts.map(rowCoursePart => ({
               id: rowCoursePart.coursePartId,

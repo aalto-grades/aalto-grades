@@ -120,22 +120,29 @@ const CoursePartsView = (): JSX.Element => {
       unsavedChanges && currentLocation.pathname !== nextLocation.pathname
   );
 
-  useEffect(() => {
-    if (courseParts.data === undefined) return;
-    const newRows = courseParts.data.map(coursePart => ({
-      id: coursePart.id,
-      coursePartId: coursePart.id,
-      name: coursePart.name,
-      daysValid: coursePart.daysValid,
-      maxGrade: coursePart.maxGrade,
-      validUntil: null,
-      aplusGradeSources: coursePart.aplusGradeSources,
-      archived: coursePart.archived,
-    }));
-    if (JSON.stringify(newRows) === JSON.stringify(rows)) return;
-    setRows(newRows);
-    setInitRows(structuredClone(newRows));
-  }, [courseParts.data]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Update rows when coursePart.data updates
+  const [oldCoursePartData, setOldCoursePartData] =
+    useState<typeof courseParts.data>(undefined);
+  if (courseParts.data !== oldCoursePartData) {
+    setOldCoursePartData(courseParts.data);
+
+    if (courseParts.data !== undefined) {
+      const newRows = courseParts.data.map(coursePart => ({
+        id: coursePart.id,
+        coursePartId: coursePart.id,
+        name: coursePart.name,
+        daysValid: coursePart.daysValid,
+        maxGrade: coursePart.maxGrade,
+        validUntil: null,
+        aplusGradeSources: coursePart.aplusGradeSources,
+        archived: coursePart.archived,
+      }));
+      if (JSON.stringify(newRows) !== JSON.stringify(rows)) {
+        setRows(newRows);
+        setInitRows(structuredClone(newRows));
+      }
+    }
+  }
 
   // Warning if leaving with unsaved
   useEffect(() => {

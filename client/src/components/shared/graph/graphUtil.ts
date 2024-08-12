@@ -3,9 +3,124 @@
 // SPDX-License-Identifier: MIT
 
 import ElkConstructor from 'elkjs/lib/elk.bundled';
-import {Edge, Node} from 'reactflow';
+import {TFunction} from 'i18next';
+import {Connection, Edge, Node} from 'reactflow';
 
-import {NodeValues} from '@/common/types/graph';
+import {DropInNodes, NodeValues} from '@/common/types/graph';
+
+export const simplifyNode = (node: Node): Node => ({
+  id: node.id,
+  type: node.type,
+  position: {
+    x: Math.round(node.position.x),
+    y: Math.round(node.position.y),
+  },
+  data: {},
+});
+
+export const getDragAndDropNodes = (
+  t: TFunction<'translation', undefined>
+): {
+  type: DropInNodes;
+  title: string;
+  tooltip: string;
+}[] => [
+  {
+    type: 'addition',
+    title: t('graph.node.add'),
+    tooltip: t('graph.node.add-tooltip'),
+  },
+  {
+    type: 'average',
+    title: t('graph.node.average'),
+    tooltip: t('graph.node.average-tooltip'),
+  },
+  {
+    type: 'stepper',
+    title: t('graph.node.stepper'),
+    tooltip: t('graph.node.stepper-tooltip'),
+  },
+  {
+    type: 'minpoints',
+    title: t('graph.node.min'),
+    tooltip: t('graph.node.min-tooltip'),
+  },
+  {
+    type: 'max',
+    title: t('graph.node.max'),
+    tooltip: t('graph.node.max-tooltip'),
+  },
+  {
+    type: 'require',
+    title: t('graph.node.require'),
+    tooltip: t('graph.node.require-tooltip'),
+  },
+  {
+    type: 'round',
+    title: t('graph.node.round'),
+    tooltip: t('graph.node.round-tooltip'),
+  },
+  {
+    type: 'substitute',
+    title: t('graph.node.substitute'),
+    tooltip: t('graph.node.substitute-tooltip'),
+  },
+];
+
+export const isValidConnection = (
+  connection: Connection,
+  edges: Edge[]
+): boolean => {
+  if (connection.source === null || connection.target === null) return false;
+
+  // Check for conflicting edges
+  for (const edge of edges) {
+    // If connection doesn't have specific target handle and connection to the target already exists
+    if (!connection.targetHandle && edge.target === connection.target)
+      return false;
+
+    // If connection to target handle already exists
+    if (
+      edge.target === connection.target &&
+      edge.targetHandle &&
+      edge.targetHandle === connection.targetHandle
+    )
+      return false;
+
+    // If connection from source handle to target node already exists
+    if (
+      edge.source === connection.source &&
+      edge.sourceHandle === connection.sourceHandle &&
+      edge.target === connection.target
+    ) {
+      return false;
+    }
+  }
+
+  // Helper map for finding cycles
+  const nextNodes: {[key: string]: string[]} = {};
+  for (const edge of edges) {
+    if (!(edge.source in nextNodes)) nextNodes[edge.source] = [];
+    nextNodes[edge.source].push(edge.target);
+  }
+
+  // Try to find route from target node back to source node
+  const hasCycle = (nodeId: string, visited = new Set()): boolean => {
+    if (visited.has(nodeId)) return false;
+    visited.add(nodeId);
+
+    if (!(nodeId in nextNodes)) return false;
+    for (const nextNode of nextNodes[nodeId]) {
+      if (nodeId === connection.source) return true;
+      if (hasCycle(nextNode, visited)) return true;
+    }
+    return false;
+  };
+
+  // Don't allow connections from a node back to itself
+  if (connection.target === connection.source) return false;
+  return !hasCycle(connection.target);
+};
 
 export const findDisconnectedEdges = (
   oldNodeValues: NodeValues,
@@ -172,10 +287,8 @@ export const formatGraph = async (
   };
 
   const newNodes = (await elk.layout(graph)).children!;
-  return newNodes.map((newNode): Node => {
-    return {
-      ...nodes.find(node => node.id === newNode.id)!,
-      position: {x: newNode.x!, y: newNode.y!},
-    };
-  });
+  return newNodes.map(newNode => ({
+    ...nodes.find(node => node.id === newNode.id)!,
+    position: {x: newNode.x!, y: newNode.y!},
+  }));
 };

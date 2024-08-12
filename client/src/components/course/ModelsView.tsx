@@ -31,6 +31,7 @@ import {
 } from '@/common/types';
 import {GraphStructure} from '@/common/types/graph';
 import Graph from '@/components/shared/graph/Graph';
+import {simplifyNode} from '@/components/shared/graph/graphUtil';
 import {useGetFinalGrades} from '@/hooks/api/finalGrade';
 import {
   useDeleteGradingModel,
@@ -209,18 +210,10 @@ const ModelsView = (): JSX.Element => {
   const onSave = async (graphStructure: GraphStructure): Promise<void> => {
     if (currentModel === null) throw new Error(t('course.models.save-null'));
 
-    const simplifiedGraphStructure = structuredClone(graphStructure);
-    // Remove unnecessary keys from data.
-    for (const node of simplifiedGraphStructure.nodes) {
-      delete node.dragging;
-      delete node.selected;
-      delete node.positionAbsolute;
-      delete node.width;
-      delete node.height;
-      // This is enough accuracy.
-      node.position.x = Math.round(node.position.x);
-      node.position.y = Math.round(node.position.y);
-    }
+    const simplifiedGraphStructure = {
+      ...graphStructure,
+      nodes: graphStructure.nodes.map(simplifyNode),
+    };
     await editModel.mutateAsync({
       courseId,
       gradingModelId: currentModel.id,
@@ -378,6 +371,7 @@ const ModelsView = (): JSX.Element => {
 
       {graphOpen && currentModel !== null && (
         <Graph
+          key={currentModel.id} // Reset graph for each model
           initGraph={currentModel.graphStructure}
           courseParts={courseParts.data}
           userGrades={

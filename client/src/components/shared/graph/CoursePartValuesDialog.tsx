@@ -10,7 +10,7 @@ import {
   DialogTitle,
   TextField,
 } from '@mui/material';
-import {ChangeEvent, JSX, useEffect, useMemo, useState} from 'react';
+import {ChangeEvent, JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Node} from 'reactflow';
 
@@ -61,20 +61,8 @@ const CoursePartValuesDialog = ({
     return newInitValues;
   }, [coursePartNodeIds, nodeValues]);
 
-  const [startValues, setStartValues] = useState<{[key: number]: string}>(
-    initValues
-  );
   const [values, setValues] = useState<{[key: number]: string}>(initValues);
   const [error, setError] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!open) return;
-    if (JSON.stringify(initValues) === JSON.stringify(startValues)) return;
-
-    setError(false);
-    setValues(initValues);
-    setStartValues(initValues);
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onChange = (
     id: number,
@@ -125,7 +113,7 @@ const CoursePartValuesDialog = ({
         <Button
           onClick={() => {
             onClose();
-            setValues(startValues);
+            setValues(initValues);
           }}
         >
           {t('general.cancel')}
