@@ -111,7 +111,7 @@ export const isValidConnection = (
 
     if (!(nodeId in nextNodes)) return false;
     for (const nextNode of nextNodes[nodeId]) {
-      if (nodeId === connection.source) return true;
+      if (nextNode === connection.source) return true;
       if (hasCycle(nextNode, visited)) return true;
     }
     return false;

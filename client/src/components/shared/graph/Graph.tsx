@@ -174,12 +174,6 @@ const Graph = ({
     JSON.stringify(originalGraphStructure.nodeData) !==
       JSON.stringify(nodeData);
 
-  const nodeMap = useMemo<{[key: string]: Node}>(() => {
-    const newMap: {[key: string]: Node} = {};
-    for (const node of nodes) newMap[node.id] = node;
-    return newMap;
-  }, [nodes]);
-
   // Course part nodes that the user is allowed to delete
   const delCourseParts = useMemo(
     () =>
@@ -251,9 +245,9 @@ const Graph = ({
 
   // Update node values when nodes/edges/values/settings change
   useEffect(() => {
-    const nodeSettings: {[key: string]: NodeSettings | undefined} = {};
-    for (const [key, value] of Object.entries(nodeData))
-      nodeSettings[key] = value.settings;
+    const nodeSettings = Object.fromEntries(
+      Object.entries(nodeData).map(([key, {settings}]) => [key, settings])
+    );
 
     if (
       lastState === null ||
@@ -385,6 +379,10 @@ const Graph = ({
     setNodeValues(newNodeValues);
   };
 
+  const nodeTypeMap = Object.fromEntries(
+    nodes.map(node => [node.id, node.type])
+  );
+
   // Handle drop-in nodes
   const onDragStart = (
     event: DragEvent<HTMLDivElement>,
@@ -407,16 +405,14 @@ const Graph = ({
         | DropInNodes
         | '';
 
-      if (typeof type === 'undefined' || !type || reactFlowInstance === null) {
-        return;
-      }
+      if (!type || reactFlowInstance === null) return;
 
       const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
       });
       let nodeId = `dnd-${type}-${getId()}`;
-      while (nodeId in nodeMap) nodeId = `dnd-${type}-${getId()}`; // To prevent duplicates from loading existing graph
+      while (nodeId in nodeTypeMap) nodeId = `dnd-${type}-${getId()}`; // To prevent duplicates from loading existing graph
 
       const initState = initNode(type);
       const newNode: Node = {id: nodeId, type, position, data: {}};
@@ -430,7 +426,7 @@ const Graph = ({
       if (initState.data.settings)
         setNodeSettings(nodeId, initState.data.settings);
     },
-    [getId, nodeMap, reactFlowInstance, setNodes]
+    [getId, nodeTypeMap, reactFlowInstance, setNodes]
   );
 
   const dragAndDropNodes = getDragAndDropNodes(t);
@@ -541,8 +537,8 @@ const Graph = ({
                       change =>
                         change.type !== 'remove' ||
                         delCourseParts.includes(change.id) ||
-                        (nodeMap[change.id].type !== 'coursepart' &&
-                          nodeMap[change.id].type !== 'grade')
+                        (nodeTypeMap[change.id] !== 'coursepart' &&
+                          nodeTypeMap[change.id] !== 'grade')
                     )
                   )
                 }
@@ -580,9 +576,12 @@ const Graph = ({
               <>
                 <div style={{marginBottom: '5px'}}>
                   {dragAndDropNodes.map(dragAndDropNode => (
-                    <Tooltip title={dragAndDropNode.tooltip} placement="top">
+                    <Tooltip
+                      key={dragAndDropNode.type}
+                      title={dragAndDropNode.tooltip}
+                      placement="top"
+                    >
                       <div
-                        key={dragAndDropNode.type}
                         className="dnd-node"
                         onDragStart={event =>
                           onDragStart(event, dragAndDropNode.type)

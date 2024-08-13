@@ -12,7 +12,7 @@ import {
   FormControlLabel,
   FormGroup,
 } from '@mui/material';
-import {JSX, useEffect, useState} from 'react';
+import {JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Node} from 'reactflow';
 
@@ -40,27 +40,13 @@ const SelectCoursePartsDialog = ({
       .filter(node => node.type === 'coursepart')
       .map(node => parseInt(node.id.split('-')[1]))
   );
-
-  const initSelected: {[key: number]: boolean} = {};
-  for (const coursePart of courseParts) initSelected[coursePart.id] = false;
-  const [startSelected, setStartSelected] = useState<{[key: number]: boolean}>(
-    initSelected
+  const startSelected = Object.fromEntries(
+    courseParts.map(({id}) => [id, coursePartNodeIds.has(id)])
   );
+
   const [selected, setSelected] = useState<{[key: number]: boolean}>(
-    initSelected
+    startSelected
   );
-
-  useEffect(() => {
-    if (!open) return;
-    const newSelected: {[key: number]: boolean} = {};
-    for (const coursePart of courseParts) {
-      newSelected[coursePart.id] = coursePartNodeIds.has(coursePart.id);
-    }
-    if (JSON.stringify(newSelected) === JSON.stringify(startSelected)) return;
-
-    setSelected(newSelected);
-    setStartSelected(newSelected);
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSelect = (id: number): void => {
     setSelected(oldSelected => ({

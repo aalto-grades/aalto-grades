@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
+import {ChangeEvent, JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position} from 'reactflow';
 
@@ -15,10 +15,6 @@ import BaseNode from './BaseNode';
 
 type OnFailSetting = 'coursefail' | 'fail';
 type LocalSettings = {onFailSetting: OnFailSetting; minPoints: string};
-const initialSettings: LocalSettings = {
-  onFailSetting: 'coursefail',
-  minPoints: '',
-};
 
 const CoursePartNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
@@ -26,24 +22,17 @@ const CoursePartNode = (props: NodeProps): JSX.Element => {
 
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
+
+  const settings = nodeData[id].settings as CoursePartNodeSettings;
+  const initSettings = {
+    ...settings,
+    minPoints: settings.minPoints !== null ? settings.minPoints.toString() : '',
+  };
   const [localSettings, setLocalSettings] =
-    useState<LocalSettings>(initialSettings);
+    useState<LocalSettings>(initSettings);
   const [error, setError] = useState<boolean>(false);
-  const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as CoursePartNodeValue;
-  const settings = nodeData[id].settings as CoursePartNodeSettings;
-
-  useEffect(() => {
-    if (init) return;
-    setLocalSettings({
-      ...settings,
-      minPoints:
-        settings.minPoints !== null ? settings.minPoints.toString() : '',
-    });
-    setError(false);
-    setInit(true);
-  }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>): void => {
     if (localSettings.onFailSetting === event.target.value) return;

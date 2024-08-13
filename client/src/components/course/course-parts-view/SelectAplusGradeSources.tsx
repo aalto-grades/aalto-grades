@@ -92,6 +92,7 @@ const SelectAplusGradeSources = ({
           <FormGroup>
             {aplusExerciseData.data.modules.map(module => (
               <FormControlLabel
+                key={module.id}
                 control={
                   <Checkbox
                     defaultChecked={isChecked(
@@ -126,6 +127,7 @@ const SelectAplusGradeSources = ({
             {aplusExerciseData.data.modules.map(module =>
               module.exercises.map(exercise => (
                 <FormControlLabel
+                  key={exercise.id}
                   control={
                     <Checkbox
                       defaultChecked={isChecked(
@@ -161,6 +163,7 @@ const SelectAplusGradeSources = ({
             <FormGroup>
               {aplusExerciseData.data.difficulties.map(difficulty => (
                 <FormControlLabel
+                  key={difficulty.difficulty}
                   control={
                     <Checkbox
                       defaultChecked={isChecked(

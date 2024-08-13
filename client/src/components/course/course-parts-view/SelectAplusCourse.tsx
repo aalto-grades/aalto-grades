@@ -3,19 +3,30 @@
 // SPDX-License-Identifier: MIT
 
 import {Autocomplete, Box, TextField} from '@mui/material';
-import {JSX, useEffect, useState} from 'react';
+import {JSX, useCallback, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {AplusCourseData} from '@/common/types';
 import {useGetCourse} from '@/hooks/useApi';
 
+type CourseOption = {label: string; courseCode: string};
+const getCourseOption = (option: AplusCourseData): CourseOption => ({
+  label: `${option.courseCode} - ${option.name}`,
+  courseCode: option.courseCode,
+});
+
+type InstanceOption = {label: string; courseId: number};
+const getInstanceOption = (option: AplusCourseData): InstanceOption => ({
+  label: option.instance,
+  courseId: option.id,
+});
+
 type PropsType = {
   aplusCourses: AplusCourseData[];
   selectedAplusCourse: AplusCourseData | null;
   setAplusCourse: (course: AplusCourseData | null) => void;
 };
-
 const SelectAplusCourse = ({
   aplusCourses,
   selectedAplusCourse,
@@ -25,58 +36,53 @@ const SelectAplusCourse = ({
   const {courseId} = useParams() as {courseId: string};
   const course = useGetCourse(courseId);
 
-  // Course code
-  const [selectedCourse, setSelectedCourse] = useState<string | null>(
-    selectedAplusCourse?.courseCode ?? null
+  const [selectedCourse, setSelectedCourse] = useState<CourseOption | null>(
+    selectedAplusCourse ? getCourseOption(selectedAplusCourse) : null
+  );
+  const [selectedInstance, setSelectedInstance] =
+    useState<InstanceOption | null>(
+      selectedAplusCourse ? getInstanceOption(selectedAplusCourse) : null
+    );
+
+  const setInstance = useCallback(
+    (aplusCourse: AplusCourseData | undefined): void => {
+      setSelectedInstance(
+        aplusCourse !== undefined ? getInstanceOption(aplusCourse) : null
+      );
+      setAplusCourse(aplusCourse ?? null);
+    },
+    [setAplusCourse]
   );
 
-  // Instance name, used to set the default selected instance
-  const [selectedInstance, setSelectedInstance] = useState<string | null>(
-    selectedAplusCourse?.instance ?? null
+  const setCourse = useCallback(
+    (courseCode: string | undefined): void => {
+      const aplusCourse = aplusCourses.find(ac => ac.courseCode === courseCode);
+
+      setSelectedCourse(
+        aplusCourse !== undefined ? getCourseOption(aplusCourse) : null
+      );
+      setInstance(aplusCourse);
+    },
+    [aplusCourses, setInstance]
   );
-
-  const setInstance = (aplusCourse: AplusCourseData | undefined): void => {
-    setSelectedInstance(aplusCourse?.instance ?? null);
-    setAplusCourse(aplusCourse ?? null);
-  };
-
-  const setCourse = (aplusCourse: AplusCourseData | undefined): void => {
-    setSelectedCourse(aplusCourse?.courseCode ?? null);
-    setInstance(aplusCourse);
-  };
 
   const courseOptions = aplusCourses
+    // Only take first instance
     .filter(
       (a, index) =>
         index === aplusCourses.findIndex(b => a.courseCode === b.courseCode)
     )
-    .map(option => ({
-      label: `${option.courseCode} - ${option.name}`,
-      courseCode: option.courseCode,
-    }));
-
-  const defaultCourse = courseOptions.find(
-    option =>
-      option.courseCode ===
-      (selectedAplusCourse?.courseCode ?? course.data?.courseCode)
-  );
+    .map(getCourseOption);
 
   const instanceOptions = aplusCourses
-    .filter(aplusCourse => aplusCourse.courseCode === selectedCourse)
-    .map(option => ({
-      label: option.instance,
-      courseId: option.id,
-    }));
+    .filter(
+      aplusCourse => aplusCourse.courseCode === selectedCourse?.courseCode
+    )
+    .map(getInstanceOption);
 
   useEffect(() => {
-    if (!selectedAplusCourse) {
-      setCourse(
-        aplusCourses.find(
-          aplusCourse => aplusCourse.courseCode === defaultCourse?.courseCode
-        )
-      );
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!selectedAplusCourse) setCourse(course.data?.courseCode);
+  }, [course.data?.courseCode, selectedAplusCourse, setCourse]);
 
   if (!course.data) return <></>;
 
@@ -84,36 +90,31 @@ const SelectAplusCourse = ({
     <Box sx={{display: 'flex', mt: 1}}>
       <Autocomplete
         sx={{width: 400}}
-        onChange={(_, value) => {
-          setCourse(
-            aplusCourses.find(
-              aplusCourse => aplusCourse.courseCode === value?.courseCode
-            )
-          );
-        }}
+        value={selectedCourse}
+        onChange={(_, value) => setCourse(value?.courseCode)}
         options={courseOptions}
         renderInput={params => (
           <TextField {...params} label={t('general.course.singular')} />
         )}
-        defaultValue={defaultCourse}
+        isOptionEqualToValue={(option, value) =>
+          option.courseCode === value.courseCode
+        }
       />
       <Autocomplete
-        disabled={!selectedCourse}
         sx={{width: 200, ml: 1}}
+        value={selectedInstance}
         onChange={(_, value) =>
           setInstance(
             aplusCourses.find(aplusCourse => aplusCourse.id === value?.courseId)
           )
         }
+        disabled={!selectedCourse}
         options={instanceOptions}
         renderInput={params => (
           <TextField {...params} label={t('general.instance')} />
         )}
-        value={
-          // We must return null instead of undefined, otherwise this
-          // Autocomplete is considered uncontrolled and our logic breaks
-          instanceOptions.find(option => option.label === selectedInstance) ??
-          null
+        isOptionEqualToValue={(option, value) =>
+          option.courseId === value.courseId
         }
       />
     </Box>

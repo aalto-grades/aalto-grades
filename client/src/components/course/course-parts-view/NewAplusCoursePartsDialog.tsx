@@ -156,7 +156,7 @@ const NewAplusCoursePartsDialog = ({
             <SelectAplusCourse
               aplusCourses={aplusCourses.data}
               selectedAplusCourse={aplusCourse}
-              setAplusCourse={(course: AplusCourseData | null) => {
+              setAplusCourse={course => {
                 setAplusCourse(course);
                 if (course) setCoursePartsWithSource([]);
               }}

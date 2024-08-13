@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {JSX, useContext, useEffect, useState} from 'react';
+import {JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 
@@ -11,11 +11,6 @@ import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
 type LocalSettings = {numFail: string; onFailSetting: 'coursefail' | 'fail'};
-const initialSettings: LocalSettings = {
-  numFail: '0',
-  onFailSetting: 'coursefail',
-};
-
 const handleStartHeight = 128.5;
 const rowHeight = 33.9;
 
@@ -27,24 +22,20 @@ const RequireNode = (props: NodeProps): JSX.Element => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
+  const settings = nodeData[id].settings as RequireNodeSettings;
+  const initSettings = {...settings, numFail: settings.numFail.toString()};
   const [localSettings, setLocalSettings] =
-    useState<LocalSettings>(initialSettings);
+    useState<LocalSettings>(initSettings);
   const [nextFree, setNextFree] = useState<number>(0);
   const [handles, setHandles] = useState<string[]>([]);
   const [error, setError] = useState<boolean>(false);
-  const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as RequireNodeValue;
-  const settings = nodeData[id].settings as RequireNodeSettings;
 
-  useEffect(() => {
-    if (init) return;
-    setLocalSettings({...settings, numFail: settings.numFail.toString()});
-    setError(false);
-    setInit(true);
-  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [oldSources, setOldSources] = useState<typeof nodeValue.sources>({});
+  if (JSON.stringify(nodeValue.sources) !== JSON.stringify(oldSources)) {
+    setOldSources(structuredClone(nodeValue.sources));
 
-  useEffect(() => {
     let change = false;
     let maxId = 0;
     let newHandles = [...handles];
@@ -64,7 +55,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
       setHandles(newHandles);
       setNextFree(maxId + 1);
     }
-  }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
+  }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const newLocalSettings = {...localSettings};

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {JSX, useContext, useEffect, useState} from 'react';
+import {JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -25,7 +25,10 @@ const AdditionNode = (props: NodeProps): JSX.Element => {
 
   const nodeValue = nodeValues[id] as AdditionNodeValue;
 
-  useEffect(() => {
+  const [oldSources, setOldSources] = useState<typeof nodeValue.sources>({});
+  if (JSON.stringify(nodeValue.sources) !== JSON.stringify(oldSources)) {
+    setOldSources(structuredClone(nodeValue.sources));
+
     let change = false;
     let maxId = 0;
     let newHandles = [...handles];
@@ -45,7 +48,7 @@ const AdditionNode = (props: NodeProps): JSX.Element => {
       setHandles(newHandles);
       setNextFree(maxId + 1);
     }
-  }, [nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
+  }
 
   return (
     <BaseNode {...props}>

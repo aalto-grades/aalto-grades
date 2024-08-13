@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {JSX, useContext, useEffect, useState} from 'react';
+import {JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position} from 'reactflow';
 
@@ -14,11 +14,6 @@ type LocalSettings = {
   numSteps: number;
   outputValues: string[];
   middlePoints: string[];
-};
-const initialSettings = {
-  numSteps: 1,
-  middlePoints: [],
-  outputValues: ['0'],
 };
 
 const checkError = (settings: LocalSettings): boolean => {
@@ -51,24 +46,18 @@ const StepperNode = (props: NodeProps): JSX.Element => {
 
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
+
+  const settings = nodeData[id].settings as StepperNodeSettings;
+  const initSettings = {
+    numSteps: settings.numSteps,
+    middlePoints: settings.middlePoints.map(val => val.toString()),
+    outputValues: settings.outputValues.map(val => val.toString()),
+  };
   const [localSettings, setLocalSettings] =
-    useState<LocalSettings>(initialSettings);
+    useState<LocalSettings>(initSettings);
   const [error, setError] = useState<boolean>(false);
-  const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as StepperNodeValue;
-  const settings = nodeData[id].settings as StepperNodeSettings;
-
-  useEffect(() => {
-    if (init) return;
-    setLocalSettings({
-      numSteps: settings.numSteps,
-      middlePoints: settings.middlePoints.map(val => val.toString()),
-      outputValues: settings.outputValues.map(val => val.toString()),
-    });
-    setInit(true);
-    setError(false);
-  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (
     type: 'middlePoint' | 'outputValue',
