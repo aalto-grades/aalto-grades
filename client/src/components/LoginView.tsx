@@ -158,7 +158,7 @@ const LoginView = (): JSX.Element => {
               {showOtpPrompt && (
                 <MuiOtpInput
                   data-testid="mfa-input"
-                  title="Mfa code"
+                  title={t('auth.login.local.mfa-code')}
                   sx={{my: 1}}
                   length={6}
                   value={otp}
