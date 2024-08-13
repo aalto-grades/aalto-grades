@@ -87,8 +87,7 @@
     "done": "UNTRANSLATED",
     "in-english": "UNTRANSLATED",
     "in-finnish": "UNTRANSLATED",
-    "in-swedish": "UNTRANSLATED",
-    "select-course-parts": "UNTRANSLATED"
+    "in-swedish": "UNTRANSLATED"
   },
   "alerts": {
     "unsaved-changes": {
@@ -114,15 +113,18 @@
       "body": "UNTRANSLATED",
       "button": "UNTRANSLATED"
     },
+    "login-title": "UNTRANSLATED",
     "local": {
       "title": "UNTRANSLATED",
       "body": "UNTRANSLATED",
+      "enter-otp": "UNTRANSLATED",
       "button": "UNTRANSLATED"
     },
     "mfa-qr": {
       "title": "UNTRANSLATED",
       "scan": "UNTRANSLATED",
       "manual": "UNTRANSLATED",
+      "enter-otp": "UNTRANSLATED",
       "cancel": "UNTRANSLATED",
       "close-without-confirm": "UNTRANSLATED"
     },
@@ -131,8 +133,7 @@
     "reset-mfa-secret": "UNTRANSLATED",
     "reset-mfa-secret-message": "UNTRANSLATED",
     "reset-mfa": "UNTRANSLATED",
-    "log-out": "UNTRANSLATED",
-    "enter-totp": "UNTRANSLATED"
+    "log-out": "UNTRANSLATED"
   },
   "course-results": {
     "model-has-deleted-and-archived": "UNTRANSLATED",
@@ -208,6 +209,7 @@
         "singular": "UNTRANSLATED",
         "plural": "UNTRANSLATED"
       },
+      "select-course-parts": "UNTRANSLATED",
       "fetching-grades": "UNTRANSLATED",
       "select-for-fetching": "UNTRANSLATED",
       "fetching-grades-wait": "UNTRANSLATED",
@@ -231,7 +233,9 @@
     "create-model": {
       "title": "UNTRANSLATED",
       "select-template": "UNTRANSLATED",
-      "none": "UNTRANSLATED"
+      "none": "UNTRANSLATED",
+      "addition": "UNTRANSLATED",
+      "average": "UNTRANSLATED"
     },
     "edit-course": {
       "saved": "UNTRANSLATED"
@@ -375,6 +379,7 @@
     "percentage-mode": "UNTRANSLATED",
     "weight": "UNTRANSLATED",
     "value": "UNTRANSLATED",
+    "average": "UNTRANSLATED",
     "min-points": "UNTRANSLATED",
     "fail-course": "UNTRANSLATED",
     "output-fail": "UNTRANSLATED",
@@ -409,6 +414,7 @@
       "plural": "UNTRANSLATED",
       "singular": "UNTRANSLATED"
     },
+    "select-parts": "UNTRANSLATED",
     "test-values": "UNTRANSLATED",
     "format": "UNTRANSLATED",
     "on-fail": "UNTRANSLATED",

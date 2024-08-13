@@ -105,7 +105,7 @@ const LoginView = (): JSX.Element => {
         alignItems="center"
         justifyContent="center"
       >
-        <Typography variant="h2">{t('auth.local.title')}</Typography>
+        <Typography variant="h2">{t('auth.login-title')}</Typography>
         <ExternalAuth />
         <Box
           sx={{
@@ -152,7 +152,7 @@ const LoginView = (): JSX.Element => {
               margin="normal"
             />
             <Collapse in={showOtpPrompt}>
-              <Typography sx={{mt: 1}}>{t('auth.enter-totp')}</Typography>
+              <Typography sx={{mt: 1}}>{t('auth.local.enter-otp')}</Typography>
               {showOtpPrompt && (
                 <MuiOtpInput
                   data-testid="mfa-input"

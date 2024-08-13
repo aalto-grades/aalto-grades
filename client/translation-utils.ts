@@ -6,7 +6,6 @@
 
 import fs from 'fs';
 import path from 'node:path';
-import readlineSync from 'readline-sync';
 
 type TranslationJson = {[key: string]: TranslationJson | string | undefined};
 
@@ -208,6 +207,7 @@ function updateTranslation(file: File, changes: Change[]): void {
   for (const change of changes) {
     const value = get(original, change.before);
     set(updated, change.before, undefined);
+    console.log(value);
     set(updated, change.after, value);
   }
 
@@ -228,58 +228,7 @@ function rename(): void {
 function merge(): void {
   const fileEntries = parseFileEntries(File.English);
   const duplicates = findDuplicateValues(fileEntries.entries);
-
-  if (duplicates.length === 0) {
-    console.log('No duplicate values found, nothing to do.');
-    return;
-  }
-
-  console.log(
-    'The following keys have the same values. Please enter the index of the key to ' +
-      'use for the values or enter a new key.'
-  );
-
-  const changes: Change[] = [];
-  for (const duplicate of duplicates) {
-    const max = duplicate.keys.length - 1;
-
-    let question = `\n'${duplicate.value}'\n`;
-    duplicate.keys.forEach((key, i) => (question += `${i}: ${key}\n`));
-    question += `[0-${max} or new key]: `;
-
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    while (true) {
-      let chosenKey = readlineSync.question(question);
-      const selection = Number(chosenKey);
-
-      if (!isNaN(selection)) {
-        if (!Number.isInteger(selection)) {
-          console.log('\nERROR: Selection must be an integer.');
-          continue;
-        }
-        if (selection < 0 || selection > max) {
-          console.log(`\nERROR: Selection must be between 0 and ${max}.`);
-          continue;
-        }
-        chosenKey = duplicate.keys[selection];
-      }
-
-      for (const key of duplicate.keys) {
-        if (key !== chosenKey) {
-          changes.push({
-            before: key,
-            after: chosenKey,
-          });
-        }
-      }
-      break;
-    }
-  }
-
-  updateSourceCode(changes);
-  updateTranslation(File.English, changes);
-  updateTranslation(File.Finnish, changes);
-  updateTranslation(File.Swedish, changes);
+  console.log(duplicates);
 }
 
 const args = process.argv.slice(2);
@@ -299,5 +248,5 @@ switch (command) {
     break;
 
   default:
-    console.error(`Unrecognized command '${command}'`);
+    console.error(`Unrecognized command ${command}`);
 }

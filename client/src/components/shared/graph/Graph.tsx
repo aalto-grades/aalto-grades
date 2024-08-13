@@ -723,7 +723,7 @@ const Graph = ({
                     onClick={() => setCoursePartsSelectOpen(true)}
                     variant="outlined"
                   >
-                    {t('general.select-course-parts')}
+                    {t('graph.select-parts')}
                   </Button>
                   <Button
                     onClick={() => setCoursePartValuesOpen(true)}
