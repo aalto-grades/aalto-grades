@@ -61,8 +61,8 @@
       "saved": "Model saved successfully",
       "has-final-grades": "Model has final grades",
       "course-failed": "Course failed",
-      "delete-node_other": "Delete nodes",
       "delete-node_one": "Delete node",
+      "delete-node_other": "Delete nodes",
       "test-values": "Test values",
       "format": "Format",
       "inputs": "Inputs",
@@ -401,18 +401,18 @@
     "local": {
       "title": "Log in to Aalto Grades",
       "body": "If you have been provided with credentials specifically for Aalto Grades, use this login.",
-      "button": "Log in",
-      "mfa-code": "MFA code"
+      "mfa-code": "MFA code",
+      "button": "Log in"
     }
   },
   "manage-students": {
     "latest-grade": "Latest grade",
-    "delete_other": "Delete students",
     "delete_one": "Delete student",
-    "delete-message_other": "All of the data of the students will be deleted permanently!",
+    "delete_other": "Delete students",
     "delete-message_one": "All of the data of the student will be deleted permanently!",
-    "delete-success_other": "Students deleted",
+    "delete-message_other": "All of the data of the students will be deleted permanently!",
     "delete-success_one": "Student deleted",
+    "delete-success_other": "Students deleted",
     "title": "Manage students"
   },
   "not-found": {

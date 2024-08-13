@@ -61,8 +61,8 @@
       "saved": "UNTRANSLATED",
       "has-final-grades": "UNTRANSLATED",
       "course-failed": "UNTRANSLATED",
-      "delete-node_other": "UNTRANSLATED",
       "delete-node_one": "UNTRANSLATED",
+      "delete-node_other": "UNTRANSLATED",
       "test-values": "UNTRANSLATED",
       "format": "UNTRANSLATED",
       "inputs": "UNTRANSLATED",
@@ -401,17 +401,18 @@
     "local": {
       "title": "UNTRANSLATED",
       "body": "UNTRANSLATED",
+      "mfa-code": "UNTRANSLATED",
       "button": "UNTRANSLATED"
     }
   },
   "manage-students": {
     "latest-grade": "UNTRANSLATED",
-    "delete_other": "UNTRANSLATED",
     "delete_one": "UNTRANSLATED",
-    "delete-message_other": "UNTRANSLATED",
+    "delete_other": "UNTRANSLATED",
     "delete-message_one": "UNTRANSLATED",
-    "delete-success_other": "UNTRANSLATED",
+    "delete-message_other": "UNTRANSLATED",
     "delete-success_one": "UNTRANSLATED",
+    "delete-success_other": "UNTRANSLATED",
     "title": "UNTRANSLATED"
   },
   "not-found": {

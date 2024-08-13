@@ -587,7 +587,7 @@ const Graph = ({
             severity="info"
             // variant="outlined"
           >
-            {t('general.unsaved-changed')}
+            {t('general.unsaved-changes')}
           </Alert>
         )}
         {unsaved && modelHasFinalGrades && (
