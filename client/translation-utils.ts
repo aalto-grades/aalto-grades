@@ -149,8 +149,8 @@ function updateSourceCode(changes: Change[]): void {
     for (const file of files) {
       const data = fs.readFileSync(file, 'utf8');
 
-      const oldRegExp = new RegExp(`t\\(\\s*'${escapeRegExp(change.before)}'`);
-      const result = data.replace(oldRegExp, `t('${change.after}'`);
+      const oldRegExp = new RegExp(`t\\(\\s*'${escapeRegExp(change.before)}'`, 'g');
+      const result = data.replaceAll(oldRegExp, `t('${change.after}'`);
       fs.writeFileSync(file, result, 'utf8');
     }
   }
@@ -165,14 +165,14 @@ function updateTranslation(file: File, changes: Change[]): void {
   fs.copyFileSync(file, backup);
 
   const entries = parseFileEntries(file).entries;
+  const updated = structuredClone(entries);
 
   for (const change of changes) {
-    (entries.find(entry => entry.key === change.before) as Entry).key =
-      change.after;
+    updated[entries.findIndex(entry => entry.key === change.before)].key = change.after;
   }
 
   const object: TranslationJson = {};
-  for (const entry of entries) {
+  for (const entry of updated) {
     const keyParts = entry.key.split('.');
 
     let iter: TranslationJson = object;

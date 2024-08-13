@@ -96,7 +96,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
             onChange={form.handleChange}
           />
         }
-        label={t('general.admin.singular')}
+        label={t('general.admin')}
       />
       <FormField
         form={form as unknown as FormikProps<{[key: string]: unknown}>}

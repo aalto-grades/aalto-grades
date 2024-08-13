@@ -61,7 +61,7 @@ const AddAplusGradeSourceDialog = ({
         {step === 0 && <DialogTitle>{t('general.a+-courses')}</DialogTitle>}
         {step === 1 && (
           <DialogTitle>
-            {t('course.a+.select-grade-source.singular')}
+            {t('course.parts.select-grade-source')}
           </DialogTitle>
         )}
         <DialogContent>

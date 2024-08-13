@@ -57,12 +57,12 @@ const RoundNode = (props: NodeProps): JSX.Element => {
         onChange={handleSelectChange}
         value={localSettings.roundingSetting}
       >
-        <option value="round-up">{t('graph.round-up')}</option>
-        <option value="round-closest">{t('graph.round-closest')}</option>
-        <option value="round-down">{t('graph.round-down')}</option>
+        <option value="round-up">{t('shared.graph.round-up')}</option>
+        <option value="round-closest">{t('shared.graph.round-closest')}</option>
+        <option value="round-down">{t('shared.graph.round-down')}</option>
       </select>
       <p className="output-value">
-        {t('graph.output')}: {Math.round(nodeValue.value * 100) / 100}
+        {t('shared.graph.output')}: {Math.round(nodeValue.value * 100) / 100}
       </p>
 
       <Handle

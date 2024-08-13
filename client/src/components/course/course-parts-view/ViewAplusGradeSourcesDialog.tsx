@@ -62,17 +62,17 @@ const ViewAplusGradeSourcesDialog = ({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="lg">
-      <DialogTitle>{t('general.a+-sources')}</DialogTitle>
+      <DialogTitle>{t('general.a+-grade-sources')}</DialogTitle>
       <DialogContent>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>{t('general.course-code')}</TableCell>
-                <TableCell>{t('course.view-a+-source.course-name')}</TableCell>
+                <TableCell>{t('general.course-name')}</TableCell>
                 <TableCell>{t('general.instance')}</TableCell>
-                <TableCell>{t('course.view-a+-source.url')}</TableCell>
-                <TableCell>{t('course.view-a+-source.source-name')}</TableCell>
+                <TableCell>{t('general.course-url')}</TableCell>
+                <TableCell>{t('general.source-name')}</TableCell>
                 <TableCell>{t('general.date')}</TableCell>
               </TableRow>
             </TableHead>
@@ -92,7 +92,7 @@ const ViewAplusGradeSourcesDialog = ({
                   <TableCell>
                     <Tooltip
                       placement="top"
-                      title={t('course.view-a+-source.delete')}
+                      title={t('course.parts.delete-a+')}
                     >
                       <IconButton onClick={() => handleDelete(source.id)}>
                         <Delete />

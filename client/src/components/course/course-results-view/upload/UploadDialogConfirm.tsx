@@ -137,7 +137,7 @@ const UploadDialogConfirm = ({
       <DialogContent>
         {invalidValues && (
           <Alert severity="warning" sx={{mb: 2}}>
-            {t('course.upload.higher-than-max')}
+            {t('course.results.upload.higher-than-max')}
           </Alert>
         )}
 
@@ -146,12 +146,12 @@ const UploadDialogConfirm = ({
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'date' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            {t('course.upload.dates')}
+            {t('course.results.upload.dates')}
           </AccordionSummary>
           <AccordionDetails>
             {dates.length > nonEmptyCols.length && (
               <Alert severity="info" sx={{mb: 1}}>
-                {t('course.upload.hidden')}
+                {t('course.results.upload.hidden')}
               </Alert>
             )}
             <LocalizationProvider
@@ -162,12 +162,12 @@ const UploadDialogConfirm = ({
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>{t('general.course-part.singular')}</TableCell>
+                      <TableCell>{t('general.course-part')}</TableCell>
                       <TableCell>
-                        {t('course.upload.completion-date')}
+                        {t('course.results.upload.completion-date')}
                       </TableCell>
                       <TableCell>
-                        {t('course.upload.expiration-date')}
+                        {t('course.results.upload.expiration-date')}
                       </TableCell>
                     </TableRow>
                   </TableHead>
@@ -200,8 +200,7 @@ const UploadDialogConfirm = ({
                                     date.expirationDate <= date.completionDate,
                                   helperText:
                                     date.expirationDate <= date.completionDate
-                                      ? t(
-                                          'course.upload.expiration-after-completion'
+                                      ? t('course.results.upload.expiration-after-completion'
                                         )
                                       : '',
                                 },
@@ -236,7 +235,7 @@ const UploadDialogConfirm = ({
           disabled={error}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            {t('course.upload.confirm-data')}
+            {t('course.results.upload.confirm-data')}
           </AccordionSummary>
           <AccordionDetails>
             <div style={{height: '70vh'}}>

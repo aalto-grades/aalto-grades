@@ -47,8 +47,8 @@ const UserButton = (): JSX.Element => {
   const handleResetMfa = async (): Promise<void> => {
     setAnchorEl(null);
     const confirmation = await AsyncConfirmationModal({
-      title: t('auth.reset-mfa-secret'),
-      message: t('auth.reset-mfa-secret-message'),
+      title: t('shared.auth.reset-mfa-secret'),
+      message: t('shared.auth.reset-mfa-secret-message'),
     });
     if (!confirmation) return;
 
@@ -89,7 +89,7 @@ const UserButton = (): JSX.Element => {
           <OtpAuthDialog
             open={showMfaDialog}
             otpAuth={otpAuth}
-            cancelText={t('auth.mfa-qr.close-without-confirm')}
+            cancelText={t('shared.auth.otp-auth.close-without-confirm')}
             onCancel={() => {
               setShowMfaDialog(false);
               setOtpAuth(null);
@@ -133,7 +133,7 @@ const UserButton = (): JSX.Element => {
             setAplusTokenDialogOpen(true);
           }}
         >
-          {t('general.a+-token')}
+          {t('general.a+-api-token')}
         </MenuItem>
         {auth.role === SystemRole.Admin && [
           <MenuItem
@@ -143,13 +143,13 @@ const UserButton = (): JSX.Element => {
               setChangePasswordDialogOpen(true);
             }}
           >
-            {t('auth.change-password')}
+            {t('shared.auth.change-password')}
           </MenuItem>,
           <MenuItem key="reset-mfa" onClick={handleResetMfa}>
-            {t('auth.reset-mfa')}
+            {t('shared.auth.reset-mfa')}
           </MenuItem>,
         ]}
-        <MenuItem onClick={handleLogOut}>{t('auth.log-out')}</MenuItem>
+        <MenuItem onClick={handleLogOut}>{t('shared.auth.log-out')}</MenuItem>
       </Menu>
     </>
   );

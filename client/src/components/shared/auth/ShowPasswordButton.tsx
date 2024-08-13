@@ -18,7 +18,7 @@ const ShowPasswordButton = ({shown, onClick}: ButtonPropsType): JSX.Element => {
         slotProps={{
           popper: {modifiers: [{name: 'offset', options: {offset: [0, -8]}}]},
         }}
-        title={shown ? t('auth.hide-password') : t('auth.show-password')}
+        title={shown ? t('shared.auth.hide-password') : t('shared.auth.show-password')}
       >
         <IconButton
           aria-label="toggle password visibility"

@@ -71,7 +71,7 @@ const FrontPageView = (): JSX.Element => {
             }}
           >
             <Typography variant="h2" align="left" sx={{flexGrow: 1}}>
-              {t('general.course.plural')}
+              {t('general.courses')}
             </Typography>
             <Button
               id="ag-new-course-btn"
