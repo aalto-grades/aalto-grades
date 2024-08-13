@@ -90,7 +90,7 @@ const PredictedGradeCell = ({
       </Tooltip>
       {gradingModelIds !== undefined && gradingModelIds.length > 0 && hover && (
         <Tooltip
-          title={t('course-results.view-graph')}
+          title={t('course.results.view-graph')}
           placement="top"
           disableInteractive
         >

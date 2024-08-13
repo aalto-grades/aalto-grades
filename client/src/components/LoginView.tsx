@@ -105,7 +105,7 @@ const LoginView = (): JSX.Element => {
         alignItems="center"
         justifyContent="center"
       >
-        <Typography variant="h2">{t('auth.local.title')}</Typography>
+        <Typography variant="h2">{t('login.local.title')}</Typography>
         <ExternalAuth />
         <Box
           sx={{
@@ -120,7 +120,7 @@ const LoginView = (): JSX.Element => {
             {t('auth.local.title')}
           </Typography>
           <Typography variant="body2" sx={{mb: 1}}>
-            {t('auth.local.body')}
+            {t('login.local.body')}
           </Typography>
           <form onSubmit={handleSubmit}>
             <TextField
@@ -152,7 +152,9 @@ const LoginView = (): JSX.Element => {
               margin="normal"
             />
             <Collapse in={showOtpPrompt}>
-              <Typography sx={{mt: 1}}>{t('auth.enter-totp')}</Typography>
+              <Typography sx={{mt: 1}}>
+                {t('shared.auth.enter-totp')}
+              </Typography>
               {showOtpPrompt && (
                 <MuiOtpInput
                   data-testid="mfa-input"
@@ -174,7 +176,7 @@ const LoginView = (): JSX.Element => {
               sx={{mt: 1}}
               disabled={email === '' || password === ''}
             >
-              {t('auth.local.button')}
+              {t('login.local.button')}
             </Button>
           </form>
         </Box>

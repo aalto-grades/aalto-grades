@@ -40,7 +40,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
   const getCourseRoleString = useCallback(
     (course: CourseData): string => {
       if (auth === null) return t('front-page.not-logged-in');
-      if (auth.role === SystemRole.Admin) return t('general.admin.singular');
+      if (auth.role === SystemRole.Admin) return t('general.admin');
 
       const courseRole = getCourseRole(course, auth);
 
@@ -48,7 +48,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
         case CourseRoleType.Teacher:
           return t('general.teacher');
         case CourseRoleType.Assistant:
-          return t('general.assistant.singular');
+          return t('general.assistant');
         case CourseRoleType.Student:
           return t('general.student');
       }

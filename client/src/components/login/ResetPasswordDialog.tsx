@@ -63,11 +63,11 @@ const ResetPasswordDialog = ({
     })
     .refine(val => val.newPassword === val.repeatPassword, {
       path: ['repeatPassword'],
-      message: t('auth.password.match'),
+      message: t('shared.auth.password.match'),
     })
     .refine(val => val.oldPassword !== val.newPassword, {
       path: ['newPassword'],
-      message: t('auth.password.old'),
+      message: t('shared.auth.password.old'),
     });
 
   const initialValues = {
@@ -90,7 +90,7 @@ const ResetPasswordDialog = ({
       return;
     }
 
-    enqueueSnackbar(t('auth.password.reset-done'), {variant: 'success'});
+    enqueueSnackbar(t('shared.auth.password.reset-done'), {variant: 'success'});
     onReset(values.newPassword);
     resetForm();
   };
@@ -146,7 +146,7 @@ const ResetPasswordDialog = ({
                     form as unknown as FormikProps<{[key: string]: unknown}>
                   }
                   value="newPassword"
-                  label={`${t('auth.password.new')}*`}
+                  label={`${t('shared.auth.password.new')}*`}
                   type={showPassword.new ? 'text' : 'password'}
                   InputProps={{
                     endAdornment: <ShowPasswordButton type="new" />,
@@ -157,7 +157,7 @@ const ResetPasswordDialog = ({
                     form as unknown as FormikProps<{[key: string]: unknown}>
                   }
                   value="repeatPassword"
-                  label={`${t('auth.password.repeat')}*`}
+                  label={`${t('shared.auth.password.repeat')}*`}
                   type={showPassword.repeat ? 'text' : 'password'}
                   InputProps={{
                     endAdornment: <ShowPasswordButton type="repeat" />,
@@ -174,7 +174,7 @@ const ResetPasswordDialog = ({
                     href="https://www.aalto.fi/en/services/password-guidelines"
                     target="_blank"
                   >
-                    {t('auth.password.requirements')}
+                    {t('shared.auth.password.requirements')}
                   </Link>
                 </Box>
               </Grid>
