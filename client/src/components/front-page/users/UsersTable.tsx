@@ -74,7 +74,7 @@ const UsersTable = (): JSX.Element => {
         sx={{width: 'fit-content' /* Fix buttons not being clickable */}}
       >
         <Tab label={t('general.idp-users')} sx={{textTransform: 'none'}} />
-        <Tab label={t('general.admins')} sx={{textTransform: 'none'}} />
+        <Tab label={t('general.admin.plural')} sx={{textTransform: 'none'}} />
       </Tabs>
       <Box sx={{px: 1}}>
         <Table>

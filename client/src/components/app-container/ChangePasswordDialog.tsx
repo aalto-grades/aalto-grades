@@ -49,7 +49,7 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
     })
     .refine(val => val.newPassword === val.repeatPassword, {
       path: ['repeatPassword'],
-      message: t('shared.auth.password.match'),
+      message: t('auth.password.match'),
     });
 
   const handleSubmit = async (
@@ -66,7 +66,7 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
       setSubmitting(false);
       return;
     }
-    enqueueSnackbar(t('shared.auth.password.changed'), {variant: 'success'});
+    enqueueSnackbar(t('auth.password.changed'), {variant: 'success'});
     setSubmitting(false);
     resetForm();
     onClose();
@@ -106,19 +106,19 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
       >
         {form => (
           <>
-            <DialogTitle>{t('shared.auth.change-password')}</DialogTitle>
+            <DialogTitle>{t('auth.change-password')}</DialogTitle>
             <DialogContent>
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="newPassword"
-                label={`${t('shared.auth.password.new')}*`}
+                label={`${t('auth.password.new')}*`}
                 type={showPassword.new ? 'text' : 'password'}
                 InputProps={{endAdornment: <ShowPasswordButton type="new" />}}
               />
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="repeatPassword"
-                label={`${t('shared.auth.password.repeat')}*`}
+                label={`${t('auth.password.repeat')}*`}
                 type={showPassword.repeat ? 'text' : 'password'}
                 InputProps={{
                   endAdornment: <ShowPasswordButton type="repeat" />,
@@ -136,14 +136,14 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
                 href="https://www.aalto.fi/en/services/password-guidelines"
                 target="_blank"
               >
-                {t('shared.auth.password.requirements')}
+                {t('auth.password.requirements')}
               </Link>
               <Button
                 variant="contained"
                 onClick={form.submitForm}
                 disabled={form.isSubmitting}
               >
-                {t('shared.auth.password.reset')}
+                {t('auth.password.reset')}
               </Button>
             </DialogActions>
           </>

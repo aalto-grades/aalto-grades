@@ -60,7 +60,9 @@ const AddAplusGradeSourceDialog = ({
       <Dialog open={open} onClose={handleResetAndClose} maxWidth="md">
         {step === 0 && <DialogTitle>{t('general.a+-courses')}</DialogTitle>}
         {step === 1 && (
-          <DialogTitle>{t('course.parts.select-grade-source')}</DialogTitle>
+          <DialogTitle>
+            {t('course.a+.select-grade-source.singular')}
+          </DialogTitle>
         )}
         <DialogContent>
           {step === 0 && aplusCourses.data && (

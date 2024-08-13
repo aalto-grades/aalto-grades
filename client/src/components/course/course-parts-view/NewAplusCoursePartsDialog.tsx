@@ -148,11 +148,9 @@ const NewAplusCoursePartsDialog = ({
       <Dialog open={open} onClose={handleResetAndClose} maxWidth="md">
         {step === 0 && <DialogTitle>{t('general.a+-courses')}</DialogTitle>}
         {step === 1 && (
-          <DialogTitle>{t('course.parts.select-grade-sources')}</DialogTitle>
+          <DialogTitle>{t('course.a+.select-grade-source.plural')}</DialogTitle>
         )}
-        {step === 2 && (
-          <DialogTitle>{t('course.parts.create-parts')}</DialogTitle>
-        )}
+        {step === 2 && <DialogTitle>{t('course.a+.create-parts')}</DialogTitle>}
         <DialogContent>
           {step === 0 && aplusCourses.data && (
             <SelectAplusCourse

@@ -50,10 +50,10 @@ const OtpAuthDialog = ({
 
   return (
     <Dialog open={open} fullWidth maxWidth="xs" disableRestoreFocus>
-      <DialogTitle>{t('shared.auth.otp-auth.title')}</DialogTitle>
+      <DialogTitle>{t('auth.mfa-qr.title')}</DialogTitle>
       <DialogContent>
         <DialogContentText sx={{textAlign: 'center'}}>
-          {t('shared.auth.otp-auth.scan')}
+          {t('auth.mfa-qr.scan')}
         </DialogContentText>
         {otpAuth !== null && (
           <Box sx={{my: 2}} style={{display: 'flex', justifyContent: 'center'}}>
@@ -63,7 +63,7 @@ const OtpAuthDialog = ({
 
         <Box style={{display: 'flex', justifyContent: 'center'}}>
           <Button onClick={() => setShowSecret(oldVal => !oldVal)}>
-            {t('shared.auth.otp-auth.manual')}
+            {t('auth.mfa-qr.manual')}
           </Button>
         </Box>
         <Collapse in={showSecret}>
@@ -75,7 +75,7 @@ const OtpAuthDialog = ({
           </DialogContentText>
         </Collapse>
         <DialogContentText sx={{mt: 2, textAlign: 'center'}}>
-          {t('shared.auth.enter-totp')}
+          {t('auth.enter-totp')}
         </DialogContentText>
         <MuiOtpInput
           data-testid="mfa-input"
@@ -100,7 +100,7 @@ const OtpAuthDialog = ({
             setOtp('');
           }}
         >
-          {cancelText ?? t('shared.auth.otp-auth.cancel')}
+          {cancelText ?? t('auth.mfa-qr.cancel')}
         </Button>
         <Button
           variant="contained"

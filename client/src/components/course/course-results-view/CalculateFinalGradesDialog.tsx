@@ -111,35 +111,33 @@ const CalculateFinalGradesDialog = ({
   const getWarning = (model: GradingModelData | null): string => {
     if (model === null) return '';
     if (model.hasArchivedCourseParts && model.hasDeletedCourseParts)
-      return t('course.results.model-has-deleted-and-archived');
+      return t('course-results.model-has-deleted-and-archived');
     if (model.hasArchivedCourseParts)
-      return t('course.results.model-has-archived');
+      return t('course-results.model-has-archived');
     if (model.hasDeletedCourseParts)
-      return t('course.results.model-has-deleted');
+      return t('course-results.model-has-deleted');
     return '';
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>{t('course.results.calculate-final')}</DialogTitle>
+      <DialogTitle>{t('course-results.calculate-final')}</DialogTitle>
       <DialogContent>
         <Typography sx={{mb: 2}}>
           {selectedRows.length === 1
-            ? t('course.results.calculating-for_one')
-            : t('course.results.calculating-for_other', {
-                n: selectedRows.length,
-              })}
+            ? t('course-results.calculating-for-1')
+            : t('course-results.calculating-for-n', {n: selectedRows.length})}
         </Typography>
 
         {/* Warnings */}
         {gradeSelectOption === 'latest' && (
           <Alert sx={{mb: 2, mt: -1}} severity="info">
-            {t('course.results.using-latest')}
+            {t('course-results.using-latest')}
           </Alert>
         )}
         <Collapse in={errors.InvalidGrade}>
           <Alert sx={{mb: 2, mt: -1}} severity="warning">
-            {t('course.results.some-grade-invalid')}
+            {t('course-results.some-grade-invalid')}
           </Alert>
         </Collapse>
         <Collapse
@@ -156,13 +154,13 @@ const CalculateFinalGradesDialog = ({
           in={errors.InvalidPredictedGrade || errors.OutOfRangePredictedGrade}
         >
           <Alert sx={{mb: 2, mt: -1}} severity="error">
-            {t('course.results.some-final-invalid')}
+            {t('course-results.some-final-invalid')}
           </Alert>
         </Collapse>
 
         <FormControl sx={{display: 'block'}}>
           <InputLabel id="calculate-grades-select">
-            {t('general.grading-model')}
+            {t('general.grading-model.singular')}
           </InputLabel>
           <Select
             labelId="calculate-grades-select"
@@ -190,7 +188,7 @@ const CalculateFinalGradesDialog = ({
               onChange={e => setDateOverride(e.target.checked)}
             />
           }
-          label={t('course.results.override-date')}
+          label={t('course-results.override-date')}
         />
         <Collapse in={dateOverride}>
           <LocalizationProvider

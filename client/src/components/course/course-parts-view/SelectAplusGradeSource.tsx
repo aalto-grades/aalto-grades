@@ -51,7 +51,7 @@ const SelectAplusGradeSource = ({
     <>
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ArrowDropDown />}>
-          {t('general.course')}
+          {t('general.course.singular')}
         </AccordionSummary>
         <AccordionDetails>
           <Button
@@ -78,7 +78,7 @@ const SelectAplusGradeSource = ({
       </Accordion>
       <Accordion>
         <AccordionSummary expandIcon={<ArrowDropDown />}>
-          {t('general.modules')}
+          {t('general.module.plural')}
         </AccordionSummary>
         <AccordionDetails>
           <FormGroup>
@@ -103,7 +103,7 @@ const SelectAplusGradeSource = ({
       </Accordion>
       <Accordion>
         <AccordionSummary expandIcon={<ArrowDropDown />}>
-          {t('general.exercises')}
+          {t('general.exercise.plural')}
         </AccordionSummary>
         <AccordionDetails>
           <FormGroup>
@@ -133,7 +133,7 @@ const SelectAplusGradeSource = ({
       {aplusExerciseData.data.difficulties.length > 0 && (
         <Accordion>
           <AccordionSummary expandIcon={<ArrowDropDown />}>
-            {t('general.difficulties')}
+            {t('general.difficulty.plural')}
           </AccordionSummary>
           <AccordionDetails>
             <FormGroup>

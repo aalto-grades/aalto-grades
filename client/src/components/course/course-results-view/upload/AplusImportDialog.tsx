@@ -87,13 +87,13 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
         <DialogTitle>{t('general.select-course-parts')}</DialogTitle>
       )}
       {step === 1 && (
-        <DialogTitle>{t('course.parts.fetching-grades')}</DialogTitle>
+        <DialogTitle>{t('course.a+.fetching-grades')}</DialogTitle>
       )}
       {step === 2 && <DialogTitle>{t('general.confirm')}</DialogTitle>}
       <DialogContent>
         {step === 0 && (
           <>
-            <Typography>{t('course.parts.select-for-fetching')}</Typography>
+            <Typography>{t('course.a+.select-for-fetching')}</Typography>
             <FormGroup>
               {courseParts.data &&
                 courseParts.data
@@ -122,7 +122,7 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
               open={aplusTokenDialogOpen}
               error={aplusGrades.isError}
             />
-            <Typography>{t('course.parts.fetching-grades-wait')}</Typography>
+            <Typography>{t('course.a+.fetching-grades-wait')}</Typography>
             <LinearProgress sx={{mt: 2}} />
           </>
         )}
@@ -135,9 +135,9 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
               <TableHead>
                 <TableRow>
                   <TableCell>{t('general.student-number')}</TableCell>
-                  <TableCell>{t('general.course-part-id')}</TableCell>
-                  <TableCell>{t('general.a+-grade-source-id')}</TableCell>
-                  <TableCell>{t('general.grade')}</TableCell>
+                  <TableCell>{t('course.a+.part-id')}</TableCell>
+                  <TableCell>{t('course.a+.source-id')}</TableCell>
+                  <TableCell>{t('general.grade.singular')}</TableCell>
                   <TableCell>{t('general.date')}</TableCell>
                   <TableCell>{t('general.expiry-date')}</TableCell>
                 </TableRow>

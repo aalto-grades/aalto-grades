@@ -65,7 +65,7 @@ const CreateGradingModelDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>{t('course.models.create-model.title')}</DialogTitle>
+      <DialogTitle>{t('course.create-model.title')}</DialogTitle>
       <DialogContent>
         <TextField
           sx={{mt: 1}}
@@ -82,7 +82,7 @@ const CreateGradingModelDialog = ({
           disabled={addGradingModel.isPending}
         >
           <InputLabel id="select-model-template">
-            {t('course.models.create-model.select-template')}
+            {t('course.create-model.select-template')}
           </InputLabel>
           <Select
             labelId="select-model-template"
@@ -90,12 +90,12 @@ const CreateGradingModelDialog = ({
             label={t('course.create-model.select-template')}
             onChange={e => setTemplate(e.target.value as GraphTemplate)}
           >
-            <MenuItem value={'none'}>
-              {t('course.models.create-model.none')}
+            <MenuItem value={'none'}>{t('course.create-model.none')}</MenuItem>
+            <MenuItem value={'addition'}>
+              {t('graph.node.add')}
             </MenuItem>
-            <MenuItem value={'addition'}>{t('shared.graph.node.add')}</MenuItem>
             <MenuItem value={'average'}>
-              {t('shared.graph.node.average')}
+              {t('graph.node.average')}
             </MenuItem>
           </Select>
         </FormControl>

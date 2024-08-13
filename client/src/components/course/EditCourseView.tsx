@@ -92,16 +92,16 @@ const EditCourseView = (): JSX.Element => {
     .object({
       courseCode: z
         .string({
-          required_error: t('course.edit.course-code-required'),
+          required_error: t('front-page.create-course.course-code-required'),
         })
         .min(1),
       minCredits: z
         .number({
-          required_error: t('course.edit.min-credits-required'),
+          required_error: t('front-page.create-course.min-credits-required'),
         })
-        .min(0, t('course.edit.min-credits-negative')),
+        .min(0, t('front-page.create-course.min-credits-negative')),
       maxCredits: z.number({
-        required_error: t('course.edit.max-credits-required'),
+        required_error: t('front-page.create-course.max-credits-required'),
       }),
       gradingScale: z.nativeEnum(GradingScale),
       languageOfInstruction: z.nativeEnum(Language),
@@ -109,18 +109,24 @@ const EditCourseView = (): JSX.Element => {
       assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
       department: z
         .number()
-        .min(0, t('course.edit.department-select'))
+        .min(0, t('front-page.create-course.department-select'))
         .max(
           departments.length - 1,
           t('front-page.create-course.department-select')
         ),
-      nameEn: z.string({required_error: t('course.edit.name-english')}).min(1),
-      nameFi: z.string({required_error: t('course.edit.name-finnish')}).min(1),
-      nameSv: z.string({required_error: t('course.edit.name-swedish')}).min(1),
+      nameEn: z
+        .string({required_error: t('front-page.create-course.name-english')})
+        .min(1),
+      nameFi: z
+        .string({required_error: t('front-page.create-course.name-finnish')})
+        .min(1),
+      nameSv: z
+        .string({required_error: t('front-page.create-course.name-swedish')})
+        .min(1),
     })
     .refine(val => val.maxCredits >= val.minCredits, {
       path: ['maxCredits'],
-      message: t('course.edit.max-below-min'),
+      message: t('front-page.create-course.max-below-min'),
     });
 
   // Warning if leaving with unsaved
@@ -202,7 +208,7 @@ const EditCourseView = (): JSX.Element => {
       {courseId: courseId, course: courseData},
       {
         onSuccess: () => {
-          enqueueSnackbar(t('course.edit.title.saved'), {variant: 'success'});
+          enqueueSnackbar(t('course.edit-course.saved'), {variant: 'success'});
           setSubmitting(false);
           setInitialValues(values);
           setInitTeachersInCharge(teachersInCharge);
@@ -308,7 +314,7 @@ const EditCourseView = (): JSX.Element => {
                     value="courseCode"
                     disabled={auth?.role !== SystemRole.Admin}
                     label={`${t('general.course-code')}*`}
-                    helperText={t('course.edit.course-code-help')}
+                    helperText={t('front-page.create-course.course-code-help')}
                   />
                   <FormLanguagesField
                     form={
@@ -316,9 +322,9 @@ const EditCourseView = (): JSX.Element => {
                     }
                     disabled={auth?.role !== SystemRole.Admin}
                     valueFormat="name%"
-                    labelFormat={`${t('course.edit.course-name-in-format')}*`}
+                    labelFormat={`${t('front-page.create-course.course-name-in-format')}*`}
                     helperTextFormat={t(
-                      'course.edit.course-name-in-help-format'
+                      'front-page.create-course.course-name-in-help-format'
                     )}
                   />
                   <FormField
@@ -328,7 +334,9 @@ const EditCourseView = (): JSX.Element => {
                     value="department"
                     disabled={auth?.role !== SystemRole.Admin}
                     label={`${t('general.organizing-department')}*`}
-                    helperText={t('course.edit.organizing-department-help')}
+                    helperText={t(
+                      'front-page.create-course.organizing-department-help'
+                    )}
                     select
                   >
                     {departments.map((department, i) => (
@@ -343,8 +351,8 @@ const EditCourseView = (): JSX.Element => {
                     }
                     value="minCredits"
                     disabled={auth?.role !== SystemRole.Admin}
-                    label={`${t('course.edit.min-credits')}*`}
-                    helperText={t('course.edit.min-credits-help')}
+                    label={`${t('front-page.create-course.min-credits')}*`}
+                    helperText={t('front-page.create-course.min-credits-help')}
                     type="number"
                   />
                   <FormField
@@ -353,8 +361,8 @@ const EditCourseView = (): JSX.Element => {
                     }
                     value="maxCredits"
                     disabled={auth?.role !== SystemRole.Admin}
-                    label={`${t('course.edit.max-credits')}*`}
-                    helperText={t('course.edit.max-credits-help')}
+                    label={`${t('front-page.create-course.max-credits')}*`}
+                    helperText={t('front-page.create-course.max-credits-help')}
                     type="number"
                   />
                   <FormField
@@ -366,8 +374,10 @@ const EditCourseView = (): JSX.Element => {
                       auth?.role !== SystemRole.Admin &&
                       finalGrades.data.length > 0
                     }
-                    label={`${t('course.edit.grading-scale')}*`}
-                    helperText={t('course.edit.grading-scale-help')}
+                    label={`${t('front-page.create-course.grading-scale')}*`}
+                    helperText={t(
+                      'front-page.create-course.grading-scale-help'
+                    )}
                     select
                   >
                     {Object.values(GradingScale).map(value => (
@@ -382,8 +392,8 @@ const EditCourseView = (): JSX.Element => {
                     }
                     value="languageOfInstruction"
                     disabled={auth?.role !== SystemRole.Admin}
-                    label={`${t('course.edit.language')}*`}
-                    helperText={t('course.edit.language-help')}
+                    label={`${t('front-page.create-course.language')}*`}
+                    helperText={t('front-page.create-course.language-help')}
                     select
                   >
                     {sisuLanguageOptions.map(option => (
@@ -402,16 +412,18 @@ const EditCourseView = (): JSX.Element => {
                     disabled={
                       auth?.role !== SystemRole.Admin || form.isSubmitting
                     }
-                    label={`${t('course.edit.teachers-in-charge')}*`}
+                    label={`${t('front-page.create-course.teachers-in-charge')}*`}
                     margin="normal"
                     InputLabelProps={{shrink: true}}
                     helperText={
                       form.errors.teacherEmail ??
                       (teachersInCharge.length === 0
-                        ? t('course.edit.input-at-least-one-teacher')
+                        ? t(
+                            'front-page.create-course.input-at-least-one-teacher'
+                          )
                         : teachersInCharge.includes(form.values.teacherEmail)
-                          ? t('course.edit.email-in-list')
-                          : t('course.edit.add-teacher-emails'))
+                          ? t('front-page.create-course.email-in-list')
+                          : t('front-page.create-course.add-teacher-emails'))
                     }
                     error={
                       form.touched.teacherEmail &&
@@ -441,7 +453,7 @@ const EditCourseView = (): JSX.Element => {
                   </Button>
                   <Box sx={{mt: 8, mb: 2, width: '50%'}}>
                     {teachersInCharge.length === 0 ? (
-                      t('course.edit.add-at-least-one-teacher')
+                      t('front-page.create-course.add-at-least-one-teacher')
                     ) : (
                       <List dense>
                         {teachersInCharge.map(teacherEmail => (
@@ -477,14 +489,14 @@ const EditCourseView = (): JSX.Element => {
                     fullWidth
                     value={form.values.assistantEmail}
                     disabled={form.isSubmitting}
-                    label={`${t('general.assistants')}*`}
+                    label={`${t('general.assistant.plural')}*`}
                     margin="normal"
                     InputLabelProps={{shrink: true}}
                     helperText={
                       form.errors.assistantEmail ??
                       (assistants.includes(form.values.assistantEmail)
                         ? t('front-page.create-course.email-in-list')
-                        : t('course.edit.add-assistant-emails'))
+                        : t('front-page.create-course.add-assistant-emails'))
                     }
                     error={
                       form.touched.assistantEmail &&
@@ -514,7 +526,7 @@ const EditCourseView = (): JSX.Element => {
                   </Button>
                   <Box sx={{mt: 8, mb: 2, width: '50%'}}>
                     {assistants.length === 0 ? (
-                      t('course.edit.no-assistants')
+                      t('front-page.create-course.no-assistants')
                     ) : (
                       <List dense>
                         {assistants.map(emailAssistant => (

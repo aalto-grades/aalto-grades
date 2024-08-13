@@ -78,20 +78,20 @@ const AddCoursePartDialog = ({
           fullWidth
           maxWidth="xs"
         >
-          <DialogTitle>{t('course.parts.create.title')}</DialogTitle>
+          <DialogTitle>{t('course.create-part.title')}</DialogTitle>
           <DialogContent>
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               value="name"
               label={`${t('general.name')}*`}
-              helperText={t('course.parts.create.name-help')}
+              helperText={t('course.create-part.name-help')}
               type="string"
             />
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               value="daysValid"
               label={`${t('general.days-valid')}*`}
-              helperText={t('course.parts.create.days-valid-help')}
+              helperText={t('course.create-part.days-valid-help')}
               type="number"
             />
             <FormControlLabel
@@ -101,14 +101,14 @@ const AddCoursePartDialog = ({
                   onChange={e => setShowMaxGrade(e.target.checked)}
                 />
               }
-              label={t('course.parts.create.set-max-grade')}
+              label={t('course.create-part.set-max-grade')}
             />
             <Collapse in={showMaxGrade}>
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="maxGrade"
                 label={`${t('general.max-grade')}*`}
-                helperText={t('course.parts.create.max-grade-help')}
+                helperText={t('course.create-part.max-grade-help')}
                 type="number"
               />
             </Collapse>

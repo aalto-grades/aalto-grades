@@ -167,8 +167,7 @@ function updateTranslation(file: File, changes: Change[]): void {
   const entries = parseFileEntries(file).entries;
 
   for (const change of changes) {
-    (entries.find(entry => entry.key === change.before) as Entry).key =
-      change.after;
+    (entries.find(entry => entry.key === change.before) as Entry).key = change.after;
   }
 
   const object: TranslationJson = {};

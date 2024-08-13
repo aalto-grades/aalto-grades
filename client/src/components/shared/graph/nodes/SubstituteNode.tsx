@@ -213,20 +213,20 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
         isConnectable={isConnectable}
       />
 
-      <label>{t('shared.graph.substitution-num')}</label>
+      <label>{t('graph.substitution-num')}</label>
       <input
         style={{width: '180px', display: 'block'}}
         type="number"
         onChange={handleNumChange}
         value={localSettings.maxSubstitutions}
       />
-      <label>{t('shared.graph.substitutes')}</label>
+      <label>{t('graph.substitutes')}</label>
 
       <table style={{width: '200px', margin: '5px 0px'}}>
         <tbody>
           <tr>
-            <th style={{width: '50%'}}>{t('shared.graph.in')}</th>
-            <th>{t('shared.graph.out')}</th>
+            <th style={{width: '50%'}}>{t('graph.in')}</th>
+            <th>{t('graph.out')}</th>
           </tr>
           {substituteHandles
             .filter(key => nodeValue.sources[key].isConnected)
@@ -263,12 +263,12 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
           </tr>
         </tbody>
       </table>
-      <label>{t('general.exercises')}</label>
+      <label>{t('general.exercise.plural')}</label>
       <table style={{width: '200px', margin: '5px 0px'}}>
         <tbody>
           <tr>
             <th style={{width: '50%'}}>{t('graph.in')}</th>
-            <th>{t('shared.graph.substitution-value')}</th>
+            <th>{t('graph.substitution-value')}</th>
           </tr>
           {exerciseHandles
             .filter(key => nodeValue.sources[key].isConnected)

@@ -120,19 +120,19 @@ const SideMenu = (): JSX.Element => {
         />
         <Divider sx={{my: 2}} />
         <SideMenuButton
-          text={t('general.grades')}
+          text={t('general.grade.plural')}
           to={`/${courseId}/course-results`}
           Icon={FlagCircle}
           IconOutlined={FlagCircleOutlined}
         />
         <SideMenuButton
-          text={t('general.grading-models')}
+          text={t('general.grading-model.plural')}
           to={`/${courseId}/models`}
           Icon={AccountTree}
           IconOutlined={AccountTreeOutlined}
         />
         <SideMenuButton
-          text={t('general.course-parts')}
+          text={t('general.course-part.plural')}
           to={`/${courseId}/course-parts`}
           Icon={Widgets}
           IconOutlined={WidgetsOutlined}
@@ -142,7 +142,7 @@ const SideMenu = (): JSX.Element => {
           <>
             <Divider sx={{my: 2}} />
             <SideMenuButton
-              text={t('course.edit.title')}
+              text={t('course.edit')}
               to={`/${courseId}/edit`}
               Icon={Edit}
               IconOutlined={EditOutlined}

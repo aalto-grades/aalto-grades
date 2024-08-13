@@ -161,7 +161,7 @@ const ModelsView = (): JSX.Element => {
         return;
       }
     }
-    enqueueSnackbar(t('course.models.model-not-found', {model: modelId}), {
+    enqueueSnackbar(t('course.models.could-not-find-model', {model: modelId}), {
       variant: 'error',
     });
     navigate(`/${courseId}/models`);
@@ -179,7 +179,7 @@ const ModelsView = (): JSX.Element => {
         return;
       }
     }
-    enqueueSnackbar(t('course.models.grade-not-found', {user: userId}), {
+    enqueueSnackbar(t('course.models.could-not-find-grade', {user: userId}), {
       variant: 'error',
     });
     navigate(`/${courseId}/models/${modelId}`);
@@ -260,7 +260,7 @@ const ModelsView = (): JSX.Element => {
         name={editDialogModel?.name ?? null}
       />
       <Typography width={'fit-content'} variant="h2">
-        {t('general.grading-models')}
+        {t('general.grading-model.plural')}
       </Typography>
       <Box sx={{display: 'flex', mb: 1}}>
         {(auth?.role === SystemRole.Admin || isTeacherInCharge) &&
@@ -303,7 +303,7 @@ const ModelsView = (): JSX.Element => {
                     <>
                       <Tooltip
                         placement="top"
-                        title={t('course.models.rename.title')}
+                        title={t('course.rename-model.title')}
                       >
                         <IconButton
                           onClick={() => {

@@ -80,7 +80,7 @@ const StudentsView = (): JSX.Element => {
         <>
           <Divider sx={{my: 2}} />
           <Typography variant="h2" sx={{pb: 2}}>
-            {t('students.viewing', {
+            {t('students.viewing-grades', {
               user:
                 selectedStudent?.name ?? selectedStudent?.studentNumber ?? '',
             })}
@@ -89,9 +89,9 @@ const StudentsView = (): JSX.Element => {
             <Table sx={{minWidth: 650}} aria-label="simple table">
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('general.course')}</TableCell>
+                  <TableCell>{t('general.course.singular')}</TableCell>
                   <TableCell align="right">
-                    {t('general.final-grades')}
+                    {t('general.final-grade.plural')}
                   </TableCell>
                 </TableRow>
               </TableHead>

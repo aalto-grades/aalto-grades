@@ -48,13 +48,13 @@ const RenameGradingModelDialog = ({
       gradingModel: {name: newName},
     });
 
-    enqueueSnackbar(t('course.models.rename.saved'), {variant: 'success'});
+    enqueueSnackbar(t('course.rename-model.saved'), {variant: 'success'});
     onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>{t('course.models.rename.title')}</DialogTitle>
+      <DialogTitle>{t('course.rename-model.title')}</DialogTitle>
       <DialogContent>
         <TextField
           sx={{mt: 1}}

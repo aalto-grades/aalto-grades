@@ -6,16 +6,22 @@
     "delete": "Delete",
     "email": "Email",
     "password": "Password",
-    "a+-api-token": "A+ API token",
-    "grading-model": "Grading model",
-    "grading-models": "Grading models",
+    "a+-token": "A+ API token",
+    "grading-model": {
+      "singular": "Grading model",
+      "plural": "Grading models"
+    },
     "grading-date": "Grading date",
-    "final-grade": "Final grade",
-    "final-grades": "Final grades",
+    "final-grade": {
+      "singular": "Final grade",
+      "plural": "Final grades"
+    },
     "loading": "Loading",
     "grader": "Grader",
-    "grade": "Grade",
-    "grades": "Grades",
+    "grade": {
+      "singular": "Grade",
+      "plural": "Grades"
+    },
     "date": "Date",
     "grading-model-name": "Grading model name",
     "export-date": "Export date",
@@ -35,30 +41,44 @@
     "name": "Name",
     "days-valid": "Days valid",
     "max-grade": "Max grade",
-    "a+-grade-sources": "A+ grade sources",
-    "course-parts": "Course parts",
-    "course-part": "Course part",
+    "a+-sources": "A+ grade sources",
+    "course-part": {
+      "plural": "Course parts",
+      "singular": "Course part"
+    },
     "course-code": "Course code",
     "organizing-department": "Organizing department",
-    "assistants": "Assistants",
-    "assistant": "Assistant",
+    "assistant": {
+      "plural": "Assistants",
+      "singular": "Assistant"
+    },
     "add": "Add",
-    "course": "Course",
-    "courses": "Courses",
+    "course": {
+      "singular": "Course",
+      "plural": "Courses"
+    },
     "instance": "Instance",
     "full-points": "Full points",
-    "modules": "Modules",
-    "module": "Module",
-    "exercises": "Exercises",
-    "exercise": "Exercise",
-    "difficulties": "Difficulties",
-    "difficulty": "Difficulty",
+    "module": {
+      "plural": "Modules",
+      "singular": "Module"
+    },
+    "exercise": {
+      "plural": "Exercises",
+      "singular": "Exercise"
+    },
+    "difficulty": {
+      "plural": "Difficulties",
+      "singular": "Difficulty"
+    },
     "import": "Import",
     "edit": "Edit",
     "code": "Code",
     "role": "Role",
-    "admin": "Admin",
-    "admins": "Admins",
+    "admin": {
+      "singular": "Admin",
+      "plural": "Admins"
+    },
     "teacher": "Teacher",
     "student": "Student",
     "copy": "Copy",
@@ -68,108 +88,27 @@
     "in-english": "in English",
     "in-finnish": "in Finnish",
     "in-swedish": "in Swedish",
-    "select-course-parts": "Select course parts",
-    "course-part-id": "Course part ID",
-    "a+-grade-source-id": "A+ grade source ID",
-    "course-name": "Course name",
-    "course-url": "Course URL",
-    "source-name": "Source name"
+    "select-course-parts": "Select course parts"
   },
-  "shared": {
+  "alerts": {
     "unsaved-changes": {
       "body": "You have unsaved changes. Data you have entered will not be saved.",
       "stay": "Stay on this page",
       "discard": "Discard changes"
-    },
-    "auth": {
-      "password": {
-        "match": "Passwords must match",
-        "changed": "Password changed successfully",
-        "new": "New password",
-        "repeat": "Repeat password",
-        "requirements": "Aalto password requirements",
-        "reset": "Reset password",
-        "old": "New password cannot be the same as the old password",
-        "reset-done": "Password reset successfully"
-      },
-      "change-password": "Change password",
-      "otp-auth": {
-        "title": "MFA QR code",
-        "scan": "Scan the QR code in your MFA application",
-        "manual": "Or manually enter the secret",
-        "cancel": "Back to login",
-        "close-without-confirm": "Cancel without confirming"
-      },
-      "hide-password": "Click to hide password from view",
-      "show-password": "Click to show password",
-      "reset-mfa-secret": "Reset MFA secret",
-      "reset-mfa-secret-message": "Are you sure you want to reset your MFA secret",
-      "reset-mfa": "Reset MFA",
-      "log-out": "Log out",
-      "enter-totp": "Enter TOTP code",
-      "a+-token": {
-        "body": "You can find your API token by logging in to A+ and navigating to",
-        "current": "Your current token",
-        "label": "API token",
-        "invalid": "The token you have entered is invalid, please make sure your token is correct.",
-        "length": "The token should be 40 characters long."
-      }
-    },
-    "graph": {
-      "inputs": "Inputs",
-      "percentage-mode": "Percentage mode",
-      "weight": "Weight",
-      "value": "value",
-      "min-points": "Minimum points",
-      "fail-course": "Fail course",
-      "output-fail": "Output fail",
-      "output": "Output",
-      "set-test-values": "Set test course part values",
-      "node": {
-        "add": "Addition",
-        "add-tooltip": "Add multiple values together",
-        "average": "Average",
-        "average-tooltip": "Take the (weighted) average of multiple values",
-        "stepper": "Stepper",
-        "stepper-tooltip": "Map ranges of values into specific values",
-        "min": "Require minimum points",
-        "min-tooltip": "Require minimum value and otherwise output fail or fail course",
-        "max": "Maximum",
-        "max-tooltip": "Take the maximum of multiple values and one custom value",
-        "require": "Require passing values",
-        "require-tooltip": "Require some number of non-fail values",
-        "round": "Round",
-        "round-tooltip": "Round value",
-        "substitute": "Substitute",
-        "substitute-tooltip": "Substitute failing values"
-      },
-      "part-deleted": "Course part has been deleted",
-      "part-archived": "Course part is archived",
-      "saving": "Saving model",
-      "has-final-grades-message": "There are final grades using this model. Editing it might cause accidentally overwriting old final grades",
-      "saved": "Model saved successfully",
-      "has-final-grades": "Model has final grades",
-      "course-failed": "Course failed",
-      "delete-node_other": "Delete nodes",
-      "delete-node_one": "Delete node",
-      "test-values": "Test values",
-      "format": "Format",
-      "on-fail": "On fail",
-      "allowed-fails": "Allowed fails",
-      "in": "in",
-      "out": "out",
-      "round-up": "Round up",
-      "round-closest": "Round to closest",
-      "round-down": "Round down",
-      "range": "Range",
-      "new-row": "New row",
-      "remove-row": "Remove row",
-      "substitution-num": "Number of substitutions",
-      "substitutes": "Substitutes",
-      "substitution-value": "sub val"
     }
   },
-  "login": {
+  "auth": {
+    "password": {
+      "match": "Passwords must match",
+      "changed": "Password changed successfully",
+      "new": "New password",
+      "repeat": "Repeat password",
+      "requirements": "Aalto password requirements",
+      "reset": "Reset password",
+      "old": "New password cannot be the same as the old password",
+      "reset-done": "Password reset successfully"
+    },
+    "change-password": "Change password",
     "external": {
       "title": "Aalto University users",
       "body": "Log in with your Aalto University user account by clicking on the button below.",
@@ -179,108 +118,104 @@
       "title": "Log in to Aalto Grades",
       "body": "If you have been provided with credentials specifically for Aalto Grades, use this login.",
       "button": "Log in"
+    },
+    "mfa-qr": {
+      "title": "MFA QR code",
+      "scan": "Scan the QR code in your MFA application",
+      "manual": "Or manually enter the secret",
+      "cancel": "Back to login",
+      "close-without-confirm": "Cancel without confirming"
+    },
+    "hide-password": "Click to hide password from view",
+    "show-password": "Click to show password",
+    "reset-mfa-secret": "Reset MFA secret",
+    "reset-mfa-secret-message": "Are you sure you want to reset your MFA secret",
+    "reset-mfa": "Reset MFA",
+    "log-out": "Log out",
+    "enter-totp": "Enter TOTP code"
+  },
+  "course-results": {
+    "model-has-deleted-and-archived": "Grading model contains deleted & archived course parts",
+    "model-has-archived": "Grading model contains archived course parts",
+    "model-has-deleted": "Grading model contains deleted course parts",
+    "calculate-final": "Calculate final grades",
+    "calculating-for-1": "Calculating final grade for 1 student",
+    "calculating-for-n": "Calculating final grades for {{n}} students",
+    "using-latest": "You are using latest grades instead of the best grades to calculate the final grades.",
+    "some-grade-invalid": "Some of the selected grades are invalid.",
+    "some-final-invalid": "Some final grades will have invalid values, check if the correct grading model is being used",
+    "override-date": "Override grading date for all students",
+    "group-by-latest-grade": "Group by the latest obtainment date of all course parts",
+    "group-by": "Group by {{grouping}}",
+    "calculating-final": "Calculating final grades...",
+    "invalid-final": "Invalid final grade {{grade}}",
+    "final-calculated": "Final grades calculated successfully.",
+    "add-grades": "Add grades",
+    "select-one-student-calculation": "Select at least one student number for grade calculation.",
+    "calculate-final-for-selected": "Calculate course final grades for selected students.",
+    "recalculate-final": "Recalculate final grades",
+    "select-one-student-download": "Select at least one student number for downloading grades.",
+    "pending-download": "Grades with status \"PENDING\" cannot be downloaded, unselect or calculate grades for these.",
+    "download-as-sisu-compat-csv": "Download final course grades as a Sisu compatible CSV file.",
+    "download-sisu-csv": "Download Sisu CSV",
+    "group-columns": "Group rows based on other columns",
+    "show-model-parts": "Show only course parts used in the model",
+    "showing-n-rows": "Showing {{n}} rows",
+    "n-errors": "{{n}} errors",
+    "not-found": "Not found",
+    "not-permitted": "Not permitted",
+    "add-final": "Add final grade",
+    "grades-saved": "Grades saved successfully",
+    "add-grade": "Add grade",
+    "expiry-before": "Expiry date cannot be before date",
+    "edit-final": "Edit final grades",
+    "multiple-final": "Multiple final grades, click to show",
+    "final-of": "Final grades of {{user}}",
+    "final-on-date": "Final grade obtained on {{date}}",
+    "edit-grade": "Edit grades",
+    "multiple-grade": "Multiple grades, click to show",
+    "grade-of-for": "Grades of {{user}} for {{part}}",
+    "grade-expired-on": "Grade expired on {{date}}",
+    "view-graph": "View graph",
+    "final-downloaded": "Final grades downloaded in the Sisu CSV format successfully.",
+    "fetching-sisu-csv": "Fetching Sisu CSV...",
+    "download-at-least-one": "You must download data for at least one student.",
+    "download-final-as-sisu-csv": "Download final grades as Sisu CSV",
+    "grading-date-default": "Grading date defaults to the latest submission of the student.",
+    "completion-language": "Completion language",
+    "use-course-language": "Use course language",
+    "assessment-date": "Assessment date",
+    "included-before": "The list of students includes students who have already been included in a Sisu CSV previously. Please select a download option from the drop-down menu.",
+    "will-not-close": "This dialog will NOT close after downloading a CSV file. You may download multiple CSV files with different options",
+    "download-all-selected": "Download all selected grades in a single CSV",
+    "download-unexported": "Only download unexported grades",
+    "download-exported": "Only download previously exported grades",
+    "selected-students": "Selected students",
+    "exported-already": "User grade has been exported to Sisu already.",
+    "data-undefined": "Data is undefined"
+  },
+  "context": {
+    "grades-table": {
+      "latest-grade": "Latest part grade",
+      "exported": "Exported to Sisu",
+      "errors": "Errors",
+      "preview": "Grade preview"
     }
   },
   "course": {
-    "results": {
-      "model-has-deleted-and-archived": "Grading model contains deleted & archived course parts",
-      "model-has-archived": "Grading model contains archived course parts",
-      "model-has-deleted": "Grading model contains deleted course parts",
-      "calculate-final": "Calculate final grades",
-      "calculating-for_one": "Calculating final grade for 1 student",
-      "calculating-for_other": "Calculating final grades for {{n}} students",
-      "using-latest": "You are using latest grades instead of the best grades to calculate the final grades.",
-      "some-grade-invalid": "Some of the selected grades are invalid.",
-      "some-final-invalid": "Some final grades will have invalid values, check if the correct grading model is being used",
-      "override-date": "Override grading date for all students",
-      "group-by-latest-grade": "Group by the latest obtainment date of all course parts",
-      "group-by": "Group by {{grouping}}",
-      "calculating-final": "Calculating final grades...",
-      "invalid-final": "Invalid final grade {{grade}}",
-      "final-calculated": "Final grades calculated successfully.",
-      "add-grades": "Add grades",
-      "select-one-student-calculation": "Select at least one student number for grade calculation.",
-      "calculate-final-for-selected": "Calculate course final grades for selected students.",
-      "recalculate-final": "Recalculate final grades",
-      "select-one-student-download": "Select at least one student number for downloading grades.",
-      "pending-download": "Grades with status \"PENDING\" cannot be downloaded, unselect or calculate grades for these.",
-      "download-as-sisu-compat-csv": "Download final course grades as a Sisu compatible CSV file.",
-      "download-sisu-csv": "Download Sisu CSV",
-      "group-columns": "Group rows based on other columns",
-      "show-model-parts": "Show only course parts used in the model",
-      "showing-n-rows": "Showing {{n}} rows",
-      "n-errors": "{{n}} errors",
-      "not-found": "Not found",
-      "not-permitted": "Not permitted",
-      "add-final": "Add final grade",
-      "grades-saved": "Grades saved successfully",
-      "add-grade": "Add grade",
-      "expiry-before": "Expiry date cannot be before date",
-      "edit-final": "Edit final grades",
-      "multiple-final": "Multiple final grades, click to show",
-      "final-of": "Final grades of {{user}}",
-      "final-on-date": "Final grade obtained on {{date}}",
-      "edit-grade": "Edit grades",
-      "multiple-grade": "Multiple grades, click to show",
-      "grade-of-for": "Grades of {{user}} for {{part}}",
-      "grade-expired-on": "Grade expired on {{date}}",
-      "view-graph": "View graph",
-      "final-downloaded": "Final grades downloaded in the Sisu CSV format successfully.",
-      "fetching-sisu-csv": "Fetching Sisu CSV...",
-      "download-at-least-one": "You must download data for at least one student.",
-      "download-final-as-sisu-csv": "Download final grades as Sisu CSV",
-      "grading-date-default": "Grading date defaults to the latest submission of the student.",
-      "completion-language": "Completion language",
-      "use-course-language": "Use course language",
-      "assessment-date": "Assessment date",
-      "included-before": "The list of students includes students who have already been included in a Sisu CSV previously. Please select a download option from the drop-down menu.",
-      "will-not-close": "This dialog will NOT close after downloading a CSV file. You may download multiple CSV files with different options",
-      "download-all-selected": "Download all selected grades in a single CSV",
-      "download-unexported": "Only download unexported grades",
-      "download-exported": "Only download previously exported grades",
-      "selected-students": "Selected students",
-      "exported-already": "User grade has been exported to Sisu already.",
-      "data-undefined": "Data is undefined",
-      "table": {
-        "latest-grade": "Latest part grade",
-        "exported": "Exported to Sisu",
-        "errors": "Errors",
-        "preview": "Grade preview"
+    "a+": {
+      "select-grade-source": {
+        "singular": "Select grade source",
+        "plural": "Select grade sources"
       },
-      "upload": {
-        "grades-added": "Grades added successfully",
-        "higher-than-max": "Some grades are higher than the maximum allowed values",
-        "dates": "Completion and expiration dates",
-        "hidden": "Some course parts are hidden due to not having any data",
-        "completion-date": "Completion date",
-        "expiration-date": "Expiration date",
-        "expiration-after-completion": "Expiry date must be after completion date",
-        "confirm-data": "Confirm data",
-        "all-done": "All done!",
-        "import-as-twice": "The same \"Import as\" value cannot appear twice",
-        "import-as-empty": "\"Import as\" field cannot be empty",
-        "no-student-number": "Student number must be specified",
-        "mismatch": "Mismatching columns found",
-        "csv-column": "CSV column",
-        "import-as": "Import as",
-        "ignore-column": "Ignore column",
-        "missing-grades": "Some students have missing grades",
-        "upload-grades": "Upload grades",
-        "paste-text": "Paste text",
-        "upload-csv": "Upload CSV",
-        "download-template": "Download CSV template",
-        "a+-import": "Import from A+",
-        "add-manually": "Or add them manually",
-        "student-number-empty": "Student number cannot be empty"
-      }
-    },
-    "parts": {
-      "select-grade-source": "Select grade source",
-      "select-grade-sources": "Select grade sources",
       "fetching-grades": "Fetching grades",
       "select-for-fetching": "Select the course parts you want to fetch grades for from A+.",
       "fetching-grades-wait": "Fetching grades from A+, this may take a few minutes...",
-      "create-parts": "Create course parts",
+      "part-id": "Course part ID",
+      "source-id": "A+ grade source ID",
+      "create-parts": "Create course parts"
+    },
+    "parts": {
       "saved": "Course parts saved successfully",
       "add-a+-source": "Add A+ grade source",
       "view-a+-sources": "View A+ grade sources",
@@ -291,24 +226,20 @@
       "valid-until": "Valid until",
       "archived": "Archived",
       "add-new": "Add new",
-      "add-from-a+": "Add from A+",
-      "create": {
-        "title": "Create new course part",
-        "name-help": "Course part name",
-        "days-valid-help": "How long the grades should stay valid for",
-        "set-max-grade": "Set maximum allowed grade",
-        "max-grade-help": "Maximum allowed grade for course part"
-      },
-      "delete-a+": "Delete A+ grade source"
+      "add-from-a+": "Add from A+"
     },
+    "create-model": {
+      "title": "Create grading model",
+      "select-template": "Select template",
+      "none": "None"
+    },
+    "edit-course": {
+      "saved": "Course details saved."
+    },
+    "edit": "Edit course",
     "models": {
-      "create-model": {
-        "title": "Create grading model",
-        "select-template": "Select template",
-        "none": "None"
-      },
-      "model-not-found": "Couldn't find grading model with ID {{model}}",
-      "grade-not-found": "Couldn't find grades for user with ID {{user}}",
+      "could-not-find-model": "Couldn't find grading model with ID {{model}}",
+      "could-not-find-grade": "Couldn't find grades for user with ID {{user}}",
       "delete-model": "Delete model",
       "delete-model-message": "Are you sure that you want to delete this model",
       "save-null": "Tried to save null model",
@@ -322,15 +253,55 @@
       "unarchive": "Unarchive grading model",
       "archive": "Archive grading model",
       "cannot-delete-with-final": "Cannot delete a model with final grades",
-      "delete-grading-model": "Delete grading model",
-      "rename": {
-        "title": "Rename grading model",
-        "saved": "Grading model saved"
-      }
+      "delete-grading-model": "Delete grading model"
     },
-    "edit": {
-      "saved": "Course details saved.",
-      "title": "Edit course",
+    "rename-model": {
+      "title": "Rename grading model",
+      "saved": "Grading model saved"
+    },
+    "create-part": {
+      "title": "Create new course part",
+      "name-help": "Course part name",
+      "days-valid-help": "How long the grades should stay valid for",
+      "set-max-grade": "Set maximum allowed grade",
+      "max-grade-help": "Maximum allowed grade for course part"
+    },
+    "list": "Course list",
+    "upload": {
+      "grades-added": "Grades added successfully",
+      "higher-than-max": "Some grades are higher than the maximum allowed values",
+      "dates": "Completion and expiration dates",
+      "hidden": "Some course parts are hidden due to not having any data",
+      "completion-date": "Completion date",
+      "expiration-date": "Expiration date",
+      "expiration-after-completion": "Expiry date must be after completion date",
+      "confirm-data": "Confirm data",
+      "all-done": "All done!",
+      "import-as-twice": "The same \"Import as\" value cannot appear twice",
+      "import-as-empty": "\"Import as\" field cannot be empty",
+      "no-student-number": "Student number must be specified",
+      "mismatch": "Mismatching columns found",
+      "csv-column": "CSV column",
+      "import-as": "Import as",
+      "ignore-column": "Ignore column",
+      "missing-grades": "Some students have missing grades",
+      "upload-grades": "Upload grades",
+      "paste-text": "Paste text",
+      "upload-csv": "Upload CSV",
+      "download-template": "Download CSV template",
+      "a+-import": "Import from A+",
+      "add-manually": "Or add them manually",
+      "student-number-empty": "Student number cannot be empty"
+    },
+    "view-a+-source": {
+      "course-name": "Course name",
+      "url": "Course URL",
+      "source-name": "Source name",
+      "delete": "Delete A+ grade source"
+    }
+  },
+  "front-page": {
+    "create-course": {
       "course-code-required": "Course code is required (e.g. CS-A1111)",
       "min-credits-required": "Minimum credits is required",
       "min-credits-negative": "Minimum credits cannot be negative",
@@ -359,12 +330,9 @@
       "add-at-least-one-teacher": "Add at least one teacher in charge to the course",
       "add-assistant-emails": "Add emails of the assistants of the course.",
       "no-assistants": "No assistants in the course",
+      "title": "Create a new course",
       "input-at-least-one-assistant": "Input the email address of at least one assistant of the course"
     },
-    "list": "Course list"
-  },
-  "front-page": {
-    "create-course": "Create a new course",
     "not-logged-in": "Not logged in",
     "search": "search",
     "user-added": "User added successfully",
@@ -388,30 +356,89 @@
     "no-courses": "You have no courses. Please contact support to have your course added.",
     "create-new-course": "Create new course"
   },
-  "app": {
-    "footer": {
-      "privacy": "Privacy notice",
-      "accessibility": "Accessibility statement",
-      "support": "Support",
-      "licenses": "JavaScript licenses",
-      "source": {
-        "tooltip": "Source code opens in a new tab",
-        "text": "Source code"
-      },
-      "feedback": {
-        "tooltip": "Feedback form opens in a new tab",
-        "text": "Feedback"
-      }
+  "footer": {
+    "privacy": "Privacy notice",
+    "accessibility": "Accessibility statement",
+    "support": "Support",
+    "licenses": "JavaScript licenses",
+    "source": {
+      "tooltip": "Source code opens in a new tab",
+      "text": "Source code"
+    },
+    "feedback": {
+      "tooltip": "Feedback form opens in a new tab",
+      "text": "Feedback"
     }
+  },
+  "graph": {
+    "inputs": "Inputs",
+    "percentage-mode": "Percentage mode",
+    "weight": "Weight",
+    "value": "value",
+    "min-points": "Minimum points",
+    "fail-course": "Fail course",
+    "output-fail": "Output fail",
+    "output": "Output",
+    "set-test-values": "Set test course part values",
+    "node": {
+      "add": "Addition",
+      "add-tooltip": "Add multiple values together",
+      "average": "Average",
+      "average-tooltip": "Take the (weighted) average of multiple values",
+      "stepper": "Stepper",
+      "stepper-tooltip": "Map ranges of values into specific values",
+      "min": "Require minimum points",
+      "min-tooltip": "Require minimum value and otherwise output fail or fail course",
+      "max": "Maximum",
+      "max-tooltip": "Take the maximum of multiple values and one custom value",
+      "require": "Require passing values",
+      "require-tooltip": "Require some number of non-fail values",
+      "round": "Round",
+      "round-tooltip": "Round value",
+      "substitute": "Substitute",
+      "substitute-tooltip": "Substitute failing values"
+    },
+    "part-deleted": "Course part has been deleted",
+    "part-archived": "Course part is archived",
+    "saving": "Saving model",
+    "has-final-grades-message": "There are final grades using this model. Editing it might cause accidentally overwriting old final grades",
+    "saved": "Model saved successfully",
+    "has-final-grades": "Model has final grades",
+    "course-failed": "Course failed",
+    "delete-node": {
+      "plural": "Delete nodes",
+      "singular": "Delete node"
+    },
+    "test-values": "Test values",
+    "format": "Format",
+    "on-fail": "On fail",
+    "allowed-fails": "Allowed fails",
+    "in": "in",
+    "out": "out",
+    "round-up": "Round up",
+    "round-closest": "Round to closest",
+    "round-down": "Round down",
+    "range": "Range",
+    "new-row": "New row",
+    "remove-row": "Remove row",
+    "substitution-num": "Number of substitutions",
+    "substitutes": "Substitutes",
+    "substitution-value": "sub val"
   },
   "manage-students": {
     "latest-grade": "Latest grade",
-    "delete_other": "Delete students",
-    "delete_one": "Delete student",
-    "delete-message_other": "All of the data of the students will be deleted permanently!",
-    "delete-message_one": "All of the data of the student will be deleted permanently!",
-    "delete-success_other": "Students deleted",
-    "delete-success_one": "Student deleted",
+    "delete": {
+      "plural": "Delete students",
+      "singular": "Delete student"
+    },
+    "delete-message": {
+      "plural": "All of the data of the students will be deleted permanently!",
+      "singular": "All of the data of the student will be deleted permanently!"
+    },
+    "delete-success": {
+      "plural": "Students deleted",
+      "singular": "Student deleted"
+    },
     "title": "Manage students"
   },
   "not-found": {
@@ -419,8 +446,17 @@
     "body": "The page you're looking for doesn't exist.",
     "back": "Go back to main page"
   },
+  "shared": {
+    "a+-token": {
+      "body": "You can find your API token by logging in to A+ and navigating to",
+      "current": "Your current token",
+      "label": "API token",
+      "invalid": "The token you have entered is invalid, please make sure your token is correct.",
+      "length": "The token should be 40 characters long."
+    }
+  },
   "students": {
     "select": "Select student",
-    "viewing": "Viewing grades for {{user}}"
+    "viewing-grades": "Viewing grades for {{user}}"
   }
 }

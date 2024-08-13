@@ -90,19 +90,19 @@ const MismatchDialog = ({
   const getErrorText = (): string => {
     switch (error) {
       case '':
-        return t('course.results.upload.all-done');
+        return t('course.upload.all-done');
       case 'duplicate':
-        return t('course.results.upload.import-as-twice');
+        return t('course.upload.import-as-twice');
       case 'empty':
-        return t('course.results.upload.import-as-empty');
+        return t('course.upload.import-as-empty');
       case 'noStudentNo':
-        return t('course.results.upload.no-student-number');
+        return t('course.upload.no-student-number');
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle>{t('course.results.upload.mismatch')}</DialogTitle>
+      <DialogTitle>{t('course.upload.mismatch')}</DialogTitle>
       <DialogContent>
         <Alert severity={error !== '' ? 'error' : 'success'} sx={{mb: 2}}>
           {getErrorText()}
@@ -111,8 +111,8 @@ const MismatchDialog = ({
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>{t('course.results.upload.csv-column')}</TableCell>
-                <TableCell>{t('course.results.upload.import-as')}</TableCell>
+                <TableCell>{t('course.upload.csv-column')}</TableCell>
+                <TableCell>{t('course.upload.import-as')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -163,7 +163,7 @@ const MismatchDialog = ({
                         ))}
                         <MenuItem
                           key="ignoreColumn"
-                          value={t('course.results.upload.ignore-column')}
+                          value={t('course.upload.ignore-column')}
                         >
                           {t('course.upload.ignore-column')}
                         </MenuItem>

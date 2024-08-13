@@ -61,7 +61,7 @@ const SisuDownloadDialog = ({
       linkElement.click();
       linkElement.remove();
 
-      enqueueSnackbar(t('course.results.final-downloaded'), {
+      enqueueSnackbar(t('course-results.final-downloaded'), {
         variant: 'success',
       });
     },
@@ -96,7 +96,7 @@ const SisuDownloadDialog = ({
   const handleDownloadSisuGradeCsv = async (): Promise<void> => {
     if (!courseId) return;
 
-    enqueueSnackbar(t('course.results.fetching-sisu-csv'), {variant: 'info'});
+    enqueueSnackbar(t('course-results.fetching-sisu-csv'), {variant: 'info'});
 
     let studentNumbers: string[] = [];
     switch (downloadOption) {
@@ -115,7 +115,7 @@ const SisuDownloadDialog = ({
         break;
     }
     if (studentNumbers.length === 0) {
-      enqueueSnackbar(t('course.results.download-at-least-one'), {
+      enqueueSnackbar(t('course-results.download-at-least-one'), {
         variant: 'warning',
       });
       return;
@@ -144,18 +144,18 @@ const SisuDownloadDialog = ({
       fullWidth
     >
       <DialogTitle>
-        {t('course.results.download-final-as-sisu-csv')}
+        {t('course-results.download-final-as-sisu-csv')}
       </DialogTitle>
       <DialogContent sx={{pb: 0}}>
         <DialogContentText sx={{mb: 3, color: 'black'}}>
-          {t('course.results.grading-date-default')}
+          {t('course-results.grading-date-default')}
         </DialogContentText>
         <TextField
           id="select-grading-completion-language"
           select
           fullWidth
           margin="normal"
-          label={t('course.results.completion-language')}
+          label={t('course-results.completion-language')}
           value={completionLanguage ?? 'default'}
           onChange={e => {
             if (e.target.value === 'default') {
@@ -166,7 +166,7 @@ const SisuDownloadDialog = ({
           }}
         >
           <MenuItem value="default">
-            {t('course.results.use-course-language')}
+            {t('course-results.use-course-language')}
           </MenuItem>
           {sisuLanguageOptions.map(option => (
             <MenuItem key={option.id} value={option.id}>
@@ -181,7 +181,7 @@ const SisuDownloadDialog = ({
               onChange={e => setDateOverride(e.target.checked)}
             />
           }
-          label={t('course.results.override-date')}
+          label={t('course-results.override-date')}
         />
         <Collapse in={dateOverride}>
           <LocalizationProvider
@@ -190,7 +190,7 @@ const SisuDownloadDialog = ({
           >
             <DatePicker
               sx={{mt: 2}}
-              label={t('course.results.assessment-date')}
+              label={t('course-results.assessment-date')}
               value={assessmentDate}
               onChange={newDate => newDate && setAssessmentDate(newDate)}
             />
@@ -199,10 +199,10 @@ const SisuDownloadDialog = ({
         {exportedValuesInList && (
           <Box sx={{my: 2}}>
             <Typography variant="body2" sx={{color: 'red'}}>
-              {t('course.results.included-before')}
+              {t('course-results.included-before')}
             </Typography>
             <Typography variant="body2" sx={{mt: 1, color: 'red'}}>
-              {t('course.results.will-not-close')}
+              {t('course-results.will-not-close')}
             </Typography>
             <TextField
               id="export-option"
@@ -215,19 +215,19 @@ const SisuDownloadDialog = ({
               }
             >
               <MenuItem value="all">
-                {t('course.results.download-all-selected')}
+                {t('course-results.download-all-selected')}
               </MenuItem>
               <MenuItem value="unexported">
-                {t('course.results.download-unexported')}
+                {t('course-results.download-unexported')}
               </MenuItem>
               <MenuItem value="exported">
-                {t('course.results.download-exported')}
+                {t('course-results.download-exported')}
               </MenuItem>
             </TextField>
           </Box>
         )}
         <Typography variant="h6" sx={{mt: 1}}>
-          {t('course.results.selected-students')}
+          {t('course-results.selected-students')}
         </Typography>
         <Paper sx={{maxHeight: 200, overflow: 'auto', my: 1}}>
           <List dense>
@@ -237,7 +237,7 @@ const SisuDownloadDialog = ({
                   primary={`${t('general.student-number')}: ${row.user.studentNumber}`}
                   secondary={
                     userGradeAlreadyExported(row.finalGrades ?? [])
-                      ? t('course.results.exported-already')
+                      ? t('course-results.exported-already')
                       : ''
                   }
                 />

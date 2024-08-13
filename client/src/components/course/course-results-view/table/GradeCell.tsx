@@ -82,8 +82,8 @@ const GradeCell = ({
             placement="top"
             title={
               coursePartResults.grades.length <= 1
-                ? t('course.results.edit-grade')
-                : t('course.results.multiple-grade')
+                ? t('course-results.edit-grade')
+                : t('course-results.multiple-grade')
             }
           >
             <IconButton
@@ -107,7 +107,7 @@ const GradeCell = ({
           studentNumber={studentNumber}
           coursePartId={coursePartResults.coursePartId}
           maxGrade={maxGrade}
-          title={t('course.results.grade-of-for', {
+          title={t('course-results.grade-of-for', {
             user: studentNumber,
             part: coursePartResults.coursePartName,
           })}
@@ -151,7 +151,7 @@ const GradeCell = ({
         <>
           <Tooltip
             placement="top"
-            title={t('course.results.grade-expired-on', {
+            title={t('course-results.grade-expired-on', {
               date: bestGrade?.expiryDate.toString(),
             })}
           >

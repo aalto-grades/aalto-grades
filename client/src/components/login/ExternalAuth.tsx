@@ -21,10 +21,10 @@ const ExternalAuth = (): JSX.Element => {
       }}
     >
       <Typography variant="h3" sx={{mb: 1}}>
-        {t('login.external.title')}
+        {t('auth.external.title')}
       </Typography>
       <Typography variant="body2" sx={{mb: 1}}>
-        {t('login.external.body')}
+        {t('auth.external.body')}
       </Typography>
       <Button
         id="ag-sso-login-btn"
@@ -34,7 +34,7 @@ const ExternalAuth = (): JSX.Element => {
         sx={{mt: 1}}
         href="/v1/auth/login-idp"
       >
-        {t('login.external.button')}
+        {t('auth.external.button')}
       </Button>
     </Box>
   );

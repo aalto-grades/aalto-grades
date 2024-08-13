@@ -151,7 +151,7 @@ const EditGradesDialog = ({
     },
     {
       field: 'grade',
-      headerName: t('general.grade'),
+      headerName: t('general.grade.singular'),
       type: 'number',
       editable: true,
     },
@@ -224,7 +224,7 @@ const EditGradesDialog = ({
     return (
       <GridToolbarContainer>
         <Button startIcon={<Add />} onClick={handleClick}>
-          {t('course.results.add-grade')}
+          {t('course-results.add-grade')}
         </Button>
       </GridToolbarContainer>
     );
@@ -290,7 +290,7 @@ const EditGradesDialog = ({
     );
 
     if (newRow.expiryDate < newRow.date)
-      throw new Error(t('course.results.expiry-before'));
+      throw new Error(t('course-results.expiry-before'));
 
     setError(false);
     return newRow;

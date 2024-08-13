@@ -125,19 +125,19 @@ const ManageStudentsView = (): JSX.Element => {
   const handleDelete = async (): Promise<void> => {
     const confirmation = await AsyncConfirmationModal({
       title: plural
-        ? t('manage-students.delete_other')
-        : t('manage-students.delete_one'),
+        ? t('manage-students.delete.plural')
+        : t('manage-students.delete.singular'),
       message: plural
-        ? t('manage-students.delete-message_other')
-        : t('manage-students.delete-message_one'),
+        ? t('manage-students.delete-message.plural')
+        : t('manage-students.delete-message.singular'),
       confirmDelete: true,
     });
     if (confirmation) {
       await deleteUsers.mutateAsync(rowSelectionModel.map(row => Number(row)));
       enqueueSnackbar(
         plural
-          ? t('manage-students.delete-success_other')
-          : t('manage-students.delete-success_one'),
+          ? t('manage-students.delete-success.plural')
+          : t('manage-students.delete-success.singular'),
         {variant: 'success'}
       );
       setRowSelectionModel([]);

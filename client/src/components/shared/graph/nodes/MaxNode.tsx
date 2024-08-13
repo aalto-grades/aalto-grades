@@ -119,7 +119,7 @@ const MaxNode = (props: NodeProps): JSX.Element => {
       <table style={{width: '100%', margin: '5px 0px'}}>
         <tbody>
           <tr>
-            <th>{t('shared.graph.value')}</th>
+            <th>{t('graph.value')}</th>
           </tr>
           <tr
             style={{
