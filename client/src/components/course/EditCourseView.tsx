@@ -398,7 +398,7 @@ const EditCourseView = (): JSX.Element => {
                   >
                     {sisuLanguageOptions.map(option => (
                       <MenuItem key={option.id} value={option.id}>
-                        {option.language}
+                        {localize(option.language)}
                       </MenuItem>
                     ))}
                   </FormField>

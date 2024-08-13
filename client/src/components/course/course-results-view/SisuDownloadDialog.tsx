@@ -32,6 +32,7 @@ import {useParams} from 'react-router-dom';
 
 import {FinalGradeData, Language, StudentRow} from '@/common/types';
 import {useDownloadSisuGradeCsv} from '@/hooks/useApi';
+import {useLocalize} from '@/hooks/useLocalize';
 import {sisuLanguageOptions} from '@/utils/utils';
 
 type DownloadOption = 'all' | 'exported' | 'unexported';
@@ -48,6 +49,7 @@ const SisuDownloadDialog = ({
   selectedRows: StudentRow[];
 }): JSX.Element => {
   const {t} = useTranslation();
+  const localize = useLocalize();
   const {courseId} = useParams() as {courseId: string};
 
   const downloadSisuGradeCsv = useDownloadSisuGradeCsv({
@@ -170,7 +172,7 @@ const SisuDownloadDialog = ({
           </MenuItem>
           {sisuLanguageOptions.map(option => (
             <MenuItem key={option.id} value={option.id}>
-              {option.language}
+              {localize(option.language)}
             </MenuItem>
           ))}
         </TextField>
