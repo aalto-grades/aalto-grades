@@ -323,7 +323,9 @@ const UploadDialogUpload = ({
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'edit' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            {editText ? t('general.edit') : t('course.results.upload.add-manually')}
+            {editText
+              ? t('general.edit')
+              : t('course.results.upload.add-manually')}
           </AccordionSummary>
           <AccordionDetails>
             <div style={{height: '40vh'}}>
@@ -349,7 +351,9 @@ const UploadDialogUpload = ({
                   );
 
                   if (updatedRow.studentNo === '')
-                    throw new Error(t('course.results.upload.student-number-empty'));
+                    throw new Error(
+                      t('course.results.upload.student-number-empty')
+                    );
 
                   setError(false);
                   return updatedRow;

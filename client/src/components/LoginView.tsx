@@ -152,7 +152,9 @@ const LoginView = (): JSX.Element => {
               margin="normal"
             />
             <Collapse in={showOtpPrompt}>
-              <Typography sx={{mt: 1}}>{t('shared.auth.enter-totp')}</Typography>
+              <Typography sx={{mt: 1}}>
+                {t('shared.auth.enter-totp')}
+              </Typography>
               {showOtpPrompt && (
                 <MuiOtpInput
                   data-testid="mfa-input"

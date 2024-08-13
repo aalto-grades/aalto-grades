@@ -200,7 +200,8 @@ const UploadDialogConfirm = ({
                                     date.expirationDate <= date.completionDate,
                                   helperText:
                                     date.expirationDate <= date.completionDate
-                                      ? t('course.results.upload.expiration-after-completion'
+                                      ? t(
+                                          'course.results.upload.expiration-after-completion'
                                         )
                                       : '',
                                 },

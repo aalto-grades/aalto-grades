@@ -74,7 +74,9 @@ const StudentsView = (): JSX.Element => {
             {getString(student)}
           </Box>
         )}
-        renderInput={params => <TextField {...params} label={t('general.student')} />}
+        renderInput={params => (
+          <TextField {...params} label={t('general.student')} />
+        )}
       />
       {studentGrades.data !== undefined && (
         <>

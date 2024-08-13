@@ -104,19 +104,10 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
       department: z
         .number()
         .min(0, t('course.edit.department-select'))
-        .max(
-          departments.length - 1,
-          t('course.edit.department-select')
-        ),
-      nameEn: z
-        .string({required_error: t('course.edit.name-english')})
-        .min(1),
-      nameFi: z
-        .string({required_error: t('course.edit.name-finnish')})
-        .min(1),
-      nameSv: z
-        .string({required_error: t('course.edit.name-swedish')})
-        .min(1),
+        .max(departments.length - 1, t('course.edit.department-select')),
+      nameEn: z.string({required_error: t('course.edit.name-english')}).min(1),
+      nameFi: z.string({required_error: t('course.edit.name-finnish')}).min(1),
+      nameSv: z.string({required_error: t('course.edit.name-swedish')}).min(1),
     })
     .refine(val => val.maxCredits >= val.minCredits, {
       path: ['maxCredits'],
@@ -205,15 +196,13 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               valueFormat="name%"
               labelFormat={`${t('course.edit.course-name-in-format')}*`}
-              helperTextFormat={t('course.edit.course-name-in-help-format'
-              )}
+              helperTextFormat={t('course.edit.course-name-in-help-format')}
             />
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               value="department"
               label={`${t('general.organizing-department')}*`}
-              helperText={t('course.edit.organizing-department-help'
-              )}
+              helperText={t('course.edit.organizing-department-help')}
               select
             >
               {departments.map((department, i) => (

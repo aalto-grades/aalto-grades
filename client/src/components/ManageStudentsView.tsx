@@ -121,11 +121,12 @@ const ManageStudentsView = (): JSX.Element => {
     setData();
   }, [students.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const plural = rowSelectionModel.length > 1;
   const handleDelete = async (): Promise<void> => {
     const confirmation = await AsyncConfirmationModal({
       title: t('manage-students.delete', {count: rowSelectionModel.length}),
-      message: t('manage-students.delete-message', {count: rowSelectionModel.length}),
+      message: t('manage-students.delete-message', {
+        count: rowSelectionModel.length,
+      }),
       confirmDelete: true,
     });
     if (confirmation) {

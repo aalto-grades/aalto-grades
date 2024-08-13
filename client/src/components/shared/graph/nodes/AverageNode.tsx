@@ -189,7 +189,9 @@ const AverageNode = (props: NodeProps): JSX.Element => {
         onChange={handleCheck}
         checked={localSettings.percentageMode}
       />
-      <label htmlFor={`percentage-${id}`}>{t('shared.graph.percentage-mode')}</label>
+      <label htmlFor={`percentage-${id}`}>
+        {t('shared.graph.percentage-mode')}
+      </label>
 
       <table style={{width: '100%', margin: '5px 0px 0px 0px'}}>
         <tbody>
@@ -241,7 +243,8 @@ const AverageNode = (props: NodeProps): JSX.Element => {
         </p>
       )}
       <p className="output-value" style={{marginTop: '5px'}}>
-        {t('shared.graph.node.average')}: {Math.round(nodeValue.value * 100) / 100}
+        {t('shared.graph.node.average')}:{' '}
+        {Math.round(nodeValue.value * 100) / 100}
       </p>
 
       <Handle

@@ -110,19 +110,10 @@ const EditCourseView = (): JSX.Element => {
       department: z
         .number()
         .min(0, t('course.edit.department-select'))
-        .max(
-          departments.length - 1,
-          t('course.edit.department-select')
-        ),
-      nameEn: z
-        .string({required_error: t('course.edit.name-english')})
-        .min(1),
-      nameFi: z
-        .string({required_error: t('course.edit.name-finnish')})
-        .min(1),
-      nameSv: z
-        .string({required_error: t('course.edit.name-swedish')})
-        .min(1),
+        .max(departments.length - 1, t('course.edit.department-select')),
+      nameEn: z.string({required_error: t('course.edit.name-english')}).min(1),
+      nameFi: z.string({required_error: t('course.edit.name-finnish')}).min(1),
+      nameSv: z.string({required_error: t('course.edit.name-swedish')}).min(1),
     })
     .refine(val => val.maxCredits >= val.minCredits, {
       path: ['maxCredits'],
@@ -323,7 +314,8 @@ const EditCourseView = (): JSX.Element => {
                     disabled={auth?.role !== SystemRole.Admin}
                     valueFormat="name%"
                     labelFormat={`${t('course.edit.course-name-in-format')}*`}
-                    helperTextFormat={t('course.edit.course-name-in-help-format'
+                    helperTextFormat={t(
+                      'course.edit.course-name-in-help-format'
                     )}
                   />
                   <FormField
@@ -333,8 +325,7 @@ const EditCourseView = (): JSX.Element => {
                     value="department"
                     disabled={auth?.role !== SystemRole.Admin}
                     label={`${t('general.organizing-department')}*`}
-                    helperText={t('course.edit.organizing-department-help'
-                    )}
+                    helperText={t('course.edit.organizing-department-help')}
                     select
                   >
                     {departments.map((department, i) => (
@@ -373,8 +364,7 @@ const EditCourseView = (): JSX.Element => {
                       finalGrades.data.length > 0
                     }
                     label={`${t('course.edit.grading-scale')}*`}
-                    helperText={t('course.edit.grading-scale-help'
-                    )}
+                    helperText={t('course.edit.grading-scale-help')}
                     select
                   >
                     {Object.values(GradingScale).map(value => (
@@ -415,8 +405,7 @@ const EditCourseView = (): JSX.Element => {
                     helperText={
                       form.errors.teacherEmail ??
                       (teachersInCharge.length === 0
-                        ? t('course.edit.input-at-least-one-teacher'
-                          )
+                        ? t('course.edit.input-at-least-one-teacher')
                         : teachersInCharge.includes(form.values.teacherEmail)
                           ? t('course.edit.email-in-list')
                           : t('course.edit.add-teacher-emails'))
