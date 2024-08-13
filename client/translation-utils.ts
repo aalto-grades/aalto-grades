@@ -6,6 +6,7 @@
 
 import fs from 'fs';
 import path from 'node:path';
+import readlineSync from 'readline-sync';
 
 type TranslationJson = {[key: string]: TranslationJson | string | undefined};
 
@@ -148,8 +149,8 @@ function updateSourceCode(changes: Change[]): void {
     for (const file of files) {
       const data = fs.readFileSync(file, 'utf8');
 
-      const oldRegExp = new RegExp(`t\\(\\s*'${escapeRegExp(change.before)}`);
-      const result = data.replace(oldRegExp, `t('${change.after}`);
+      const oldRegExp = new RegExp(`t\\(\\s*'${escapeRegExp(change.before)}'`);
+      const result = data.replace(oldRegExp, `t('${change.after}'`);
       fs.writeFileSync(file, result, 'utf8');
     }
   }
@@ -163,38 +164,21 @@ function updateTranslation(file: File, changes: Change[]): void {
   }
   fs.copyFileSync(file, backup);
 
-  const original = JSON.parse(
-    fs.readFileSync(file).toString()
-  ) as TranslationJson;
-  const updated: TranslationJson = structuredClone(original);
+  const entries = parseFileEntries(file).entries;
 
-  function get(object: TranslationJson, key: string): string {
-    const keyParts = key.split('.');
-    let value: string | null = null;
-
-    let iter: TranslationJson = object;
-    keyParts.forEach((part, i) => {
-      if (i === keyParts.length - 1) {
-        value = iter[part] as string;
-      } else {
-        iter = iter[part] as TranslationJson;
-      }
-    });
-
-    return value!;
+  for (const change of changes) {
+    (entries.find(entry => entry.key === change.before) as Entry).key =
+      change.after;
   }
 
-  function set(
-    object: TranslationJson,
-    key: string,
-    value: string | undefined
-  ): void {
-    const keyParts = key.split('.');
+  const object: TranslationJson = {};
+  for (const entry of entries) {
+    const keyParts = entry.key.split('.');
 
     let iter: TranslationJson = object;
     keyParts.forEach((part, i) => {
       if (i === keyParts.length - 1) {
-        iter[part] = value;
+        iter[part] = entry.value;
       } else {
         if (iter[part] === undefined) {
           iter[part] = {};
@@ -204,14 +188,7 @@ function updateTranslation(file: File, changes: Change[]): void {
     });
   }
 
-  for (const change of changes) {
-    const value = get(original, change.before);
-    set(updated, change.before, undefined);
-    console.log(value);
-    set(updated, change.after, value);
-  }
-
-  fs.writeFileSync(file, JSON.stringify(updated, null, 2));
+  fs.writeFileSync(file, JSON.stringify(object, null, 2));
 }
 
 function rename(): void {
@@ -228,7 +205,58 @@ function rename(): void {
 function merge(): void {
   const fileEntries = parseFileEntries(File.English);
   const duplicates = findDuplicateValues(fileEntries.entries);
-  console.log(duplicates);
+
+  if (duplicates.length === 0) {
+    console.log('No duplicate values found, nothing to do.');
+    return;
+  }
+
+  console.log(
+    'The following keys have the same values. Please enter the index of the key to ' +
+      'use for the values or enter a new key.'
+  );
+
+  const changes: Change[] = [];
+  for (const duplicate of duplicates) {
+    const max = duplicate.keys.length - 1;
+
+    let question = `\n'${duplicate.value}'\n`;
+    duplicate.keys.forEach((key, i) => (question += `${i}: ${key}\n`));
+    question += `[0-${max} or new key]: `;
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    while (true) {
+      let chosenKey = readlineSync.question(question);
+      const selection = Number(chosenKey);
+
+      if (!isNaN(selection)) {
+        if (!Number.isInteger(selection)) {
+          console.log('\nERROR: Selection must be an integer.');
+          continue;
+        }
+        if (selection < 0 || selection > max) {
+          console.log(`\nERROR: Selection must be between 0 and ${max}.`);
+          continue;
+        }
+        chosenKey = duplicate.keys[selection];
+      }
+
+      for (const key of duplicate.keys) {
+        if (key !== chosenKey) {
+          changes.push({
+            before: key,
+            after: chosenKey,
+          });
+        }
+      }
+      break;
+    }
+  }
+
+  updateSourceCode(changes);
+  updateTranslation(File.English, changes);
+  updateTranslation(File.Finnish, changes);
+  updateTranslation(File.Swedish, changes);
 }
 
 const args = process.argv.slice(2);
@@ -248,5 +276,5 @@ switch (command) {
     break;
 
   default:
-    console.error(`Unrecognized command ${command}`);
+    console.error(`Unrecognized command '${command}'`);
 }
