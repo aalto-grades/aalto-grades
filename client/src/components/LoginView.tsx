@@ -105,7 +105,7 @@ const LoginView = (): JSX.Element => {
         alignItems="center"
         justifyContent="center"
       >
-        <Typography variant="h2">{t('auth.login-title')}</Typography>
+        <Typography variant="h2">{t('auth.local.title')}</Typography>
         <ExternalAuth />
         <Box
           sx={{

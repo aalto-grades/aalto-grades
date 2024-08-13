@@ -75,7 +75,7 @@ const OtpAuthDialog = ({
           </DialogContentText>
         </Collapse>
         <DialogContentText sx={{mt: 2, textAlign: 'center'}}>
-          {t('auth.mfa-qr.enter-otp')}
+          {t('auth.local.enter-otp')}
         </DialogContentText>
         <MuiOtpInput
           data-testid="mfa-input"

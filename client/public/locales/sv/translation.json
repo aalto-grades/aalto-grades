@@ -1,58 +1,66 @@
 {
+  "auth": {
+    "password": {
+      "match": "UNTRANSLATED",
+      "changed": "UNTRANSLATED",
+      "new": "UNTRANSLATED",
+      "repeat": "UNTRANSLATED",
+      "requirements": "UNTRANSLATED",
+      "reset": "UNTRANSLATED",
+      "reset-done": "UNTRANSLATED",
+      "old": "UNTRANSLATED"
+    },
+    "change-password": "UNTRANSLATED",
+    "reset-mfa-secret": "UNTRANSLATED",
+    "reset-mfa-secret-message": "UNTRANSLATED",
+    "mfa-qr": {
+      "close-without-confirm": "UNTRANSLATED",
+      "title": "UNTRANSLATED",
+      "scan": "UNTRANSLATED",
+      "manual": "UNTRANSLATED",
+      "cancel": "UNTRANSLATED"
+    },
+    "reset-mfa": "UNTRANSLATED",
+    "log-out": "UNTRANSLATED",
+    "external": {
+      "title": "UNTRANSLATED",
+      "body": "UNTRANSLATED",
+      "button": "UNTRANSLATED"
+    },
+    "local": {
+      "title": "UNTRANSLATED",
+      "body": "UNTRANSLATED",
+      "enter-otp": "UNTRANSLATED",
+      "button": "UNTRANSLATED"
+    },
+    "hide-password": "UNTRANSLATED",
+    "show-password": "UNTRANSLATED"
+  },
+  "footer": {
+    "privacy": "UNTRANSLATED",
+    "accessibility": "UNTRANSLATED",
+    "support": "UNTRANSLATED",
+    "licenses": "UNTRANSLATED",
+    "source": {
+      "tooltip": "UNTRANSLATED",
+      "text": "UNTRANSLATED"
+    },
+    "feedback": {
+      "tooltip": "UNTRANSLATED",
+      "text": "UNTRANSLATED"
+    }
+  },
   "general": {
-    "cancel": "UNTRANSLATED",
-    "confirm": "UNTRANSLATED",
-    "unsaved-changes": "UNTRANSLATED",
-    "delete": "UNTRANSLATED",
-    "email": "UNTRANSLATED",
-    "password": "UNTRANSLATED",
     "a+-token": "UNTRANSLATED",
-    "grading-model": {
-      "singular": "UNTRANSLATED",
-      "plural": "UNTRANSLATED"
-    },
-    "grading-date": "UNTRANSLATED",
-    "final-grade": {
-      "singular": "UNTRANSLATED",
-      "plural": "UNTRANSLATED"
-    },
-    "loading": "UNTRANSLATED",
-    "grader": "UNTRANSLATED",
-    "grade": {
-      "singular": "UNTRANSLATED",
-      "plural": "UNTRANSLATED"
-    },
-    "date": "UNTRANSLATED",
-    "grading-model-name": "UNTRANSLATED",
-    "export-date": "UNTRANSLATED",
-    "comment": "UNTRANSLATED",
-    "discard": "UNTRANSLATED",
-    "close": "UNTRANSLATED",
-    "save": "UNTRANSLATED",
-    "expiry-date": "UNTRANSLATED",
-    "exported": "UNTRANSLATED",
-    "grades-saved": "UNTRANSLATED",
-    "student-number": "UNTRANSLATED",
-    "download": "UNTRANSLATED",
     "a+-courses": "UNTRANSLATED",
     "next": "UNTRANSLATED",
     "back": "UNTRANSLATED",
-    "submit": "UNTRANSLATED",
     "name": "UNTRANSLATED",
     "days-valid": "UNTRANSLATED",
     "max-grade": "UNTRANSLATED",
-    "a+-sources": "UNTRANSLATED",
-    "course-part": {
-      "plural": "UNTRANSLATED",
-      "singular": "UNTRANSLATED"
-    },
-    "course-code": "UNTRANSLATED",
-    "organizing-department": "UNTRANSLATED",
-    "assistant": {
-      "plural": "UNTRANSLATED",
-      "singular": "UNTRANSLATED"
-    },
-    "add": "UNTRANSLATED",
+    "submit": "UNTRANSLATED",
+    "cancel": "UNTRANSLATED",
+    "save": "UNTRANSLATED",
     "course": {
       "singular": "UNTRANSLATED",
       "plural": "UNTRANSLATED"
@@ -71,8 +79,49 @@
       "plural": "UNTRANSLATED",
       "singular": "UNTRANSLATED"
     },
+    "a+-sources": "UNTRANSLATED",
+    "course-code": "UNTRANSLATED",
+    "date": "UNTRANSLATED",
+    "grading-model": {
+      "singular": "UNTRANSLATED",
+      "plural": "UNTRANSLATED"
+    },
+    "grading-date": "UNTRANSLATED",
+    "confirm": "UNTRANSLATED",
+    "final-grade": {
+      "singular": "UNTRANSLATED",
+      "plural": "UNTRANSLATED"
+    },
+    "student-number": "UNTRANSLATED",
+    "download": "UNTRANSLATED",
+    "loading": "UNTRANSLATED",
+    "grader": "UNTRANSLATED",
+    "grade": {
+      "singular": "UNTRANSLATED",
+      "plural": "UNTRANSLATED"
+    },
+    "grading-model-name": "UNTRANSLATED",
+    "export-date": "UNTRANSLATED",
+    "comment": "UNTRANSLATED",
+    "delete": "UNTRANSLATED",
+    "discard": "UNTRANSLATED",
+    "close": "UNTRANSLATED",
+    "expiry-date": "UNTRANSLATED",
+    "exported": "UNTRANSLATED",
+    "grades-saved": "UNTRANSLATED",
+    "select-course-parts": "UNTRANSLATED",
+    "course-part": {
+      "singular": "UNTRANSLATED",
+      "plural": "UNTRANSLATED"
+    },
     "import": "UNTRANSLATED",
     "edit": "UNTRANSLATED",
+    "organizing-department": "UNTRANSLATED",
+    "assistant": {
+      "plural": "UNTRANSLATED",
+      "singular": "UNTRANSLATED"
+    },
+    "add": "UNTRANSLATED",
     "code": "UNTRANSLATED",
     "role": "UNTRANSLATED",
     "admin": {
@@ -81,59 +130,114 @@
     },
     "teacher": "UNTRANSLATED",
     "student": "UNTRANSLATED",
+    "email": "UNTRANSLATED",
     "copy": "UNTRANSLATED",
-    "idp-users": "UNTRANSLATED",
     "users": "UNTRANSLATED",
-    "done": "UNTRANSLATED",
+    "idp-users": "UNTRANSLATED",
+    "password": "UNTRANSLATED",
+    "unsaved-changes": "UNTRANSLATED",
     "in-english": "UNTRANSLATED",
     "in-finnish": "UNTRANSLATED",
-    "in-swedish": "UNTRANSLATED"
+    "in-swedish": "UNTRANSLATED",
+    "done": "UNTRANSLATED"
   },
-  "alerts": {
-    "unsaved-changes": {
-      "body": "UNTRANSLATED",
-      "stay": "UNTRANSLATED",
-      "discard": "UNTRANSLATED"
-    }
-  },
-  "auth": {
-    "password": {
-      "match": "UNTRANSLATED",
-      "changed": "UNTRANSLATED",
-      "new": "UNTRANSLATED",
-      "repeat": "UNTRANSLATED",
-      "requirements": "UNTRANSLATED",
-      "reset": "UNTRANSLATED",
-      "old": "UNTRANSLATED",
-      "reset-done": "UNTRANSLATED"
+  "course": {
+    "a+": {
+      "select-grade-source": {
+        "singular": "UNTRANSLATED",
+        "plural": "UNTRANSLATED"
+      },
+      "create-parts": "UNTRANSLATED",
+      "fetching-grades": "UNTRANSLATED",
+      "select-for-fetching": "UNTRANSLATED",
+      "fetching-grades-wait": "UNTRANSLATED",
+      "part-id": "UNTRANSLATED",
+      "source-id": "UNTRANSLATED"
     },
-    "change-password": "UNTRANSLATED",
-    "external": {
+    "create-part": {
       "title": "UNTRANSLATED",
-      "body": "UNTRANSLATED",
-      "button": "UNTRANSLATED"
+      "name-help": "UNTRANSLATED",
+      "days-valid-help": "UNTRANSLATED",
+      "set-max-grade": "UNTRANSLATED",
+      "max-grade-help": "UNTRANSLATED"
     },
-    "login-title": "UNTRANSLATED",
-    "local": {
+    "view-a+-source": {
+      "course-name": "UNTRANSLATED",
+      "url": "UNTRANSLATED",
+      "source-name": "UNTRANSLATED",
+      "delete": "UNTRANSLATED"
+    },
+    "upload": {
+      "grades-added": "UNTRANSLATED",
+      "higher-than-max": "UNTRANSLATED",
+      "dates": "UNTRANSLATED",
+      "hidden": "UNTRANSLATED",
+      "completion-date": "UNTRANSLATED",
+      "expiration-date": "UNTRANSLATED",
+      "expiration-after-completion": "UNTRANSLATED",
+      "confirm-data": "UNTRANSLATED",
+      "all-done": "UNTRANSLATED",
+      "import-as-twice": "UNTRANSLATED",
+      "import-as-empty": "UNTRANSLATED",
+      "no-student-number": "UNTRANSLATED",
+      "mismatch": "UNTRANSLATED",
+      "csv-column": "UNTRANSLATED",
+      "import-as": "UNTRANSLATED",
+      "ignore-column": "UNTRANSLATED",
+      "missing-grades": "UNTRANSLATED",
+      "upload-grades": "UNTRANSLATED",
+      "paste-text": "UNTRANSLATED",
+      "upload-csv": "UNTRANSLATED",
+      "download-template": "UNTRANSLATED",
+      "a+-import": "UNTRANSLATED",
+      "add-manually": "UNTRANSLATED",
+      "student-number-empty": "UNTRANSLATED"
+    },
+    "parts": {
+      "saved": "UNTRANSLATED",
+      "add-a+-source": "UNTRANSLATED",
+      "view-a+-sources": "UNTRANSLATED",
+      "unarchive": "UNTRANSLATED",
+      "archive": "UNTRANSLATED",
+      "delete": "UNTRANSLATED",
+      "delete-message": "UNTRANSLATED",
+      "valid-until": "UNTRANSLATED",
+      "archived": "UNTRANSLATED",
+      "add-new": "UNTRANSLATED",
+      "add-from-a+": "UNTRANSLATED"
+    },
+    "edit-course": {
+      "saved": "UNTRANSLATED"
+    },
+    "edit": "UNTRANSLATED",
+    "create-model": {
       "title": "UNTRANSLATED",
-      "body": "UNTRANSLATED",
-      "enter-otp": "UNTRANSLATED",
-      "button": "UNTRANSLATED"
+      "select-template": "UNTRANSLATED",
+      "none": "UNTRANSLATED"
     },
-    "mfa-qr": {
-      "title": "UNTRANSLATED",
-      "scan": "UNTRANSLATED",
-      "manual": "UNTRANSLATED",
-      "enter-otp": "UNTRANSLATED",
-      "cancel": "UNTRANSLATED",
-      "close-without-confirm": "UNTRANSLATED"
+    "rename-model": {
+      "saved": "UNTRANSLATED",
+      "title": "UNTRANSLATED"
     },
-    "hide-password": "UNTRANSLATED",
-    "show-password": "UNTRANSLATED",
-    "reset-mfa-secret": "UNTRANSLATED",
-    "reset-mfa-secret-message": "UNTRANSLATED",
-    "reset-mfa": "UNTRANSLATED",
-    "log-out": "UNTRANSLATED"
+    "models": {
+      "could-not-find-model": "UNTRANSLATED",
+      "could-not-find-grade": "UNTRANSLATED",
+      "delete-model": "UNTRANSLATED",
+      "delete-model-message": "UNTRANSLATED",
+      "save-null": "UNTRANSLATED",
+      "has-deleted-and-archived": "UNTRANSLATED",
+      "has-archived": "UNTRANSLATED",
+      "has-deleted": "UNTRANSLATED",
+      "new-model": "UNTRANSLATED",
+      "create-new": "UNTRANSLATED",
+      "back": "UNTRANSLATED",
+      "no-models": "UNTRANSLATED",
+      "unarchive": "UNTRANSLATED",
+      "archive": "UNTRANSLATED",
+      "cannot-delete-with-final": "UNTRANSLATED",
+      "delete-grading-model": "UNTRANSLATED"
+    },
+    "list": "UNTRANSLATED"
   },
   "course-results": {
     "model-has-deleted-and-archived": "UNTRANSLATED",
@@ -163,21 +267,6 @@
     "show-model-parts": "UNTRANSLATED",
     "showing-n-rows": "UNTRANSLATED",
     "n-errors": "UNTRANSLATED",
-    "not-found": "UNTRANSLATED",
-    "not-permitted": "UNTRANSLATED",
-    "add-final": "UNTRANSLATED",
-    "grades-saved": "UNTRANSLATED",
-    "add-grade": "UNTRANSLATED",
-    "expiry-before": "UNTRANSLATED",
-    "edit-final": "UNTRANSLATED",
-    "multiple-final": "UNTRANSLATED",
-    "final-of": "UNTRANSLATED",
-    "final-on-date": "UNTRANSLATED",
-    "edit-grade": "UNTRANSLATED",
-    "multiple-grade": "UNTRANSLATED",
-    "grade-of-for": "UNTRANSLATED",
-    "grade-expired-on": "UNTRANSLATED",
-    "view-graph": "UNTRANSLATED",
     "final-downloaded": "UNTRANSLATED",
     "fetching-sisu-csv": "UNTRANSLATED",
     "download-at-least-one": "UNTRANSLATED",
@@ -193,6 +282,21 @@
     "download-exported": "UNTRANSLATED",
     "selected-students": "UNTRANSLATED",
     "exported-already": "UNTRANSLATED",
+    "not-found": "UNTRANSLATED",
+    "not-permitted": "UNTRANSLATED",
+    "add-final": "UNTRANSLATED",
+    "grades-saved": "UNTRANSLATED",
+    "add-grade": "UNTRANSLATED",
+    "expiry-before": "UNTRANSLATED",
+    "edit-final": "UNTRANSLATED",
+    "multiple-final": "UNTRANSLATED",
+    "final-of": "UNTRANSLATED",
+    "final-on-date": "UNTRANSLATED",
+    "edit-grade": "UNTRANSLATED",
+    "multiple-grade": "UNTRANSLATED",
+    "grade-of-for": "UNTRANSLATED",
+    "grade-expired-on": "UNTRANSLATED",
+    "view-graph": "UNTRANSLATED",
     "data-undefined": "UNTRANSLATED"
   },
   "context": {
@@ -201,107 +305,6 @@
       "exported": "UNTRANSLATED",
       "errors": "UNTRANSLATED",
       "preview": "UNTRANSLATED"
-    }
-  },
-  "course": {
-    "a+": {
-      "select-grade-source": {
-        "singular": "UNTRANSLATED",
-        "plural": "UNTRANSLATED"
-      },
-      "select-course-parts": "UNTRANSLATED",
-      "fetching-grades": "UNTRANSLATED",
-      "select-for-fetching": "UNTRANSLATED",
-      "fetching-grades-wait": "UNTRANSLATED",
-      "part-id": "UNTRANSLATED",
-      "source-id": "UNTRANSLATED",
-      "create-parts": "UNTRANSLATED"
-    },
-    "parts": {
-      "saved": "UNTRANSLATED",
-      "add-a+-source": "UNTRANSLATED",
-      "view-a+-sources": "UNTRANSLATED",
-      "unarchive": "UNTRANSLATED",
-      "archive": "UNTRANSLATED",
-      "delete": "UNTRANSLATED",
-      "delete-message": "UNTRANSLATED",
-      "valid-until": "UNTRANSLATED",
-      "archived": "UNTRANSLATED",
-      "add-new": "UNTRANSLATED",
-      "add-from-a+": "UNTRANSLATED"
-    },
-    "create-model": {
-      "title": "UNTRANSLATED",
-      "select-template": "UNTRANSLATED",
-      "none": "UNTRANSLATED",
-      "addition": "UNTRANSLATED",
-      "average": "UNTRANSLATED"
-    },
-    "edit-course": {
-      "saved": "UNTRANSLATED"
-    },
-    "edit": "UNTRANSLATED",
-    "models": {
-      "could-not-find-model": "UNTRANSLATED",
-      "could-not-find-grade": "UNTRANSLATED",
-      "delete-model": "UNTRANSLATED",
-      "delete-model-message": "UNTRANSLATED",
-      "save-null": "UNTRANSLATED",
-      "has-deleted-and-archived": "UNTRANSLATED",
-      "has-archived": "UNTRANSLATED",
-      "has-deleted": "UNTRANSLATED",
-      "new-model": "UNTRANSLATED",
-      "create-new": "UNTRANSLATED",
-      "back": "UNTRANSLATED",
-      "no-models": "UNTRANSLATED",
-      "unarchive": "UNTRANSLATED",
-      "archive": "UNTRANSLATED",
-      "cannot-delete-with-final": "UNTRANSLATED",
-      "delete-grading-model": "UNTRANSLATED"
-    },
-    "rename-model": {
-      "title": "UNTRANSLATED",
-      "saved": "UNTRANSLATED"
-    },
-    "create-part": {
-      "title": "UNTRANSLATED",
-      "name-help": "UNTRANSLATED",
-      "days-valid-help": "UNTRANSLATED",
-      "set-max-grade": "UNTRANSLATED",
-      "max-grade-help": "UNTRANSLATED"
-    },
-    "list": "UNTRANSLATED",
-    "upload": {
-      "grades-added": "UNTRANSLATED",
-      "higher-than-max": "UNTRANSLATED",
-      "dates": "UNTRANSLATED",
-      "hidden": "UNTRANSLATED",
-      "completion-date": "UNTRANSLATED",
-      "expiration-date": "UNTRANSLATED",
-      "expiration-after-completion": "UNTRANSLATED",
-      "confirm-data": "UNTRANSLATED",
-      "all-done": "UNTRANSLATED",
-      "import-as-twice": "UNTRANSLATED",
-      "import-as-empty": "UNTRANSLATED",
-      "no-student-number": "UNTRANSLATED",
-      "mismatch": "UNTRANSLATED",
-      "csv-column": "UNTRANSLATED",
-      "import-as": "UNTRANSLATED",
-      "ignore-column": "UNTRANSLATED",
-      "missing-grades": "UNTRANSLATED",
-      "upload-grades": "UNTRANSLATED",
-      "paste-text": "UNTRANSLATED",
-      "upload-csv": "UNTRANSLATED",
-      "download-template": "UNTRANSLATED",
-      "a+-import": "UNTRANSLATED",
-      "add-manually": "UNTRANSLATED",
-      "student-number-empty": "UNTRANSLATED"
-    },
-    "view-a+-source": {
-      "course-name": "UNTRANSLATED",
-      "url": "UNTRANSLATED",
-      "source-name": "UNTRANSLATED",
-      "delete": "UNTRANSLATED"
     }
   },
   "front-page": {
@@ -350,45 +353,21 @@
     "mfa-reset": "UNTRANSLATED",
     "reset-auth": "UNTRANSLATED",
     "resetting-password-for": "UNTRANSLATED",
+    "manage-users": "UNTRANSLATED",
     "delete-user": "UNTRANSLATED",
     "delete-user-message": "UNTRANSLATED",
     "user-deleted": "UNTRANSLATED",
     "no-users": "UNTRANSLATED",
     "reset-password-mfa": "UNTRANSLATED",
-    "manage-users": "UNTRANSLATED",
     "your-courses": "UNTRANSLATED",
     "no-courses": "UNTRANSLATED",
     "create-new-course": "UNTRANSLATED"
   },
-  "footer": {
-    "privacy": "UNTRANSLATED",
-    "accessibility": "UNTRANSLATED",
-    "support": "UNTRANSLATED",
-    "licenses": "UNTRANSLATED",
-    "source": {
-      "tooltip": "UNTRANSLATED",
-      "text": "UNTRANSLATED"
-    },
-    "feedback": {
-      "tooltip": "UNTRANSLATED",
-      "text": "UNTRANSLATED"
-    }
-  },
   "graph": {
-    "inputs": "UNTRANSLATED",
-    "percentage-mode": "UNTRANSLATED",
-    "weight": "UNTRANSLATED",
-    "value": "UNTRANSLATED",
-    "average": "UNTRANSLATED",
-    "min-points": "UNTRANSLATED",
-    "fail-course": "UNTRANSLATED",
-    "output-fail": "UNTRANSLATED",
-    "output": "UNTRANSLATED",
-    "set-test-values": "UNTRANSLATED",
     "node": {
       "add": "UNTRANSLATED",
-      "add-tooltip": "UNTRANSLATED",
       "average": "UNTRANSLATED",
+      "add-tooltip": "UNTRANSLATED",
       "average-tooltip": "UNTRANSLATED",
       "stepper": "UNTRANSLATED",
       "stepper-tooltip": "UNTRANSLATED",
@@ -403,6 +382,7 @@
       "substitute": "UNTRANSLATED",
       "substitute-tooltip": "UNTRANSLATED"
     },
+    "set-test-values": "UNTRANSLATED",
     "part-deleted": "UNTRANSLATED",
     "part-archived": "UNTRANSLATED",
     "saving": "UNTRANSLATED",
@@ -414,9 +394,16 @@
       "plural": "UNTRANSLATED",
       "singular": "UNTRANSLATED"
     },
-    "select-parts": "UNTRANSLATED",
     "test-values": "UNTRANSLATED",
     "format": "UNTRANSLATED",
+    "inputs": "UNTRANSLATED",
+    "percentage-mode": "UNTRANSLATED",
+    "weight": "UNTRANSLATED",
+    "value": "UNTRANSLATED",
+    "min-points": "UNTRANSLATED",
+    "fail-course": "UNTRANSLATED",
+    "output-fail": "UNTRANSLATED",
+    "output": "UNTRANSLATED",
     "on-fail": "UNTRANSLATED",
     "allowed-fails": "UNTRANSLATED",
     "in": "UNTRANSLATED",
@@ -459,6 +446,13 @@
       "label": "UNTRANSLATED",
       "invalid": "UNTRANSLATED",
       "length": "UNTRANSLATED"
+    }
+  },
+  "alerts": {
+    "unsaved-changes": {
+      "body": "UNTRANSLATED",
+      "stay": "UNTRANSLATED",
+      "discard": "UNTRANSLATED"
     }
   },
   "students": {
