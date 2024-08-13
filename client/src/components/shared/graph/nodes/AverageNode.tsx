@@ -65,7 +65,7 @@ const AverageNode = (props: NodeProps): JSX.Element => {
 
   const nodeValue = nodeValues[id] as AverageNodeValue;
 
-  // Nonoptimal useEffect, but we must update parent state (settings) when
+  // Unoptimal useEffect, but we must update parent state (settings) when
   // The node inputs change...
   useEffect(() => {
     let change = false;

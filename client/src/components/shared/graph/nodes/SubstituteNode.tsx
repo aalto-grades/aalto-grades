@@ -62,7 +62,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
 
   const nodeValue = nodeValues[id] as SubstituteNodeValue;
 
-  // Nonoptimal useEffect, but we must update parent state (settings) when
+  // Unoptimal useEffect, but we must update parent state (settings) when
   // The node inputs change...
   useEffect(() => {
     let change = false;

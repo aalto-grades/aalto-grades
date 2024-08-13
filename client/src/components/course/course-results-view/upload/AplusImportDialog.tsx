@@ -56,7 +56,7 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
   const [oldAplusGrades, setOldAplusGrades] = useState<
     typeof aplusGrades | null
   >(null);
-  if (aplusGrades !== oldAplusGrades) {
+  if (JSON.stringify(aplusGrades) !== JSON.stringify(oldAplusGrades)) {
     setOldAplusGrades(aplusGrades);
 
     if (step === 1) {
