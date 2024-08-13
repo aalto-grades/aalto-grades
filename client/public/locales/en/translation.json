@@ -178,8 +178,7 @@
     "local": {
       "title": "Log in to Aalto Grades",
       "body": "If you have been provided with credentials specifically for Aalto Grades, use this login.",
-      "button": "Log in",
-      "mfa-code": "MFA code"
+      "button": "Log in"
     }
   },
   "course": {
@@ -189,7 +188,7 @@
       "model-has-deleted": "Grading model contains deleted course parts",
       "calculate-final": "Calculate final grades",
       "calculating-for_one": "Calculating final grade for 1 student",
-      "calculating-for_other": "Calculating final grades for {{count}} students",
+      "calculating-for_other": "Calculating final grades for {{n}} students",
       "using-latest": "You are using latest grades instead of the best grades to calculate the final grades.",
       "some-grade-invalid": "Some of the selected grades are invalid.",
       "some-final-invalid": "Some final grades will have invalid values, check if the correct grading model is being used",

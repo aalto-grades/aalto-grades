@@ -124,7 +124,11 @@ const CalculateFinalGradesDialog = ({
       <DialogTitle>{t('course.results.calculate-final')}</DialogTitle>
       <DialogContent>
         <Typography sx={{mb: 2}}>
-          {t('course.results.calculating-for', {count: selectedRows.length})}
+          {selectedRows.length === 1
+            ? t('course.results.calculating-for_one')
+            : t('course.results.calculating-for_other', {
+                n: selectedRows.length,
+              })}
         </Typography>
 
         {/* Warnings */}

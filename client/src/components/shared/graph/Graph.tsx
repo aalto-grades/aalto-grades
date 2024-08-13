@@ -640,7 +640,9 @@ const Graph = ({
               zIndex: 1,
             }}
           >
-            {t('shared.graph.delete-node', {count: selected.length})}
+            {selected.length > 1
+              ? t('shared.graph.delete-node_other')
+              : t('shared.graph.delete-node_one')}
           </Button>
         )}
       </div>
