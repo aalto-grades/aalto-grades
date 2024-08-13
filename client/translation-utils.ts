@@ -164,20 +164,38 @@ function updateTranslation(file: File, changes: Change[]): void {
   }
   fs.copyFileSync(file, backup);
 
-  const entries = parseFileEntries(file).entries;
+  const original = JSON.parse(
+    fs.readFileSync(file).toString()
+  ) as TranslationJson;
+  const updated: TranslationJson = structuredClone(original);
 
-  for (const change of changes) {
-    (entries.find(entry => entry.key === change.before) as Entry).key = change.after;
-  }
-
-  const object: TranslationJson = {};
-  for (const entry of entries) {
-    const keyParts = entry.key.split('.');
+  function get(object: TranslationJson, key: string): string {
+    const keyParts = key.split('.');
+    let value: string | null = null;
 
     let iter: TranslationJson = object;
     keyParts.forEach((part, i) => {
       if (i === keyParts.length - 1) {
-        iter[part] = entry.value;
+        value = iter[part] as string;
+      } else {
+        iter = iter[part] as TranslationJson;
+      }
+    });
+
+    return value!;
+  }
+
+  function set(
+    object: TranslationJson,
+    key: string,
+    value: string | undefined
+  ): void {
+    const keyParts = key.split('.');
+
+    let iter: TranslationJson = object;
+    keyParts.forEach((part, i) => {
+      if (i === keyParts.length - 1) {
+        iter[part] = value;
       } else {
         if (iter[part] === undefined) {
           iter[part] = {};
@@ -187,7 +205,13 @@ function updateTranslation(file: File, changes: Change[]): void {
     });
   }
 
-  fs.writeFileSync(file, JSON.stringify(object, null, 2));
+  for (const change of changes) {
+    const value = get(original, change.before);
+    set(updated, change.before, undefined);
+    set(updated, change.after, value);
+  }
+
+  fs.writeFileSync(file, JSON.stringify(updated, null, 2));
 }
 
 function rename(): void {
