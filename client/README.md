@@ -51,7 +51,7 @@ $ npm test
 
 ## Translation utils
 
-There are several scripts to aide in managing translations.
+There are several scripts to aid in managing translations.
 
 - `npm run trans-parse`: Parses the source code for missing translation keys in
   the locale translation files.
