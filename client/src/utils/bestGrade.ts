@@ -11,7 +11,7 @@ type BaseType = {
 
 export const gradeIsExpired = (grade: BaseType | null): boolean => {
   if (grade === null) return false;
-  return new Date().getTime() > grade.expiryDate.getTime();
+  return Date.now() > grade.expiryDate.getTime();
 };
 
 const gradeIsNewer = (

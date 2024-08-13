@@ -73,7 +73,7 @@ const CourseResultsTable = (): JSX.Element => {
                       display: 'flex',
                       // Calculate correct size for groupHeaders
                       width:
-                        header.subHeaders.length !== 0
+                        header.subHeaders.length > 0
                           ? header.subHeaders.reduce(
                               (acc, subHeader) => acc + subHeader.getSize(),
                               0

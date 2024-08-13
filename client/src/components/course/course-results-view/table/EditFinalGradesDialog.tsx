@@ -215,8 +215,7 @@ const EditFinalGradesDialog = ({
   const dataGridToolbar = (): JSX.Element => {
     const addFinalGrade = (): void => {
       setRows(oldRows => {
-        const freeId =
-          oldRows.reduce((mxVal, row) => Math.max(mxVal, row.id), 0) + 1;
+        const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
         const newRow: ColTypes = {
           id: freeId,
           finalGradeId: -1,
@@ -243,7 +242,7 @@ const EditFinalGradesDialog = ({
   const handleSubmit = async (): Promise<void> => {
     const newGrades: NewFinalGrade[] = [];
     const deletedGrades: number[] = [];
-    const editedGrades: ({finalGradeId: number} & EditFinalGrade)[] = [];
+    const editedGrades: {finalGradeId: number; data: EditFinalGrade}[] = [];
 
     for (const row of rows) {
       if (row.finalGradeId === -1) {
@@ -257,29 +256,26 @@ const EditFinalGradesDialog = ({
       } else {
         editedGrades.push({
           finalGradeId: row.finalGradeId,
-          grade: row.grade,
-          date: row.date,
-          sisuExportDate: row.exportDate,
-          comment: row.comment,
+          data: {
+            grade: row.grade,
+            date: row.date,
+            sisuExportDate: row.exportDate,
+            comment: row.comment,
+          },
         });
       }
     }
 
-    const rowIds = rows.map(row => row.finalGradeId);
+    const rowIds = new Set(rows.map(row => row.finalGradeId));
     for (const initRow of initRows) {
-      if (!rowIds.includes(initRow.finalGradeId))
+      if (!rowIds.has(initRow.finalGradeId))
         deletedGrades.push(initRow.finalGradeId);
     }
 
     await Promise.all([
       addFinalGrades.mutateAsync(newGrades),
       ...deletedGrades.map(fGradeId => deleteFinalGrade.mutateAsync(fGradeId)),
-      ...editedGrades.map(finalGrade =>
-        editFinalGrade.mutateAsync({
-          finalGradeId: finalGrade.finalGradeId,
-          data: finalGrade,
-        })
-      ),
+      ...editedGrades.map(editData => editFinalGrade.mutateAsync(editData)),
     ]);
 
     onClose();

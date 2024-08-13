@@ -248,12 +248,14 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       const gradingModel = gradingModels.find(model => model.id === modelId);
       if (gradingModel === undefined) return [];
 
-      const coursePartIds = gradingModel.graphStructure.nodes
-        .filter(node => node.id.startsWith('coursepart'))
-        .map(node => parseInt(node.id.split('-')[1]));
+      const coursePartIds = new Set(
+        gradingModel.graphStructure.nodes
+          .filter(node => node.id.startsWith('coursepart'))
+          .map(node => parseInt(node.id.split('-')[1]))
+      );
 
       return courseParts.data.filter(coursePart =>
-        coursePartIds.includes(coursePart.id)
+        coursePartIds.has(coursePart.id)
       );
     },
     [gradingModels, courseParts.data]

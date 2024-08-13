@@ -22,7 +22,7 @@ const splitString = (str: string | null, chunkSize: number): string => {
 
   const chunks = [];
   for (let i = 0; i < str.length; i += chunkSize) {
-    chunks.push(str.substring(i, i + chunkSize));
+    chunks.push(str.slice(i, i + chunkSize));
   }
   return chunks.join('\n');
 };

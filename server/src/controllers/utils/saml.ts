@@ -42,8 +42,8 @@ export const fetchIdpMetadata = async (
       ds: 'http://www.w3.org/2000/09/xmldsig#',
     });
     return query => select(query, xml);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    httpLogger.error(error);
     return null;
   }
 };
@@ -106,22 +106,22 @@ export const getSamlStrategy = async (): Promise<SamlStrategy> =>
         if (!user.name || user.name === user.email)
           await user.update({name: name});
 
-        // for now if teacher email is added by admin we allow the teacher to signin
+        // for now if teacher email is added by admin we allow the teacher to sign in
         return done(null, {
           id: user.id,
           role: user.role as SystemRole,
           name: user.name,
         });
-      } catch (err) {
-        return done(err as Error);
+      } catch (error) {
+        return done(error as Error);
       }
     },
     (_req: Request, profile: Profile | null, done: SamlVerifiedCallback) => {
       // for logout
       try {
         return done(null, {profile});
-      } catch (err) {
-        return done(err as Error);
+      } catch (error) {
+        return done(error as Error);
       }
     }
   );

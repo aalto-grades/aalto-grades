@@ -167,13 +167,25 @@ export const addGrades: Endpoint<NewGrade[], void> = async (req, res) => {
   const courseId = await validateCourseId(req.params.courseId);
 
   // Validate that course parts and A+ grade sources belong to correct course
+  const validCoursePartIds = new Set<number>();
+  const validAPlusCoursePartIds = new Set<number>();
   for (const grade of req.body) {
-    await validateCoursePartBelongsToCourse(courseId, grade.coursePartId);
-    if (grade.aplusGradeSourceId) {
+    // Validate course part id
+    if (!validCoursePartIds.has(grade.coursePartId)) {
+      await validateCoursePartBelongsToCourse(courseId, grade.coursePartId);
+      validCoursePartIds.add(grade.coursePartId);
+    }
+
+    // Validate A+ course part id
+    if (
+      grade.aplusGradeSourceId !== undefined &&
+      !validAPlusCoursePartIds.has(grade.aplusGradeSourceId)
+    ) {
       await validateAplusGradeSourceBelongsToCoursePart(
         grade.coursePartId,
         grade.aplusGradeSourceId
       );
+      validAPlusCoursePartIds.add(grade.aplusGradeSourceId);
     }
   }
 
@@ -183,39 +195,36 @@ export const addGrades: Endpoint<NewGrade[], void> = async (req, res) => {
     new Set(req.body.map(grade => grade.studentNumber))
   );
 
-  let students = (await User.findAll({
-    attributes: ['id', 'studentNumber'],
+  const dbStudentNumbers = (await User.findAll({
+    attributes: ['studentNumber'],
     where: {
       studentNumber: {[Op.in]: studentNumbers},
     },
-  })) as (UserData & {studentNumber: string})[];
-  const foundStudents = students.map(student => student.studentNumber);
+  })) as {studentNumber: string}[];
+  const foundStudents = new Set(
+    dbStudentNumbers.map(student => student.studentNumber)
+  );
   const nonExistingStudents = studentNumbers.filter(
-    id => !foundStudents.includes(id)
+    id => !foundStudents.has(id)
   );
 
-  await sequelize.transaction(async t => {
-    if (nonExistingStudents.length === 0) return;
-
-    // Create new users (students) from the CSV.
-    const newUsers = (await User.bulkCreate(
-      nonExistingStudents.map(studentNumber => ({
-        studentNumber: studentNumber,
-      })),
-      {transaction: t}
-    )) as (UserData & {studentNumber: string})[];
-    students = students.concat(newUsers);
-  });
+  // Create missing users
+  if (nonExistingStudents.length > 0) {
+    await sequelize.transaction(async t => {
+      await User.bulkCreate(
+        nonExistingStudents.map(studentNumber => ({
+          studentNumber: studentNumber,
+        })),
+        {transaction: t}
+      );
+    });
+  }
 
   // All students now exists in the database.
-  students = (await User.findAll({
+  const students = (await User.findAll({
     attributes: ['id', 'studentNumber'],
-    where: {
-      studentNumber: {
-        [Op.in]: studentNumbers,
-      },
-    },
-  })) as (UserData & {studentNumber: string})[];
+    where: {studentNumber: {[Op.in]: studentNumbers}},
+  })) as {id: number; studentNumber: string}[];
 
   const studentNumberToId = Object.fromEntries(
     students.map(student => [student.studentNumber, student.id])
@@ -262,23 +271,21 @@ export const addGrades: Endpoint<NewGrade[], void> = async (req, res) => {
       });
     }
 
-    // TODO: Optimize if datasets are big.
+    // TODO: Takes a while, optimize?
     await AttainmentGrade.bulkCreate(preparedBulkCreate, {transaction: t});
   });
 
   // Create student roles for all the students (TODO: Remove role if grades are removed?)
+  const studentUserIds = students.map(student => student.id);
   const dbCourseRoles = await CourseRole.findAll({
     attributes: ['userId'],
     where: {
       courseId: courseId,
-      userId: {[Op.in]: students.map(student => student.id)},
+      userId: {[Op.in]: studentUserIds},
       role: CourseRoleType.Student,
     },
   });
   const studentsWithRoles = new Set(dbCourseRoles.map(role => role.userId));
-  const studentUserIds = Array.from(
-    new Set(students.map(student => student.id))
-  );
   const missingRoles = studentUserIds.filter(
     userId => !studentsWithRoles.has(userId)
   );
@@ -290,7 +297,6 @@ export const addGrades: Endpoint<NewGrade[], void> = async (req, res) => {
     }))
   );
 
-  // After this point all the students' grades have been created
   return res.sendStatus(HttpCode.Created);
 };
 
@@ -514,9 +520,8 @@ export const getSisuFormattedGradingCSV: Endpoint<
       // Assessment date must be in form dd.mm.yyyy.
       // HERE we want to find the latest completed grade for student
       const assessmentDate = (
-        req.body.assessmentDate
-          ? req.body.assessmentDate
-          : await getDateOfLatestGrade(finalGrade.userId, course.id)
+        req.body.assessmentDate ??
+        (await getDateOfLatestGrade(finalGrade.userId, course.id))
       ).toLocaleDateString('fi-FI');
 
       const completionLanguage = req.body.completionLanguage

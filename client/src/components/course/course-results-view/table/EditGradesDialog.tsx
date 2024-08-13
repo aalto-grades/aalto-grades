@@ -205,17 +205,14 @@ const EditGradesDialog = ({
   const dataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
       setRows(oldRows => {
-        const freeId =
-          oldRows.reduce((mxVal, row) => Math.max(mxVal, row.id), 0) + 1;
+        const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
         const newRow: ColTypes = {
           id: freeId,
           gradeId: -1,
           grader: auth.name,
           grade: 0,
           date: new Date(),
-          expiryDate: new Date(
-            new Date().getTime() + 365 * 24 * 60 * 60 * 1000
-          ),
+          expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
           exported: false,
           comment: '',
           selected: '',
@@ -261,16 +258,15 @@ const EditGradesDialog = ({
       }
     }
 
-    const rowIds = rows.map(row => row.gradeId);
+    const rowIds = new Set(rows.map(row => row.gradeId));
     for (const initRow of initRows) {
-      if (!rowIds.includes(initRow.gradeId))
-        deletedGrades.push(initRow.gradeId);
+      if (!rowIds.has(initRow.gradeId)) deletedGrades.push(initRow.gradeId);
     }
 
     await Promise.all([
       addGrades.mutateAsync(newGrades),
       ...deletedGrades.map(gradeId => deleteGrade.mutateAsync(gradeId)),
-      ...editedGrades.map(editedGrade => editGrade.mutateAsync(editedGrade)),
+      ...editedGrades.map(editData => editGrade.mutateAsync(editData)),
     ]);
 
     onClose();

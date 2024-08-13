@@ -203,10 +203,10 @@ export const deleteAplusGradeSource: Endpoint<void, void> = async (
 
   try {
     await aplusGradeSource.destroy();
-  } catch (e) {
+  } catch (error) {
     if (
-      e instanceof ForeignKeyConstraintError &&
-      e.index === 'attainment_grade_aplus_grade_source_id_fkey'
+      error instanceof ForeignKeyConstraintError &&
+      error.index === 'attainment_grade_aplus_grade_source_id_fkey'
     ) {
       throw new ApiError(
         'Tried to delete an A+ grade source with grades',
@@ -214,7 +214,7 @@ export const deleteAplusGradeSource: Endpoint<void, void> = async (
       );
     }
 
-    throw e;
+    throw error;
   }
 
   res.sendStatus(HttpCode.Ok);
@@ -236,9 +236,9 @@ export const fetchAplusGrades: Endpoint<void, NewGrade[]> = async (
     coursePartIds = z
       .array(IdSchema)
       .parse(JSON.parse(String(req.query['course-parts'])));
-  } catch (e) {
-    if (e instanceof Error) {
-      throw new ApiError(e.message, HttpCode.BadRequest);
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new ApiError(error.message, HttpCode.BadRequest);
     }
   }
 
