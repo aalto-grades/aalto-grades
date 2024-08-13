@@ -241,7 +241,7 @@ const AverageNode = (props: NodeProps): JSX.Element => {
         </p>
       )}
       <p className="output-value" style={{marginTop: '5px'}}>
-        {t('graph.average')}: {Math.round(nodeValue.value * 100) / 100}
+        {t('graph.node.average')}: {Math.round(nodeValue.value * 100) / 100}
       </p>
 
       <Handle

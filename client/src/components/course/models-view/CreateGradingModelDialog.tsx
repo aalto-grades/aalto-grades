@@ -92,10 +92,10 @@ const CreateGradingModelDialog = ({
           >
             <MenuItem value={'none'}>{t('course.create-model.none')}</MenuItem>
             <MenuItem value={'addition'}>
-              {t('course.create-model.addition')}
+              {t('graph.node.add')}
             </MenuItem>
             <MenuItem value={'average'}>
-              {t('course.create-model.average')}
+              {t('graph.node.average')}
             </MenuItem>
           </Select>
         </FormControl>

@@ -87,7 +87,8 @@
     "done": "Done",
     "in-english": "in English",
     "in-finnish": "in Finnish",
-    "in-swedish": "in Swedish"
+    "in-swedish": "in Swedish",
+    "select-course-parts": "Select course parts"
   },
   "alerts": {
     "unsaved-changes": {
@@ -113,18 +114,15 @@
       "body": "Log in with your Aalto University user account by clicking on the button below.",
       "button": "Log in with Aalto account"
     },
-    "login-title": "Log in to Aalto Grades",
     "local": {
       "title": "Log in to Aalto Grades",
       "body": "If you have been provided with credentials specifically for Aalto Grades, use this login.",
-      "enter-otp": "Enter TOTP code",
       "button": "Log in"
     },
     "mfa-qr": {
       "title": "MFA QR code",
       "scan": "Scan the QR code in your MFA application",
       "manual": "Or manually enter the secret",
-      "enter-otp": "Enter TOTP code",
       "cancel": "Back to login",
       "close-without-confirm": "Cancel without confirming"
     },
@@ -133,7 +131,8 @@
     "reset-mfa-secret": "Reset MFA secret",
     "reset-mfa-secret-message": "Are you sure you want to reset your MFA secret",
     "reset-mfa": "Reset MFA",
-    "log-out": "Log out"
+    "log-out": "Log out",
+    "enter-totp": "Enter TOTP code"
   },
   "course-results": {
     "model-has-deleted-and-archived": "Grading model contains deleted & archived course parts",
@@ -209,7 +208,6 @@
         "singular": "Select grade source",
         "plural": "Select grade sources"
       },
-      "select-course-parts": "Select course parts",
       "fetching-grades": "Fetching grades",
       "select-for-fetching": "Select the course parts you want to fetch grades for from A+.",
       "fetching-grades-wait": "Fetching grades from A+, this may take a few minutes...",
@@ -233,9 +231,7 @@
     "create-model": {
       "title": "Create grading model",
       "select-template": "Select template",
-      "none": "None",
-      "addition": "Addition",
-      "average": "Average"
+      "none": "None"
     },
     "edit-course": {
       "saved": "Course details saved."
@@ -379,7 +375,6 @@
     "percentage-mode": "Percentage mode",
     "weight": "Weight",
     "value": "value",
-    "average": "Average",
     "min-points": "Minimum points",
     "fail-course": "Fail course",
     "output-fail": "Output fail",
@@ -414,7 +409,6 @@
       "plural": "Delete nodes",
       "singular": "Delete node"
     },
-    "select-parts": "Select course parts",
     "test-values": "Test values",
     "format": "Format",
     "on-fail": "On fail",

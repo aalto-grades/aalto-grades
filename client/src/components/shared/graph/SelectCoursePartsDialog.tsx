@@ -93,7 +93,7 @@ const SelectCoursePartsDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>{t('graph.select-parts')}</DialogTitle>
+      <DialogTitle>{t('general.select-course-parts')}</DialogTitle>
 
       <DialogContent>
         <FormGroup>
