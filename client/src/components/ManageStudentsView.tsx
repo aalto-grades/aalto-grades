@@ -124,20 +124,14 @@ const ManageStudentsView = (): JSX.Element => {
   const plural = rowSelectionModel.length > 1;
   const handleDelete = async (): Promise<void> => {
     const confirmation = await AsyncConfirmationModal({
-      title: plural
-        ? t('manage-students.delete_other')
-        : t('manage-students.delete_one'),
-      message: plural
-        ? t('manage-students.delete-message_other')
-        : t('manage-students.delete-message_one'),
+      title: t('manage-students.delete', {count: rowSelectionModel.length}),
+      message: t('manage-students.delete-message', {count: rowSelectionModel.length}),
       confirmDelete: true,
     });
     if (confirmation) {
       await deleteUsers.mutateAsync(rowSelectionModel.map(row => Number(row)));
       enqueueSnackbar(
-        plural
-          ? t('manage-students.delete-success_other')
-          : t('manage-students.delete-success_one'),
+        t('manage-students.delete-success', {count: rowSelectionModel.length}),
         {variant: 'success'}
       );
       setRowSelectionModel([]);
@@ -157,9 +151,7 @@ const ManageStudentsView = (): JSX.Element => {
         variant="contained"
         color="error"
       >
-        {plural
-          ? t('manage-students.delete_other')
-          : t('manage-students.delete_one')}
+        {t('manage-students.delete', {count: rowSelectionModel.length})}
       </Button>
       <div style={{height: '30vh'}}>
         <DataGrid
