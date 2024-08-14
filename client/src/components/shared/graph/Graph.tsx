@@ -102,9 +102,9 @@ const initGraphFn = (
       coursePart => coursePart.id === coursePartId
     );
     if (nodeCoursePart === undefined) {
-      extraNodeData[node.id] = {warning: t('graph.part-deleted')};
+      extraNodeData[node.id] = {warning: t('shared.graph.part-deleted')};
     } else if (nodeCoursePart.archived) {
-      extraNodeData[node.id] = {warning: t('graph.part-archived')};
+      extraNodeData[node.id] = {warning: t('shared.graph.part-archived')};
     }
   }
 
@@ -301,14 +301,14 @@ const Graph = ({
     let confirmation = true;
     if (modelHasFinalGrades) {
       confirmation = await AsyncConfirmationModal({
-        title: t('graph.saving'),
-        message: t('graph.has-final-grades-message'),
+        title: t('shared.graph.saving'),
+        message: t('shared.graph.has-final-grades-message'),
       });
     }
     if (confirmation) {
-      enqueueSnackbar(t('graph.saving'), {variant: 'info'});
+      enqueueSnackbar(t('shared.graph.saving'), {variant: 'info'});
       await onParentSave({nodes, edges, nodeData});
-      enqueueSnackbar(t('graph.saved'), {variant: 'success'});
+      enqueueSnackbar(t('shared.graph.saved'), {variant: 'success'});
       setOriginalGraphStructure(structuredClone({nodes, edges, nodeData}));
     }
   };
@@ -463,11 +463,11 @@ const Graph = ({
             severity="info"
             // variant="outlined"
           >
-            Unsaved changes
+            {t('general.unsaved-changes')}
           </Alert>
         )}
         {unsaved && modelHasFinalGrades && (
-          <Tooltip title={t('graph.has-final-grades-message')}>
+          <Tooltip title={t('shared.graph.has-final-grades-message')}>
             <Alert
               sx={{
                 position: 'absolute',
@@ -477,7 +477,7 @@ const Graph = ({
               }}
               severity="warning"
             >
-              {t('graph.has-final-grades')}
+              {t('shared.graph.has-final-grades')}
             </Alert>
           </Tooltip>
         )}
@@ -495,7 +495,7 @@ const Graph = ({
             severity="warning"
             // variant="outlined"
           >
-            {t('graph.course-failed')}
+            {t('shared.graph.course-failed')}
           </Alert>
         )}
       </div>
@@ -516,9 +516,7 @@ const Graph = ({
               zIndex: 1,
             }}
           >
-            {selected.length > 1
-              ? t('graph.delete-node.plural')
-              : t('graph.delete-node.singular')}
+            {t('shared.graph.delete-node', {count: selected.length})}
           </Button>
         )}
       </div>
@@ -599,17 +597,17 @@ const Graph = ({
                     onClick={() => setCoursePartsSelectOpen(true)}
                     variant="outlined"
                   >
-                    {t('graph.select-parts')}
+                    {t('general.select-course-parts')}
                   </Button>
                   <Button
                     onClick={() => setCoursePartValuesOpen(true)}
                     variant="outlined"
                     sx={{ml: 1}}
                   >
-                    {t('graph.test-values')}
+                    {t('shared.graph.test-values')}
                   </Button>
                   <Button onClick={format} variant="outlined" sx={{ml: 1}}>
-                    {t('graph.format')}
+                    {t('shared.graph.format')}
                   </Button>
                 </div>
                 <div

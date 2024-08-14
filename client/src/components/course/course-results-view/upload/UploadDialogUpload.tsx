@@ -140,7 +140,7 @@ const UploadDialogUpload = ({
       newRows.push(rowData);
     }
     if (missingData) {
-      enqueueSnackbar(t('course.upload.missing-grades'), {
+      enqueueSnackbar(t('course.results.upload.missing-grades'), {
         variant: 'warning',
       });
     }
@@ -206,13 +206,13 @@ const UploadDialogUpload = ({
 
   return (
     <>
-      <DialogTitle>{t('course.upload.upload-grades')}</DialogTitle>
+      <DialogTitle>{t('course.results.upload.upload-grades')}</DialogTitle>
       <Dialog
         open={textFieldOpen}
         fullWidth
         onClose={() => setTextFieldOpen(false)}
       >
-        <DialogTitle>{t('course.upload.paste-text')}</DialogTitle>
+        <DialogTitle>{t('course.results.upload.paste-text')}</DialogTitle>
         <DialogContent>
           <TextField
             multiline
@@ -259,7 +259,7 @@ const UploadDialogUpload = ({
       <DialogContent sx={{minHeight: 500}}>
         <Collapse in={invalidValues}>
           <Alert severity="warning" sx={{mb: 2}}>
-            {t('course.upload.higher-than-max')}
+            {t('course.results.upload.higher-than-max')}
           </Alert>
         </Collapse>
 
@@ -282,12 +282,12 @@ const UploadDialogUpload = ({
           }
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            {t('course.upload.upload-grades')}
+            {t('course.results.upload.upload-grades')}
           </AccordionSummary>
           <AccordionDetails>
             <ButtonGroup>
               <Button component="label" variant="outlined">
-                {t('course.upload.upload-csv')}
+                {t('course.results.upload.upload-csv')}
                 <input
                   type="file"
                   accept=".csv"
@@ -298,17 +298,17 @@ const UploadDialogUpload = ({
                 />
               </Button>
               <Button variant="outlined" onClick={downloadTemplate}>
-                {t('course.upload.download-template')}
+                {t('course.results.upload.download-template')}
               </Button>
               <Button
                 variant="outlined"
                 onClick={() => setAplusImportDialogOpen(true)}
               >
-                {t('course.upload.a+-import')}
+                {t('course.results.upload.a+-import')}
               </Button>
               <Button variant="outlined">Import from MyCourses</Button>
               <Button variant="outlined" onClick={() => setTextFieldOpen(true)}>
-                {t('course.upload.paste-text')}
+                {t('course.results.upload.paste-text')}
               </Button>
             </ButtonGroup>
           </AccordionDetails>
@@ -318,7 +318,9 @@ const UploadDialogUpload = ({
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'edit' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            {editText ? t('general.edit') : t('course.upload.add-manually')}
+            {editText
+              ? t('general.edit')
+              : t('course.results.upload.add-manually')}
           </AccordionSummary>
           <AccordionDetails>
             <div style={{height: '40vh'}}>
@@ -350,7 +352,9 @@ const UploadDialogUpload = ({
                   );
 
                   if (updatedRow.studentNo === '')
-                    throw new Error(t('course.upload.student-number-empty'));
+                    throw new Error(
+                      t('course.results.upload.student-number-empty')
+                    );
 
                   setError(false);
                   setReady(!editing);

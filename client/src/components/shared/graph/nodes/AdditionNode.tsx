@@ -81,7 +81,7 @@ const AdditionNode = (props: NodeProps): JSX.Element => {
       <table style={{width: '100%', minWidth: '60px'}}>
         <tbody>
           <tr>
-            <th>{t('graph.inputs')}</th>
+            <th>{t('shared.graph.inputs')}</th>
           </tr>
           {Object.entries(nodeValue.sources)
             .filter(([, source]) => source.isConnected)

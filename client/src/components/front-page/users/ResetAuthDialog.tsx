@@ -50,7 +50,9 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
     else if (resetMfa)
       enqueueSnackbar(t('front-page.mfa-reset'), {variant: 'success'});
     else if (resetPassword)
-      enqueueSnackbar(t('auth.password.reset-done'), {variant: 'success'});
+      enqueueSnackbar(t('shared.auth.password.reset-done'), {
+        variant: 'success',
+      });
 
     if (resetPassword) setTemporaryPassword(res.temporaryPassword as string);
     else onClose();
@@ -85,7 +87,7 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
                     onClick={() => setResetPassword(oldVal => !oldVal)}
                   />
                 }
-                label={t('auth.password.reset')}
+                label={t('shared.auth.password.reset')}
               />
               <FormControlLabel
                 control={
@@ -94,7 +96,7 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
                     onClick={() => setResetMfa(oldVal => !oldVal)}
                   />
                 }
-                label={t('auth.reset-mfa')}
+                label={t('shared.auth.reset-mfa')}
               />
             </FormGroup>
           </>

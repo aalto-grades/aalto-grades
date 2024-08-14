@@ -76,7 +76,7 @@ const MinPointsNode = (props: NodeProps): JSX.Element => {
       />
 
       <div>
-        <label>{t('graph.min-points')}: </label>
+        <label>{t('shared.graph.min-points')}: </label>
         <input
           style={{width: '70px'}}
           onChange={handleChange}
@@ -85,17 +85,17 @@ const MinPointsNode = (props: NodeProps): JSX.Element => {
         />
       </div>
       <div style={{textAlign: 'left'}}>
-        <label>{t('graph.on-fail')}: </label>
+        <label>{t('shared.graph.on-fail')}: </label>
         <select
           onChange={handleSelectChange}
           value={localSettings.onFailSetting}
         >
-          <option value="coursefail">{t('graph.fail-course')}</option>
-          <option value="fail">{t('graph.output-fail')}</option>
+          <option value="coursefail">{t('shared.graph.fail-course')}</option>
+          <option value="fail">{t('shared.graph.output-fail')}</option>
         </select>
       </div>
       <p className="output-value">
-        {t('graph.output')}:{' '}
+        {t('shared.graph.output')}:{' '}
         {nodeValue.value === 'fail'
           ? 'fail'
           : Math.round(nodeValue.value * 100) / 100}

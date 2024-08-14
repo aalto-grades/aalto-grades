@@ -27,43 +27,43 @@ export const getDragAndDropNodes = (
 }[] => [
   {
     type: 'addition',
-    title: t('graph.node.add'),
-    tooltip: t('graph.node.add-tooltip'),
+    title: t('shared.graph.node.add'),
+    tooltip: t('shared.graph.node.add-tooltip'),
   },
   {
     type: 'average',
-    title: t('graph.node.average'),
-    tooltip: t('graph.node.average-tooltip'),
+    title: t('shared.graph.node.average'),
+    tooltip: t('shared.graph.node.average-tooltip'),
   },
   {
     type: 'stepper',
-    title: t('graph.node.stepper'),
-    tooltip: t('graph.node.stepper-tooltip'),
+    title: t('shared.graph.node.stepper'),
+    tooltip: t('shared.graph.node.stepper-tooltip'),
   },
   {
     type: 'minpoints',
-    title: t('graph.node.min'),
-    tooltip: t('graph.node.min-tooltip'),
+    title: t('shared.graph.node.min'),
+    tooltip: t('shared.graph.node.min-tooltip'),
   },
   {
     type: 'max',
-    title: t('graph.node.max'),
-    tooltip: t('graph.node.max-tooltip'),
+    title: t('shared.graph.node.max'),
+    tooltip: t('shared.graph.node.max-tooltip'),
   },
   {
     type: 'require',
-    title: t('graph.node.require'),
-    tooltip: t('graph.node.require-tooltip'),
+    title: t('shared.graph.node.require'),
+    tooltip: t('shared.graph.node.require-tooltip'),
   },
   {
     type: 'round',
-    title: t('graph.node.round'),
-    tooltip: t('graph.node.round-tooltip'),
+    title: t('shared.graph.node.round'),
+    tooltip: t('shared.graph.node.round-tooltip'),
   },
   {
     type: 'substitute',
-    title: t('graph.node.substitute'),
-    tooltip: t('graph.node.substitute-tooltip'),
+    title: t('shared.graph.node.substitute'),
+    tooltip: t('shared.graph.node.substitute-tooltip'),
   },
 ];
 

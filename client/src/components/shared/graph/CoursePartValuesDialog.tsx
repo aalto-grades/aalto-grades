@@ -95,7 +95,7 @@ const CoursePartValuesDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>{t('graph.set-test-values')}</DialogTitle>
+      <DialogTitle>{t('shared.graph.set-test-values')}</DialogTitle>
 
       <DialogContent>
         {coursePartNodeIds.map(coursePartId => (

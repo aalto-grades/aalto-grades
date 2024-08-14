@@ -94,7 +94,7 @@ const SelectAplusCourse = ({
         onChange={(_, value) => setCourse(value?.courseCode)}
         options={courseOptions}
         renderInput={params => (
-          <TextField {...params} label={t('general.course.singular')} />
+          <TextField {...params} label={t('general.course')} />
         )}
         isOptionEqualToValue={(option, value) =>
           option.courseCode === value.courseCode

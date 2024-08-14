@@ -132,7 +132,7 @@ const EditFinalGradesDialog = ({
       if (modelId === null) return null;
       if (gradingModels.data === undefined) return t('general.loading');
       const model = gradingModels.data.find(mod => mod.id === modelId);
-      return model?.name ?? t('course-results.not-found');
+      return model?.name ?? t('course.results.not-found');
     };
 
     const newRows = finalGrades.map((finalGrade, finalGradeId) => ({
@@ -150,7 +150,7 @@ const EditFinalGradesDialog = ({
     setInitRows(structuredClone(newRows));
   }, [gradingModels.data, finalGrades, t]);
 
-  if (!auth) return <>{t('course-results.not-permitted')}</>; // Not needed?
+  if (!auth) return <>{t('course.results.not-permitted')}</>; // Not needed?
 
   const columns: GridColDef<ColTypes>[] = [
     {
@@ -161,7 +161,7 @@ const EditFinalGradesDialog = ({
     },
     {
       field: 'grade',
-      headerName: t('general.grade.singular'),
+      headerName: t('general.grade'),
       type: 'number',
       editable: true,
     },
@@ -233,7 +233,7 @@ const EditFinalGradesDialog = ({
     return (
       <GridToolbarContainer>
         <Button startIcon={<Add />} onClick={addFinalGrade}>
-          {t('course-results.add-final')}
+          {t('course.results.add-final')}
         </Button>
       </GridToolbarContainer>
     );
@@ -279,7 +279,7 @@ const EditFinalGradesDialog = ({
     ]);
 
     onClose();
-    enqueueSnackbar(t('course-results.grades-saved'), {variant: 'success'});
+    enqueueSnackbar(t('course.results.grades-saved'), {variant: 'success'});
     setInitRows(structuredClone(rows));
   };
 

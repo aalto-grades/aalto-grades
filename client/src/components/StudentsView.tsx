@@ -74,13 +74,15 @@ const StudentsView = (): JSX.Element => {
             {getString(student)}
           </Box>
         )}
-        renderInput={params => <TextField {...params} label="Student" />}
+        renderInput={params => (
+          <TextField {...params} label={t('general.student')} />
+        )}
       />
       {studentGrades.data !== undefined && (
         <>
           <Divider sx={{my: 2}} />
           <Typography variant="h2" sx={{pb: 2}}>
-            {t('students.viewing-grades', {
+            {t('students.viewing', {
               user:
                 selectedStudent?.name ?? selectedStudent?.studentNumber ?? '',
             })}
@@ -89,9 +91,9 @@ const StudentsView = (): JSX.Element => {
             <Table sx={{minWidth: 650}} aria-label="simple table">
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('general.course.singular')}</TableCell>
+                  <TableCell>{t('general.course')}</TableCell>
                   <TableCell align="right">
-                    {t('general.final-grade.plural')}
+                    {t('general.final-grades')}
                   </TableCell>
                 </TableRow>
               </TableHead>

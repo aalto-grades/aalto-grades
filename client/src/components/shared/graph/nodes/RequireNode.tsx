@@ -132,17 +132,17 @@ const RequireNode = (props: NodeProps): JSX.Element => {
       />
 
       <div>
-        <label>{t('graph.on-fail')} </label>
+        <label>{t('shared.graph.on-fail')} </label>
         <select
           onChange={handleSelectChange}
           value={localSettings.onFailSetting}
         >
-          <option value="coursefail">{t('graph.fail-course')}</option>
-          <option value="fail">{t('graph.output-fail')}</option>
+          <option value="coursefail">{t('shared.graph.fail-course')}</option>
+          <option value="fail">{t('shared.graph.output-fail')}</option>
         </select>
       </div>
       <div>
-        <label>{t('graph.allowed-fails')} </label>
+        <label>{t('shared.graph.allowed-fails')} </label>
         <input
           style={{width: '90px'}}
           type="number"
@@ -153,8 +153,8 @@ const RequireNode = (props: NodeProps): JSX.Element => {
       <table style={{width: '200px', margin: '5px 0px'}}>
         <tbody>
           <tr>
-            <th style={{width: '50%'}}>{t('graph.in')}</th>
-            <th>{t('graph.out')}</th>
+            <th style={{width: '50%'}}>{t('shared.graph.in')}</th>
+            <th>{t('shared.graph.out')}</th>
           </tr>
           {Object.entries(nodeValue.sources)
             .filter(([, source]) => source.isConnected)

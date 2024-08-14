@@ -36,10 +36,10 @@ const AplusTokenDialog = ({
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>{t('general.a+-token')}</DialogTitle>
+      <DialogTitle>{t('general.a+-api-token')}</DialogTitle>
       <DialogContent>
         <Typography>
-          {t('shared.a+-token.body')}:{' '}
+          {t('shared.auth.a+-token.body')}:{' '}
           <Link
             href="https://plus.cs.aalto.fi/accounts/accounts/"
             target="_blank"
@@ -49,12 +49,12 @@ const AplusTokenDialog = ({
         </Typography>
         {currentToken && (
           <Typography sx={{mt: 1}}>
-            {t('shared.a+-token.current')}: {currentToken}
+            {t('shared.auth.a+-token.current')}: {currentToken}
           </Typography>
         )}
         <TextField
           sx={{mt: 2, width: 1}}
-          label={t('shared.a+-token.label')}
+          label={t('shared.auth.a+-token.label')}
           value={token}
           onChange={e => setToken(e.target.value)}
           required={true}
@@ -64,9 +64,9 @@ const AplusTokenDialog = ({
           }
           helperText={
             error && !token
-              ? t('shared.a+-token.invalid')
+              ? t('shared.auth.a+-token.invalid')
               : token.length > 0 && token.length !== 40
-                ? t('shared.a+-token.length')
+                ? t('shared.auth.a+-token.length')
                 : ''
           }
         />

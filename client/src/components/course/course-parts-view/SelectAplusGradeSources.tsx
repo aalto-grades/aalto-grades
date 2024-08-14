@@ -53,7 +53,7 @@ const SelectAplusGradeSources = ({
     <>
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ArrowDropDown />}>
-          {t('general.course.singular')}
+          {t('general.course')}
         </AccordionSummary>
         <AccordionDetails>
           <FormControlLabel
@@ -69,7 +69,7 @@ const SelectAplusGradeSources = ({
                 onChange={e =>
                   handleChange(
                     e.target.checked,
-                    `A+ ${t('general.course.singular')}: ${aplusCourse.name}`,
+                    `A+ ${t('general.course')}: ${aplusCourse.name}`,
                     aplusExerciseData.data.maxGrade,
                     newAplusGradeSource(
                       aplusCourse,
@@ -86,7 +86,7 @@ const SelectAplusGradeSources = ({
       </Accordion>
       <Accordion>
         <AccordionSummary expandIcon={<ArrowDropDown />}>
-          {t('general.module.plural')}
+          {t('general.modules')}
         </AccordionSummary>
         <AccordionDetails>
           <FormGroup>
@@ -103,7 +103,7 @@ const SelectAplusGradeSources = ({
                     onChange={e =>
                       handleChange(
                         e.target.checked,
-                        `A+ ${t('general.module.singular')}: ${module.name}`,
+                        `A+ ${t('general.module')}: ${module.name}`,
                         module.maxGrade,
                         newAplusGradeSource(aplusCourse, module.closingDate, {
                           module,
@@ -120,7 +120,7 @@ const SelectAplusGradeSources = ({
       </Accordion>
       <Accordion>
         <AccordionSummary expandIcon={<ArrowDropDown />}>
-          {t('general.exercise.plural')}
+          {t('general.exercises')}
         </AccordionSummary>
         <AccordionDetails>
           <FormGroup>
@@ -138,7 +138,7 @@ const SelectAplusGradeSources = ({
                       onChange={e =>
                         handleChange(
                           e.target.checked,
-                          `A+ ${t('general.exercise.singular')}: ${exercise.name}`,
+                          `A+ ${t('general.exercise')}: ${exercise.name}`,
                           exercise.maxGrade,
                           newAplusGradeSource(aplusCourse, module.closingDate, {
                             exercise,
@@ -157,7 +157,7 @@ const SelectAplusGradeSources = ({
       {aplusExerciseData.data.difficulties.length > 0 && (
         <Accordion>
           <AccordionSummary expandIcon={<ArrowDropDown />}>
-            {t('general.difficulty.plural')}
+            {t('general.difficulties')}
           </AccordionSummary>
           <AccordionDetails>
             <FormGroup>
@@ -176,7 +176,7 @@ const SelectAplusGradeSources = ({
                       onChange={e =>
                         handleChange(
                           e.target.checked,
-                          `A+ ${t('general.difficulty.singular')}: ${difficulty.difficulty}`,
+                          `A+ ${t('general.difficulty')}: ${difficulty.difficulty}`,
                           difficulty.maxGrade,
                           newAplusGradeSource(
                             aplusCourse,

@@ -68,11 +68,11 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
     [
       {
         id: 'latestBestGrade',
-        name: t('context.grades-table.latest-grade'),
-        info: t('course-results.group-by-latest-grade'),
+        name: t('course.results.table.latest-grade'),
+        info: t('course.results.group-by-latest-grade'),
       },
-      {id: 'Exported to Sisu', name: t('context.grades-table.exported')},
-      {id: 'finalGrade', name: t('general.final-grade.singular')},
+      {id: 'Exported to Sisu', name: t('course.results.table.exported')},
+      {id: 'finalGrade', name: t('general.final-grade')},
     ],
 
     table
@@ -120,7 +120,7 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
               width: 'max-content',
             }}
           >
-            {t('course-results.group-by', {
+            {t('course.results.group-by', {
               grouping: groupByElements
                 .flat()
                 .filter(el => table.getState().grouping.includes(el.id))
@@ -275,7 +275,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
                 ? gradingModels?.filter(
                     ass => ass.id === selectedGradingModel
                   )[0]?.name
-                : t('general.grading-model.singular')}
+                : t('general.grading-model')}
             </div>
 
             {!isActive && (
@@ -427,7 +427,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
     );
     if (model === undefined || course.data === undefined) return false;
 
-    enqueueSnackbar(t('course-results.calculating-final'), {variant: 'info'});
+    enqueueSnackbar(t('course.results.calculating-final'), {variant: 'info'});
     const finalGrades = batchCalculateGraph(
       model.graphStructure,
       selectedRows.map(selectedRow => ({
@@ -445,7 +445,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       const result = Schema.safeParse(grade.finalGrade);
       if (!result.success) {
         enqueueSnackbar(
-          t('course-results.invalid-final', {grade: grade.finalGrade}),
+          t('course.results.invalid-final', {grade: grade.finalGrade}),
           {
             variant: 'error',
           }
@@ -462,7 +462,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         comment: null,
       }))
     );
-    enqueueSnackbar(t('course-results.final-calculated'), {
+    enqueueSnackbar(t('course.results.final-calculated'), {
       variant: 'success',
     });
     // refreshFinalGrades();
@@ -492,7 +492,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
             startIcon={<Add />}
             color="primary"
           >
-            {t('course-results.add-grades')}
+            {t('course.results.add-grades')}
           </Button>
         </Box>
       ) : (
@@ -540,8 +540,8 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                   <Tooltip
                     title={
                       table.getSelectedRowModel().rows.length === 0
-                        ? t('course-results.select-one-student-calculation')
-                        : t('course-results.calculate-final-for-selected')
+                        ? t('course.results.select-one-student-calculation')
+                        : t('course.results.calculate-final-for-selected')
                     }
                     placement="top"
                   >
@@ -559,18 +559,18 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                         id="calculate-final-grades"
                       >
                         {missingFinalGrades
-                          ? t('course-results.calculate-final')
-                          : t('course-results.recalculate-final')}
+                          ? t('course.results.calculate-final')
+                          : t('course.results.recalculate-final')}
                       </Button>
                     </span>
                   </Tooltip>
                   <Tooltip
                     title={
                       table.getSelectedRowModel().rows.length === 0
-                        ? t('course-results.select-one-student-download')
+                        ? t('course.results.select-one-student-download')
                         : missingFinalGrades
-                          ? t('course-results.pending-download')
-                          : t('course-results.download-as-sisu-compat-csv')
+                          ? t('course.results.pending-download')
+                          : t('course.results.download-as-sisu-compat-csv')
                     }
                     placement="top"
                   >
@@ -588,7 +588,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                           missingFinalGrades
                         }
                       >
-                        {t('course-results.download-sisu-csv')}
+                        {t('course.results.download-sisu-csv')}
                       </Button>
                     </span>
                   </Tooltip>
@@ -609,7 +609,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         }}
       >
         <Tooltip
-          title={t('course-results.group-columns')}
+          title={t('course.results.group-columns')}
           placement="top"
           disableInteractive
         >
@@ -617,7 +617,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
         </Tooltip>
         {(gradingModels?.length ?? 0) > 1 && (
           <Tooltip
-            title={t('course-results.show-model-parts')}
+            title={t('course.results.show-model-parts')}
             placement="top"
             disableInteractive
           >
@@ -648,7 +648,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
           className="w-36 border shadow rounded"
         />
         <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
-          {t('course-results.showing-n-rows', {
+          {t('course.results.showing-n-rows', {
             n: table.getFilteredRowModel().rows.length,
           })}
           <Fade
@@ -692,7 +692,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                 }
               }}
             >
-              {t('course-results.n-errors', {
+              {t('course.results.n-errors', {
                 n: getErrorCount(
                   table.getFilteredRowModel().rows.map(e => e.original),
                   selectedGradingModel

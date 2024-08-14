@@ -44,7 +44,7 @@ const ConfirmDialog = ({
   if (confirmNavigate && title === defaultTitle)
     title = t('general.unsaved-changes');
   if (confirmNavigate && body === defaultBody)
-    body = t('alerts.unsaved-changes.body');
+    body = t('shared.unsaved-changes.body');
 
   return (
     <Dialog open={open!} onClose={cancelButton.onClick} fullWidth maxWidth="xs">
@@ -55,7 +55,7 @@ const ConfirmDialog = ({
       <DialogActions>
         <Button onClick={cancelButton.onClick}>
           {confirmNavigate
-            ? t('alerts.unsaved-changes.stay')
+            ? t('shared.unsaved-changes.stay')
             : t('general.cancel')}
         </Button>
         <Button
@@ -64,7 +64,7 @@ const ConfirmDialog = ({
           color={confirmNavigate || confirmDelete ? 'error' : 'primary'}
         >
           {confirmNavigate
-            ? t('alerts.unsaved-changes.discard')
+            ? t('shared.unsaved-changes.discard')
             : confirmDelete
               ? t('general.delete')
               : t('general.confirm')}

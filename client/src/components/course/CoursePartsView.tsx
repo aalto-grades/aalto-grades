@@ -336,7 +336,7 @@ const CoursePartsView = (): JSX.Element => {
     },
     {
       field: 'aplusGradeSources',
-      headerName: t('general.a+-sources'),
+      headerName: t('general.a+-grade-sources'),
       type: 'actions',
       getActions: getAplusActions,
     },
@@ -396,7 +396,7 @@ const CoursePartsView = (): JSX.Element => {
 
       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
         <Typography width={'fit-content'} variant="h2">
-          {t('general.course-part.plural')}
+          {t('general.course-parts')}
         </Typography>
         <SaveBar
           show={editRights && unsavedChanges}
