@@ -28,8 +28,7 @@ const GradeNode = (props: NodeProps): JSX.Element => {
       />
 
       <p className="output-value">
-        {t('general.final-grade.singular')}:{' '}
-        {Math.round(nodeValue.value * 100) / 100}
+        {t('general.final-grade')}: {Math.round(nodeValue.value * 100) / 100}
       </p>
     </BaseNode>
   );

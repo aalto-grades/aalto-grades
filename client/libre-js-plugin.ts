@@ -71,10 +71,10 @@ type Options = {
  * Attempts to transform a license string to an identifier recognized by
  * LibreJS.
  */
-function transform(
+const transform = (
   aliases: {[key: string]: string | undefined},
   license: string
-): string {
+): string => {
   const spdxToLibreJsId: {[key: string]: string | undefined} = {
     'AGPL-3.0-only': 'AGPL-3.0',
     'AGPL-3.0-or-later': 'AGPL-3.0',
@@ -93,9 +93,11 @@ function transform(
 
   const alias = aliases[license] ?? license;
   return spdxToLibreJsId[alias] || alias;
-}
+};
 
-async function makeLicenseList(exceptions: string[]): Promise<LicenseInfo[]> {
+const makeLicenseList = async (
+  exceptions: string[]
+): Promise<LicenseInfo[]> => {
   // Licenses recognized as free by LibreJS
   const libreJsList = (
     await axios.get<{
@@ -160,18 +162,18 @@ async function makeLicenseList(exceptions: string[]): Promise<LicenseInfo[]> {
     );
 
   return [...libreJsInfoList, ...spdxInfoList];
-}
+};
 
-function findLicenseInfo(
+const findLicenseInfo = (
   list: LicenseInfo[],
   aliases: {[key: string]: string | undefined},
   dependency: Dependency
-): DependencyLicenseInfo {
+): DependencyLicenseInfo => {
   const info = list.find(
     val => val.id === transform(aliases, dependency.license)
   );
 
-  function traverseSpdxExpr(expr: Info): DependencyLicenseInfo {
+  const traverseSpdxExpr = (expr: Info): DependencyLicenseInfo => {
     if ('license' in expr) {
       return list.find(val => val.id === transform(aliases, expr.license));
     }
@@ -181,31 +183,31 @@ function findLicenseInfo(
       conjunction: expr.conjunction,
       right: traverseSpdxExpr(expr.right),
     };
-  }
+  };
 
   if (!info) {
     return traverseSpdxExpr(parse(dependency.license));
   }
 
   return info;
-}
+};
 
-function validateLicense(
+const validateLicense = (
   dependency: Dependency,
   info: DependencyLicenseInfo
-): LicenseInfo[] {
-  function traverseSpdxExpr(
+): LicenseInfo[] => {
+  const traverseSpdxExpr = (
     expr: DependencyLicenseInfo,
     throwError: boolean
-  ): (LicenseInfo | Error)[] {
-    function raiseError(message: string): [Error] {
+  ): (LicenseInfo | Error)[] => {
+    const raiseError = (message: string): [Error] => {
       const error = new Error(message);
       if (throwError) {
         throw error;
       }
 
       return [error];
-    }
+    };
 
     if (!expr) {
       return raiseError(
@@ -267,21 +269,21 @@ function validateLicense(
         return [...(leftError ? [] : left), ...(rightError ? [] : right)];
       }
     }
-  }
+  };
 
   return traverseSpdxExpr(info, true).filter(
     val => !(val instanceof Error)
   ) as LicenseInfo[];
-}
+};
 
-export default function libreJs({
+const libreJs = ({
   indexFile,
   webLabelsFile,
   dependenciesFile,
   projectLicense,
   licenseExceptions = [],
   licenseAliases = {},
-}: Options): Plugin {
+}: Options): Plugin => {
   return {
     name: 'react-librejs',
     closeBundle() {
@@ -339,4 +341,6 @@ export default function libreJs({
       })();
     },
   };
-}
+};
+
+export default libreJs;

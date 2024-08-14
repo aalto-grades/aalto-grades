@@ -300,7 +300,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         id: 'latestBestGrade',
         meta: {PrettyChipPosition: 'first'},
         header: () => {
-          return t('context.grades-table.latest-grade') as string; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+          return t('course.results.table.latest-grade') as string; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
         },
         cell: prop => prop.getValue(),
       }),
@@ -400,7 +400,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       ),
     }),
     columnHelper.accessor(row => row.errors, {
-      header: t('context.grades-table.errors'),
+      header: t('course.results.table.errors'),
       id: 'errors',
       enableHiding: true,
       // The column only filter, for other type of filtering write another filterFn
@@ -415,7 +415,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       meta: {PrettyChipPosition: 'first'},
     }),
     columnHelper.accessor(row => row.finalGrades ?? [], {
-      header: t('general.final-grade.singular'),
+      header: t('general.final-grade'),
       id: 'finalGrade',
       enableSorting: false,
       getGroupingValue: row => findBestFinalGrade(row.finalGrades ?? [])?.grade,
@@ -429,7 +429,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       ),
     }),
     columnHelper.accessor(row => row, {
-      header: t('context.grades-table.preview'),
+      header: t('course.results.table.preview'),
       meta: {PrettyChipPosition: 'middle'},
       sortingFn: (a, b, columnId) => {
         const modelId =
@@ -488,7 +488,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       },
 
       {
-        header: t('context.grades-table.exported'),
+        header: t('course.results.table.exported'),
         meta: {PrettyChipPosition: 'last'},
         cell: info => info.getValue(),
         aggregatedCell: () => null,

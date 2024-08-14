@@ -93,7 +93,7 @@ const SelectAplusCourse = ({
         }}
         options={courseOptions}
         renderInput={params => (
-          <TextField {...params} label={t('general.course.singular')} />
+          <TextField {...params} label={t('general.course')} />
         )}
         defaultValue={defaultCourse}
       />

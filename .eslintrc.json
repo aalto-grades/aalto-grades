@@ -25,6 +25,7 @@
     "no-unused-vars": "off", // Replaced by @typescript-eslint rule
     "sort-imports": ["warn", {"ignoreDeclarationSort": true}],
     "spaced-comment": ["warn", "always", {"markers": ["/"]}],
+    "func-style": ["warn", "expression"],
 
     "import/extensions": [
       "error",

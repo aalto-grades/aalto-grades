@@ -153,7 +153,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
 
     await addGrades.mutateAsync(gradeData);
 
-    enqueueSnackbar(t('course.upload.grades-added'), {
+    enqueueSnackbar(t('course.results.upload.grades-added'), {
       variant: 'success',
     });
 

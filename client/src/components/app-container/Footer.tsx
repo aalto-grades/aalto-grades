@@ -22,18 +22,18 @@ const Footer = (): JSX.Element => {
       }}
     >
       <Link href="/privacy-notice" underline="none" sx={{mx: 3}}>
-        {t('footer.privacy')}
+        {t('app.footer.privacy')}
       </Link>
       <Link href="/accessibility-statement" underline="none" sx={{mr: 3}}>
-        {t('footer.accessibility')}
+        {t('app.footer.accessibility')}
       </Link>
       <Link href="/support" underline="none" sx={{mr: 3}}>
-        {t('footer.support')}
+        {t('app.footer.support')}
       </Link>
       <Link href="/licenses" underline="none" sx={{mr: 3}}>
-        {t('footer.licenses')}
+        {t('app.footer.licenses')}
       </Link>
-      <Tooltip title={t('footer.source.tooltip')}>
+      <Tooltip title={t('app.footer.source.tooltip')}>
         <Link
           // TODO: Once we have releases and employ a versioning scheme, link the version tag
           // href={`https://github.com/aalto-grades/aalto-grades/tree/${AALTO_GRADES_VERSION}`}
@@ -43,10 +43,10 @@ const Footer = (): JSX.Element => {
           underline="none"
           sx={{mr: 3}}
         >
-          {t('footer.source.text')}
+          {t('app.footer.source.text')}
         </Link>
       </Tooltip>
-      <Tooltip title={t('footer.feedback.tooltip')}>
+      <Tooltip title={t('app.footer.feedback.tooltip')}>
         <Link
           href="https://link.webropolsurveys.com/S/E358C6E5E7690C72"
           rel="noreferrer"
@@ -54,7 +54,7 @@ const Footer = (): JSX.Element => {
           underline="none"
           sx={{mr: 3}}
         >
-          {t('footer.feedback.text')}
+          {t('app.footer.feedback.text')}
         </Link>
       </Tooltip>
       <Typography>Aalto Grades {AALTO_GRADES_VERSION}</Typography>

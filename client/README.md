@@ -48,3 +48,19 @@ Start the test runner:
 ```
 $ npm test
 ```
+
+## Translation utils
+
+There are several scripts to aid in managing translations.
+
+- `npm run trans-parse`: Parses the source code for missing translation keys in
+  the locale translation files.
+- `npm run trans-copy` and `npm run trans-rename`: The first command simply
+  copies the English translation file to `client/translation.json`. The
+  structure of this file can then be edited, and afterwards the second command
+  can be used to apply the changes to the source code as well as the locale
+  translation files. Note that you may not remove, add, or change any of the
+  values themselves, this script is only useful for renaming keys.
+- `npm run trans-merge`: Checks whether multiple translation keys are pointing
+  to the same value in English and if so, asks the user to merge the keys to the
+  same value. <!-- This may not be desirable in all cases -->

@@ -35,10 +35,10 @@ const UnsavedChangesDialog = ({
       aria-describedby="dialog-for-unsaved-changes"
     >
       <DialogTitle>{t('general.unsaved-changes')}</DialogTitle>
-      <DialogContent>{t('alerts.unsaved-changes.body')}</DialogContent>
+      <DialogContent>{t('shared.unsaved-changes.body')}</DialogContent>
       <DialogActions>
         <Button variant="outlined" onClick={onClose}>
-          {t('alerts.unsaved-changes.stay')}
+          {t('shared.unsaved-changes.stay')}
         </Button>
         <Button
           variant="contained"
@@ -50,7 +50,7 @@ const UnsavedChangesDialog = ({
               blocker.proceed();
           }}
         >
-          {t('alerts.unsaved-changes.discard')}
+          {t('shared.unsaved-changes.discard')}
         </Button>
       </DialogActions>
     </Dialog>
