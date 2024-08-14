@@ -94,7 +94,7 @@ const EditCourseView = (): JSX.Element => {
         .string({
           required_error: t('course.edit.course-code-required'),
         })
-        .min(1),
+        .min(1, t('course.edit.course-code-required')),
       minCredits: z
         .number({
           required_error: t('course.edit.min-credits-required'),
@@ -111,9 +111,15 @@ const EditCourseView = (): JSX.Element => {
         .number()
         .min(0, t('course.edit.department-select'))
         .max(departments.length - 1, t('course.edit.department-select')),
-      nameEn: z.string({required_error: t('course.edit.name-english')}).min(1),
-      nameFi: z.string({required_error: t('course.edit.name-finnish')}).min(1),
-      nameSv: z.string({required_error: t('course.edit.name-swedish')}).min(1),
+      nameEn: z
+        .string({required_error: t('course.edit.name-english')})
+        .min(1, t('course.edit.name-english')),
+      nameFi: z
+        .string({required_error: t('course.edit.name-finnish')})
+        .min(1, t('course.edit.name-finnish')),
+      nameSv: z
+        .string({required_error: t('course.edit.name-swedish')})
+        .min(1, t('course.edit.name-swedish')),
     })
     .refine(val => val.maxCredits >= val.minCredits, {
       path: ['maxCredits'],
