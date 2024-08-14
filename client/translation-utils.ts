@@ -21,9 +21,9 @@ type FileEntries = {file: string; entries: Entry[]};
 type Duplicate = {value: string; keys: string[]};
 type Change = {before: string; after: string};
 
-function parseFileEntries(file: File | string): FileEntries {
+const parseFileEntries = (file: File | string): FileEntries => {
   const t: {[key: string]: string} = {};
-  function parseObject(object: TranslationJson, prefix: string = ''): void {
+  const parseObject = (object: TranslationJson, prefix: string = ''): void => {
     for (const key of Object.keys(object)) {
       const value = object[key];
       if (typeof value === 'object') {
@@ -32,16 +32,16 @@ function parseFileEntries(file: File | string): FileEntries {
         t[`${prefix}${key}`] = value as string;
       }
     }
-  }
+  };
 
   parseObject(JSON.parse(fs.readFileSync(file).toString()) as TranslationJson);
   return {
     file: file,
     entries: Object.entries(t).map(([key, value]) => ({key, value})),
   };
-}
+};
 
-function findDuplicateValues(entries: Entry[]): Duplicate[] {
+const findDuplicateValues = (entries: Entry[]): Duplicate[] => {
   const duplicates: {[key: string]: string[]} = {};
   for (const entry of entries) {
     const filtered = entries.filter(other => other.value === entry.value);
@@ -52,11 +52,12 @@ function findDuplicateValues(entries: Entry[]): Duplicate[] {
   }
 
   return Object.entries(duplicates).map(([value, keys]) => ({value, keys}));
-}
+};
 
 // Validates that there are no duplicate values in entries
-function validateNoDuplicates(fileEntries: FileEntries): void {
+const validateNoDuplicates = (fileEntries: FileEntries): void => {
   const duplicates = findDuplicateValues(fileEntries.entries);
+
   if (duplicates.length > 0) {
     console.error(
       `Found keys with duplicate values in ${fileEntries.file}, unable to proceed:`
@@ -68,41 +69,30 @@ function validateNoDuplicates(fileEntries: FileEntries): void {
     }
     process.exit();
   }
-}
+};
 
-// Validates that a and b have the same set of values
-function validateValueMatch(a: FileEntries, b: FileEntries): void {
-  function validate(x: FileEntries, y: FileEntries): void {
-    const notFound: string[] = [];
-    for (const xEntry of x.entries) {
-      const filtered = y.entries.filter(
-        yEntry => yEntry.value === xEntry.value
-      );
+// Validates that the set difference a \ b in terms of entry values is empty
+const validateNoDifference = (a: FileEntries, b: FileEntries): void => {
+  const difference = a.entries.filter(
+    xEntry => !b.entries.some(yEntry => yEntry.value === xEntry.value)
+  );
 
-      if (filtered.length === 0) {
-        notFound.push(xEntry.value);
-      }
+  if (difference.length > 0) {
+    console.error(
+      `Found values in ${a.file} not present in ${b.file}, unable to proceed:`
+    );
+    for (const entry of difference) {
+      console.log(`  - ${entry.key}: ${entry.value}`);
     }
-
-    if (notFound.length > 0) {
-      console.error(
-        `Found values in ${x.file} not present in ${y.file}, unable to proceed:`
-      );
-      for (const value of notFound) {
-        console.log(`  - ${value}`);
-      }
-      process.exit();
-    }
+    process.exit();
   }
+};
 
-  validate(a, b);
-  validate(b, a);
-}
-
-function findChanges(before: FileEntries, after: FileEntries): Change[] {
+const findChanges = (before: FileEntries, after: FileEntries): Change[] => {
   validateNoDuplicates(before);
   validateNoDuplicates(after);
-  validateValueMatch(before, after);
+  validateNoDifference(before, after);
+  validateNoDifference(after, before);
 
   const changes: Change[] = [];
   for (const beforeEntry of before.entries) {
@@ -119,30 +109,29 @@ function findChanges(before: FileEntries, after: FileEntries): Change[] {
   }
 
   return changes;
-}
+};
 
-function updateSourceCode(changes: Change[]): void {
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions#escaping
-  function escapeRegExp(string: string): string {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
-  function findSourceFiles(): string[] {
-    const files: string[] = [];
-    function find(directory: string = 'src'): void {
-      for (const read of fs.readdirSync(directory)) {
-        const sub = `${directory}/${read}`;
-        if (fs.lstatSync(sub).isDirectory()) {
-          find(sub);
-        } else {
-          files.push(sub);
-        }
+const findSourceFiles = (): string[] => {
+  const files: string[] = [];
+  const find = (directory: string = 'src'): void => {
+    for (const read of fs.readdirSync(directory)) {
+      const sub = `${directory}/${read}`;
+      if (fs.lstatSync(sub).isDirectory()) {
+        find(sub);
+      } else {
+        files.push(sub);
       }
     }
+  };
 
-    find();
-    return files;
-  }
+  find();
+  return files;
+};
+
+const updateSourceCode = (changes: Change[]): void => {
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions#escaping
+  const escapeRegExp = (string: string): string =>
+    string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
   const files = findSourceFiles();
   for (const change of changes) {
@@ -157,9 +146,9 @@ function updateSourceCode(changes: Change[]): void {
       fs.writeFileSync(file, result, 'utf8');
     }
   }
-}
+};
 
-function updateTranslation(file: File, changes: Change[]): void {
+const updateTranslation = (file: File, changes: Change[]): void => {
   const backupDir = `${path.dirname(file)}/backups`;
   const backup = `${backupDir}/translation.json.${new Date().toISOString()}`;
   if (!fs.existsSync(backupDir)) {
@@ -179,7 +168,7 @@ function updateTranslation(file: File, changes: Change[]): void {
   for (const entry of updated) {
     const keyParts = entry.key.split('.');
 
-    let iter: TranslationJson = object;
+    let iter = object;
     keyParts.forEach((part, i) => {
       if (i === keyParts.length - 1) {
         iter[part] = entry.value;
@@ -193,9 +182,9 @@ function updateTranslation(file: File, changes: Change[]): void {
   }
 
   fs.writeFileSync(file, JSON.stringify(object, null, 2));
-}
+};
 
-function rename(): void {
+const rename = (): void => {
   const original = parseFileEntries(File.English);
   const updated = parseFileEntries('translation.json');
   const changes = findChanges(original, updated);
@@ -204,9 +193,9 @@ function rename(): void {
   updateTranslation(File.English, changes);
   updateTranslation(File.Finnish, changes);
   updateTranslation(File.Swedish, changes);
-}
+};
 
-function merge(): void {
+const merge = (): void => {
   const fileEntries = parseFileEntries(File.English);
   const duplicates = findDuplicateValues(fileEntries.entries);
 
@@ -261,7 +250,7 @@ function merge(): void {
   updateTranslation(File.English, changes);
   updateTranslation(File.Finnish, changes);
   updateTranslation(File.Swedish, changes);
-}
+};
 
 const args = process.argv.slice(2);
 if (args.length !== 1) {
