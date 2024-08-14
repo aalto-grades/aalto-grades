@@ -60,8 +60,8 @@ const FinalGradeCell = ({
             placement="top"
             title={
               finalGrades.length <= 1
-                ? t('course-results.edit-final')
-                : t('course-results.multiple-final')
+                ? t('course.results.edit-final')
+                : t('course.results.multiple-final')
             }
           >
             <IconButton
@@ -84,13 +84,13 @@ const FinalGradeCell = ({
           onClose={() => setGradeDialogOpen(false)}
           userId={userId}
           finalGrades={finalGrades}
-          title={t('course-results.final-of', {user: studentNumber})}
+          title={t('course.results.final-of', {user: studentNumber})}
         />
       }
       {bestFinalGrade?.date && (
         <Tooltip
           placement="top"
-          title={t('course-results.final-on-date', {
+          title={t('course.results.final-on-date', {
             date: bestFinalGrade.date.toString(),
           })}
           disableInteractive

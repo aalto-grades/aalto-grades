@@ -158,8 +158,8 @@ const StepperNode = (props: NodeProps): JSX.Element => {
       <table style={{width: '100%', margin: '5px 0px'}}>
         <tbody>
           <tr>
-            <th>{t('graph.range')}</th>
-            <th>{t('graph.output')}</th>
+            <th>{t('shared.graph.range')}</th>
+            <th>{t('shared.graph.output')}</th>
           </tr>
           {new Array(localSettings.numSteps).fill(0).map((_, index) => (
             <tr
@@ -200,14 +200,14 @@ const StepperNode = (props: NodeProps): JSX.Element => {
         </tbody>
       </table>
       <button style={{float: 'left', marginRight: '5px'}} onClick={handleAdd}>
-        {t('graph.new-row')}
+        {t('shared.graph.new-row')}
       </button>
       <button
         style={{float: 'right'}}
         disabled={localSettings.numSteps === 1}
         onClick={handleRemove}
       >
-        {t('graph.remove-row')}
+        {t('shared.graph.remove-row')}
       </button>
 
       <Handle

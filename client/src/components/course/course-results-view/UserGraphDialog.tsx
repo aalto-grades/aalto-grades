@@ -54,7 +54,7 @@ const UserGraphDialog = ({
       <DialogTitle>Final grade preview</DialogTitle>
       <DialogContent>
         {row === null ? (
-          <>{t('course-results.data-undefined')}</>
+          <>{t('course.results.data-undefined')}</>
         ) : selectedModel === null || courseParts.data === undefined ? (
           <>{t('general.loading')}</>
         ) : (
@@ -78,7 +78,7 @@ const UserGraphDialog = ({
         {gradingModels !== undefined && gradingModels.length > 0 && (
           <FormControl size="small">
             <InputLabel id="grading-model-select-label">
-              {t('general.grading-model.singular')}
+              {t('general.grading-model')}
             </InputLabel>
             <Select
               labelId="grading-model-select-label"

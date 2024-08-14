@@ -136,43 +136,43 @@ const Graph = ({
   }[] = [
     {
       type: 'addition',
-      title: t('graph.node.add'),
-      tooltip: t('graph.node.add-tooltip'),
+      title: t('shared.graph.node.add'),
+      tooltip: t('shared.graph.node.add-tooltip'),
     },
     {
       type: 'average',
-      title: t('graph.node.average'),
-      tooltip: t('graph.node.average-tooltip'),
+      title: t('shared.graph.node.average'),
+      tooltip: t('shared.graph.node.average-tooltip'),
     },
     {
       type: 'stepper',
-      title: t('graph.node.stepper'),
-      tooltip: t('graph.node.stepper-tooltip'),
+      title: t('shared.graph.node.stepper'),
+      tooltip: t('shared.graph.node.stepper-tooltip'),
     },
     {
       type: 'minpoints',
-      title: t('graph.node.min'),
-      tooltip: t('graph.node.min-tooltip'),
+      title: t('shared.graph.node.min'),
+      tooltip: t('shared.graph.node.min-tooltip'),
     },
     {
       type: 'max',
-      title: t('graph.node.max'),
-      tooltip: t('graph.node.max-tooltip'),
+      title: t('shared.graph.node.max'),
+      tooltip: t('shared.graph.node.max-tooltip'),
     },
     {
       type: 'require',
-      title: t('graph.node.require'),
-      tooltip: t('graph.node.require-tooltip'),
+      title: t('shared.graph.node.require'),
+      tooltip: t('shared.graph.node.require-tooltip'),
     },
     {
       type: 'round',
-      title: t('graph.node.round'),
-      tooltip: t('graph.node.round-tooltip'),
+      title: t('shared.graph.node.round'),
+      tooltip: t('shared.graph.node.round-tooltip'),
     },
     {
       type: 'substitute',
-      title: t('graph.node.substitute'),
-      tooltip: t('graph.node.substitute-tooltip'),
+      title: t('shared.graph.node.substitute'),
+      tooltip: t('shared.graph.node.substitute-tooltip'),
     },
   ];
 
@@ -309,7 +309,7 @@ const Graph = ({
             ...oldExtraNodeData,
             [node.id]: {
               ...oldExtraNodeData[node.id],
-              warning: t('graph.part-deleted'),
+              warning: t('shared.graph.part-deleted'),
             },
           }));
           setDelCourseParts(oldDelCourseParts =>
@@ -320,7 +320,7 @@ const Graph = ({
             ...oldExtraNodeData,
             [node.id]: {
               ...oldExtraNodeData[node.id],
-              warning: t('graph.part-archived'),
+              warning: t('shared.graph.part-archived'),
             },
           }));
           setDelCourseParts(oldArchivedCourseParts =>
@@ -378,14 +378,14 @@ const Graph = ({
     let confirmation = true;
     if (modelHasFinalGrades) {
       confirmation = await AsyncConfirmationModal({
-        title: t('graph.saving'),
-        message: t('graph.has-final-grades-message'),
+        title: t('shared.graph.saving'),
+        message: t('shared.graph.has-final-grades-message'),
       });
     }
     if (confirmation) {
-      enqueueSnackbar(t('graph.saving'), {variant: 'info'});
+      enqueueSnackbar(t('shared.graph.saving'), {variant: 'info'});
       await onParentSave({nodes, edges, nodeData});
-      enqueueSnackbar(t('graph.saved'), {variant: 'success'});
+      enqueueSnackbar(t('shared.graph.saved'), {variant: 'success'});
       setOriginalGraphStructure(structuredClone({nodes, edges, nodeData}));
       setUnsaved(false);
     }
@@ -587,11 +587,11 @@ const Graph = ({
             severity="info"
             // variant="outlined"
           >
-            Unsaved changes
+            {t('general.unsaved-changes')}
           </Alert>
         )}
         {unsaved && modelHasFinalGrades && (
-          <Tooltip title={t('graph.has-final-grades-message')}>
+          <Tooltip title={t('shared.graph.has-final-grades-message')}>
             <Alert
               sx={{
                 position: 'absolute',
@@ -601,7 +601,7 @@ const Graph = ({
               }}
               severity="warning"
             >
-              {t('graph.has-final-grades')}
+              {t('shared.graph.has-final-grades')}
             </Alert>
           </Tooltip>
         )}
@@ -619,7 +619,7 @@ const Graph = ({
             severity="warning"
             // variant="outlined"
           >
-            {t('graph.course-failed')}
+            {t('shared.graph.course-failed')}
           </Alert>
         )}
       </div>
@@ -640,9 +640,7 @@ const Graph = ({
               zIndex: 1,
             }}
           >
-            {selected.length > 1
-              ? t('graph.delete-node.plural')
-              : t('graph.delete-node.singular')}
+            {t('shared.graph.delete-node', {count: selected.length})}
           </Button>
         )}
       </div>
@@ -723,17 +721,17 @@ const Graph = ({
                     onClick={() => setCoursePartsSelectOpen(true)}
                     variant="outlined"
                   >
-                    {t('graph.select-parts')}
+                    {t('general.select-course-parts')}
                   </Button>
                   <Button
                     onClick={() => setCoursePartValuesOpen(true)}
                     variant="outlined"
                     sx={{ml: 1}}
                   >
-                    {t('graph.test-values')}
+                    {t('shared.graph.test-values')}
                   </Button>
                   <Button onClick={format} variant="outlined" sx={{ml: 1}}>
-                    {t('graph.format')}
+                    {t('shared.graph.format')}
                   </Button>
                 </div>
                 <div
