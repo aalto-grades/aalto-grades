@@ -28,7 +28,7 @@ import {
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {ParseResult, parse, unparse} from 'papaparse';
-import {Dispatch, JSX, SetStateAction, useEffect, useState} from 'react';
+import {Dispatch, JSX, SetStateAction, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
@@ -70,11 +70,6 @@ const UploadDialogUpload = ({
   const [error, setError] = useState<boolean>(false);
   const [aplusImportDialogOpen, setAplusImportDialogOpen] =
     useState<boolean>(false);
-
-  useEffect(() => {
-    if (error || editing) setReady(false);
-    else setReady(true);
-  }, [error, editing]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const dataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
@@ -338,8 +333,14 @@ const UploadDialogUpload = ({
                 rowSelection={false}
                 disableColumnSelector
                 slots={{toolbar: dataGridToolbar}}
-                onRowEditStart={() => setEditing(true)}
-                onRowEditStop={() => setEditing(false)}
+                onRowEditStart={() => {
+                  setEditing(true);
+                  setReady(false);
+                }}
+                onRowEditStop={() => {
+                  setEditing(false);
+                  setReady(!error);
+                }}
                 getRowClassName={getRowClassName}
                 processRowUpdate={updatedRow => {
                   setRows(oldRows =>
@@ -356,10 +357,12 @@ const UploadDialogUpload = ({
                     );
 
                   setError(false);
+                  setReady(!editing);
                   return updatedRow;
                 }}
                 onProcessRowUpdateError={(rowError: Error) => {
                   setError(true);
+                  setReady(false);
                   enqueueSnackbar(rowError.message, {variant: 'error'});
                 }}
               />

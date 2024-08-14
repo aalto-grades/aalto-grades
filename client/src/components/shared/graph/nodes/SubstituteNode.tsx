@@ -14,8 +14,6 @@ import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
 type LocalSettings = {maxSubstitutions: string; substituteValues: string[]};
-const initialSettings = {maxSubstitutions: '0', substituteValues: []};
-
 const handleStartHeight = 110 + 33.9;
 const handleMiddleHeight = 60 + 33.9;
 const rowHeight = 33.9;
@@ -53,26 +51,20 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
-  const [localSettings, setLocalSettings] =
-    useState<LocalSettings>(initialSettings);
+  const settings = nodeData[id].settings as SubstituteNodeSettings;
+  const [localSettings, setLocalSettings] = useState<LocalSettings>(
+    convertToLocalSettings(settings)
+  );
   const [nextFree, setNextFree] = useState<number>(0);
   const [substituteHandles, setSubstituteHandles] = useState<string[]>([]);
   const [exerciseHandles, setExerciseHandles] = useState<string[]>([]);
   const [error, setError] = useState<boolean>(false);
-  const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as SubstituteNodeValue;
-  const settings = nodeData[id].settings as SubstituteNodeSettings;
 
+  // Unoptimal useEffect, but we must update parent state (settings) when
+  // The node inputs change...
   useEffect(() => {
-    if (init) return;
-    setLocalSettings(convertToLocalSettings(settings));
-    setError(false);
-    setInit(true);
-  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (!init) return;
     let change = false;
     let maxId = 0;
     const newLocalSettings = {...localSettings};
@@ -121,7 +113,8 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
       setError(false);
       setNodeSettings(id, convertFromLocalSettings(newLocalSettings));
     }
-  }, [nodeValues, init]); // eslint-disable-line react-hooks/exhaustive-deps
+    // The JSON.stringify() is a hacky solution to get React to realize that the sources updated
+  }, [JSON.stringify(nodeValue.sources)]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleNumChange = (
     event: React.ChangeEvent<HTMLInputElement>

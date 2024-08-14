@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
+import {ChangeEvent, JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position} from 'reactflow';
 
@@ -12,7 +12,6 @@ import BaseNode from './BaseNode';
 
 type RoundSetting = 'round-up' | 'round-closest' | 'round-down';
 type LocalSettings = {roundingSetting: RoundSetting};
-const initialSettings: LocalSettings = {roundingSetting: 'round-closest'};
 
 const RoundNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
@@ -20,18 +19,13 @@ const RoundNode = (props: NodeProps): JSX.Element => {
 
   const {nodeValues} = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
-  const [localSettings, setLocalSettings] =
-    useState<LocalSettings>(initialSettings);
-  const [init, setInit] = useState<boolean>(false);
+
+  const settings = nodeData[id].settings as RoundNodeSettings;
+  const [localSettings, setLocalSettings] = useState<LocalSettings>({
+    ...settings,
+  });
 
   const nodeValue = nodeValues[id] as RoundNodeValue;
-  const settings = nodeData[id].settings as RoundNodeSettings;
-
-  useEffect(() => {
-    if (init) return;
-    setLocalSettings({...settings});
-    setInit(true);
-  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>): void => {
     if (localSettings.roundingSetting === event.target.value) return;

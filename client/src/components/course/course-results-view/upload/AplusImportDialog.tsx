@@ -21,7 +21,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import {ChangeEvent, JSX, useEffect, useState} from 'react';
+import {ChangeEvent, JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
@@ -53,16 +53,20 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
     enabled: false,
   });
 
-  useEffect(() => {
+  const [oldAplusGrades, setOldAplusGrades] = useState<
+    typeof aplusGrades | null
+  >(null);
+  if (JSON.stringify(aplusGrades) !== JSON.stringify(oldAplusGrades)) {
+    setOldAplusGrades(aplusGrades);
+
     if (step === 1) {
       if (!aplusGrades.isFetching && aplusGrades.data) {
         setStep(2);
-        return;
+      } else {
+        setAplusTokenDialogOpen(!getAplusToken() || aplusGrades.isError);
       }
-
-      setAplusTokenDialogOpen(!getAplusToken() || aplusGrades.isError);
     }
-  }, [aplusGrades]); // eslint-disable-line react-hooks/exhaustive-deps
+  }
 
   const handleSelect = (
     event: ChangeEvent<HTMLInputElement>,

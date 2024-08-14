@@ -16,14 +16,16 @@ import {
   Tooltip,
   useTheme,
 } from '@mui/material';
+import {Row} from '@tanstack/react-table';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, forwardRef, useEffect, useMemo, useState} from 'react';
+import {JSX, forwardRef, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 
 import {StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateGraph} from '@/common/util/calculateGraph';
+import {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 import {useAddFinalGrades} from '@/hooks/api/finalGrade';
 import {
@@ -373,9 +375,12 @@ const CourseResultsTableToolbar = (): JSX.Element => {
     [auth?.role, isTeacherInCharge]
   );
 
-  useEffect(() => {
+  const [oldRows, setOldRows] = useState<Row<GroupedStudentRow>[] | null>(null);
+  if (table.getSelectedRowModel().rows !== oldRows) {
+    setOldRows(table.getSelectedRowModel().rows);
+
+    // Prevent exporting sisu csv if students without final grades found
     setMissingFinalGrades(
-      // Prevent exporting sisu csv if students without final grades found
       table
         .getSelectedRowModel()
         .rows.some(
@@ -384,17 +389,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
             selectedRow.original.finalGrades.length === 0
         )
     );
-    console.log('missingFinalGrades', missingFinalGrades);
-    console.log(
-      table
-        .getSelectedRowModel()
-        .rows.find(
-          selectedRow =>
-            selectedRow.original.finalGrades === undefined ||
-            selectedRow.original.finalGrades.length === 0
-        )
-    );
-  }, [table.getSelectedRowModel().rows]); // eslint-disable-line react-hooks/exhaustive-deps
+  }
 
   // // If asking for a refetch then it also update the selectedRows
   // // Refresh selectedRows for updating children's state
@@ -550,22 +545,24 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                     }
                     placement="top"
                   >
-                    <Button
-                      variant={
-                        table.getSelectedRowModel().rows.length === 0
-                          ? 'outlined'
-                          : !missingFinalGrades
+                    <span>
+                      <Button
+                        variant={
+                          table.getSelectedRowModel().rows.length === 0
                             ? 'outlined'
-                            : 'contained'
-                      }
-                      onClick={() => setShowCalculateDialog(true)}
-                      disabled={table.getSelectedRowModel().rows.length === 0}
-                      id="calculate-final-grades"
-                    >
-                      {missingFinalGrades
-                        ? t('course.results.calculate-final')
-                        : t('course.results.recalculate-final')}
-                    </Button>
+                            : !missingFinalGrades
+                              ? 'outlined'
+                              : 'contained'
+                        }
+                        onClick={() => setShowCalculateDialog(true)}
+                        disabled={table.getSelectedRowModel().rows.length === 0}
+                        id="calculate-final-grades"
+                      >
+                        {missingFinalGrades
+                          ? t('course.results.calculate-final')
+                          : t('course.results.recalculate-final')}
+                      </Button>
+                    </span>
                   </Tooltip>
                   <Tooltip
                     title={
@@ -577,21 +574,23 @@ const CourseResultsTableToolbar = (): JSX.Element => {
                     }
                     placement="top"
                   >
-                    <Button
-                      variant="contained"
-                      color={missingFinalGrades ? 'error' : 'primary'}
-                      onClick={(): void => {
-                        if (!missingFinalGrades) {
-                          setShowSisuDialog(true);
+                    <span>
+                      <Button
+                        variant="contained"
+                        color={missingFinalGrades ? 'error' : 'primary'}
+                        onClick={(): void => {
+                          if (!missingFinalGrades) {
+                            setShowSisuDialog(true);
+                          }
+                        }}
+                        disabled={
+                          table.getSelectedRowModel().rows.length > 0 &&
+                          missingFinalGrades
                         }
-                      }}
-                      disabled={
-                        table.getSelectedRowModel().rows.length > 0 &&
-                        missingFinalGrades
-                      }
-                    >
-                      {t('course.results.download-sisu-csv')}
-                    </Button>
+                      >
+                        {t('course.results.download-sisu-csv')}
+                      </Button>
+                    </span>
                   </Tooltip>
                 </Box>
               )}
