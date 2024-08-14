@@ -168,6 +168,21 @@ const updateTranslation = (file: File, changes: Change[]): void => {
   for (const entry of updated) {
     const keyParts = entry.key.split('.');
 
+    /*
+     * Transform entries from:
+     *   [
+     *     {"key": "nested.key", "value": "first"},
+     *     {"key": "not-nested", "value": "second"}
+     *   ]
+     *
+     * to:
+     *   {
+     *     "nested": {
+     *       "key": "first"
+     *     },
+     *     "not-nested": "second"
+     *   }
+     */
     let iter = object;
     keyParts.forEach((part, i) => {
       if (i === keyParts.length - 1) {
