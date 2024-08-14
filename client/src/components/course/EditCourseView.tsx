@@ -78,96 +78,82 @@ const EditCourseView = (): JSX.Element => {
   const [initAssistants, setInitAssistants] = useState<string[]>([]);
   const [assistants, setAssistants] = useState<string[]>([]);
   const [initialValues, setInitialValues] = useState<FormData | null>(null);
+  const [formChanges, setFormChanges] = useState<boolean>(false);
 
-  const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
-
-  const formRef = useRef<FormikProps<FormData>>(null);
+  const changes =
+    JSON.stringify(initTeachersInCharge) !== JSON.stringify(teachersInCharge) ||
+    JSON.stringify(initAssistants) !== JSON.stringify(assistants);
 
   const blocker = useBlocker(
     ({currentLocation, nextLocation}) =>
-      unsavedChanges && currentLocation.pathname !== nextLocation.pathname
+      (changes || formChanges) &&
+      currentLocation.pathname !== nextLocation.pathname
   );
-
-  const ValidationSchema = z
-    .object({
-      courseCode: z
-        .string({
-          required_error: t('course.edit.course-code-required'),
-        })
-        .min(1, t('course.edit.course-code-required')),
-      minCredits: z
-        .number({
-          required_error: t('course.edit.min-credits-required'),
-        })
-        .min(0, t('course.edit.min-credits-negative')),
-      maxCredits: z.number({
-        required_error: t('course.edit.max-credits-required'),
-      }),
-      gradingScale: z.nativeEnum(GradingScale),
-      languageOfInstruction: z.nativeEnum(Language),
-      teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
-      assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
-      department: z
-        .number()
-        .min(0, t('course.edit.department-select'))
-        .max(departments.length - 1, t('course.edit.department-select')),
-      nameEn: z
-        .string({required_error: t('course.edit.name-english')})
-        .min(1, t('course.edit.name-english')),
-      nameFi: z
-        .string({required_error: t('course.edit.name-finnish')})
-        .min(1, t('course.edit.name-finnish')),
-      nameSv: z
-        .string({required_error: t('course.edit.name-swedish')})
-        .min(1, t('course.edit.name-swedish')),
-    })
-    .refine(val => val.maxCredits >= val.minCredits, {
-      path: ['maxCredits'],
-      message: t('course.edit.max-below-min'),
-    });
 
   // Warning if leaving with unsaved
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent): void => {
-      if (unsavedChanges) {
+      if (changes || formChanges) {
         e.preventDefault();
         e.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
-  }, [unsavedChanges]);
+  }, [changes, formChanges]);
 
-  useEffect(() => {
-    if (initialValues || !course.data) return;
-    setInitialValues({
-      courseCode: course.data.courseCode,
-      minCredits: course.data.minCredits,
-      maxCredits: course.data.maxCredits,
-      gradingScale: course.data.gradingScale,
-      languageOfInstruction: course.data.languageOfInstruction,
-      teacherEmail: '',
-      assistantEmail: '',
-      department: departments.findIndex(
-        department =>
-          department.en === course.data.department.en ||
-          department.fi === course.data.department.fi ||
-          department.sv === course.data.department.sv
-      ),
-      nameEn: course.data.name.en,
-      nameFi: course.data.name.fi,
-      nameSv: course.data.name.sv,
-    });
+  const formRef = useRef<FormikProps<FormData>>(null);
 
-    setInitTeachersInCharge(
-      course.data.teachersInCharge.map(teacher => teacher.email)
-    );
-    setTeachersInCharge(
-      course.data.teachersInCharge.map(teacher => teacher.email)
-    );
-    setInitAssistants(course.data.assistants.map(assistant => assistant.email));
-    setAssistants(course.data.assistants.map(assistant => assistant.email));
-  }, [course.data]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [oldCourseData, setOldCourseData] =
+    useState<typeof course.data>(undefined);
+  if (course.data !== oldCourseData) {
+    setOldCourseData(course.data);
+
+    if (initialValues === null && course.data !== undefined) {
+      setInitialValues({
+        courseCode: course.data.courseCode,
+        minCredits: course.data.minCredits,
+        maxCredits: course.data.maxCredits,
+        gradingScale: course.data.gradingScale,
+        languageOfInstruction: course.data.languageOfInstruction,
+        teacherEmail: '',
+        assistantEmail: '',
+        department: departments.findIndex(
+          department =>
+            department.en === course.data.department.en ||
+            department.fi === course.data.department.fi ||
+            department.sv === course.data.department.sv
+        ),
+        nameEn: course.data.name.en,
+        nameFi: course.data.name.fi,
+        nameSv: course.data.name.sv,
+      });
+
+      setInitTeachersInCharge(
+        course.data.teachersInCharge.map(teacher => teacher.email)
+      );
+      setTeachersInCharge(
+        course.data.teachersInCharge.map(teacher => teacher.email)
+      );
+      setInitAssistants(
+        course.data.assistants.map(assistant => assistant.email)
+      );
+      setAssistants(course.data.assistants.map(assistant => assistant.email));
+      setFormChanges(false);
+    }
+  }
+
+  const formChanged = (formData: FormData): boolean => {
+    if (initialValues === null) return false;
+
+    return !Object.keys(initialValues)
+      .filter(key => key !== 'teacherEmail' && key !== 'assistantEmail')
+      .every(
+        key =>
+          JSON.stringify(initialValues[key as keyof FormData]) ===
+          JSON.stringify(formData[key as keyof FormData])
+      );
+  };
 
   const removeTeacher = (value: string): void => {
     setTeachersInCharge(teachersInCharge.filter(teacher => teacher !== value));
@@ -210,37 +196,55 @@ const EditCourseView = (): JSX.Element => {
           setInitialValues(values);
           setInitTeachersInCharge(teachersInCharge);
           setInitAssistants(assistants);
-          setUnsavedChanges(false);
+          setFormChanges(false);
         },
-        onError: () => {
-          setSubmitting(false);
-        },
+        onError: () => setSubmitting(false),
       }
     );
   };
 
-  const changed = (formData?: FormData): boolean => {
-    if (initialValues === null) return false;
-    return (
-      JSON.stringify(initTeachersInCharge) !==
-        JSON.stringify(teachersInCharge) ||
-      JSON.stringify(initAssistants) !== JSON.stringify(assistants) ||
-      (formData
-        ? !Object.keys(initialValues)
-            .filter(key => key !== 'teacherEmail' && key !== 'assistantEmail')
-            .every(
-              key =>
-                JSON.stringify(initialValues[key as keyof FormData]) ===
-                JSON.stringify(formData[key as keyof FormData])
-            )
-        : false)
-    );
-  };
+  const ValidationSchema = z
+    .object({
+      courseCode: z
+        .string({
+          required_error: t('course.edit.course-code-required'),
+        })
+        .min(1, t('course.edit.course-code-required')),
+      minCredits: z
+        .number({
+          required_error: t('course.edit.min-credits-required'),
+        })
+        .min(0, t('course.edit.min-credits-negative')),
+      maxCredits: z.number({
+        required_error: t('course.edit.max-credits-required'),
+      }),
+      gradingScale: z.nativeEnum(GradingScale),
+      languageOfInstruction: z.nativeEnum(Language),
+      teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
+      assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
+      department: z
+        .number()
+        .min(0, t('course.edit.department-select'))
+        .max(departments.length - 1, t('course.edit.department-select')),
+      nameEn: z
+        .string({required_error: t('course.edit.name-english')})
+        .min(1, t('course.edit.name-english')),
+      nameFi: z
+        .string({required_error: t('course.edit.name-finnish')})
+        .min(1, t('course.edit.name-finnish')),
+      nameSv: z
+        .string({required_error: t('course.edit.name-swedish')})
+        .min(1, t('course.edit.name-swedish')),
+    })
+    .refine(val => val.maxCredits >= val.minCredits, {
+      path: ['maxCredits'],
+      message: t('course.edit.max-below-min'),
+    });
 
   const validateForm = (
     values: FormData
   ): {[key in keyof FormData]?: string[]} | undefined => {
-    setUnsavedChanges(changed(values)); // Hacky workaround to get form data
+    setFormChanges(formChanged(values)); // Hacky workaround to get form data
     const result = ValidationSchema.safeParse(values);
     if (result.success) return;
     const fieldErrors = result.error.formErrors.fieldErrors;
@@ -249,10 +253,6 @@ const EditCourseView = (): JSX.Element => {
     );
   };
 
-  useEffect(() => {
-    setUnsavedChanges(changed());
-  }, [assistants, teachersInCharge, initTeachersInCharge, initAssistants]); // eslint-disable-line react-hooks/exhaustive-deps
-
   const confirmDiscard = async ({
     resetForm,
   }: FormikHelpers<FormData>): Promise<void> => {
@@ -260,6 +260,7 @@ const EditCourseView = (): JSX.Element => {
       resetForm();
       setTeachersInCharge(initTeachersInCharge);
       setAssistants(initAssistants);
+      setFormChanges(false);
     }
   };
 
@@ -282,7 +283,7 @@ const EditCourseView = (): JSX.Element => {
                   {t('course.edit.title')}
                 </Typography>
                 <SaveBar
-                  show={unsavedChanges}
+                  show={changes || formChanges}
                   handleDiscard={() => confirmDiscard(form)}
                   loading={form.isSubmitting}
                   disabled={!form.isValid}

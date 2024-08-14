@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Alert, Button, Divider, Tooltip, Typography} from '@mui/material';
+import {TFunction} from 'i18next';
 import {enqueueSnackbar} from 'notistack';
 import {
   DragEvent,
@@ -41,7 +42,6 @@ import {
   FullNodeData,
   GraphStructure,
   NodeSettings,
-  NodeValue,
   NodeValues,
 } from '@/common/types/graph';
 import {calculateNewNodeValues, initNode} from '@/common/util/calculateGraph';
@@ -55,7 +55,13 @@ import {
 import {GradeSelectOption, findBestGrade} from '@/utils/bestGrade';
 import CoursePartValuesDialog from './CoursePartValuesDialog';
 import SelectCoursePartsDialog from './SelectCoursePartsDialog';
-import {findDisconnectedEdges, formatGraph} from './graphUtil';
+import {
+  findDisconnectedEdges,
+  formatGraph,
+  getDragAndDropNodes,
+  isValidConnection,
+  simplifyNode,
+} from './graphUtil';
 import AdditionNode from './nodes/AdditionNode';
 import AverageNode from './nodes/AverageNode';
 import CoursePartNode from './nodes/CoursePartNode';
@@ -80,6 +86,39 @@ const nodeTypesMap = {
   substitute: SubstituteNode,
 };
 
+// Load graph for the first time
+const initGraphFn = (
+  initGraph: GraphStructure,
+  courseParts: {id: number; name: string; archived: boolean}[],
+  t: TFunction<'translation', undefined>
+): {initNodeValues: NodeValues; extraNodeData: ExtraNodeData} => {
+  // Check for deleted & archived course parts (edit extra data)
+  const extraNodeData: ExtraNodeData = {};
+  for (const node of initGraph.nodes) {
+    if (node.type !== 'coursepart') continue;
+    const coursePartId = parseInt(node.id.split('-')[1]);
+
+    const nodeCoursePart = courseParts.find(
+      coursePart => coursePart.id === coursePartId
+    );
+    if (nodeCoursePart === undefined) {
+      extraNodeData[node.id] = {warning: t('shared.graph.part-deleted')};
+    } else if (nodeCoursePart.archived) {
+      extraNodeData[node.id] = {warning: t('shared.graph.part-archived')};
+    }
+  }
+
+  // Load initGraph
+  const initNodeValues = Object.fromEntries(
+    initGraph.nodes.map(node => [
+      node.id,
+      initNode(node.type as CustomNodeTypes, node.id, initGraph.edges).value,
+    ])
+  );
+
+  return {initNodeValues, extraNodeData};
+};
+
 type GraphProps = {
   initGraph: GraphStructure;
   courseParts: {id: number; name: string; archived: boolean}[];
@@ -99,88 +138,58 @@ const Graph = ({
   modelHasFinalGrades = false,
 }: GraphProps): JSX.Element => {
   const {t} = useTranslation();
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [nodeData, setNodeData] = useState<FullNodeData>({});
-  const [extraNodeData, setExtraNodeData] = useState<ExtraNodeData>({});
-  const [nodeValues, setNodeValues] = useState<NodeValues>({});
+
+  const {initNodeValues, extraNodeData} = useMemo(
+    () => initGraphFn(initGraph, courseParts, t),
+    [courseParts, initGraph, t]
+  );
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(initGraph.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initGraph.edges);
+  const [nodeData, setNodeData] = useState<FullNodeData>(initGraph.nodeData);
+  const [nodeValues, setNodeValues] = useState<NodeValues>(initNodeValues);
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
 
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const [savedNodes, setSavedNodes] = useState<Node[] | null>(null);
-  const [savedEdges, setSavedEdges] = useState<Edge[] | null>(null);
-  const [savedNodeSettings, setSavedNodeSettings] = useState<{
-    [key: string]: NodeSettings | undefined;
+  // Used to check for changes
+  const [lastState, setLastState] = useState<{
+    nodes: Node[];
+    edges: Edge[];
+    nodeSettings: {[key: string]: NodeSettings | undefined};
+    nodeValues: NodeValues;
   } | null>(null);
-  const [savedNodeValues, setSavedNodeValues] = useState<NodeValues | null>(
-    null
-  );
 
-  const [unsaved, setUnsaved] = useState<boolean>(false);
   const [selected, setSelected] = useState<Node[]>([]);
   const [coursePartsSelectOpen, setCoursePartsSelectOpen] =
     useState<boolean>(false);
   const [coursePartValuesOpen, setCoursePartValuesOpen] =
     useState<boolean>(false);
-  // Course part nodes that the user is allowed to delete
-  const [delCourseParts, setDelCourseParts] = useState<string[]>([]);
   const [originalGraphStructure, setOriginalGraphStructure] =
-    useState<GraphStructure>({nodes: [], edges: [], nodeData: {}});
+    useState<GraphStructure>(initGraph);
 
-  const dragAndDropNodes: {
-    type: DropInNodes;
-    title: string;
-    tooltip: string;
-  }[] = [
-    {
-      type: 'addition',
-      title: t('shared.graph.node.add'),
-      tooltip: t('shared.graph.node.add-tooltip'),
-    },
-    {
-      type: 'average',
-      title: t('shared.graph.node.average'),
-      tooltip: t('shared.graph.node.average-tooltip'),
-    },
-    {
-      type: 'stepper',
-      title: t('shared.graph.node.stepper'),
-      tooltip: t('shared.graph.node.stepper-tooltip'),
-    },
-    {
-      type: 'minpoints',
-      title: t('shared.graph.node.min'),
-      tooltip: t('shared.graph.node.min-tooltip'),
-    },
-    {
-      type: 'max',
-      title: t('shared.graph.node.max'),
-      tooltip: t('shared.graph.node.max-tooltip'),
-    },
-    {
-      type: 'require',
-      title: t('shared.graph.node.require'),
-      tooltip: t('shared.graph.node.require-tooltip'),
-    },
-    {
-      type: 'round',
-      title: t('shared.graph.node.round'),
-      tooltip: t('shared.graph.node.round-tooltip'),
-    },
-    {
-      type: 'substitute',
-      title: t('shared.graph.node.substitute'),
-      tooltip: t('shared.graph.node.substitute-tooltip'),
-    },
-  ];
+  const unsaved =
+    JSON.stringify(originalGraphStructure.nodes.map(simplifyNode)) !==
+      JSON.stringify(nodes.map(simplifyNode)) ||
+    JSON.stringify(originalGraphStructure.edges) !== JSON.stringify(edges) ||
+    JSON.stringify(originalGraphStructure.nodeData) !==
+      JSON.stringify(nodeData);
 
-  const nodeMap = useMemo<{[key: string]: Node}>(() => {
-    const newMap: {[key: string]: Node} = {};
-    for (const node of nodes) newMap[node.id] = node;
-    return newMap;
-  }, [nodes]);
+  // Course part nodes that the user is allowed to delete
+  const delCourseParts = useMemo(
+    () =>
+      initGraph.nodes
+        .filter(node => {
+          if (node.type !== 'coursepart') return false;
+          const coursePartId = parseInt(node.id.split('-')[1]);
+
+          const nodeCoursePart = courseParts.find(
+            coursePart => coursePart.id === coursePartId
+          );
+          return nodeCoursePart === undefined || nodeCoursePart.archived;
+        })
+        .map(node => node.id),
+    [courseParts, initGraph.nodes]
+  );
 
   const blocker = useBlocker(
     ({currentLocation, nextLocation}) =>
@@ -218,62 +227,39 @@ const Graph = ({
         edge => !disconnectedEdges.includes(edge)
       );
 
-      const newNodeValues = calculateNewNodeValues(
+      const newNodeValues: NodeValues = calculateNewNodeValues(
         nodeValues,
         nodeData,
         nodes,
         filteredEdges
       );
-      setSavedNodeValues(structuredClone(newNodeValues));
+      setLastState(oldLastState => ({
+        ...oldLastState!,
+        nodeValues: newNodeValues,
+      }));
       setNodeValues(newNodeValues);
       if (disconnectedEdges.length > 0) setEdges(filteredEdges);
     },
     [nodeValues, nodes, edges, nodeData, setEdges]
   );
 
+  // Update node values when nodes/edges/values/settings change
   useEffect(() => {
-    const nodeSettings: {[key: string]: NodeSettings | undefined} = {};
-    for (const [key, value] of Object.entries(nodeData))
-      nodeSettings[key] = value.settings;
+    const nodeSettings = Object.fromEntries(
+      Object.entries(nodeData).map(([key, {settings}]) => [key, settings])
+    );
 
     if (
-      !loading &&
-      (savedNodes?.length !== nodes.length ||
-        savedEdges?.length !== edges.length ||
-        JSON.stringify(savedNodeValues) !== JSON.stringify(nodeValues) ||
-        JSON.stringify(savedNodeSettings) !== JSON.stringify(nodeSettings))
+      lastState === null ||
+      lastState.nodes.length !== nodes.length ||
+      lastState.edges.length !== edges.length ||
+      JSON.stringify(lastState.nodeValues) !== JSON.stringify(nodeValues) ||
+      JSON.stringify(lastState.nodeSettings) !== JSON.stringify(nodeSettings)
     ) {
-      setSavedNodes(structuredClone(nodes));
-      setSavedEdges(structuredClone(edges));
-      setSavedNodeValues(structuredClone(nodeValues));
-      setSavedNodeSettings(structuredClone(nodeSettings));
+      setLastState(structuredClone({nodes, edges, nodeValues, nodeSettings}));
       updateValues();
     }
-
-    const simplifyNodes = (node: Node): Node => ({
-      id: node.id,
-      type: node.type,
-      position: {
-        x: Math.round(node.position.x),
-        y: Math.round(node.position.y),
-      },
-      data: {},
-    });
-
-    if (
-      !loading &&
-      (JSON.stringify(originalGraphStructure.nodes.map(simplifyNodes)) !==
-        JSON.stringify(nodes.map(simplifyNodes)) ||
-        JSON.stringify(originalGraphStructure.edges) !==
-          JSON.stringify(edges) ||
-        JSON.stringify(originalGraphStructure.nodeData) !==
-          JSON.stringify(nodeData))
-    ) {
-      setUnsaved(true);
-    } else if (!loading) {
-      setUnsaved(false);
-    }
-  }, [loading, nodes, edges, nodeData, nodeValues]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nodes, edges, nodeData, nodeValues, updateValues, lastState]);
 
   // Warning if leaving with unsaved
   useEffect(() => {
@@ -287,71 +273,8 @@ const Graph = ({
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [unsaved]);
 
-  // Load graph for the first time
   useEffect(() => {
-    console.debug('Loading graph');
-    setLoading(true);
-
-    for (const node of nodes) onNodesChange([{id: node.id, type: 'remove'}]);
-
-    // Timeout to prevent nodes updating with missing data
-    setTimeout(() => {
-      // Check for deleted & archived course parts (edit extra data)
-      for (const node of initGraph.nodes) {
-        if (node.type !== 'coursepart') continue;
-        const coursePartId = parseInt(node.id.split('-')[1]);
-
-        const nodeCoursePart = courseParts.find(
-          coursePart => coursePart.id === coursePartId
-        );
-        if (nodeCoursePart === undefined) {
-          setExtraNodeData(oldExtraNodeData => ({
-            ...oldExtraNodeData,
-            [node.id]: {
-              ...oldExtraNodeData[node.id],
-              warning: t('shared.graph.part-deleted'),
-            },
-          }));
-          setDelCourseParts(oldDelCourseParts =>
-            oldDelCourseParts.concat(node.id)
-          );
-        } else if (nodeCoursePart.archived) {
-          setExtraNodeData(oldExtraNodeData => ({
-            ...oldExtraNodeData,
-            [node.id]: {
-              ...oldExtraNodeData[node.id],
-              warning: t('shared.graph.part-archived'),
-            },
-          }));
-          setDelCourseParts(oldArchivedCourseParts =>
-            oldArchivedCourseParts.concat(node.id)
-          );
-        }
-      }
-
-      // Load initGraph
-      const initNodeValues: {[key: string]: NodeValue} = {};
-      for (const node of initGraph.nodes)
-        initNodeValues[node.id] = initNode(
-          node.type as CustomNodeTypes,
-          node.id,
-          initGraph.edges
-        ).value;
-
-      setNodes(initGraph.nodes);
-      setEdges(initGraph.edges);
-      setNodeData(initGraph.nodeData);
-      setNodeValues(initNodeValues);
-
-      setOriginalGraphStructure(structuredClone(initGraph));
-      setUnsaved(false);
-      setLoading(false);
-      reactFlowInstance?.fitView();
-    }, 50);
-  }, [initGraph]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (loading || userGrades === null) return;
+    if (userGrades === null) return;
     const newNodeValues = {...nodeValues};
     let change = false;
 
@@ -370,7 +293,7 @@ const Graph = ({
       }
     }
     if (change) setNodeValues(newNodeValues);
-  }, [gradeSelectOption, loading, nodeValues, userGrades]);
+  }, [gradeSelectOption, nodeValues, userGrades]);
 
   const onSave = async (): Promise<void> => {
     if (onParentSave === undefined) return;
@@ -387,7 +310,6 @@ const Graph = ({
       await onParentSave({nodes, edges, nodeData});
       enqueueSnackbar(t('shared.graph.saved'), {variant: 'success'});
       setOriginalGraphStructure(structuredClone({nodes, edges, nodeData}));
-      setUnsaved(false);
     }
   };
 
@@ -397,63 +319,6 @@ const Graph = ({
       updateValues(addEdge(params, edges));
     },
     [edges, setEdges, updateValues]
-  );
-
-  const isValidConnection = useCallback(
-    (connection: Connection) => {
-      // Check for conflicting edges
-      for (const edge of edges) {
-        // If connection doesn't have specific target handle and connection to the target already exists
-        if (!connection.targetHandle && edge.target === connection.target)
-          return false;
-
-        // If connection to target handle already exists
-        if (
-          edge.target === connection.target &&
-          edge.targetHandle &&
-          edge.targetHandle === connection.targetHandle
-        )
-          return false;
-
-        // If connection from source handle to target node already exists
-        if (
-          edge.source === connection.source &&
-          edge.sourceHandle === connection.sourceHandle &&
-          edge.target === connection.target
-        ) {
-          return false;
-        }
-      }
-
-      // Helper map for finding cycles
-      const nextNodes: {[key: string]: Node[]} = {};
-      for (const edge of edges) {
-        if (!(edge.source in nextNodes)) nextNodes[edge.source] = [];
-        nextNodes[edge.source].push(
-          nodes.find(node => node.id === edge.target) as Node
-        );
-      }
-
-      // Try to find route from target node back to source node
-      const hasCycle = (node: Node, visited = new Set()): boolean => {
-        if (visited.has(node.id)) return false;
-        visited.add(node.id);
-
-        if (!(node.id in nextNodes)) return false;
-        for (const nextNode of nextNodes[node.id]) {
-          if (nextNode.id === connection.source) return true;
-          if (hasCycle(nextNode, visited)) return true;
-        }
-        return false;
-      };
-
-      const targetNode = nodes.find(node => node.id === connection.target)!;
-
-      // Don't allow connections from a node back to itself
-      if (targetNode.id === connection.source) return false;
-      return !hasCycle(targetNode);
-    },
-    [nodes, edges]
   );
 
   const format = async (): Promise<void> => {
@@ -480,7 +345,7 @@ const Graph = ({
       });
       newNodeData[`coursepart-${coursePart.id}`] = {
         title: coursePart.name,
-        settings: {minPoints: 0, onFailSetting: 'coursefail'},
+        settings: {minPoints: null, onFailSetting: 'coursefail'},
       };
       newNodeValues[`coursepart-${coursePart.id}`] =
         initNode('coursepart').value;
@@ -506,13 +371,17 @@ const Graph = ({
   const handleSetCoursePartValues = (coursePartValues: {
     [key: number]: number;
   }): void => {
-    const newNodeValues = {...nodeValues};
+    const newNodeValues = structuredClone(nodeValues);
     for (const [coursePartId, value] of Object.entries(coursePartValues)) {
       const nodeValue = newNodeValues[`coursepart-${coursePartId}`];
       if (nodeValue.type === 'coursepart') nodeValue.source = value;
     }
     setNodeValues(newNodeValues);
   };
+
+  const nodeTypeMap = Object.fromEntries(
+    nodes.map(node => [node.id, node.type])
+  );
 
   // Handle drop-in nodes
   const onDragStart = (
@@ -536,16 +405,14 @@ const Graph = ({
         | DropInNodes
         | '';
 
-      if (typeof type === 'undefined' || !type || reactFlowInstance === null) {
-        return;
-      }
+      if (!type || reactFlowInstance === null) return;
 
       const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
       });
       let nodeId = `dnd-${type}-${getId()}`;
-      while (nodeId in nodeMap) nodeId = `dnd-${type}-${getId()}`; // To prevent duplicates from loading existing graph
+      while (nodeId in nodeTypeMap) nodeId = `dnd-${type}-${getId()}`; // To prevent duplicates from loading existing graph
 
       const initState = initNode(type);
       const newNode: Node = {id: nodeId, type, position, data: {}};
@@ -559,9 +426,10 @@ const Graph = ({
       if (initState.data.settings)
         setNodeSettings(nodeId, initState.data.settings);
     },
-    [getId, nodeMap, reactFlowInstance, setNodes]
+    [getId, nodeTypeMap, reactFlowInstance, setNodes]
   );
 
+  const dragAndDropNodes = getDragAndDropNodes(t);
   const courseFail = Object.values(nodeValues).find(
     nodeVal => 'courseFail' in nodeVal && nodeVal.courseFail
   );
@@ -574,6 +442,14 @@ const Graph = ({
         open={coursePartsSelectOpen}
         handleCoursePartSelect={handleCoursePartSelect}
         onClose={() => setCoursePartsSelectOpen(false)}
+      />
+      <CoursePartValuesDialog
+        nodes={nodes}
+        nodeValues={nodeValues}
+        courseParts={courseParts}
+        open={coursePartValuesOpen}
+        onClose={() => setCoursePartValuesOpen(false)}
+        handleSetCoursePartValues={handleSetCoursePartValues}
       />
       <div style={{position: 'relative'}}>
         {unsaved && (
@@ -644,14 +520,6 @@ const Graph = ({
           </Button>
         )}
       </div>
-      <CoursePartValuesDialog
-        nodes={nodes}
-        nodeValues={nodeValues}
-        courseParts={courseParts}
-        open={coursePartValuesOpen}
-        onClose={() => setCoursePartValuesOpen(false)}
-        handleSetCoursePartValues={handleSetCoursePartValues}
-      />
       <NodeValuesContext.Provider value={{nodeValues}}>
         <ExtraNodeDataContext.Provider value={{extraNodeData}}>
           <NodeDataContext.Provider
@@ -667,8 +535,8 @@ const Graph = ({
                       change =>
                         change.type !== 'remove' ||
                         delCourseParts.includes(change.id) ||
-                        (nodeMap[change.id].type !== 'coursepart' &&
-                          nodeMap[change.id].type !== 'grade')
+                        (nodeTypeMap[change.id] !== 'coursepart' &&
+                          nodeTypeMap[change.id] !== 'grade')
                     )
                   )
                 }
@@ -676,9 +544,14 @@ const Graph = ({
                 minZoom={0.25}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
-                isValidConnection={isValidConnection}
+                isValidConnection={connection =>
+                  isValidConnection(connection, edges)
+                }
                 nodeTypes={nodeTypesMap}
-                onInit={setReactFlowInstance}
+                onInit={flowInstance => {
+                  setReactFlowInstance(flowInstance);
+                  reactFlowInstance?.fitView();
+                }}
                 onDrop={onDrop}
                 onDragOver={onDragOver}
                 onError={(i, m) => i !== '008' && console.warn(m)} // Ignore "couldn't create edge" warnings
@@ -701,9 +574,12 @@ const Graph = ({
               <>
                 <div style={{marginBottom: '5px'}}>
                   {dragAndDropNodes.map(dragAndDropNode => (
-                    <Tooltip title={dragAndDropNode.tooltip} placement="top">
+                    <Tooltip
+                      key={dragAndDropNode.type}
+                      title={dragAndDropNode.tooltip}
+                      placement="top"
+                    >
                       <div
-                        key={dragAndDropNode.type}
                         className="dnd-node"
                         onDragStart={event =>
                           onDragStart(event, dragAndDropNode.type)

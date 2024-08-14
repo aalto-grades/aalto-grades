@@ -12,7 +12,7 @@ import {
   TextField,
 } from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useEffect, useState} from 'react';
+import {JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
@@ -36,9 +36,11 @@ const RenameGradingModelDialog = ({
 
   const [newName, setNewName] = useState<string>('');
 
-  useEffect(() => {
+  const [oldNameProp, setOldNameProp] = useState<typeof name>(null);
+  if (name !== oldNameProp) {
+    setOldNameProp(name);
     if (name !== null && name !== newName) setNewName(name);
-  }, [name]); // eslint-disable-line react-hooks/exhaustive-deps
+  }
 
   const handleSave = async (): Promise<void> => {
     if (gradingModelId === null) return;

@@ -14,8 +14,6 @@ type LocalSettings = {
   weights: {[key: string]: string};
   percentageMode: boolean;
 };
-const initialSettings = {weights: {}, percentageMode: false};
-
 const handleStartHeight = 103;
 const rowHeight = 33.9;
 
@@ -57,27 +55,19 @@ const AverageNode = (props: NodeProps): JSX.Element => {
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {nodeValues} = useContext(NodeValuesContext);
 
-  const [localSettings, setLocalSettings] =
-    useState<LocalSettings>(initialSettings);
-
+  const settings = nodeData[id].settings as AverageNodeSettings;
+  const [localSettings, setLocalSettings] = useState<LocalSettings>(
+    convertSettingsToStrings(settings)
+  );
   const [handles, setHandles] = useState<string[]>([]);
   const [nextFree, setNextFree] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
-  const [init, setInit] = useState<boolean>(false);
 
   const nodeValue = nodeValues[id] as AverageNodeValue;
-  const settings = nodeData[id].settings as AverageNodeSettings;
 
+  // Unoptimal useEffect, but we must update parent state (settings) when
+  // The node inputs change...
   useEffect(() => {
-    if (init) return;
-    const initSettings = settings;
-    setLocalSettings(convertSettingsToStrings(initSettings));
-    setError(false);
-    setInit(true);
-  }, [nodeData]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (!init) return;
     let change = false;
     let maxId = 0;
     let newHandles = [...handles];
@@ -109,7 +99,8 @@ const AverageNode = (props: NodeProps): JSX.Element => {
       setError(false);
       setNodeSettings(id, convertSettingsToFloats(newLocalSettings));
     }
-  }, [nodeValues, init]); // eslint-disable-line react-hooks/exhaustive-deps
+    // The JSON.stringify() is a hacky solution to get React to realize that the sources updated
+  }, [JSON.stringify(nodeValue.sources)]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCheck = (event: ChangeEvent<HTMLInputElement>): void => {
     const newLocalSettings = {

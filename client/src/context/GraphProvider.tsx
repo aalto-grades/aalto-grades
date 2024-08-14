@@ -21,9 +21,7 @@ export const NodeDataContext = createContext<NodeDataContext>(
 );
 
 export type ExtraNodeData = {
-  [key: string]: {
-    warning?: string;
-  };
+  [key: string]: {warning?: string} | undefined;
 };
 type ExtraNodeDataContext = {
   extraNodeData: ExtraNodeData;
