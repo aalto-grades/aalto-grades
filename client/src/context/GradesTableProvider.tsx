@@ -208,6 +208,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
           // keep the same structure of predictedGrades but only show result for the student
           predictedFinalGrades: studentPredictedGrades,
           errors: getRowErrors(
+            t,
             row,
             courseParts.data ?? [],
             studentPredictedGrades,
@@ -218,6 +219,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       gradeSelectOption
     );
   }, [
+    t,
     gradingModels,
     props.data,
     gradeSelectOption,

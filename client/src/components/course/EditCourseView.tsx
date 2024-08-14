@@ -375,7 +375,7 @@ const EditCourseView = (): JSX.Element => {
                   >
                     {Object.values(GradingScale).map(value => (
                       <MenuItem key={value} value={value}>
-                        {convertToClientGradingScale(value)}
+                        {convertToClientGradingScale(t, value)}
                       </MenuItem>
                     ))}
                   </FormField>

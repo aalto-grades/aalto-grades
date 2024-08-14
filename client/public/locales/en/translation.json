@@ -423,5 +423,17 @@
   "students": {
     "select": "Select student",
     "viewing": "Viewing grades for {{user}}"
+  },
+  "utils": {
+    "grade-higher-than-max": "Grade is higher than maximum allowed value",
+    "grade-not-an-int": "The predicted final grade is not an integer",
+    "grade-out-of-range": "The predicted final grade is out of range",
+    "scale-numerical": "Grading scale, 0-5",
+    "scale-pass-fail": "Pass-Fail",
+    "scale-second-lang": "Second national language",
+    "fail": "Fail",
+    "pass": "Pass",
+    "sat": "Sat",
+    "good": "Good"
   }
 }
