@@ -5,7 +5,7 @@
 import supertest from 'supertest';
 
 import {app} from '../../src/app';
-import {getDateOfLatestGrade} from '../../src/controllers/utils/grades';
+import {getDateOfLatestGrade} from '../../src/controllers/utils/taskGrade';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
 import {resetDb} from '../util/resetDb';

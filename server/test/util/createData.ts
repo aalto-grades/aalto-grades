@@ -8,6 +8,7 @@ import {
   AplusGradeSourceType,
   CoursePartData,
   CourseRoleType,
+  CourseTaskData,
   GradingScale,
   Language,
   NewCourseData,
@@ -21,6 +22,7 @@ import AplusGradeSource from '../../src/database/models/aplusGradeSource';
 import Course from '../../src/database/models/course';
 import CoursePart from '../../src/database/models/coursePart';
 import CourseRole from '../../src/database/models/courseRole';
+import CourseTask from '../../src/database/models/courseTask';
 import CourseTranslation from '../../src/database/models/courseTranslation';
 import FinalGrade from '../../src/database/models/finalGrade';
 import GradingModel from '../../src/database/models/gradingModel';
@@ -145,6 +147,31 @@ class CreateData {
     return courseParts;
   }
 
+  private async createCourseTasks(
+    courseParts: CoursePartData[]
+  ): Promise<CourseTaskData[]> {
+    const courseTasks: CourseTaskData[] = [];
+    for (const coursePart of courseParts) {
+      for (let i = 0; i < 4; i++) {
+        const newCoursePart = await CourseTask.create({
+          coursePartId: coursePart.id,
+          name: `Round ${i + 1}`,
+        });
+
+        courseTasks.push({
+          id: newCoursePart.id,
+          coursePartId: coursePart.id,
+          name: newCoursePart.name,
+          daysValid: newCoursePart.daysValid,
+          maxGrade: newCoursePart.maxGrade,
+          archived: newCoursePart.archived,
+          aplusGradeSources: [],
+        });
+      }
+    }
+    return courseTasks;
+  }
+
   async createAplusGradeSources(
     courseId: number
   ): Promise<
@@ -245,10 +272,12 @@ class CreateData {
     return finalGrade.id;
   }
 
+  // TODO: Support course part models.
   /** Creates a grading model that uses the average model */
   async createGradingModel(
     courseId: number,
-    courseParts: CoursePartData[]
+    courseParts: CoursePartData[],
+    _courseTasks: CourseTaskData[]
   ): Promise<number> {
     const gradingModel = await GradingModel.create({
       courseId,
@@ -355,12 +384,14 @@ class CreateData {
     return course.id;
   }
 
+  // TODO: Support create full models.
   async createCourse({
     hasTeacher = true,
     hasAssistant = true,
     hasStudent = true,
     courseData = null,
     createCourseParts = true,
+    createCourseTasks = true,
     createGradingModel = true,
   }: {
     hasTeacher?: boolean;
@@ -368,8 +399,9 @@ class CreateData {
     hasStudent?: boolean;
     courseData?: Partial<NewCourseData> | null;
     createCourseParts?: boolean;
+    createCourseTasks?: boolean;
     createGradingModel?: boolean;
-  }): Promise<[number, CoursePartData[], number]> {
+  }): Promise<[number, CoursePartData[], CourseTaskData[], number]> {
     const courseId = await this.createDbCourse(
       hasTeacher,
       hasAssistant,
@@ -380,12 +412,20 @@ class CreateData {
     let courseParts: CoursePartData[] = [];
     if (createCourseParts) courseParts = await this.createCourseParts(courseId);
 
+    let courseTasks: CourseTaskData[] = [];
+    if (createCourseTasks)
+      courseTasks = await this.createCourseTasks(courseParts);
+
     let gradingModelId = -1;
-    if (createCourseParts && createGradingModel) {
-      gradingModelId = await this.createGradingModel(courseId, courseParts);
+    if (createCourseParts && createCourseTasks && createGradingModel) {
+      gradingModelId = await this.createGradingModel(
+        courseId,
+        courseParts,
+        courseTasks
+      );
     }
 
-    return [courseId, courseParts, gradingModelId];
+    return [courseId, courseParts, courseTasks, gradingModelId];
   }
 }
 

@@ -7,15 +7,16 @@ import supertest from 'supertest';
 
 import {
   CoursePartData,
-  EditGradeData,
+  CourseTaskData,
+  EditTaskGradeData,
   GradingScale,
   HttpCode,
   LatestGradesSchema,
-  NewGrade,
+  NewTaskGrade,
   StudentRowArraySchema,
 } from '@/common/types';
 import {app} from '../../src/app';
-import * as gradesUtil from '../../src/controllers/utils/grades';
+import * as gradesUtil from '../../src/controllers/utils/taskGrade';
 import TaskGrade from '../../src/database/models/taskGrade';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
@@ -30,6 +31,7 @@ const responseTests = new ResponseTests(request);
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
 let courseParts: CoursePartData[] = [];
+let _courseTasks: CourseTaskData[] = []; // TODO: Use
 let editGradeId = -1;
 let aplusGradeSourceId = -1;
 let aplusCoursePartId = -1;
@@ -58,9 +60,10 @@ beforeAll(async () => {
   studentNumbers = students.map(student => student.studentNumber);
 
   let gradingModelId: number;
-  [courseId, courseParts, gradingModelId] = await createData.createCourse({
-    courseData: {maxCredits: 5, courseCode: 'CS-A????'},
-  });
+  [courseId, courseParts, _courseTasks, gradingModelId] =
+    await createData.createCourse({
+      courseData: {maxCredits: 5, courseCode: 'CS-A????'},
+    });
   for (const student of students) {
     // Create a worse final grade before the actual one
     if (student.finalGrade > 0) {
@@ -174,7 +177,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       studentNumber: newUser.studentNumber,
     };
   };
-  const genGrades = async (studentNumber?: string): Promise<NewGrade[]> => {
+  const genGrades = async (studentNumber?: string): Promise<NewTaskGrade[]> => {
     if (studentNumber === undefined)
       studentNumber = (await genStudent()).studentNumber;
 
@@ -300,7 +303,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
   it('should allow uploading multiple grades to the same course part for a student', async () => {
     const student = await genStudent();
 
-    const upload = async (): Promise<NewGrade[]> => {
+    const upload = async (): Promise<NewTaskGrade[]> => {
       const data = await genGrades(student.studentNumber);
       const res = await request
         .post(`/v1/courses/${courseId}/grades`)
@@ -332,7 +335,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
   it('should update existing grade for a student from an A+ grade source rather than adding a new grade', async () => {
     const student = await genStudent();
 
-    const upload = async (): Promise<NewGrade[]> => {
+    const upload = async (): Promise<NewTaskGrade[]> => {
       const data = (await genGrades(student.studentNumber)).filter(
         grade => grade.aplusGradeSourceId !== undefined
       );
@@ -367,7 +370,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
   it(
     'should process big json successfully (5 000 x 3 x 2 = 90 000 individual grades)',
     async () => {
-      const data: NewGrade[] = [];
+      const data: NewTaskGrade[] = [];
       for (let studentNum = 10000; studentNum < 15000; studentNum++) {
         for (let submission = 0; submission < 2; submission++) {
           const newData = await genGrades(studentNum.toString());
@@ -508,7 +511,7 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
   it('should respond with 400 if validation fails', async () => {
     const url = `/v1/courses/${courseId}/grades/${editGradeId}`;
 
-    let data: EditGradeData = {
+    let data: EditTaskGradeData = {
       comment: 'not edited',
       grade: '1' as unknown as number,
     };
@@ -832,7 +835,7 @@ ${createCSVString(students, '12.5.2023', 'ja').join(',\n')},\n`);
   });
 
   it('should export CSV when gradingScale is pass/fail', async () => {
-    const [passFailCourseId, , modelId] = await createData.createCourse({
+    const [passFailCourseId, , , modelId] = await createData.createCourse({
       courseData: {
         gradingScale: GradingScale.PassFail,
         maxCredits: 5,
@@ -868,7 +871,7 @@ ${students[1].studentNumber},pass,5,21.6.2023,en,\n`);
   });
 
   it('should export CSV when gradingScale is secondary language', async () => {
-    const [passFailCourseId, , modelId] = await createData.createCourse({
+    const [passFailCourseId, , , modelId] = await createData.createCourse({
       courseData: {
         gradingScale: GradingScale.SecondNationalLanguage,
         maxCredits: 5,

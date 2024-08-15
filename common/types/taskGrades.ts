@@ -6,11 +6,11 @@ import {z} from 'zod';
 
 import {AplusGradeSourceDataSchema} from './aplus';
 import {FinalGradeDataArraySchema} from './finalGrade';
-import {DateSchema, LanguageSchema} from './general';
+import {DateSchema, IdSchema, LanguageSchema} from './general';
 import {UserDataSchema} from './user';
 
-export const BaseGradeDataSchema = z.strictObject({
-  gradeId: z.number().int(),
+const BaseGradeDataSchema = z.strictObject({
+  gradeId: IdSchema,
   grader: UserDataSchema,
   aplusGradeSource: AplusGradeSourceDataSchema.nullable(),
   grade: z.number(),
@@ -19,11 +19,11 @@ export const BaseGradeDataSchema = z.strictObject({
   expiryDate: DateSchema,
   comment: z.string().nullable(),
 });
-export const GradeDataSchema = BaseGradeDataSchema.refine(
+export const TaskGradeDataSchema = BaseGradeDataSchema.refine(
   val => val.expiryDate >= val.date,
   {path: ['date']}
 );
-export const NewGradeSchema = z
+export const NewTaskGradeSchema = z
   .strictObject({
     studentNumber: z.string(),
     courseTaskId: z.number().int(),
@@ -34,7 +34,7 @@ export const NewGradeSchema = z
     comment: z.string().nullable(),
   })
   .refine(val => val.expiryDate >= val.date, {path: ['date']});
-export const EditGradeDataSchema = BaseGradeDataSchema.omit({
+export const EditTaskGradeDataSchema = BaseGradeDataSchema.omit({
   gradeId: true,
   aplusGradeSource: true,
   grader: true,
@@ -49,35 +49,35 @@ export const EditGradeDataSchema = BaseGradeDataSchema.omit({
     {path: ['date']}
   );
 
-export const NewGradeArraySchema = z.array(NewGradeSchema);
+export const NewTaskGradeArraySchema = z.array(NewTaskGradeSchema);
 
-export const CoursePartGradesDataSchema = z.strictObject({
-  coursePartId: z.number().int(),
-  coursePartName: z.string(),
-  grades: z.array(GradeDataSchema),
+export const CourseTaskGradesDataSchema = z.strictObject({
+  courseTaskId: IdSchema,
+  courseTaskName: z.string(),
+  grades: z.array(TaskGradeDataSchema),
 });
 export const StudentRowSchema = z.strictObject({
   user: UserDataSchema,
-  courseParts: z.array(CoursePartGradesDataSchema),
-  finalGrades: FinalGradeDataArraySchema.optional(),
+  courseTasks: z.array(CourseTaskGradesDataSchema),
+  finalGrades: FinalGradeDataArraySchema,
 });
 export const StudentRowArraySchema = z.array(StudentRowSchema);
 export const LatestGradesSchema = z.array(
   z.strictObject({
-    userId: z.number().int(),
+    userId: IdSchema,
     date: DateSchema.nullable(),
   })
 );
 export const SisuCsvUploadSchema = z.strictObject({
-  assessmentDate: DateSchema.optional(), // Assessment date override
-  completionLanguage: LanguageSchema.optional(), // Defaults to course language
+  assessmentDate: DateSchema.nullable(), // Assessment date override
+  completionLanguage: LanguageSchema.nullable(), // Defaults to course language
   studentNumbers: z.array(z.string()).nonempty(),
 });
 
-export type GradeData = z.infer<typeof GradeDataSchema>;
-export type EditGradeData = z.infer<typeof EditGradeDataSchema>;
-export type NewGrade = z.infer<typeof NewGradeSchema>;
-export type CoursePartGradesData = z.infer<typeof CoursePartGradesDataSchema>;
+export type TaskGradeData = z.infer<typeof TaskGradeDataSchema>;
+export type EditTaskGradeData = z.infer<typeof EditTaskGradeDataSchema>;
+export type NewTaskGrade = z.infer<typeof NewTaskGradeSchema>;
+export type CourseTaskGradesData = z.infer<typeof CourseTaskGradesDataSchema>;
 export type StudentRow = z.infer<typeof StudentRowSchema>;
 export type LatestGrades = z.infer<typeof LatestGradesSchema>;
 export type SisuCsvUpload = z.infer<typeof SisuCsvUploadSchema>;

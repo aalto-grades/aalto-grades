@@ -8,6 +8,8 @@ import Course from '../../database/models/course';
 import GradingModel from '../../database/models/gradingModel';
 import {ApiError, stringToIdSchema} from '../../types';
 
+// TODO: Add support for course part models
+
 /**
  * Finds a grading model by id.
  *

@@ -34,11 +34,12 @@ const nonExistentId = 1000000;
 beforeAll(async () => {
   cookies = await getCookies();
 
-  const [courseId, , modelId] = await createData.createCourse({}); // Create course the student is a part of
+  // Create a course that the student is a part of
+  const [courseId, , , modelId] = await createData.createCourse({});
   await createData.createFinalGrade(courseId, STUDENT_ID, modelId, TEACHER_ID);
 
   let noTeacherModelId;
-  [noTeachersCourseId, , noTeacherModelId] = await createData.createCourse({
+  [noTeachersCourseId, , , noTeacherModelId] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: true,

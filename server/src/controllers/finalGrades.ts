@@ -11,8 +11,8 @@ import {
 } from '@/common/types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {findAndValidateFinalGradePath} from './utils/finalGrade';
-import {validateUserAndGrader} from './utils/grades';
 import {validateGradingModelBelongsToCourse} from './utils/gradingModel';
+import {validateUserAndGrader} from './utils/taskGrade';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
 import {ApiError, Endpoint, JwtClaims, NewDbFinalGradeData} from '../types';

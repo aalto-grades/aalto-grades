@@ -8,7 +8,7 @@ import {z} from 'zod';
 
 import {AplusGradeSourceData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
-import {findCoursePartById} from './coursePart';
+import {validateCourseTaskBelongsToCourse} from './courseTask';
 import {AXIOS_TIMEOUT} from '../../configs/constants';
 import httpLogger from '../../configs/winston';
 import AplusGradeSource from '../../database/models/aplusGradeSource';
@@ -80,34 +80,30 @@ export const validateAplusGradeSourcePath = async (
   const course = await findAndValidateCourseId(courseId);
   const aplusGradeSource =
     await findAndValidateAplusGradeSourceId(aplusGradeSourceId);
-  const coursePart = await findCoursePartById(aplusGradeSource.courseTaskId);
 
-  if (coursePart.courseId !== course.id) {
-    throw new ApiError(
-      `A+ grade source with ID ${aplusGradeSource.id} ` +
-        `does not belong to the course with ID ${course.id}`,
-      HttpCode.Conflict
-    );
-  }
+  await validateCourseTaskBelongsToCourse(
+    course.id,
+    aplusGradeSource.courseTaskId
+  );
 
   return [course, aplusGradeSource];
 };
 
 /**
- * Validates that an A+ grade source exists and belongs to a course part.
+ * Validates that an A+ grade source exists and belongs to a course task.
  *
  * @throws ApiError(404|409) if A+ grade source is not found or doesn't belong
- *   to the course part.
+ *   to the course task.
  */
-export const validateAplusGradeSourceBelongsToCoursePart = async (
-  coursePartId: number,
+export const validateAplusGradeSourceBelongsToCourseTask = async (
+  courseTaskId: number,
   aplusGradeSourceId: number
 ): Promise<void> => {
   const aplusGradeSource = await findAplusGradeSourceById(aplusGradeSourceId);
-  if (aplusGradeSource.courseTaskId !== coursePartId) {
+  if (aplusGradeSource.courseTaskId !== courseTaskId) {
     throw new ApiError(
       `A+ grade source with ID ${aplusGradeSource.id} ` +
-        `does not  belong to the course part with ID ${coursePartId}`,
+        `does not belong to the course task with ID ${courseTaskId}`,
       HttpCode.Conflict
     );
   }

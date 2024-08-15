@@ -5,7 +5,7 @@
 import {z} from 'zod';
 
 import {FinalGradeDataArraySchema} from './finalGrade';
-import {LanguageSchema, LocalizedStringSchema} from './general';
+import {IdSchema, LanguageSchema, LocalizedStringSchema} from './general';
 import {TeacherDataSchema} from './user';
 
 export enum GradingScale {
@@ -23,7 +23,7 @@ export enum CourseRoleType {
 export const GradingScaleSchema = z.nativeEnum(GradingScale);
 
 export const BaseCourseDataSchema = z.strictObject({
-  id: z.number().int(),
+  id: IdSchema,
   courseCode: z.string(),
   minCredits: z.number().int().min(0),
   maxCredits: z.number().int(),

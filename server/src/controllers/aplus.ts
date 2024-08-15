@@ -13,7 +13,7 @@ import {
   HttpCode,
   IdSchema,
   NewAplusGradeSourceData,
-  NewGrade,
+  NewTaskGrade,
 } from '@/common/types';
 import {aplusGradeSourcesEqual} from '@/common/util/aplus';
 import {
@@ -23,7 +23,6 @@ import {
   validateAplusCourseId,
   validateAplusGradeSourcePath,
 } from './utils/aplus';
-import {validateCoursePartPath} from './utils/coursePart';
 import {validateCourseTaskPath} from './utils/courseTask';
 import {APLUS_API_URL} from '../configs/environment';
 import AplusGradeSource from '../database/models/aplusGradeSource';
@@ -145,13 +144,13 @@ export const addAplusGradeSources: Endpoint<
   NewAplusGradeSourceData[],
   void
 > = async (req, res) => {
-  const partGradeSourcesById: {[key: number]: AplusGradeSource[]} = {};
+  const taskGradeSourcesById: {[key: number]: AplusGradeSource[]} = {};
   const newGradeSources: NewAplusGradeSourceData[] = req.body;
 
   for (const newGradeSource of newGradeSources) {
-    const [_, coursePart] = await validateCoursePartPath(
+    const [, , courseTask] = await validateCourseTaskPath(
       req.params.courseId,
-      String(newGradeSource.coursePartId)
+      String(newGradeSource.courseTaskId)
     );
 
     for (const other of newGradeSources.filter(
@@ -165,17 +164,17 @@ export const addAplusGradeSources: Endpoint<
       }
     }
 
-    if (!(coursePart.id in partGradeSourcesById)) {
-      partGradeSourcesById[coursePart.id] = await AplusGradeSource.findAll({
-        where: {courseTaskId: coursePart.id},
+    if (!(courseTask.id in taskGradeSourcesById)) {
+      taskGradeSourcesById[courseTask.id] = await AplusGradeSource.findAll({
+        where: {courseTaskId: courseTask.id},
       });
     }
 
-    for (const partGradeSource of partGradeSourcesById[coursePart.id]) {
-      const parsed = parseAplusGradeSource(partGradeSource);
+    for (const taskGradeSource of taskGradeSourcesById[courseTask.id]) {
+      const parsed = parseAplusGradeSource(taskGradeSource);
       if (aplusGradeSourcesEqual(newGradeSource, parsed)) {
         throw new ApiError(
-          `course task with ID ${partGradeSource.courseTaskId} ` +
+          `course task with ID ${taskGradeSource.courseTaskId} ` +
             `already has the A+ grade source ${JSON.stringify(newGradeSource)}`,
           HttpCode.Conflict
         );
@@ -222,11 +221,11 @@ export const deleteAplusGradeSource: Endpoint<void, void> = async (
 };
 
 /**
- * () => NewGrade[]
+ * () => NewTaskGrade[]
  *
  * @throws ApiError(400|404|409|502)
  */
-export const fetchAplusGrades: Endpoint<void, NewGrade[]> = async (
+export const fetchAplusGrades: Endpoint<void, NewTaskGrade[]> = async (
   req,
   res
 ) => {
@@ -251,7 +250,7 @@ export const fetchAplusGrades: Endpoint<void, NewGrade[]> = async (
    */
   const pointsResCache: {[key: number]: AplusStudentPoints[]} = {};
 
-  const newGrades: NewGrade[] = [];
+  const newGrades: NewTaskGrade[] = [];
   for (const courseTaskId of courseTaskIds) {
     const [, , courseTask] = await validateCourseTaskPath(
       req.params.courseId,

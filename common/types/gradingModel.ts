@@ -4,12 +4,14 @@
 
 import {z} from 'zod';
 
+import {IdSchema} from './general';
 import {GraphStructureSchema} from './graph';
 
 // Types
 export const GradingModelDataSchema = z.strictObject({
-  id: z.number().int(),
-  courseId: z.number().int(),
+  id: IdSchema,
+  courseId: IdSchema,
+  coursePartId: IdSchema.nullable(),
   name: z.string(),
   graphStructure: GraphStructureSchema,
   archived: z.boolean(),
@@ -19,6 +21,7 @@ export const GradingModelDataSchema = z.strictObject({
 export const NewGradingModelDataSchema = GradingModelDataSchema.omit({
   id: true,
   courseId: true,
+  coursePartId: true,
   archived: true,
   hasArchivedCourseParts: true,
   hasDeletedCourseParts: true,
@@ -26,6 +29,7 @@ export const NewGradingModelDataSchema = GradingModelDataSchema.omit({
 export const EditGradingModelDataSchema = GradingModelDataSchema.omit({
   id: true,
   courseId: true,
+  coursePartId: true,
   hasArchivedCourseParts: true,
   hasDeletedCourseParts: true,
 })

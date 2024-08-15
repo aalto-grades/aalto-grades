@@ -494,7 +494,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
   });
 
   it('should respond with 400 if trying to edit grading scale of a course with final grades', async () => {
-    const [tmpCourseId, , modelId] = await createData.createCourse({});
+    const [tmpCourseId, , , modelId] = await createData.createCourse({});
     const student = await createData.createUser();
     await createData.createFinalGrade(
       tmpCourseId,

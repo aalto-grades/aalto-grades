@@ -28,6 +28,7 @@ export const findCourseTaskById = async (id: number): Promise<CourseTask> => {
   return courseTask;
 };
 
+// TODO: Remove if unused
 /** Finds all course tasks of a specific course part. */
 export const findCourseTaskByCoursePartId = async (
   coursePartId: number
@@ -74,22 +75,23 @@ const findAndValidateCourseTaskId = async (
 };
 
 /**
- * Validates that a course task id belongs to a course part.
+ * Validates that a course task id belongs to a course.
  *
- * @throws ApiError(404|409) if course part not found or doesn't belong to the
+ * @throws ApiError(404|409) if course task not found or doesn't belong to the
  *   course.
  */
-export const validateCourseTaskBelongsToCoursePart = async (
-  coursePartId: number,
+export const validateCourseTaskBelongsToCourse = async (
+  courseId: number,
   courseTaskId: number
 ): Promise<void> => {
   const courseTask = await findCourseTaskById(courseTaskId);
+  const coursePart = await findCoursePartById(courseTask.coursePartId);
 
   // Check that course task belongs to the course.
-  if (courseTask.coursePartId !== coursePartId) {
+  if (coursePart.courseId !== courseId) {
     throw new ApiError(
-      `Course part ID ${courseTask.id} ` +
-        `does not belong to the course with ID ${coursePartId}`,
+      `Course task ID ${courseTask.id} ` +
+        `does not belong to the course with ID ${courseId}`,
       HttpCode.Conflict
     );
   }

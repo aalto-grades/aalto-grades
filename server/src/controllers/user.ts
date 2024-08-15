@@ -19,7 +19,7 @@ import {
   UserIdArray,
 } from '@/common/types';
 import {parseCourseFull} from './utils/course';
-import {validateUserAndGrader} from './utils/grades';
+import {validateUserAndGrader} from './utils/taskGrade';
 import {findAndValidateUserId, validateUserId} from './utils/user';
 import Course from '../database/models/course';
 import CourseRole from '../database/models/courseRole';

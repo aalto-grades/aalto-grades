@@ -80,7 +80,7 @@ export const AplusGradeSourceDataSchema = z.discriminatedUnion('sourceType', [
 ]);
 
 const NewGradeSourceBase = z.strictObject({
-  coursePartId: IdSchema,
+  courseTaskId: IdSchema,
   aplusCourse: AplusCourseDataSchema,
   date: DateSchema,
 });

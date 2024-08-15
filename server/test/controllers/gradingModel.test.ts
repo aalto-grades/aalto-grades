@@ -6,6 +6,7 @@ import supertest from 'supertest';
 
 import {
   CoursePartData,
+  CourseTaskData,
   EditGradingModelData,
   GradingModelDataArraySchema,
   GradingModelDataSchema,
@@ -29,6 +30,7 @@ const responseTests = new ResponseTests(request);
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
 let courseParts: CoursePartData[] = [];
+let courseTasks: CourseTaskData[] = []; // TODO: Use
 let gradingModId = -1;
 let testStructure: GraphStructure = {} as GraphStructure;
 
@@ -42,15 +44,16 @@ const otherGradingModId = 1;
 beforeAll(async () => {
   cookies = await getCookies();
 
-  [courseId, courseParts, gradingModId] = await createData.createCourse({});
-  await createData.createGradingModel(courseId, courseParts);
+  [courseId, courseParts, courseTasks, gradingModId] =
+    await createData.createCourse({});
+  await createData.createGradingModel(courseId, courseParts, courseTasks);
   testStructure = initGraph('addition', courseParts);
 
   [noModelsCourseId] = await createData.createCourse({
     createGradingModel: false,
   });
 
-  [noRoleCourseId, , noRoleModelId] = await createData.createCourse({
+  [noRoleCourseId, , , noRoleModelId] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
@@ -382,7 +385,8 @@ describe('Test DELETE /v1/courses/:courseId/grading-models/:gradingModId - delet
     for (const cookie of testCookies) {
       const modelId = await createData.createGradingModel(
         courseId,
-        courseParts
+        courseParts,
+        courseTasks
       );
       await checkModel(modelId, {}); // Validate that exists
 
@@ -437,7 +441,11 @@ describe('Test DELETE /v1/courses/:courseId/grading-models/:gradingModId - delet
   });
 
   it('should respond with 409 conflict when trying to delete a grading model with final grades', async () => {
-    const modelId = await createData.createGradingModel(courseId, courseParts);
+    const modelId = await createData.createGradingModel(
+      courseId,
+      courseParts,
+      courseTasks
+    );
     const user = await createData.createUser();
     await createData.createFinalGrade(courseId, user.id, modelId, TEACHER_ID);
 

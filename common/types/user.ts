@@ -5,16 +5,16 @@
 import {z} from 'zod';
 
 import {SystemRoleSchema} from './auth';
-import {AaltoEmailSchema} from './general';
+import {AaltoEmailSchema, IdSchema} from './general';
 
 export const UserDataSchema = z.strictObject({
-  id: z.number().int(),
+  id: IdSchema,
   name: z.string().nullable(),
   email: z.string().email().nullable(),
   studentNumber: z.string().nullable(),
 });
 export const FullUserDataSchema = z.strictObject({
-  id: z.number().int(),
+  id: IdSchema,
   name: z.string().nullable(),
   email: z.string().email().nullable(),
   studentNumber: z.string().nullable(),
@@ -22,7 +22,7 @@ export const FullUserDataSchema = z.strictObject({
   idpUser: z.boolean(),
 });
 export const TeacherDataSchema = z.strictObject({
-  id: z.number().int(),
+  id: IdSchema,
   name: z.string().nullable(),
   email: z.string().email(),
   studentNumber: z.string().nullable(),
@@ -47,7 +47,7 @@ export const NewUserResponseSchema = z.strictObject({
   temporaryPassword: z.string().nullable(),
 });
 export const UserIdArraySchema = z
-  .array(z.number().int())
+  .array(IdSchema)
   .refine(items => new Set(items).size === items.length);
 
 export const UserDataArraySchema = z.array(UserDataSchema);

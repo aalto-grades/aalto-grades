@@ -19,6 +19,8 @@ import {
 import GradingModel from '../database/models/gradingModel';
 import {ApiError, Endpoint} from '../types';
 
+// TODO: Add support for course part models
+
 /**
  * () => GradingModelData
  *
@@ -37,6 +39,7 @@ export const getGradingModel: Endpoint<void, GradingModelData> = async (
   res.json({
     id: gradingModel.id,
     courseId: gradingModel.courseId,
+    coursePartId: gradingModel.coursePartId,
     name: gradingModel.name,
     graphStructure: gradingModel.graphStructure,
     archived: gradingModel.archived,
@@ -65,6 +68,7 @@ export const getAllGradingModels: Endpoint<void, GradingModelData[]> = async (
     gradingModelsData.push({
       id: gradingModel.id,
       courseId: gradingModel.courseId,
+      coursePartId: gradingModel.coursePartId,
       name: gradingModel.name,
       graphStructure: gradingModel.graphStructure,
       archived: gradingModel.archived,
@@ -86,14 +90,18 @@ export const addGradingModel: Endpoint<NewGradingModelData, number> = async (
 ) => {
   const courseId = await validateCourseId(req.params.courseId);
 
+  // TODO: Probably wont work with courseIdPartId
   // Find or create new grading model based on name and course ID.
   const [gradingModel, created] = await GradingModel.findOrCreate({
     where: {
       name: req.body.name,
       courseId: courseId,
+      // courseIdPartId:
     },
     defaults: {
       name: req.body.name,
+      courseId: courseId,
+      // coursePartId: courseIdPartId:,
       graphStructure: req.body.graphStructure,
     },
   });

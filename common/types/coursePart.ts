@@ -4,11 +4,11 @@
 
 import {z} from 'zod';
 
-import {DateSchema} from './general';
+import {DateSchema, IdSchema} from './general';
 
 export const CoursePartDataSchema = z.strictObject({
-  id: z.number().int(),
-  courseId: z.number().int(),
+  id: IdSchema,
+  courseId: IdSchema,
   name: z.string().min(1),
   expiryDate: DateSchema.nullable(),
   archived: z.boolean(),

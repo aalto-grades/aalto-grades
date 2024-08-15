@@ -9,7 +9,7 @@ export * from './coursePart';
 export * from './courseTask';
 export * from './finalGrade';
 export * from './general';
-export * from './grades';
 export * from './gradingModel';
 export * from './graph';
+export * from './taskGrades';
 export * from './user';

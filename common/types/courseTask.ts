@@ -5,10 +5,11 @@
 import {z} from 'zod';
 
 import {AplusGradeSourceDataSchema} from './aplus';
+import {IdSchema} from './general';
 
 export const CourseTaskDataSchema = z.strictObject({
-  id: z.number().int(),
-  coursePartId: z.number().int(),
+  id: IdSchema,
+  coursePartId: IdSchema,
   name: z.string().min(1),
   daysValid: z.number().int().nonnegative().nullable(),
   maxGrade: z.number().nullable(),

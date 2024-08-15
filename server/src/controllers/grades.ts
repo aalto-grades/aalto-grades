@@ -6,36 +6,36 @@ import {Op} from 'sequelize';
 
 import {
   CourseRoleType,
-  EditGradeData,
+  EditTaskGradeData,
   FinalGradeData,
-  GradeData,
   GradingScale,
   HttpCode,
   LatestGrades,
-  NewGrade,
+  NewTaskGrade,
   SisuCsvUpload,
   StudentRow,
+  TaskGradeData,
   UserData,
   UserIdArray,
 } from '@/common/types';
-import {
-  parseAplusGradeSource,
-  validateAplusGradeSourceBelongsToCoursePart,
-} from './utils/aplus';
+import {validateAplusGradeSourceBelongsToCourseTask} from './utils/aplus';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
-import {validateCoursePartBelongsToCourse} from './utils/coursePart';
+import {validateCourseTaskBelongsToCourse} from './utils/courseTask';
+import {parseFinalGrade} from './utils/finalGrade';
 import {
   findAndValidateGradePath,
   getDateOfLatestGrade,
   getFinalGradesFor,
+  parseTaskGrade,
   studentNumbersExist,
   validateUserAndGrader,
-} from './utils/grades';
+} from './utils/taskGrade';
 import httpLogger from '../configs/winston';
 import {sequelize} from '../database';
 import AplusGradeSource from '../database/models/aplusGradeSource';
 import CoursePart from '../database/models/coursePart';
 import CourseRole from '../database/models/courseRole';
+import CourseTask from '../database/models/courseTask';
 import FinalGrade from '../database/models/finalGrade';
 import TaskGrade from '../database/models/taskGrade';
 import User from '../database/models/user';
@@ -49,12 +49,13 @@ import {ApiError, Endpoint, JwtClaims, NewDbGradeData} from '../types';
 export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
   const courseId = await validateCourseId(req.params.courseId);
 
-  // Get all course parts for the course
-  const courseParts = await CoursePart.findAll({
-    where: {courseId: courseId},
+  // Get all course tasks for the course
+  const courseParts = await CoursePart.findAll({where: {courseId}});
+  const courseTasks = await CourseTask.findAll({
+    where: {coursePartId: courseParts.map(part => part.id)},
   });
 
-  // Get grades of all course parts
+  // Get grades of all course tasks
   const grades = await TaskGrade.findAll({
     include: [
       {model: User, attributes: ['id', 'name', 'email', 'studentNumber']},
@@ -66,9 +67,7 @@ export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
       {model: AplusGradeSource},
     ],
     where: {
-      courseTaskId: {
-        [Op.in]: courseParts.map(coursePart => coursePart.id),
-      },
+      courseTaskId: courseTasks.map(courseTask => courseTask.id),
     },
   });
 
@@ -85,71 +84,45 @@ export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
     where: {courseId: courseId},
   });
 
-  // User dict of unique users {userId: User, ...}
-  const usersDict: {[key: string]: UserData & {studentNumber: string}} = {};
-
-  // Grades dict {userId: {coursePartId: GradeData[], ...}, ...}
-  const userGrades: {[key: string]: {[key: string]: GradeData[]}} = {};
+  type StudentData = {
+    user: UserData & {studentNumber: string};
+    grades: {[key: string]: TaskGradeData[]};
+    finalGrades: FinalGradeData[];
+  };
+  const studentData = new Map<number, StudentData>();
 
   for (const grade of grades) {
-    const [user, grader] = validateUserAndGrader(grade);
+    const [user] = validateUserAndGrader(grade);
+    if (!studentData.has(user.id))
+      studentData.set(user.id, {user, grades: {}, finalGrades: []});
 
-    if (!(user.id in usersDict)) {
-      usersDict[user.id] = {
-        ...user.dataValues,
-        studentNumber: user.studentNumber,
-      };
-    }
+    const userGrades = (studentData.get(user.id) as StudentData).grades;
+    if (!Object.hasOwn(userGrades[grade.courseTaskId], grade.courseTaskId))
+      userGrades[grade.courseTaskId] = [];
 
-    const userId = grade.userId;
-    if (!(userId in userGrades)) userGrades[userId] = {};
-    if (!(grade.courseTaskId in userGrades[userId]))
-      userGrades[userId][grade.courseTaskId] = [];
-
-    userGrades[userId][grade.courseTaskId].push({
-      gradeId: grade.id,
-      grader: grader,
-      aplusGradeSource: grade.AplusGradeSource
-        ? parseAplusGradeSource(grade.AplusGradeSource)
-        : null,
-      grade: grade.grade,
-      exportedToSisu: grade.sisuExportDate,
-      date: new Date(grade.date),
-      expiryDate: new Date(grade.expiryDate),
-      comment: grade.comment,
-    });
+    userGrades[grade.courseTaskId].push(parseTaskGrade(grade));
   }
 
-  // FinalGrades dict {userId: FinalGradeData[], ...}
-  const finalGradesDict: {[key: string]: FinalGradeData[]} = {};
   for (const finalGrade of finalGrades) {
-    const [user, grader] = validateUserAndGrader(finalGrade);
+    const [user] = validateUserAndGrader(finalGrade);
 
-    const userId = user.id;
-    if (!(userId in finalGradesDict)) finalGradesDict[userId] = [];
+    if (!studentData.has(user.id))
+      studentData.set(user.id, {user, grades: {}, finalGrades: []});
 
-    finalGradesDict[userId].push({
-      finalGradeId: finalGrade.id,
-      user: user,
-      courseId: finalGrade.courseId,
-      gradingModelId: finalGrade.gradingModelId,
-      grader: grader,
-      grade: finalGrade.grade,
-      date: new Date(finalGrade.date),
-      sisuExportDate: finalGrade.sisuExportDate,
-      comment: finalGrade.comment,
-    });
+    const userFinalGrades = (studentData.get(user.id) as StudentData)
+      .finalGrades;
+    userFinalGrades.push(parseFinalGrade(finalGrade));
   }
 
-  const studentRows = Object.keys(userGrades).map(
-    (userId): StudentRow => ({
-      user: usersDict[userId],
-      finalGrades: finalGradesDict[userId],
-      courseParts: courseParts.map(coursePart => ({
-        coursePartId: coursePart.id,
-        coursePartName: coursePart.name,
+  const studentRows = Array.from(studentData.values()).map(
+    (data): StudentRow => ({
+      user: data.user,
+      finalGrades: data.finalGrades,
+      courseTasks: courseTasks.map(courseTask => ({
+        courseTaskId: courseTask.id,
+        courseTaskName: courseTask.name,
         grades:
-          (userGrades[userId][coursePart.id] as GradeData[] | undefined) ?? [],
+          (data.grades[courseTask.id] as TaskGradeData[] | undefined) ?? [],
       })),
     })
   );
@@ -158,34 +131,34 @@ export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
 };
 
 /**
- * (NewGrade[]) => void
+ * (NewTaskGrade[]) => void
  *
  * @throws ApiError(400|404|409)
  */
-export const addGrades: Endpoint<NewGrade[], void> = async (req, res) => {
+export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
   const grader = req.user as JwtClaims;
   const courseId = await validateCourseId(req.params.courseId);
 
-  // Validate that course parts and A+ grade sources belong to correct course
+  // Validate that course tasks and A+ grade sources belong to correct course
   const validCourseTaskIds = new Set<number>();
-  const validAPlusCoursePartIds = new Set<number>();
+  const validAPlusCourseTaskIds = new Set<number>();
   for (const grade of req.body) {
-    // Validate course part id
+    // Validate course task id
     if (!validCourseTaskIds.has(grade.courseTaskId)) {
-      await validateCoursePartBelongsToCourse(courseId, grade.courseTaskId);
+      await validateCourseTaskBelongsToCourse(courseId, grade.courseTaskId);
       validCourseTaskIds.add(grade.courseTaskId);
     }
 
-    // Validate A+ course part id
+    // Validate A+ course task id
     if (
       grade.aplusGradeSourceId !== undefined &&
-      !validAPlusCoursePartIds.has(grade.aplusGradeSourceId)
+      !validAPlusCourseTaskIds.has(grade.aplusGradeSourceId)
     ) {
-      await validateAplusGradeSourceBelongsToCoursePart(
+      await validateAplusGradeSourceBelongsToCourseTask(
         grade.courseTaskId,
         grade.aplusGradeSourceId
       );
-      validAPlusCoursePartIds.add(grade.aplusGradeSourceId);
+      validAPlusCourseTaskIds.add(grade.aplusGradeSourceId);
     }
   }
 
@@ -301,11 +274,14 @@ export const addGrades: Endpoint<NewGrade[], void> = async (req, res) => {
 };
 
 /**
- * (EditGradeData) => void
+ * (EditTaskGradeData) => void
  *
  * @throws ApiError(400|404|409)
  */
-export const editGrade: Endpoint<EditGradeData, void> = async (req, res) => {
+export const editGrade: Endpoint<EditTaskGradeData, void> = async (
+  req,
+  res
+) => {
   const grader = req.user as JwtClaims;
   const [, gradeData] = await findAndValidateGradePath(
     req.params.courseId,

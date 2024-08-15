@@ -8,8 +8,8 @@ import {processRequestBody} from 'zod-express-middleware';
 
 import {
   CourseRoleType,
-  EditGradeDataSchema,
-  NewGradeArraySchema,
+  EditTaskGradeDataSchema,
+  NewTaskGradeArraySchema,
   SisuCsvUploadSchema,
   SystemRole,
   UserIdArraySchema,
@@ -41,7 +41,7 @@ router.post(
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   express.json({limit: '25mb'}),
   handleInvalidRequestJson,
-  processRequestBody(NewGradeArraySchema),
+  processRequestBody(NewTaskGradeArraySchema),
   controllerDispatcher(addGrades)
 );
 
@@ -51,7 +51,7 @@ router.put(
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(EditGradeDataSchema),
+  processRequestBody(EditTaskGradeDataSchema),
   controllerDispatcher(editGrade)
 );
 

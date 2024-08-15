@@ -4,7 +4,8 @@
 
 import {Includeable, Op} from 'sequelize';
 
-import {HttpCode} from '@/common/types';
+import {HttpCode, TaskGradeData, UserData} from '@/common/types';
+import {parseAplusGradeSource} from './aplus';
 import {findAndValidateCourseId, findCourseById} from './course';
 import {findCoursePartById} from './coursePart';
 import httpLogger from '../../configs/winston';
@@ -43,6 +44,86 @@ export const getDateOfLatestGrade = async (
       ` no grades for course ${courseId}.`,
     HttpCode.BadRequest
   );
+};
+
+/**
+ * Validates that the user and grader of an AttainmentGrade or FinalGrade are
+ * defined and that the user has a studentNumber and the grader a name.
+ *
+ * @throws ApiError(500) if any values are undefined or null.
+ */
+export const validateUserAndGrader = (
+  grade: TaskGrade | FinalGrade
+): [UserData & {studentNumber: string}, UserData & {name: string}] => {
+  const gradeType = grade instanceof TaskGrade ? 'grade' : 'final grade';
+
+  if (grade.User === undefined) {
+    httpLogger.error(`Found a ${gradeType} ${grade.id} with no user`);
+    throw new ApiError(
+      `Found a ${gradeType} with no user`,
+      HttpCode.InternalServerError
+    );
+  }
+
+  if (grade.User.studentNumber === null) {
+    httpLogger.error(
+      `Found a ${gradeType} ${grade.id} where user ${grade.User.id} studentNumber was null`
+    );
+    throw new ApiError(
+      `Found a ${gradeType} where user studentNumber was null`,
+      HttpCode.InternalServerError
+    );
+  }
+
+  if (grade.grader === undefined) {
+    httpLogger.error(`Found a ${gradeType} ${grade.id} with no grader`);
+    throw new ApiError(
+      `Found a ${gradeType} with no grader`,
+      HttpCode.InternalServerError
+    );
+  }
+
+  if (grade.grader.name === null) {
+    httpLogger.error(
+      `Found a ${gradeType} ${grade.id} where grader ${grade.grader.id} name is null`
+    );
+    throw new ApiError(
+      `Found a ${gradeType} where grader name is null`,
+      HttpCode.InternalServerError
+    );
+  }
+
+  return [
+    {
+      id: grade.User.id,
+      name: grade.User.name,
+      email: grade.User.email,
+      studentNumber: grade.User.studentNumber,
+    },
+    {
+      id: grade.grader.id,
+      name: grade.grader.name,
+      email: grade.grader.email,
+      studentNumber: grade.grader.studentNumber,
+    },
+  ];
+};
+
+/** Converts taskGrade database object into the TaskGradeData type */
+export const parseTaskGrade = (taskGrade: TaskGrade): TaskGradeData => {
+  const [, grader] = validateUserAndGrader(taskGrade);
+  return {
+    gradeId: taskGrade.id,
+    grader: grader,
+    aplusGradeSource: taskGrade.AplusGradeSource
+      ? parseAplusGradeSource(taskGrade.AplusGradeSource)
+      : null,
+    grade: taskGrade.grade,
+    exportedToSisu: taskGrade.sisuExportDate,
+    date: new Date(taskGrade.date),
+    expiryDate: new Date(taskGrade.expiryDate),
+    comment: taskGrade.comment,
+  };
 };
 
 /**
@@ -168,54 +249,4 @@ export const findAndValidateGradePath = async (
   }
 
   return [course, grade];
-};
-
-/**
- * Validates that the user and grader of an AttainmentGrade or FinalGrade are
- * defined and that the user has a studentNumber and the grader a name.
- *
- * @throws ApiError(500) if any values are undefined or null.
- */
-export const validateUserAndGrader = (
-  grade: TaskGrade | FinalGrade
-): [User & {studentNumber: string}, User] => {
-  const gradeType = grade instanceof TaskGrade ? 'grade' : 'final grade';
-
-  if (grade.User === undefined) {
-    httpLogger.error(`Found a ${gradeType} ${grade.id} with no user`);
-    throw new ApiError(
-      `Found a ${gradeType} with no user`,
-      HttpCode.InternalServerError
-    );
-  }
-
-  if (grade.User.studentNumber === null) {
-    httpLogger.error(
-      `Found a ${gradeType} ${grade.id} where user ${grade.User.id} studentNumber was null`
-    );
-    throw new ApiError(
-      `Found a ${gradeType} where user studentNumber was null`,
-      HttpCode.InternalServerError
-    );
-  }
-
-  if (grade.grader === undefined) {
-    httpLogger.error(`Found a ${gradeType} ${grade.id} with no grader`);
-    throw new ApiError(
-      `Found a ${gradeType} with no grader`,
-      HttpCode.InternalServerError
-    );
-  }
-
-  if (grade.grader.name === null) {
-    httpLogger.error(
-      `Found a ${gradeType} ${grade.id} where grader ${grade.grader.id} name is null`
-    );
-    throw new ApiError(
-      `Found a ${gradeType} where grader name is null`,
-      HttpCode.InternalServerError
-    );
-  }
-
-  return [grade.User as User & {studentNumber: string}, grade.grader];
 };

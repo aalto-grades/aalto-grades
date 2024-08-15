@@ -2,8 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from '@/common/types';
+import {FinalGradeData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
+import {validateUserAndGrader} from './taskGrade';
 import Course from '../../database/models/course';
 import FinalGrade from '../../database/models/finalGrade';
 import {ApiError, stringToIdSchema} from '../../types';
@@ -22,6 +23,22 @@ export const findFinalGradeById = async (id: number): Promise<FinalGrade> => {
     );
   }
   return finalGrade;
+};
+
+/** Converts finalGrade database object into the FinalGradeData type */
+export const parseFinalGrade = (finalGrade: FinalGrade): FinalGradeData => {
+  const [user, grader] = validateUserAndGrader(finalGrade);
+  return {
+    finalGradeId: finalGrade.id,
+    user: user,
+    courseId: finalGrade.courseId,
+    gradingModelId: finalGrade.gradingModelId,
+    grader: grader,
+    grade: finalGrade.grade,
+    date: new Date(finalGrade.date),
+    sisuExportDate: finalGrade.sisuExportDate,
+    comment: finalGrade.comment,
+  };
 };
 
 /**

@@ -4,14 +4,14 @@
 
 import {z} from 'zod';
 
-import {DateSchema} from './general';
+import {DateSchema, IdSchema} from './general';
 import {UserDataSchema} from './user';
 
 export const FinalGradeDataSchema = z.strictObject({
-  finalGradeId: z.number().int(),
+  finalGradeId: IdSchema,
   user: UserDataSchema,
-  courseId: z.number().int(),
-  gradingModelId: z.number().int().nullable(),
+  courseId: IdSchema,
+  gradingModelId: IdSchema.nullable(),
   grader: UserDataSchema,
   grade: z.number().int().min(0).max(5),
   date: DateSchema,
@@ -19,8 +19,8 @@ export const FinalGradeDataSchema = z.strictObject({
   comment: z.string().nullable(),
 });
 export const NewFinalGradeSchema = z.strictObject({
-  userId: z.number().int(),
-  gradingModelId: z.number().int().nullable(),
+  userId: IdSchema,
+  gradingModelId: IdSchema.nullable(),
   grade: z.number().int().min(0).max(5),
   date: DateSchema,
   comment: z.string().nullable(),

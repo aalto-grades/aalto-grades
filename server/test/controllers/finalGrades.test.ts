@@ -37,7 +37,7 @@ beforeAll(async () => {
   cookies = await getCookies();
 
   let gradingModelId;
-  [courseId, , gradingModelId] = await createData.createCourse({});
+  [courseId, , , gradingModelId] = await createData.createCourse({});
   // Create 10 final grades
   for (let i = 0; i < 10; i++) {
     const student = await createData.createUser();
@@ -58,7 +58,7 @@ beforeAll(async () => {
     }
   }
 
-  [editCourseId, , editCourseModelId] = await createData.createCourse({});
+  [editCourseId, , , editCourseModelId] = await createData.createCourse({});
   const user = await createData.createUser();
   editFinalGradeId = await createData.createFinalGrade(
     editCourseId,
