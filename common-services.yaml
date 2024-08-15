@@ -19,8 +19,10 @@ services:
     restart: always
     tty: true
     environment:
-      BACKEND_URL: 'backend'
-      BACKEND_PORT: '3000'
+      VITE_APP_BACKEND_URL: ${AALTO_GRADES_FRONTEND_CORS_ORIGIN}
+      VITE_APP_BACKEND_PORT: "443"
+      # BACKEND_URL: 'backend' # If it is still commentend it is obsolete
+      # BACKEND_PORT: '3000' # If it is still commentend it is obsolete
     networks:
       - local
 
