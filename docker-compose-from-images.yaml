@@ -22,7 +22,6 @@ services:
       # - ./reverse-proxy.conf:/etc/nginx/conf.d/default.conf
       - ./reverse-proxy.conf:/etc/nginx/templates/nginx.conf.template
     environment:
-      NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx # If necessary otherwise delete it
       SERVER_NAME: '${SERVER_NAME}'
     networks:
       - local
