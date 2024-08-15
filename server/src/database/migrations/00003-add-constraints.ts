@@ -25,10 +25,24 @@ export default {
         transaction,
       });
 
-      await queryInterface.addConstraint('assessment_model', {
+      await queryInterface.addConstraint('course', {
+        fields: ['course_code'],
+        type: 'unique',
+        name: 'course_course_code_un',
+        transaction,
+      });
+
+      await queryInterface.addConstraint('grading_model', {
         fields: ['course_id', 'name'],
         type: 'unique',
-        name: 'course_assessment_model_name_un',
+        name: 'course_grading_model_name_un',
+        transaction,
+      });
+
+      await queryInterface.addConstraint('course_part', {
+        fields: ['course_id', 'name'],
+        type: 'unique',
+        name: 'course_course_part_name_un',
         transaction,
       });
 
@@ -57,9 +71,19 @@ export default {
         transaction,
       });
 
+      await queryInterface.removeConstraint('course', 'course_course_code_un', {
+        transaction,
+      });
+
       await queryInterface.removeConstraint(
-        'assessment_model',
-        'course_assessment_model_name_un',
+        'grading_model',
+        'course_grading_model_name_un',
+        {transaction}
+      );
+
+      await queryInterface.removeConstraint(
+        'course_part',
+        'course_course_part_name_un',
         {transaction}
       );
 

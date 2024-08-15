@@ -23,7 +23,7 @@ export default {
       });
 
       await queryInterface.addIndex('course_role', ['user_id', 'course_id'], {
-        unique: true,
+        unique: false,
         transaction,
       });
 
@@ -38,7 +38,7 @@ export default {
 
       await queryInterface.addIndex(
         'attainment_grade',
-        ['user_id', 'attainment_id'],
+        ['user_id', 'course_part_id'],
         {
           unique: false,
           transaction,
@@ -54,28 +54,26 @@ export default {
   down: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
+      await queryInterface.sequelize.query('DROP INDEX course_course_code', {
+        transaction,
+      });
+
+      await queryInterface.sequelize.query('DROP INDEX user_student_number', {
+        transaction,
+      });
+
       await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS course_course_code',
+        'DROP INDEX course_role_user_id_course_id',
         {transaction}
       );
 
       await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS user_student_number',
+        'DROP INDEX course_translation_course_id_language',
         {transaction}
       );
 
       await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS course_role_user_id_course_id',
-        {transaction}
-      );
-
-      await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS course_translation_course_id_language',
-        {transaction}
-      );
-
-      await queryInterface.sequelize.query(
-        'DROP INDEX IF EXISTS attainment_grade_user_id_attainment_id',
+        'DROP INDEX attainment_grade_user_id_course_part_id',
         {transaction}
       );
 
