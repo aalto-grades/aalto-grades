@@ -179,43 +179,43 @@ export const departments: LocalizedString[] = [
 export const sisuLanguageOptions: LanguageOption[] = [
   {
     id: Language.Finnish,
-    language: 'Finnish',
+    language: {fi: 'Suomi', en: 'Finnish', sv: 'Finska'},
   },
   {
     id: Language.Swedish,
-    language: 'Swedish',
+    language: {fi: 'Ruotsi', en: 'Swedish', sv: 'Svenska'},
   },
   {
     id: Language.English,
-    language: 'English',
+    language: {fi: 'Englanti', en: 'English', sv: 'Engelska'},
   },
   {
     id: Language.Spanish,
-    language: 'Spanish',
+    language: {fi: 'Espanja', en: 'Spanish', sv: 'Spanska'},
   },
   {
     id: Language.Japanese,
-    language: 'Japanese',
+    language: {fi: 'Japani', en: 'Japanese', sv: 'Japanska'},
   },
   {
     id: Language.Chinese,
-    language: 'Chinese',
+    language: {fi: 'Kiina', en: 'Chinese', sv: 'Kinesiska'},
   },
   {
     id: Language.Portuguese,
-    language: 'Portuguese',
+    language: {fi: 'Portugali', en: 'Portuguese', sv: 'Portugisiska'},
   },
   {
     id: Language.French,
-    language: 'French',
+    language: {fi: 'Ranska', en: 'French', sv: 'Franska'},
   },
   {
     id: Language.German,
-    language: 'German',
+    language: {fi: 'Saksa', en: 'German', sv: 'Tyska'},
   },
   {
     id: Language.Russian,
-    language: 'Russian',
+    language: {fi: 'Venäjä', en: 'Russian', sv: 'Ryska'},
   },
 ];
 

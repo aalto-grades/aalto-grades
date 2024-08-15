@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Language} from '@/common/types';
+import {Language, LocalizedString} from '@/common/types';
 
 export type HeadCellData = {
   id: string;
@@ -13,5 +13,5 @@ export type Numeric = number | string;
 
 export type LanguageOption = {
   id: Language;
-  language: string;
+  language: LocalizedString;
 };

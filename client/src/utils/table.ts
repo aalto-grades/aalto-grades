@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {TFunction} from 'i18next';
+
 import {
   CoursePartData,
   GradingModelData,
@@ -98,6 +100,7 @@ export const predictGrades = (
 };
 
 export const invalidGradesCheck = (
+  t: TFunction<'translation', undefined>,
   row: StudentRow,
   courseParts: CoursePartData[]
 ): RowError[] => {
@@ -114,7 +117,7 @@ export const invalidGradesCheck = (
       coursePart.grades.some(grade => grade.grade > maxGrade)
     )
       errors.push({
-        message: 'Grade is higher than maximum allowed value',
+        message: t('utils.grade-higher-than-max'),
         type: 'InvalidGrade',
         info: {
           columnId: coursePart.coursePartName,
@@ -126,6 +129,7 @@ export const invalidGradesCheck = (
 };
 
 export const predictedGradesErrorCheck = (
+  t: TFunction<'translation', undefined>,
   studentPredictedGrades: {[k: string]: {finalGrade: number}},
   courseScale: GradingScale
 ): RowError[] => {
@@ -133,7 +137,7 @@ export const predictedGradesErrorCheck = (
   for (const [modelId, grade] of Object.entries(studentPredictedGrades)) {
     if (grade.finalGrade % 1 !== 0) {
       errors.push({
-        message: 'The predicted final grade is not an integer',
+        message: t('utils.grade-not-an-int'),
         type: 'InvalidPredictedGrade',
         info: {
           columnId: 'predictedFinalGrades',
@@ -151,7 +155,7 @@ export const predictedGradesErrorCheck = (
         !(grade.finalGrade >= 0 && grade.finalGrade <= 2))
     ) {
       errors.push({
-        message: 'The predicted final grade is out of range',
+        message: t('utils.grade-out-of-range'),
         type: 'OutOfRangePredictedGrade',
         info: {
           columnId: 'predictedFinalGrades',
@@ -164,16 +168,18 @@ export const predictedGradesErrorCheck = (
 };
 
 export const getRowErrors = (
+  t: TFunction<'translation', undefined>,
   row: StudentRow,
   courseParts: CoursePartData[],
   studentPredictedGrades: {[k: string]: {finalGrade: number}},
   courseScale: GradingScale
 ): RowError[] => {
   const predictedGradeErrors = predictedGradesErrorCheck(
+    t,
     studentPredictedGrades,
     courseScale
   );
-  const invalidGradeErrors = invalidGradesCheck(row, courseParts);
+  const invalidGradeErrors = invalidGradesCheck(t, row, courseParts);
   return [...predictedGradeErrors, ...invalidGradeErrors];
 };
 

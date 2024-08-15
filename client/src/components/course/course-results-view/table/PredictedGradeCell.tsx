@@ -81,6 +81,7 @@ const PredictedGradeCell = ({
           {gradingModelIds
             ?.map(modelId =>
               getGradeString(
+                t,
                 gradingScale,
                 row.predictedFinalGrades?.[modelId]?.finalGrade
               )

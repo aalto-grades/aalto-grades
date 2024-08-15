@@ -376,7 +376,7 @@ const EditCourseView = (): JSX.Element => {
                   >
                     {Object.values(GradingScale).map(value => (
                       <MenuItem key={value} value={value}>
-                        {convertToClientGradingScale(value)}
+                        {convertToClientGradingScale(t, value)}
                       </MenuItem>
                     ))}
                   </FormField>
@@ -392,7 +392,7 @@ const EditCourseView = (): JSX.Element => {
                   >
                     {sisuLanguageOptions.map(option => (
                       <MenuItem key={option.id} value={option.id}>
-                        {option.language}
+                        {localize(option.language)}
                       </MenuItem>
                     ))}
                   </FormField>

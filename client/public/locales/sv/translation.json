@@ -423,5 +423,17 @@
   "students": {
     "select": "UNTRANSLATED",
     "viewing": "UNTRANSLATED"
+  },
+  "utils": {
+    "grade-higher-than-max": "UNTRANSLATED",
+    "grade-not-an-int": "UNTRANSLATED",
+    "grade-out-of-range": "UNTRANSLATED",
+    "scale-numerical": "UNTRANSLATED",
+    "scale-pass-fail": "UNTRANSLATED",
+    "scale-second-lang": "UNTRANSLATED",
+    "fail": "UNTRANSLATED",
+    "pass": "UNTRANSLATED",
+    "sat": "UNTRANSLATED",
+    "good": "UNTRANSLATED"
   }
 }

@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {TFunction} from 'i18next';
+
 import {GradingScale} from '@/common/types';
 
 /**
@@ -10,15 +12,16 @@ import {GradingScale} from '@/common/types';
  * only. These need to be converted back when adding data to the server.
  */
 export const convertToClientGradingScale = (
+  t: TFunction<'translation', undefined>,
   gradingScale: GradingScale
 ): string => {
   switch (gradingScale) {
     case GradingScale.Numerical:
-      return 'General scale, 0-5';
+      return t('utils.scale-numerical');
     case GradingScale.PassFail:
-      return 'Pass-Fail';
+      return t('utils.scale-pass-fail');
     case GradingScale.SecondNationalLanguage:
-      return 'Second national language';
+      return t('utils.scale-second-lang');
     default:
       return gradingScale;
   }
@@ -29,6 +32,7 @@ export const convertToClientGradingScale = (
  * pass/fail, good/sat/fail
  */
 export const getGradeString = (
+  t: TFunction<'translation', undefined>,
   gradingScale: GradingScale,
   grade: number | undefined
 ): string => {
@@ -37,9 +41,9 @@ export const getGradeString = (
     case GradingScale.Numerical:
       return grade.toString();
     case GradingScale.PassFail:
-      return grade === 0 ? 'Fail' : 'Pass';
+      return grade === 0 ? t('utils.fail') : t('utils.pass');
     case GradingScale.SecondNationalLanguage:
-      if (grade === 0) return 'Fail';
-      return grade === 1 ? 'Sat' : 'Good';
+      if (grade === 0) return t('utils.fail');
+      return grade === 1 ? t('utils.sat') : t('utils.good');
   }
 };

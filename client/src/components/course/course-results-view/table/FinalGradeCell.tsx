@@ -52,7 +52,7 @@ const FinalGradeCell = ({
       }}
       // align="center"
     >
-      <span>{getGradeString(gradingScale, bestFinalGrade?.grade)}</span>
+      <span>{getGradeString(t, gradingScale, bestFinalGrade?.grade)}</span>
       {/* If there are multiple final grades "show more" icon*/}
       {(finalGrades.length > 1 || hover) && (
         <>
