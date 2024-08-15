@@ -8,6 +8,7 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
+    "@types/react": "^18.3.3",
     "@types/zxcvbn": "^4.4.4",
     "reactflow": "^11.10.4"
   },
