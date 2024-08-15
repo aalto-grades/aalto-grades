@@ -7,6 +7,7 @@ import {GradingModelData} from '@/common/types';
 export const mockGradingModel: GradingModelData = {
   id: 1,
   courseId: 1,
+  coursePartId: null,
   name: 'Average',
   archived: false,
   hasArchivedCourseParts: false,

@@ -26,11 +26,8 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
-import {
-  useAddGrades,
-  useFetchAplusGrades,
-  useGetCourseParts,
-} from '@/hooks/useApi';
+import {useGetCourseTasks} from '@/hooks/api/courseTask';
+import {useAddGrades, useFetchAplusGrades} from '@/hooks/useApi';
 import {getAplusToken} from '@/utils/utils';
 
 type PropsType = {
@@ -41,7 +38,7 @@ type PropsType = {
 const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
-  const courseParts = useGetCourseParts(courseId);
+  const courseTasks = useGetCourseTasks(courseId);
 
   const [step, setStep] = useState<number>(0);
   const [coursePartIds, setCoursePartIds] = useState<number[]>([]);
@@ -99,8 +96,8 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
           <>
             <Typography>{t('course.parts.select-for-fetching')}</Typography>
             <FormGroup>
-              {courseParts.data &&
-                courseParts.data
+              {courseTasks.data &&
+                courseTasks.data
                   .filter(coursePart => coursePart.aplusGradeSources.length > 0)
                   .map(coursePart => (
                     <FormControlLabel
@@ -151,7 +148,7 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
                   aplusGrades.data.map(row => (
                     <TableRow>
                       <TableCell>{row.studentNumber}</TableCell>
-                      <TableCell>{row.coursePartId}</TableCell>
+                      <TableCell>{row.courseTaskId}</TableCell>
                       <TableCell>{row.aplusGradeSourceId}</TableCell>
                       <TableCell>{row.grade}</TableCell>
                       <TableCell>{row.date.toDateString()}</TableCell>

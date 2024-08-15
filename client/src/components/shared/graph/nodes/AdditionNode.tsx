@@ -7,7 +7,7 @@ import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import {AdditionNodeValue} from '@/common/types/graph';
+import {AdditionNodeValue} from '@/common/types';
 import {NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 

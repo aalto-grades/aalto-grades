@@ -13,14 +13,14 @@ import type {} from '@mui/material/themeCssVarsAugmentation';
 import {JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {CoursePartGradesData} from '@/common/types';
+import {CourseTaskGradesData} from '@/common/types';
 import {useTableContext} from '@/context/useTableContext';
 import {findBestGrade, gradeIsExpired} from '@/utils/bestGrade';
 import EditGradesDialog from './EditGradesDialog';
 
 type GradeCellProps = {
   studentNumber: string;
-  coursePartResults?: CoursePartGradesData;
+  coursePartResults?: CourseTaskGradesData;
   maxGrade: number | null;
 };
 const GradeCell = ({
@@ -105,11 +105,11 @@ const GradeCell = ({
           open={gradeDialogOpen}
           onClose={() => setGradeDialogOpen(false)}
           studentNumber={studentNumber}
-          coursePartId={coursePartResults.coursePartId}
+          courseTaskId={coursePartResults.courseTaskId}
           maxGrade={maxGrade}
           title={t('course.results.grade-of-for', {
             user: studentNumber,
-            part: coursePartResults.coursePartName,
+            part: coursePartResults.courseTaskName,
           })}
           grades={coursePartResults.grades}
         />

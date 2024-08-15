@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AddCircle, Archive, Delete, More, Unarchive} from '@mui/icons-material';
+import {Archive, Delete, Unarchive} from '@mui/icons-material';
 import {Box, Button, Typography} from '@mui/material';
 import {
   DataGrid,
@@ -43,10 +43,7 @@ type ColTypes = {
   id: number;
   coursePartId: number;
   name: string;
-  daysValid: number;
-  maxGrade: number | null;
-  validUntil: Date | null;
-  aplusGradeSources: AplusGradeSourceData[];
+  expiryDate: Date | null;
   archived: boolean;
 };
 
@@ -68,25 +65,25 @@ const CoursePartsView = (): JSX.Element => {
   const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false);
   const [aplusDialogOpen, setAplusDialogOpen] = useState<boolean>(false);
   const [addAplusSourcesTo, setAddAplusSourcesTo] = useState<{
-    coursePartId: number | null;
+    courseTaskId: number | null;
     aplusGradeSources: AplusGradeSourceData[];
   }>({
-    coursePartId: null,
+    courseTaskId: null,
     aplusGradeSources: [],
   });
   const [viewAplusSourcesOpen, setViewAplusSourcesOpen] =
     useState<boolean>(false);
-  const [aplusGradeSources, setAplusGradeSources] = useState<
+  const [aplusGradeSources, _setAplusGradeSources] = useState<
     AplusGradeSourceData[]
   >([]);
 
-  const coursePartsWithGrades = useMemo(() => {
+  const courseTasksWithGrades = useMemo(() => {
     const withGrades = new Set<number>();
     if (grades.data === undefined) return withGrades;
     for (const grade of grades.data) {
-      for (const coursePart of grade.courseParts) {
-        if (coursePart.grades.length > 0) {
-          withGrades.add(coursePart.coursePartId);
+      for (const courseTask of grade.courseTasks) {
+        if (courseTask.grades.length > 0) {
+          withGrades.add(courseTask.courseTaskId);
         }
       }
     }
@@ -131,10 +128,8 @@ const CoursePartsView = (): JSX.Element => {
         id: coursePart.id,
         coursePartId: coursePart.id,
         name: coursePart.name,
-        daysValid: coursePart.daysValid,
-        maxGrade: coursePart.maxGrade,
+        expiryDate: coursePart.expiryDate,
         validUntil: null,
-        aplusGradeSources: coursePart.aplusGradeSources,
         archived: coursePart.archived,
       }));
       if (JSON.stringify(newRows) !== JSON.stringify(rows)) {
@@ -156,21 +151,14 @@ const CoursePartsView = (): JSX.Element => {
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [unsavedChanges]);
 
-  const handleAddCoursePart = (
-    name: string,
-    daysValid: number,
-    maxGrade: number | null
-  ): void => {
+  const handleAddCoursePart = (name: string, expiryDate: Date | null): void => {
     setRows(oldRows => {
       const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
       return oldRows.concat({
         id: freeId,
         coursePartId: -1,
         name,
-        daysValid,
-        maxGrade,
-        validUntil: null,
-        aplusGradeSources: [],
+        expiryDate,
         archived: false,
       });
     });
@@ -188,16 +176,14 @@ const CoursePartsView = (): JSX.Element => {
       if (row.coursePartId === -1) {
         newCourseParts.push({
           name: row.name,
-          daysValid: row.daysValid,
-          maxGrade: row.maxGrade,
+          expiryDate: row.expiryDate,
         });
       } else {
         editedCourseParts.push({
           coursePartsId: row.coursePartId,
           coursePart: {
             name: row.name,
-            daysValid: row.daysValid,
-            maxGrade: row.maxGrade,
+            expiryDate: row.expiryDate,
             archived: row.archived,
           },
         });
@@ -229,34 +215,34 @@ const CoursePartsView = (): JSX.Element => {
     setInitRows(structuredClone(rows));
   };
 
-  const getAplusActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
+  const getAplusActions = (_params: GridRowParams<ColTypes>): JSX.Element[] => {
     const elements: JSX.Element[] = [];
 
-    elements.push(
-      <GridActionsCellItem
-        icon={<AddCircle />}
-        label={t('course.parts.add-a+-source')}
-        onClick={() =>
-          setAddAplusSourcesTo({
-            coursePartId: params.row.id,
-            aplusGradeSources: params.row.aplusGradeSources,
-          })
-        }
-      />
-    );
+    // elements.push(
+    //   <GridActionsCellItem
+    //     icon={<AddCircle />}
+    //     label={t('course.parts.add-a+-source')}
+    //     onClick={() =>
+    //       setAddAplusSourcesTo({
+    //         coursePartId: params.row.id,
+    //         aplusGradeSources: params.row.aplusGradeSources,
+    //       })
+    //     }
+    //   />
+    // );
 
-    if (params.row.aplusGradeSources.length > 0) {
-      elements.push(
-        <GridActionsCellItem
-          icon={<More />}
-          label={t('course.parts.view-a+-sources')}
-          onClick={() => {
-            setAplusGradeSources(params.row.aplusGradeSources);
-            setViewAplusSourcesOpen(true);
-          }}
-        />
-      );
-    }
+    // if (params.row.aplusGradeSources.length > 0) {
+    //   elements.push(
+    //     <GridActionsCellItem
+    //       icon={<More />}
+    //       label={t('course.parts.view-a+-sources')}
+    //       onClick={() => {
+    //         setAplusGradeSources(params.row.aplusGradeSources);
+    //         setViewAplusSourcesOpen(true);
+    //       }}
+    //     />
+    //   );
+    // }
 
     return elements;
   };
@@ -284,7 +270,7 @@ const CoursePartsView = (): JSX.Element => {
         />
       );
     }
-    if (!coursePartsWithGrades.has(params.row.coursePartId)) {
+    if (!courseTasksWithGrades.has(params.row.coursePartId)) {
       elements.push(
         <GridActionsCellItem
           icon={<Delete />}
@@ -377,11 +363,11 @@ const CoursePartsView = (): JSX.Element => {
       <AddAplusGradeSourceDialog
         handleClose={() =>
           setAddAplusSourcesTo({
-            coursePartId: null,
+            courseTaskId: null,
             aplusGradeSources: [],
           })
         }
-        coursePartId={addAplusSourcesTo.coursePartId}
+        courseTaskId={addAplusSourcesTo.courseTaskId}
         aplusGradeSources={addAplusSourcesTo.aplusGradeSources}
       />
       <ViewAplusGradeSourcesDialog

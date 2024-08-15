@@ -14,7 +14,7 @@ import {ChangeEvent, JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Node} from 'reactflow';
 
-import {NodeValues} from '@/common/types/graph';
+import {NodeValues} from '@/common/types';
 
 const testFloat = (val: string): boolean => /^\d+(?:\.\d+?)?$/.test(val);
 

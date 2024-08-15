@@ -26,10 +26,10 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {
   CourseRoleType,
   GradingModelData,
+  GraphStructure,
   StudentRow,
   SystemRole,
 } from '@/common/types';
-import {GraphStructure} from '@/common/types/graph';
 import Graph from '@/components/shared/graph/Graph';
 import {simplifyNode} from '@/components/shared/graph/graphUtil';
 import {useGetFinalGrades} from '@/hooks/api/finalGrade';
@@ -375,7 +375,7 @@ const ModelsView = (): JSX.Element => {
           initGraph={currentModel.graphStructure}
           courseParts={courseParts.data}
           userGrades={
-            currentUserRow === null ? null : currentUserRow.courseParts
+            currentUserRow === null ? null : currentUserRow.courseTasks
           }
           readOnly={!editRights}
           onSave={onSave}

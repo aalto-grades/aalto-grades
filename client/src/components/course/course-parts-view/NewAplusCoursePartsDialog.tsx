@@ -19,11 +19,8 @@ import {
   NewAplusGradeSourceData,
 } from '@/common/types';
 import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
-import {
-  useAddAplusGradeSources,
-  useAddCoursePart,
-  useFetchAplusCourses,
-} from '@/hooks/useApi';
+import {useAddCourseTask} from '@/hooks/api/courseTask';
+import {useAddAplusGradeSources, useFetchAplusCourses} from '@/hooks/useApi';
 import {getAplusToken} from '@/utils/utils';
 import CreateAplusCourseParts from './CreateAplusCourseParts';
 import SelectAplusCourse from './SelectAplusCourse';
@@ -45,7 +42,7 @@ const NewAplusCoursePartsDialog = ({
   const aplusCourses = useFetchAplusCourses({
     enabled: Boolean(getAplusToken()),
   });
-  const addCoursePart = useAddCoursePart(courseId);
+  const addCourseTask = useAddCourseTask(courseId);
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
   const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
@@ -53,7 +50,7 @@ const NewAplusCoursePartsDialog = ({
   const [step, setStep] = useState<number>(0);
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
-  const [coursePartsWithSource, setCoursePartsWithSource] = useState<
+  const [courseTasksWithSource, setCourseTasksWithSource] = useState<
     [
       {name: string; daysValid: number; maxGrade: number},
       NewAplusGradeSourceData,
@@ -67,7 +64,7 @@ const NewAplusCoursePartsDialog = ({
   const handleResetAndClose = (): void => {
     setStep(0);
     setAplusCourse(null);
-    setCoursePartsWithSource([]);
+    setCourseTasksWithSource([]);
     handleClose();
   };
 
@@ -78,13 +75,13 @@ const NewAplusCoursePartsDialog = ({
     source: NewAplusGradeSourceData
   ): void => {
     if (checked) {
-      setCoursePartsWithSource([
-        ...coursePartsWithSource,
+      setCourseTasksWithSource([
+        ...courseTasksWithSource,
         [{name: name, daysValid: 365, maxGrade: maxGrade}, source],
       ]);
     } else {
-      setCoursePartsWithSource(
-        coursePartsWithSource.filter(([_, s]) => {
+      setCourseTasksWithSource(
+        courseTasksWithSource.filter(([_, s]) => {
           if (s.sourceType === Type.Module && source.sourceType === Type.Module)
             return s.moduleId !== source.moduleId;
 
@@ -111,8 +108,8 @@ const NewAplusCoursePartsDialog = ({
       maxGrade?: number;
     }
   ): void => {
-    setCoursePartsWithSource(
-      coursePartsWithSource.map(([coursePart, source], i) => {
+    setCourseTasksWithSource(
+      courseTasksWithSource.map(([coursePart, source], i) => {
         if (i === index) {
           return [
             {
@@ -133,10 +130,10 @@ const NewAplusCoursePartsDialog = ({
 
   const handleSubmit = async (): Promise<void> => {
     const sources: NewAplusGradeSourceData[] = [];
-    for (const [coursePart, source] of coursePartsWithSource) {
+    for (const [coursePart, source] of courseTasksWithSource) {
       sources.push({
         ...source,
-        coursePartId: await addCoursePart.mutateAsync(coursePart),
+        courseTaskId: await addCourseTask.mutateAsync(coursePart),
       });
     }
 
@@ -160,20 +157,20 @@ const NewAplusCoursePartsDialog = ({
               selectedAplusCourse={aplusCourse}
               setAplusCourse={course => {
                 setAplusCourse(course);
-                if (course) setCoursePartsWithSource([]);
+                if (course) setCourseTasksWithSource([]);
               }}
             />
           )}
           {step === 1 && aplusCourse && (
             <SelectAplusGradeSources
               aplusCourse={aplusCourse}
-              selectedGradeSources={coursePartsWithSource.map(([_, s]) => s)}
+              selectedGradeSources={courseTasksWithSource.map(([_, s]) => s)}
               handleChange={handleSelectionChange}
             />
           )}
           {step === 2 && aplusCourse && (
             <CreateAplusCourseParts
-              coursePartsWithSource={coursePartsWithSource}
+              coursePartsWithSource={courseTasksWithSource}
               handleChange={handleCoursePartChange}
             />
           )}
@@ -187,7 +184,7 @@ const NewAplusCoursePartsDialog = ({
           {step <= 1 && (
             <Button
               disabled={
-                step === 0 ? !aplusCourse : coursePartsWithSource.length === 0
+                step === 0 ? !aplusCourse : courseTasksWithSource.length === 0
               }
               onClick={() => setStep(step + 1)}
             >

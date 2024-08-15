@@ -253,7 +253,7 @@ export const newAplusGradeSource = (
     };
   }
 ): NewAplusGradeSourceData => {
-  const base = {coursePartId: -1, aplusCourse: aplusCourse, date: date};
+  const base = {courseTaskId: -1, aplusCourse: aplusCourse, date: date};
 
   if (module !== undefined) {
     return {

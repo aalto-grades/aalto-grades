@@ -6,7 +6,7 @@ import {JSX, useContext} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position} from 'reactflow';
 
-import {GradeNodeValue} from '@/common/types/graph';
+import {GradeNodeValue} from '@/common/types';
 import {NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 

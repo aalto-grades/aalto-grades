@@ -4,7 +4,7 @@
 
 import {createContext} from 'react';
 
-import {NodeData, NodeSettings, NodeValues} from '@/common/types/graph';
+import {NodeData, NodeSettings, NodeValues} from '@/common/types';
 
 type NodeValuesContext = {nodeValues: NodeValues};
 export const NodeValuesContext = createContext<NodeValuesContext>(

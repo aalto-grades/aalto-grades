@@ -61,15 +61,15 @@ const UserGraphDialog = ({
           <Graph
             key={selectedModel.id} // Reset graph for each model
             initGraph={selectedModel.graphStructure}
-            courseParts={row.courseParts.map(rowCoursePart => ({
-              id: rowCoursePart.coursePartId,
-              name: rowCoursePart.coursePartName,
+            courseParts={row.courseTasks.map(rowCourseTask => ({
+              id: rowCourseTask.courseTaskId,
+              name: rowCourseTask.courseTaskName,
               archived:
                 courseParts.data.find(
-                  coursePart => coursePart.id === rowCoursePart.coursePartId
+                  coursePart => coursePart.id === rowCourseTask.courseTaskId // TODO: Fix
                 )?.archived ?? false,
             }))}
-            userGrades={row.courseParts}
+            userGrades={row.courseTasks}
             gradeSelectOption={gradeSelectOption}
             readOnly
           />

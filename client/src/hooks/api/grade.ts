@@ -13,10 +13,10 @@ import {
 } from '@tanstack/react-query';
 
 import {
-  EditGradeData,
+  EditTaskGradeData,
   LatestGrades,
   LatestGradesSchema,
-  NewGrade,
+  NewTaskGrade,
   SisuCsvUpload,
   StudentRow,
   StudentRowArraySchema,
@@ -40,8 +40,8 @@ export const useGetGrades = (
 
 export const useAddGrades = (
   courseId: Numeric,
-  options?: UseMutationOptions<void, unknown, NewGrade[]>
-): UseMutationResult<void, unknown, NewGrade[]> => {
+  options?: UseMutationOptions<void, unknown, NewTaskGrade[]>
+): UseMutationResult<void, unknown, NewTaskGrade[]> => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -57,7 +57,7 @@ export const useAddGrades = (
   });
 };
 
-type EditGradeVars = {gradeId: Numeric; data: EditGradeData};
+type EditGradeVars = {gradeId: Numeric; data: EditTaskGradeData};
 export const useEditGrade = (
   courseId: Numeric,
   options?: UseMutationOptions<void, unknown, EditGradeVars>

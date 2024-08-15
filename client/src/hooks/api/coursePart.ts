@@ -12,13 +12,13 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-import {IdSchema} from '@/common/types';
 import {
   CoursePartData,
   CoursePartDataArraySchema,
   EditCoursePartData,
+  IdSchema,
   NewCoursePartData,
-} from '@/common/types/coursePart';
+} from '@/common/types';
 import {Numeric} from '@/types';
 import axios from './axios';
 

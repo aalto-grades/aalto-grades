@@ -383,11 +383,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
     setMissingFinalGrades(
       table
         .getSelectedRowModel()
-        .rows.some(
-          selectedRow =>
-            selectedRow.original.finalGrades === undefined ||
-            selectedRow.original.finalGrades.length === 0
-        )
+        .rows.some(selectedRow => selectedRow.original.finalGrades.length === 0)
     );
   }
 
@@ -432,10 +428,10 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       model.graphStructure,
       selectedRows.map(selectedRow => ({
         userId: selectedRow.user.id,
-        courseParts: selectedRow.courseParts.map(coursePart => ({
-          coursePartId: coursePart.coursePartId,
+        courseParts: selectedRow.courseTasks.map(courseTask => ({
+          coursePartId: courseTask.courseTaskId, // TODO: Broken
           grade:
-            findBestGrade(coursePart.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Manage expired course parts
+            findBestGrade(courseTask.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Manage expired course parts
         })),
       }))
     );

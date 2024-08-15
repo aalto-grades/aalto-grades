@@ -6,7 +6,7 @@ import ElkConstructor from 'elkjs/lib/elk.bundled';
 import {TFunction} from 'i18next';
 import {Connection, Edge, Node} from 'reactflow';
 
-import {DropInNodes, NodeValues} from '@/common/types/graph';
+import {DropInNodes, NodeValues} from '@/common/types';
 
 export const simplifyNode = (node: Node): Node => ({
   id: node.id,

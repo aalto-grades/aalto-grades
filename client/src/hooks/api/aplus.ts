@@ -19,8 +19,8 @@ import {
   AplusExerciseData,
   AplusExerciseDataSchema,
   NewAplusGradeSourceData,
-  NewGrade,
-  NewGradeArraySchema,
+  NewTaskGrade,
+  NewTaskGradeArraySchema,
 } from '@/common/types';
 import {Numeric} from '@/types';
 import {getAplusToken} from '@/utils/utils';
@@ -99,12 +99,12 @@ export const useDeleteAplusGradeSource = (
 export const useFetchAplusGrades = (
   courseId: Numeric,
   coursePartIds: number[],
-  options?: Partial<UseQueryOptions<NewGrade[]>>
-): UseQueryResult<NewGrade[]> =>
+  options?: Partial<UseQueryOptions<NewTaskGrade[]>>
+): UseQueryResult<NewTaskGrade[]> =>
   useQuery({
     queryKey: ['a+-grades', courseId],
     queryFn: async () =>
-      NewGradeArraySchema.parse(
+      NewTaskGradeArraySchema.parse(
         (
           await axios.get(
             `/v1/courses/${courseId}/aplus-fetch?course-parts=${JSON.stringify(

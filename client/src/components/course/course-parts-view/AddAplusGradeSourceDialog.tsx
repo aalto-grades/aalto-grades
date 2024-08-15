@@ -26,13 +26,13 @@ import SelectAplusGradeSource from './SelectAplusGradeSource';
 
 type PropsType = {
   handleClose: () => void;
-  coursePartId: number | null;
+  courseTaskId: number | null;
   aplusGradeSources: AplusGradeSourceData[];
 };
 
 const AddAplusGradeSourceDialog = ({
   handleClose,
-  coursePartId,
+  courseTaskId,
   aplusGradeSources,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
@@ -47,7 +47,7 @@ const AddAplusGradeSourceDialog = ({
   const [step, setStep] = useState<number>(0);
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
-  const open = coursePartId !== null;
+  const open = courseTaskId !== null;
 
   const handleResetAndClose = (): void => {
     setStep(0);
@@ -75,11 +75,11 @@ const AddAplusGradeSourceDialog = ({
               aplusCourse={aplusCourse}
               aplusGradeSources={aplusGradeSources}
               handleSelect={(aplusGradeSource: NewAplusGradeSourceData) => {
-                if (coursePartId !== null) {
+                if (courseTaskId !== null) {
                   addAplusGradeSources.mutate([
                     {
                       ...aplusGradeSource,
-                      coursePartId,
+                      courseTaskId,
                     },
                   ]);
                 }

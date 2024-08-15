@@ -5,7 +5,7 @@
 import {TFunction} from 'i18next';
 
 import {
-  CoursePartData,
+  CourseTaskData,
   GradingModelData,
   GradingScale,
   StudentRow,
@@ -33,8 +33,8 @@ export const groupByLatestBestGrade = (
   const findLatestBestGradeDate = (row: StudentRow): string => {
     let newestDate = new Date('1970-01-01');
 
-    for (const coursePart of row.courseParts) {
-      const bestGrade = findBestGrade(coursePart.grades, {
+    for (const courseTask of row.courseTasks) {
+      const bestGrade = findBestGrade(courseTask.grades, {
         expiredOption: 'prefer_non_expired',
         gradeSelectOption,
       });
@@ -57,8 +57,8 @@ export const groupByLatestBestGrade = (
 
 export const findLatestGrade = (row: StudentRow): Date => {
   let latestDate = new Date(1970, 0, 1);
-  for (const coursePart of row.courseParts) {
-    for (const grade of coursePart.grades) {
+  for (const courseTask of row.courseTasks) {
+    for (const grade of courseTask.grades) {
       if (grade.date.getTime() > latestDate.getTime()) latestDate = grade.date;
     }
   }
@@ -76,7 +76,7 @@ export const findLatestGrade = (row: StudentRow): Date => {
 export const predictGrades = (
   rows: StudentRow[],
   gradingModels: GradingModelData[],
-  gradeSelectOption: GradeSelectOption
+  _gradeSelectOption: GradeSelectOption
 ): {
   [key: GradingModelData['id']]: ReturnType<typeof batchCalculateGraph>;
 } => {
@@ -84,17 +84,21 @@ export const predictGrades = (
     [key: GradingModelData['id']]: ReturnType<typeof batchCalculateGraph>;
   } = {};
   for (const gradingModel of gradingModels) {
-    result[gradingModel.id] = batchCalculateGraph(
-      gradingModel.graphStructure,
-      rows.map(row => ({
-        userId: row.user.id,
-        courseParts: row.courseParts.map(coursePart => ({
-          coursePartId: coursePart.coursePartId,
-          grade:
-            findBestGrade(coursePart.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Handle grade expiration
-        })),
-      }))
+    result[gradingModel.id] = Object.fromEntries(
+      rows.map(row => [row.user.id, {finalGrade: 0}])
     );
+    // TODO: Fix
+    // result[gradingModel.id] = batchCalculateGraph(
+    //   gradingModel.graphStructure,
+    //   rows.map(row => ({
+    //     userId: row.user.id,
+    //     courseParts: row.courseTasks.map(courseTask => ({
+    //       coursePartId: courseTask.coursePartId,
+    //       grade:
+    //         findBestGrade(courseTask.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Handle grade expiration
+    //     })),
+    //   }))
+    // );
   }
   return result;
 };
@@ -102,25 +106,25 @@ export const predictGrades = (
 export const invalidGradesCheck = (
   t: TFunction<'translation', undefined>,
   row: StudentRow,
-  courseParts: CoursePartData[]
+  courseTasks: CourseTaskData[]
 ): RowError[] => {
   const errors: RowError[] = [];
   const maxGrades = Object.fromEntries(
-    courseParts.map(coursePart => [coursePart.id, coursePart.maxGrade])
+    courseTasks.map(courseTask => [courseTask.id, courseTask.maxGrade])
   );
 
-  for (const coursePart of row.courseParts) {
-    const maxGrade = maxGrades[coursePart.coursePartId];
+  for (const courseTask of row.courseTasks) {
+    const maxGrade = maxGrades[courseTask.courseTaskId];
     if (
-      coursePart.coursePartId in maxGrades &&
+      courseTask.courseTaskId in maxGrades &&
       maxGrade !== null &&
-      coursePart.grades.some(grade => grade.grade > maxGrade)
+      courseTask.grades.some(grade => grade.grade > maxGrade)
     )
       errors.push({
         message: t('utils.grade-higher-than-max'),
         type: 'InvalidGrade',
         info: {
-          columnId: coursePart.coursePartName,
+          columnId: courseTask.courseTaskName,
         },
       });
   }
@@ -170,7 +174,7 @@ export const predictedGradesErrorCheck = (
 export const getRowErrors = (
   t: TFunction<'translation', undefined>,
   row: StudentRow,
-  courseParts: CoursePartData[],
+  courseTasks: CourseTaskData[],
   studentPredictedGrades: {[k: string]: {finalGrade: number}},
   courseScale: GradingScale
 ): RowError[] => {
@@ -179,7 +183,7 @@ export const getRowErrors = (
     studentPredictedGrades,
     courseScale
   );
-  const invalidGradeErrors = invalidGradesCheck(t, row, courseParts);
+  const invalidGradeErrors = invalidGradesCheck(t, row, courseTasks);
   return [...predictedGradeErrors, ...invalidGradeErrors];
 };
 

@@ -12,10 +12,10 @@ export const mockGrades: StudentRow[] = [
       email: 'carolyn.janek@aalto.fi',
       studentNumber: '325235',
     },
-    courseParts: [
+    courseTasks: [
       {
-        coursePartId: 1,
-        coursePartName: 'Exercise 1',
+        courseTaskId: 1,
+        courseTaskName: 'Exercise 1',
         grades: [
           {
             gradeId: 1,
@@ -35,8 +35,8 @@ export const mockGrades: StudentRow[] = [
         ],
       },
       {
-        coursePartId: 2,
-        coursePartName: 'Exercise 2',
+        courseTaskId: 2,
+        courseTaskName: 'Exercise 2',
         grades: [
           {
             gradeId: 2,
@@ -56,8 +56,8 @@ export const mockGrades: StudentRow[] = [
         ],
       },
       {
-        coursePartId: 3,
-        coursePartName: 'Exam',
+        courseTaskId: 3,
+        courseTaskName: 'Exam',
         grades: [
           {
             gradeId: 3,
@@ -108,10 +108,10 @@ export const mockGrades: StudentRow[] = [
       email: 'vonda.morgan@aalto.fi',
       studentNumber: '826139',
     },
-    courseParts: [
+    courseTasks: [
       {
-        coursePartId: 1,
-        coursePartName: 'Exercise 1',
+        courseTaskId: 1,
+        courseTaskName: 'Exercise 1',
         grades: [
           {
             gradeId: 4,
@@ -131,8 +131,8 @@ export const mockGrades: StudentRow[] = [
         ],
       },
       {
-        coursePartId: 2,
-        coursePartName: 'Exercise 2',
+        courseTaskId: 2,
+        courseTaskName: 'Exercise 2',
         grades: [
           {
             gradeId: 5,
@@ -152,8 +152,8 @@ export const mockGrades: StudentRow[] = [
         ],
       },
       {
-        coursePartId: 3,
-        coursePartName: 'Exam',
+        courseTaskId: 3,
+        courseTaskName: 'Exam',
         grades: [
           {
             gradeId: 6,

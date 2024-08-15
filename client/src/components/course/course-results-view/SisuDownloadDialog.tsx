@@ -80,7 +80,7 @@ const SisuDownloadDialog = ({
 
   const selectedStudents = selectedRows.map(row => ({
     studentNumber: row.user.studentNumber!,
-    grades: row.finalGrades ?? [],
+    grades: row.finalGrades,
   }));
 
   const userGradeAlreadyExported = (grades: FinalGradeData[]): boolean =>
@@ -88,7 +88,7 @@ const SisuDownloadDialog = ({
 
   const exportedValuesInList = useMemo(() => {
     for (const row of selectedRows) {
-      if (userGradeAlreadyExported(row.finalGrades ?? [])) {
+      if (userGradeAlreadyExported(row.finalGrades)) {
         return true;
       }
     }
@@ -126,11 +126,11 @@ const SisuDownloadDialog = ({
     await downloadSisuGradeCsv.mutateAsync({
       courseId,
       data: {
-        completionLanguage,
+        completionLanguage: completionLanguage ?? null,
         assessmentDate:
           dateOverride && assessmentDate !== null
             ? assessmentDate.toDate()
-            : undefined,
+            : null,
         studentNumbers: studentNumbers as [string, ...string[]], // Non-empty array
       },
     });
@@ -238,7 +238,7 @@ const SisuDownloadDialog = ({
                 <ListItemText
                   primary={`${t('general.student-number')}: ${row.user.studentNumber}`}
                   secondary={
-                    userGradeAlreadyExported(row.finalGrades ?? [])
+                    userGradeAlreadyExported(row.finalGrades)
                       ? t('course.results.exported-already')
                       : ''
                   }

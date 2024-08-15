@@ -41,7 +41,7 @@ import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import {GradeUploadColTypes} from './UploadDialog';
 
 type DateType = {
-  coursePartName: string;
+  courseTaskName: string;
   completionDate: Dayjs;
   expirationDate: Dayjs;
 };
@@ -103,7 +103,7 @@ const UploadDialogConfirm = ({
     // Move expiration date the same amount as the new date
     setDates(oldDates =>
       oldDates.map(oldDate =>
-        oldDate.coursePartName === coursePartName
+        oldDate.courseTaskName === coursePartName
           ? {
               ...oldDate,
               completionDate: newCompletionDate,
@@ -174,11 +174,11 @@ const UploadDialogConfirm = ({
                   <TableBody>
                     {dates
                       .filter(date =>
-                        nonEmptyCols.includes(date.coursePartName)
+                        nonEmptyCols.includes(date.courseTaskName)
                       )
                       .map(date => (
-                        <TableRow key={date.coursePartName}>
-                          <TableCell>{date.coursePartName}</TableCell>
+                        <TableRow key={date.courseTaskName}>
+                          <TableCell>{date.courseTaskName}</TableCell>
                           <TableCell>
                             <DatePicker
                               slotProps={{textField: {size: 'small'}}}
@@ -186,7 +186,7 @@ const UploadDialogConfirm = ({
                               onChange={value =>
                                 handleCompletionDateChange(
                                   value,
-                                  date.coursePartName
+                                  date.courseTaskName
                                 )
                               }
                             />
@@ -210,8 +210,8 @@ const UploadDialogConfirm = ({
                               onChange={e =>
                                 setDates(oldDates =>
                                   oldDates.map(oldDate =>
-                                    oldDate.coursePartName ===
-                                      date.coursePartName && e !== null
+                                    oldDate.courseTaskName ===
+                                      date.courseTaskName && e !== null
                                       ? {...oldDate, expirationDate: e}
                                       : oldDate
                                   )

@@ -11,8 +11,9 @@ import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {NewGrade} from '@/common/types';
-import {useAddGrades, useGetCourseParts} from '@/hooks/useApi';
+import {NewTaskGrade} from '@/common/types';
+import {useGetCourseTasks} from '@/hooks/api/courseTask';
+import {useAddGrades} from '@/hooks/useApi';
 import UploadDialogConfirm from './UploadDialogConfirm';
 import UploadDialogUpload from './UploadDialogUpload';
 
@@ -25,7 +26,7 @@ type PropsType = {open: boolean; onClose: () => void};
 const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams();
-  const courseParts = useGetCourseParts(courseId!, {
+  const courseTasks = useGetCourseTasks(courseId!, {
     enabled: Boolean(courseId),
   });
   const addGrades = useAddGrades(courseId!);
@@ -40,25 +41,25 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const [rows, setRows] = useState<GridRowsProp<GradeUploadColTypes>>([]);
   const [ready, setReady] = useState<boolean>(true);
   const [dates, setDates] = useState<
-    {coursePartName: string; completionDate: Dayjs; expirationDate: Dayjs}[]
+    {courseTaskName: string; completionDate: Dayjs; expirationDate: Dayjs}[]
   >([]);
 
-  const coursePartData = useMemo(
-    () => courseParts.data?.filter(coursePart => !coursePart.archived) ?? [],
-    [courseParts.data]
+  const courseTaskData = useMemo(
+    () => courseTasks.data?.filter(courseTask => !courseTask.archived) ?? [],
+    [courseTasks.data]
   );
 
   const maxGrades = useMemo(
     () =>
       Object.fromEntries(
-        coursePartData.map(coursePart => [coursePart.name, coursePart.maxGrade])
+        courseTaskData.map(courseTask => [courseTask.name, courseTask.maxGrade])
       ),
-    [coursePartData]
+    [courseTaskData]
   );
 
   const invalidValues = useMemo(() => {
     for (const row of rows) {
-      for (const coursePart of coursePartData) {
+      for (const coursePart of courseTaskData) {
         const grade = row[coursePart.name];
         if (!(coursePart.name in row) || grade === null) continue; // Skip empty cells
 
@@ -67,18 +68,18 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       }
     }
     return false;
-  }, [coursePartData, rows]);
+  }, [courseTaskData, rows]);
 
   useEffect(() => {
-    if (coursePartData.length === dates.length) return;
+    if (courseTaskData.length === dates.length) return;
     setDates(
-      coursePartData.map(coursePart => ({
-        coursePartName: coursePart.name,
+      courseTaskData.map(courseTask => ({
+        courseTaskName: courseTask.name,
         completionDate: dayjs(),
-        expirationDate: dayjs().add(coursePart.daysValid, 'day'),
+        expirationDate: dayjs().add(courseTask.daysValid ?? 0, 'day'), // TODO: Fix
       }))
     );
-  }, [coursePartData, dates.length]);
+  }, [courseTaskData, dates.length]);
 
   const columns: GridColDef<GradeUploadColTypes>[] = [
     {
@@ -88,7 +89,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       width: 120,
       editable: true,
     },
-    ...coursePartData.map(
+    ...courseTaskData.map(
       (coursePart): GridColDef<GradeUploadColTypes> => ({
         field: coursePart.name,
         headerName: coursePart.name,
@@ -116,7 +117,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       headerName: t('general.student-number'),
       type: 'string',
     },
-    ...coursePartData.map(
+    ...courseTaskData.map(
       (coursePart): GridColDef<GradeUploadColTypes> => ({
         field: coursePart.name,
         headerName: coursePart.name,
@@ -126,15 +127,15 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   ];
 
   const onSubmit = async (): Promise<void> => {
-    const gradeData: NewGrade[] = [];
+    const gradeData: NewTaskGrade[] = [];
 
     for (const row of rows) {
-      for (const coursePart of coursePartData) {
-        const grade = row[coursePart.name];
-        if (!(coursePart.name in row) || grade === null) continue; // Skip empty cells
+      for (const courseTask of courseTaskData) {
+        const grade = row[courseTask.name];
+        if (!(courseTask.name in row) || grade === null) continue; // Skip empty cells
 
         const dateData = dates.find(
-          date => date.coursePartName === coursePart.name
+          date => date.courseTaskName === courseTask.name
         );
         if (dateData === undefined) {
           console.error('DateData was undefined');
@@ -142,7 +143,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
         }
         gradeData.push({
           studentNumber: row.studentNo,
-          coursePartId: coursePart.id,
+          courseTaskId: courseTask.id,
           grade: grade,
           date: dateData.completionDate.toDate(),
           expiryDate: dateData.expirationDate.toDate(),
@@ -162,10 +163,10 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     setConfirmExpanded('date');
     setRows([]);
     setDates(
-      coursePartData.map(coursePart => ({
-        coursePartName: coursePart.name,
+      courseTaskData.map(courseTask => ({
+        courseTaskName: courseTask.name,
         completionDate: dayjs(),
-        expirationDate: dayjs().add(coursePart.daysValid, 'day'),
+        expirationDate: dayjs().add(courseTask.daysValid ?? 0, 'day'), // TODO: Fix
       }))
     );
     onClose();

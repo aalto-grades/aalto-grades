@@ -26,7 +26,7 @@ import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker, useParams} from 'react-router-dom';
 
-import {EditGradeData, GradeData, NewGrade} from '@/common/types';
+import {EditTaskGradeData, NewTaskGrade, TaskGradeData} from '@/common/types';
 import StyledDataGrid, {
   GetRowClassName,
   ProcessRowUpdate,
@@ -54,16 +54,16 @@ type PropsType = {
   open: boolean;
   onClose: () => void;
   studentNumber: string;
-  coursePartId: number;
+  courseTaskId: number;
   maxGrade: number | null;
   title: string;
-  grades: GradeData[];
+  grades: TaskGradeData[];
 };
 const EditGradesDialog = ({
   open,
   onClose,
   studentNumber,
-  coursePartId,
+  courseTaskId,
   maxGrade,
   title,
   grades,
@@ -231,15 +231,15 @@ const EditGradesDialog = ({
   };
 
   const handleSubmit = async (): Promise<void> => {
-    const newGrades: NewGrade[] = [];
+    const newGrades: NewTaskGrade[] = [];
     const deletedGrades: number[] = [];
-    const editedGrades: {gradeId: number; data: EditGradeData}[] = [];
+    const editedGrades: {gradeId: number; data: EditTaskGradeData}[] = [];
 
     for (const row of rows) {
       if (row.gradeId === -1) {
         newGrades.push({
           studentNumber,
-          coursePartId,
+          courseTaskId,
           grade: row.grade,
           date: row.date,
           expiryDate: row.expiryDate,

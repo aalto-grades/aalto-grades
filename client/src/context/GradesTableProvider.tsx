@@ -43,6 +43,7 @@ import FinalGradeCell from '@/components/course/course-results-view/table/FinalG
 import GradeCell from '@/components/course/course-results-view/table/GradeCell';
 import PredictedGradeCell from '@/components/course/course-results-view/table/PredictedGradeCell';
 import PrettyChip from '@/components/shared/PrettyChip';
+import {useGetCourseTasks} from '@/hooks/api/courseTask';
 import {
   useGetAllGradingModels,
   useGetCourse,
@@ -125,8 +126,6 @@ const findPreviouslyExportedToSisu = (
   bestGrade: FinalGradeData,
   row: StudentRow
 ): FinalGradeData | null => {
-  if (row.finalGrades === undefined) return null;
-
   for (const fg of row.finalGrades) {
     if (bestGrade.finalGradeId === fg.finalGradeId) continue; // Skip the best grade
     if (fg.sisuExportDate === null) continue; // and those not exported to sisu
@@ -150,6 +149,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
 
   const course = useGetCourse(courseId);
   const courseParts = useGetCourseParts(courseId);
+  const courseTasks = useGetCourseTasks(courseId);
   const allGradingModels = useGetAllGradingModels(courseId);
 
   const [rowSelection, setRowSelection] = useState({});
@@ -210,7 +210,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
           errors: getRowErrors(
             t,
             row,
-            courseParts.data ?? [],
+            courseTasks.data ?? [],
             studentPredictedGrades,
             course.data?.gradingScale ?? GradingScale.Numerical
           ),
@@ -223,7 +223,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     gradingModels,
     props.data,
     gradeSelectOption,
-    courseParts.data,
+    courseTasks.data,
     course.data?.gradingScale,
   ]);
 
@@ -271,8 +271,8 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     return selectedCourseParts.map(coursePart =>
       columnHelper.accessor(
         row =>
-          row.courseParts.find(
-            rowCoursePart => rowCoursePart.coursePartId === coursePart.id
+          row.courseTasks.find(
+            rowCourseTask => rowCourseTask.courseTaskId === coursePart.id // TODO: Broken.
           ),
         {
           header: coursePart.name,
@@ -283,7 +283,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
             <GradeCell
               studentNumber={row.original.user.studentNumber ?? 'N/A'}
               coursePartResults={getValue()}
-              maxGrade={coursePart.maxGrade}
+              maxGrade={/* coursePart.maxGrade */ null}
             />
           ),
           footer: coursePart.name,
@@ -416,11 +416,11 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       header: t('general.student-number'),
       meta: {PrettyChipPosition: 'first'},
     }),
-    columnHelper.accessor(row => row.finalGrades ?? [], {
+    columnHelper.accessor(row => row.finalGrades, {
       header: t('general.final-grade'),
       id: 'finalGrade',
       enableSorting: false,
-      getGroupingValue: row => findBestFinalGrade(row.finalGrades ?? [])?.grade,
+      getGroupingValue: row => findBestFinalGrade(row.finalGrades)?.grade,
       cell: ({getValue, row}) => (
         <FinalGradeCell
           userId={row.original.user.id}
@@ -482,7 +482,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       row => {
         // ATTENTION this function needs to have the same parameters of the one inside the grade cell
         // Clearly can be done in a better way
-        const bestFinalGrade = findBestFinalGrade(row.finalGrades ?? []);
+        const bestFinalGrade = findBestFinalGrade(row.finalGrades);
         if (!bestFinalGrade) return '-';
         if (bestFinalGrade.sisuExportDate) return '✅';
         if (findPreviouslyExportedToSisu(bestFinalGrade, row)) return '⚠️';

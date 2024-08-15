@@ -33,17 +33,17 @@ import {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import './flow.scss'; // Import styles
-import {CoursePartData, CoursePartGradesData} from '@/common/types';
 import {
+  CoursePartData,
   CoursePartNodeValue,
+  CourseTaskGradesData,
   CustomNodeTypes,
   DropInNodes,
   FullNodeData,
   GraphStructure,
   NodeSettings,
   NodeValues,
-} from '@/common/types/graph';
+} from '@/common/types';
 import {calculateNewNodeValues, initNode} from '@/common/util/calculateGraph';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
@@ -55,6 +55,7 @@ import {
 import {GradeSelectOption, findBestGrade} from '@/utils/bestGrade';
 import CoursePartValuesDialog from './CoursePartValuesDialog';
 import SelectCoursePartsDialog from './SelectCoursePartsDialog';
+import './flow.scss'; // Import styles
 import {
   findDisconnectedEdges,
   formatGraph,
@@ -72,6 +73,8 @@ import RequireNode from './nodes/RequireNode';
 import RoundNode from './nodes/RoundNode';
 import StepperNode from './nodes/StepperNode';
 import SubstituteNode from './nodes/SubstituteNode';
+
+// TODO: Fix
 
 const nodeTypesMap = {
   addition: AdditionNode,
@@ -122,7 +125,7 @@ const initGraphFn = (
 type GraphProps = {
   initGraph: GraphStructure;
   courseParts: {id: number; name: string; archived: boolean}[];
-  userGrades: CoursePartGradesData[] | null;
+  userGrades: CourseTaskGradesData[] | null;
   gradeSelectOption?: GradeSelectOption;
   onSave?: (graphStructure: GraphStructure) => Promise<void>;
   readOnly?: boolean;
@@ -279,7 +282,7 @@ const Graph = ({
     let change = false;
 
     for (const coursePart of userGrades) {
-      const coursePartId = `coursepart-${coursePart.coursePartId}`;
+      const coursePartId = `coursepart-${coursePart.courseTaskId}`;
       if (!(coursePartId in newNodeValues)) continue;
 
       const newValue = newNodeValues[coursePartId] as CoursePartNodeValue;

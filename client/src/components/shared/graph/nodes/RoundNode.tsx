@@ -6,7 +6,7 @@ import {ChangeEvent, JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position} from 'reactflow';
 
-import {RoundNodeSettings, RoundNodeValue} from '@/common/types/graph';
+import {RoundNodeSettings, RoundNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 

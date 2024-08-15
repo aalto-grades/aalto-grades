@@ -4,8 +4,7 @@
 
 import {RateLimiterMemory} from 'rate-limiter-flexible';
 
-import {HttpCode} from '@/common/types';
-import {LoginData, ResetOwnPasswordData} from '@/common/types/auth';
+import {HttpCode, LoginData, ResetOwnPasswordData} from '@/common/types';
 import logger from '../configs/winston';
 import {SyncEndpoint} from '../types';
 

@@ -6,7 +6,7 @@ import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
 
-import {AverageNodeSettings, AverageNodeValue} from '@/common/types/graph';
+import {AverageNodeSettings, AverageNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 

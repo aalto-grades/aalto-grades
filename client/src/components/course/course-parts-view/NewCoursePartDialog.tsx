@@ -4,29 +4,25 @@
 
 import {
   Button,
-  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControlLabel,
-  Switch,
 } from '@mui/material';
 import {Formik, FormikHelpers, FormikProps} from 'formik';
-import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import {NewCoursePartDataSchema} from '@/common/types';
 import FormField from '@/components/shared/FormikField';
 
-type FormData = {name: string; daysValid: number; maxGrade: number};
+type FormData = {name: string; expiryDate: Date | null};
 const ValidationSchema = NewCoursePartDataSchema;
-const initialValues: FormData = {name: '', daysValid: 365, maxGrade: 0};
+const initialValues: FormData = {name: '', expiryDate: null};
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
-  onSave: (name: string, daysValid: number, maxGrade: number | null) => void;
+  onSave: (name: string, expiryDate: Date | null) => void;
 };
 const AddCoursePartDialog = ({
   open,
@@ -34,20 +30,14 @@ const AddCoursePartDialog = ({
   onSave,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
-  const [showMaxGrade, setShowMaxGrade] = useState<boolean>(false);
 
   const onSubmit = (
     values: FormData,
     {resetForm}: FormikHelpers<FormData>
   ): void => {
-    onSave(
-      values.name,
-      values.daysValid,
-      showMaxGrade ? values.maxGrade : null
-    );
+    onSave(values.name, values.expiryDate);
     onClose();
     resetForm();
-    setShowMaxGrade(false);
   };
 
   const validateForm = (
@@ -89,29 +79,11 @@ const AddCoursePartDialog = ({
             />
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
-              value="daysValid"
-              label={`${t('general.days-valid')}*`}
-              helperText={t('course.parts.create.days-valid-help')}
+              value="expiryDate"
+              label={`${t('general.expiry-date')}*`}
+              helperText={t('course.parts.create.expiry-date-valid-help')}
               type="number"
             />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={showMaxGrade}
-                  onChange={e => setShowMaxGrade(e.target.checked)}
-                />
-              }
-              label={t('course.parts.create.set-max-grade')}
-            />
-            <Collapse in={showMaxGrade}>
-              <FormField
-                form={form as unknown as FormikProps<{[key: string]: unknown}>}
-                value="maxGrade"
-                label={`${t('general.max-grade')}*`}
-                helperText={t('course.parts.create.max-grade-help')}
-                type="number"
-              />
-            </Collapse>
           </DialogContent>
           <DialogActions>
             <Button
@@ -120,7 +92,6 @@ const AddCoursePartDialog = ({
               onClick={() => {
                 onClose();
                 form.resetForm();
-                setShowMaxGrade(false);
               }}
             >
               {t('general.cancel')}
