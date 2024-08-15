@@ -347,13 +347,13 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
               onChange={() => {
                 if (row.getIsSomeSelected()) {
                   // If some rows are selected, select all
-                  row.subRows.map(subRow => {
-                    !subRow.getIsSelected() &&
+                  row.subRows.forEach(subRow => {
+                    if (!subRow.getIsSelected())
                       subRow.getToggleSelectedHandler()(subRow);
                   });
                 } else {
                   // All rows are selected, deselect all (and vice versa)
-                  row.subRows.map(subRow =>
+                  row.subRows.forEach(subRow =>
                     subRow.getToggleSelectedHandler()(subRow)
                   );
                 }
