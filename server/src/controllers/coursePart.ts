@@ -51,8 +51,7 @@ export const addCoursePart: Endpoint<NewCoursePartData, number> = async (
     },
     defaults: {
       name: req.body.name,
-      daysValid: req.body.daysValid,
-      maxGrade: req.body.maxGrade,
+      expiryDate: req.body.expiryDate,
     },
   });
 
@@ -84,11 +83,10 @@ export const editCoursePart: Endpoint<EditCoursePartData, void> = async (
     await coursePart
       .set({
         name: req.body.name ?? coursePart.name,
-        daysValid: req.body.daysValid ?? coursePart.daysValid,
-        maxGrade:
-          req.body.maxGrade !== undefined
-            ? req.body.maxGrade
-            : coursePart.maxGrade,
+        expiryDate:
+          req.body.expiryDate !== undefined
+            ? req.body.expiryDate
+            : coursePart.expiryDate,
         archived: req.body.archived ?? coursePart.archived,
       })
       .save();

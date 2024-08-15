@@ -13,6 +13,7 @@ import {
 
 import {GraphStructure} from '@/common/types';
 import Course from './course';
+import CoursePart from './coursePart';
 import {sequelize} from '..';
 
 export default class GradingModel extends Model<
@@ -21,6 +22,7 @@ export default class GradingModel extends Model<
 > {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
+  declare coursePartId: CreationOptional<ForeignKey<CoursePart['id']> | null>;
   declare name: string;
   declare graphStructure: GraphStructure;
   declare archived: CreationOptional<boolean>;
@@ -40,6 +42,15 @@ GradingModel.init(
       allowNull: false,
       references: {
         model: 'course',
+        key: 'id',
+      },
+    },
+    coursePartId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      unique: true,
+      references: {
+        model: 'course_part',
         key: 'id',
       },
     },
@@ -67,3 +78,6 @@ GradingModel.init(
 
 Course.hasMany(GradingModel, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
 GradingModel.belongsTo(Course, {foreignKey: 'courseId'});
+
+CoursePart.hasOne(GradingModel, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+GradingModel.belongsTo(CoursePart, {foreignKey: 'coursePartId'});

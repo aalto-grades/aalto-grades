@@ -61,8 +61,8 @@ const checkCoursePart = async (
 
   expect(result).not.toBe(null);
   if (coursePart.name !== undefined) expect(result?.name).toBe(coursePart.name);
-  if (coursePart.daysValid !== undefined)
-    expect(result?.daysValid).toBe(coursePart.daysValid);
+  if (coursePart.expiryDate !== undefined)
+    expect(result?.expiryDate).toBe(coursePart.expiryDate);
 };
 
 const coursePartDoesNotExist = async (id: number): Promise<void> => {
@@ -204,7 +204,10 @@ describe('Test PUT /v1/courses/:courseId/parts/:coursePartId - edit a course par
   });
 
   it('should partially edit a course part', async () => {
-    const data: EditCoursePartData[] = [{name: 'edit1 new'}, {daysValid: 80}];
+    const data: EditCoursePartData[] = [
+      {name: 'edit1 new'},
+      {expiryDate: new Date(Date.now() + 365 * 24 * 3600 * 1000)},
+    ];
     for (const editData of data) {
       const res = await request
         .put(`/v1/courses/${courseId}/parts/${editCoursePartId}`)

@@ -80,7 +80,7 @@ export const validateAplusGradeSourcePath = async (
   const course = await findAndValidateCourseId(courseId);
   const aplusGradeSource =
     await findAndValidateAplusGradeSourceId(aplusGradeSourceId);
-  const coursePart = await findCoursePartById(aplusGradeSource.coursePartId);
+  const coursePart = await findCoursePartById(aplusGradeSource.courseTaskId);
 
   if (coursePart.courseId !== course.id) {
     throw new ApiError(
@@ -104,7 +104,7 @@ export const validateAplusGradeSourceBelongsToCoursePart = async (
   aplusGradeSourceId: number
 ): Promise<void> => {
   const aplusGradeSource = await findAplusGradeSourceById(aplusGradeSourceId);
-  if (aplusGradeSource.coursePartId !== coursePartId) {
+  if (aplusGradeSource.courseTaskId !== coursePartId) {
     throw new ApiError(
       `A+ grade source with ID ${aplusGradeSource.id} ` +
         `does not  belong to the course part with ID ${coursePartId}`,

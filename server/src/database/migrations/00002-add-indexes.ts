@@ -37,8 +37,8 @@ export default {
       );
 
       await queryInterface.addIndex(
-        'attainment_grade',
-        ['user_id', 'course_part_id'],
+        'task_grade',
+        ['user_id', 'course_task_id'],
         {
           unique: false,
           transaction,
@@ -73,7 +73,7 @@ export default {
       );
 
       await queryInterface.sequelize.query(
-        'DROP INDEX attainment_grade_user_id_course_part_id',
+        'DROP INDEX task_grade_user_id_course_task_id',
         {transaction}
       );
 

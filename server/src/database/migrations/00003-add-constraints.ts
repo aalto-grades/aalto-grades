@@ -46,10 +46,10 @@ export default {
         transaction,
       });
 
-      await queryInterface.addConstraint('attainment_grade', {
+      await queryInterface.addConstraint('task_grade', {
         fields: ['date'],
         type: 'check',
-        name: 'attainment_grade_date_ck',
+        name: 'task_grade_date_ck',
         where: {
           date: {
             [Op.lte]: sequelize.col('expiry_date'),
@@ -88,8 +88,8 @@ export default {
       );
 
       await queryInterface.removeConstraint(
-        'attainment_grade',
-        'attainment_grade_date_ck',
+        'task_grade',
+        'task_grade_date_ck',
         {transaction}
       );
 

@@ -11,34 +11,36 @@ import {
   Model,
 } from 'sequelize';
 
-import Course from './course';
+import CoursePart from './coursePart';
 import {sequelize} from '..';
 
-export default class CoursePart extends Model<
-  InferAttributes<CoursePart>,
-  InferCreationAttributes<CoursePart>
+export default class CourseTask extends Model<
+  InferAttributes<CourseTask>,
+  InferCreationAttributes<CourseTask>
 > {
   declare id: CreationOptional<number>;
-  declare courseId: ForeignKey<Course['id']>;
+  declare coursePartId: ForeignKey<CoursePart['id']>;
   declare name: string;
-  declare expiryDate: CreationOptional<Date | string | null>;
+  // Default value, expiry date in grade takes precedence
+  declare daysValid: number | null;
+  declare maxGrade: number | null;
   declare archived: CreationOptional<boolean>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-CoursePart.init(
+CourseTask.init(
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    courseId: {
+    coursePartId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'course',
+        model: 'course_part',
         key: 'id',
       },
     },
@@ -46,8 +48,12 @@ CoursePart.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    expiryDate: {
-      type: DataTypes.DATEONLY,
+    daysValid: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    maxGrade: {
+      type: DataTypes.FLOAT,
       allowNull: true,
     },
     archived: {
@@ -60,9 +66,9 @@ CoursePart.init(
   },
   {
     sequelize,
-    tableName: 'course_part',
+    tableName: 'course_task',
   }
 );
 
-Course.hasMany(CoursePart, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
-CoursePart.belongsTo(Course, {foreignKey: 'courseId'});
+CoursePart.hasMany(CourseTask, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+CourseTask.belongsTo(CoursePart, {foreignKey: 'coursePartId'});

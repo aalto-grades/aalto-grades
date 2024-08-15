@@ -359,7 +359,7 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
     const sourceType = gradeSource.sourceType;
     const result = await AplusGradeSource.findOne({
       where: {
-        coursePartId: gradeSource.coursePartId,
+        courseTaskId: gradeSource.coursePartId,
         aplusCourse: gradeSource.aplusCourse,
         sourceType: sourceType,
         moduleId:
@@ -651,7 +651,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
   it('should fetch grades from multiple sources', async () => {
     const [[coursePartId]] = await createData.createAplusGradeSources(courseId);
     await AplusGradeSource.create({
-      coursePartId,
+      courseTaskId: coursePartId,
       aplusCourse: {
         id: 2,
         courseCode: 'CS-123',

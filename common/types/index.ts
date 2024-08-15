@@ -6,6 +6,7 @@ export * from './aplus';
 export * from './auth';
 export * from './course';
 export * from './coursePart';
+export * from './courseTask';
 export * from './finalGrade';
 export * from './general';
 export * from './grades';

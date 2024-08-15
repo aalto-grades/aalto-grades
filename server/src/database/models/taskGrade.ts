@@ -12,17 +12,17 @@ import {
 } from 'sequelize';
 
 import AplusGradeSource from './aplusGradeSource';
-import CoursePart from './coursePart';
+import CourseTask from './courseTask';
 import User from './user';
 import {sequelize} from '..';
 
-export default class AttainmentGrade extends Model<
-  InferAttributes<AttainmentGrade>,
-  InferCreationAttributes<AttainmentGrade>
+export default class TaskGrade extends Model<
+  InferAttributes<TaskGrade>,
+  InferCreationAttributes<TaskGrade>
 > {
   declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
-  declare coursePartId: ForeignKey<CoursePart['id']>;
+  declare courseTaskId: ForeignKey<CourseTask['id']>;
   declare graderId: ForeignKey<User['id']>;
   declare aplusGradeSourceId: CreationOptional<ForeignKey<
     AplusGradeSource['id']
@@ -37,11 +37,11 @@ export default class AttainmentGrade extends Model<
   declare updatedAt: CreationOptional<Date>;
   grader?: User;
   User?: User;
-  CoursePart?: CoursePart;
+  CourseTask?: CourseTask;
   AplusGradeSource?: AplusGradeSource;
 }
 
-AttainmentGrade.init(
+TaskGrade.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -55,7 +55,7 @@ AttainmentGrade.init(
         key: 'id',
       },
     },
-    coursePartId: {
+    courseTaskId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'course_part',
@@ -103,28 +103,28 @@ AttainmentGrade.init(
   },
   {
     sequelize,
-    tableName: 'attainment_grade',
+    tableName: 'task_grade',
   }
 );
 
-User.hasMany(AttainmentGrade, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
-AttainmentGrade.belongsTo(User, {foreignKey: 'userId'});
+User.hasMany(TaskGrade, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+TaskGrade.belongsTo(User, {foreignKey: 'userId'});
 
-CoursePart.hasMany(AttainmentGrade, {
+CourseTask.hasMany(TaskGrade, {
   onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
-AttainmentGrade.belongsTo(CoursePart, {foreignKey: 'coursePartId'});
+TaskGrade.belongsTo(CourseTask, {foreignKey: 'courseTaskId'});
 
-User.hasMany(AttainmentGrade, {
+User.hasMany(TaskGrade, {
   foreignKey: 'graderId',
   onDelete: 'NO ACTION',
   onUpdate: 'CASCADE',
 });
-AttainmentGrade.belongsTo(User, {foreignKey: 'graderId', as: 'grader'});
+TaskGrade.belongsTo(User, {foreignKey: 'graderId', as: 'grader'});
 
-AplusGradeSource.hasMany(AttainmentGrade, {
+AplusGradeSource.hasMany(TaskGrade, {
   onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
-AttainmentGrade.belongsTo(AplusGradeSource, {foreignKey: 'aplusGradeSourceId'});
+TaskGrade.belongsTo(AplusGradeSource, {foreignKey: 'aplusGradeSourceId'});

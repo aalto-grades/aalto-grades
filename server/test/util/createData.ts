@@ -18,13 +18,13 @@ import {initGraph} from '@/common/util/initGraph';
 import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';
 import {sequelize} from '../../src/database';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
-import AttainmentGrade from '../../src/database/models/attainmentGrade';
 import Course from '../../src/database/models/course';
 import CoursePart from '../../src/database/models/coursePart';
 import CourseRole from '../../src/database/models/courseRole';
 import CourseTranslation from '../../src/database/models/courseTranslation';
 import FinalGrade from '../../src/database/models/finalGrade';
 import GradingModel from '../../src/database/models/gradingModel';
+import TaskGrade from '../../src/database/models/taskGrade';
 import User from '../../src/database/models/user';
 
 /**
@@ -103,17 +103,20 @@ class CreateData {
     const newCoursePart = await CoursePart.create({
       courseId: courseId,
       name: `Round ${this.freeCoursePartId}`,
-      daysValid: this.randInt(10, 365),
+      expiryDate: new Date(
+        Date.now() + this.randInt(10, 365) * 24 * 3600 * 1000
+      ),
     });
     this.freeCoursePartId += 1;
     return {
       id: newCoursePart.id,
       courseId: newCoursePart.courseId,
       name: newCoursePart.name,
-      daysValid: newCoursePart.daysValid,
-      maxGrade: newCoursePart.maxGrade,
+      expiryDate:
+        newCoursePart.expiryDate !== null
+          ? new Date(newCoursePart.expiryDate)
+          : null,
       archived: newCoursePart.archived,
-      aplusGradeSources: [],
     };
   }
 
@@ -123,17 +126,20 @@ class CreateData {
       const newCoursePart = await CoursePart.create({
         courseId: courseId,
         name: `Round ${i + 1}`,
-        daysValid: this.randInt(10, 365),
+        expiryDate: new Date(
+          Date.now() + this.randInt(10, 365) * 24 * 3600 * 1000
+        ),
       });
 
       courseParts.push({
         id: newCoursePart.id,
         courseId: newCoursePart.courseId,
         name: newCoursePart.name,
-        daysValid: newCoursePart.daysValid,
-        maxGrade: newCoursePart.maxGrade,
+        expiryDate:
+          newCoursePart.expiryDate !== null
+            ? new Date(newCoursePart.expiryDate)
+            : null,
         archived: newCoursePart.archived,
-        aplusGradeSources: [],
       });
     }
     return courseParts;
@@ -154,7 +160,7 @@ class CreateData {
 
     const fullPointsCoursePart = await this.createCoursePart(courseId);
     const fullPointsGradeSource = await AplusGradeSource.create({
-      coursePartId: fullPointsCoursePart.id,
+      courseTaskId: fullPointsCoursePart.id,
       aplusCourse: aplusCourse,
       sourceType: AplusGradeSourceType.FullPoints,
       date: new Date(),
@@ -162,7 +168,7 @@ class CreateData {
 
     const moduleCoursePart = await this.createCoursePart(courseId);
     const moduleGradeSource = await AplusGradeSource.create({
-      coursePartId: moduleCoursePart.id,
+      courseTaskId: moduleCoursePart.id,
       aplusCourse: aplusCourse,
       sourceType: AplusGradeSourceType.Module,
       moduleId: 1,
@@ -172,7 +178,7 @@ class CreateData {
 
     const exerciseCoursePart = await this.createCoursePart(courseId);
     const exerciseGradeSource = await AplusGradeSource.create({
-      coursePartId: exerciseCoursePart.id,
+      courseTaskId: exerciseCoursePart.id,
       aplusCourse: aplusCourse,
       sourceType: AplusGradeSourceType.Exercise,
       exerciseId: 1,
@@ -182,7 +188,7 @@ class CreateData {
 
     const difficultyCoursePart = await this.createCoursePart(courseId);
     const difficultyGradeSource = await AplusGradeSource.create({
-      coursePartId: difficultyCoursePart.id,
+      courseTaskId: difficultyCoursePart.id,
       aplusCourse: aplusCourse,
       sourceType: AplusGradeSourceType.Difficulty,
       difficulty: 'A',
@@ -199,16 +205,16 @@ class CreateData {
 
   async createGrade(
     userId: number,
-    coursePartId: number,
+    courseTaskId: number,
     graderId: number,
     grade?: number,
     date?: Date,
     aplusGradeSourceId?: number
   ): Promise<number> {
     const gradeDate = date ?? new Date();
-    const attGrade = await AttainmentGrade.create({
+    const attGrade = await TaskGrade.create({
       userId: userId,
-      coursePartId: coursePartId,
+      courseTaskId: courseTaskId,
       graderId: graderId,
       date: gradeDate,
       expiryDate: new Date(gradeDate.getTime() + 365 * 24 * 3600 * 1000),

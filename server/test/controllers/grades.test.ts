@@ -16,7 +16,7 @@ import {
 } from '@/common/types';
 import {app} from '../../src/app';
 import * as gradesUtil from '../../src/controllers/utils/grades';
-import AttainmentGrade from '../../src/database/models/attainmentGrade';
+import TaskGrade from '../../src/database/models/taskGrade';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
@@ -181,7 +181,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     return [
       {
         studentNumber: studentNumber,
-        coursePartId: courseParts[0].id,
+        courseTaskId: courseParts[0].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
@@ -189,7 +189,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       },
       {
         studentNumber: studentNumber,
-        coursePartId: courseParts[1].id,
+        courseTaskId: courseParts[1].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
@@ -197,7 +197,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       },
       {
         studentNumber: studentNumber,
-        coursePartId: courseParts[2].id,
+        courseTaskId: courseParts[2].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
@@ -205,7 +205,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       },
       {
         studentNumber: studentNumber,
-        coursePartId: aplusCoursePartId,
+        courseTaskId: aplusCoursePartId,
         aplusGradeSourceId: aplusGradeSourceId,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
@@ -266,10 +266,10 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
 
     expect(JSON.stringify(res.body)).toBe('{}');
 
-    const userCoursePart = await AttainmentGrade.findOne({
+    const userCoursePart = await TaskGrade.findOne({
       where: {
         userId: student.id,
-        coursePartId: courseParts[0].id,
+        courseTaskId: courseParts[0].id,
       },
     });
 
@@ -286,15 +286,15 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       .set('Accept', 'application/json')
       .expect(HttpCode.Created);
 
-    const grade = await AttainmentGrade.findOne({
+    const grade = await TaskGrade.findOne({
       where: {
         userId: student.id,
-        coursePartId: courseParts[0].id,
+        courseTaskId: courseParts[0].id,
       },
     });
     expect(grade?.grade).toEqual(data[0].grade);
     expect(grade?.userId).toEqual(student.id);
-    expect(grade?.coursePartId).toEqual(courseParts[0].id);
+    expect(grade?.courseTaskId).toEqual(courseParts[0].id);
   });
 
   it('should allow uploading multiple grades to the same course part for a student', async () => {
@@ -314,15 +314,15 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     };
 
     const data1 = await upload();
-    let grades = await AttainmentGrade.findAll({
-      where: {userId: student.id, coursePartId: courseParts[0].id},
+    let grades = await TaskGrade.findAll({
+      where: {userId: student.id, courseTaskId: courseParts[0].id},
     });
     expect(grades.length).toEqual(1);
     expect(grades[0].grade).toEqual(data1[0].grade);
 
     const data2 = await upload();
-    grades = await AttainmentGrade.findAll({
-      where: {userId: student.id, coursePartId: courseParts[0].id},
+    grades = await TaskGrade.findAll({
+      where: {userId: student.id, courseTaskId: courseParts[0].id},
     });
     expect(grades.length).toEqual(2);
     expect(grades.find(val => val.grade === data1[0].grade)).toBeDefined();
@@ -349,15 +349,15 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     };
 
     let data = await upload();
-    let grades = await AttainmentGrade.findAll({
-      where: {userId: student.id, coursePartId: aplusCoursePartId},
+    let grades = await TaskGrade.findAll({
+      where: {userId: student.id, courseTaskId: aplusCoursePartId},
     });
     expect(grades.length).toEqual(1);
     expect(grades[0].grade).toEqual(data[0].grade);
 
     data = await upload();
-    grades = await AttainmentGrade.findAll({
-      where: {userId: student.id, coursePartId: aplusCoursePartId},
+    grades = await TaskGrade.findAll({
+      where: {userId: student.id, courseTaskId: aplusCoursePartId},
     });
     expect(grades.length).toEqual(1);
     expect(grades[0].grade).toEqual(data[0].grade);
@@ -593,7 +593,7 @@ describe('Test Delete/v1/courses/:courseId/grades/:gradeId - delete a grade', ()
     return await createData.createGrade(user.id, courseParts[0].id, TEACHER_ID);
   };
   const gradeDoesNotExist = async (id: number): Promise<void> => {
-    const result = await AttainmentGrade.findOne({where: {id: id}});
+    const result = await TaskGrade.findOne({where: {id: id}});
     expect(result).toBeNull();
   };
 

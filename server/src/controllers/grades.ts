@@ -34,10 +34,10 @@ import {
 import httpLogger from '../configs/winston';
 import {sequelize} from '../database';
 import AplusGradeSource from '../database/models/aplusGradeSource';
-import AttainmentGrade from '../database/models/attainmentGrade';
 import CoursePart from '../database/models/coursePart';
 import CourseRole from '../database/models/courseRole';
 import FinalGrade from '../database/models/finalGrade';
+import TaskGrade from '../database/models/taskGrade';
 import User from '../database/models/user';
 import {ApiError, Endpoint, JwtClaims, NewDbGradeData} from '../types';
 
@@ -55,7 +55,7 @@ export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
   });
 
   // Get grades of all course parts
-  const grades = await AttainmentGrade.findAll({
+  const grades = await TaskGrade.findAll({
     include: [
       {model: User, attributes: ['id', 'name', 'email', 'studentNumber']},
       {
@@ -66,7 +66,7 @@ export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
       {model: AplusGradeSource},
     ],
     where: {
-      coursePartId: {
+      courseTaskId: {
         [Op.in]: courseParts.map(coursePart => coursePart.id),
       },
     },
@@ -103,10 +103,10 @@ export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
 
     const userId = grade.userId;
     if (!(userId in userGrades)) userGrades[userId] = {};
-    if (!(grade.coursePartId in userGrades[userId]))
-      userGrades[userId][grade.coursePartId] = [];
+    if (!(grade.courseTaskId in userGrades[userId]))
+      userGrades[userId][grade.courseTaskId] = [];
 
-    userGrades[userId][grade.coursePartId].push({
+    userGrades[userId][grade.courseTaskId].push({
       gradeId: grade.id,
       grader: grader,
       aplusGradeSource: grade.AplusGradeSource
@@ -167,13 +167,13 @@ export const addGrades: Endpoint<NewGrade[], void> = async (req, res) => {
   const courseId = await validateCourseId(req.params.courseId);
 
   // Validate that course parts and A+ grade sources belong to correct course
-  const validCoursePartIds = new Set<number>();
+  const validCourseTaskIds = new Set<number>();
   const validAPlusCoursePartIds = new Set<number>();
   for (const grade of req.body) {
     // Validate course part id
-    if (!validCoursePartIds.has(grade.coursePartId)) {
-      await validateCoursePartBelongsToCourse(courseId, grade.coursePartId);
-      validCoursePartIds.add(grade.coursePartId);
+    if (!validCourseTaskIds.has(grade.courseTaskId)) {
+      await validateCoursePartBelongsToCourse(courseId, grade.courseTaskId);
+      validCourseTaskIds.add(grade.courseTaskId);
     }
 
     // Validate A+ course part id
@@ -182,7 +182,7 @@ export const addGrades: Endpoint<NewGrade[], void> = async (req, res) => {
       !validAPlusCoursePartIds.has(grade.aplusGradeSourceId)
     ) {
       await validateAplusGradeSourceBelongsToCoursePart(
-        grade.coursePartId,
+        grade.courseTaskId,
         grade.aplusGradeSourceId
       );
       validAPlusCoursePartIds.add(grade.aplusGradeSourceId);
@@ -239,10 +239,10 @@ export const addGrades: Endpoint<NewGrade[], void> = async (req, res) => {
       // If a student already has a grade for a particular A+ grade source,
       // don't create a new grade row. Instead, update the existing one.
       if (gradeEntry.aplusGradeSourceId !== undefined) {
-        const grade = await AttainmentGrade.findOne({
+        const grade = await TaskGrade.findOne({
           where: {
             userId: userId,
-            coursePartId: gradeEntry.coursePartId,
+            courseTaskId: gradeEntry.courseTaskId,
             aplusGradeSourceId: gradeEntry.aplusGradeSourceId,
           },
         });
@@ -262,7 +262,7 @@ export const addGrades: Endpoint<NewGrade[], void> = async (req, res) => {
 
       preparedBulkCreate.push({
         userId: userId,
-        coursePartId: gradeEntry.coursePartId,
+        coursePartId: gradeEntry.courseTaskId,
         graderId: grader.id,
         aplusGradeSourceId: gradeEntry.aplusGradeSourceId,
         date: gradeEntry.date,
@@ -272,7 +272,7 @@ export const addGrades: Endpoint<NewGrade[], void> = async (req, res) => {
     }
 
     // TODO: Takes a while, optimize?
-    await AttainmentGrade.bulkCreate(preparedBulkCreate, {transaction: t});
+    await TaskGrade.bulkCreate(preparedBulkCreate, {transaction: t});
   });
 
   // Create student roles for all the students (TODO: Remove role if grades are removed?)
@@ -384,7 +384,7 @@ export const getLatestGrades: Endpoint<UserIdArray, LatestGrades> = async (
   if (dbUsers.length < req.body.length)
     throw new ApiError('Some user ids not found', HttpCode.NotFound);
 
-  const dbGrades = await AttainmentGrade.findAll({
+  const dbGrades = await TaskGrade.findAll({
     where: {userId: req.body},
     group: ['userId'],
     attributes: [

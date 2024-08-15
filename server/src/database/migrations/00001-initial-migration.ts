@@ -120,6 +120,43 @@ export default {
       );
 
       await queryInterface.createTable(
+        'course_part',
+        {
+          id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+          },
+          course_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+              model: 'course',
+              key: 'id',
+            },
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+          },
+          name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          expiry_date: {
+            type: DataTypes.DATEONLY,
+            allowNull: true,
+          },
+          archived: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+            allowNull: false,
+          },
+          created_at: DataTypes.DATE,
+          updated_at: DataTypes.DATE,
+        },
+        {transaction}
+      );
+
+      await queryInterface.createTable(
         'grading_model',
         {
           id: {
@@ -132,6 +169,17 @@ export default {
             allowNull: false,
             references: {
               model: 'course',
+              key: 'id',
+            },
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+          },
+          course_part_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            unique: true,
+            references: {
+              model: 'course_part',
               key: 'id',
             },
             onDelete: 'CASCADE',
@@ -157,18 +205,18 @@ export default {
       );
 
       await queryInterface.createTable(
-        'course_part',
+        'course_task',
         {
           id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
           },
-          course_id: {
+          course_part_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-              model: 'course',
+              model: 'course_part',
               key: 'id',
             },
             onDelete: 'CASCADE',
@@ -180,8 +228,7 @@ export default {
           },
           days_valid: {
             type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 365,
+            allowNull: true,
           },
           max_grade: {
             type: DataTypes.FLOAT,
@@ -206,11 +253,11 @@ export default {
             autoIncrement: true,
             primaryKey: true,
           },
-          course_part_id: {
+          course_task_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-              model: 'course_part',
+              model: 'course_task',
               key: 'id',
             },
             onDelete: 'CASCADE',
@@ -260,7 +307,7 @@ export default {
       );
 
       await queryInterface.createTable(
-        'attainment_grade',
+        'task_grade',
         {
           id: {
             type: DataTypes.INTEGER,
@@ -276,10 +323,10 @@ export default {
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE',
           },
-          course_part_id: {
+          course_task_id: {
             type: DataTypes.INTEGER,
             references: {
-              model: 'course_part',
+              model: 'course_task',
               key: 'id',
             },
             onDelete: 'RESTRICT',
@@ -484,10 +531,11 @@ export default {
       await queryInterface.dropTable('final_grade', {transaction});
       await queryInterface.dropTable('course_translation', {transaction});
       await queryInterface.dropTable('course_role', {transaction});
-      await queryInterface.dropTable('attainment_grade', {transaction});
+      await queryInterface.dropTable('task_grade', {transaction});
       await queryInterface.dropTable('aplus_grade_source', {transaction});
-      await queryInterface.dropTable('course_part', {transaction});
+      await queryInterface.dropTable('course_task', {transaction});
       await queryInterface.dropTable('grading_model', {transaction});
+      await queryInterface.dropTable('course_part', {transaction});
       await queryInterface.dropTable('course', {transaction});
       await queryInterface.dropTable('user', {transaction});
 

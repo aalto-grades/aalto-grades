@@ -26,7 +26,7 @@ export const GradeDataSchema = BaseGradeDataSchema.refine(
 export const NewGradeSchema = z
   .strictObject({
     studentNumber: z.string(),
-    coursePartId: z.number().int(),
+    courseTaskId: z.number().int(),
     aplusGradeSourceId: z.number().int().optional(),
     grade: z.number(),
     date: DateSchema,

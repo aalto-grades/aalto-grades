@@ -8,10 +8,10 @@ import {HttpCode} from '@/common/types';
 import {findAndValidateCourseId, findCourseById} from './course';
 import {findCoursePartById} from './coursePart';
 import httpLogger from '../../configs/winston';
-import AttainmentGrade from '../../database/models/attainmentGrade';
 import Course from '../../database/models/course';
 import CoursePart from '../../database/models/coursePart';
 import FinalGrade from '../../database/models/finalGrade';
+import TaskGrade from '../../database/models/taskGrade';
 import User from '../../database/models/user';
 import {ApiError, stringToIdSchema} from '../../types';
 
@@ -24,7 +24,7 @@ export const getDateOfLatestGrade = async (
   userId: number,
   courseId: number
 ): Promise<Date> => {
-  const grades = await AttainmentGrade.findAll({
+  const grades = await TaskGrade.findAll({
     where: {userId: userId},
     include: [{model: CoursePart, where: {courseId: courseId}}],
   });
@@ -131,8 +131,8 @@ export const getFinalGradesFor = async (
  *
  * @throws ApiError(404) if not found.
  */
-export const findGradeById = async (id: number): Promise<AttainmentGrade> => {
-  const grade = await AttainmentGrade.findByPk(id);
+export const findGradeById = async (id: number): Promise<TaskGrade> => {
+  const grade = await TaskGrade.findByPk(id);
   if (grade === null) {
     throw new ApiError(`Grade with ID ${id} not found`, HttpCode.NotFound);
   }
@@ -147,7 +147,7 @@ export const findGradeById = async (id: number): Promise<AttainmentGrade> => {
 export const findAndValidateGradePath = async (
   courseId: string,
   gradeId: string
-): Promise<[Course, AttainmentGrade]> => {
+): Promise<[Course, TaskGrade]> => {
   const result = stringToIdSchema.safeParse(gradeId);
   if (!result.success) {
     throw new ApiError(`Invalid grade ID ${gradeId}`, HttpCode.BadRequest);
@@ -155,7 +155,7 @@ export const findAndValidateGradePath = async (
   const targetCourse = await findAndValidateCourseId(courseId);
   const grade = await findGradeById(result.data);
 
-  const coursePart = await findCoursePartById(grade.coursePartId);
+  const coursePart = await findCoursePartById(grade.courseTaskId);
   const course = await findCourseById(coursePart.courseId);
 
   // Check that grading model belongs to the course.
@@ -177,9 +177,9 @@ export const findAndValidateGradePath = async (
  * @throws ApiError(500) if any values are undefined or null.
  */
 export const validateUserAndGrader = (
-  grade: AttainmentGrade | FinalGrade
+  grade: TaskGrade | FinalGrade
 ): [User & {studentNumber: string}, User] => {
-  const gradeType = grade instanceof AttainmentGrade ? 'grade' : 'final grade';
+  const gradeType = grade instanceof TaskGrade ? 'grade' : 'final grade';
 
   if (grade.User === undefined) {
     httpLogger.error(`Found a ${gradeType} ${grade.id} with no user`);

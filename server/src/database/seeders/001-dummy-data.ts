@@ -14,11 +14,12 @@ const readSql = (fileName: string): string =>
 
 const users = readSql('users.sql');
 const courses = readSql('courses.sql');
-const courseRole = readSql('course_role.sql');
 const courseTranslation = readSql('course_translations.sql');
-const gradingModel = readSql('grading_model.sql');
+const courseRole = readSql('course_role.sql');
 const coursePart = readSql('course_part.sql');
-const grade = readSql('attainment_grade.sql');
+const gradingModel = readSql('grading_model.sql');
+const courseTask = readSql('course_task.sql');
+const taskGrade = readSql('task_grade.sql');
 const finalGrade = readSql('final_grade.sql');
 
 export default {
@@ -27,12 +28,13 @@ export default {
     try {
       await queryInterface.sequelize.query(users, {transaction});
       await queryInterface.sequelize.query(courses, {transaction});
-      await queryInterface.sequelize.query(gradingModel, {transaction});
-      await queryInterface.sequelize.query(coursePart, {transaction});
-      await queryInterface.sequelize.query(grade, {transaction});
-      await queryInterface.sequelize.query(finalGrade, {transaction});
       await queryInterface.sequelize.query(courseTranslation, {transaction});
       await queryInterface.sequelize.query(courseRole, {transaction});
+      await queryInterface.sequelize.query(coursePart, {transaction});
+      await queryInterface.sequelize.query(gradingModel, {transaction});
+      await queryInterface.sequelize.query(courseTask, {transaction});
+      await queryInterface.sequelize.query(taskGrade, {transaction});
+      await queryInterface.sequelize.query(finalGrade, {transaction});
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
@@ -42,22 +44,28 @@ export default {
   down: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
+      await queryInterface.bulkDelete('final_grade', {}, {transaction});
+      await queryInterface.bulkDelete('task_grade', {}, {transaction});
+      await queryInterface.bulkDelete('course_task', {}, {transaction});
+      await queryInterface.bulkDelete('grading_model', {}, {transaction});
+      await queryInterface.bulkDelete('course_part', {}, {transaction});
       await queryInterface.bulkDelete('course_role', {}, {transaction});
       await queryInterface.bulkDelete('course_translation', {}, {transaction});
-      await queryInterface.bulkDelete('final_grade', {}, {transaction});
-      await queryInterface.bulkDelete('attainment_grade', {}, {transaction});
-      await queryInterface.bulkDelete('course_part', {}, {transaction});
-      await queryInterface.bulkDelete('grading_model', {}, {transaction});
       await queryInterface.bulkDelete('course', {}, {transaction});
       await queryInterface.bulkDelete('user', {}, {transaction});
 
       await queryInterface.sequelize.query(
-        'ALTER SEQUENCE user_id_seq RESTART;',
+        'ALTER SEQUENCE final_grade_id_seq RESTART;',
         {transaction}
       );
 
       await queryInterface.sequelize.query(
-        'ALTER SEQUENCE course_id_seq RESTART;',
+        'ALTER SEQUENCE task_grade_id_seq RESTART;',
+        {transaction}
+      );
+
+      await queryInterface.sequelize.query(
+        'ALTER SEQUENCE course_task_id_seq RESTART;',
         {transaction}
       );
 
@@ -71,22 +79,22 @@ export default {
         {transaction}
       );
 
-      await queryInterface.sequelize.query(
-        'ALTER SEQUENCE attainment_grade_id_seq RESTART;',
-        {transaction}
-      );
-
-      await queryInterface.sequelize.query(
-        'ALTER SEQUENCE final_grade_id_seq RESTART;',
-        {transaction}
-      );
+      // 'ALTER SEQUENCE' not needed for course_role
 
       await queryInterface.sequelize.query(
         'ALTER SEQUENCE course_translation_id_seq RESTART;',
         {transaction}
       );
 
-      // 'ALTER SEQUENCE' not needed for course_role
+      await queryInterface.sequelize.query(
+        'ALTER SEQUENCE course_id_seq RESTART;',
+        {transaction}
+      );
+
+      await queryInterface.sequelize.query(
+        'ALTER SEQUENCE user_id_seq RESTART;',
+        {transaction}
+      );
 
       await transaction.commit();
     } catch (error) {

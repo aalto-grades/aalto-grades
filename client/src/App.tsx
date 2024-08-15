@@ -250,10 +250,10 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       {path: '/login', element: <LoginView />},
-      ...['/licenses', '/licences'].map(path => ({
-        path,
-        element: <StaticPageView url={'/javascript.html'} title="Licences" />,
-      })),
+      {
+        path: '/licenses',
+        element: <StaticPageView url={'/javascript.html'} title="Licenses" />,
+      },
       {
         path: '/accessibility-statement',
         element: <StaticPageView url="/accessibility-statement.html" />,
