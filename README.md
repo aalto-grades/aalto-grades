@@ -51,11 +51,10 @@ Windows and macOS users may install Docker and Docker Compose from:
 ## Building and running
 
 You can run the development build of the whole Aalto Grades system, including
-the frontend, backend, and database, by running `docker-compose up` at the root
-of the project.
+the frontend, backend, and database, by running docker compose at the root of the project:
 
 ```
-$ docker-compose up
+docker-compose up
 ```
 
 After that the website is accessible at localhost:8080 and the api docs at localhost:8080/api-docs

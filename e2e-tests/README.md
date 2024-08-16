@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 ## Running tests
 
-Start the website in docker by running docker compose in the project root:
+Start the website in docker by running docker compose at the root of the project:
 
 ```
 docker compose up --build
