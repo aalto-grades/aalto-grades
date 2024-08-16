@@ -24,7 +24,7 @@ COPY common/types types
 COPY common/util util
 
 WORKDIR /app/client
-COPY client/tsconfig.json client/.env client/index.html client/libre-js-plugin.ts client/vite-env.d.ts client/vite.config.ts ./
+COPY client/tsconfig.json client/index.html client/libre-js-plugin.ts client/vite-env.d.ts client/vite.config.ts ./
 COPY client/public ./public
 COPY client/src ./src
 

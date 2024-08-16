@@ -18,7 +18,8 @@ services:
     volumes:
       - ${CERT_FILE}:/etc/ssl/certs/aalto-grades.cs.aalto.fi.crt
       - ${CERT_KEY_FILE}:/etc/ssl/private/aalto-grades.cs.aalto.fi.key
-      # - ./reverse-proxy.conf:/etc/nginx/conf.d/default.conf
+      # We use the /templates/ folder because we need to be able to use
+      # ${SERVER_NAME} in the nginx.conf
       - ./reverse-proxy.conf:/etc/nginx/templates/nginx.conf.template
     environment:
       SERVER_NAME: '${SERVER_NAME}'

@@ -58,6 +58,8 @@ of the project.
 $ docker-compose up
 ```
 
+After that the website is accessible at localhost:8080 and the api docs at localhost:8080/api-docs
+
 When developing or demonstrating the system, you may use one of the pre-made
 user accounts for this purpose.
 
