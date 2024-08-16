@@ -3,21 +3,29 @@
 # SPDX-License-Identifier: MIT
 
 # This is a Docker Compose configuration for running the backend unit tests
+
 ---
-
-version: "3.7"
-
 services:
   backend:
-    extends:
-      file: ../common-services.yaml
-      service: backend-common-test
-    container_name: "backend-server-test"
+    build:
+      context: ..
+      dockerfile: ./server/dockerfiles/Dockerfile.test
+    container_name: 'aalto-grades-backend-test'
+    environment:
+      POSTGRES_URL: 'database'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_DATABASE: 'postgres'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+    depends_on:
+      - database
 
   database:
-    extends:
-      file: ../common-services.yaml
-      service: database
+    image: postgres:15
+    container_name: 'aalto-grades-database-test'
+    environment:
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+    ports:
+      - 5432:5432
 
 networks:
   local:

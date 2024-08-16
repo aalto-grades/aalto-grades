@@ -45,9 +45,9 @@ export const mockPostSuccess = (
 };
 
 export const server: SetupServer = setupServer(
-  http.get('/v1/courses/1/grades', mockSuccess(mockGrades)),
-  http.get('/v1/courses/1/grading-models', mockSuccess([mockGradingModel])),
-  http.get('/v1/courses/1/final-grades', mockSuccess(mockFinalGrades)),
-  http.get('/v1/courses/1/parts', mockSuccess(mockCourseParts)),
-  http.get('/v1/courses/1', mockSuccess(mockCourse))
+  http.get('/api/v1/courses/1/grades', mockSuccess(mockGrades)),
+  http.get('/api/v1/courses/1/grading-models', mockSuccess([mockGradingModel])),
+  http.get('/api/v1/courses/1/final-grades', mockSuccess(mockFinalGrades)),
+  http.get('/api/v1/courses/1/parts', mockSuccess(mockCourseParts)),
+  http.get('/api/v1/courses/1', mockSuccess(mockCourse))
 );

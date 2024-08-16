@@ -43,13 +43,14 @@ export default defineConfig({
   //   },
   define: {
     // The build will contain a syntax error if we don't manually insert quotes
-    AALTO_GRADES_VERSION: `"${
+    AALTO_GRADES_VERSION:
+      '"' +
       (
         JSON.parse(fs.readFileSync('../package.json').toString()) as {
           version: string;
         }
-      ).version
-    }"`,
+      ).version +
+      '"',
   },
   esbuild: {
     loader: 'tsx',
@@ -78,7 +79,14 @@ export default defineConfig({
   server: {
     // this ensures that the browser opens upon server start
     open: true,
-    // this sets a default port to 3000
+    // this sets a default port to 3005
     port: 3005,
+    // Forward /api/v1/... to localhost:3000/v1/...
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        rewrite: path => path.replace(/^\/api/, ''),
+      },
+    },
   },
 });

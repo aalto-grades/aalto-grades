@@ -35,7 +35,7 @@ export const useGetRefreshToken = (
   useQuery({
     queryKey: ['refresh-token'],
     queryFn: async () => {
-      const res = await axios.get('/v1/auth/self-info');
+      const res = await axios.get('/api/v1/auth/self-info');
       if (res.status === 401) return null;
       return AuthDataSchema.parse(res.data);
     },
@@ -48,7 +48,7 @@ export const useLogIn = (
   useMutation({
     mutationFn: async credentials =>
       LoginResultSchema.parse(
-        (await axios.post('/v1/auth/login', credentials)).data
+        (await axios.post('/api/v1/auth/login', credentials)).data
       ),
     ...options,
   });
@@ -57,7 +57,7 @@ export const useLogOut = (
   options?: UseMutationOptions<void, unknown, void>
 ): UseMutationResult<void, unknown, void> =>
   useMutation({
-    mutationFn: () => axios.post('/v1/auth/logout'),
+    mutationFn: () => axios.post('/api/v1/auth/logout'),
     ...options,
   });
 
@@ -66,7 +66,7 @@ export const useResetOwnPassword = (
 ): UseMutationResult<void, unknown, ResetOwnPasswordData> =>
   useMutation({
     mutationFn: async credentials =>
-      axios.post('/v1/auth/reset-own-password', credentials),
+      axios.post('/api/v1/auth/reset-own-password', credentials),
     ...options,
   });
 
@@ -77,8 +77,12 @@ export const useResetAuth = (
   useMutation({
     mutationFn: async vars =>
       ResetAuthResultSchema.parse(
-        (await axios.post(`/v1/auth/reset-auth/${vars.userId}`, vars.resetData))
-          .data
+        (
+          await axios.post(
+            `/api/v1/auth/reset-auth/${vars.userId}`,
+            vars.resetData
+          )
+        ).data
       ),
     ...options,
   });
@@ -93,7 +97,7 @@ export const useResetOwnAuth = (
   useMutation({
     mutationFn: async data =>
       ChangeOwnAuthResponseSchema.parse(
-        (await axios.post('/v1/auth/change-own-auth', data)).data
+        (await axios.post('/api/v1/auth/change-own-auth', data)).data
       ),
     ...options,
   });
@@ -102,6 +106,6 @@ export const useConfirmMfa = (
   options?: UseMutationOptions<void, unknown, ConfirmMfaData>
 ): UseMutationResult<void, unknown, ConfirmMfaData> =>
   useMutation({
-    mutationFn: async data => axios.post('/v1/auth/confirm-mfa', data),
+    mutationFn: async data => axios.post('/api/v1/auth/confirm-mfa', data),
     ...options,
   });

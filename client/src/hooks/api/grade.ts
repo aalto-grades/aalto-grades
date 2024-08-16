@@ -33,7 +33,7 @@ export const useGetGrades = (
     queryKey: ['grades', courseId],
     queryFn: async () =>
       StudentRowArraySchema.parse(
-        (await axios.get(`/v1/courses/${courseId}/grades`)).data
+        (await axios.get(`/api/v1/courses/${courseId}/grades`)).data
       ),
     ...options,
   });
@@ -46,7 +46,7 @@ export const useAddGrades = (
 
   return useMutation({
     mutationFn: newGrades =>
-      axios.post(`/v1/courses/${courseId}/grades`, newGrades),
+      axios.post(`/api/v1/courses/${courseId}/grades`, newGrades),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -64,7 +64,10 @@ export const useEditGrade = (
 ): UseMutationResult<void, unknown, EditGradeVars> =>
   useMutation({
     mutationFn: vars =>
-      axios.put(`/v1/courses/${courseId}/grades/${vars.gradeId}`, vars.data),
+      axios.put(
+        `/api/v1/courses/${courseId}/grades/${vars.gradeId}`,
+        vars.data
+      ),
     ...options,
   });
 
@@ -76,7 +79,7 @@ export const useDeleteGrade = (
 
   return useMutation({
     mutationFn: gradeId =>
-      axios.delete(`/v1/courses/${courseId}/grades/${gradeId}`),
+      axios.delete(`/api/v1/courses/${courseId}/grades/${gradeId}`),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -93,7 +96,7 @@ export const useGetLatestGrades = (
   useMutation({
     mutationFn: async userIds =>
       LatestGradesSchema.parse(
-        (await axios.post('/v1/latest-grades', userIds)).data
+        (await axios.post('/api/v1/latest-grades', userIds)).data
       ),
     ...options,
   });
@@ -106,7 +109,7 @@ export const useDownloadSisuGradeCsv = (
     mutationFn: async vars =>
       (
         await axios.post<BlobPart>(
-          `/v1/courses/${vars.courseId}/grades/csv/sisu`,
+          `/api/v1/courses/${vars.courseId}/grades/csv/sisu`,
           vars.data
         )
       ).data,

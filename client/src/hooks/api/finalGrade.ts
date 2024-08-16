@@ -29,7 +29,7 @@ export const useGetFinalGrades = (
     queryKey: ['final-grades', courseId],
     queryFn: async () =>
       FinalGradeDataArraySchema.parse(
-        (await axios.get(`/v1/courses/${courseId}/final-grades`)).data
+        (await axios.get(`/api/v1/courses/${courseId}/final-grades`)).data
       ),
     ...options,
   });
@@ -42,7 +42,7 @@ export const useAddFinalGrades = (
 
   return useMutation({
     mutationFn: newFinalGrades =>
-      axios.post(`/v1/courses/${courseId}/final-grades`, newFinalGrades),
+      axios.post(`/api/v1/courses/${courseId}/final-grades`, newFinalGrades),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -64,7 +64,7 @@ export const useEditFinalGrade = (
   useMutation({
     mutationFn: vars =>
       axios.put(
-        `/v1/courses/${courseId}/final-grades/${vars.finalGradeId}`,
+        `/api/v1/courses/${courseId}/final-grades/${vars.finalGradeId}`,
         vars.data
       ),
     ...options,
@@ -78,7 +78,7 @@ export const useDeleteFinalGrade = (
 
   return useMutation({
     mutationFn: finalGradeId =>
-      axios.delete(`/v1/courses/${courseId}/final-grades/${finalGradeId}`),
+      axios.delete(`/api/v1/courses/${courseId}/final-grades/${finalGradeId}`),
 
     onSuccess: () => {
       queryClient.invalidateQueries({

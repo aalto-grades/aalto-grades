@@ -4,6 +4,8 @@ SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
 SPDX-License-Identifier: MIT
 -->
 
+<!-- TODO: Update readme to use `docker compose` instead of `docker-compose` -->
+
 # Aalto Grades
 
 Aalto Grades is a grade/point management system for storing the grades of
@@ -46,42 +48,26 @@ Windows and macOS users may install Docker and Docker Compose from:
 - https://www.docker.com/
 - https://docs.docker.com/compose/install/
 
-When using Docker to run the system, in order to speed up repeated startups of
-the system, you may define the environment variables `CLIENT_SKIP_NPM_CI` and
-`SERVER_SKIP_NPM_CI` to skip running `npm ci` each time in the build process
-of the frontend and backend respectively. You will need to manually run
-`npm ci` once in the corresponding directory, and then after setting the
-environment variables, the `node_modules` you already fetched will be copied to
-the containers. Setting the value of the variables to `1` is treated as
-enabling the functionality.
-
 ## Building and running
 
 You can run the development build of the whole Aalto Grades system, including
-the frontend, backend, and database, by running `docker-compose up` at the root
-of the project.
-
-In order to run the program, you must define the `POSTGRES_PASSWORD`
-environment variable with a password of your choice.
+the frontend, backend, and database, by running docker compose at the root of the project:
 
 ```
-$ export POSTGRES_PASSWORD=XXXX
-$ docker-compose up
+docker-compose up
 ```
+
+After that the website is accessible at localhost:8080 and the api docs at localhost:8080/api-docs
 
 When developing or demonstrating the system, you may use one of the pre-made
-user accounts for this purpose. There are two such accounts, an admin account
-and a teacher account.
+user accounts for this purpose.
 
-Admin user credentials:
-
-- Email: `admin@aalto.fi`
-- Password: `password`
-
-Teacher user credentials:
-
-- Email: `teacher@aalto.fi`
-- Password: `password`
+| User              | Email                | Password   |
+| ----------------- | -------------------- | ---------- |
+| Admin account     | `admin@aalto.fi`     | `password` |
+| Teacher account   | `teacher@aalto.fi`   | `password` |
+| Assistant account | `assistant@aalto.fi` | `password` |
+| Student account   | `student@aalto.fi`   | `password` |
 
 For instructions on running tests or individual parts of the system, see the
 README file of the corresponding directory, such as `client/README.md` and
@@ -90,6 +76,8 @@ README file of the corresponding directory, such as `client/README.md` and
 ## How to contribute
 
 ### New feature
+
+<!-- TODO: Update? -->
 
 1. Create a local development branch from the 'dev' branch.
 2. Do your additions and changes.

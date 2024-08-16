@@ -5,9 +5,8 @@
 # This is a Docker Compose configuration for deploying Aalto Grades to a
 # virtual machine from the dev branch. Requires correct setup work to be done
 # on the VM. Documentation for deployment is available in the aalto wiki.
----
-version: '3.7'
 
+---
 services:
   reverse-proxy:
     extends:
@@ -30,7 +29,3 @@ services:
     extends:
       file: ./docker-compose-from-images.yaml
       service: database
-
-networks:
-  local:
-    driver: bridge
