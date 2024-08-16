@@ -37,7 +37,7 @@ export const useFetchAplusCourses = (
     queryKey: ['a+-courses'],
     queryFn: async () =>
       AplusCourseDataArraySchema.parse(
-        (await axios.get('/v1/aplus/courses', getHeaders())).data
+        (await axios.get('/api/v1/aplus/courses', getHeaders())).data
       ),
     ...options,
   });
@@ -50,8 +50,12 @@ export const useFetchAplusExerciseData = (
     queryKey: ['a+-exercises', aplusCourseId],
     queryFn: async () =>
       AplusExerciseDataSchema.parse(
-        (await axios.get(`/v1/aplus/courses/${aplusCourseId}`, getHeaders()))
-          .data
+        (
+          await axios.get(
+            `/api/v1/aplus/courses/${aplusCourseId}`,
+            getHeaders()
+          )
+        ).data
       ),
     ...options,
   });
@@ -64,7 +68,7 @@ export const useAddAplusGradeSources = (
 
   return useMutation({
     mutationFn: gradeSources =>
-      axios.post(`/v1/courses/${courseId}/aplus-sources`, gradeSources),
+      axios.post(`/api/v1/courses/${courseId}/aplus-sources`, gradeSources),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -84,7 +88,7 @@ export const useDeleteAplusGradeSource = (
   return useMutation({
     mutationFn: aplusGradeSourceId =>
       axios.delete(
-        `/v1/courses/${courseId}/aplus-sources/${aplusGradeSourceId}`
+        `/api/v1/courses/${courseId}/aplus-sources/${aplusGradeSourceId}`
       ),
 
     onSuccess: () => {
@@ -107,7 +111,7 @@ export const useFetchAplusGrades = (
       NewGradeArraySchema.parse(
         (
           await axios.get(
-            `/v1/courses/${courseId}/aplus-fetch?course-parts=${JSON.stringify(
+            `/api/v1/courses/${courseId}/aplus-fetch?course-parts=${JSON.stringify(
               coursePartIds
             )}`,
             getHeaders()

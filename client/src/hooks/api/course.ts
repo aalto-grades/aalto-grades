@@ -30,7 +30,9 @@ export const useGetCourse = (
   useQuery({
     queryKey: ['course', courseId],
     queryFn: async () =>
-      CourseDataSchema.parse((await axios.get(`/v1/courses/${courseId}`)).data),
+      CourseDataSchema.parse(
+        (await axios.get(`/api/v1/courses/${courseId}`)).data
+      ),
     ...options,
   });
 
@@ -40,7 +42,7 @@ export const useGetAllCourses = (
   useQuery({
     queryKey: ['all-courses'],
     queryFn: async () =>
-      CourseDataArraySchema.parse((await axios.get('/v1/courses')).data),
+      CourseDataArraySchema.parse((await axios.get('/api/v1/courses')).data),
     ...options,
   });
 
@@ -51,7 +53,7 @@ export const useAddCourse = (
 
   return useMutation({
     mutationFn: async course =>
-      IdSchema.parse((await axios.post('/v1/courses', course)).data),
+      IdSchema.parse((await axios.post('/api/v1/courses', course)).data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['all-courses']});
@@ -67,7 +69,8 @@ export const useEditCourse = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: vars => axios.put(`/v1/courses/${vars.courseId}`, vars.course),
+    mutationFn: vars =>
+      axios.put(`/api/v1/courses/${vars.courseId}`, vars.course),
 
     onSuccess: (_data: unknown, vars: EditCourseVars) => {
       queryClient.invalidateQueries({queryKey: ['course', vars.courseId]});

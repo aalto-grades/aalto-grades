@@ -31,10 +31,8 @@ COPY server/src ./src
 USER node
 RUN npm run build
 
-# The sleep is to wait for the database.
 EXPOSE 3000
 CMD ["/bin/sh", "-c", "\
-    sleep 5s && \
     npm run migration:up && \
     npm run seed:up && \
     npm run citest"]

@@ -2,38 +2,39 @@
 #
 # SPDX-License-Identifier: MIT
 
-# This is a Docker Compose configuration for executing Aalto Grades normally,
-# optionally without the frontend
+# This is a Docker Compose configuration for running Aalto Grades locally,
+
 ---
-
-version: "3.7"
-
 services:
-  frontend:
-    extends:
-      file: ./common-services.yaml
-      service: frontend-common
-    container_name: frontend-server
+  reverse-proxy:
+    image: nginx:1.27-alpine
+    container_name: aalto-grades-reverse-proxy-dev
     ports:
-      - 3005:80
-    restart: always
+      - 8080:80
+    volumes:
+      - ./reverse-proxy-dev.conf:/etc/nginx/nginx.conf
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+    container_name: aalto-grades-frontend-dev
 
   backend:
-    extends:
-      file: ./common-services.yaml
-      service: backend-common
-    container_name: backend-server
-    ports:
-      - 3000:3000
-    restart: always
+    build:
+      context: .
+      dockerfile: ./server/dockerfiles/Dockerfile
+    container_name: aalto-grades-backend-dev
+    environment:
+      POSTGRES_URL: 'database'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_DATABASE: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+    depends_on:
+      - database
 
   database:
-    extends:
-      file: ./common-services.yaml
-      service: database
-    ports:
-      - 5432:5432
-
-networks:
-  local:
-    driver: bridge
+    image: postgres:15
+    container_name: aalto-grades-database-dev
+    environment:
+      POSTGRES_PASSWORD: 'postgres'

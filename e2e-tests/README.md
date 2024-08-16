@@ -6,20 +6,19 @@ SPDX-License-Identifier: MIT
 
 ## Running tests
 
-In another terminal in the project root run:
+Start the website in docker by running docker compose in the project root:
 
 ```
-export POSTGRES_PASSWORD="postgres"
 docker compose up --build
 ```
 
-Then run
+Then launch playwright in cli mode:
 
 ```
 npx playwright test
 ```
 
-or
+or in ui mode:
 
 ```
 npx playwright test --ui

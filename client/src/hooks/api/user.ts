@@ -36,7 +36,7 @@ export const useGetOwnCourses = (
     queryKey: ['own-courses'],
     queryFn: async () =>
       CourseDataArraySchema.parse(
-        (await axios.get('/v1/users/own-courses')).data
+        (await axios.get('/api/v1/users/own-courses')).data
       ),
     ...options,
   });
@@ -49,7 +49,7 @@ export const useGetCoursesOfStudent = (
     queryKey: ['student-courses', userId],
     queryFn: async () =>
       CourseWithFinalGradesArraySchema.parse(
-        (await axios.get(`/v1/users/${userId}/courses`)).data
+        (await axios.get(`/api/v1/users/${userId}/courses`)).data
       ),
     ...options,
   });
@@ -60,7 +60,9 @@ export const useGetStudents = (
   useQuery({
     queryKey: ['students'],
     queryFn: async () =>
-      UserDataArraySchema.parse((await axios.get('/v1/users/students')).data),
+      UserDataArraySchema.parse(
+        (await axios.get('/api/v1/users/students')).data
+      ),
     ...options,
   });
 
@@ -70,7 +72,7 @@ export const useGetUsers = (
   useQuery({
     queryKey: ['users'],
     queryFn: async () =>
-      UserWithRoleArraySchema.parse((await axios.get('/v1/users')).data),
+      UserWithRoleArraySchema.parse((await axios.get('/api/v1/users')).data),
     ...options,
   });
 
@@ -80,7 +82,9 @@ export const useAddUser = (
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async user =>
-      NewUserResponseSchema.parse((await axios.post('/v1/users', user)).data),
+      NewUserResponseSchema.parse(
+        (await axios.post('/api/v1/users', user)).data
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['users']});
     },
@@ -93,7 +97,7 @@ export const useDeleteUser = (
 ): UseMutationResult<void, unknown, number> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: userId => axios.delete(`/v1/users/${userId}`),
+    mutationFn: userId => axios.delete(`/api/v1/users/${userId}`),
 
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['users']});
@@ -108,7 +112,7 @@ export const useDeleteUsers = (
 ): UseMutationResult<void, unknown, UserIdArray> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: userIds => axios.post('/v1/users/delete', userIds),
+    mutationFn: userIds => axios.post('/api/v1/users/delete', userIds),
 
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['users']});

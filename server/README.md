@@ -8,72 +8,56 @@ SPDX-License-Identifier: MIT
 
 ## Running
 
-### Running on local environment
-
-<!-- TODO: Setting up a database needs a more detailed explanation -->
+### Setting up the database
 
 > If the command `npm install` fails on Apple Silicon, check that there are NO spaces in the folder path
 
-#### Running postgreSQL and pgAdmin with docker
+#### Running postgreSQL (and pgAdmin) with docker
 
 For development purposes, you can easily run the database and pgadmin in docker
 and then start node server locally in development mode.
 
-Set the following environment variables:
-
-```
-$ export POSTGRES_PASSWORD=postgres
-
-```
-
 Start the postgreSQL and pgadmin:
 
 ```
-$ docker compose up database pgadmin
+docker compose up database pgadmin
 ```
 
-pgAdmin will be
-available at http://localhost:5050.
-
-You can now setup the node environment by following the instructions and to start e.g.
-the development server to start developing.
+pgAdmin will be available at http://localhost:5050.
 
 When you are done with these stop the container and run:
 
 ```
-$ docker compose down --remove-orphans
+docker compose down --remove-orphans
 ```
 
-to remove containers and network
+to remove containers.
 
-#### Setting up local node environment
+#### Running the migrations and the seed
 
-In a `.env` file setup the node env variables (.env.example included as an example)
-
-```
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DATABASE=postgres
-POSTGRES_URL=localhost
-```
-
-Install the necessary Node modules:
+copy `.env.example` to `.env`:
 
 ```
-$ npm ci
+cp .env.example .env
 ```
 
-Build the server:
+Install the packages:
 
 ```
-$ npm run build
+npm i
+```
+
+Build the server to be able to run the migrations and the seed:
+
+```
+npm run build
 ```
 
 Run migrations and seeder:
 
 ```
-$ npm run migration:up
-$ npm run seed:up
+npm run migration:up
+npm run seed:up
 ```
 
 ### Running the server
@@ -81,43 +65,30 @@ $ npm run seed:up
 Start the server:
 
 ```
-$ npm run start
+npm run dev
 ```
 
-After running the last command, the server will be available at
-http://localhost:3000.
-
-### Running in development mode
-
-You can run the server in development mode with the command:
-
-```
-$ npm run dev
-```
-
-In development mode, the server is automatically restarted after any changes to
-the code are saved.
+The backend will be available at http://localhost:3000.
 
 ### Running with Docker
 
-You can also run the server and database using Docker Compose. You only need to
-define the `POSTGRES_PASSWORD` with a password of your choice, and then execute
-Docker Compose:
+You can also run the server and database using Docker:
 
 ```
-$ export POSTGRES_PASSWORD=XXXX
-$ docker compose up
+docker compose up
 ```
 
-This Docker Compose configuration will also start
-[pgAdmin](https://www.pgadmin.org/docs/pgadmin4/7.1/index.html)
+### pgAdmin
+
+The Docker Compose configuration will also start
+[pgAdmin](https://www.pgadmin.org/docs/pgadmin4/latest/index.html)
 for accessing and configuring database using a browser. pgAdmin will be
 available at http://localhost:5050.
 
 Login credentials for pgAdmin:
 
-- Email: `admin@admin.com`
-- Password: `root`
+- Email: `admin@aalto.fi`
+- Password: `password`
 
 From left side menu, select `Servers` and `Grades server` to access the Aalto
 Grades database. If prompted, use the password `postgres` to connect.
@@ -134,5 +105,5 @@ configuration located in this directory.
 Execute Docker Compose to run the tests:
 
 ```
-$ docker compose -f docker-compose-test.yaml up --abort-on-container-exit --exit-code-from backend
+docker compose -f docker-compose-test.yaml up --abort-on-container-exit --exit-code-from backend
 ```
