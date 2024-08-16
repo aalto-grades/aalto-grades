@@ -36,5 +36,7 @@ services:
   database:
     image: postgres:15
     container_name: aalto-grades-database-dev
+    ports:
+      - 5432:5432 # Exposed for e2e tests to work
     environment:
       POSTGRES_PASSWORD: 'postgres'

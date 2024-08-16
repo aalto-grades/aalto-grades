@@ -12,12 +12,12 @@ SPDX-License-Identifier: MIT
 
 > If the command `npm install` fails on Apple Silicon, check that there are NO spaces in the folder path
 
-#### Running postgreSQL (and pgAdmin) with docker
+#### Running the database (and pgAdmin) with docker
 
 For development purposes, you can easily run the database and pgadmin in docker
 and then start node server locally in development mode.
 
-Start the postgreSQL and pgadmin:
+Start the database and pgadmin:
 
 ```
 docker compose up database pgadmin
