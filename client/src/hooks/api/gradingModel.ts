@@ -31,7 +31,7 @@ export const useGetAllGradingModels = (
     queryKey: ['all-grading-models', courseId],
     queryFn: async () =>
       GradingModelDataArraySchema.parse(
-        (await axios.get(`/v1/courses/${courseId}/grading-models`)).data
+        (await axios.get(`/api/v1/courses/${courseId}/grading-models`)).data
       ),
     ...options,
   });
@@ -47,7 +47,7 @@ export const useGetGradingModel = (
       GradingModelDataSchema.parse(
         (
           await axios.get(
-            `/v1/courses/${courseId}/grading-models/${gradingModelId}`
+            `/api/v1/courses/${courseId}/grading-models/${gradingModelId}`
           )
         ).data
       ),
@@ -68,7 +68,7 @@ export const useAddGradingModel = (
       IdSchema.parse(
         (
           await axios.post(
-            `/v1/courses/${vars.courseId}/grading-models`,
+            `/api/v1/courses/${vars.courseId}/grading-models`,
             vars.gradingModel
           )
         ).data
@@ -96,7 +96,7 @@ export const useEditGradingModel = (
   return useMutation({
     mutationFn: vars =>
       axios.put(
-        `/v1/courses/${vars.courseId}/grading-models/${vars.gradingModelId}`,
+        `/api/v1/courses/${vars.courseId}/grading-models/${vars.gradingModelId}`,
         vars.gradingModel
       ),
 
@@ -125,7 +125,7 @@ export const useDeleteGradingModel = (
   return useMutation({
     mutationFn: vars =>
       axios.delete(
-        `/v1/courses/${vars.courseId}/grading-models/${vars.gradingModelId}`
+        `/api/v1/courses/${vars.courseId}/grading-models/${vars.gradingModelId}`
       ),
 
     onSuccess: (_data, vars) => {

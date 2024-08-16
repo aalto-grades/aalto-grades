@@ -5,14 +5,7 @@
 import axios from 'axios';
 import {ZodError} from 'zod';
 
-const BACKEND_URL =
-  (import.meta.env.VITE_APP_BACKEND_URL as string | undefined) ||
-  'http://back-end';
-const BACKEND_PORT =
-  (import.meta.env.VITE_APP_BACKEND_PORT as string | undefined) || '3000';
-
 const axiosInstance = axios.create({
-  baseURL: `${BACKEND_URL}:${BACKEND_PORT}`,
   withCredentials: true,
   validateStatus: (status: number) => status < 600 && status >= 100,
 });
