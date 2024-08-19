@@ -117,10 +117,10 @@
     "name": "Name",
     "days-valid": "Days valid",
     "max-grade": "Max grade",
-    "submit": "Submit",
     "expiry-date": "Expiry date",
     "cancel": "Cancel",
     "save": "Save",
+    "submit": "Submit",
     "course": "Course",
     "instance": "Instance",
     "full-points": "Full points",
@@ -189,13 +189,13 @@
   "course": {
     "parts": {
       "select-grade-source": "Select grade source",
-      "select-grade-sources": "Select grade sources",
-      "create-parts": "Create course parts",
       "create": {
         "title": "Create new course part",
         "name-help": "Course part name",
         "expiry-date-valid-help": "Course part expiration date"
       },
+      "select-grade-sources": "Select grade sources",
+      "create-tasks": "Create course tasks",
       "create-task": {
         "title": "Create new course task",
         "name-help": "Course task name",
@@ -219,7 +219,8 @@
       "add-new-task": "Add new course task",
       "add-from-a+": "Add course tasks from A+",
       "open-part-graph": "Open course part graph",
-      "edit-part": "Edit course part"
+      "edit-part": "Edit course part",
+      "no-expiry-date": "No expiry date"
     },
     "results": {
       "model-has-deleted-and-archived": "Grading model contains deleted & archived course parts",

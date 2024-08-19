@@ -117,10 +117,10 @@
     "name": "UNTRANSLATED",
     "days-valid": "UNTRANSLATED",
     "max-grade": "UNTRANSLATED",
-    "submit": "UNTRANSLATED",
     "expiry-date": "UNTRANSLATED",
     "cancel": "UNTRANSLATED",
     "save": "UNTRANSLATED",
+    "submit": "UNTRANSLATED",
     "course": "UNTRANSLATED",
     "instance": "UNTRANSLATED",
     "full-points": "UNTRANSLATED",
@@ -189,13 +189,13 @@
   "course": {
     "parts": {
       "select-grade-source": "UNTRANSLATED",
-      "select-grade-sources": "UNTRANSLATED",
-      "create-parts": "UNTRANSLATED",
       "create": {
         "title": "UNTRANSLATED",
         "name-help": "UNTRANSLATED",
         "expiry-date-valid-help": "UNTRANSLATED"
       },
+      "select-grade-sources": "UNTRANSLATED",
+      "create-tasks": "UNTRANSLATED",
       "create-task": {
         "title": "UNTRANSLATED",
         "name-help": "UNTRANSLATED",
@@ -219,7 +219,8 @@
       "add-new-task": "UNTRANSLATED",
       "add-from-a+": "UNTRANSLATED",
       "open-part-graph": "UNTRANSLATED",
-      "edit-part": "UNTRANSLATED"
+      "edit-part": "UNTRANSLATED",
+      "no-expiry-date": "UNTRANSLATED"
     },
     "results": {
       "model-has-deleted-and-archived": "UNTRANSLATED",

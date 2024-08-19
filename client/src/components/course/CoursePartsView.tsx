@@ -35,10 +35,11 @@ import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
-import {useBlocker, useParams} from 'react-router-dom';
+import {useBlocker, useNavigate, useParams} from 'react-router-dom';
 
 import {
   AplusGradeSourceData,
+  CoursePartData,
   EditCourseTaskData,
   NewCourseTaskData,
   SystemRole,
@@ -52,12 +53,14 @@ import {
   useGetCourseTasks,
 } from '@/hooks/api/courseTask';
 import {
+  useEditCoursePart,
   useGetAllGradingModels,
   useGetCourseParts,
   useGetGrades,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import AddAplusGradeSourceDialog from './course-parts-view/AddAplusGradeSourceDialog';
+import EditCoursePartDialog from './course-parts-view/EditCoursePartDialog';
 import NewAplusCourseTasksDialog from './course-parts-view/NewAplusCourseTasksDialog';
 import AddCoursePartDialog from './course-parts-view/NewCoursePartDialog';
 import AddCourseTaskDialog from './course-parts-view/NewCourseTaskDialog';
@@ -77,9 +80,11 @@ const CoursePartsView = (): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
+  const navigate = useNavigate();
 
   const gradingModels = useGetAllGradingModels(courseId);
   const courseParts = useGetCourseParts(courseId);
+  const editCoursePart = useEditCoursePart(courseId);
 
   const grades = useGetGrades(courseId);
   const courseTasks = useGetCourseTasks(courseId);
@@ -88,6 +93,8 @@ const CoursePartsView = (): JSX.Element => {
   const deleteCourseTask = useDeleteCourseTask(courseId);
 
   const [addPartDialogOpen, setAddPartDialogOpen] = useState<boolean>(false);
+  const [editPartDialogOpen, setEditPartDialogOpen] = useState<boolean>(false);
+  const [editPart, setEditPart] = useState<CoursePartData | null>(null);
   const [selectedPart, setSelectedPart] = useState<number | null>(null);
 
   const [addTaskDialogOpen, setAddTaskDialogOpen] = useState<boolean>(false);
@@ -179,6 +186,7 @@ const CoursePartsView = (): JSX.Element => {
   };
 
   // Update rows when course tasks change
+  // TODO: Fix this such that it wont overwrite changes
   const [oldCourseTaskData, setOldCourseTaskData] =
     useState<typeof courseTasks.data>(undefined);
   if (courseTasks.data !== oldCourseTaskData) {
@@ -397,6 +405,12 @@ const CoursePartsView = (): JSX.Element => {
       : []),
   ];
 
+  const sortCourseParts = (a: CoursePartData, b: CoursePartData): number => {
+    if (a.archived && !b.archived) return 1;
+    if (b.archived && !a.archived) return -1;
+    return a.id - b.id;
+  };
+
   const confirmDiscard = async (): Promise<void> => {
     if (await AsyncConfirmationModal({confirmDiscard: true})) {
       setRows(structuredClone(initRows));
@@ -408,6 +422,11 @@ const CoursePartsView = (): JSX.Element => {
       <AddCoursePartDialog
         open={addPartDialogOpen}
         onClose={() => setAddPartDialogOpen(false)}
+      />
+      <EditCoursePartDialog
+        open={editPartDialogOpen}
+        onClose={() => setEditPartDialogOpen(false)}
+        coursePart={editPart}
       />
       <AddCourseTaskDialog
         open={addTaskDialogOpen}
@@ -482,12 +501,16 @@ const CoursePartsView = (): JSX.Element => {
       </Box>
 
       <Grid container spacing={2}>
-        <Grid item xs={4} sx={{border: '1px solid'}}>
+        <Grid item xs={4}>
           <List>
-            {courseParts.data?.map(coursePart => (
+            {courseParts.data?.sort(sortCourseParts).map(coursePart => (
               <ListItem
                 key={coursePart.id}
-                sx={{backgroundColor: coursePart.archived ? grey[200] : ''}}
+                sx={{
+                  backgroundColor: coursePart.archived ? grey[200] : '',
+                  border: selectedPart === coursePart.id ? '1px solid' : 'none',
+                  borderRadius: '5px',
+                }}
                 disablePadding
                 secondaryAction={
                   editRights ? (
@@ -496,7 +519,13 @@ const CoursePartsView = (): JSX.Element => {
                         placement="top"
                         title={t('course.parts.open-part-graph')}
                       >
-                        <IconButton onClick={() => {}}>
+                        <IconButton
+                          onClick={() => {
+                            navigate(
+                              `/courses/${courseId}/models/course-part/${coursePart.id}`
+                            );
+                          }}
+                        >
                           <OpenInNew />
                         </IconButton>
                       </Tooltip>
@@ -504,8 +533,32 @@ const CoursePartsView = (): JSX.Element => {
                         placement="top"
                         title={t('course.parts.edit-part')}
                       >
-                        <IconButton onClick={() => {}}>
+                        <IconButton
+                          onClick={() => {
+                            setEditPart(coursePart);
+                            setEditPartDialogOpen(true);
+                          }}
+                        >
                           <Edit />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip
+                        placement="top"
+                        title={
+                          coursePart.archived
+                            ? t('course.parts.unarchive')
+                            : t('course.parts.archive')
+                        }
+                      >
+                        <IconButton
+                          onClick={() => {
+                            editCoursePart.mutate({
+                              coursePartId: coursePart.id,
+                              coursePart: {archived: !coursePart.archived},
+                            });
+                          }}
+                        >
+                          {coursePart.archived ? <Unarchive /> : <Archive />}
                         </IconButton>
                       </Tooltip>
                     </>
@@ -519,17 +572,17 @@ const CoursePartsView = (): JSX.Element => {
                 >
                   <ListItemText
                     primary={coursePart.name}
-                    sx={{
-                      border:
-                        selectedPart === coursePart.id ? '1px solid' : 'none',
-                    }}
+                    secondary={
+                      coursePart.expiryDate?.toLocaleDateString() ??
+                      t('course.parts.no-expiry-date')
+                    }
                   />
                 </ListItemButton>
               </ListItem>
             ))}
           </List>
         </Grid>
-        <Grid item xs={8} sx={{border: '1px solid'}}>
+        <Grid item xs={8}>
           <div style={{height: '100%', maxHeight: '70vh'}}>
             <DataGrid
               rows={rows}
