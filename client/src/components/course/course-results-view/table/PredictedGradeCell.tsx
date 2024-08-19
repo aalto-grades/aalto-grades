@@ -11,7 +11,7 @@ import {useParams} from 'react-router-dom';
 import {GradingScale} from '@/common/types';
 import {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useGetAllGradingModels} from '@/hooks/useApi';
-import {getGradeString} from '@/utils/textFormat';
+import {getGradeString} from '@/utils';
 
 type PropsType = {
   row: GroupedStudentRow;

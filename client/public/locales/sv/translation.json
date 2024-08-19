@@ -118,6 +118,7 @@
     "days-valid": "UNTRANSLATED",
     "max-grade": "UNTRANSLATED",
     "submit": "UNTRANSLATED",
+    "expiry-date": "UNTRANSLATED",
     "cancel": "UNTRANSLATED",
     "save": "UNTRANSLATED",
     "course": "UNTRANSLATED",
@@ -150,7 +151,6 @@
     "delete": "UNTRANSLATED",
     "discard": "UNTRANSLATED",
     "close": "UNTRANSLATED",
-    "expiry-date": "UNTRANSLATED",
     "exported": "UNTRANSLATED",
     "grades-saved": "UNTRANSLATED",
     "select-course-parts": "UNTRANSLATED",
@@ -183,7 +183,8 @@
     "in-finnish": "UNTRANSLATED",
     "in-swedish": "UNTRANSLATED",
     "done": "UNTRANSLATED",
-    "final-grades": "UNTRANSLATED"
+    "final-grades": "UNTRANSLATED",
+    "not-int": "UNTRANSLATED"
   },
   "course": {
     "parts": {
@@ -193,9 +194,13 @@
       "create": {
         "title": "UNTRANSLATED",
         "name-help": "UNTRANSLATED",
+        "expiry-date-valid-help": "UNTRANSLATED"
+      },
+      "create-task": {
+        "title": "UNTRANSLATED",
+        "name-help": "UNTRANSLATED",
         "days-valid-help": "UNTRANSLATED",
-        "set-max-grade": "UNTRANSLATED",
-        "max-grade-help": "UNTRANSLATED"
+        "max-grade-valid-help": "UNTRANSLATED"
       },
       "delete-a+": "UNTRANSLATED",
       "fetching-grades": "UNTRANSLATED",
@@ -210,8 +215,11 @@
       "delete-message": "UNTRANSLATED",
       "valid-until": "UNTRANSLATED",
       "archived": "UNTRANSLATED",
-      "add-new": "UNTRANSLATED",
-      "add-from-a+": "UNTRANSLATED"
+      "add-new-part": "UNTRANSLATED",
+      "add-new-task": "UNTRANSLATED",
+      "add-from-a+": "UNTRANSLATED",
+      "open-part-graph": "UNTRANSLATED",
+      "edit-part": "UNTRANSLATED"
     },
     "results": {
       "model-has-deleted-and-archived": "UNTRANSLATED",
@@ -306,6 +314,7 @@
       "data-undefined": "UNTRANSLATED"
     },
     "edit": {
+      "saved": "UNTRANSLATED",
       "course-code-required": "UNTRANSLATED",
       "min-credits-required": "UNTRANSLATED",
       "min-credits-negative": "UNTRANSLATED",
@@ -315,7 +324,6 @@
       "name-finnish": "UNTRANSLATED",
       "name-swedish": "UNTRANSLATED",
       "max-below-min": "UNTRANSLATED",
-      "saved": "UNTRANSLATED",
       "title": "UNTRANSLATED",
       "course-code-help": "UNTRANSLATED",
       "course-name-in-format": "UNTRANSLATED",

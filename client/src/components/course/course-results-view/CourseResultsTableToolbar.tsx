@@ -24,7 +24,7 @@ import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 
 import {StudentRow, SystemRole} from '@/common/types';
-import {batchCalculateGraph} from '@/common/util/calculateGraph';
+import {batchCalculateGraph} from '@/common/util';
 import {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 import {useAddFinalGrades} from '@/hooks/api/finalGrade';
@@ -34,9 +34,12 @@ import {
   useGetGrades,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
-import {findBestGrade} from '@/utils/bestGrade';
-import {findLatestGrade, getErrorCount} from '@/utils/table';
-import {getMaxFinalGrade} from '@/utils/utils';
+import {
+  findBestGrade,
+  findLatestGrade,
+  getErrorCount,
+  getMaxFinalGrade,
+} from '@/utils';
 import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
 import SisuDownloadDialog from './SisuDownloadDialog';
 import UploadDialog from './upload/UploadDialog';

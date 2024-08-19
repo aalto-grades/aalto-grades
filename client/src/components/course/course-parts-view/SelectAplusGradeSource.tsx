@@ -18,9 +18,9 @@ import {
   AplusGradeSourceData,
   NewAplusGradeSourceData,
 } from '@/common/types';
-import {aplusGradeSourcesEqual} from '@/common/util/aplus';
+import {aplusGradeSourcesEqual} from '@/common/util';
 import {useFetchAplusExerciseData} from '@/hooks/useApi';
-import {getLatestAplusModuleDate, newAplusGradeSource} from '@/utils/utils';
+import {getLatestAplusModuleDate, newAplusGradeSource} from '@/utils';
 
 type PropsType = {
   aplusCourse: AplusCourseData;

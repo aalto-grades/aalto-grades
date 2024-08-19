@@ -28,7 +28,7 @@ import {useParams} from 'react-router-dom';
 import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
 import {useGetCourseTasks} from '@/hooks/api/courseTask';
 import {useAddGrades, useFetchAplusGrades} from '@/hooks/useApi';
-import {getAplusToken} from '@/utils/utils';
+import {getAplusToken} from '@/utils';
 
 type PropsType = {
   handleClose: () => void;

@@ -44,8 +44,11 @@ import {useGetFinalGrades} from '@/hooks/api/finalGrade';
 import {useEditCourse, useGetCourse} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import {useLocalize} from '@/hooks/useLocalize';
-import {convertToClientGradingScale} from '@/utils/textFormat';
-import {departments, sisuLanguageOptions} from '@/utils/utils';
+import {
+  convertToClientGradingScale,
+  departments,
+  sisuLanguageOptions,
+} from '@/utils';
 
 type FormData = {
   courseCode: string;

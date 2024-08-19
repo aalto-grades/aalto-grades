@@ -29,8 +29,7 @@ import {useParams} from 'react-router-dom';
 import {GradingModelData, StudentRow} from '@/common/types';
 import {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useGetAllGradingModels} from '@/hooks/useApi';
-import {GradeSelectOption} from '@/utils/bestGrade';
-import {getErrorTypes} from '@/utils/table';
+import {GradeSelectOption, getErrorTypes} from '@/utils';
 
 type PropsType = {
   open: boolean;

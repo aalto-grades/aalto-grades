@@ -42,7 +42,7 @@ import {
   useGetGrades,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
-import {getCourseRole} from '@/utils/utils';
+import {getCourseRole} from '@/utils';
 import CreateGradingModelDialog from './models-view/CreateGradingModelDialog';
 import RenameGradingModelDialog from './models-view/RenameGradingModelDialog';
 

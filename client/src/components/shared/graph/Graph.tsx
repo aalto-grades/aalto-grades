@@ -44,7 +44,7 @@ import {
   NodeSettings,
   NodeValues,
 } from '@/common/types';
-import {calculateNewNodeValues, initNode} from '@/common/util/calculateGraph';
+import {calculateNewNodeValues, initNode} from '@/common/util';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
   ExtraNodeData,
@@ -52,7 +52,7 @@ import {
   NodeDataContext,
   NodeValuesContext,
 } from '@/context/GraphProvider';
-import {GradeSelectOption, findBestGrade} from '@/utils/bestGrade';
+import {GradeSelectOption, findBestGrade} from '@/utils';
 import CoursePartValuesDialog from './CoursePartValuesDialog';
 import SelectCoursePartsDialog from './SelectCoursePartsDialog';
 import './flow.scss'; // Import styles

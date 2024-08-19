@@ -58,7 +58,7 @@ import {
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import AddAplusGradeSourceDialog from './course-parts-view/AddAplusGradeSourceDialog';
-import NewAplusCoursePartsDialog from './course-parts-view/NewAplusCoursePartsDialog';
+import NewAplusCourseTasksDialog from './course-parts-view/NewAplusCourseTasksDialog';
 import AddCoursePartDialog from './course-parts-view/NewCoursePartDialog';
 import AddCourseTaskDialog from './course-parts-view/NewCourseTaskDialog';
 import ViewAplusGradeSourcesDialog from './course-parts-view/ViewAplusGradeSourcesDialog';
@@ -161,15 +161,7 @@ const CoursePartsView = (): JSX.Element => {
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [unsavedChanges]);
 
-  const handleSelectCoursePart = async (partId: number): Promise<void> => {
-    if (partId === selectedPart) return;
-
-    if (unsavedChanges) {
-      const confirmation = await AsyncConfirmationModal({confirmDiscard: true});
-      if (!confirmation) return;
-    }
-    setSelectedPart(partId);
-
+  const updateRows = (partId: number): void => {
     if (courseTasks.data === undefined) return;
     const newRows = courseTasks.data
       .filter(courseTask => courseTask.coursePartId === partId)
@@ -184,6 +176,25 @@ const CoursePartsView = (): JSX.Element => {
       }));
     setRows(newRows);
     setInitRows(structuredClone(newRows));
+  };
+
+  // Update rows when course tasks change
+  const [oldCourseTaskData, setOldCourseTaskData] =
+    useState<typeof courseTasks.data>(undefined);
+  if (courseTasks.data !== oldCourseTaskData) {
+    setOldCourseTaskData(courseTasks.data);
+    if (selectedPart !== null) updateRows(selectedPart);
+  }
+
+  const handleSelectCoursePart = async (partId: number): Promise<void> => {
+    if (partId === selectedPart) return;
+
+    if (unsavedChanges) {
+      const confirmation = await AsyncConfirmationModal({confirmDiscard: true});
+      if (!confirmation) return;
+    }
+    setSelectedPart(partId);
+    updateRows(partId);
   };
 
   const handleAddCourseTask = (
@@ -403,7 +414,7 @@ const CoursePartsView = (): JSX.Element => {
         onClose={() => setAddTaskDialogOpen(false)}
         onSave={handleAddCourseTask}
       />
-      <NewAplusCoursePartsDialog
+      <NewAplusCourseTasksDialog
         open={aplusDialogOpen}
         onClose={() => setAplusDialogOpen(false)}
         coursePartId={selectedPart}
@@ -481,14 +492,17 @@ const CoursePartsView = (): JSX.Element => {
                 secondaryAction={
                   editRights ? (
                     <>
-                      <Tooltip placement="top" title={t('Exit')}>
+                      <Tooltip
+                        placement="top"
+                        title={t('course.parts.open-part-graph')}
+                      >
                         <IconButton onClick={() => {}}>
                           <OpenInNew />
                         </IconButton>
                       </Tooltip>
                       <Tooltip
                         placement="top"
-                        title={t('course.models.rename.title')}
+                        title={t('course.parts.edit-part')}
                       >
                         <IconButton onClick={() => {}}>
                           <Edit />

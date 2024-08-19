@@ -15,7 +15,7 @@ import {
   IdSchema,
   NewGradingModelData,
 } from '@/common/types';
-import {initGraph} from '@/common/util/initGraph';
+import {initGraph} from '@/common/util';
 import {app} from '../../src/app';
 import GradingModel from '../../src/database/models/gradingModel';
 import {createData} from '../util/createData';

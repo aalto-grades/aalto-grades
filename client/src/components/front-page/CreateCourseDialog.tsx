@@ -41,8 +41,11 @@ import FormField from '@/components/shared/FormikField';
 import FormLanguagesField from '@/components/shared/FormikLanguageField';
 import {useAddCourse} from '@/hooks/useApi';
 import {useLocalize} from '@/hooks/useLocalize';
-import {convertToClientGradingScale} from '@/utils/textFormat';
-import {departments, sisuLanguageOptions} from '@/utils/utils';
+import {
+  convertToClientGradingScale,
+  departments,
+  sisuLanguageOptions,
+} from '@/utils';
 
 type FormData = {
   courseCode: string;

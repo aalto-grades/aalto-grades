@@ -78,7 +78,7 @@ const ViewAplusGradeSourcesDialog = ({
             </TableHead>
             <TableBody>
               {aplusGradeSources.map(source => (
-                <TableRow>
+                <TableRow key={source.id}>
                   <TableCell>{source.aplusCourse.courseCode}</TableCell>
                   <TableCell>{source.aplusCourse.name}</TableCell>
                   <TableCell>{source.aplusCourse.instance}</TableCell>

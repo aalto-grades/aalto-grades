@@ -102,6 +102,7 @@ const AddCourseTaskDialog = ({
               label={t('general.days-valid')}
               helperText={t('course.parts.create-task.days-valid-help')}
               type="string"
+              InputProps={{inputMode: 'numeric'}}
             />
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
@@ -109,6 +110,7 @@ const AddCourseTaskDialog = ({
               label={t('general.max-grade')}
               helperText={t('course.parts.create-task.max-grade-valid-help')}
               type="string"
+              InputProps={{inputMode: 'numeric'}}
             />
           </DialogContent>
           <DialogActions>

@@ -21,7 +21,7 @@ import {useNavigate} from 'react-router-dom';
 import {CourseData, CourseRoleType, SystemRole} from '@/common/types';
 import useAuth from '@/hooks/useAuth';
 import {HeadCellData} from '@/types';
-import {getCourseRole} from '@/utils/utils';
+import {getCourseRole} from '@/utils';
 
 const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
   const {t} = useTranslation();
