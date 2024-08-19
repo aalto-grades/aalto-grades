@@ -16,7 +16,9 @@ import {useParams} from 'react-router-dom';
 import {
   AplusCourseData,
   AplusGradeSourceType,
+  EditCourseTaskData,
   NewAplusGradeSourceData,
+  NewCourseTaskData,
 } from '@/common/types';
 import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
 import {useAddCourseTask} from '@/hooks/api/courseTask';
@@ -29,13 +31,15 @@ import SelectAplusGradeSources from './SelectAplusGradeSources';
 import Type = AplusGradeSourceType;
 
 type PropsType = {
-  handleClose: () => void;
   open: boolean;
+  onClose: () => void;
+  coursePartId: number | null;
 };
 
 const NewAplusCoursePartsDialog = ({
-  handleClose,
   open,
+  onClose,
+  coursePartId,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
@@ -51,10 +55,7 @@ const NewAplusCoursePartsDialog = ({
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
   const [courseTasksWithSource, setCourseTasksWithSource] = useState<
-    [
-      {name: string; daysValid: number; maxGrade: number},
-      NewAplusGradeSourceData,
-    ][]
+    [NewCourseTaskData, NewAplusGradeSourceData][]
   >([]);
 
   useEffect(() => {
@@ -65,7 +66,7 @@ const NewAplusCoursePartsDialog = ({
     setStep(0);
     setAplusCourse(null);
     setCourseTasksWithSource([]);
-    handleClose();
+    onClose();
   };
 
   const handleSelectionChange = (
@@ -75,13 +76,21 @@ const NewAplusCoursePartsDialog = ({
     source: NewAplusGradeSourceData
   ): void => {
     if (checked) {
-      setCourseTasksWithSource([
-        ...courseTasksWithSource,
-        [{name: name, daysValid: 365, maxGrade: maxGrade}, source],
-      ]);
+      setCourseTasksWithSource(oldTasks =>
+        oldTasks.concat([
+          {
+            name: name,
+            coursePartId: coursePartId!,
+            daysValid: null,
+            maxGrade: maxGrade,
+          },
+          source,
+        ])
+      );
     } else {
-      setCourseTasksWithSource(
-        courseTasksWithSource.filter(([_, s]) => {
+      setCourseTasksWithSource(oldTasks =>
+        oldTasks.filter(([_, s]) => {
+          // Type.Exercise missing?
           if (s.sourceType === Type.Module && source.sourceType === Type.Module)
             return s.moduleId !== source.moduleId;
 
@@ -100,40 +109,40 @@ const NewAplusCoursePartsDialog = ({
     }
   };
 
-  const handleCoursePartChange = (
+  const handleCourseTaskChange = (
     index: number,
-    coursePartEdit: {
-      name?: string;
-      daysValid?: number;
-      maxGrade?: number;
-    }
+    coursePartEdit: EditCourseTaskData
   ): void => {
     setCourseTasksWithSource(
-      courseTasksWithSource.map(([coursePart, source], i) => {
+      courseTasksWithSource.map(([courseTask, source], i) => {
         if (i === index) {
           return [
             {
-              name: coursePartEdit.name ?? coursePart.name,
-              daysValid: coursePartEdit.daysValid ?? coursePart.daysValid,
+              name: coursePartEdit.name ?? courseTask.name,
+              coursePartId: coursePartId!,
+              daysValid:
+                coursePartEdit.daysValid !== undefined
+                  ? coursePartEdit.daysValid
+                  : courseTask.daysValid,
               maxGrade:
                 coursePartEdit.maxGrade !== undefined
                   ? coursePartEdit.maxGrade
-                  : coursePart.maxGrade,
+                  : courseTask.maxGrade,
             },
             source,
           ];
         }
-        return [coursePart, source];
+        return [courseTask, source];
       })
     );
   };
 
   const handleSubmit = async (): Promise<void> => {
     const sources: NewAplusGradeSourceData[] = [];
-    for (const [coursePart, source] of courseTasksWithSource) {
+    for (const [courseTask, source] of courseTasksWithSource) {
       sources.push({
         ...source,
-        courseTaskId: await addCourseTask.mutateAsync(coursePart),
+        courseTaskId: await addCourseTask.mutateAsync(courseTask),
       });
     }
 
@@ -170,8 +179,8 @@ const NewAplusCoursePartsDialog = ({
           )}
           {step === 2 && aplusCourse && (
             <CreateAplusCourseParts
-              coursePartsWithSource={courseTasksWithSource}
-              handleChange={handleCoursePartChange}
+              courseTasksWithSource={courseTasksWithSource}
+              handleChange={handleCourseTaskChange}
             />
           )}
         </DialogContent>
@@ -204,7 +213,7 @@ const NewAplusCoursePartsDialog = ({
         </DialogActions>
       </Dialog>
       <AplusTokenDialog
-        handleClose={handleClose}
+        handleClose={onClose}
         handleSubmit={() => {
           setAplusTokenDialogOpen(false);
           aplusCourses.refetch();

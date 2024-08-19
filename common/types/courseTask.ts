@@ -18,7 +18,6 @@ export const CourseTaskDataSchema = z.strictObject({
 });
 export const NewCourseTaskSchema = CourseTaskDataSchema.omit({
   id: true,
-  coursePartId: true,
   archived: true,
   aplusGradeSources: true,
 }).strict();

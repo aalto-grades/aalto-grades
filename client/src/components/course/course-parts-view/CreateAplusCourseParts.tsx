@@ -14,28 +14,26 @@ import {
 import {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {NewAplusGradeSourceData} from '@/common/types';
+import {
+  EditCourseTaskData,
+  NewAplusGradeSourceData,
+  NewCourseTaskData,
+} from '@/common/types';
 
 type CreateAplusCoursePartsProps = {
-  coursePartsWithSource: [
-    {name: string; daysValid: number; maxGrade: number},
-    NewAplusGradeSourceData,
-  ][];
-  handleChange: (
-    index: number,
-    coursePart: {name?: string; daysValid?: number}
-  ) => void;
+  courseTasksWithSource: [NewCourseTaskData, NewAplusGradeSourceData][];
+  handleChange: (index: number, courseTask: EditCourseTaskData) => void;
 };
 
 const CreateAplusCourseParts = ({
-  coursePartsWithSource,
+  courseTasksWithSource,
   handleChange,
 }: CreateAplusCoursePartsProps): JSX.Element => {
   const {t} = useTranslation();
 
   return (
     <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
-      {coursePartsWithSource.map(([coursePart, _], index) => (
+      {courseTasksWithSource.map(([coursePart, _], index) => (
         <Card sx={{m: 1}}>
           <CardContent
             sx={{display: 'flex', flexDirection: 'column', width: 370}}
@@ -50,9 +48,12 @@ const CreateAplusCourseParts = ({
               sx={{mt: 2}}
               label={t('general.days-valid')}
               type="number"
-              value={coursePart.daysValid}
+              value={coursePart.daysValid ?? ''}
               onChange={e =>
-                handleChange(index, {daysValid: Number(e.target.value)})
+                handleChange(index, {
+                  daysValid:
+                    e.target.value === '' ? null : Number(e.target.value),
+                })
               }
             />
             <Box

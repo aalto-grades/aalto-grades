@@ -11,44 +11,47 @@ import {
 } from '@mui/material';
 import {Formik, FormikHelpers, FormikProps} from 'formik';
 import {useTranslation} from 'react-i18next';
-import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 
 import FormField from '@/components/shared/FormikField';
-import {useAddCoursePart} from '@/hooks/useApi';
-import {nullableDateSchema} from '@/types';
+import {nullableIntSchema} from '@/types';
 
-type FormData = {name: string; expiryDate: Date | '' | null};
-const initialValues: FormData = {name: '', expiryDate: null};
+type FormData = {
+  name: string;
+  daysValid: number | '' | null;
+  maxGrade: number | '' | null;
+};
+
+const initialValues: FormData = {name: '', daysValid: null, maxGrade: null};
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
+  onSave: (
+    name: string,
+    daysValid: number | null,
+    maxGrade: number | null
+  ) => void;
 };
-const AddCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
+const AddCourseTaskDialog = ({
+  open,
+  onClose,
+  onSave,
+}: PropsType): JSX.Element => {
   const {t} = useTranslation();
-  const {courseId} = useParams() as {courseId: string};
-  const addCoursePart = useAddCoursePart(courseId);
 
   const ValidationSchema = z.strictObject({
     name: z.string().min(1),
-    expiryDate: nullableDateSchema(t),
+    daysValid: nullableIntSchema(t),
+    maxGrade: nullableIntSchema(t),
   });
 
-  const onSubmit = async (
+  const onSubmit = (
     values: FormData,
-    {resetForm, setSubmitting}: FormikHelpers<FormData>
-  ): Promise<void> => {
+    {resetForm}: FormikHelpers<FormData>
+  ): void => {
     const parsedValues = ValidationSchema.parse(values);
-    try {
-      await addCoursePart.mutateAsync({
-        name: parsedValues.name,
-        expiryDate: parsedValues.expiryDate,
-      });
-    } catch {
-      setSubmitting(false);
-      return;
-    }
+    onSave(parsedValues.name, parsedValues.daysValid, parsedValues.maxGrade);
     onClose();
     resetForm();
   };
@@ -56,7 +59,8 @@ const AddCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
   const validateForm = (
     values: FormData
   ): {[key in keyof FormData]?: string[]} | undefined => {
-    if (values.expiryDate === '') values.expiryDate = null;
+    if (values.daysValid === '') values.daysValid = null;
+    if (values.maxGrade === '') values.maxGrade = null;
 
     const result = ValidationSchema.safeParse(values);
     if (result.success) return;
@@ -83,21 +87,28 @@ const AddCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
           fullWidth
           maxWidth="xs"
         >
-          <DialogTitle>{t('course.parts.create.title')}</DialogTitle>
+          <DialogTitle>{t('course.parts.create-task.title')}</DialogTitle>
           <DialogContent>
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               value="name"
               label={`${t('general.name')}*`}
-              helperText={t('course.parts.create.name-help')}
+              helperText={t('course.parts.create-task.name-help')}
               type="string"
             />
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
-              value="expiryDate"
-              label={t('general.expiry-date')}
-              helperText={t('course.parts.create.expiry-date-valid-help')}
-              type="date"
+              value="daysValid"
+              label={t('general.days-valid')}
+              helperText={t('course.parts.create-task.days-valid-help')}
+              type="string"
+            />
+            <FormField
+              form={form as unknown as FormikProps<{[key: string]: unknown}>}
+              value="maxGrade"
+              label={t('general.max-grade')}
+              helperText={t('course.parts.create-task.max-grade-valid-help')}
+              type="string"
             />
           </DialogContent>
           <DialogActions>
@@ -125,4 +136,4 @@ const AddCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
   );
 };
 
-export default AddCoursePartDialog;
+export default AddCourseTaskDialog;

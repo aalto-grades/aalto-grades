@@ -28,13 +28,14 @@ export const findCourseTaskById = async (id: number): Promise<CourseTask> => {
   return courseTask;
 };
 
-// TODO: Remove if unused
-/** Finds all course tasks of a specific course part. */
-export const findCourseTaskByCoursePartId = async (
-  coursePartId: number
+/** Finds all course tasks of a specific course. */
+export const findCourseTaskByCourseId = async (
+  courseId: number
 ): Promise<CourseTaskData[]> => {
+  const courseParts = await CoursePart.findAll({where: {courseId}});
+
   const courseTasks = (await CourseTask.findAll({
-    where: {coursePartId: coursePartId},
+    where: {coursePartId: courseParts.map(part => part.id)},
     include: AplusGradeSource,
     order: [['id', 'ASC']],
   })) as (CourseTask & {

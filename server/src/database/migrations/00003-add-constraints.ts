@@ -46,6 +46,13 @@ export default {
         transaction,
       });
 
+      await queryInterface.addConstraint('course_task', {
+        fields: ['course_part_id', 'name'],
+        type: 'unique',
+        name: 'course_part_course_task_name_un',
+        transaction,
+      });
+
       await queryInterface.addConstraint('task_grade', {
         fields: ['date'],
         type: 'check',
@@ -84,6 +91,12 @@ export default {
       await queryInterface.removeConstraint(
         'course_part',
         'course_course_part_name_un',
+        {transaction}
+      );
+
+      await queryInterface.removeConstraint(
+        'course_task',
+        'course_part_course_task_name_un',
         {transaction}
       );
 

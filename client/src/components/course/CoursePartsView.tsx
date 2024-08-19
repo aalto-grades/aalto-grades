@@ -2,8 +2,28 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Archive, Delete, Unarchive} from '@mui/icons-material';
-import {Box, Button, Typography} from '@mui/material';
+import {
+  AddCircle,
+  Archive,
+  Delete,
+  Edit,
+  More,
+  OpenInNew,
+  Unarchive,
+} from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import {grey} from '@mui/material/colors';
 import {
   DataGrid,
   GridActionsCellItem,
@@ -19,16 +39,19 @@ import {useBlocker, useParams} from 'react-router-dom';
 
 import {
   AplusGradeSourceData,
-  EditCoursePartData,
-  NewCoursePartData,
+  EditCourseTaskData,
+  NewCourseTaskData,
   SystemRole,
 } from '@/common/types';
 import SaveBar from '@/components/shared/SaveBar';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
-  useAddCoursePart,
-  useDeleteCoursePart,
-  useEditCoursePart,
+  useAddCourseTask,
+  useDeleteCourseTask,
+  useEditCourseTask,
+  useGetCourseTasks,
+} from '@/hooks/api/courseTask';
+import {
   useGetAllGradingModels,
   useGetCourseParts,
   useGetGrades,
@@ -37,14 +60,17 @@ import useAuth from '@/hooks/useAuth';
 import AddAplusGradeSourceDialog from './course-parts-view/AddAplusGradeSourceDialog';
 import NewAplusCoursePartsDialog from './course-parts-view/NewAplusCoursePartsDialog';
 import AddCoursePartDialog from './course-parts-view/NewCoursePartDialog';
+import AddCourseTaskDialog from './course-parts-view/NewCourseTaskDialog';
 import ViewAplusGradeSourcesDialog from './course-parts-view/ViewAplusGradeSourcesDialog';
 
 type ColTypes = {
   id: number;
   coursePartId: number;
   name: string;
-  expiryDate: Date | null;
+  daysValid: number | null;
+  maxGrade: number | null;
   archived: boolean;
+  aplusGradeSources: AplusGradeSourceData[];
 };
 
 const CoursePartsView = (): JSX.Element => {
@@ -52,17 +78,23 @@ const CoursePartsView = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
 
-  const grades = useGetGrades(courseId);
   const gradingModels = useGetAllGradingModels(courseId);
   const courseParts = useGetCourseParts(courseId);
-  const addCoursePart = useAddCoursePart(courseId);
-  const editCoursePart = useEditCoursePart(courseId);
-  const deleteCoursePart = useDeleteCoursePart(courseId);
 
+  const grades = useGetGrades(courseId);
+  const courseTasks = useGetCourseTasks(courseId);
+  const addCourseTask = useAddCourseTask(courseId);
+  const editCourseTask = useEditCourseTask(courseId);
+  const deleteCourseTask = useDeleteCourseTask(courseId);
+
+  const [addPartDialogOpen, setAddPartDialogOpen] = useState<boolean>(false);
+  const [selectedPart, setSelectedPart] = useState<number | null>(null);
+
+  const [addTaskDialogOpen, setAddTaskDialogOpen] = useState<boolean>(false);
   const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
   const [editing, setEditing] = useState<boolean>(false);
-  const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false);
+
   const [aplusDialogOpen, setAplusDialogOpen] = useState<boolean>(false);
   const [addAplusSourcesTo, setAddAplusSourcesTo] = useState<{
     courseTaskId: number | null;
@@ -73,7 +105,7 @@ const CoursePartsView = (): JSX.Element => {
   });
   const [viewAplusSourcesOpen, setViewAplusSourcesOpen] =
     useState<boolean>(false);
-  const [aplusGradeSources, _setAplusGradeSources] = useState<
+  const [aplusGradeSources, setAplusGradeSources] = useState<
     AplusGradeSourceData[]
   >([]);
 
@@ -117,28 +149,6 @@ const CoursePartsView = (): JSX.Element => {
       unsavedChanges && currentLocation.pathname !== nextLocation.pathname
   );
 
-  // Update rows when coursePart.data updates
-  const [oldCoursePartData, setOldCoursePartData] =
-    useState<typeof courseParts.data>(undefined);
-  if (courseParts.data !== oldCoursePartData) {
-    setOldCoursePartData(courseParts.data);
-
-    if (courseParts.data !== undefined) {
-      const newRows = courseParts.data.map(coursePart => ({
-        id: coursePart.id,
-        coursePartId: coursePart.id,
-        name: coursePart.name,
-        expiryDate: coursePart.expiryDate,
-        validUntil: null,
-        archived: coursePart.archived,
-      }));
-      if (JSON.stringify(newRows) !== JSON.stringify(rows)) {
-        setRows(newRows);
-        setInitRows(structuredClone(newRows));
-      }
-    }
-  }
-
   // Warning if leaving with unsaved
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent): void => {
@@ -151,40 +161,73 @@ const CoursePartsView = (): JSX.Element => {
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [unsavedChanges]);
 
-  const handleAddCoursePart = (name: string, expiryDate: Date | null): void => {
+  const handleSelectCoursePart = async (partId: number): Promise<void> => {
+    if (partId === selectedPart) return;
+
+    if (unsavedChanges) {
+      const confirmation = await AsyncConfirmationModal({confirmDiscard: true});
+      if (!confirmation) return;
+    }
+    setSelectedPart(partId);
+
+    if (courseTasks.data === undefined) return;
+    const newRows = courseTasks.data
+      .filter(courseTask => courseTask.coursePartId === partId)
+      .map(courseTask => ({
+        id: courseTask.id,
+        coursePartId: courseTask.id,
+        name: courseTask.name,
+        daysValid: courseTask.daysValid,
+        maxGrade: courseTask.maxGrade,
+        archived: courseTask.archived,
+        aplusGradeSources: courseTask.aplusGradeSources,
+      }));
+    setRows(newRows);
+    setInitRows(structuredClone(newRows));
+  };
+
+  const handleAddCourseTask = (
+    name: string,
+    daysValid: number | null,
+    maxGrade: number | null
+  ): void => {
     setRows(oldRows => {
       const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
       return oldRows.concat({
         id: freeId,
         coursePartId: -1,
         name,
-        expiryDate,
+        daysValid,
+        maxGrade,
         archived: false,
+        aplusGradeSources: [],
       });
     });
   };
 
   const handleSubmit = async (): Promise<void> => {
-    const newCourseParts: NewCoursePartData[] = [];
-    const deletedCourseParts: number[] = [];
-    const editedCourseParts: {
-      coursePartsId: number;
-      coursePart: EditCoursePartData;
+    const newCourseTasks: NewCourseTaskData[] = [];
+    const deletedCourseTasks: number[] = [];
+    const editedCourseTasks: {
+      courseTaskId: number;
+      courseTask: EditCourseTaskData;
     }[] = [];
 
     for (const row of rows) {
       if (row.coursePartId === -1) {
-        newCourseParts.push({
+        newCourseTasks.push({
           name: row.name,
-          expiryDate: row.expiryDate,
+          coursePartId: selectedPart!,
+          daysValid: row.daysValid,
+          maxGrade: row.maxGrade,
         });
       } else {
-        editedCourseParts.push({
-          coursePartsId: row.coursePartId,
-          coursePart: {
+        editedCourseTasks.push({
+          courseTaskId: row.coursePartId,
+          courseTask: {
             name: row.name,
-            expiryDate: row.expiryDate,
-            archived: row.archived,
+            daysValid: row.daysValid,
+            maxGrade: row.maxGrade,
           },
         });
       }
@@ -193,20 +236,20 @@ const CoursePartsView = (): JSX.Element => {
     const newAttIds = new Set(rows.map(row => row.coursePartId));
     for (const initRow of initRows) {
       if (!newAttIds.has(initRow.coursePartId))
-        deletedCourseParts.push(initRow.coursePartId);
+        deletedCourseTasks.push(initRow.coursePartId);
     }
 
     await Promise.all([
-      ...newCourseParts.map(coursePart =>
-        addCoursePart.mutateAsync(coursePart)
+      ...newCourseTasks.map(courseTask =>
+        addCourseTask.mutateAsync(courseTask)
       ),
-      ...deletedCourseParts.map(coursePartId =>
-        deleteCoursePart.mutateAsync(coursePartId)
+      ...deletedCourseTasks.map(coursePartId =>
+        deleteCourseTask.mutateAsync(coursePartId)
       ),
-      ...editedCourseParts.map(coursePartData =>
-        editCoursePart.mutateAsync({
-          coursePartId: coursePartData.coursePartsId,
-          coursePart: coursePartData.coursePart,
+      ...editedCourseTasks.map(courseTaskData =>
+        editCourseTask.mutateAsync({
+          courseTaskId: courseTaskData.courseTaskId,
+          courseTask: courseTaskData.courseTask,
         })
       ),
     ]);
@@ -215,34 +258,34 @@ const CoursePartsView = (): JSX.Element => {
     setInitRows(structuredClone(rows));
   };
 
-  const getAplusActions = (_params: GridRowParams<ColTypes>): JSX.Element[] => {
+  const getAplusActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
     const elements: JSX.Element[] = [];
 
-    // elements.push(
-    //   <GridActionsCellItem
-    //     icon={<AddCircle />}
-    //     label={t('course.parts.add-a+-source')}
-    //     onClick={() =>
-    //       setAddAplusSourcesTo({
-    //         coursePartId: params.row.id,
-    //         aplusGradeSources: params.row.aplusGradeSources,
-    //       })
-    //     }
-    //   />
-    // );
+    elements.push(
+      <GridActionsCellItem
+        icon={<AddCircle />}
+        label={t('course.parts.add-a+-source')}
+        onClick={() =>
+          setAddAplusSourcesTo({
+            courseTaskId: params.row.id,
+            aplusGradeSources: params.row.aplusGradeSources,
+          })
+        }
+      />
+    );
 
-    // if (params.row.aplusGradeSources.length > 0) {
-    //   elements.push(
-    //     <GridActionsCellItem
-    //       icon={<More />}
-    //       label={t('course.parts.view-a+-sources')}
-    //       onClick={() => {
-    //         setAplusGradeSources(params.row.aplusGradeSources);
-    //         setViewAplusSourcesOpen(true);
-    //       }}
-    //     />
-    //   );
-    // }
+    if (params.row.aplusGradeSources.length > 0) {
+      elements.push(
+        <GridActionsCellItem
+          icon={<More />}
+          label={t('course.parts.view-a+-sources')}
+          onClick={() => {
+            setAplusGradeSources(params.row.aplusGradeSources);
+            setViewAplusSourcesOpen(true);
+          }}
+        />
+      );
+    }
 
     return elements;
   };
@@ -344,7 +387,7 @@ const CoursePartsView = (): JSX.Element => {
   ];
 
   const confirmDiscard = async (): Promise<void> => {
-    if (await AsyncConfirmationModal({confirmNavigate: true})) {
+    if (await AsyncConfirmationModal({confirmDiscard: true})) {
       setRows(structuredClone(initRows));
     }
   };
@@ -352,13 +395,18 @@ const CoursePartsView = (): JSX.Element => {
   return (
     <>
       <AddCoursePartDialog
-        onClose={() => setAddDialogOpen(false)}
-        open={addDialogOpen}
-        onSave={handleAddCoursePart}
+        open={addPartDialogOpen}
+        onClose={() => setAddPartDialogOpen(false)}
+      />
+      <AddCourseTaskDialog
+        open={addTaskDialogOpen}
+        onClose={() => setAddTaskDialogOpen(false)}
+        onSave={handleAddCourseTask}
       />
       <NewAplusCoursePartsDialog
-        handleClose={() => setAplusDialogOpen(false)}
         open={aplusDialogOpen}
+        onClose={() => setAplusDialogOpen(false)}
+        coursePartId={selectedPart}
       />
       <AddAplusGradeSourceDialog
         handleClose={() =>
@@ -396,34 +444,100 @@ const CoursePartsView = (): JSX.Element => {
       <Box sx={{display: 'flex', gap: 1, mb: 1, mt: 1}}>
         {editRights && (
           <>
-            <Button variant="outlined" onClick={() => setAddDialogOpen(true)}>
-              {t('course.parts.add-new')}
+            <Button
+              variant="outlined"
+              onClick={() => setAddPartDialogOpen(true)}
+            >
+              {t('course.parts.add-new-part')}
             </Button>
-            <Button variant="outlined" onClick={() => setAplusDialogOpen(true)}>
-              {t('course.parts.add-from-a+')}
-            </Button>
+            {selectedPart !== null && (
+              <>
+                <Button
+                  variant="outlined"
+                  onClick={() => setAddTaskDialogOpen(true)}
+                >
+                  {t('course.parts.add-new-task')}
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() => setAplusDialogOpen(true)}
+                >
+                  {t('course.parts.add-from-a+')}
+                </Button>
+              </>
+            )}
           </>
         )}
       </Box>
 
-      <div style={{height: '100%', maxHeight: '70vh'}}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          rowHeight={25}
-          editMode="row"
-          rowSelection={false}
-          disableColumnSelector
-          onRowEditStart={() => setEditing(true)}
-          onRowEditStop={() => setEditing(false)}
-          processRowUpdate={updatedRow => {
-            setRows(oldRows =>
-              oldRows.map(row => (row.id === updatedRow.id ? updatedRow : row))
-            );
-            return updatedRow;
-          }}
-        />
-      </div>
+      <Grid container spacing={2}>
+        <Grid item xs={4} sx={{border: '1px solid'}}>
+          <List>
+            {courseParts.data?.map(coursePart => (
+              <ListItem
+                key={coursePart.id}
+                sx={{backgroundColor: coursePart.archived ? grey[200] : ''}}
+                disablePadding
+                secondaryAction={
+                  editRights ? (
+                    <>
+                      <Tooltip placement="top" title={t('Exit')}>
+                        <IconButton onClick={() => {}}>
+                          <OpenInNew />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip
+                        placement="top"
+                        title={t('course.models.rename.title')}
+                      >
+                        <IconButton onClick={() => {}}>
+                          <Edit />
+                        </IconButton>
+                      </Tooltip>
+                    </>
+                  ) : null
+                }
+              >
+                <ListItemButton
+                  onClick={() => {
+                    handleSelectCoursePart(coursePart.id);
+                  }}
+                >
+                  <ListItemText
+                    primary={coursePart.name}
+                    sx={{
+                      border:
+                        selectedPart === coursePart.id ? '1px solid' : 'none',
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Grid>
+        <Grid item xs={8} sx={{border: '1px solid'}}>
+          <div style={{height: '100%', maxHeight: '70vh'}}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              rowHeight={25}
+              editMode="row"
+              rowSelection={false}
+              disableColumnSelector
+              onRowEditStart={() => setEditing(true)}
+              onRowEditStop={() => setEditing(false)}
+              processRowUpdate={updatedRow => {
+                setRows(oldRows =>
+                  oldRows.map(row =>
+                    row.id === updatedRow.id ? updatedRow : row
+                  )
+                );
+                return updatedRow;
+              }}
+            />
+          </div>
+        </Grid>
+      </Grid>
     </>
   );
 };

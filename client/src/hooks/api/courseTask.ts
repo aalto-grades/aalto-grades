@@ -15,6 +15,7 @@ import {
 import {
   CourseTaskData,
   CourseTaskDataArraySchema,
+  EditCourseTaskData,
   IdSchema,
   NewCourseTaskData,
 } from '@/common/types';
@@ -29,7 +30,7 @@ export const useGetCourseTasks = (
     queryKey: ['course-tasks', courseId],
     queryFn: async () =>
       CourseTaskDataArraySchema.parse(
-        (await axios.get(`/v1/courses/${courseId}/tasks`)).data
+        (await axios.get(`/api/v1/courses/${courseId}/tasks`)).data
       ),
     ...options,
   });
@@ -43,7 +44,7 @@ export const useAddCourseTask = (
   return useMutation({
     mutationFn: async courseTask =>
       IdSchema.parse(
-        (await axios.post(`/v1/courses/${courseId}/parts`, courseTask)).data
+        (await axios.post(`/api/v1/courses/${courseId}/tasks`, courseTask)).data
       ),
 
     onSuccess: () => {
@@ -55,55 +56,55 @@ export const useAddCourseTask = (
   });
 };
 
-// type EditCoursePartVars = {
-//   coursePartId: Numeric;
-//   coursePart: EditCoursePartData;
-// };
-// export const useEditCoursePart = (
-//   courseId: Numeric,
-//   options?: UseMutationOptions<void, unknown, EditCoursePartVars>
-// ): UseMutationResult<void, unknown, EditCoursePartVars> => {
-//   const queryClient = useQueryClient();
+type EditCourseTaskVars = {
+  courseTaskId: Numeric;
+  courseTask: EditCourseTaskData;
+};
+export const useEditCourseTask = (
+  courseId: Numeric,
+  options?: UseMutationOptions<void, unknown, EditCourseTaskVars>
+): UseMutationResult<void, unknown, EditCourseTaskVars> => {
+  const queryClient = useQueryClient();
 
-//   return useMutation({
-//     mutationFn: vars =>
-//       axios.put(
-//         `/v1/courses/${courseId}/parts/${vars.coursePartId}`,
-//         vars.coursePart
-//       ),
+  return useMutation({
+    mutationFn: vars =>
+      axios.put(
+        `/api/v1/courses/${courseId}/tasks/${vars.courseTaskId}`,
+        vars.courseTask
+      ),
 
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({
-//         queryKey: ['course-parts', courseId],
-//       });
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['course-tasks', courseId],
+      });
 
-//       queryClient.invalidateQueries({
-//         queryKey: ['all-grading-models', courseId],
-//       });
-//     },
-//     ...options,
-//   });
-// };
+      queryClient.invalidateQueries({
+        queryKey: ['all-grading-models', courseId],
+      });
+    },
+    ...options,
+  });
+};
 
-// export const useDeleteCoursePart = (
-//   courseId: Numeric,
-//   options?: UseMutationOptions<void, unknown, Numeric>
-// ): UseMutationResult<void, unknown, Numeric> => {
-//   const queryClient = useQueryClient();
+export const useDeleteCourseTask = (
+  courseId: Numeric,
+  options?: UseMutationOptions<void, unknown, Numeric>
+): UseMutationResult<void, unknown, Numeric> => {
+  const queryClient = useQueryClient();
 
-//   return useMutation({
-//     mutationFn: coursePartId =>
-//       axios.delete(`/v1/courses/${courseId}/parts/${coursePartId}`),
+  return useMutation({
+    mutationFn: courseTaskId =>
+      axios.delete(`/api/v1/courses/${courseId}/tasks/${courseTaskId}`),
 
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({
-//         queryKey: ['course-parts', courseId],
-//       });
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['course-tasks', courseId],
+      });
 
-//       queryClient.invalidateQueries({
-//         queryKey: ['all-grading-models', courseId],
-//       });
-//     },
-//     ...options,
-//   });
-// };
+      queryClient.invalidateQueries({
+        queryKey: ['all-grading-models', courseId],
+      });
+    },
+    ...options,
+  });
+};
