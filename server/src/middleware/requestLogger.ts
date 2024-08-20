@@ -12,6 +12,9 @@ morgan.token('remote-addr', req => {
     req.headers['x-forwarded-for'] ||
     req.socket.remoteAddress) as string;
 });
+morgan.token('user', (req: Request) => JSON.stringify(req.user));
+morgan.token('params', (req: Request) => JSON.stringify(req.params));
+morgan.token('body', (req: Request) => JSON.stringify(req.body));
 
 /**
  * Log messages for incoming HTTP requests to the Express server. Morgan formats
@@ -26,11 +29,6 @@ morgan.token('remote-addr', req => {
  * allowing for uniformity in log handling, and enabling any additional
  * configurations (like file logging) made in winston.
  */
-
-morgan.token('user', (req: Request) => JSON.stringify(req.user));
-morgan.token('params', (req: Request) => JSON.stringify(req.params));
-morgan.token('body', (req: Request) => JSON.stringify(req.body));
-
 export const requestLogger: RequestHandler = morgan(
   ':remote-addr :remote-user ":method :url HTTP/:http-version"' +
     ' :status :res[content-length] ":referrer" ":user-agent" ":user" ":params" ":body"',
