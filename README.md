@@ -20,34 +20,14 @@ allowing results to be directly imported to Aalto Grades through the A+ API.
 ## Getting started
 
 The project uses [Node.js](https://nodejs.org/en/) as its runtime environment
-and npm to manage dependencies.
+and npm to manage dependencies, which you will need to install.
 
-Most major GNU/Linux and BSD distributions contain packages for Node.js and
-npm. You can find a list of some common distributions and their Node.js and npm
-packages at: https://nodejs.org/en/download/package-manager/
-
-Windows and macOS users can install Node.js and npm from:
-https://nodejs.org/en/download/
+You may also wish to run the system using [Docker](https://www.docker.com), in
+which case you must also install Docker itself and Docker Compose.
 
 The README files of this repository primarily contain instructions for running
 Aalto Grades and its tests. For more documentation, please see the
 [wiki](https://github.com/aalto-grades/base-repository/wiki).
-
-### Docker
-
-You may also wish to run the system using [Docker](https://www.docker.com), in
-which case you must install Docker itself and Docker Compose.
-
-Many GNU/Linux and BSD distributions contain packages for `docker` and
-`docker compose`. You may need to configure Docker to use the remote registry
-`https://registry.hub.docker.com` before being able to run Aalto Grades, if it
-is not already preconfigured. Note that the registry and its containers can
-include _proprietary software_, so use it at your own discretion.
-
-Windows and macOS users may install Docker and Docker Compose from:
-
-- https://www.docker.com/
-- https://docs.docker.com/compose/install/
 
 ## Building and running
 
@@ -89,9 +69,11 @@ README file of the corresponding directory, such as `client/README.md` and
    [design guidelines](https://github.com/aalto-grades/base-repository/wiki/Design-Guidelines),
    and [licensing guidelines](https://github.com/aalto-grades/base-repository/wiki/Licensing-Guidelines).
 6. Update documentation and API definition as needed.
-7. Create a pull request to the `dev` branch.
-8. Check that all requirements pass.
-9. Request someone to review your PR.
+7. When developing the client, update (at minimum) the translation keys of all
+   languages using `npm run trans-parse` as described in `client/README.md`.
+8. Create a pull request to the `dev` branch.
+9. Check that all requirements pass.
+10. Request someone to review your PR.
 
 ## License
 

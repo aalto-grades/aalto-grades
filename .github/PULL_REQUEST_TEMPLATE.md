@@ -12,6 +12,7 @@ pull request by removing it from the list or by adding a short explanation.
 - [ ] I have updated documentation
 - [ ] My changes to the UI are in accordance with the [design guidelines](
       https://github.com/aalto-grades/base-repository/wiki/Design-Guidelines)
+- [ ] I have updated translation keys for all languages
 - [ ] I have marked all new files with the correct [license](
       https://github.com/aalto-grades/base-repository/wiki/Licensing-Guidelines)
 
