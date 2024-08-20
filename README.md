@@ -6,15 +6,15 @@ SPDX-License-Identifier: MIT
 
 # Aalto Grades
 
-Aalto Grades is a grade management system for storing the grades of students to
-course parts such as an exam, exercises, or a project, and optionally individual
-assigned tasks which make up these course parts, such as a particular essay or
-an A+ module. The grades of these tasks can then be used to calculate the grades
-of the course parts as well as students' final grades of the course. These final
-grades can then be exported to an external system for tracking course
-completion.
+Aalto Grades is a grade management system for storing the grades (or points) of
+students to course parts such as an exam, exercises, or a project, and
+optionally individual assigned tasks which make up these course parts, such as a
+particular essay or exercise. The grades of these tasks can then be used to
+calculate the grades of the course parts as well as students' final grades of
+the course. These final grades can then be exported to an external system for
+tracking course completion.
 
-Aalto Grades contains integration with (A+)[https://github.com/apluslms/a-plus],
+Aalto Grades contains integration with [A+](https://github.com/apluslms/a-plus),
 allowing results to be directly imported to Aalto Grades through the A+ API.
 
 ## Getting started
