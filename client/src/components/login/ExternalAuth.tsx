@@ -32,7 +32,7 @@ const ExternalAuth = (): JSX.Element => {
         type="submit"
         fullWidth
         sx={{mt: 1}}
-        href="/v1/auth/login-idp"
+        href="/api/v1/auth/login-idp"
       >
         {t('login.external.button')}
       </Button>
