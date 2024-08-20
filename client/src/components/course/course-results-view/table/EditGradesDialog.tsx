@@ -35,7 +35,7 @@ import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {useTableContext} from '@/context/useTableContext';
 import {useAddGrades, useDeleteGrade, useEditGrade} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
-import {findBestGrade} from '@/utils/bestGrade';
+import {findBestGrade} from '@/utils';
 
 type ColTypes = {
   id: number;

@@ -117,9 +117,10 @@
     "name": "UNTRANSLATED",
     "days-valid": "UNTRANSLATED",
     "max-grade": "UNTRANSLATED",
-    "submit": "UNTRANSLATED",
+    "expiry-date": "UNTRANSLATED",
     "cancel": "UNTRANSLATED",
     "save": "UNTRANSLATED",
+    "submit": "UNTRANSLATED",
     "course": "UNTRANSLATED",
     "instance": "UNTRANSLATED",
     "full-points": "UNTRANSLATED",
@@ -150,7 +151,6 @@
     "delete": "UNTRANSLATED",
     "discard": "UNTRANSLATED",
     "close": "UNTRANSLATED",
-    "expiry-date": "UNTRANSLATED",
     "exported": "UNTRANSLATED",
     "grades-saved": "UNTRANSLATED",
     "select-course-parts": "UNTRANSLATED",
@@ -158,6 +158,7 @@
     "a+-grade-source-id": "UNTRANSLATED",
     "course-part": "UNTRANSLATED",
     "import": "UNTRANSLATED",
+    "add-row": "UNTRANSLATED",
     "edit": "UNTRANSLATED",
     "course-parts": "UNTRANSLATED",
     "organizing-department": "UNTRANSLATED",
@@ -183,20 +184,19 @@
     "in-finnish": "UNTRANSLATED",
     "in-swedish": "UNTRANSLATED",
     "done": "UNTRANSLATED",
-    "final-grades": "UNTRANSLATED"
+    "final-grades": "UNTRANSLATED",
+    "not-int": "UNTRANSLATED"
   },
   "course": {
     "parts": {
       "select-grade-source": "UNTRANSLATED",
-      "select-grade-sources": "UNTRANSLATED",
-      "create-parts": "UNTRANSLATED",
       "create": {
         "title": "UNTRANSLATED",
         "name-help": "UNTRANSLATED",
-        "days-valid-help": "UNTRANSLATED",
-        "set-max-grade": "UNTRANSLATED",
-        "max-grade-help": "UNTRANSLATED"
+        "expiry-date-valid-help": "UNTRANSLATED"
       },
+      "select-grade-sources": "UNTRANSLATED",
+      "create-tasks": "UNTRANSLATED",
       "delete-a+": "UNTRANSLATED",
       "fetching-grades": "UNTRANSLATED",
       "select-for-fetching": "UNTRANSLATED",
@@ -210,8 +210,12 @@
       "delete-message": "UNTRANSLATED",
       "valid-until": "UNTRANSLATED",
       "archived": "UNTRANSLATED",
-      "add-new": "UNTRANSLATED",
-      "add-from-a+": "UNTRANSLATED"
+      "add-new-task": "UNTRANSLATED",
+      "add-new-part": "UNTRANSLATED",
+      "add-from-a+": "UNTRANSLATED",
+      "open-part-graph": "UNTRANSLATED",
+      "edit-part": "UNTRANSLATED",
+      "no-expiry-date": "UNTRANSLATED"
     },
     "results": {
       "model-has-deleted-and-archived": "UNTRANSLATED",
@@ -306,6 +310,7 @@
       "data-undefined": "UNTRANSLATED"
     },
     "edit": {
+      "saved": "UNTRANSLATED",
       "course-code-required": "UNTRANSLATED",
       "min-credits-required": "UNTRANSLATED",
       "min-credits-negative": "UNTRANSLATED",
@@ -315,7 +320,6 @@
       "name-finnish": "UNTRANSLATED",
       "name-swedish": "UNTRANSLATED",
       "max-below-min": "UNTRANSLATED",
-      "saved": "UNTRANSLATED",
       "title": "UNTRANSLATED",
       "course-code-help": "UNTRANSLATED",
       "course-name-in-format": "UNTRANSLATED",

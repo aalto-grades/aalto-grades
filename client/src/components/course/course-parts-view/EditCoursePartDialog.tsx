@@ -14,22 +14,31 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 
+import {CoursePartData} from '@/common/types';
 import FormField from '@/components/shared/FormikField';
-import {useAddCoursePart} from '@/hooks/useApi';
+import {useEditCoursePart} from '@/hooks/useApi';
 import {nullableDateSchema} from '@/types';
 
 type FormData = {name: string; expiryDate: Date | '' | null};
-const initialValues: FormData = {name: '', expiryDate: null};
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
+  coursePart: CoursePartData | null;
 };
-const AddCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
+const EditCoursePartDialog = ({
+  open,
+  onClose,
+  coursePart,
+}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
-  const addCoursePart = useAddCoursePart(courseId);
+  const editCoursePart = useEditCoursePart(courseId);
 
+  const initialValues: FormData = {
+    name: coursePart?.name ?? '',
+    expiryDate: coursePart?.expiryDate ?? '',
+  };
   const ValidationSchema = z.strictObject({
     name: z.string().min(1),
     expiryDate: nullableDateSchema(t),
@@ -41,9 +50,12 @@ const AddCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
   ): Promise<void> => {
     const parsedValues = ValidationSchema.parse(values);
     try {
-      await addCoursePart.mutateAsync({
-        name: parsedValues.name,
-        expiryDate: parsedValues.expiryDate,
+      await editCoursePart.mutateAsync({
+        coursePartId: coursePart!.id,
+        coursePart: {
+          name: parsedValues.name,
+          expiryDate: parsedValues.expiryDate,
+        },
       });
     } catch {
       setSubmitting(false);
@@ -72,6 +84,7 @@ const AddCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
       initialValues={initialValues}
       validate={validateForm}
       onSubmit={onSubmit}
+      enableReinitialize
     >
       {form => (
         <Dialog
@@ -125,4 +138,4 @@ const AddCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
   );
 };
 
-export default AddCoursePartDialog;
+export default EditCoursePartDialog;

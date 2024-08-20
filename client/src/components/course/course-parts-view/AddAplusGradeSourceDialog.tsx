@@ -20,7 +20,7 @@ import {
 } from '@/common/types';
 import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
 import {useAddAplusGradeSources, useFetchAplusCourses} from '@/hooks/useApi';
-import {getAplusToken} from '@/utils/utils';
+import {getAplusToken} from '@/utils';
 import SelectAplusCourse from './SelectAplusCourse';
 import SelectAplusGradeSource from './SelectAplusGradeSource';
 

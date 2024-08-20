@@ -23,7 +23,7 @@ import {
   NewTaskGradeArraySchema,
 } from '@/common/types';
 import {Numeric} from '@/types';
-import {getAplusToken} from '@/utils/utils';
+import {getAplusToken} from '@/utils';
 import axios from './axios';
 
 const getHeaders = (): AxiosRequestConfig => ({
@@ -72,7 +72,7 @@ export const useAddAplusGradeSources = (
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['course-parts', courseId],
+        queryKey: ['course-tasks', courseId],
       });
     },
     ...options,
@@ -93,7 +93,7 @@ export const useDeleteAplusGradeSource = (
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['course-parts', courseId],
+        queryKey: ['course-tasks', courseId],
       });
     },
     ...options,

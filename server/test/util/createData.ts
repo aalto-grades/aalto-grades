@@ -15,7 +15,7 @@ import {
   SystemRole,
   UserData,
 } from '@/common/types';
-import {initGraph} from '@/common/util/initGraph';
+import {initGraph} from '@/common/util';
 import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';
 import {sequelize} from '../../src/database';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';

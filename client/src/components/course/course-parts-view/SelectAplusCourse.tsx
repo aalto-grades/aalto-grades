@@ -89,7 +89,7 @@ const SelectAplusCourse = ({
   return (
     <Box sx={{display: 'flex', mt: 1}}>
       <Autocomplete
-        sx={{width: 400}}
+        sx={{width: '60%'}}
         value={selectedCourse}
         onChange={(_, value) => setCourse(value?.courseCode)}
         options={courseOptions}
@@ -101,7 +101,7 @@ const SelectAplusCourse = ({
         }
       />
       <Autocomplete
-        sx={{width: 200, ml: 1}}
+        sx={{width: '30%', ml: 1}}
         value={selectedInstance}
         onChange={(_, value) =>
           setInstance(

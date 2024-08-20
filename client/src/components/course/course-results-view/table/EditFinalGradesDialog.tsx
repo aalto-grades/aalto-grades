@@ -40,8 +40,7 @@ import {
 } from '@/hooks/api/finalGrade';
 import {useGetAllGradingModels, useGetCourse} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
-import {findBestFinalGrade} from '@/utils/bestGrade';
-import {getMaxFinalGrade} from '@/utils/utils';
+import {findBestFinalGrade, getMaxFinalGrade} from '@/utils';
 
 type ColTypes = {
   id: number;

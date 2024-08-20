@@ -14,45 +14,48 @@ import {
 import {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {NewAplusGradeSourceData} from '@/common/types';
+import {
+  EditCourseTaskData,
+  NewAplusGradeSourceData,
+  NewCourseTaskData,
+} from '@/common/types';
 
-type CreateAplusCoursePartsProps = {
-  coursePartsWithSource: [
-    {name: string; daysValid: number; maxGrade: number},
-    NewAplusGradeSourceData,
-  ][];
-  handleChange: (
-    index: number,
-    coursePart: {name?: string; daysValid?: number}
-  ) => void;
+type PropsType = {
+  courseTasksWithSource: [NewCourseTaskData, NewAplusGradeSourceData][];
+  handleChange: (index: number, courseTask: EditCourseTaskData) => void;
 };
-
-const CreateAplusCourseParts = ({
-  coursePartsWithSource,
+const CreateAplusCourseTasks = ({
+  courseTasksWithSource,
   handleChange,
-}: CreateAplusCoursePartsProps): JSX.Element => {
+}: PropsType): JSX.Element => {
   const {t} = useTranslation();
 
   return (
     <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
-      {coursePartsWithSource.map(([coursePart, _], index) => (
-        <Card sx={{m: 1}}>
+      {courseTasksWithSource.map(([courseTask, _], index) => (
+        <Card sx={{m: 1}} key={index}>
           <CardContent
             sx={{display: 'flex', flexDirection: 'column', width: 370}}
           >
             <TextField
               sx={{mt: 2}}
               label={t('general.name')}
-              value={coursePart.name}
+              value={courseTask.name}
               onChange={e => handleChange(index, {name: e.target.value})}
             />
             <TextField
               sx={{mt: 2}}
               label={t('general.days-valid')}
-              type="number"
-              value={coursePart.daysValid}
+              type="string"
+              inputMode="numeric"
+              value={courseTask.daysValid ?? ''}
+              // I'd rather show a warning but this works fine enough
               onChange={e =>
-                handleChange(index, {daysValid: Number(e.target.value)})
+                handleChange(index, {
+                  daysValid: !/^[1-9]+\d*$/.test(e.target.value)
+                    ? null
+                    : Number(e.target.value),
+                })
               }
             />
             <Box
@@ -64,11 +67,11 @@ const CreateAplusCourseParts = ({
               }}
             >
               <Typography>
-                {t('general.max-grade')}: {coursePart.maxGrade}
+                {t('general.max-grade')}: {courseTask.maxGrade}
               </Typography>
-              {/* In case the teacher changes the course part's name, this is intended
-                  to show which source the course part was initially created from. */}
-              <Tooltip title={coursePart.name}>
+              {/* In case the teacher changes the course task's name, this is intended
+                  to show which source the course task was initially created from. */}
+              <Tooltip title={courseTask.name}>
                 <Notes />
               </Tooltip>
             </Box>
@@ -79,4 +82,4 @@ const CreateAplusCourseParts = ({
   );
 };
 
-export default CreateAplusCourseParts;
+export default CreateAplusCourseTasks;

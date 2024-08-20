@@ -71,24 +71,24 @@ const UploadDialogUpload = ({
   const [aplusImportDialogOpen, setAplusImportDialogOpen] =
     useState<boolean>(false);
 
-  const dataGridToolbar = (): JSX.Element => {
+  const DataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
       setRows(oldRows => {
         const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
-        const fieldValues: GradeUploadColTypes = {
+        const newRow: GradeUploadColTypes = {
           id: freeId,
         } as GradeUploadColTypes;
         for (const column of columns) {
-          if (column.field === 'studentNo') fieldValues[column.field] = '-';
-          else fieldValues[column.field] = 0;
+          if (column.field === 'studentNo') newRow[column.field] = '-';
+          else newRow[column.field] = 0;
         }
-        return oldRows.concat(fieldValues);
+        return oldRows.concat(newRow);
       });
     };
     return (
       <GridToolbarContainer>
         <Button startIcon={<Add />} onClick={handleClick}>
-          Add row
+          {t('general.add-row')}
         </Button>
       </GridToolbarContainer>
     );
@@ -332,7 +332,7 @@ const UploadDialogUpload = ({
                 editMode="row"
                 rowSelection={false}
                 disableColumnSelector
-                slots={{toolbar: dataGridToolbar}}
+                slots={{toolbar: DataGridToolbar}}
                 onRowEditStart={() => {
                   setEditing(true);
                   setReady(false);

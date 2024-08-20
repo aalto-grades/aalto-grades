@@ -15,7 +15,7 @@ import {useTranslation} from 'react-i18next';
 
 import {CourseTaskGradesData} from '@/common/types';
 import {useTableContext} from '@/context/useTableContext';
-import {findBestGrade, gradeIsExpired} from '@/utils/bestGrade';
+import {findBestGrade, gradeIsExpired} from '@/utils';
 import EditGradesDialog from './EditGradesDialog';
 
 type GradeCellProps = {

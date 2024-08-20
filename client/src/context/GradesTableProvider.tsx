@@ -49,12 +49,12 @@ import {
   useGetCourse,
   useGetCourseParts,
 } from '@/hooks/useApi';
-import {findBestFinalGrade} from '@/utils/bestGrade';
 import {
+  findBestFinalGrade,
   getRowErrors,
   groupByLatestBestGrade,
   predictGrades,
-} from '@/utils/table';
+} from '@/utils';
 
 // Define the shape of the context
 export type TableContextProps = {

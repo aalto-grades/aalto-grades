@@ -15,7 +15,7 @@ import {
   NewAplusGradeSourceData,
   NewTaskGrade,
 } from '@/common/types';
-import {aplusGradeSourcesEqual} from '@/common/util/aplus';
+import {aplusGradeSourcesEqual} from '@/common/util';
 import {
   fetchFromAplus,
   parseAplusGradeSource,

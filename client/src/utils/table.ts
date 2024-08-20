@@ -10,7 +10,7 @@ import {
   GradingScale,
   StudentRow,
 } from '@/common/types';
-import {batchCalculateGraph} from '@/common/util/calculateGraph';
+import {batchCalculateGraph} from '@/common/util';
 import {
   ExtendedStudentRow,
   GroupedStudentRow,

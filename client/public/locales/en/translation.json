@@ -117,9 +117,10 @@
     "name": "Name",
     "days-valid": "Days valid",
     "max-grade": "Max grade",
-    "submit": "Submit",
+    "expiry-date": "Expiry date",
     "cancel": "Cancel",
     "save": "Save",
+    "submit": "Submit",
     "course": "Course",
     "instance": "Instance",
     "full-points": "Full points",
@@ -150,7 +151,6 @@
     "delete": "Delete",
     "discard": "Discard",
     "close": "Close",
-    "expiry-date": "Expiry date",
     "exported": "Exported",
     "grades-saved": "Grades saved",
     "select-course-parts": "Select course parts",
@@ -158,6 +158,7 @@
     "a+-grade-source-id": "A+ grade source ID",
     "course-part": "Course part",
     "import": "Import",
+    "add-row": "Add row",
     "edit": "Edit",
     "course-parts": "Course parts",
     "organizing-department": "Organizing department",
@@ -183,20 +184,19 @@
     "in-finnish": "in Finnish",
     "in-swedish": "in Swedish",
     "done": "Done",
-    "final-grades": "Final grades"
+    "final-grades": "Final grades",
+    "not-int": "Value must be a valid integer"
   },
   "course": {
     "parts": {
       "select-grade-source": "Select grade source",
-      "select-grade-sources": "Select grade sources",
-      "create-parts": "Create course parts",
       "create": {
         "title": "Create new course part",
         "name-help": "Course part name",
-        "days-valid-help": "How long the grades should stay valid for",
-        "set-max-grade": "Set maximum allowed grade",
-        "max-grade-help": "Maximum allowed grade for course part"
+        "expiry-date-valid-help": "Course part expiration date"
       },
+      "select-grade-sources": "Select grade sources",
+      "create-tasks": "Create course tasks",
       "delete-a+": "Delete A+ grade source",
       "fetching-grades": "Fetching grades",
       "select-for-fetching": "Select the course parts you want to fetch grades for from A+.",
@@ -210,8 +210,12 @@
       "delete-message": "Some models are using this course part. Are you sure you want to delete it?",
       "valid-until": "Valid until",
       "archived": "Archived",
-      "add-new": "Add new",
-      "add-from-a+": "Add from A+"
+      "add-new-task": "Add new course task",
+      "add-new-part": "Add new course part",
+      "add-from-a+": "Add course tasks from A+",
+      "open-part-graph": "Open course part graph",
+      "edit-part": "Edit course part",
+      "no-expiry-date": "No expiry date"
     },
     "results": {
       "model-has-deleted-and-archived": "Grading model contains deleted & archived course parts",
@@ -306,6 +310,7 @@
       "data-undefined": "Data is undefined"
     },
     "edit": {
+      "saved": "Course details saved.",
       "course-code-required": "Course code is required (e.g. CS-A1111)",
       "min-credits-required": "Minimum credits is required",
       "min-credits-negative": "Minimum credits cannot be negative",
@@ -315,7 +320,6 @@
       "name-finnish": "Please input a valid course name in Finnish",
       "name-swedish": "Please input a valid course name in Swedish",
       "max-below-min": "Maximum credits cannot be lower than minimum credits",
-      "saved": "Course details saved.",
       "title": "Edit course",
       "course-code-help": "Give code for the new course.",
       "course-name-in-format": "Course name %",

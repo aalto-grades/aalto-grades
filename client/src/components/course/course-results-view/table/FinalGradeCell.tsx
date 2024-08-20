@@ -9,8 +9,7 @@ import {JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import {FinalGradeData, GradingScale} from '@/common/types';
-import {findBestFinalGrade} from '@/utils/bestGrade';
-import {getGradeString} from '@/utils/textFormat';
+import {findBestFinalGrade, getGradeString} from '@/utils';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
 
 type FinalGradeCellProps = {
