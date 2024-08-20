@@ -6,19 +6,20 @@ SPDX-License-Identifier: MIT
 
 ## Running tests
 
-Start the website in docker by running docker compose at the root of the project:
+Start the website in Docker by running Docker Compose at the root of the
+project:
 
 ```
 docker compose up --build
 ```
 
-Then launch playwright in cli mode:
+Then launch Playwright in this directory in CLI mode:
 
 ```
 npx playwright test
 ```
 
-or in ui mode:
+Or in UI mode:
 
 ```
 npx playwright test --ui
