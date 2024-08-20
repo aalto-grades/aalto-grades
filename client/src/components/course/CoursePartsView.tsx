@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  Add,
   AddCircle,
   Archive,
   Delete,
@@ -30,6 +31,7 @@ import {
   GridColDef,
   GridRowParams,
   GridRowsProp,
+  GridToolbarContainer,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useEffect, useMemo, useState} from 'react';
@@ -63,7 +65,6 @@ import AddAplusGradeSourceDialog from './course-parts-view/AddAplusGradeSourceDi
 import EditCoursePartDialog from './course-parts-view/EditCoursePartDialog';
 import NewAplusCourseTasksDialog from './course-parts-view/NewAplusCourseTasksDialog';
 import AddCoursePartDialog from './course-parts-view/NewCoursePartDialog';
-import AddCourseTaskDialog from './course-parts-view/NewCourseTaskDialog';
 import ViewAplusGradeSourcesDialog from './course-parts-view/ViewAplusGradeSourcesDialog';
 
 type ColTypes = {
@@ -74,6 +75,7 @@ type ColTypes = {
   maxGrade: number | null;
   archived: boolean;
   aplusGradeSources: AplusGradeSourceData[];
+  new: boolean;
 };
 
 const CoursePartsView = (): JSX.Element => {
@@ -97,7 +99,6 @@ const CoursePartsView = (): JSX.Element => {
   const [editPart, setEditPart] = useState<CoursePartData | null>(null);
   const [selectedPart, setSelectedPart] = useState<number | null>(null);
 
-  const [addTaskDialogOpen, setAddTaskDialogOpen] = useState<boolean>(false);
   const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
   const [editing, setEditing] = useState<boolean>(false);
@@ -180,6 +181,7 @@ const CoursePartsView = (): JSX.Element => {
         maxGrade: courseTask.maxGrade,
         archived: courseTask.archived,
         aplusGradeSources: courseTask.aplusGradeSources,
+        new: false,
       }));
     setRows(newRows);
     setInitRows(structuredClone(newRows));
@@ -205,25 +207,6 @@ const CoursePartsView = (): JSX.Element => {
     updateRows(partId);
   };
 
-  const handleAddCourseTask = (
-    name: string,
-    daysValid: number | null,
-    maxGrade: number | null
-  ): void => {
-    setRows(oldRows => {
-      const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
-      return oldRows.concat({
-        id: freeId,
-        coursePartId: -1,
-        name,
-        daysValid,
-        maxGrade,
-        archived: false,
-        aplusGradeSources: [],
-      });
-    });
-  };
-
   const handleSubmit = async (): Promise<void> => {
     const newCourseTasks: NewCourseTaskData[] = [];
     const deletedCourseTasks: number[] = [];
@@ -233,7 +216,7 @@ const CoursePartsView = (): JSX.Element => {
     }[] = [];
 
     for (const row of rows) {
-      if (row.coursePartId === -1) {
+      if (row.new) {
         newCourseTasks.push({
           name: row.name,
           coursePartId: selectedPart!,
@@ -405,6 +388,37 @@ const CoursePartsView = (): JSX.Element => {
       : []),
   ];
 
+  const DataGridToolbar = (): JSX.Element => {
+    const handleClick = (): void => {
+      setRows(oldRows => {
+        const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
+        console.log(freeId);
+        const newRow: ColTypes = {
+          id: freeId,
+          coursePartId: selectedPart!,
+          daysValid: null,
+          maxGrade: null,
+          name: '',
+          archived: false,
+          aplusGradeSources: [],
+          new: true,
+        };
+        return oldRows.concat(newRow);
+      });
+    };
+    return (
+      <GridToolbarContainer>
+        <Button
+          startIcon={<Add />}
+          onClick={handleClick}
+          disabled={selectedPart === null}
+        >
+          {t('course.parts.add-new-task')}
+        </Button>
+      </GridToolbarContainer>
+    );
+  };
+
   const sortCourseParts = (a: CoursePartData, b: CoursePartData): number => {
     if (a.archived && !b.archived) return 1;
     if (b.archived && !a.archived) return -1;
@@ -427,11 +441,6 @@ const CoursePartsView = (): JSX.Element => {
         open={editPartDialogOpen}
         onClose={() => setEditPartDialogOpen(false)}
         coursePart={editPart}
-      />
-      <AddCourseTaskDialog
-        open={addTaskDialogOpen}
-        onClose={() => setAddTaskDialogOpen(false)}
-        onSave={handleAddCourseTask}
       />
       <NewAplusCourseTasksDialog
         open={aplusDialogOpen}
@@ -482,12 +491,6 @@ const CoursePartsView = (): JSX.Element => {
             </Button>
             {selectedPart !== null && (
               <>
-                <Button
-                  variant="outlined"
-                  onClick={() => setAddTaskDialogOpen(true)}
-                >
-                  {t('course.parts.add-new-task')}
-                </Button>
                 <Button
                   variant="outlined"
                   onClick={() => setAplusDialogOpen(true)}
@@ -591,6 +594,7 @@ const CoursePartsView = (): JSX.Element => {
               editMode="row"
               rowSelection={false}
               disableColumnSelector
+              slots={{toolbar: DataGridToolbar}}
               onRowEditStart={() => setEditing(true)}
               onRowEditStop={() => setEditing(false)}
               processRowUpdate={updatedRow => {

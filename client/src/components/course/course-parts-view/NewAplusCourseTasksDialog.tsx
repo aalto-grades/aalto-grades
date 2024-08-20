@@ -147,7 +147,12 @@ const NewAplusCourseTasksDialog = ({
         open={aplusTokenDialogOpen && open}
         error={aplusCourses.isError}
       />
-      <Dialog open={open} onClose={handleResetAndClose} maxWidth="md">
+      <Dialog
+        open={open && !aplusTokenDialogOpen}
+        onClose={handleResetAndClose}
+        maxWidth="md"
+        fullWidth
+      >
         {step === 0 && <DialogTitle>{t('general.a+-courses')}</DialogTitle>}
         {step === 1 && (
           <DialogTitle>{t('course.parts.select-grade-sources')}</DialogTitle>
