@@ -52,6 +52,9 @@ user accounts for this purpose.
 | Assistant account | `assistant@aalto.fi` | `password` |
 | Student account   | `student@aalto.fi`   | `password` |
 
+When asked for an MFA code in the development environment, the server will
+accept any input without validation.
+
 For instructions on running tests or individual parts of the system, see the
 README file of the corresponding directory, such as `client/README.md` and
 `server/README.md`.
