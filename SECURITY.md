@@ -8,8 +8,8 @@ SPDX-License-Identifier: MIT
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+The following table shows which versions of Aalto Grades are supported with
+security updates.
 
 | Version | Supported          |
 | ------- | ------------------ |
@@ -19,4 +19,4 @@ currently being supported with security updates.
 
 Create a new issue using the **Report a security vulnerability** template.
 
-thank you for reporting! We will try to get back to you as soon as possible.
+Thank you for reporting! We will try to get back to you as soon as possible.
