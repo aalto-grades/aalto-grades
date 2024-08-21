@@ -40,6 +40,8 @@ class CreateData {
   private freeId: number = 10;
   /** Next free course part name */
   private freeCoursePartId: number = 10;
+  /** Next free course task name */
+  private freeCourseTaskId: number = 10;
   /** Next free grading model code */
   private freeModelId: number = 10;
   /** Next free user name */
@@ -145,6 +147,23 @@ class CreateData {
       });
     }
     return courseParts;
+  }
+
+  async createCourseTask(coursePartId: number): Promise<CourseTaskData> {
+    const newCoursePart = await CourseTask.create({
+      coursePartId,
+      name: `Exercise ${this.freeCourseTaskId++}`,
+    });
+
+    return {
+      id: newCoursePart.id,
+      coursePartId,
+      name: newCoursePart.name,
+      daysValid: newCoursePart.daysValid,
+      maxGrade: newCoursePart.maxGrade,
+      archived: newCoursePart.archived,
+      aplusGradeSources: [],
+    };
   }
 
   private async createCourseTasks(
