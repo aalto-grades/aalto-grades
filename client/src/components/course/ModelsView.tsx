@@ -2,21 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Archive, Delete, Edit, Unarchive, Warning} from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Collapse,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Tooltip,
-  Typography,
-} from '@mui/material';
-import {grey} from '@mui/material/colors';
+import {Box, Button, Collapse, List, Tooltip, Typography} from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
 import {JSX, useCallback, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
@@ -44,6 +30,8 @@ import {
 import useAuth from '@/hooks/useAuth';
 import {getCourseRole} from '@/utils';
 import CreateGradingModelDialog from './models-view/CreateGradingModelDialog';
+import MissingModelButton from './models-view/MissingModelButton';
+import ModelButton from './models-view/ModelButton';
 import RenameGradingModelDialog from './models-view/RenameGradingModelDialog';
 
 type ParamsType = {courseId: string; modelId?: string; userId?: string};
@@ -53,6 +41,7 @@ const ModelsView = (): JSX.Element => {
   const {courseId, modelId, userId} = useParams() as ParamsType;
   const navigate = useNavigate();
 
+  const courseParts = useGetCourseParts(courseId);
   const allGradingModels = useGetAllGradingModels(courseId);
   const course = useGetCourse(courseId);
   const finalGrades = useGetFinalGrades(courseId, {
@@ -64,7 +53,6 @@ const ModelsView = (): JSX.Element => {
   });
   const editModel = useEditGradingModel();
   const delModel = useDeleteGradingModel();
-  const courseParts = useGetCourseParts(courseId);
   const grades = useGetGrades(courseId);
 
   const [currentModel, setCurrentModel] = useState<GradingModelData | null>(
@@ -82,12 +70,20 @@ const ModelsView = (): JSX.Element => {
   // Sort models by archived status
   const models = useMemo(
     () =>
-      allGradingModels.data !== undefined
-        ? allGradingModels.data.toSorted(
-            (m1, m2) => Number(m1.archived) - Number(m2.archived)
-          )
-        : undefined,
+      // allGradingModels.data !== undefined
+      allGradingModels.data?.toSorted(
+        (m1, m2) => Number(m1.archived) - Number(m2.archived)
+      ) ?? [],
+    // : undefined,
     [allGradingModels.data]
+  );
+
+  const coursePartsWithoutModels = useMemo(
+    () =>
+      courseParts.data?.filter(
+        part => !models.some(model => model.coursePartId === part.id)
+      ) ?? [],
+    [courseParts.data, models]
   );
 
   const modelsWithFinalGrades = useMemo(() => {
@@ -106,7 +102,7 @@ const ModelsView = (): JSX.Element => {
   );
 
   useEffect(() => {
-    if (loadGraphId === -1 || models === undefined) return;
+    if (loadGraphId === -1) return;
 
     for (const model of models) {
       if (model.id === loadGraphId) {
@@ -153,7 +149,7 @@ const ModelsView = (): JSX.Element => {
       setGraphOpen(false);
     }
 
-    if (modelId === undefined || models === undefined) return;
+    if (modelId === undefined) return;
     if (currentModel !== null && currentModel.id === parseInt(modelId)) return;
 
     for (const model of models) {
@@ -224,16 +220,7 @@ const ModelsView = (): JSX.Element => {
     });
   };
 
-  if (models === undefined || courseParts.data === undefined)
-    return <>{t('general.loading')}</>;
-
-  const getWarning = (model: GradingModelData): string => {
-    if (model.hasArchivedCourseParts && model.hasDeletedCourseParts)
-      return t('course.models.has-deleted-and-archived');
-    if (model.hasArchivedCourseParts) return t('course.models.has-archived');
-    if (model.hasDeletedCourseParts) return t('course.models.has-deleted');
-    return '';
-  };
+  if (courseParts.data === undefined) return <>{t('general.loading')}</>;
 
   return (
     <>
@@ -245,13 +232,13 @@ const ModelsView = (): JSX.Element => {
           setLoadGraphId(id);
         }}
       />
-
       <RenameGradingModelDialog
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
         gradingModelId={editDialogModel?.id ?? null}
         name={editDialogModel?.name ?? null}
       />
+
       <Typography width={'fit-content'} variant="h2">
         {t('general.grading-models')}
       </Typography>
@@ -280,91 +267,44 @@ const ModelsView = (): JSX.Element => {
       </Box>
 
       <Collapse in={!graphOpen}>
-        {models.length === 0 ? (
+        {models.length + coursePartsWithoutModels.length === 0 ? (
           <Typography textAlign="left" sx={{p: 2}}>
             {t('course.models.no-models')}
           </Typography>
         ) : (
           <List sx={{width: 400}} disablePadding>
             {models.map(model => (
-              <ListItem
+              <ModelButton
                 key={model.id}
-                sx={{backgroundColor: model.archived ? grey[200] : ''}}
-                disablePadding
-                secondaryAction={
-                  editRights ? (
-                    <>
-                      <Tooltip
-                        placement="top"
-                        title={t('course.models.rename.title')}
-                      >
-                        <IconButton
-                          onClick={() => {
-                            setEditDialogModel(model);
-                            setEditDialogOpen(true);
-                          }}
-                        >
-                          <Edit />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip
-                        placement="top"
-                        title={
-                          model.archived
-                            ? t('course.models.unarchive')
-                            : t('course.models.archive')
-                        }
-                      >
-                        <IconButton
-                          onClick={() =>
-                            handleArchiveModel(model.id, !model.archived)
-                          }
-                        >
-                          {model.archived ? <Unarchive /> : <Archive />}
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip
-                        placement="top"
-                        title={
-                          modelsWithFinalGrades.has(model.id)
-                            ? t('course.models.cannot-delete-with-final')
-                            : t('course.models.delete-grading-model')
-                        }
-                      >
-                        {/* The span is necessary because tooltips don't like disabled buttons*/}
-                        <span>
-                          <IconButton
-                            disabled={modelsWithFinalGrades.has(model.id)}
-                            edge="end"
-                            onClick={() => handleDelModel(model.id)}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                    </>
-                  ) : null
-                }
-              >
-                <ListItemButton
-                  onClick={() => {
-                    if (userId !== undefined)
-                      navigate(`/${courseId}/models/${model.id}/${userId}`);
-                    else navigate(`/${courseId}/models/${model.id}`);
-                  }}
-                >
-                  <ListItemText primary={model.name} />
-                  {(model.hasArchivedCourseParts ||
-                    model.hasDeletedCourseParts) && (
-                    <ListItemIcon sx={{mr: 6.6}}>
-                      <Tooltip title={getWarning(model)} placement="top">
-                        <Warning color="warning" />
-                      </Tooltip>
-                    </ListItemIcon>
-                  )}
-                </ListItemButton>
-              </ListItem>
+                model={model}
+                editRights={editRights}
+                modelsWithFinalGrades={modelsWithFinalGrades}
+                onEdit={() => {
+                  setEditDialogModel(model);
+                  setEditDialogOpen(true);
+                }}
+                onArchive={() => handleArchiveModel(model.id, !model.archived)}
+                onDelete={() => handleDelModel(model.id)}
+                onClick={() => {
+                  if (userId !== undefined)
+                    navigate(`/${courseId}/models/${model.id}/${userId}`);
+                  else navigate(`/${courseId}/models/${model.id}`);
+                }}
+              />
             ))}
+            {editRights &&
+              coursePartsWithoutModels.map(part => (
+                <MissingModelButton
+                  key={part.id}
+                  part={part}
+                  onCreate={() => {}}
+                  // onClick={() => {
+                  //   if (userId !== undefined)
+                  //     navigate(`/${courseId}/models/${model.id}/${userId}`);
+                  //   else navigate(`/${courseId}/models/${model.id}`);
+                  // }}
+                />
+              ))}
           </List>
         )}
       </Collapse>
