@@ -202,6 +202,7 @@
       "select-for-fetching": "UNTRANSLATED",
       "fetching-grades-wait": "UNTRANSLATED",
       "saved": "UNTRANSLATED",
+      "a+-disabled": "UNTRANSLATED",
       "add-a+-source": "UNTRANSLATED",
       "view-a+-sources": "UNTRANSLATED",
       "unarchive": "UNTRANSLATED",
@@ -211,8 +212,8 @@
       "valid-until": "UNTRANSLATED",
       "archived": "UNTRANSLATED",
       "add-new-task": "UNTRANSLATED",
-      "add-new-part": "UNTRANSLATED",
       "add-from-a+": "UNTRANSLATED",
+      "add-new-part": "UNTRANSLATED",
       "open-part-graph": "UNTRANSLATED",
       "edit-part": "UNTRANSLATED",
       "no-expiry-date": "UNTRANSLATED"

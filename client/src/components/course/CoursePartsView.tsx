@@ -239,23 +239,23 @@ const CoursePartsView = (): JSX.Element => {
   const getAplusActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
     const elements: JSX.Element[] = [];
 
-    // If the course task does not exist in the database, A+ grade sources
-    // can't be added
-    if (params.row.new) {
-      return elements;
-    }
-
+    // span is necessary to show the tooltip while the button is disabled
     elements.push(
-      <GridActionsCellItem
-        icon={<AddCircle />}
-        label={t('course.parts.add-a+-source')}
-        onClick={() =>
-          setAddAplusSourcesTo({
-            courseTaskId: params.row.id,
-            aplusGradeSources: params.row.aplusGradeSources,
-          })
-        }
-      />
+      <Tooltip title={unsavedChanges ? t('course.parts.a+-disabled') : ''}>
+        <span>
+          <GridActionsCellItem
+            disabled={unsavedChanges}
+            icon={<AddCircle />}
+            label={t('course.parts.add-a+-source')}
+            onClick={() =>
+              setAddAplusSourcesTo({
+                courseTaskId: params.row.id,
+                aplusGradeSources: params.row.aplusGradeSources,
+              })
+            }
+          />
+        </span>
+      </Tooltip>
     );
 
     if (params.row.aplusGradeSources.length > 0) {
@@ -397,6 +397,17 @@ const CoursePartsView = (): JSX.Element => {
         >
           {t('course.parts.add-new-task')}
         </Button>
+        <Tooltip title={unsavedChanges ? t('course.parts.a+-disabled') : ''}>
+          <span>
+            <Button
+              startIcon={<Add />}
+              onClick={() => setAplusDialogOpen(true)}
+              disabled={selectedPart === null || unsavedChanges}
+            >
+              {t('course.parts.add-from-a+')}
+            </Button>
+          </span>
+        </Tooltip>
       </GridToolbarContainer>
     );
   };
@@ -471,16 +482,6 @@ const CoursePartsView = (): JSX.Element => {
             >
               {t('course.parts.add-new-part')}
             </Button>
-            {selectedPart !== null && (
-              <>
-                <Button
-                  variant="outlined"
-                  onClick={() => setAplusDialogOpen(true)}
-                >
-                  {t('course.parts.add-from-a+')}
-                </Button>
-              </>
-            )}
           </>
         )}
       </Box>
