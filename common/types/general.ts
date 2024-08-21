@@ -35,6 +35,7 @@ export enum Language {
 export const LanguageSchema = z.nativeEnum(Language);
 
 export const IdSchema = z.number().int();
+export const IdArraySchema = z.array(IdSchema);
 export const DateSchema = z
   .string()
   .datetime()

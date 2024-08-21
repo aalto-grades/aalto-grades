@@ -9,6 +9,7 @@ import {
   CourseTaskDataArraySchema,
   EditCourseTaskData,
   HttpCode,
+  IdArraySchema,
   NewCourseTaskData,
 } from '@/common/types';
 import {app} from '../../src/app';
@@ -151,7 +152,9 @@ describe('Test POST /v1/courses/:courseId/tasks - modify course tasks', () => {
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(JSON.stringify(res.body)).toBe('{}');
+      const Schema = IdArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
+      expect(result.success).toBeTruthy();
       await checkCourseTask(courseTask);
     }
   });
@@ -168,7 +171,8 @@ describe('Test POST /v1/courses/:courseId/tasks - modify course tasks', () => {
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(JSON.stringify(res.body)).toBe('{}');
+      const result = IdArraySchema.safeParse(res.body);
+      expect(result.success).toBeTruthy();
       await checkCourseTask(courseTask);
     }
   });
@@ -185,7 +189,8 @@ describe('Test POST /v1/courses/:courseId/tasks - modify course tasks', () => {
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(JSON.stringify(res.body)).toBe('{}');
+      const result = IdArraySchema.safeParse(res.body);
+      expect(result.success).toBeTruthy();
       await courseTaskDoesNotExist(courseTaskId);
     }
   });
@@ -204,7 +209,9 @@ describe('Test POST /v1/courses/:courseId/tasks - modify course tasks', () => {
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      expect(JSON.stringify(res.body)).toBe('{}');
+      const Schema = IdArraySchema.nonempty();
+      const result = Schema.safeParse(res.body);
+      expect(result.success).toBeTruthy();
       await checkCourseTask(addTask);
       await checkCourseTask(editTask);
       await courseTaskDoesNotExist(deleteId);

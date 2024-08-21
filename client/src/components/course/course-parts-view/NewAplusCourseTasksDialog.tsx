@@ -128,20 +128,16 @@ const NewAplusCourseTasksDialog = ({
   };
 
   const handleSubmit = async (): Promise<void> => {
-    const sources: NewAplusGradeSourceData[] = [];
-    await modifyCourseTasks.mutateAsync({
-      add: courseTasksWithSource.map(([courseTask]) => courseTask),
-    });
+    const courseTasks = courseTasksWithSource.map(([courseTask]) => courseTask);
+    const sources = courseTasksWithSource.map(([, source]) => source);
 
-    // TODO: We don't get IDs of new course tasks
-    // for (const [courseTask, source] of courseTasksWithSource) {
-    //   sources.push({
-    //     ...source,
-    //     courseTaskId: await addCourseTask.mutateAsync(courseTask),
-    //   });
-    // }
+    const newIds = await modifyCourseTasks.mutateAsync({add: courseTasks});
+    const newSources = newIds.map((courseTaskId, i) => ({
+      ...sources[i],
+      courseTaskId,
+    }));
 
-    await addAplusGradeSources.mutateAsync(sources);
+    await addAplusGradeSources.mutateAsync(newSources);
   };
 
   return (

@@ -15,6 +15,7 @@ import {
 import {
   CourseTaskData,
   CourseTaskDataArraySchema,
+  IdArraySchema,
   ModifyCourseTasks,
 } from '@/common/types';
 import {Numeric} from '@/types';
@@ -35,13 +36,16 @@ export const useGetCourseTasks = (
 
 export const useModifyCourseTasks = (
   courseId: Numeric,
-  options?: UseMutationOptions<void, unknown, ModifyCourseTasks>
-): UseMutationResult<void, unknown, ModifyCourseTasks> => {
+  options?: UseMutationOptions<number[], unknown, ModifyCourseTasks>
+): UseMutationResult<number[], unknown, ModifyCourseTasks> => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async modifications =>
-      await axios.post(`/api/v1/courses/${courseId}/tasks`, modifications),
+      IdArraySchema.parse(
+        (await axios.post(`/api/v1/courses/${courseId}/tasks`, modifications))
+          .data
+      ),
 
     onSuccess: () => {
       queryClient.invalidateQueries({

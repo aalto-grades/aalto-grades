@@ -58,6 +58,7 @@ export const modifyCourseTasks: Endpoint<ModifyCourseTasks, unknown> = async (
     throw error;
   };
 
+  let newIds: number[] = [];
   await sequelize.transaction(async t => {
     // Add tasks
     for (const {coursePartId} of addTasks) {
@@ -65,7 +66,9 @@ export const modifyCourseTasks: Endpoint<ModifyCourseTasks, unknown> = async (
     }
 
     try {
-      await CourseTask.bulkCreate(addTasks, {transaction: t});
+      newIds = (await CourseTask.bulkCreate(addTasks, {transaction: t})).map(
+        courseTask => courseTask.id
+      );
     } catch (error) {
       checkForDuplicateError(error);
     }
@@ -124,5 +127,5 @@ export const modifyCourseTasks: Endpoint<ModifyCourseTasks, unknown> = async (
     }
   });
 
-  res.sendStatus(HttpCode.Ok);
+  res.json(newIds);
 };
