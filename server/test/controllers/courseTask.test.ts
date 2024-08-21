@@ -6,7 +6,6 @@ import supertest from 'supertest';
 
 import {
   CoursePartData,
-  CourseTaskData,
   CourseTaskDataArraySchema,
   EditCourseTaskData,
   HttpCode,
@@ -220,7 +219,7 @@ describe('Test POST /v1/courses/:courseId/tasks - modify course tasks', () => {
     // TODO
   });
 
-  it('should respond wiht 404 when not found', async () => {
+  it('should respond with 404 when not found', async () => {
     // TODO
   });
 });

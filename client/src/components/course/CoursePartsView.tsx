@@ -42,23 +42,18 @@ import {useBlocker, useNavigate, useParams} from 'react-router-dom';
 import {
   AplusGradeSourceData,
   CoursePartData,
-  EditCourseTaskData,
-  NewCourseTaskData,
+  ModifyCourseTasks,
   SystemRole,
 } from '@/common/types';
 import SaveBar from '@/components/shared/SaveBar';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
-  useAddCourseTask,
-  useDeleteCourseTask,
-  useEditCourseTask,
-  useGetCourseTasks,
-} from '@/hooks/api/courseTask';
-import {
   useEditCoursePart,
   useGetAllGradingModels,
   useGetCourseParts,
+  useGetCourseTasks,
   useGetGrades,
+  useModifyCourseTasks,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import AddAplusGradeSourceDialog from './course-parts-view/AddAplusGradeSourceDialog';
@@ -90,9 +85,7 @@ const CoursePartsView = (): JSX.Element => {
 
   const grades = useGetGrades(courseId);
   const courseTasks = useGetCourseTasks(courseId);
-  const addCourseTask = useAddCourseTask(courseId);
-  const editCourseTask = useEditCourseTask(courseId);
-  const deleteCourseTask = useDeleteCourseTask(courseId);
+  const modifyCourseTasks = useModifyCourseTasks(courseId);
 
   const [addPartDialogOpen, setAddPartDialogOpen] = useState<boolean>(false);
   const [editPartDialogOpen, setEditPartDialogOpen] = useState<boolean>(false);
@@ -208,29 +201,26 @@ const CoursePartsView = (): JSX.Element => {
   };
 
   const handleSubmit = async (): Promise<void> => {
-    const newCourseTasks: NewCourseTaskData[] = [];
-    const deletedCourseTasks: number[] = [];
-    const editedCourseTasks: {
-      courseTaskId: number;
-      courseTask: EditCourseTaskData;
-    }[] = [];
+    const modifications: ModifyCourseTasks = {
+      add: [],
+      edit: [],
+      delete: [],
+    };
 
     for (const row of rows) {
       if (row.new) {
-        newCourseTasks.push({
+        modifications.add!.push({
           name: row.name,
           coursePartId: selectedPart!,
           daysValid: row.daysValid,
           maxGrade: row.maxGrade,
         });
       } else {
-        editedCourseTasks.push({
-          courseTaskId: row.coursePartId,
-          courseTask: {
-            name: row.name,
-            daysValid: row.daysValid,
-            maxGrade: row.maxGrade,
-          },
+        modifications.edit!.push({
+          id: row.coursePartId,
+          name: row.name,
+          daysValid: row.daysValid,
+          maxGrade: row.maxGrade,
         });
       }
     }
@@ -238,30 +228,22 @@ const CoursePartsView = (): JSX.Element => {
     const newAttIds = new Set(rows.map(row => row.coursePartId));
     for (const initRow of initRows) {
       if (!newAttIds.has(initRow.coursePartId))
-        deletedCourseTasks.push(initRow.coursePartId);
+        modifications.delete!.push(initRow.coursePartId);
     }
 
-    await Promise.all([
-      ...newCourseTasks.map(courseTask =>
-        addCourseTask.mutateAsync(courseTask)
-      ),
-      ...deletedCourseTasks.map(coursePartId =>
-        deleteCourseTask.mutateAsync(coursePartId)
-      ),
-      ...editedCourseTasks.map(courseTaskData =>
-        editCourseTask.mutateAsync({
-          courseTaskId: courseTaskData.courseTaskId,
-          courseTask: courseTaskData.courseTask,
-        })
-      ),
-    ]);
-
+    await modifyCourseTasks.mutateAsync(modifications);
     enqueueSnackbar(t('course.parts.saved'), {variant: 'success'});
     setInitRows(structuredClone(rows));
   };
 
   const getAplusActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
     const elements: JSX.Element[] = [];
+
+    // If the course task does not exist in the database, A+ grade sources
+    // can't be added
+    if (params.row.new) {
+      return elements;
+    }
 
     elements.push(
       <GridActionsCellItem
