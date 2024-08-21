@@ -242,13 +242,13 @@ const CoursePartsView = (): JSX.Element => {
     }
 
     await Promise.all([
-      ...newCourseTasks.map(courseTask =>
+      ...newCourseTasks.map(async courseTask =>
         addCourseTask.mutateAsync(courseTask)
       ),
-      ...deletedCourseTasks.map(coursePartId =>
+      ...deletedCourseTasks.map(async coursePartId =>
         deleteCourseTask.mutateAsync(coursePartId)
       ),
-      ...editedCourseTasks.map(courseTaskData =>
+      ...editedCourseTasks.map(async courseTaskData =>
         editCourseTask.mutateAsync({
           courseTaskId: courseTaskData.courseTaskId,
           courseTask: courseTaskData.courseTask,

@@ -67,7 +67,7 @@ export const useEditCoursePart = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: vars =>
+    mutationFn: async vars =>
       axios.put(
         `/api/v1/courses/${courseId}/parts/${vars.coursePartId}`,
         vars.coursePart
@@ -93,7 +93,7 @@ export const useDeleteCoursePart = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: coursePartId =>
+    mutationFn: async coursePartId =>
       axios.delete(`/api/v1/courses/${courseId}/parts/${coursePartId}`),
 
     onSuccess: () => {

@@ -21,7 +21,7 @@ const FormLanguagesField = ({
   valueFormat,
   labelFormat,
   helperTextFormat,
-  disabled,
+  disabled = false,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
 

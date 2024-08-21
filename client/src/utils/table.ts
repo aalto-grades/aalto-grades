@@ -104,7 +104,7 @@ export const predictGrades = (
 };
 
 export const invalidGradesCheck = (
-  t: TFunction<'translation', undefined>,
+  t: TFunction,
   row: StudentRow,
   courseTasks: CourseTaskData[]
 ): RowError[] => {
@@ -133,7 +133,7 @@ export const invalidGradesCheck = (
 };
 
 export const predictedGradesErrorCheck = (
-  t: TFunction<'translation', undefined>,
+  t: TFunction,
   studentPredictedGrades: {[k: string]: {finalGrade: number}},
   courseScale: GradingScale
 ): RowError[] => {
@@ -172,7 +172,7 @@ export const predictedGradesErrorCheck = (
 };
 
 export const getRowErrors = (
-  t: TFunction<'translation', undefined>,
+  t: TFunction,
   row: StudentRow,
   courseTasks: CourseTaskData[],
   studentPredictedGrades: {[k: string]: {finalGrade: number}},

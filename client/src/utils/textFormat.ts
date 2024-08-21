@@ -12,7 +12,7 @@ import {GradingScale} from '@/common/types';
  * only. These need to be converted back when adding data to the server.
  */
 export const convertToClientGradingScale = (
-  t: TFunction<'translation', undefined>,
+  t: TFunction,
   gradingScale: GradingScale
 ): string => {
   switch (gradingScale) {
@@ -32,7 +32,7 @@ export const convertToClientGradingScale = (
  * pass/fail, good/sat/fail
  */
 export const getGradeString = (
-  t: TFunction<'translation', undefined>,
+  t: TFunction,
   gradingScale: GradingScale,
   grade: number | undefined
 ): string => {

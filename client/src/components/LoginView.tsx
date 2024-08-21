@@ -165,7 +165,7 @@ const LoginView = (): JSX.Element => {
                   autoFocus
                   onChange={newOtp => setOtp(newOtp)}
                   validateChar={(c: string) => /\d/.test(c)}
-                  onComplete={fullOtp => handleSubmit(null, fullOtp)}
+                  onComplete={async fullOtp => handleSubmit(null, fullOtp)}
                 />
               )}
             </Collapse>

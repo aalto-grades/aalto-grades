@@ -97,7 +97,7 @@ export const useDeleteUser = (
 ): UseMutationResult<void, unknown, number> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: userId => axios.delete(`/api/v1/users/${userId}`),
+    mutationFn: async userId => axios.delete(`/api/v1/users/${userId}`),
 
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['users']});
@@ -112,7 +112,7 @@ export const useDeleteUsers = (
 ): UseMutationResult<void, unknown, UserIdArray> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: userIds => axios.post('/api/v1/users/delete', userIds),
+    mutationFn: async userIds => axios.post('/api/v1/users/delete', userIds),
 
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['users']});

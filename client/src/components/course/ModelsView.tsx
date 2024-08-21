@@ -284,7 +284,7 @@ const ModelsView = (): JSX.Element => {
                   setEditDialogOpen(true);
                 }}
                 onArchive={() => handleArchiveModel(model.id, !model.archived)}
-                onDelete={() => handleDelModel(model.id)}
+                onDelete={async () => handleDelModel(model.id)}
                 onClick={() => {
                   if (userId !== undefined)
                     navigate(`/${courseId}/models/${model.id}/${userId}`);

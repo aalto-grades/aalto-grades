@@ -266,8 +266,8 @@ const EditGradesDialog = ({
 
     await Promise.all([
       addGrades.mutateAsync(newGrades),
-      ...deletedGrades.map(gradeId => deleteGrade.mutateAsync(gradeId)),
-      ...editedGrades.map(editData => editGrade.mutateAsync(editData)),
+      ...deletedGrades.map(async gradeId => deleteGrade.mutateAsync(gradeId)),
+      ...editedGrades.map(async editData => editGrade.mutateAsync(editData)),
     ]);
 
     onClose();

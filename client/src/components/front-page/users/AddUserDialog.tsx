@@ -208,7 +208,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
             {userData === null && (
               <Button
                 variant="outlined"
-                onClick={() => confirmDiscard(form)}
+                onClick={async () => confirmDiscard(form)}
                 disabled={form.isSubmitting}
               >
                 {t('general.cancel')}

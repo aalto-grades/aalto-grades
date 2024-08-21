@@ -41,7 +41,7 @@ export const useAddFinalGrades = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: newFinalGrades =>
+    mutationFn: async newFinalGrades =>
       axios.post(`/api/v1/courses/${courseId}/final-grades`, newFinalGrades),
 
     onSuccess: () => {
@@ -62,7 +62,7 @@ export const useEditFinalGrade = (
   options?: UseMutationOptions<void, unknown, EditFinalGradeVars>
 ): UseMutationResult<void, unknown, EditFinalGradeVars> =>
   useMutation({
-    mutationFn: vars =>
+    mutationFn: async vars =>
       axios.put(
         `/api/v1/courses/${courseId}/final-grades/${vars.finalGradeId}`,
         vars.data
@@ -77,7 +77,7 @@ export const useDeleteFinalGrade = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: finalGradeId =>
+    mutationFn: async finalGradeId =>
       axios.delete(`/api/v1/courses/${courseId}/final-grades/${finalGradeId}`),
 
     onSuccess: () => {

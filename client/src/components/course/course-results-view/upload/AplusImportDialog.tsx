@@ -96,20 +96,19 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
           <>
             <Typography>{t('course.parts.select-for-fetching')}</Typography>
             <FormGroup>
-              {courseTasks.data !== undefined &&
-                courseTasks.data
-                  .filter(coursePart => coursePart.aplusGradeSources.length > 0)
-                  .map(coursePart => (
-                    <FormControlLabel
-                      key={coursePart.id}
-                      control={
-                        <Checkbox
-                          onChange={e => handleSelect(e, coursePart.id)}
-                        />
-                      }
-                      label={coursePart.name}
-                    />
-                  ))}
+              {courseTasks.data
+                ?.filter(coursePart => coursePart.aplusGradeSources.length > 0)
+                .map(coursePart => (
+                  <FormControlLabel
+                    key={coursePart.id}
+                    control={
+                      <Checkbox
+                        onChange={e => handleSelect(e, coursePart.id)}
+                      />
+                    }
+                    label={coursePart.name}
+                  />
+                ))}
             </FormGroup>
           </>
         )}
@@ -145,17 +144,16 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {aplusGrades.data !== undefined &&
-                  aplusGrades.data.map(row => (
-                    <TableRow key={row.courseTaskId}>
-                      <TableCell>{row.studentNumber}</TableCell>
-                      <TableCell>{row.courseTaskId}</TableCell>
-                      <TableCell>{row.aplusGradeSourceId}</TableCell>
-                      <TableCell>{row.grade}</TableCell>
-                      <TableCell>{row.date.toDateString()}</TableCell>
-                      <TableCell>{row.expiryDate.toDateString()}</TableCell>
-                    </TableRow>
-                  ))}
+                {aplusGrades.data?.map(row => (
+                  <TableRow key={row.courseTaskId}>
+                    <TableCell>{row.studentNumber}</TableCell>
+                    <TableCell>{row.courseTaskId}</TableCell>
+                    <TableCell>{row.aplusGradeSourceId}</TableCell>
+                    <TableCell>{row.grade}</TableCell>
+                    <TableCell>{row.date.toDateString()}</TableCell>
+                    <TableCell>{row.expiryDate.toDateString()}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>

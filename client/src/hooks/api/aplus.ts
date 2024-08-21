@@ -67,7 +67,7 @@ export const useAddAplusGradeSources = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: gradeSources =>
+    mutationFn: async gradeSources =>
       axios.post(`/api/v1/courses/${courseId}/aplus-sources`, gradeSources),
 
     onSuccess: () => {
@@ -86,7 +86,7 @@ export const useDeleteAplusGradeSource = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: aplusGradeSourceId =>
+    mutationFn: async aplusGradeSourceId =>
       axios.delete(
         `/api/v1/courses/${courseId}/aplus-sources/${aplusGradeSourceId}`
       ),

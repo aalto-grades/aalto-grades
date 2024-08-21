@@ -45,7 +45,7 @@ export const useAddGrades = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: newGrades =>
+    mutationFn: async newGrades =>
       axios.post(`/api/v1/courses/${courseId}/grades`, newGrades),
 
     onSuccess: () => {
@@ -63,7 +63,7 @@ export const useEditGrade = (
   options?: UseMutationOptions<void, unknown, EditGradeVars>
 ): UseMutationResult<void, unknown, EditGradeVars> =>
   useMutation({
-    mutationFn: vars =>
+    mutationFn: async vars =>
       axios.put(
         `/api/v1/courses/${courseId}/grades/${vars.gradeId}`,
         vars.data
@@ -78,7 +78,7 @@ export const useDeleteGrade = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: gradeId =>
+    mutationFn: async gradeId =>
       axios.delete(`/api/v1/courses/${courseId}/grades/${gradeId}`),
 
     onSuccess: () => {

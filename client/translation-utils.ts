@@ -156,7 +156,7 @@ const updateTranslation = (file: File, changes: Change[]): void => {
   }
   fs.copyFileSync(file, backup);
 
-  const entries = parseFileEntries(file).entries;
+  const {entries} = parseFileEntries(file);
   const updated = structuredClone(entries);
 
   for (const change of changes) {

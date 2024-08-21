@@ -69,7 +69,7 @@ export const useEditCourse = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: vars =>
+    mutationFn: async vars =>
       axios.put(`/api/v1/courses/${vars.courseId}`, vars.course),
 
     onSuccess: (_data: unknown, vars: EditCourseVars) => {

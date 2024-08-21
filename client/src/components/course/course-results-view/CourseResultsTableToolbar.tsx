@@ -276,9 +276,8 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
               }}
             >
               {isActive
-                ? gradingModels?.filter(
-                    ass => ass.id === selectedGradingModel
-                  )[0]?.name
+                ? gradingModels?.find(ass => ass.id === selectedGradingModel)
+                    ?.name
                 : t('general.grading-model')}
             </div>
 

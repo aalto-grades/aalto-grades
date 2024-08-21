@@ -54,10 +54,10 @@ export const useLogIn = (
   });
 
 export const useLogOut = (
-  options?: UseMutationOptions<void, unknown, void>
+  options?: UseMutationOptions<void, unknown>
 ): UseMutationResult<void, unknown, void> =>
   useMutation({
-    mutationFn: () => axios.post('/api/v1/auth/logout'),
+    mutationFn: async () => axios.post('/api/v1/auth/logout'),
     ...options,
   });
 

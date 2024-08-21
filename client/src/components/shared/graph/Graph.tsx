@@ -93,7 +93,7 @@ const nodeTypesMap = {
 const initGraphFn = (
   initGraph: GraphStructure,
   courseParts: {id: number; name: string; archived: boolean}[],
-  t: TFunction<'translation', undefined>
+  t: TFunction
 ): {initNodeValues: NodeValues; extraNodeData: ExtraNodeData} => {
   // Check for deleted & archived course parts (edit extra data)
   const extraNodeData: ExtraNodeData = {};

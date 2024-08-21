@@ -112,7 +112,7 @@ const UsersTable = (): JSX.Element => {
                     <span>
                       <IconButton
                         aria-label="delete"
-                        onClick={() => handleDeleteUser(user)}
+                        onClick={async () => handleDeleteUser(user)}
                       >
                         <Delete />
                       </IconButton>

@@ -285,7 +285,7 @@ const EditCourseView = (): JSX.Element => {
             </Typography>
             <SaveBar
               show={changes || formChanges}
-              handleDiscard={() => confirmDiscard(form)}
+              handleDiscard={async () => confirmDiscard(form)}
               loading={form.isSubmitting}
               disabled={!form.isValid}
             />

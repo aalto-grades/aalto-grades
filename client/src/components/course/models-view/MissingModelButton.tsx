@@ -27,7 +27,7 @@ const MissingModelButton = ({
   // onDelete,
   // onClick,
 }: PropsType): JSX.Element => {
-  const {t} = useTranslation();
+  const {t: _} = useTranslation();
 
   // let warning = '';
   // if (model.hasArchivedCourseParts && model.hasDeletedCourseParts)

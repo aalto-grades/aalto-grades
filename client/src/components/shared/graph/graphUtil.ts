@@ -19,7 +19,7 @@ export const simplifyNode = (node: Node): Node => ({
 });
 
 export const getDragAndDropNodes = (
-  t: TFunction<'translation', undefined>
+  t: TFunction
 ): {
   type: DropInNodes;
   title: string;
