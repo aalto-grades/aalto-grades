@@ -468,7 +468,7 @@ const CoursePartsView = (): JSX.Element => {
       />
 
       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-        <Typography width={'fit-content'} variant="h2">
+        <Typography width="fit-content" variant="h2">
           {t('general.course-parts')}
         </Typography>
         <SaveBar
@@ -490,14 +490,12 @@ const CoursePartsView = (): JSX.Element => {
               {t('course.parts.add-new-part')}
             </Button>
             {selectedPart !== null && (
-              <>
-                <Button
-                  variant="outlined"
-                  onClick={() => setAplusDialogOpen(true)}
-                >
-                  {t('course.parts.add-from-a+')}
-                </Button>
-              </>
+              <Button
+                variant="outlined"
+                onClick={() => setAplusDialogOpen(true)}
+              >
+                {t('course.parts.add-from-a+')}
+              </Button>
             )}
           </>
         )}

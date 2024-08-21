@@ -70,7 +70,7 @@ const UserButton = (): JSX.Element => {
   const menuOpen = Boolean(anchorEl);
 
   if (auth?.name === undefined) {
-    return <div data-testid="not-logged-in"></div>;
+    return <div data-testid="not-logged-in" />;
   }
 
   return (

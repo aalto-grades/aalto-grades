@@ -25,7 +25,7 @@ const BaseNode = ({
   children,
 }: PropsType): JSX.Element => {
   const {nodeData, setNodeTitle} = useContext(NodeDataContext);
-  const {extraNodeData} = useContext(ExtraNodeDataContext);
+  const extraNodeData = useContext(ExtraNodeDataContext);
 
   const title = nodeData[id].title;
   const extraData = extraNodeData[id];
@@ -63,7 +63,7 @@ const BaseNode = ({
         >
           {title}
         </h4>
-        {extraData?.warning && (
+        {extraData?.warning !== undefined && (
           <div style={{position: 'absolute', top: '5px', right: '5px'}}>
             <Tooltip title={extraData.warning} placement="top">
               <WarningIcon color="warning" sx={{fontSize: '16px'}} />

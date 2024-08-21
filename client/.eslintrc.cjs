@@ -8,23 +8,20 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended-type-checked',
+    'plugin:react/recommended',
+    'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
     '../node_modules/gts',
     '../.eslintrc.json',
   ],
-  ignorePatterns: [
-    'node_modules',
-    'dist',
-    '.eslintrc.cjs',
-    'vite-env.d.ts',
-    // 'vite.config.ts',
-  ],
+  ignorePatterns: ['node_modules', 'dist', '.eslintrc.cjs', 'vite-env.d.ts'],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'react-refresh', 'no-relative-import-paths'],
   settings: {
     'import/resolver': {
       typescript: {project: `${__dirname}/`}, // this loads <rootdir>/tsconfig.json to eslint
     },
+    react: {version: 'detect'},
   },
   rules: {
     camelcase: ['warn', {allow: ['required_error', 'unstable_viewTransition']}],
@@ -45,6 +42,22 @@ module.exports = {
         ],
       },
     ],
+
+    'react/button-has-type': 'warn',
+    'react/destructuring-assignment': 'warn',
+    'react/function-component-definition': [
+      'warn',
+      {namedComponents: 'arrow-function', unnamedComponents: 'arrow-function'},
+    ],
+    'react/hook-use-state': 'warn',
+    'react/jsx-boolean-value': 'warn',
+    'react/jsx-curly-brace-presence': 'warn',
+    'react/jsx-filename-extension': ['warn', {extensions: ['.tsx']}],
+    'react/jsx-no-constructed-context-values': 'warn',
+    'react/jsx-no-useless-fragment': 'warn',
+    'react/no-danger': 'error',
+    'react/prop-types': 'off', // Buggy
+    'react/self-closing-comp': 'warn',
 
     'react-refresh/only-export-components': [
       'warn',

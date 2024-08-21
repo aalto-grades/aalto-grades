@@ -43,7 +43,7 @@ const SelectAplusGradeSources = ({
       aplusGradeSourcesEqual(newSource, source)
     );
 
-  if (aplusExerciseData.data === undefined) return <></>;
+  if (aplusExerciseData.data === undefined) return <>{t('loading')}</>;
 
   return (
     <>

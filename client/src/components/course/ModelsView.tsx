@@ -239,7 +239,7 @@ const ModelsView = (): JSX.Element => {
         name={editDialogModel?.name ?? null}
       />
 
-      <Typography width={'fit-content'} variant="h2">
+      <Typography width="fit-content" variant="h2">
         {t('general.grading-models')}
       </Typography>
       <Box sx={{display: 'flex', mb: 1}}>

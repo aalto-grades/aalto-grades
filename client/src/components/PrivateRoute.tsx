@@ -36,7 +36,7 @@ const PrivateRoute = ({children, roles}: PropsType): JSX.Element | null => {
   if (!roles.includes(auth.role) && !isTeacherInCharge)
     return <Navigate to="/" />;
 
-  return <>{children ?? <Outlet />}</>;
+  return children ?? <Outlet />;
 };
 
 export default PrivateRoute;

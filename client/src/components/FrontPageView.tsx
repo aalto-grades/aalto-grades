@@ -83,7 +83,7 @@ const FrontPageView = (): JSX.Element => {
               {t('front-page.create-new-course')}
             </Button>
           </Box>
-          {courses.data && <CourseTable courses={courses.data} />}
+          {courses.data !== undefined && <CourseTable courses={courses.data} />}
           <Users />
         </>
       )}

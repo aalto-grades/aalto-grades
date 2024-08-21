@@ -252,7 +252,7 @@ const router = createBrowserRouter([
       {path: '/login', element: <LoginView />},
       {
         path: '/licenses',
-        element: <StaticPageView url={'/javascript.html'} title="Licenses" />,
+        element: <StaticPageView url="/javascript.html" title="Licenses" />,
       },
       {
         path: '/accessibility-statement',

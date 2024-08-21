@@ -113,7 +113,7 @@ const SideMenu = (): JSX.Element => {
       <List>
         <SideMenuButton
           text={t('course.list')}
-          to={'/'}
+          to="/"
           Icon={HomeMaxRounded}
           IconOutlined={ArrowBack}
           unstable_viewTransition

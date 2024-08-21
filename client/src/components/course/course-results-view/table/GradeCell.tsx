@@ -76,31 +76,29 @@ const GradeCell = ({
     >
       <span>{bestGrade?.grade ?? '-'}</span>
       {/* If there are multiple grades "show more" icon*/}
-      {coursePartResults && hover && (
-        <>
-          <Tooltip
-            placement="top"
-            title={
-              coursePartResults.grades.length <= 1
-                ? t('course.results.edit-grade')
-                : t('course.results.multiple-grade')
-            }
+      {coursePartResults !== undefined && hover && (
+        <Tooltip
+          placement="top"
+          title={
+            coursePartResults.grades.length <= 1
+              ? t('course.results.edit-grade')
+              : t('course.results.multiple-grade')
+          }
+        >
+          <IconButton
+            color="primary"
+            sx={{
+              position: 'absolute',
+              right: '0px',
+              top: 'calc(50% - 20px)',
+            }}
+            onClick={(): void => setGradeDialogOpen(true)}
           >
-            <IconButton
-              color="primary"
-              sx={{
-                position: 'absolute',
-                right: '0px',
-                top: 'calc(50% - 20px)',
-              }}
-              onClick={(): void => setGradeDialogOpen(true)}
-            >
-              <MoreVert />
-            </IconButton>
-          </Tooltip>
-        </>
+            <MoreVert />
+          </IconButton>
+        </Tooltip>
       )}
-      {coursePartResults && gradeDialogOpen && (
+      {coursePartResults !== undefined && gradeDialogOpen && (
         <EditGradesDialog
           open={gradeDialogOpen}
           onClose={() => setGradeDialogOpen(false)}
@@ -118,68 +116,64 @@ const GradeCell = ({
       {/* Info/warning icons */}
       {/* Contains invalid grades */}
       {hasInvalidGrade && (
-        <>
-          <Tooltip placement="top" title={'Invalid grades'}>
-            {/* <IconButton
+        <Tooltip placement="top" title="Invalid grades">
+          {/* <IconButton
                   size='small'
                   color='error'
                   style={{
                     position: 'relative',
                   }}
                 > */}
-            <WarningAmberOutlined
-              sx={{
-                position: 'absolute',
-                float: 'left',
-                top: '-5%',
-                left: '1%',
-                width: '15px',
-                // transform: 'translate(-50%, -50%)',
-                color: `rgba(${theme.vars.palette.error.mainChannel} / 0.7)`,
-                // When over color is 100%
-                '&:hover': {
-                  color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
-                },
-              }}
-            />
-            {/* </IconButton> */}
-          </Tooltip>
-        </>
+          <WarningAmberOutlined
+            sx={{
+              position: 'absolute',
+              float: 'left',
+              top: '-5%',
+              left: '1%',
+              width: '15px',
+              // transform: 'translate(-50%, -50%)',
+              color: `rgba(${theme.vars.palette.error.mainChannel} / 0.7)`,
+              // When over color is 100%
+              '&:hover': {
+                color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
+              },
+            }}
+          />
+          {/* </IconButton> */}
+        </Tooltip>
       )}
       {/* Expired grade */}
       {!hasInvalidGrade && isGradeExpired && (
-        <>
-          <Tooltip
-            placement="top"
-            title={t('course.results.grade-expired-on', {
-              date: bestGrade?.expiryDate.toString(),
-            })}
-          >
-            {/* <IconButton
+        <Tooltip
+          placement="top"
+          title={t('course.results.grade-expired-on', {
+            date: bestGrade?.expiryDate.toString(),
+          })}
+        >
+          {/* <IconButton
                   size='small'
                   color='error'
                   style={{
                     position: 'relative',
                   }}
                 > */}
-            <EventBusyOutlined
-              sx={{
-                position: 'absolute',
-                float: 'left',
-                top: '-5%',
-                left: '1%',
-                width: '15px',
-                // transform: 'translate(-50%, -50%)',
-                color: `rgba(${theme.vars.palette.error.mainChannel} / 0.7)`,
-                // When over color is 100%
-                '&:hover': {
-                  color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
-                },
-              }}
-            />
-            {/* </IconButton> */}
-          </Tooltip>
-        </>
+          <EventBusyOutlined
+            sx={{
+              position: 'absolute',
+              float: 'left',
+              top: '-5%',
+              left: '1%',
+              width: '15px',
+              // transform: 'translate(-50%, -50%)',
+              color: `rgba(${theme.vars.palette.error.mainChannel} / 0.7)`,
+              // When over color is 100%
+              '&:hover': {
+                color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
+              },
+            }}
+          />
+          {/* </IconButton> */}
+        </Tooltip>
       )}
       {/* Multiple grades (more performance than showing button) TODO: Better solution */}
       {!hasInvalidGrade &&
@@ -199,7 +193,7 @@ const GradeCell = ({
           />
         )}
 
-      {bestGrade?.date && (
+      {bestGrade?.date !== undefined && (
         // The tooltip has poor performance.
         // <Tooltip
         //   placement="top"

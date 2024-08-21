@@ -53,7 +53,7 @@ const AverageNode = (props: NodeProps): JSX.Element => {
 
   const updateNodeInternals = useUpdateNodeInternals();
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
-  const {nodeValues} = useContext(NodeValuesContext);
+  const nodeValues = useContext(NodeValuesContext);
 
   const settings = nodeData[id].settings as AverageNodeSettings;
   const [localSettings, setLocalSettings] = useState<LocalSettings>(

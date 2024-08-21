@@ -18,7 +18,7 @@ const AdditionNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
   const {id, isConnectable} = props;
   const updateNodeInternals = useUpdateNodeInternals();
-  const {nodeValues} = useContext(NodeValuesContext);
+  const nodeValues = useContext(NodeValuesContext);
 
   const [handles, setHandles] = useState<string[]>([]);
   const [nextFree, setNextFree] = useState<number>(0);
@@ -91,7 +91,7 @@ const AdditionNode = (props: NodeProps): JSX.Element => {
               </tr>
             ))}
           <tr>
-            <td style={{height: '20px'}}></td>
+            <td style={{height: '20px'}} />
           </tr>
           <tr style={{background: '#ccf'}}>
             <td style={{height: '20px'}}>

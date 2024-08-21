@@ -22,11 +22,11 @@ const CourseResultsView = (): JSX.Element => {
 
   return (
     <Box textAlign="left" alignItems="left">
-      <Typography width={'fit-content'} variant="h2">
+      <Typography width="fit-content" variant="h2">
         Grades
       </Typography>
 
-      {gradesQuery.data && !isTransitioning && (
+      {gradesQuery.data !== undefined && !isTransitioning && (
         <Delayed>
           <GradesTableProvider data={gradesQuery.data}>
             <CourseResultsTableToolbar />

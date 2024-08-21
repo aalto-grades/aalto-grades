@@ -107,16 +107,13 @@ const CourseResultsTable = (): JSX.Element => {
                           )}
                           {!header.column.getCanSort() ? null : (
                             <Icon>
-                              <>
-                                {{
-                                  asc: <ArrowUpward />,
-                                  desc: (
-                                    <ArrowUpward style={{rotate: '180deg'}} />
-                                  ),
-                                }[header.column.getIsSorted() as string] ?? (
-                                  <Sort></Sort>
-                                )}
-                              </>
+                              {header.column.getIsSorted() === 'asc' ? (
+                                <ArrowUpward />
+                              ) : header.column.getIsSorted() === 'desc' ? (
+                                <ArrowUpward style={{rotate: '180deg'}} />
+                              ) : (
+                                <Sort />
+                              )}
                             </Icon>
                           )}
                         </>
@@ -232,32 +229,28 @@ const CourseResultsTable = (): JSX.Element => {
                               cell.column.columnDef.cell,
                             cell.getContext()
                           )
-                        ) : cell.getIsPlaceholder() ? null : ( // For cells with repeated values, render null
-                          // Otherwise, just render the regular cell
-                          <>
-                            {cell.getValue() === undefined ? (
-                              flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext()
-                              )
-                            ) : (
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  borderBottom: '1px solid lightgray',
-                                  height: '100%',
-                                  width: '100%',
-                                }}
-                              >
-                                {flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext()
-                                )}
-                              </div>
+                        ) : cell.getIsPlaceholder() ? null : cell.getValue() === // Otherwise, just render the regular cell // For cells with repeated values, render null
+                          undefined ? (
+                          flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )
+                        ) : (
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderBottom: '1px solid lightgray',
+                              height: '100%',
+                              width: '100%',
+                            }}
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
                             )}
-                          </>
+                          </div>
                         )}
                       </td>
                     );

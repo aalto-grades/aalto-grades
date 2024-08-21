@@ -523,10 +523,13 @@ const Graph = ({
           </Button>
         )}
       </div>
-      <NodeValuesContext.Provider value={{nodeValues}}>
-        <ExtraNodeDataContext.Provider value={{extraNodeData}}>
+      <NodeValuesContext.Provider value={nodeValues}>
+        <ExtraNodeDataContext.Provider value={extraNodeData}>
           <NodeDataContext.Provider
-            value={{nodeData, setNodeTitle, setNodeSettings}}
+            value={useMemo(
+              () => ({nodeData, setNodeTitle, setNodeSettings}),
+              [nodeData]
+            )}
           >
             <div style={{width: '100%', height: '60vh'}}>
               <ReactFlow

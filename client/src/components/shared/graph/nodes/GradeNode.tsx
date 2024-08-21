@@ -14,7 +14,7 @@ const GradeNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
   const {id, isConnectable} = props;
 
-  const {nodeValues} = useContext(NodeValuesContext);
+  const nodeValues = useContext(NodeValuesContext);
   const nodeValue = nodeValues[id] as GradeNodeValue;
 
   return (

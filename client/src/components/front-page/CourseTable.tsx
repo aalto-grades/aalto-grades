@@ -119,7 +119,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
             <TableRow
               key={course.id}
               id={`ag-see-instances-tr-${course.id}`}
-              hover={true}
+              hover
               sx={{
                 cursor: 'pointer',
                 '&:focus': {backgroundColor: 'rgba(0, 0, 0, 0.04)'},

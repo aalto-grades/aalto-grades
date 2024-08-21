@@ -200,13 +200,14 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
 
           // Only add divider between elements
           ...(i !== groupByElements.length - 1
-            ? [<Divider sx={{my: 0}} />]
+            ? [<Divider key={i} sx={{my: 0}} />]
             : []),
         ])}
       </Menu>
     </>
   );
 });
+GroupByButton.displayName = 'GroupByButton';
 
 const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
   (props, ref): JSX.Element => {
@@ -344,6 +345,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
     );
   }
 );
+AssessmentFilterButton.displayName = 'AssessmentFilterButton';
 
 const CourseResultsTableToolbar = (): JSX.Element => {
   const {t} = useTranslation();
@@ -643,7 +645,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
               .getColumn('user_studentNumber')
               ?.setFilterValue(e.target.value);
           }}
-          placeholder={'Search...'}
+          placeholder="Search..."
           className="w-36 border shadow rounded"
         />
         <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>

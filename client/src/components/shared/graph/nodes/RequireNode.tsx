@@ -19,7 +19,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;
 
   const updateNodeInternals = useUpdateNodeInternals();
-  const {nodeValues} = useContext(NodeValuesContext);
+  const nodeValues = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const settings = nodeData[id].settings as RequireNodeSettings;
@@ -182,8 +182,8 @@ const RequireNode = (props: NodeProps): JSX.Element => {
               </tr>
             ))}
           <tr style={{height: rowHeight}}>
-            <td></td>
-            <td></td>
+            <td />
+            <td />
           </tr>
         </tbody>
       </table>

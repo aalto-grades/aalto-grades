@@ -102,6 +102,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       type: 'actions',
       getActions: params => [
         <GridActionsCellItem
+          key={params.id}
           icon={<Delete />}
           label={t('general.delete')}
           onClick={() =>
@@ -173,63 +174,61 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   };
 
   return (
-    <>
-      <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
-        {currentStep === 0 ? (
-          <UploadDialogUpload
-            columns={columns}
-            rows={rows}
-            maxGrades={maxGrades}
-            setRows={setRows}
-            setReady={setReady}
-            expanded={uploadExpanded}
-            setExpanded={setUploadExpanded}
-            invalidValues={invalidValues}
-          />
-        ) : (
-          <UploadDialogConfirm
-            columns={readOnlyColumns}
-            rows={rows}
-            maxGrades={maxGrades}
-            dates={dates}
-            setDates={setDates}
-            setReady={setReady}
-            expanded={confirmExpanded}
-            setExpanded={setConfirmExpanded}
-            invalidValues={invalidValues}
-          />
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
+      {currentStep === 0 ? (
+        <UploadDialogUpload
+          columns={columns}
+          rows={rows}
+          maxGrades={maxGrades}
+          setRows={setRows}
+          setReady={setReady}
+          expanded={uploadExpanded}
+          setExpanded={setUploadExpanded}
+          invalidValues={invalidValues}
+        />
+      ) : (
+        <UploadDialogConfirm
+          columns={readOnlyColumns}
+          rows={rows}
+          maxGrades={maxGrades}
+          dates={dates}
+          setDates={setDates}
+          setReady={setReady}
+          expanded={confirmExpanded}
+          setExpanded={setConfirmExpanded}
+          invalidValues={invalidValues}
+        />
+      )}
+      <DialogActions>
+        {currentStep === 1 && (
+          <Button
+            onClick={() => setCurrentStep(cur => cur - 1)}
+            sx={{mr: 'auto'}}
+          >
+            {t('general.back')}
+          </Button>
         )}
-        <DialogActions>
-          {currentStep === 1 && (
-            <Button
-              onClick={() => setCurrentStep(cur => cur - 1)}
-              sx={{mr: 'auto'}}
-            >
-              {t('general.back')}
-            </Button>
-          )}
-          {currentStep === 0 && (
-            <Button
-              onClick={() => setCurrentStep(cur => cur + 1)}
-              disabled={!ready || rows.length === 0}
-            >
-              {t('general.next')}
-            </Button>
-          )}
-          {currentStep === 1 && confirmExpanded === 'date' && (
-            <Button
-              onClick={() => setConfirmExpanded('confirm')}
-              disabled={!ready}
-            >
-              {t('general.confirm')}
-            </Button>
-          )}
-          {currentStep === 1 && confirmExpanded === 'confirm' && (
-            <Button onClick={onSubmit}>{t('general.submit')}</Button>
-          )}
-        </DialogActions>
-      </Dialog>
-    </>
+        {currentStep === 0 && (
+          <Button
+            onClick={() => setCurrentStep(cur => cur + 1)}
+            disabled={!ready || rows.length === 0}
+          >
+            {t('general.next')}
+          </Button>
+        )}
+        {currentStep === 1 && confirmExpanded === 'date' && (
+          <Button
+            onClick={() => setConfirmExpanded('confirm')}
+            disabled={!ready}
+          >
+            {t('general.confirm')}
+          </Button>
+        )}
+        {currentStep === 1 && confirmExpanded === 'confirm' && (
+          <Button onClick={onSubmit}>{t('general.submit')}</Button>
+        )}
+      </DialogActions>
+    </Dialog>
   );
 };
 export default UploadDialog;

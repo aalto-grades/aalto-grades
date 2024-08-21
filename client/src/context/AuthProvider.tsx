@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {JSX, PropsWithChildren, createContext, useState} from 'react';
+import {JSX, PropsWithChildren, createContext, useMemo, useState} from 'react';
 
 import {AuthData} from '@/common/types';
 
@@ -34,19 +34,19 @@ export const AuthProvider = ({children}: PropsWithChildren): JSX.Element => {
   const [isTeacherInCharge, setIsTeacherInCharge] = useState<boolean>(false);
   const [isAssistant, setIsAssistant] = useState<boolean>(false);
 
+  const authData = useMemo(
+    () => ({
+      auth,
+      setAuth,
+      isTeacherInCharge,
+      setIsTeacherInCharge,
+      isAssistant,
+      setIsAssistant,
+    }),
+    [auth, isAssistant, isTeacherInCharge]
+  );
   return (
-    <AuthContext.Provider
-      value={{
-        auth,
-        setAuth,
-        isTeacherInCharge,
-        setIsTeacherInCharge,
-        isAssistant,
-        setIsAssistant,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={authData}>{children}</AuthContext.Provider>
   );
 };
 

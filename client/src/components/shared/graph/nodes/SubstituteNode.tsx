@@ -45,7 +45,8 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;
 
   const updateNodeInternals = useUpdateNodeInternals();
-  const {nodeValues} = useContext(NodeValuesContext);
+  const nodeValues = useContext(NodeValuesContext);
+
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const settings = nodeData[id].settings as SubstituteNodeSettings;
@@ -248,8 +249,8 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
               </tr>
             ))}
           <tr style={{height: rowHeight}}>
-            <td></td>
-            <td></td>
+            <td />
+            <td />
           </tr>
         </tbody>
       </table>
@@ -294,8 +295,8 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
               </tr>
             ))}
           <tr style={{height: rowHeight}}>
-            <td></td>
-            <td></td>
+            <td />
+            <td />
           </tr>
         </tbody>
       </table>

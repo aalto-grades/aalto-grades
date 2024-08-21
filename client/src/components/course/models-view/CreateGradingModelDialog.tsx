@@ -90,11 +90,11 @@ const CreateGradingModelDialog = ({
             label={t('course.models.create-model.select-template')}
             onChange={e => setTemplate(e.target.value as GraphTemplate)}
           >
-            <MenuItem value={'none'}>
+            <MenuItem value="none">
               {t('course.models.create-model.none')}
             </MenuItem>
-            <MenuItem value={'addition'}>{t('shared.graph.node.add')}</MenuItem>
-            <MenuItem value={'average'}>
+            <MenuItem value="addition">{t('shared.graph.node.add')}</MenuItem>
+            <MenuItem value="average">
               {t('shared.graph.node.average')}
             </MenuItem>
           </Select>

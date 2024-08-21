@@ -17,7 +17,7 @@ const CoursePartNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
   const {id, isConnectable} = props;
 
-  const {nodeValues} = useContext(NodeValuesContext);
+  const nodeValues = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const settings = nodeData[id].settings as CoursePartNodeSettings;

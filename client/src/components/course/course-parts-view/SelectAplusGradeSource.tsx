@@ -45,7 +45,7 @@ const SelectAplusGradeSource = ({
     return false;
   };
 
-  if (aplusExerciseData.data === undefined) return <></>;
+  if (aplusExerciseData.data === undefined) return <>{t('loading')}</>;
 
   return (
     <>
@@ -84,6 +84,7 @@ const SelectAplusGradeSource = ({
           <FormGroup>
             {aplusExerciseData.data.modules.map(module => (
               <Button
+                key={module.id}
                 disabled={isDisabled(
                   newAplusGradeSource(aplusCourse, module.closingDate, {module})
                 )}
@@ -110,6 +111,7 @@ const SelectAplusGradeSource = ({
             {aplusExerciseData.data.modules.map(module =>
               module.exercises.map(exercise => (
                 <Button
+                  key={exercise.id}
                   disabled={isDisabled(
                     newAplusGradeSource(aplusCourse, module.closingDate, {
                       exercise,
@@ -139,6 +141,7 @@ const SelectAplusGradeSource = ({
             <FormGroup>
               {aplusExerciseData.data.difficulties.map(difficulty => (
                 <Button
+                  key={difficulty.difficulty}
                   disabled={isDisabled(
                     newAplusGradeSource(
                       aplusCourse,

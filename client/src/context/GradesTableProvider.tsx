@@ -70,10 +70,6 @@ export const GradesTableContext = createContext<TableContextProps | undefined>(
   undefined
 );
 
-type PropsType = PropsWithChildren & {
-  data: StudentRow[];
-};
-
 // Table creation
 declare module '@tanstack/table-core' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -142,8 +138,11 @@ const findPreviouslyExportedToSisu = (
 
 const columnHelper = createColumnHelper<GroupedStudentRow>();
 
-// Create a provider component
-export const GradesTableProvider = (props: PropsType): JSX.Element => {
+type PropsType = PropsWithChildren & {data: StudentRow[]};
+export const GradesTableProvider = ({
+  data,
+  children,
+}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
 
@@ -186,17 +185,13 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     // Here we predict the grades for the students
     let predictedGrades: ReturnType<typeof predictGrades> = [];
     if (gradingModels) {
-      predictedGrades = predictGrades(
-        props.data,
-        gradingModels,
-        gradeSelectOption
-      );
+      predictedGrades = predictGrades(data, gradingModels, gradeSelectOption);
     }
 
     // Add all auxiliary columns to the data
     return groupByLatestBestGrade(
       // Creating the extended rows
-      props.data.map(row => {
+      data.map(row => {
         const studentPredictedGrades = Object.fromEntries(
           Object.entries(predictedGrades).map(([key, value]) => [
             key,
@@ -221,7 +216,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   }, [
     t,
     gradingModels,
-    props.data,
+    data,
     gradeSelectOption,
     courseTasks.data,
     course.data?.gradingScale,
@@ -316,26 +311,24 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       id: 'select',
       size: 70,
       meta: {PrettyChipPosition: grouping.length > 0 ? 'last' : 'alone'},
-      header: ({table}) => {
-        return (
-          <>
-            <Checkbox
-              id="select-all"
-              checked={table.getIsAllRowsSelected()}
-              indeterminate={table.getIsSomeRowsSelected()}
-              onChange={table.getToggleAllRowsSelectedHandler()}
+      header: ({table}) => (
+        <>
+          <Checkbox
+            id="select-all"
+            checked={table.getIsAllRowsSelected()}
+            indeterminate={table.getIsSomeRowsSelected()}
+            onChange={table.getToggleAllRowsSelectedHandler()}
+          />
+          <span style={{marginLeft: '4px', marginRight: '15px'}}>
+            <Badge
+              badgeContent={table.getSelectedRowModel().rows.length || '0'}
+              // color="secondary"
+              color="primary"
+              max={999}
             />
-            <span style={{marginLeft: '4px', marginRight: '15px'}}>
-              <Badge
-                badgeContent={table.getSelectedRowModel().rows.length || '0'}
-                // color="secondary"
-                color="primary"
-                max={999}
-              />
-            </span>
-          </>
-        );
-      },
+          </span>
+        </>
+      ),
       aggregatedCell: ({row}) => (
         <PrettyChip position="last">
           <>
@@ -548,16 +541,19 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     // debugAll: true,
   });
 
+  const providerData = useMemo(
+    () => ({
+      table,
+      gradeSelectOption,
+      setGradeSelectOption,
+      selectedGradingModel,
+      setSelectedGradingModel,
+    }),
+    [gradeSelectOption, selectedGradingModel, table]
+  );
+
   return (
-    <GradesTableContext.Provider
-      value={{
-        table,
-        gradeSelectOption,
-        setGradeSelectOption,
-        selectedGradingModel: selectedGradingModel,
-        setSelectedGradingModel: setSelectedGradingModel,
-      }}
-    >
+    <GradesTableContext.Provider value={providerData}>
       <UserGraphDialog
         open={userGraphOpen}
         onClose={() => setUserGraphOpen(false)}
@@ -575,7 +571,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         ]} // Very ugly way to sort the selected model to be the first
         row={userGraphData}
       />
-      {props.children}
+      {children}
     </GradesTableContext.Provider>
   );
 };

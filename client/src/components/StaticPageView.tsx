@@ -44,12 +44,13 @@ const StaticPageView: React.FC<StaticPageProps> = ({url, title}) => {
         }}
         className="static-page-container"
       >
-        {title && (
+        {title !== undefined && (
           <Typography variant="h4" sx={{marginBottom: '16px'}}>
             {title}
           </Typography>
         )}
         <span
+          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(htmlContent)}}
         />
       </Box>

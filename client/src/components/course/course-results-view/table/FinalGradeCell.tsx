@@ -54,39 +54,35 @@ const FinalGradeCell = ({
       <span>{getGradeString(t, gradingScale, bestFinalGrade?.grade)}</span>
       {/* If there are multiple final grades "show more" icon*/}
       {(finalGrades.length > 1 || hover) && (
-        <>
-          <Tooltip
-            placement="top"
-            title={
-              finalGrades.length <= 1
-                ? t('course.results.edit-final')
-                : t('course.results.multiple-final')
-            }
+        <Tooltip
+          placement="top"
+          title={
+            finalGrades.length <= 1
+              ? t('course.results.edit-final')
+              : t('course.results.multiple-final')
+          }
+        >
+          <IconButton
+            color="primary"
+            sx={{
+              position: 'absolute',
+              right: '0px',
+              top: 'calc(50% - 20px)',
+            }}
+            onClick={(): void => setGradeDialogOpen(true)}
           >
-            <IconButton
-              color="primary"
-              sx={{
-                position: 'absolute',
-                right: '0px',
-                top: 'calc(50% - 20px)',
-              }}
-              onClick={(): void => setGradeDialogOpen(true)}
-            >
-              <MoreVert />
-            </IconButton>
-          </Tooltip>
-        </>
+            <MoreVert />
+          </IconButton>
+        </Tooltip>
       )}
-      {
-        <EditFinalGradesDialog
-          open={gradeDialogOpen}
-          onClose={() => setGradeDialogOpen(false)}
-          userId={userId}
-          finalGrades={finalGrades}
-          title={t('course.results.final-of', {user: studentNumber})}
-        />
-      }
-      {bestFinalGrade?.date && (
+      <EditFinalGradesDialog
+        open={gradeDialogOpen}
+        onClose={() => setGradeDialogOpen(false)}
+        userId={userId}
+        finalGrades={finalGrades}
+        title={t('course.results.final-of', {user: studentNumber})}
+      />
+      {bestFinalGrade?.date !== undefined && (
         <Tooltip
           placement="top"
           title={t('course.results.final-on-date', {

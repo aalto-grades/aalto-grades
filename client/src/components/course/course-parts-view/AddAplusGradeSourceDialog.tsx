@@ -63,14 +63,14 @@ const AddAplusGradeSourceDialog = ({
           <DialogTitle>{t('course.parts.select-grade-source')}</DialogTitle>
         )}
         <DialogContent>
-          {step === 0 && aplusCourses.data && (
+          {step === 0 && aplusCourses.data !== undefined && (
             <SelectAplusCourse
               aplusCourses={aplusCourses.data}
               selectedAplusCourse={aplusCourse}
               setAplusCourse={setAplusCourse}
             />
           )}
-          {step === 1 && aplusCourse && (
+          {step === 1 && aplusCourse !== null && (
             <SelectAplusGradeSource
               aplusCourse={aplusCourse}
               aplusGradeSources={aplusGradeSources}

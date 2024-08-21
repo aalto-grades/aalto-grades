@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-/* eslint camelcase: off */
+/* eslint-disable camelcase */
 
 import {Op, QueryInterface} from 'sequelize';
 

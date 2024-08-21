@@ -271,291 +271,268 @@ const EditCourseView = (): JSX.Element => {
     return <Typography>{t('general.loading')}</Typography>;
 
   return (
-    <>
-      <Formik
-        initialValues={initialValues}
-        validate={validateForm}
-        onSubmit={handleSubmit}
-        innerRef={formRef}
-      >
-        {form => (
-          <>
-            <Form>
-              <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                <Typography width={'fit-content'} variant="h2">
-                  {t('course.edit.title')}
-                </Typography>
-                <SaveBar
-                  show={changes || formChanges}
-                  handleDiscard={() => confirmDiscard(form)}
-                  loading={form.isSubmitting}
-                  disabled={!form.isValid}
-                />
-              </div>
-              <UnsavedChangesDialog
-                blocker={blocker}
-                handleDiscard={() => {
-                  form.resetForm();
-                  setTeachersInCharge(initTeachersInCharge);
-                  setAssistants(initAssistants);
-                }}
-              />
+    <Formik
+      initialValues={initialValues}
+      validate={validateForm}
+      onSubmit={handleSubmit}
+      innerRef={formRef}
+    >
+      {form => (
+        <Form>
+          <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+            <Typography width="fit-content" variant="h2">
+              {t('course.edit.title')}
+            </Typography>
+            <SaveBar
+              show={changes || formChanges}
+              handleDiscard={() => confirmDiscard(form)}
+              loading={form.isSubmitting}
+              disabled={!form.isValid}
+            />
+          </div>
+          <UnsavedChangesDialog
+            blocker={blocker}
+            handleDiscard={() => {
+              form.resetForm();
+              setTeachersInCharge(initTeachersInCharge);
+              setAssistants(initAssistants);
+            }}
+          />
 
-              <Grid
-                container
-                justifyContent="flex-start"
-                gap={5}
-                sx={{overflow: 'auto', height: '100%'}}
+          <Grid
+            container
+            justifyContent="flex-start"
+            gap={5}
+            sx={{overflow: 'auto', height: '100%'}}
+          >
+            <Grid md={5}>
+              <FormField
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
+                value="courseCode"
+                disabled={auth?.role !== SystemRole.Admin}
+                label={`${t('general.course-code')}*`}
+                helperText={t('course.edit.course-code-help')}
+              />
+              <FormLanguagesField
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
+                disabled={auth?.role !== SystemRole.Admin}
+                valueFormat="name%"
+                labelFormat={`${t('course.edit.course-name-in-format')}*`}
+                helperTextFormat={t('course.edit.course-name-in-help-format')}
+              />
+              <FormField
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
+                value="department"
+                disabled={auth?.role !== SystemRole.Admin}
+                label={`${t('general.organizing-department')}*`}
+                helperText={t('course.edit.organizing-department-help')}
+                select
               >
-                <Grid md={5}>
-                  <FormField
-                    form={
-                      form as unknown as FormikProps<{[key: string]: unknown}>
-                    }
-                    value="courseCode"
-                    disabled={auth?.role !== SystemRole.Admin}
-                    label={`${t('general.course-code')}*`}
-                    helperText={t('course.edit.course-code-help')}
-                  />
-                  <FormLanguagesField
-                    form={
-                      form as unknown as FormikProps<{[key: string]: unknown}>
-                    }
-                    disabled={auth?.role !== SystemRole.Admin}
-                    valueFormat="name%"
-                    labelFormat={`${t('course.edit.course-name-in-format')}*`}
-                    helperTextFormat={t(
-                      'course.edit.course-name-in-help-format'
-                    )}
-                  />
-                  <FormField
-                    form={
-                      form as unknown as FormikProps<{[key: string]: unknown}>
-                    }
-                    value="department"
-                    disabled={auth?.role !== SystemRole.Admin}
-                    label={`${t('general.organizing-department')}*`}
-                    helperText={t('course.edit.organizing-department-help')}
-                    select
-                  >
-                    {departments.map((department, i) => (
-                      <MenuItem key={i} value={i}>
-                        {localize(department)}
-                      </MenuItem>
+                {departments.map((department, i) => (
+                  <MenuItem key={department.en} value={i}>
+                    {localize(department)}
+                  </MenuItem>
+                ))}
+              </FormField>
+              <FormField
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
+                value="minCredits"
+                disabled={auth?.role !== SystemRole.Admin}
+                label={`${t('course.edit.min-credits')}*`}
+                helperText={t('course.edit.min-credits-help')}
+                type="number"
+              />
+              <FormField
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
+                value="maxCredits"
+                disabled={auth?.role !== SystemRole.Admin}
+                label={`${t('course.edit.max-credits')}*`}
+                helperText={t('course.edit.max-credits-help')}
+                type="number"
+              />
+              <FormField
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
+                value="gradingScale"
+                disabled={
+                  auth?.role !== SystemRole.Admin && finalGrades.data.length > 0
+                }
+                label={`${t('course.edit.grading-scale')}*`}
+                helperText={t('course.edit.grading-scale-help')}
+                select
+              >
+                {Object.values(GradingScale).map(value => (
+                  <MenuItem key={value} value={value}>
+                    {convertToClientGradingScale(t, value)}
+                  </MenuItem>
+                ))}
+              </FormField>
+              <FormField
+                form={form as unknown as FormikProps<{[key: string]: unknown}>}
+                value="languageOfInstruction"
+                disabled={auth?.role !== SystemRole.Admin}
+                label={`${t('course.edit.language')}*`}
+                helperText={t('course.edit.language-help')}
+                select
+              >
+                {sisuLanguageOptions.map(option => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {localize(option.language)}
+                  </MenuItem>
+                ))}
+              </FormField>
+            </Grid>
+            <Grid md={5}>
+              <TextField
+                id="teacherEmail" // Must be in camelCase to match data
+                type="text"
+                fullWidth
+                value={form.values.teacherEmail}
+                disabled={auth?.role !== SystemRole.Admin || form.isSubmitting}
+                label={`${t('course.edit.teachers-in-charge')}*`}
+                margin="normal"
+                InputLabelProps={{shrink: true}}
+                helperText={
+                  form.errors.teacherEmail ??
+                  (teachersInCharge.length === 0
+                    ? t('course.edit.input-at-least-one-teacher')
+                    : teachersInCharge.includes(form.values.teacherEmail)
+                      ? t('course.edit.email-in-list')
+                      : t('course.edit.add-teacher-emails'))
+                }
+                error={
+                  form.touched.teacherEmail &&
+                  form.errors.teacherEmail !== undefined
+                }
+                onChange={form.handleChange}
+              />
+              <Button
+                variant="outlined"
+                startIcon={<PersonAddAlt1Icon />}
+                disabled={
+                  auth?.role !== SystemRole.Admin ||
+                  form.errors.teacherEmail !== undefined ||
+                  form.values.teacherEmail.length === 0 ||
+                  teachersInCharge.includes(form.values.teacherEmail) ||
+                  form.isSubmitting
+                }
+                onClick={() => {
+                  setTeachersInCharge(oldTeachers =>
+                    oldTeachers.concat(form.values.teacherEmail)
+                  );
+                  form.setFieldValue('teacherEmail', '');
+                }}
+                sx={{mt: 1, float: 'left'}}
+              >
+                Add
+              </Button>
+              <Box sx={{mt: 8, mb: 2, width: '50%'}}>
+                {teachersInCharge.length === 0 ? (
+                  t('course.edit.add-at-least-one-teacher')
+                ) : (
+                  <List dense>
+                    {teachersInCharge.map(teacherEmail => (
+                      <ListItem
+                        key={teacherEmail}
+                        secondaryAction={
+                          auth?.role === SystemRole.Admin && (
+                            <IconButton
+                              edge="end"
+                              disabled={form.isSubmitting}
+                              aria-label="delete"
+                              onClick={() => removeTeacher(teacherEmail)}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          )
+                        }
+                      >
+                        <ListItemAvatar>
+                          <Avatar>
+                            <PersonIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary={teacherEmail} />
+                      </ListItem>
                     ))}
-                  </FormField>
-                  <FormField
-                    form={
-                      form as unknown as FormikProps<{[key: string]: unknown}>
-                    }
-                    value="minCredits"
-                    disabled={auth?.role !== SystemRole.Admin}
-                    label={`${t('course.edit.min-credits')}*`}
-                    helperText={t('course.edit.min-credits-help')}
-                    type="number"
-                  />
-                  <FormField
-                    form={
-                      form as unknown as FormikProps<{[key: string]: unknown}>
-                    }
-                    value="maxCredits"
-                    disabled={auth?.role !== SystemRole.Admin}
-                    label={`${t('course.edit.max-credits')}*`}
-                    helperText={t('course.edit.max-credits-help')}
-                    type="number"
-                  />
-                  <FormField
-                    form={
-                      form as unknown as FormikProps<{[key: string]: unknown}>
-                    }
-                    value="gradingScale"
-                    disabled={
-                      auth?.role !== SystemRole.Admin &&
-                      finalGrades.data.length > 0
-                    }
-                    label={`${t('course.edit.grading-scale')}*`}
-                    helperText={t('course.edit.grading-scale-help')}
-                    select
-                  >
-                    {Object.values(GradingScale).map(value => (
-                      <MenuItem key={value} value={value}>
-                        {convertToClientGradingScale(t, value)}
-                      </MenuItem>
-                    ))}
-                  </FormField>
-                  <FormField
-                    form={
-                      form as unknown as FormikProps<{[key: string]: unknown}>
-                    }
-                    value="languageOfInstruction"
-                    disabled={auth?.role !== SystemRole.Admin}
-                    label={`${t('course.edit.language')}*`}
-                    helperText={t('course.edit.language-help')}
-                    select
-                  >
-                    {sisuLanguageOptions.map(option => (
-                      <MenuItem key={option.id} value={option.id}>
-                        {localize(option.language)}
-                      </MenuItem>
-                    ))}
-                  </FormField>
-                </Grid>
-                <Grid md={5}>
-                  <TextField
-                    id="teacherEmail" // Must be in camelCase to match data
-                    type="text"
-                    fullWidth
-                    value={form.values.teacherEmail}
-                    disabled={
-                      auth?.role !== SystemRole.Admin || form.isSubmitting
-                    }
-                    label={`${t('course.edit.teachers-in-charge')}*`}
-                    margin="normal"
-                    InputLabelProps={{shrink: true}}
-                    helperText={
-                      form.errors.teacherEmail ??
-                      (teachersInCharge.length === 0
-                        ? t('course.edit.input-at-least-one-teacher')
-                        : teachersInCharge.includes(form.values.teacherEmail)
-                          ? t('course.edit.email-in-list')
-                          : t('course.edit.add-teacher-emails'))
-                    }
-                    error={
-                      form.touched.teacherEmail &&
-                      form.errors.teacherEmail !== undefined
-                    }
-                    onChange={form.handleChange}
-                  />
-                  <Button
-                    variant="outlined"
-                    startIcon={<PersonAddAlt1Icon />}
-                    disabled={
-                      auth?.role !== SystemRole.Admin ||
-                      form.errors.teacherEmail !== undefined ||
-                      form.values.teacherEmail.length === 0 ||
-                      teachersInCharge.includes(form.values.teacherEmail) ||
-                      form.isSubmitting
-                    }
-                    onClick={() => {
-                      setTeachersInCharge(oldTeachers =>
-                        oldTeachers.concat(form.values.teacherEmail)
-                      );
-                      form.setFieldValue('teacherEmail', '');
-                    }}
-                    sx={{mt: 1, float: 'left'}}
-                  >
-                    Add
-                  </Button>
-                  <Box sx={{mt: 8, mb: 2, width: '50%'}}>
-                    {teachersInCharge.length === 0 ? (
-                      t('course.edit.add-at-least-one-teacher')
-                    ) : (
-                      <List dense>
-                        {teachersInCharge.map(teacherEmail => (
-                          <ListItem
-                            key={teacherEmail}
-                            secondaryAction={
-                              auth?.role === SystemRole.Admin && (
-                                <IconButton
-                                  edge="end"
-                                  disabled={form.isSubmitting}
-                                  aria-label="delete"
-                                  onClick={() => removeTeacher(teacherEmail)}
-                                >
-                                  <DeleteIcon />
-                                </IconButton>
-                              )
-                            }
+                  </List>
+                )}
+              </Box>
+              <TextField
+                id="assistantEmail" // Must be in camelCase to match data
+                type="text"
+                fullWidth
+                value={form.values.assistantEmail}
+                disabled={form.isSubmitting}
+                label={`${t('general.assistants')}*`}
+                margin="normal"
+                InputLabelProps={{shrink: true}}
+                helperText={
+                  form.errors.assistantEmail ??
+                  (assistants.includes(form.values.assistantEmail)
+                    ? t('course.edit.email-in-list')
+                    : t('course.edit.add-assistant-emails'))
+                }
+                error={
+                  form.touched.assistantEmail &&
+                  form.errors.assistantEmail !== undefined
+                }
+                onChange={form.handleChange}
+              />
+              <Button
+                variant="outlined"
+                startIcon={<PersonAddAlt1Icon />}
+                disabled={
+                  // Allow submit of email only if validation passes and not on list.
+                  form.errors.assistantEmail !== undefined ||
+                  form.values.assistantEmail.length === 0 ||
+                  assistants.includes(form.values.assistantEmail) ||
+                  form.isSubmitting
+                }
+                onClick={() => {
+                  setAssistants(oldAssistants =>
+                    oldAssistants.concat(form.values.assistantEmail)
+                  );
+                  form.setFieldValue('assistantEmail', '');
+                }}
+                sx={{mt: 1, float: 'left'}}
+              >
+                {t('general.add')}
+              </Button>
+              <Box sx={{mt: 8, mb: 2, width: '50%'}}>
+                {assistants.length === 0 ? (
+                  t('course.edit.no-assistants')
+                ) : (
+                  <List dense>
+                    {assistants.map(emailAssistant => (
+                      <ListItem
+                        key={emailAssistant}
+                        secondaryAction={
+                          <IconButton
+                            edge="end"
+                            disabled={form.isSubmitting}
+                            aria-label="delete"
+                            onClick={() => removeAssistant(emailAssistant)}
                           >
-                            <ListItemAvatar>
-                              <Avatar>
-                                <PersonIcon />
-                              </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText primary={teacherEmail} />
-                          </ListItem>
-                        ))}
-                      </List>
-                    )}
-                  </Box>
-                  <TextField
-                    id="assistantEmail" // Must be in camelCase to match data
-                    type="text"
-                    fullWidth
-                    value={form.values.assistantEmail}
-                    disabled={form.isSubmitting}
-                    label={`${t('general.assistants')}*`}
-                    margin="normal"
-                    InputLabelProps={{shrink: true}}
-                    helperText={
-                      form.errors.assistantEmail ??
-                      (assistants.includes(form.values.assistantEmail)
-                        ? t('course.edit.email-in-list')
-                        : t('course.edit.add-assistant-emails'))
-                    }
-                    error={
-                      form.touched.assistantEmail &&
-                      form.errors.assistantEmail !== undefined
-                    }
-                    onChange={form.handleChange}
-                  />
-                  <Button
-                    variant="outlined"
-                    startIcon={<PersonAddAlt1Icon />}
-                    disabled={
-                      // Allow submit of email only if validation passes and not on list.
-                      form.errors.assistantEmail !== undefined ||
-                      form.values.assistantEmail.length === 0 ||
-                      assistants.includes(form.values.assistantEmail) ||
-                      form.isSubmitting
-                    }
-                    onClick={() => {
-                      setAssistants(oldAssistants =>
-                        oldAssistants.concat(form.values.assistantEmail)
-                      );
-                      form.setFieldValue('assistantEmail', '');
-                    }}
-                    sx={{mt: 1, float: 'left'}}
-                  >
-                    {t('general.add')}
-                  </Button>
-                  <Box sx={{mt: 8, mb: 2, width: '50%'}}>
-                    {assistants.length === 0 ? (
-                      t('course.edit.no-assistants')
-                    ) : (
-                      <List dense>
-                        {assistants.map(emailAssistant => (
-                          <ListItem
-                            key={emailAssistant}
-                            secondaryAction={
-                              <IconButton
-                                edge="end"
-                                disabled={form.isSubmitting}
-                                aria-label="delete"
-                                onClick={() => removeAssistant(emailAssistant)}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            }
-                          >
-                            <ListItemAvatar>
-                              <Avatar>
-                                <PersonIcon />
-                              </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText primary={emailAssistant} />
-                          </ListItem>
-                        ))}
-                      </List>
-                    )}
-                  </Box>
-                </Grid>
-              </Grid>
-            </Form>
-          </>
-        )}
-      </Formik>
-    </>
+                            <DeleteIcon />
+                          </IconButton>
+                        }
+                      >
+                        <ListItemAvatar>
+                          <Avatar>
+                            <PersonIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary={emailAssistant} />
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
+              </Box>
+            </Grid>
+          </Grid>
+        </Form>
+      )}
+    </Formik>
   );
 };
 

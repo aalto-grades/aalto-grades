@@ -215,7 +215,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               select
             >
               {departments.map((department, i) => (
-                <MenuItem key={i} value={i}>
+                <MenuItem key={department.en} value={i}>
                   {localize(department)}
                 </MenuItem>
               ))}
@@ -378,7 +378,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               {assistants.length === 0 ? (
                 t('course.edit.no-assistants')
               ) : (
-                <List dense={true}>
+                <List dense>
                   {assistants.map((emailAssistant: string) => (
                     <ListItem
                       key={emailAssistant}

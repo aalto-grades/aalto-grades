@@ -186,6 +186,7 @@ const EditGradesDialog = ({
       type: 'actions',
       getActions: params => [
         <GridActionsCellItem
+          key={params.id}
           icon={<Delete />}
           label={t('general.delete')}
           onClick={() =>

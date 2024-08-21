@@ -91,7 +91,7 @@ const UsersTable = (): JSX.Element => {
           </TableHead>
           <TableBody>
             {shownUsers.map(user => (
-              <TableRow key={user.email} hover={true}>
+              <TableRow key={user.email} hover>
                 <TableCell sx={{width: '75%'}}>{user.email}</TableCell>
                 <TableCell>
                   <Tooltip
