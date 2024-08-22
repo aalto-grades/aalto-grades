@@ -4,8 +4,8 @@
 
 import WarningIcon from '@mui/icons-material/Warning';
 import {Tooltip} from '@mui/material';
-import {JSX, PropsWithChildren, useContext} from 'react';
-import {NodeProps} from 'reactflow';
+import {type JSX, type PropsWithChildren, useContext} from 'react';
+import type {NodeProps} from 'reactflow';
 
 import {ExtraNodeDataContext, NodeDataContext} from '@/context/GraphProvider';
 

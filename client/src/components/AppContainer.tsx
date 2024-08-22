@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Box, useTheme} from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {Outlet} from 'react-router-dom';
 
 import Footer from './app-container/Footer';

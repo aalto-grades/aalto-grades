@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {TFunction} from 'i18next';
+import type {TFunction} from 'i18next';
 
 import {GradingScale} from '@/common/types';
 

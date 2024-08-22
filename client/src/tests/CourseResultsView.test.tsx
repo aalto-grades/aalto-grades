@@ -7,7 +7,7 @@
 import {Experimental_CssVarsProvider as CssVarsProvider} from '@mui/material';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {
-  RenderResult,
+  type RenderResult,
   configure,
   render,
   screen,

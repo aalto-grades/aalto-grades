@@ -6,14 +6,14 @@ import {ForeignKeyConstraintError} from 'sequelize';
 import {z} from 'zod';
 
 import {
-  AplusCourseData,
-  AplusExerciseData,
-  AplusGradeSourceData,
+  type AplusCourseData,
+  type AplusExerciseData,
+  type AplusGradeSourceData,
   AplusGradeSourceType,
   HttpCode,
   IdSchema,
-  NewAplusGradeSourceData,
-  NewTaskGrade,
+  type NewAplusGradeSourceData,
+  type NewTaskGrade,
 } from '@/common/types';
 import {aplusGradeSourcesEqual} from '@/common/util';
 import {
@@ -28,11 +28,11 @@ import {APLUS_API_URL} from '../configs/environment';
 import AplusGradeSource from '../database/models/aplusGradeSource';
 import {
   ApiError,
-  AplusCoursesRes,
-  AplusExercisesRes,
-  AplusPointsRes,
-  AplusStudentPoints,
-  Endpoint,
+  type AplusCoursesRes,
+  type AplusExercisesRes,
+  type AplusPointsRes,
+  type AplusStudentPoints,
+  type Endpoint,
 } from '../types';
 
 /**

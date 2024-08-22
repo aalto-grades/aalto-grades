@@ -16,16 +16,16 @@ import {
   Tooltip,
   useTheme,
 } from '@mui/material';
-import {Row} from '@tanstack/react-table';
+import type {Row} from '@tanstack/react-table';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, forwardRef, useMemo, useState} from 'react';
+import {type JSX, forwardRef, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 
-import {StudentRow, SystemRole} from '@/common/types';
+import {type StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateGraph} from '@/common/util';
-import {GroupedStudentRow} from '@/context/GradesTableProvider';
+import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 import {useAddFinalGrades} from '@/hooks/api/finalGrade';
 import {

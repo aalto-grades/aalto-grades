@@ -8,10 +8,10 @@ import {
   Tooltip,
 } from '@mui/material';
 import {grey} from '@mui/material/colors';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {GradingModelData} from '@/common/types';
+import type {GradingModelData} from '@/common/types';
 
 type PropsType = {
   model: GradingModelData;

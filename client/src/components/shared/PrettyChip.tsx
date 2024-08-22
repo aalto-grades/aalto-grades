@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, ButtonBase, ButtonProps} from '@mui/material';
-import {JSX} from 'react';
+import {Box, ButtonBase, type ButtonProps} from '@mui/material';
+import type {JSX} from 'react';
 
 type PropsType = ButtonProps & {
   children: JSX.Element;

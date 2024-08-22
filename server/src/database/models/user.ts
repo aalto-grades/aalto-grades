@@ -3,15 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional,
+  type CreationOptional,
   DataTypes,
-  InferAttributes,
-  InferCreationAttributes,
+  type InferAttributes,
+  type InferCreationAttributes,
   Model,
   Op,
 } from 'sequelize';
 
-import {SystemRole} from '@/common/types';
+import type {SystemRole} from '@/common/types';
 import {sequelize} from '..';
 
 export default class User extends Model<

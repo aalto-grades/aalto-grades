@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from '@mui/material';
 import {MuiOtpInput} from 'mui-one-time-password-input';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import QRCode from 'react-qr-code';
 

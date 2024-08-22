@@ -4,9 +4,13 @@
 
 import {RateLimiterMemory} from 'rate-limiter-flexible';
 
-import {HttpCode, LoginData, ResetOwnPasswordData} from '@/common/types';
+import {
+  HttpCode,
+  type LoginData,
+  type ResetOwnPasswordData,
+} from '@/common/types';
 import logger from '../configs/winston';
-import {SyncEndpoint} from '../types';
+import type {SyncEndpoint} from '../types';
 
 const rateLimiter = new RateLimiterMemory({
   keyPrefix: 'ip_',

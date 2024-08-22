@@ -50,6 +50,10 @@ module.exports = {
       },
     ],
 
+    '@typescript-eslint/consistent-type-imports': [
+      'warn',
+      {fixStyle: 'inline-type-imports'},
+    ],
     '@typescript-eslint/dot-notation': 'warn',
     '@typescript-eslint/explicit-function-return-type': [
       'warn',

@@ -6,17 +6,17 @@ import {Op} from 'sequelize';
 
 import {
   CourseRoleType,
-  EditTaskGradeData,
-  FinalGradeData,
+  type EditTaskGradeData,
+  type FinalGradeData,
   GradingScale,
   HttpCode,
-  LatestGrades,
-  NewTaskGrade,
-  SisuCsvUpload,
-  StudentRow,
-  TaskGradeData,
-  UserData,
-  UserIdArray,
+  type LatestGrades,
+  type NewTaskGrade,
+  type SisuCsvUpload,
+  type StudentRow,
+  type TaskGradeData,
+  type UserData,
+  type UserIdArray,
 } from '@/common/types';
 import {validateAplusGradeSourceBelongsToCourseTask} from './utils/aplus';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
@@ -39,7 +39,12 @@ import CourseTask from '../database/models/courseTask';
 import FinalGrade from '../database/models/finalGrade';
 import TaskGrade from '../database/models/taskGrade';
 import User from '../database/models/user';
-import {ApiError, Endpoint, JwtClaims, NewDbGradeData} from '../types';
+import {
+  ApiError,
+  type Endpoint,
+  type JwtClaims,
+  type NewDbGradeData,
+} from '../types';
 
 /**
  * () => StudentRow[]

@@ -24,8 +24,8 @@ import {
   MenuItem,
   TextField,
 } from '@mui/material';
-import {Formik, FormikHelpers, FormikProps} from 'formik';
-import {JSX, useState} from 'react';
+import {Formik, type FormikHelpers, type FormikProps} from 'formik';
+import {type JSX, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
@@ -35,7 +35,7 @@ import {
   AaltoEmailSchema,
   GradingScale,
   Language,
-  NewCourseData,
+  type NewCourseData,
 } from '@/common/types';
 import FormField from '@/components/shared/FormikField';
 import FormLanguagesField from '@/components/shared/FormikLanguageField';

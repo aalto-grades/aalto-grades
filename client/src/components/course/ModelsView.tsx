@@ -4,16 +4,16 @@
 
 import {Box, Button, Collapse, List, Tooltip, Typography} from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useCallback, useEffect, useMemo, useState} from 'react';
+import {type JSX, useCallback, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {
   CourseRoleType,
-  GradingModelData,
-  GraphStructure,
-  StudentRow,
+  type GradingModelData,
+  type GraphStructure,
+  type StudentRow,
   SystemRole,
 } from '@/common/types';
 import Graph from '@/components/shared/graph/Graph';

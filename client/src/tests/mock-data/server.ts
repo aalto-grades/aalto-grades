@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ResponseResolver, http} from 'msw';
-import {SetupServer, setupServer} from 'msw/node';
-import {Mock} from 'vitest';
+import {type ResponseResolver, http} from 'msw';
+import {type SetupServer, setupServer} from 'msw/node';
+import type {Mock} from 'vitest';
 
 import {mockCourse} from './mockCourse';
 import {mockCourseParts} from './mockCourseParts';

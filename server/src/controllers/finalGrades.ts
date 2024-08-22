@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  EditFinalGrade,
-  FinalGradeData,
+  type EditFinalGrade,
+  type FinalGradeData,
   GradingScale,
   HttpCode,
-  NewFinalGrade,
+  type NewFinalGrade,
 } from '@/common/types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {findAndValidateFinalGradePath} from './utils/finalGrade';
@@ -15,7 +15,12 @@ import {validateGradingModelBelongsToCourse} from './utils/gradingModel';
 import {validateUserAndGrader} from './utils/taskGrade';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
-import {ApiError, Endpoint, JwtClaims, NewDbFinalGradeData} from '../types';
+import {
+  ApiError,
+  type Endpoint,
+  type JwtClaims,
+  type NewDbFinalGradeData,
+} from '../types';
 
 /**
  * () => FinalGradeData[]

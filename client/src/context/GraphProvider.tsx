@@ -4,7 +4,7 @@
 
 import {createContext} from 'react';
 
-import {NodeData, NodeSettings, NodeValues} from '@/common/types';
+import type {NodeData, NodeSettings, NodeValues} from '@/common/types';
 
 type NodeValuesContext = NodeValues;
 export const NodeValuesContext = createContext<NodeValuesContext>(

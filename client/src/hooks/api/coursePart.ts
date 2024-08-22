@@ -3,23 +3,23 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult,
+  type UseMutationOptions,
+  type UseMutationResult,
+  type UseQueryOptions,
+  type UseQueryResult,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
 
 import {
-  CoursePartData,
+  type CoursePartData,
   CoursePartDataArraySchema,
-  EditCoursePartData,
+  type EditCoursePartData,
   IdSchema,
-  NewCoursePartData,
+  type NewCoursePartData,
 } from '@/common/types';
-import {Numeric} from '@/types';
+import type {Numeric} from '@/types';
 import axios from './axios';
 
 export const useGetCourseParts = (

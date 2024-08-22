@@ -10,11 +10,11 @@ import {
   DialogTitle,
   TextField,
 } from '@mui/material';
-import {ChangeEvent, JSX, useMemo, useState} from 'react';
+import {type ChangeEvent, type JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Node} from 'reactflow';
+import type {Node} from 'reactflow';
 
-import {NodeValues} from '@/common/types';
+import type {NodeValues} from '@/common/types';
 
 const testFloat = (val: string): boolean => /^\d+(?:\.\d+?)?$/.test(val);
 

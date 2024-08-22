@@ -4,7 +4,7 @@
 
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {
-  RenderResult,
+  type RenderResult,
   cleanup,
   render,
   screen,

@@ -17,13 +17,13 @@ import {
   Typography,
 } from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useMemo, useState} from 'react';
+import {type JSX, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 
-import {SystemRole, UserData} from '@/common/types';
+import {SystemRole, type UserData} from '@/common/types';
 import {useDeleteUser, useGetUsers} from '@/hooks/useApi';
-import {HeadCellData} from '@/types';
+import type {HeadCellData} from '@/types';
 import ResetAuthDialog from './ResetAuthDialog';
 
 const UsersTable = (): JSX.Element => {

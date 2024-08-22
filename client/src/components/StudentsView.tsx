@@ -17,11 +17,11 @@ import {
   Typography,
   createFilterOptions,
 } from '@mui/material';
-import {JSX, useMemo, useState} from 'react';
+import {type JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate, useParams} from 'react-router-dom';
 
-import {UserData} from '@/common/types';
+import type {UserData} from '@/common/types';
 import {useGetCoursesOfStudent, useGetStudents} from '@/hooks/useApi';
 import {useLocalize} from '@/hooks/useLocalize';
 

@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {JSX, useContext} from 'react';
+import {type JSX, useContext} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Handle, NodeProps, Position} from 'reactflow';
+import {Handle, type NodeProps, Position} from 'reactflow';
 
-import {GradeNodeValue} from '@/common/types';
+import type {GradeNodeValue} from '@/common/types';
 import {NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 

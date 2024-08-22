@@ -5,7 +5,12 @@
 /* eslint-disable no-restricted-imports */
 
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {RenderResult, render, screen, waitFor} from '@testing-library/react';
+import {
+  type RenderResult,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import {userEvent} from '@testing-library/user-event';
 import {http} from 'msw';
 import {RouterProvider, createMemoryRouter} from 'react-router-dom';

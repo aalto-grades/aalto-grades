@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import TestAgent from 'supertest/lib/agent';
-import Test from 'supertest/lib/test';
+import type TestAgent from 'supertest/lib/agent';
+import type Test from 'supertest/lib/test';
 import {z} from 'zod';
 
 import {HttpCode} from '@/common/types';

@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Edge, Node} from 'reactflow';
+import type {Edge, Node} from 'reactflow';
 
-import {
+import type {
   AverageNodeSettings,
   CoursePartNodeSettings,
   CustomNodeTypes,

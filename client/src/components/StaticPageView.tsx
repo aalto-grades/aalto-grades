@@ -4,7 +4,8 @@
 
 import {Box, Typography} from '@mui/material';
 import DOMPurify from 'dompurify';
-import React, {useEffect, useState} from 'react';
+import type React from 'react';
+import {useEffect, useState} from 'react';
 
 interface StaticPageProps {
   url: string;

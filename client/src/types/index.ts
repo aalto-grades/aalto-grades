@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {TFunction} from 'i18next';
+import type {TFunction} from 'i18next';
 import {z} from 'zod';
 
-import {Language, LocalizedString} from '@/common/types';
+import type {Language, LocalizedString} from '@/common/types';
 
 export type HeadCellData = {
   id: string;

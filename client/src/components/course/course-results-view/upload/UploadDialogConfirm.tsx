@@ -17,7 +17,7 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import {
+import type {
   GridColDef,
   GridRowClassNameParams,
   GridRowsProp,
@@ -25,12 +25,12 @@ import {
 } from '@mui/x-data-grid';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
-import {Dayjs} from 'dayjs';
+import type {Dayjs} from 'dayjs';
 import 'dayjs/locale/en-gb';
 import {
-  Dispatch,
-  JSX,
-  SetStateAction,
+  type Dispatch,
+  type JSX,
+  type SetStateAction,
   useEffect,
   useMemo,
   useState,
@@ -38,7 +38,7 @@ import {
 import {useTranslation} from 'react-i18next';
 
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
-import {GradeUploadColTypes} from './UploadDialog';
+import type {GradeUploadColTypes} from './UploadDialog';
 
 type DateType = {
   courseTaskName: string;

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {GradingModelData} from '@/common/types';
+import type {GradingModelData} from '@/common/types';
 
 export const mockGradingModel: GradingModelData = {
   id: 1,

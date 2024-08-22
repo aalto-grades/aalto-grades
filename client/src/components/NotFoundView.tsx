@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Box, Typography} from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
 

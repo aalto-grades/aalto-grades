@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 import {Box, useTheme} from '@mui/material';
-import {UseQueryResult} from '@tanstack/react-query';
-import {JSX, useEffect} from 'react';
-import {Outlet, Params, useParams} from 'react-router-dom';
+import type {UseQueryResult} from '@tanstack/react-query';
+import {type JSX, useEffect} from 'react';
+import {Outlet, type Params, useParams} from 'react-router-dom';
 
-import {CourseData} from '@/common/types';
+import type {CourseData} from '@/common/types';
 import {useGetCourse} from '@/hooks/useApi';
-import useAuth, {AuthContextType} from '@/hooks/useAuth';
+import useAuth, {type AuthContextType} from '@/hooks/useAuth';
 import SideMenu from './SideMenu';
 
 const CourseContainer = (): JSX.Element => {

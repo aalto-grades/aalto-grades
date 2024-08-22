@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {RenderResult, render, screen} from '@testing-library/react';
+import {type RenderResult, render, screen} from '@testing-library/react';
 import {BrowserRouter} from 'react-router-dom';
 
 import LoginView from '@/components/LoginView';

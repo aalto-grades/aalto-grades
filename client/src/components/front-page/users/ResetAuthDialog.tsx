@@ -19,10 +19,10 @@ import {
   Typography,
 } from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {UserData} from '@/common/types';
+import type {UserData} from '@/common/types';
 import {useResetAuth} from '@/hooks/useApi';
 
 type PropsType = {

@@ -2,11 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ChangeEvent, JSX, useContext, useEffect, useState} from 'react';
+import {
+  type ChangeEvent,
+  type JSX,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
+import {
+  Handle,
+  type NodeProps,
+  Position,
+  useUpdateNodeInternals,
+} from 'reactflow';
 
-import {AverageNodeSettings, AverageNodeValue} from '@/common/types';
+import type {AverageNodeSettings, AverageNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 

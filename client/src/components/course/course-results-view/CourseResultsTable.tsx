@@ -6,7 +6,7 @@ import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
 import {Badge, Icon, IconButton} from '@mui/material';
 import {flexRender} from '@tanstack/react-table';
 import {useVirtualizer} from '@tanstack/react-virtual';
-import {JSX, useRef} from 'react';
+import {type JSX, useRef} from 'react';
 
 import PrettyChip from '@/components/shared/PrettyChip';
 import {useTableContext} from '@/context/useTableContext';

@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AplusCourseData,
-  AplusExerciseData,
+  type AplusCourseData,
+  type AplusExerciseData,
   AplusGradeSourceType,
-  NewAplusGradeSourceData,
+  type NewAplusGradeSourceData,
 } from '../../../common/types';
 
 export const setAplusToken = (token: string): void =>

@@ -15,11 +15,11 @@ import {
   Select,
   TextField,
 } from '@mui/material';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {GraphTemplate, initGraph} from '@/common/util';
+import {type GraphTemplate, initGraph} from '@/common/util';
 import {useAddGradingModel, useGetCourseParts} from '@/hooks/useApi';
 
 const CreateGradingModelDialog = ({

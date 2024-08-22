@@ -28,22 +28,22 @@ import {grey} from '@mui/material/colors';
 import {
   DataGrid,
   GridActionsCellItem,
-  GridColDef,
-  GridRowParams,
-  GridRowsProp,
+  type GridColDef,
+  type GridRowParams,
+  type GridRowsProp,
   GridToolbarContainer,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useEffect, useMemo, useState} from 'react';
+import {type JSX, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker, useNavigate, useParams} from 'react-router-dom';
 
 import {
-  AplusGradeSourceData,
-  CoursePartData,
-  EditCourseTaskData,
-  NewCourseTaskData,
+  type AplusGradeSourceData,
+  type CoursePartData,
+  type EditCourseTaskData,
+  type NewCourseTaskData,
   SystemRole,
 } from '@/common/types';
 import SaveBar from '@/components/shared/SaveBar';

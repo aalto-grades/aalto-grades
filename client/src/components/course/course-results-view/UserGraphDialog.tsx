@@ -13,13 +13,13 @@ import {
   MenuItem,
   Select,
 } from '@mui/material';
-import {JSX, useEffect, useState} from 'react';
+import {type JSX, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {GradingModelData} from '@/common/types';
+import type {GradingModelData} from '@/common/types';
 import Graph from '@/components/shared/graph/Graph';
-import {GroupedStudentRow} from '@/context/GradesTableProvider';
+import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 import {useGetCourseParts} from '@/hooks/useApi';
 

@@ -4,7 +4,7 @@
 
 import {ClearRounded, SaveOutlined} from '@mui/icons-material';
 import {Box, Button, Fade, Typography, useTheme} from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
 type PropsType = {

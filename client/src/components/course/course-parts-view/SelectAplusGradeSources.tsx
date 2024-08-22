@@ -11,10 +11,10 @@ import {
   FormControlLabel,
   FormGroup,
 } from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {AplusCourseData, NewAplusGradeSourceData} from '@/common/types';
+import type {AplusCourseData, NewAplusGradeSourceData} from '@/common/types';
 import {aplusGradeSourcesEqual} from '@/common/util';
 import {useFetchAplusExerciseData} from '@/hooks/useApi';
 import {getLatestAplusModuleDate, newAplusGradeSource} from '@/utils';

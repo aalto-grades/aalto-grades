@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {StudentRow} from '@/common/types';
+import type {StudentRow} from '@/common/types';
 
 export const mockGrades: StudentRow[] = [
   {

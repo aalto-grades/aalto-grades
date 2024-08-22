@@ -4,14 +4,18 @@
 
 import {Delete} from '@mui/icons-material';
 import {Button, Dialog, DialogActions} from '@mui/material';
-import {GridActionsCellItem, GridColDef, GridRowsProp} from '@mui/x-data-grid';
-import dayjs, {Dayjs} from 'dayjs';
+import {
+  GridActionsCellItem,
+  type GridColDef,
+  type GridRowsProp,
+} from '@mui/x-data-grid';
+import dayjs, {type Dayjs} from 'dayjs';
 import {enqueueSnackbar} from 'notistack';
 import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {NewTaskGrade} from '@/common/types';
+import type {NewTaskGrade} from '@/common/types';
 import {useGetCourseTasks} from '@/hooks/api/courseTask';
 import {useAddGrades} from '@/hooks/useApi';
 import UploadDialogConfirm from './UploadDialogConfirm';

@@ -6,7 +6,7 @@ import 'react-global-modal/dist/style.css';
 
 import {
   Experimental_CssVarsProvider as CssVarsProvider,
-  CssVarsTheme,
+  type CssVarsTheme,
   experimental_extendTheme as extendTheme,
 } from '@mui/material/styles';
 import {
@@ -17,7 +17,7 @@ import {
 } from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
 import {enqueueSnackbar} from 'notistack';
-import {CSSProperties, JSX, Ref, useEffect} from 'react';
+import {type CSSProperties, type JSX, type Ref, useEffect} from 'react';
 import {GlobalModal, GlobalModalWrapper} from 'react-global-modal';
 import {RouterProvider, createBrowserRouter} from 'react-router-dom';
 

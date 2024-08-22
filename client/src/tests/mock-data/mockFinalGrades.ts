@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGradeData} from '@/common/types';
+import type {FinalGradeData} from '@/common/types';
 
 export const mockFinalGrades: FinalGradeData[] = [
   {

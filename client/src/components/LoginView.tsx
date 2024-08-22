@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import {MuiOtpInput} from 'mui-one-time-password-input';
-import {JSX, SyntheticEvent, useState} from 'react';
+import {type JSX, type SyntheticEvent, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 

@@ -2,9 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {JSX, PropsWithChildren, createContext, useMemo, useState} from 'react';
+import {
+  type JSX,
+  type PropsWithChildren,
+  createContext,
+  useMemo,
+  useState,
+} from 'react';
 
-import {AuthData} from '@/common/types';
+import type {AuthData} from '@/common/types';
 
 /**
  * AuthContext stores both the users authentication information and is the user

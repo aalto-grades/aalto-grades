@@ -5,10 +5,10 @@
 import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
 
 import {
-  EditGradingModelData,
-  GradingModelData,
+  type EditGradingModelData,
+  type GradingModelData,
   HttpCode,
-  NewGradingModelData,
+  type NewGradingModelData,
 } from '@/common/types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {findCoursePartByCourseId} from './utils/coursePart';
@@ -17,7 +17,7 @@ import {
   validateGradingModelPath,
 } from './utils/gradingModel';
 import GradingModel from '../database/models/gradingModel';
-import {ApiError, Endpoint} from '../types';
+import {ApiError, type Endpoint} from '../types';
 
 // TODO: Add support for course part models
 

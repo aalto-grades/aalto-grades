@@ -6,7 +6,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import PersonIcon from '@mui/icons-material/Person';
 import {Box, Button, Menu, MenuItem} from '@mui/material';
 import {useQueryClient} from '@tanstack/react-query';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';

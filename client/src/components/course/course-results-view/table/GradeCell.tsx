@@ -10,10 +10,10 @@ import {
 } from '@mui/icons-material';
 import {Box, IconButton, Tooltip, Typography, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import {JSX, useMemo, useState} from 'react';
+import {type JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {CourseTaskGradesData} from '@/common/types';
+import type {CourseTaskGradesData} from '@/common/types';
 import {useTableContext} from '@/context/useTableContext';
 import {findBestGrade, gradeIsExpired} from '@/utils';
 import EditGradesDialog from './EditGradesDialog';

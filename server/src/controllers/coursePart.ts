@@ -5,10 +5,10 @@
 import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
 
 import {
-  CoursePartData,
-  EditCoursePartData,
+  type CoursePartData,
+  type EditCoursePartData,
   HttpCode,
-  NewCoursePartData,
+  type NewCoursePartData,
 } from '@/common/types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
@@ -16,7 +16,7 @@ import {
   validateCoursePartPath,
 } from './utils/coursePart';
 import CoursePart from '../database/models/coursePart';
-import {ApiError, Endpoint} from '../types';
+import {ApiError, type Endpoint} from '../types';
 
 /**
  * () => CoursePartData[]

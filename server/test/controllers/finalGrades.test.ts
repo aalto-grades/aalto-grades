@@ -5,17 +5,17 @@
 import supertest from 'supertest';
 
 import {
-  EditFinalGrade,
+  type EditFinalGrade,
   FinalGradeDataArraySchema,
   GradingScale,
   HttpCode,
-  NewFinalGrade,
+  type NewFinalGrade,
 } from '@/common/types';
 import {app} from '../../src/app';
 import FinalGrade from '../../src/database/models/finalGrade';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
-import {Cookies, getCookies} from '../util/getCookies';
+import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
 

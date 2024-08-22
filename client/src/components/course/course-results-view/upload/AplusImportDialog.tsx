@@ -21,7 +21,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import {ChangeEvent, JSX, useState} from 'react';
+import {type ChangeEvent, type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 

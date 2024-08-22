@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional,
+  type CreationOptional,
   DataTypes,
-  ForeignKey,
-  InferAttributes,
-  InferCreationAttributes,
+  type ForeignKey,
+  type InferAttributes,
+  type InferCreationAttributes,
   Model,
   Op,
 } from 'sequelize';

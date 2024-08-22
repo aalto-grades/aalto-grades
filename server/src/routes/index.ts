@@ -5,7 +5,7 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import {Router} from 'express';
-import swaggerJsdoc, {OAS3Options} from 'swagger-jsdoc';
+import swaggerJsdoc, {type OAS3Options} from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
 import {router as aplusRouter} from './aplus';

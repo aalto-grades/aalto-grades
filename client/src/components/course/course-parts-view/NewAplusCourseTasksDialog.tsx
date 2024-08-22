@@ -9,11 +9,11 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import {JSX, useEffect, useState} from 'react';
+import {type JSX, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {
+import type {
   AplusCourseData,
   EditCourseTaskData,
   NewAplusGradeSourceData,

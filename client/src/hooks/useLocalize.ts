@@ -4,7 +4,7 @@
 
 import {useTranslation} from 'react-i18next';
 
-import {LocalizedString} from '@/common/types';
+import type {LocalizedString} from '@/common/types';
 
 export const useLocalize = () => {
   const {i18n} = useTranslation();

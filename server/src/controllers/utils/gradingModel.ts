@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CoursePartData, HttpCode} from '@/common/types';
+import {type CoursePartData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId, findCourseById} from './course';
-import Course from '../../database/models/course';
+import type Course from '../../database/models/course';
 import GradingModel from '../../database/models/gradingModel';
 import {ApiError, stringToIdSchema} from '../../types';
 

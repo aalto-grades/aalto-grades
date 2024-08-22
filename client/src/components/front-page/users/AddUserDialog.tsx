@@ -17,9 +17,9 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import {Formik, FormikHelpers, FormikProps} from 'formik';
+import {Formik, type FormikHelpers, type FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 

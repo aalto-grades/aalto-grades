@@ -5,10 +5,10 @@
 import {MoreVert} from '@mui/icons-material';
 import {Box, IconButton, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {FinalGradeData, GradingScale} from '@/common/types';
+import type {FinalGradeData, GradingScale} from '@/common/types';
 import {findBestFinalGrade, getGradeString} from '@/utils';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
 

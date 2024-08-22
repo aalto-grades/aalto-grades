@@ -4,7 +4,7 @@
 
 /* eslint-disable camelcase */
 
-import {Op, QueryInterface} from 'sequelize';
+import {Op, type QueryInterface} from 'sequelize';
 
 import {sequelize} from '..';
 import {dbLogger} from '../../configs/winston';

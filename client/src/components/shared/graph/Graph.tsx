@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import {Alert, Button, Divider, Tooltip, Typography} from '@mui/material';
-import {TFunction} from 'i18next';
+import type {TFunction} from 'i18next';
 import {enqueueSnackbar} from 'notistack';
 import {
-  DragEvent,
-  DragEventHandler,
-  JSX,
+  type DragEvent,
+  type DragEventHandler,
+  type JSX,
   useCallback,
   useEffect,
   useMemo,
@@ -20,20 +20,20 @@ import {useBlocker} from 'react-router-dom';
 import {
   Background,
   BackgroundVariant,
-  Connection,
+  type Connection,
   Controls,
-  Edge,
+  type Edge,
   MiniMap,
-  Node,
+  type Node,
   ReactFlow,
-  ReactFlowInstance,
+  type ReactFlowInstance,
   addEdge,
   useEdgesState,
   useNodesState,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import {
+import type {
   CoursePartData,
   CoursePartNodeValue,
   CourseTaskGradesData,
@@ -47,12 +47,12 @@ import {
 import {calculateNewNodeValues, initNode} from '@/common/util';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
-  ExtraNodeData,
+  type ExtraNodeData,
   ExtraNodeDataContext,
   NodeDataContext,
   NodeValuesContext,
 } from '@/context/GraphProvider';
-import {GradeSelectOption, findBestGrade} from '@/utils';
+import {type GradeSelectOption, findBestGrade} from '@/utils';
 import CoursePartValuesDialog from './CoursePartValuesDialog';
 import SelectCoursePartsDialog from './SelectCoursePartsDialog';
 import './flow.scss'; // Import styles

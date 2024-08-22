@@ -21,9 +21,9 @@ import {
   Typography,
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
-import {Form, Formik, FormikHelpers, FormikProps} from 'formik';
+import {Form, Formik, type FormikHelpers, type FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useEffect, useRef, useState} from 'react';
+import {type JSX, useEffect, useRef, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker, useParams} from 'react-router-dom';
@@ -31,7 +31,7 @@ import {z} from 'zod';
 
 import {
   AaltoEmailSchema,
-  EditCourseData,
+  type EditCourseData,
   GradingScale,
   Language,
   SystemRole,

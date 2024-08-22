@@ -3,24 +3,24 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult,
+  type UseMutationOptions,
+  type UseMutationResult,
+  type UseQueryOptions,
+  type UseQueryResult,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
 
 import {
-  EditGradingModelData,
-  GradingModelData,
+  type EditGradingModelData,
+  type GradingModelData,
   GradingModelDataArraySchema,
   GradingModelDataSchema,
   IdSchema,
-  NewGradingModelData,
+  type NewGradingModelData,
 } from '@/common/types';
-import {Numeric} from '@/types';
+import type {Numeric} from '@/types';
 import axios from './axios';
 
 export const useGetAllGradingModels = (

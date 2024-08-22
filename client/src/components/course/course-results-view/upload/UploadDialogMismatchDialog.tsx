@@ -20,7 +20,7 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import {JSX, useEffect, useState} from 'react';
+import {type JSX, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 export type MismatchData = {

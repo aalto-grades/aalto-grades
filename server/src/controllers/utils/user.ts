@@ -5,7 +5,7 @@
 import {HttpCode} from '@/common/types';
 import CourseRole from '../../database/models/courseRole';
 import User from '../../database/models/user';
-import {ApiError, JwtClaims, stringToIdSchema} from '../../types';
+import {ApiError, type JwtClaims, stringToIdSchema} from '../../types';
 
 /**
  * Finds a user by its ID.

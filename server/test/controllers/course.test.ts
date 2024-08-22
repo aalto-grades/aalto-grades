@@ -5,16 +5,16 @@
 import supertest from 'supertest';
 
 import {
-  CourseData,
+  type CourseData,
   CourseDataArraySchema,
   CourseDataSchema,
-  EditCourseData,
+  type EditCourseData,
   GradingScale,
   HttpCode,
   IdSchema,
   Language,
-  NewCourseData,
-  TeacherData,
+  type NewCourseData,
+  type TeacherData,
 } from '@/common/types';
 import {app} from '../../src/app';
 import {
@@ -23,7 +23,7 @@ import {
 } from '../../src/controllers/utils/course';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
-import {Cookies, getCookies} from '../util/getCookies';
+import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
 

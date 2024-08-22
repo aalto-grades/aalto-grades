@@ -6,11 +6,11 @@
 
 import {Badge, Checkbox} from '@mui/material';
 import {
-  ExpandedState,
-  GroupingState,
-  RowData,
-  SortingState,
-  VisibilityState,
+  type ExpandedState,
+  type GroupingState,
+  type RowData,
+  type SortingState,
+  type VisibilityState,
   createColumnHelper,
   getCoreRowModel,
   getExpandedRowModel,
@@ -20,10 +20,10 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import {
-  Dispatch,
-  JSX,
-  PropsWithChildren,
-  SetStateAction,
+  type Dispatch,
+  type JSX,
+  type PropsWithChildren,
+  type SetStateAction,
   createContext,
   useCallback,
   useMemo,
@@ -33,10 +33,10 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {
-  CoursePartData,
-  FinalGradeData,
+  type CoursePartData,
+  type FinalGradeData,
   GradingScale,
-  StudentRow,
+  type StudentRow,
 } from '@/common/types';
 import UserGraphDialog from '@/components/course/course-results-view/UserGraphDialog';
 import FinalGradeCell from '@/components/course/course-results-view/table/FinalGradeCell';

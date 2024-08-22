@@ -5,8 +5,8 @@
 import {darken, lighten, styled} from '@mui/material';
 import {
   DataGrid,
-  GridRowClassNameParams,
-  GridValidRowModel,
+  type GridRowClassNameParams,
+  type GridValidRowModel,
 } from '@mui/x-data-grid';
 
 export type ProcessRowUpdate = (

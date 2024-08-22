@@ -2,22 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {TFunction} from 'i18next';
+import type {TFunction} from 'i18next';
 
 import {
-  CourseTaskData,
-  GradingModelData,
+  type CourseTaskData,
+  type GradingModelData,
   GradingScale,
-  StudentRow,
+  type StudentRow,
 } from '@/common/types';
-import {batchCalculateGraph} from '@/common/util';
-import {
+import type {batchCalculateGraph} from '@/common/util';
+import type {
   ExtendedStudentRow,
   GroupedStudentRow,
   RowError,
   RowErrorType,
 } from '@/context/GradesTableProvider';
-import {GradeSelectOption, findBestGrade} from './bestGrade';
+import {type GradeSelectOption, findBestGrade} from './bestGrade';
 
 /**
  * Groups the student rows by their latest best grade date.

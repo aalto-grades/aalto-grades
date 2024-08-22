@@ -6,13 +6,13 @@ import assert from 'assert';
 import supertest from 'supertest';
 
 import {
-  CoursePartData,
-  CourseTaskData,
-  EditTaskGradeData,
+  type CoursePartData,
+  type CourseTaskData,
+  type EditTaskGradeData,
   GradingScale,
   HttpCode,
   LatestGradesSchema,
-  NewTaskGrade,
+  type NewTaskGrade,
   StudentRowArraySchema,
 } from '@/common/types';
 import {app} from '../../src/app';
@@ -21,7 +21,7 @@ import TaskGrade from '../../src/database/models/taskGrade';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
-import {Cookies, getCookies} from '../util/getCookies';
+import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
 

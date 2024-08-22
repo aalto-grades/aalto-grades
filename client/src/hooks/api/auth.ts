@@ -3,30 +3,30 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult,
+  type UseMutationOptions,
+  type UseMutationResult,
+  type UseQueryOptions,
+  type UseQueryResult,
   useMutation,
   useQuery,
 } from '@tanstack/react-query';
 
 import {
-  AuthData,
+  type AuthData,
   AuthDataSchema,
-  ChangeOwnAuthData,
-  ChangeOwnAuthResponse,
+  type ChangeOwnAuthData,
+  type ChangeOwnAuthResponse,
   ChangeOwnAuthResponseSchema,
-  ConfirmMfaData,
-  LoginData,
-  LoginResult,
+  type ConfirmMfaData,
+  type LoginData,
+  type LoginResult,
   LoginResultSchema,
-  ResetAuthData,
-  ResetAuthResult,
+  type ResetAuthData,
+  type ResetAuthResult,
   ResetAuthResultSchema,
-  ResetOwnPasswordData,
+  type ResetOwnPasswordData,
 } from '@/common/types';
-import {Numeric} from '@/types';
+import type {Numeric} from '@/types';
 import axios from './axios';
 
 export const useGetRefreshToken = (
