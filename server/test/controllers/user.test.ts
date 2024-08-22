@@ -143,7 +143,7 @@ describe('Test GET /v1/users/:userId/courses - get all courses and grades of use
   });
 
   it('should respond with 400 if invalid', async () => {
-    const url = `/v1/users/${'bad'}/courses`;
+    const url = '/v1/users/bad/courses';
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 

@@ -64,7 +64,7 @@ const findAndValidateAplusGradeSourceId = async (
       HttpCode.BadRequest
     );
   }
-  return await findAplusGradeSourceById(result.data);
+  return findAplusGradeSourceById(result.data);
 };
 
 /**
@@ -157,7 +157,7 @@ export const fetchFromAplus = async <T>(
   aplusToken: string
 ): Promise<AxiosResponse<T>> => {
   httpLogger.http(`Calling A+ With "GET ${url}"`);
-  return await axios.get<T>(url, {
+  return axios.get<T>(url, {
     timeout: AXIOS_TIMEOUT,
     validateStatus: (status: number) => status === 200,
     headers: {Authorization: `Token ${aplusToken}`},

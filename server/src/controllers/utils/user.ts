@@ -30,7 +30,7 @@ export const findAndValidateUserId = async (userId: string): Promise<User> => {
   if (!result.success) {
     throw new ApiError(`Invalid user id ${userId}`, HttpCode.BadRequest);
   }
-  return await findUserById(result.data);
+  return findUserById(result.data);
 };
 
 /**

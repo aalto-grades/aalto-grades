@@ -57,7 +57,7 @@ const findAndValidateCoursePartId = async (
       HttpCode.BadRequest
     );
   }
-  return await findCoursePartById(result.data);
+  return findCoursePartById(result.data);
 };
 
 /**

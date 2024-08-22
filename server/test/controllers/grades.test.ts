@@ -143,7 +143,7 @@ describe('Test GET /v1/courses/:courseId/grades - get all grades', () => {
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    const url = `/v1/courses/${'bad'}/grades`;
+    const url = '/v1/courses/bad/grades';
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 
@@ -531,7 +531,7 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${'bad'}/grades/${editGradeId}`;
+    let url = `/v1/courses/bad/grades/${editGradeId}`;
     const data = {comment: 'not edited'};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
@@ -593,7 +593,7 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
 describe('Test Delete/v1/courses/:courseId/grades/:gradeId - delete a grade', () => {
   const createGrade = async (): Promise<number> => {
     const user = await createData.createUser();
-    return await createData.createGrade(user.id, courseParts[0].id, TEACHER_ID);
+    return createData.createGrade(user.id, courseParts[0].id, TEACHER_ID);
   };
   const gradeDoesNotExist = async (id: number): Promise<void> => {
     const result = await TaskGrade.findOne({where: {id: id}});
@@ -620,7 +620,7 @@ describe('Test Delete/v1/courses/:courseId/grades/:gradeId - delete a grade', ()
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${'bad'}/grades/${editGradeId}`;
+    let url = `/v1/courses/bad/grades/${editGradeId}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).delete();
 
     url = `/v1/courses/${courseId}/grades/${-1}`;
@@ -765,7 +765,7 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
       .mockImplementation(() => new Date('2023-06-21').getTime());
     jest
       .spyOn(gradesUtil, 'getDateOfLatestGrade')
-      .mockImplementation(() => Promise.resolve(new Date('2023-06-21')));
+      .mockImplementation(async () => Promise.resolve(new Date('2023-06-21')));
   });
 
   afterEach(() => {
@@ -919,7 +919,7 @@ ${students[2].studentNumber},G,5,21.6.2023,en,\n`);
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    const url = `/v1/courses/${'bad'}/grades/csv/sisu`;
+    const url = '/v1/courses/bad/grades/csv/sisu';
     const data = {studentNumbers};
     await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
   });

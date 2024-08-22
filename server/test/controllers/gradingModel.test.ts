@@ -110,7 +110,7 @@ describe('Test GET /v1/courses/:courseId/grading-models/:gradingModelId - get gr
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${courseId}/grading-models/${5.5}`;
+    let url = `/v1/courses/${courseId}/grading-models/5.5`;
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
 
     url = `/v1/courses/${-1}/grading-models/${gradingModId}`;
@@ -330,11 +330,11 @@ describe('Test Put /v1/courses/:courseId/grading-models/:gradingModId - edit a g
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${courseId}/grading-models/${'bad'}`;
+    let url = `/v1/courses/${courseId}/grading-models/bad`;
     const data = {name: 'Not added', graphStructure: testStructure};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
-    url = `/v1/courses/${1.5}/grading-models/${gradingModId}`;
+    url = `/v1/courses/1.5/grading-models/${gradingModId}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 
@@ -402,10 +402,10 @@ describe('Test DELETE /v1/courses/:courseId/grading-models/:gradingModId - delet
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${courseId}/grading-models/${'bad'}`;
+    let url = `/v1/courses/${courseId}/grading-models/bad`;
     await responseTests.testBadRequest(url, cookies.adminCookie).delete();
 
-    url = `/v1/courses/${1.5}/grading-models/${gradingModId}`;
+    url = `/v1/courses/1.5/grading-models/${gradingModId}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).delete();
   });
 

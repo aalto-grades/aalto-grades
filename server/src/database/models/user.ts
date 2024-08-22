@@ -97,21 +97,21 @@ User.init(
 );
 
 User.findByEmail = async (email: string): Promise<User | null> =>
-  await User.findOne({
+  User.findOne({
     where: {
       email,
     },
   });
 
 User.findByEduUser = async (eduUser: string): Promise<User | null> =>
-  await User.findOne({
+  User.findOne({
     where: {
       eduUser,
     },
   });
 
 User.findIdpUserByEmail = async (email: string): Promise<User | null> =>
-  await User.findOne({
+  User.findOne({
     where: {
       email,
       password: {
@@ -121,7 +121,7 @@ User.findIdpUserByEmail = async (email: string): Promise<User | null> =>
   });
 
 User.findIdpUsers = async (): Promise<User[]> =>
-  await User.findAll({
+  User.findAll({
     where: {
       password: {
         [Op.is]: undefined,

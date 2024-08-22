@@ -72,7 +72,7 @@ const findAndValidateCourseTaskId = async (
       HttpCode.BadRequest
     );
   }
-  return await findCourseTaskById(result.data);
+  return findCourseTaskById(result.data);
 };
 
 /**

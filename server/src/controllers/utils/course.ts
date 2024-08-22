@@ -191,7 +191,7 @@ export const findAndValidateCourseId = async (
   const result = stringToIdSchema.safeParse(courseId);
   if (!result.success)
     throw new ApiError(`Invalid course id ${courseId}`, HttpCode.BadRequest);
-  return await findCourseById(result.data);
+  return findCourseById(result.data);
 };
 
 /**

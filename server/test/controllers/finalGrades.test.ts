@@ -128,10 +128,10 @@ describe('Test GET /v1/courses/:courseId/final-grades - get all final grades', (
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${'bad'}/final-grades`;
+    let url = '/v1/courses/bad/final-grades';
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
 
-    url = `/v1/courses/${1.5}/final-grades`;
+    url = '/v1/courses/1.5/final-grades';
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 
@@ -254,7 +254,7 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
     const student = await createStudent();
     const data = [getData(student)];
 
-    const url = `/v1/courses/${'bad'}/final-grades`;
+    const url = '/v1/courses/bad/final-grades';
     await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
   });
 
@@ -383,7 +383,7 @@ describe('Test PUT /v1/courses/:courseId/final-grades/:finalGradeId - edit a fin
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${'bad'}/final-grades/${editFinalGradeId}`;
+    let url = `/v1/courses/bad/final-grades/${editFinalGradeId}`;
     const data = {grade: 3};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
@@ -432,7 +432,7 @@ describe('Test PUT /v1/courses/:courseId/final-grades/:finalGradeId - edit a fin
 describe('Test Delete/v1/courses/:courseId/final-grades/:finalGradeId - delete a final grade', () => {
   const createFinalGrade = async (): Promise<number> => {
     const user = await createData.createUser();
-    return await createData.createFinalGrade(
+    return createData.createFinalGrade(
       editCourseId,
       user.id,
       editCourseModelId,
@@ -460,7 +460,7 @@ describe('Test Delete/v1/courses/:courseId/final-grades/:finalGradeId - delete a
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${'bad'}/final-grades/${editFinalGradeId}`;
+    let url = `/v1/courses/bad/final-grades/${editFinalGradeId}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).delete();
 
     url = `/v1/courses/${editCourseId}/final-grades/${-1}`;

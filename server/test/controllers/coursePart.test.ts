@@ -94,7 +94,7 @@ describe('Test GET /v1/courses/:courseId/parts - get all course parts', () => {
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    const url = `/v1/courses/${'bad'}/parts`;
+    const url = '/v1/courses/bad/parts';
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 
@@ -148,7 +148,7 @@ describe('Test POST /v1/courses/:courseId/parts - add a course part', () => {
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    const url = `/v1/courses/${'bad'}/parts`;
+    const url = '/v1/courses/bad/parts';
     const data = {name: 'not added', daysValid: 365, maxGrade: 5};
     await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
   });
@@ -229,7 +229,7 @@ describe('Test PUT /v1/courses/:courseId/parts/:coursePartId - edit a course par
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${'bad'}/parts/${editCoursePartId}`;
+    let url = `/v1/courses/bad/parts/${editCoursePartId}`;
     const data = {name: 'not edited', daysValid: 365};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
@@ -296,7 +296,7 @@ describe('Test Delete /v1/courses/:courseId/parts/:coursePartId - delete a cours
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${'bad'}/parts/${editCoursePartId}`;
+    let url = `/v1/courses/bad/parts/${editCoursePartId}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).delete();
 
     url = `/v1/courses/${courseId}/parts/${-1}`;

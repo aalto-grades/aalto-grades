@@ -93,10 +93,10 @@ describe('Test GET /v1/courses/:courseId - get a course', () => {
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${1.2}`;
+    let url = '/v1/courses/1.2';
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
 
-    url = `/v1/courses/${'abc'}`;
+    url = '/v1/courses/abc';
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 

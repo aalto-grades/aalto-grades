@@ -73,7 +73,7 @@ const findAndValidateGradingModelId = async (
       HttpCode.BadRequest
     );
   }
-  return await findGradingModelById(result.data);
+  return findGradingModelById(result.data);
 };
 
 /**

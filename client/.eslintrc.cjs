@@ -12,7 +12,7 @@ module.exports = {
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
     '../node_modules/gts',
-    '../.eslintrc.json',
+    '../.eslintrc.cjs',
   ],
   ignorePatterns: ['node_modules', 'dist', '.eslintrc.cjs', 'vite-env.d.ts'],
   parser: '@typescript-eslint/parser',
