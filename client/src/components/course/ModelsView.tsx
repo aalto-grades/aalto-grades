@@ -119,7 +119,7 @@ const ModelsView = (): JSX.Element => {
       if (courseParts.data === undefined) return model;
 
       for (const node of model.graphStructure.nodes) {
-        if (node.type !== 'coursepart') continue;
+        if (node.type !== 'source') continue;
         const coursePartId = parseInt(node.id.split('-')[1]);
 
         const nodeCoursePart = courseParts.data.find(

@@ -6,7 +6,6 @@ import type {Edge, Node} from 'reactflow';
 
 import type {
   AverageNodeSettings,
-  CoursePartNodeSettings,
   CustomNodeTypes,
   FullNodeData,
   GraphStructure,
@@ -17,6 +16,7 @@ import type {
   NodeValues,
   RequireNodeSettings,
   RoundNodeSettings,
+  SourceNodeSettings,
   StepperNodeSettings,
   SubstituteNodeSettings,
 } from '../types/graph';
@@ -50,14 +50,6 @@ export const initNode = (
         value: {type, sources, value: 0},
         data: {title: 'Addition'},
       };
-    case 'coursepart':
-      return {
-        value: {type, source: 0, value: 0, courseFail: false},
-        data: {
-          title: 'Course part',
-          settings: {onFailSetting: 'coursefail', minPoints: 0},
-        },
-      };
     case 'average':
       return {
         value: {type, sources, value: 0},
@@ -65,11 +57,6 @@ export const initNode = (
           title: 'Average',
           settings: {weights: {}, percentageMode: false},
         },
-      };
-    case 'grade':
-      return {
-        value: {type, source: 0, value: 0, courseFail: false},
-        data: {title: 'Grade'},
       };
     case 'max':
       return {
@@ -81,7 +68,7 @@ export const initNode = (
         value: {type, source: 0, value: 0, courseFail: false},
         data: {
           title: 'Require points',
-          settings: {minPoints: 0, onFailSetting: 'coursefail'},
+          settings: {minPoints: 0, onFailSetting: 'fullfail'},
         },
       };
     case 'require':
@@ -89,13 +76,28 @@ export const initNode = (
         value: {type, sources, values, courseFail: false},
         data: {
           title: 'Require',
-          settings: {numFail: 0, onFailSetting: 'coursefail'},
+          settings: {numFail: 0, onFailSetting: 'fullfail'},
         },
       };
     case 'round':
       return {
         value: {type, source: 0, value: 0},
         data: {title: 'Round', settings: {roundingSetting: 'round-closest'}},
+      };
+    case 'sink':
+      return {
+        value: {type, source: 0, value: 0, courseFail: false},
+        //  TODO: title
+        data: {title: 'Grade'},
+      };
+    case 'source':
+      return {
+        value: {type, source: 0, value: 0, courseFail: false},
+        data: {
+          // TODO: title
+          title: 'Course part',
+          settings: {onFailSetting: 'fullfail', minPoints: 0},
+        },
       };
     case 'stepper':
       return {
@@ -129,25 +131,6 @@ const calculateNodeValue = (
       nodeValue.value = sum;
       break;
     }
-    case 'coursepart': {
-      const settings = nodeData[nodeId].settings as CoursePartNodeSettings;
-      nodeValue.value = nodeValue.source;
-      nodeValue.courseFail = false;
-      if (
-        settings.minPoints !== null &&
-        nodeValue.source < settings.minPoints
-      ) {
-        switch (settings.onFailSetting) {
-          case 'coursefail':
-            nodeValue.courseFail = true;
-            break;
-          case 'fail':
-            nodeValue.value = 'fail';
-            break;
-        }
-      }
-      break;
-    }
     case 'average': {
       const settings = nodeData[nodeId].settings as AverageNodeSettings;
       let valueSum = 0;
@@ -162,30 +145,6 @@ const calculateNodeValue = (
       nodeValue.value = weightSum === 0 ? 0 : valueSum / weightSum;
       break;
     }
-    case 'grade':
-      nodeValue.value = nodeValue.source;
-      nodeValue.courseFail = false;
-      break;
-    case 'max': {
-      const settings = nodeData[nodeId].settings as MaxNodeSettings;
-      let maxValue = settings.minValue;
-
-      for (const value of Object.values(nodeValue.sources)) {
-        if (value.isConnected) maxValue = Math.max(maxValue, value.value);
-      }
-      nodeValue.value = maxValue;
-      break;
-    }
-    case 'minpoints': {
-      const settings = nodeData[nodeId].settings as MinPointsNodeSettings;
-      nodeValue.courseFail = false;
-      nodeValue.value = nodeValue.source;
-      if (nodeValue.source >= settings.minPoints) break;
-
-      if (settings.onFailSetting === 'coursefail') nodeValue.courseFail = true;
-      else nodeValue.value = 'fail';
-      break;
-    }
     case 'require': {
       const settings = nodeData[nodeId].settings as RequireNodeSettings;
       nodeValue.courseFail = false;
@@ -198,7 +157,7 @@ const calculateNodeValue = (
       }
       if (numFail <= settings.numFail) break;
 
-      if (settings.onFailSetting === 'coursefail') {
+      if (settings.onFailSetting === 'fullfail') {
         nodeValue.courseFail = true;
       } else {
         for (const [handleId, source] of Object.entries(nodeValue.sources)) {
@@ -220,6 +179,49 @@ const calculateNodeValue = (
         case 'round-down':
           nodeValue.value = Math.floor(nodeValue.source);
           break;
+      }
+      break;
+    }
+    case 'max': {
+      const settings = nodeData[nodeId].settings as MaxNodeSettings;
+      let maxValue = settings.minValue;
+
+      for (const value of Object.values(nodeValue.sources)) {
+        if (value.isConnected) maxValue = Math.max(maxValue, value.value);
+      }
+      nodeValue.value = maxValue;
+      break;
+    }
+    case 'minpoints': {
+      const settings = nodeData[nodeId].settings as MinPointsNodeSettings;
+      nodeValue.courseFail = false;
+      nodeValue.value = nodeValue.source;
+      if (nodeValue.source >= settings.minPoints) break;
+
+      if (settings.onFailSetting === 'fullfail') nodeValue.courseFail = true;
+      else nodeValue.value = 'fail';
+      break;
+    }
+    case 'sink':
+      nodeValue.value = nodeValue.source;
+      nodeValue.courseFail = false;
+      break;
+    case 'source': {
+      const settings = nodeData[nodeId].settings as SourceNodeSettings;
+      nodeValue.value = nodeValue.source;
+      nodeValue.courseFail = false;
+      if (
+        settings.minPoints !== null &&
+        nodeValue.source < settings.minPoints
+      ) {
+        switch (settings.onFailSetting) {
+          case 'fullfail':
+            nodeValue.courseFail = true;
+            break;
+          case 'fail':
+            nodeValue.value = 'fail';
+            break;
+        }
       }
       break;
     }
@@ -303,7 +305,7 @@ const calculateNodeValue = (
 export const calculateNewNodeValues = (
   oldNodeValues: NodeValues,
   nodeData: FullNodeData,
-  nodes: Node[],
+  nodes: Node<object, CustomNodeTypes>[],
   edges: Edge[]
 ): NodeValues => {
   const nodeSources: {[key: string]: Set<string>} = {};
@@ -325,11 +327,11 @@ export const calculateNewNodeValues = (
       nodeValue.values = {};
     else nodeValue.value = 0;
     switch (nodeValue.type) {
-      case 'coursepart':
+      case 'source':
         break;
-      case 'grade':
       case 'minpoints':
       case 'round':
+      case 'sink':
       case 'stepper':
         nodeValue.source = 0;
         break;
@@ -379,11 +381,11 @@ export const calculateNewNodeValues = (
       }
       const nodeValue = newNodeValues[edge.target];
       switch (nodeValue.type) {
-        case 'coursepart':
+        case 'source':
           throw new Error('Should not happen');
         case 'minpoints':
-        case 'grade':
         case 'round':
+        case 'sink':
         case 'stepper':
           nodeValue.source = sourceValue === 'fail' ? 0 : sourceValue;
           break;
@@ -410,7 +412,7 @@ export const calculateNewNodeValues = (
       const nodeValue = newNodeValues[node.id];
 
       // Failed course
-      if (nodeValue.type === 'grade') {
+      if (nodeValue.type === 'sink') {
         nodeValue.value = 0;
         nodeValue.courseFail = true;
       }
@@ -451,11 +453,11 @@ export const batchCalculateGraph = (
       const nodeType = node.type as CustomNodeTypes;
       nodeValues[student.userId][node.id] = initNode(nodeType).value;
       const nodeValue = nodeValues[student.userId][node.id];
-      if (nodeValue.type !== 'coursepart') continue;
+      if (nodeValue.type !== 'source') continue;
 
       // Find matching course part from student data
       for (const coursePart of student.courseParts) {
-        if (node.id === `coursepart-${coursePart.coursePartId}`)
+        if (node.id === `source-${coursePart.coursePartId}`)
           nodeValue.source = coursePart.grade;
       }
     }
@@ -507,11 +509,11 @@ export const batchCalculateGraph = (
 
         const nodeValue = nodeValues[student.userId][edge.target];
         switch (nodeValue.type) {
-          case 'coursepart':
+          case 'source':
             throw new Error('Should not happen');
           case 'minpoints':
-          case 'grade':
           case 'round':
+          case 'sink':
           case 'stepper':
             nodeValue.source = sourceValue === 'fail' ? 0 : sourceValue;
             break;
@@ -540,7 +542,7 @@ export const batchCalculateGraph = (
   for (const student of studentData) {
     for (const node of nodes) {
       const nodeValue = nodeValues[student.userId][node.id];
-      if (nodeValue.type !== 'grade') continue;
+      if (nodeValue.type !== 'sink') continue;
 
       // Failed course
       if (courseFail[student.userId]) {

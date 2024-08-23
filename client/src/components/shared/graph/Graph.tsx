@@ -6,9 +6,11 @@ import {Alert, Button, Divider, Tooltip, Typography} from '@mui/material';
 import type {TFunction} from 'i18next';
 import {enqueueSnackbar} from 'notistack';
 import {
+  type Dispatch,
   type DragEvent,
   type DragEventHandler,
   type JSX,
+  type SetStateAction,
   useCallback,
   useEffect,
   useMemo,
@@ -25,6 +27,8 @@ import {
   type Edge,
   MiniMap,
   type Node,
+  type NodeChange,
+  type NodeProps,
   ReactFlow,
   type ReactFlowInstance,
   addEdge,
@@ -35,7 +39,6 @@ import 'reactflow/dist/style.css';
 
 import type {
   CoursePartData,
-  CoursePartNodeValue,
   CourseTaskGradesData,
   CustomNodeTypes,
   DropInNodes,
@@ -43,6 +46,7 @@ import type {
   GraphStructure,
   NodeSettings,
   NodeValues,
+  SourceNodeValue,
 } from '@/common/types';
 import {calculateNewNodeValues, initNode} from '@/common/util';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
@@ -65,26 +69,34 @@ import {
 } from './graphUtil';
 import AdditionNode from './nodes/AdditionNode';
 import AverageNode from './nodes/AverageNode';
-import CoursePartNode from './nodes/CoursePartNode';
-import GradeNode from './nodes/GradeNode';
 import MaxNode from './nodes/MaxNode';
 import MinPointsNode from './nodes/MinPointsNode';
 import RequireNode from './nodes/RequireNode';
 import RoundNode from './nodes/RoundNode';
+import SinkNode from './nodes/SinkNode';
+import SourceNode from './nodes/SourceNode';
 import StepperNode from './nodes/StepperNode';
 import SubstituteNode from './nodes/SubstituteNode';
 
 // TODO: Fix
 
-const nodeTypesMap = {
+type NodeState = [
+  Node<object, CustomNodeTypes>[],
+  Dispatch<SetStateAction<Node<object, CustomNodeTypes>[]>>,
+  (changes: NodeChange[]) => void,
+];
+
+const nodeTypesMap: {
+  [key in CustomNodeTypes]: (props: NodeProps) => JSX.Element;
+} = {
   addition: AdditionNode,
-  coursepart: CoursePartNode,
   average: AverageNode,
-  grade: GradeNode,
   max: MaxNode,
   minpoints: MinPointsNode,
   require: RequireNode,
   round: RoundNode,
+  sink: SinkNode,
+  source: SourceNode,
   stepper: StepperNode,
   substitute: SubstituteNode,
 };
@@ -98,7 +110,7 @@ const initGraphFn = (
   // Check for deleted & archived course parts (edit extra data)
   const extraNodeData: ExtraNodeData = {};
   for (const node of initGraph.nodes) {
-    if (node.type !== 'coursepart') continue;
+    if (node.type !== 'source') continue;
     const coursePartId = parseInt(node.id.split('-')[1]);
 
     const nodeCoursePart = courseParts.find(
@@ -146,8 +158,9 @@ const Graph = ({
     () => initGraphFn(initGraph, courseParts, t),
     [courseParts, initGraph, t]
   );
-
-  const [nodes, setNodes, onNodesChange] = useNodesState(initGraph.nodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState(
+    initGraph.nodes
+  ) as NodeState;
   const [edges, setEdges, onEdgesChange] = useEdgesState(initGraph.edges);
   const [nodeData, setNodeData] = useState<FullNodeData>(initGraph.nodeData);
   const [nodeValues, setNodeValues] = useState<NodeValues>(initNodeValues);
@@ -156,7 +169,7 @@ const Graph = ({
 
   // Used to check for changes
   const [lastState, setLastState] = useState<{
-    nodes: Node[];
+    nodes: Node<object, CustomNodeTypes>[];
     edges: Edge[];
     nodeSettings: {[key: string]: NodeSettings | undefined};
     nodeValues: NodeValues;
@@ -182,7 +195,7 @@ const Graph = ({
     () =>
       initGraph.nodes
         .filter(node => {
-          if (node.type !== 'coursepart') return false;
+          if (node.type !== 'source') return false;
           const coursePartId = parseInt(node.id.split('-')[1]);
 
           const nodeCoursePart = courseParts.find(
@@ -282,10 +295,10 @@ const Graph = ({
     let change = false;
 
     for (const coursePart of userGrades) {
-      const coursePartId = `coursepart-${coursePart.courseTaskId}`;
+      const coursePartId = `source-${coursePart.courseTaskId}`;
       if (!(coursePartId in newNodeValues)) continue;
 
-      const newValue = newNodeValues[coursePartId] as CoursePartNodeValue;
+      const newValue = newNodeValues[coursePartId] as SourceNodeValue;
       const bestGrade =
         coursePart.grades.length === 0
           ? 0
@@ -341,21 +354,20 @@ const Graph = ({
 
     for (const coursePart of newCourseParts) {
       newNodes.push({
-        id: `coursepart-${coursePart.id}`,
-        type: 'coursepart',
+        id: `source-${coursePart.id}`,
+        type: 'source',
         position: {x: 0, y: 100 * newNodes.length},
         data: {},
       });
-      newNodeData[`coursepart-${coursePart.id}`] = {
+      newNodeData[`source-${coursePart.id}`] = {
         title: coursePart.name,
-        settings: {minPoints: null, onFailSetting: 'coursefail'},
+        settings: {minPoints: null, onFailSetting: 'fullfail'},
       };
-      newNodeValues[`coursepart-${coursePart.id}`] =
-        initNode('coursepart').value;
+      newNodeValues[`source-${coursePart.id}`] = initNode('source').value;
     }
 
     for (const coursePart of removedCourseParts) {
-      const nodeId = `coursepart-${coursePart.id}`;
+      const nodeId = `source-${coursePart.id}`;
       newNodes = newNodes.filter(newNode => newNode.id !== nodeId);
       newEdges = newEdges.filter(newEdge => newEdge.source !== nodeId);
     }
@@ -376,8 +388,8 @@ const Graph = ({
   }): void => {
     const newNodeValues = structuredClone(nodeValues);
     for (const [coursePartId, value] of Object.entries(coursePartValues)) {
-      const nodeValue = newNodeValues[`coursepart-${coursePartId}`];
-      if (nodeValue.type === 'coursepart') nodeValue.source = value;
+      const nodeValue = newNodeValues[`source-${coursePartId}`];
+      if (nodeValue.type === 'source') nodeValue.source = value;
     }
     setNodeValues(newNodeValues);
   };
@@ -418,7 +430,12 @@ const Graph = ({
       while (nodeId in nodeTypeMap) nodeId = `dnd-${type}-${getId()}`; // To prevent duplicates from loading existing graph
 
       const initState = initNode(type);
-      const newNode: Node = {id: nodeId, type, position, data: {}};
+      const newNode: Node<object, CustomNodeTypes> = {
+        id: nodeId,
+        type,
+        position,
+        data: {},
+      };
 
       setNodes(oldNodes => oldNodes.concat(newNode));
       setNodeValues(oldNodeValues => ({
@@ -541,8 +558,8 @@ const Graph = ({
                       change =>
                         change.type !== 'remove' ||
                         delCourseParts.includes(change.id) ||
-                        (nodeTypeMap[change.id] !== 'coursepart' &&
-                          nodeTypeMap[change.id] !== 'grade')
+                        (nodeTypeMap[change.id] !== 'source' &&
+                          nodeTypeMap[change.id] !== 'sink')
                     )
                   )
                 }

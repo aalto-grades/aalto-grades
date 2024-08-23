@@ -135,7 +135,7 @@ const CoursePartsView = (): JSX.Element => {
     if (gradingModels.data === undefined) return withModels;
     for (const model of gradingModels.data) {
       for (const node of model.graphStructure.nodes) {
-        if (node.type !== 'coursepart') continue;
+        if (node.type !== 'source') continue;
         withModels.add(parseInt(node.id.split('-')[1]));
       }
     }

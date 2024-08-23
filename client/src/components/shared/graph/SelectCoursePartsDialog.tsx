@@ -16,7 +16,7 @@ import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import type {Node} from 'reactflow';
 
-import type {CoursePartData} from '@/common/types';
+import type {CoursePartData, CustomNodeTypes} from '@/common/types';
 
 const SelectCoursePartsDialog = ({
   nodes,
@@ -25,7 +25,7 @@ const SelectCoursePartsDialog = ({
   onClose,
   handleCoursePartSelect,
 }: {
-  nodes: Node[];
+  nodes: Node<object, CustomNodeTypes>[];
   courseParts: {id: number; name: string}[];
   open: boolean;
   onClose: () => void;
@@ -37,7 +37,7 @@ const SelectCoursePartsDialog = ({
   const {t} = useTranslation();
   const coursePartNodeIds = new Set(
     nodes
-      .filter(node => node.type === 'coursepart')
+      .filter(node => node.type === 'source')
       .map(node => parseInt(node.id.split('-')[1]))
   );
   const startSelected = Object.fromEntries(

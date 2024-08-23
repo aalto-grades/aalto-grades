@@ -10,7 +10,7 @@ import type {MinPointsNodeSettings, MinPointsNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
-type OnFailSetting = 'coursefail' | 'fail';
+type OnFailSetting = 'fullfail' | 'fail';
 type LocalSettings = {onFailSetting: OnFailSetting; minPoints: string};
 
 const MinPointsNode = (props: NodeProps): JSX.Element => {
@@ -90,7 +90,7 @@ const MinPointsNode = (props: NodeProps): JSX.Element => {
           onChange={handleSelectChange}
           value={localSettings.onFailSetting}
         >
-          <option value="coursefail">{t('shared.graph.fail-course')}</option>
+          <option value="fullfail">{t('shared.graph.fail-course')}</option>
           <option value="fail">{t('shared.graph.output-fail')}</option>
         </select>
       </div>

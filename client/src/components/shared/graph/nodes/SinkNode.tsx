@@ -6,16 +6,16 @@ import {type JSX, useContext} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Handle, type NodeProps, Position} from 'reactflow';
 
-import type {GradeNodeValue} from '@/common/types';
+import type {SinkNodeValue} from '@/common/types';
 import {NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
-const GradeNode = (props: NodeProps): JSX.Element => {
+const SinkNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
   const {id, isConnectable} = props;
 
   const nodeValues = useContext(NodeValuesContext);
-  const nodeValue = nodeValues[id] as GradeNodeValue;
+  const nodeValue = nodeValues[id] as SinkNodeValue;
 
   return (
     <BaseNode {...props} courseFail={nodeValue.courseFail}>
@@ -27,6 +27,7 @@ const GradeNode = (props: NodeProps): JSX.Element => {
         isConnectable={isConnectable}
       />
 
+      {/* Todo: what if not final grade */}
       <p className="output-value">
         {t('general.final-grade')}: {Math.round(nodeValue.value * 100) / 100}
       </p>
@@ -34,4 +35,4 @@ const GradeNode = (props: NodeProps): JSX.Element => {
   );
 };
 
-export default GradeNode;
+export default SinkNode;

@@ -6,9 +6,11 @@ import ElkConstructor from 'elkjs/lib/elk.bundled';
 import type {TFunction} from 'i18next';
 import type {Connection, Edge, Node} from 'reactflow';
 
-import type {DropInNodes, NodeValues} from '@/common/types';
+import type {CustomNodeTypes, DropInNodes, NodeValues} from '@/common/types';
 
-export const simplifyNode = (node: Node): Node => ({
+export const simplifyNode = (
+  node: Node<object, CustomNodeTypes>
+): Node<object, CustomNodeTypes> => ({
   id: node.id,
   type: node.type,
   position: {
@@ -124,7 +126,7 @@ export const isValidConnection = (
 
 export const findDisconnectedEdges = (
   oldNodeValues: NodeValues,
-  nodes: Node[],
+  nodes: Node<object, CustomNodeTypes>[],
   edges: Edge[]
 ): Edge[] => {
   const nodeSources: {[key: string]: Set<string>} = {};
@@ -188,10 +190,10 @@ export const findDisconnectedEdges = (
 const elk = new ElkConstructor();
 
 export const formatGraph = async (
-  nodes: Node[],
+  nodes: Node<object, CustomNodeTypes>[],
   edges: Edge[],
   nodeValues: NodeValues
-): Promise<Node[]> => {
+): Promise<Node<object, CustomNodeTypes>[]> => {
   const nodesForElk = nodes.map(node => ({
     type: node.type,
     id: node.id,
@@ -209,12 +211,12 @@ export const formatGraph = async (
     },
     children: nodesForElk.map(node => {
       const nodeValue = nodeValues[node.id];
-      if (nodeValue.type === 'coursepart') {
+      if (nodeValue.type === 'source') {
         return {
           ...node,
           ports: [{id: `${node.id}-source`, properties: {side: 'EAST'}}],
         };
-      } else if (nodeValue.type === 'grade') {
+      } else if (nodeValue.type === 'sink') {
         return {
           ...node,
           ports: [{id: node.id, properties: {side: 'WEST'}}],

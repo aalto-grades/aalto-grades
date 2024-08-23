@@ -4,7 +4,12 @@
 
 import type {Edge, Node} from 'reactflow';
 
-import type {CoursePartData, FullNodeData, GraphStructure} from '../types';
+import type {
+  CoursePartData,
+  CustomNodeTypes,
+  FullNodeData,
+  GraphStructure,
+} from '../types';
 
 export type GraphTemplate = 'none' | 'addition' | 'average';
 
@@ -29,30 +34,31 @@ export const initGraph = (
   template: GraphTemplate,
   courseParts: CoursePartData[]
 ): GraphStructure => {
-  const nodes: Node[] = [
+  const nodes: Node<object, CustomNodeTypes>[] = [
     {
       id: 'final-grade',
-      type: 'grade',
+      type: 'sink',
       position: {x: 1116, y: 0},
       data: {},
     },
-    ...courseParts.map((coursePart, index) => ({
-      id: `coursepart-${coursePart.id}`,
-      type: 'coursepart',
-
-      position: {x: 12, y: 173 * index},
-      data: {},
-    })),
+    ...courseParts.map(
+      (coursePart, index): Node<object, CustomNodeTypes> => ({
+        id: `source-${coursePart.id}`,
+        type: 'source',
+        position: {x: 12, y: 173 * index},
+        data: {},
+      })
+    ),
   ];
   const edges: Edge[] = [];
   const nodeData: FullNodeData = {
     'final-grade': {title: 'Final grade'},
     ...Object.fromEntries(
       courseParts.map(coursePart => [
-        `coursepart-${coursePart.id}`,
+        `source-${coursePart.id}`,
         {
           title: coursePart.name,
-          settings: {onFailSetting: 'coursefail', minPoints: null},
+          settings: {onFailSetting: 'fullfail', minPoints: null},
         },
       ])
     ),
@@ -70,7 +76,7 @@ export const initGraph = (
       data: {},
     });
     for (let i = 0; i < courseParts.length; i++) {
-      const coursePartNodeId = `coursepart-${courseParts[i].id}`;
+      const coursePartNodeId = `source-${courseParts[i].id}`;
       edges.push(createEdge(coursePartNodeId, middleNodeId, undefined, i));
     }
     nodeData[middleNodeId] =
