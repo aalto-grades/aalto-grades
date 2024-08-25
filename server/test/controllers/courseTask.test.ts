@@ -6,6 +6,7 @@ import supertest from 'supertest';
 
 import {
   CoursePartData,
+  CourseTaskData,
   CourseTaskDataArraySchema,
   EditCourseTaskData,
   HttpCode,
@@ -28,6 +29,9 @@ let coursePartId = -1;
 
 let noRoleCourseId = -1;
 
+let differentCoursePartId = -1;
+let differentCourseTaskId = -1;
+
 const nonExistentId = 1000000;
 
 beforeAll(async () => {
@@ -37,11 +41,14 @@ beforeAll(async () => {
   [courseId, courseParts] = await createData.createCourse({});
   coursePartId = courseParts[0].id;
 
-  [noRoleCourseId, courseParts] = await createData.createCourse({
+  let courseTasks: CourseTaskData[] = [];
+  [noRoleCourseId, courseParts, courseTasks] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
   });
+  differentCoursePartId = courseParts[0].id;
+  differentCourseTaskId = courseTasks[0].id;
 });
 
 afterAll(async () => {
@@ -95,9 +102,6 @@ describe('Test GET /v1/courses/:courseId/tasks - get all course tasks', () => {
 });
 
 describe('Test POST /v1/courses/:courseId/tasks - modify course tasks', () => {
-  const getNewCourseTaskId = async (): Promise<number> =>
-    (await createData.createCourseTask(coursePartId)).id;
-
   let i = 0;
   const getCourseTaskBase = (): {
     name: string;
@@ -109,13 +113,13 @@ describe('Test POST /v1/courses/:courseId/tasks - modify course tasks', () => {
     maxGrade: i++,
   });
 
-  const getNewCourseTask = (): NewCourseTaskData => ({
+  const getAddCourseTask = (): NewCourseTaskData => ({
     coursePartId,
     ...getCourseTaskBase(),
   });
 
-  const getEditCourseTask = (id: number): EditCourseTaskData => ({
-    id,
+  const getEditCourseTask = async (): Promise<EditCourseTaskData> => ({
+    id: (await createData.createCourseTask(coursePartId)).id,
     ...getCourseTaskBase(),
   });
 
@@ -143,7 +147,7 @@ describe('Test POST /v1/courses/:courseId/tasks - modify course tasks', () => {
   it('should add course tasks', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
-      const courseTask = getNewCourseTask();
+      const courseTask = getAddCourseTask();
 
       const res = await request
         .post(`/v1/courses/${courseId}/tasks`)
@@ -162,7 +166,7 @@ describe('Test POST /v1/courses/:courseId/tasks - modify course tasks', () => {
   it('should edit course tasks', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
-      const courseTask = getEditCourseTask(await getNewCourseTaskId());
+      const courseTask = await getEditCourseTask();
 
       const res = await request
         .post(`/v1/courses/${courseId}/tasks`)
@@ -180,7 +184,7 @@ describe('Test POST /v1/courses/:courseId/tasks - modify course tasks', () => {
   it('should delete course tasks', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
-      const courseTaskId = await getNewCourseTaskId();
+      const courseTaskId = (await createData.createCourseTask(coursePartId)).id;
 
       const res = await request
         .post(`/v1/courses/${courseId}/tasks`)
@@ -198,9 +202,9 @@ describe('Test POST /v1/courses/:courseId/tasks - modify course tasks', () => {
   it('should add, edit, and delete course tasks', async () => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
-      const addTask = getNewCourseTask();
-      const editTask = getEditCourseTask(await getNewCourseTaskId());
-      const deleteId = await getNewCourseTaskId();
+      const addTask = getAddCourseTask();
+      const editTask = await getEditCourseTask();
+      const deleteId = (await createData.createCourseTask(coursePartId)).id;
 
       const res = await request
         .post(`/v1/courses/${courseId}/tasks`)
@@ -219,14 +223,111 @@ describe('Test POST /v1/courses/:courseId/tasks - modify course tasks', () => {
   });
 
   it('should respond with 400 if ID is invalid', async () => {
-    // TODO
+    const url = '/v1/courses/bad/tasks';
+    await responseTests.testBadRequest(url, cookies.adminCookie).post({});
+  });
+
+  it('should respond with 400 if validation fails', async () => {
+    const url = `/v1/courses/${courseId}/tasks`;
+    await responseTests
+      .testBadRequest(url, cookies.adminCookie)
+      .post({bad: []});
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
-    // TODO
+    const url401 = `/v1/courses/${courseId}/tasks`;
+    await responseTests.testUnauthorized(url401).post({});
+
+    const url403 = `/v1/courses/${noRoleCourseId}/tasks`;
+    await responseTests
+      .testForbidden(url403, [
+        cookies.teacherCookie,
+        cookies.assistantCookie,
+        cookies.studentCookie,
+      ])
+      .post({});
   });
 
   it('should respond with 404 when not found', async () => {
-    // TODO
+    const url = `/v1/courses/${courseId}/tasks`;
+
+    const urlCourseNotFound = `/v1/courses/${nonExistentId}/tasks`;
+    await responseTests
+      .testNotFound(urlCourseNotFound, cookies.adminCookie)
+      .post({});
+
+    const invalid = [
+      {add: [{...getAddCourseTask(), coursePartId: nonExistentId}]},
+      {edit: [{...(await getEditCourseTask()), id: nonExistentId}]},
+      {delete: [nonExistentId]},
+    ];
+
+    for (const input of invalid) {
+      await responseTests.testNotFound(url, cookies.adminCookie).post(input);
+    }
+  });
+
+  it('should respond with 409 when there are duplicate names', async () => {
+    const url = `/v1/courses/${courseId}/tasks`;
+    const dbName = (await createData.createCourseTask(coursePartId)).name;
+
+    const add = (name: string): NewCourseTaskData => ({
+      ...getAddCourseTask(),
+      name,
+    });
+
+    const edit = async (name: string): Promise<EditCourseTaskData> => ({
+      ...(await getEditCourseTask()),
+      name,
+    });
+
+    const invalid = [
+      {add: [add('same'), add('same')]},
+      {edit: [await edit('same'), await edit('same')]},
+      {add: [add('same')], edit: [await edit('same')]},
+      {add: [add(dbName)]},
+      {edit: [await edit(dbName)]},
+    ];
+
+    for (const input of invalid) {
+      await responseTests.testConflict(url, cookies.adminCookie).post(input);
+    }
+  });
+
+  it('should respond with 409 when trying to modify the same task multiple times', async () => {
+    const url = `/v1/courses/${courseId}/tasks`;
+
+    const id = (await createData.createCourseTask(coursePartId)).id;
+    const edit = {...(await getEditCourseTask()), id};
+
+    const invalid = [
+      {edit: [edit, edit]},
+      {delete: [id, id]},
+      {edit: [edit], delete: [id]},
+    ];
+
+    for (const input of invalid) {
+      await responseTests.testConflict(url, cookies.adminCookie).post(input);
+    }
+  });
+
+  it('should respond with 409 when a course part does not belong to the course', async () => {
+    const url = `/v1/courses/${courseId}/tasks`;
+    await responseTests.testConflict(url, cookies.adminCookie).post({
+      add: [{...getAddCourseTask(), coursePartId: differentCoursePartId}],
+    });
+  });
+
+  it('should respond with 409 when a course task does not belong to the course', async () => {
+    const url = `/v1/courses/${courseId}/tasks`;
+
+    const invalid = [
+      {edit: [{...(await getEditCourseTask()), id: differentCourseTaskId}]},
+      {delete: [differentCourseTaskId]},
+    ];
+
+    for (const input of invalid) {
+      await responseTests.testConflict(url, cookies.adminCookie).post(input);
+    }
   });
 });

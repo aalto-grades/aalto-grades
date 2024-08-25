@@ -45,6 +45,29 @@ export const modifyCourseTasks: Endpoint<ModifyCourseTasks, unknown> = async (
   const editTasks = req.body.edit ?? [];
   const deleteIds = req.body.delete ?? [];
 
+  const editIds = editTasks.map(editTask => editTask.id);
+
+  if (editIds.length !== [...new Set(editIds)].length) {
+    throw new ApiError(
+      'Tried to edit the same course task multiple times',
+      HttpCode.Conflict
+    );
+  }
+
+  if (deleteIds.length !== [...new Set(deleteIds)].length) {
+    throw new ApiError(
+      'Tried to delete the same course task multiple times',
+      HttpCode.Conflict
+    );
+  }
+
+  if (!editIds.every(editId => !new Set(deleteIds).has(editId))) {
+    throw new ApiError(
+      'Tried to edit and delete the same course task',
+      HttpCode.Conflict
+    );
+  }
+
   const checkForDuplicateError = (error: unknown): void => {
     // Duplicate name error
     if (error instanceof UniqueConstraintError) {
