@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import axios, {AxiosResponse} from 'axios';
+import axios from 'axios';
 import {Request} from 'express';
-import {z} from 'zod';
+import {ZodSchema, z} from 'zod';
 
 import {AplusGradeSourceData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
@@ -154,12 +154,27 @@ export const parseAplusToken = (req: Request): string => {
  */
 export const fetchFromAplus = async <T>(
   url: string,
-  aplusToken: string
-): Promise<AxiosResponse<T>> => {
+  aplusToken: string,
+  schema: ZodSchema<T>
+): Promise<T> => {
   httpLogger.http(`Calling A+ With "GET ${url}"`);
-  return await axios.get<T>(url, {
-    timeout: AXIOS_TIMEOUT,
-    validateStatus: (status: number) => status === 200,
-    headers: {Authorization: `Token ${aplusToken}`},
-  });
+
+  const result = schema.safeParse(
+    (
+      await axios.get<T>(url, {
+        timeout: AXIOS_TIMEOUT,
+        validateStatus: (status: number) => status === 200,
+        headers: {Authorization: `Token ${aplusToken}`},
+      })
+    ).data
+  );
+
+  if (!result.success) {
+    throw new ApiError(
+      `Validating data from A+ failed: ${result.error}`,
+      HttpCode.BadGateway
+    );
+  }
+
+  return result.data;
 };

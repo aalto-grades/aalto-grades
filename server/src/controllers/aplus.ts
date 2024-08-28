@@ -29,8 +29,11 @@ import AplusGradeSource from '../database/models/aplusGradeSource';
 import {
   ApiError,
   AplusCoursesRes,
+  AplusCoursesResSchema,
   AplusExercisesRes,
+  AplusExercisesResSchema,
   AplusPointsRes,
+  AplusPointsResSchema,
   AplusStudentPoints,
   Endpoint,
 } from '../types';
@@ -47,10 +50,11 @@ export const fetchAplusCourses: Endpoint<void, AplusCourseData[]> = async (
   const aplusToken = parseAplusToken(req);
   const coursesRes = await fetchFromAplus<AplusCoursesRes>(
     `${APLUS_API_URL}/users/me`,
-    aplusToken
+    aplusToken,
+    AplusCoursesResSchema
   );
 
-  const staffCourses = coursesRes.data.staff_courses;
+  const staffCourses = coursesRes.staff_courses;
   if (staffCourses.length === 0) {
     throw new ApiError('no staff courses found in A+', HttpCode.NotFound);
   }
@@ -80,7 +84,8 @@ export const fetchAplusExerciseData: Endpoint<void, AplusExerciseData> = async (
 
   const exercisesRes = await fetchFromAplus<AplusExercisesRes>(
     `${APLUS_API_URL}/courses/${aplusCourseId}/exercises?format=json`,
-    aplusToken
+    aplusToken,
+    AplusExercisesResSchema
   );
 
   // Map from exercise IDs to difficulties
@@ -88,7 +93,7 @@ export const fetchAplusExerciseData: Endpoint<void, AplusExerciseData> = async (
 
   // There doesn't appear to be a better way to get difficulties
   const difficulties = new Set<string>();
-  for (const module of exercisesRes.data.results) {
+  for (const module of exercisesRes.results) {
     for (const exercise of module.exercises) {
       if (exercise.difficulty) {
         difficulties.add(exercise.difficulty);
@@ -101,7 +106,7 @@ export const fetchAplusExerciseData: Endpoint<void, AplusExerciseData> = async (
 
   const exerciseData: AplusExerciseData = {
     maxGrade: 0,
-    modules: exercisesRes.data.results.map(module => ({
+    modules: exercisesRes.results.map(module => ({
       id: module.id,
       name: module.display_name,
       closingDate: module.closing_time,
@@ -274,10 +279,11 @@ export const fetchAplusGrades: Endpoint<void, NewTaskGrade[]> = async (
       if (!(aplusCourseId in pointsResCache)) {
         const pointsRes = await fetchFromAplus<AplusPointsRes>(
           `${APLUS_API_URL}/courses/${aplusCourseId}/points?format=json`,
-          aplusToken
+          aplusToken,
+          AplusPointsResSchema
         );
 
-        pointsResCache[aplusCourseId] = pointsRes.data.results;
+        pointsResCache[aplusCourseId] = pointsRes.results;
       }
 
       const points = pointsResCache[aplusCourseId];

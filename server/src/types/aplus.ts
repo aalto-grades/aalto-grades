@@ -4,6 +4,8 @@
 
 import {z} from 'zod';
 
+import {DateSchema} from '@/common/types';
+
 // This file contains validation schemas and types for data returned by the A+
 // API.
 
@@ -28,7 +30,7 @@ export const AplusExercisesResSchema = z.object({
     z.object({
       id: z.number().int(),
       display_name: z.string(),
-      closing_time: z.date(),
+      closing_time: DateSchema,
       exercises: z.array(
         z.object({
           id: z.number().int(),
