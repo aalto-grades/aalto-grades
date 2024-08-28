@@ -15,6 +15,7 @@ import {
 import {
   Box,
   Button,
+  CircularProgress,
   Grid,
   IconButton,
   List,
@@ -488,6 +489,13 @@ const CoursePartsView = (): JSX.Element => {
 
       <Grid container spacing={2}>
         <Grid item xs={4}>
+          {courseParts.data === undefined ? (
+            <CircularProgress />
+          ) : (
+            courseParts.data.length === 0 && (
+              <Typography>{t('course.parts.no-course-parts')}</Typography>
+            )
+          )}
           <List>
             {courseParts.data?.sort(sortCourseParts).map(coursePart => (
               <ListItem
