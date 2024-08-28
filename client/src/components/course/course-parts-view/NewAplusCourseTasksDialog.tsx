@@ -101,7 +101,7 @@ const NewAplusCourseTasksDialog = ({
 
   const handleCourseTaskChange = (
     index: number,
-    courseTaskEdit: EditCourseTaskData
+    courseTaskEdit: Omit<EditCourseTaskData, 'id'>
   ): void => {
     setCourseTasksWithSource(
       courseTasksWithSource.map(([courseTask, source], i) => {

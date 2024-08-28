@@ -45,7 +45,7 @@ const SelectAplusGradeSource = ({
     return false;
   };
 
-  if (aplusExerciseData.data === undefined) return <>{t('loading')}</>;
+  if (aplusExerciseData.data === undefined) return <>{t('general.loading')}</>;
 
   return (
     <>

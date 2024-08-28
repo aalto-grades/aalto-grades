@@ -109,12 +109,10 @@ const CalculateFinalGradesDialog = ({
 
   const getWarning = (model: GradingModelData | null): string => {
     if (model === null) return '';
-    if (model.hasArchivedCourseParts && model.hasDeletedCourseParts)
+    if (model.hasArchivedSources && model.hasDeletedSources)
       return t('course.results.model-has-deleted-and-archived');
-    if (model.hasArchivedCourseParts)
-      return t('course.results.model-has-archived');
-    if (model.hasDeletedCourseParts)
-      return t('course.results.model-has-deleted');
+    if (model.hasArchivedSources) return t('course.results.model-has-archived');
+    if (model.hasDeletedSources) return t('course.results.model-has-deleted');
     return '';
   };
 
@@ -139,8 +137,8 @@ const CalculateFinalGradesDialog = ({
         </Collapse>
         <Collapse
           in={
-            selectedModel?.hasDeletedCourseParts ||
-            selectedModel?.hasArchivedCourseParts
+            selectedModel?.hasDeletedSources ||
+            selectedModel?.hasArchivedSources
           }
         >
           <Alert sx={{mb: 2, mt: -1}} severity="warning">

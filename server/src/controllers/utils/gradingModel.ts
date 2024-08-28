@@ -2,13 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {type CoursePartData, HttpCode} from '@/common/types';
+import {
+  type CoursePartData,
+  type CourseTaskData,
+  HttpCode,
+} from '@/common/types';
 import {findAndValidateCourseId, findCourseById} from './course';
 import type Course from '../../database/models/course';
 import GradingModel from '../../database/models/gradingModel';
 import {ApiError, stringToIdSchema} from '../../types';
-
-// TODO: Add support for course part models
 
 /**
  * Finds a grading model by id.
@@ -29,32 +31,32 @@ export const findGradingModelById = async (
   return gradingModel;
 };
 
-/** Checks if grading model has deleted or archived course parts. */
-export const checkGradingModelCourseParts = (
+/** Checks if grading model has deleted or archived course sources. */
+export const checkGradingModelSources = (
   gradingModel: GradingModel,
-  courseParts: CoursePartData[]
-): {hasDeletedCourseParts: boolean; hasArchivedCourseParts: boolean} => {
+  sources: CourseTaskData[] | CoursePartData[]
+): {hasDeletedSources: boolean; hasArchivedSources: boolean} => {
   let hasDeleted = false;
   let hasArchived = false;
 
-  const modelCoursePartIds = [];
+  const modelSourceIds = [];
   for (const node of gradingModel.graphStructure.nodes) {
-    if (node.type !== 'coursepart') continue;
-    modelCoursePartIds.push(parseInt(node.id.split('-')[1]));
+    if (node.type !== 'source') continue;
+    modelSourceIds.push(parseInt(node.id.split('-')[1]));
   }
 
-  const coursePartIds = new Set(courseParts.map(coursePart => coursePart.id));
-  for (const coursePartId of modelCoursePartIds) {
-    if (!coursePartIds.has(coursePartId)) hasDeleted = true;
+  const sourceIds = new Set(sources.map(source => source.id));
+  for (const sourceId of modelSourceIds) {
+    if (!sourceIds.has(sourceId)) hasDeleted = true;
   }
-  for (const coursePart of courseParts) {
-    if (modelCoursePartIds.includes(coursePart.id) && coursePart.archived)
+  for (const source of sources) {
+    if (modelSourceIds.includes(source.id) && source.archived)
       hasArchived = true;
   }
 
   return {
-    hasDeletedCourseParts: hasDeleted,
-    hasArchivedCourseParts: hasArchived,
+    hasDeletedSources: hasDeleted,
+    hasArchivedSources: hasArchived,
   };
 };
 

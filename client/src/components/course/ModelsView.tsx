@@ -10,6 +10,7 @@ import {useTranslation} from 'react-i18next';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {
+  type CoursePartData,
   CourseRoleType,
   type GradingModelData,
   type GraphStructure,
@@ -24,11 +25,12 @@ import {
   useGetAllGradingModels,
   useGetCourse,
   useGetCourseParts,
+  useGetCourseTasks,
   useGetFinalGrades,
   useGetGrades,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
-import {getCourseRole} from '@/utils';
+import {findBestGrade, getCourseRole} from '@/utils';
 import CreateGradingModelDialog from './models-view/CreateGradingModelDialog';
 import MissingModelButton from './models-view/MissingModelButton';
 import ModelButton from './models-view/ModelButton';
@@ -42,6 +44,7 @@ const ModelsView = (): JSX.Element => {
   const navigate = useNavigate();
 
   const courseParts = useGetCourseParts(courseId);
+  const courseTasks = useGetCourseTasks(courseId);
   const allGradingModels = useGetAllGradingModels(courseId);
   const course = useGetCourse(courseId);
   const finalGrades = useGetFinalGrades(courseId, {
@@ -61,7 +64,10 @@ const ModelsView = (): JSX.Element => {
   const [currentUserRow, setCurrentUserRow] = useState<StudentRow | null>(null);
   const [loadGraphId, setLoadGraphId] = useState<number>(-1);
 
-  const [createDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState<{
+    open: boolean;
+    coursePart?: CoursePartData;
+  }>({open: false});
   const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
   const [editDialogModel, setEditDialogModel] =
     useState<GradingModelData | null>(null);
@@ -73,7 +79,7 @@ const ModelsView = (): JSX.Element => {
       // allGradingModels.data !== undefined
       allGradingModels.data?.toSorted(
         (m1, m2) => Number(m1.archived) - Number(m2.archived)
-      ) ?? [],
+      ) ?? null,
     // : undefined,
     [allGradingModels.data]
   );
@@ -81,7 +87,7 @@ const ModelsView = (): JSX.Element => {
   const coursePartsWithoutModels = useMemo(
     () =>
       courseParts.data?.filter(
-        part => !models.some(model => model.coursePartId === part.id)
+        part => !models?.some(model => model.coursePartId === part.id)
       ) ?? [],
     [courseParts.data, models]
   );
@@ -104,7 +110,7 @@ const ModelsView = (): JSX.Element => {
   useEffect(() => {
     if (loadGraphId === -1) return;
 
-    for (const model of models) {
+    for (const model of models!) {
       if (model.id === loadGraphId) {
         setCurrentModel(model);
         setGraphOpen(true);
@@ -143,6 +149,8 @@ const ModelsView = (): JSX.Element => {
 
   // Load modelId url param
   useEffect(() => {
+    if (models === null) return;
+
     // If modelId is undefined, unload current model
     if (modelId === undefined && currentModel !== null) {
       setCurrentModel(null);
@@ -220,13 +228,19 @@ const ModelsView = (): JSX.Element => {
     });
   };
 
-  if (courseParts.data === undefined) return <>{t('general.loading')}</>;
+  if (
+    courseParts.data === undefined ||
+    courseTasks.data === undefined ||
+    models === null
+  )
+    return <>{t('general.loading')}</>;
 
   return (
     <>
       <CreateGradingModelDialog
-        open={createDialogOpen}
-        onClose={() => setCreateDialogOpen(false)}
+        open={createDialogOpen.open}
+        onClose={() => setCreateDialogOpen({open: false})}
+        coursePart={createDialogOpen.coursePart}
         onSubmit={id => {
           allGradingModels.refetch();
           setLoadGraphId(id);
@@ -249,7 +263,7 @@ const ModelsView = (): JSX.Element => {
               <Button
                 sx={{mt: 1}}
                 variant="outlined"
-                onClick={() => setCreateDialogOpen(true)}
+                onClick={() => setCreateDialogOpen({open: true})}
               >
                 {t('course.models.create-new')}
               </Button>
@@ -297,7 +311,9 @@ const ModelsView = (): JSX.Element => {
                 <MissingModelButton
                   key={part.id}
                   part={part}
-                  onCreate={() => {}}
+                  onCreate={() =>
+                    setCreateDialogOpen({open: true, coursePart: part})
+                  }
                   // onClick={() => {
                   //   if (userId !== undefined)
                   //     navigate(`/${courseId}/models/${model.id}/${userId}`);
@@ -313,9 +329,20 @@ const ModelsView = (): JSX.Element => {
         <Graph
           key={currentModel.id} // Reset graph for each model
           initGraph={currentModel.graphStructure}
-          courseParts={courseParts.data}
-          userGrades={
-            currentUserRow === null ? null : currentUserRow.courseTasks
+          sources={
+            currentModel.coursePartId
+              ? courseTasks.data.filter(
+                  task => task.coursePartId === currentModel.coursePartId
+                )
+              : courseParts.data
+          }
+          sourceValues={
+            currentModel.coursePartId
+              ? (currentUserRow?.courseTasks.map(task => ({
+                  sourceId: task.courseTaskId,
+                  sourceValue: findBestGrade(task.grades)?.grade ?? 0,
+                })) ?? null)
+              : null // TODO
           }
           readOnly={!editRights}
           onSave={onSave}

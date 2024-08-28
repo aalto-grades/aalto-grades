@@ -84,7 +84,7 @@ const SelectAplusCourse = ({
     if (!selectedAplusCourse) setCourse(course.data?.courseCode);
   }, [course.data?.courseCode, selectedAplusCourse, setCourse]);
 
-  if (!course.data) return <>{t('loading')}</>;
+  if (!course.data) return <>{t('general.loading')}</>;
 
   return (
     <Box sx={{display: 'flex', mt: 1}}>

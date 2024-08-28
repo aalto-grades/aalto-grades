@@ -6,6 +6,7 @@ import type {Edge, Node} from 'reactflow';
 
 import type {
   CoursePartData,
+  CourseTaskData,
   CustomNodeTypes,
   FullNodeData,
   GraphStructure,
@@ -32,7 +33,8 @@ const createEdge = (
 
 export const initGraph = (
   template: GraphTemplate,
-  courseParts: CoursePartData[]
+  sources: CoursePartData[] | CourseTaskData[],
+  coursePart: CoursePartData | null = null
 ): GraphStructure => {
   const nodes: Node<object, CustomNodeTypes>[] = [
     {
@@ -41,9 +43,9 @@ export const initGraph = (
       position: {x: 1116, y: 0},
       data: {},
     },
-    ...courseParts.map(
-      (coursePart, index): Node<object, CustomNodeTypes> => ({
-        id: `source-${coursePart.id}`,
+    ...sources.map(
+      (source, index): Node<object, CustomNodeTypes> => ({
+        id: `source-${source.id}`,
         type: 'source',
         position: {x: 12, y: 173 * index},
         data: {},
@@ -52,12 +54,14 @@ export const initGraph = (
   ];
   const edges: Edge[] = [];
   const nodeData: FullNodeData = {
-    'final-grade': {title: 'Final grade'},
+    'final-grade': {
+      title: coursePart !== null ? coursePart.name : 'Final grade',
+    },
     ...Object.fromEntries(
-      courseParts.map(coursePart => [
-        `source-${coursePart.id}`,
+      sources.map(source => [
+        `source-${source.id}`,
         {
-          title: coursePart.name,
+          title: source.name,
           settings: {onFailSetting: 'fullfail', minPoints: null},
         },
       ])
@@ -75,9 +79,9 @@ export const initGraph = (
       position: {x: 437, y: 0},
       data: {},
     });
-    for (let i = 0; i < courseParts.length; i++) {
-      const coursePartNodeId = `source-${courseParts[i].id}`;
-      edges.push(createEdge(coursePartNodeId, middleNodeId, undefined, i));
+    for (let i = 0; i < sources.length; i++) {
+      const sourceNodeId = `source-${sources[i].id}`;
+      edges.push(createEdge(sourceNodeId, middleNodeId, undefined, i));
     }
     nodeData[middleNodeId] =
       template === 'addition'
@@ -86,9 +90,9 @@ export const initGraph = (
             title: 'Average',
             settings: {
               weights: Object.fromEntries(
-                courseParts.map((_, i) => [
+                sources.map((_, i) => [
                   `average-${i}`,
-                  Math.round((100 / courseParts.length) * 10) / 10,
+                  Math.round((100 / sources.length) * 10) / 10,
                 ])
               ),
               percentageMode: true,
@@ -114,8 +118,7 @@ export const initGraph = (
             : Array.from(
                 {length: 5},
                 (_, i) =>
-                  Math.round((((i + 1) * 10 * courseParts.length) / 6) * 10) /
-                  10
+                  Math.round((((i + 1) * 10 * sources.length) / 6) * 10) / 10
               ),
       },
     };

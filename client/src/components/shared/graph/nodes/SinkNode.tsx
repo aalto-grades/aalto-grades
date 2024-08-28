@@ -27,9 +27,9 @@ const SinkNode = (props: NodeProps): JSX.Element => {
         isConnectable={isConnectable}
       />
 
-      {/* Todo: what if not final grade */}
       <p className="output-value">
-        {t('general.final-grade')}: {Math.round(nodeValue.value * 100) / 100}
+        {t('shared.graph.node.value')}:{' '}
+        {Math.round(nodeValue.value * 100) / 100}
       </p>
     </BaseNode>
   );

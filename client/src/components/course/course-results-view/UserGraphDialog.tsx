@@ -22,6 +22,7 @@ import Graph from '@/components/shared/graph/Graph';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 import {useGetCourseParts} from '@/hooks/useApi';
+import {findBestGrade} from '@/utils';
 
 type PropsType = {
   open: boolean;
@@ -61,7 +62,7 @@ const UserGraphDialog = ({
           <Graph
             key={selectedModel.id} // Reset graph for each model
             initGraph={selectedModel.graphStructure}
-            courseParts={row.courseTasks.map(rowCourseTask => ({
+            sources={row.courseTasks.map(rowCourseTask => ({
               id: rowCourseTask.courseTaskId,
               name: rowCourseTask.courseTaskName,
               archived:
@@ -69,7 +70,10 @@ const UserGraphDialog = ({
                   coursePart => coursePart.id === rowCourseTask.courseTaskId // TODO: Fix
                 )?.archived ?? false,
             }))}
-            userGrades={row.courseTasks}
+            sourceValues={row.courseTasks.map(task => ({
+              sourceId: task.courseTaskId,
+              sourceValue: findBestGrade(task.grades)?.grade ?? 0,
+            }))}
             gradeSelectOption={gradeSelectOption}
             readOnly
           />

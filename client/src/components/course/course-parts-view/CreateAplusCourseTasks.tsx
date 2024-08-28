@@ -22,7 +22,10 @@ import type {
 
 type PropsType = {
   courseTasksWithSource: [NewCourseTaskData, NewAplusGradeSourceData][];
-  handleChange: (index: number, courseTask: EditCourseTaskData) => void;
+  handleChange: (
+    index: number,
+    courseTask: Omit<EditCourseTaskData, 'id'>
+  ) => void;
 };
 const CreateAplusCourseTasks = ({
   courseTasksWithSource,

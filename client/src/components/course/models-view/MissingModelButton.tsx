@@ -27,7 +27,7 @@ const MissingModelButton = ({
   // onDelete,
   // onClick,
 }: PropsType): JSX.Element => {
-  const {t: _} = useTranslation();
+  const {t} = useTranslation();
 
   // let warning = '';
   // if (model.hasArchivedCourseParts && model.hasDeletedCourseParts)
@@ -41,6 +41,7 @@ const MissingModelButton = ({
     <ListItem
       sx={{backgroundColor: grey[300]}}
       disablePadding
+      title={t('course.models.missing-part-model-create')}
       // secondaryAction={
       //   editRights ? (
       //     <>
