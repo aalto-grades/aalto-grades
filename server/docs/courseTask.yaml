@@ -1,0 +1,172 @@
+# SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+---
+definitions:
+  CourseTaskId:
+    type: integer
+    description: Internal course task database ID.
+    format: int32
+    minimum: 1
+    example: 1
+  CourseTaskName:
+    type: string
+    description: Name of the course task.
+    example: Exercise 1
+  CourseTaskDaysValid:
+    type: number
+    description: Number of days valid.
+    minimum: 1
+    example: 365
+  CourseTaskMaxGrade:
+    type: number
+    description: Maximum grade.
+    example: 25
+    nullable: true
+  CourseTaskArchived:
+    type: boolean
+    description: If the course task has been archived.
+    example: false
+
+  CourseTaskData:
+    description: Course task information.
+    type: object
+    properties:
+      id:
+        $ref: '#/definitions/CourseTaskId'
+      coursePartId:
+        $ref: '#/definitions/CoursePartId'
+      name:
+        $ref: '#/definitions/CourseTaskName'
+      daysValid:
+        $ref: '#/definitions/CourseTaskDaysValid'
+      maxGrade:
+        $ref: '#/definitions/CourseTaskMaxGrade'
+      archived:
+        $ref: '#/definitions/CourseTaskArchived'
+      aplusGradeSources:
+        type: array
+        description: A+ grade sources connected to the course task.
+        items:
+          $ref: '#/definitions/AplusGradeSourceData'
+    required:
+      - id
+      - coursePartId
+      - name
+      - daysValid
+      - maxGrade
+      - archived
+      - aplusGradeSources
+
+  NewCourseTaskData:
+    description: Course task information.
+    type: object
+    properties:
+      coursePartId:
+        $ref: '#/definitions/CoursePartId'
+      name:
+        $ref: '#/definitions/CourseTaskName'
+      daysValid:
+        $ref: '#/definitions/CourseTaskDaysValid'
+      maxGrade:
+        $ref: '#/definitions/CourseTaskMaxGrade'
+      archived:
+        $ref: '#/definitions/CourseTaskArchived'
+    required:
+      - coursePartId
+      - name
+      - daysValid
+      - maxGrade
+
+  EditCourseTaskData:
+    description: Course task information.
+    type: object
+    properties:
+      id:
+        $ref: '#/definitions/CourseTaskId'
+      name:
+        $ref: '#/definitions/CourseTaskName'
+      daysValid:
+        $ref: '#/definitions/CourseTaskDaysValid'
+      maxGrade:
+        $ref: '#/definitions/CourseTaskMaxGrade'
+      archived:
+        $ref: '#/definitions/CourseTaskArchived'
+    required:
+      - id
+
+  ModifyCourseTasks:
+    description: Course tasks to be added, edited, and deleted.
+    type: object
+    properties:
+      add:
+        type: array
+        description: Course tasks to be added.
+        items:
+          $ref: '#/definitions/NewCourseTaskData'
+      edit:
+        type: array
+        description: Course tasks to be edited.
+        items:
+          $ref: '#/definitions/EditCourseTaskData'
+      delete:
+        type: array
+        description: Course tasks to be deleted.
+        items:
+          $ref: '#/definitions/CourseTaskId'
+
+/v1/courses/{courseId}/tasks:
+  get:
+    tags: [Course Task]
+    description: Get all the course tasks of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+    responses:
+      200:
+        description: Returns all course tasks of the course.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/CourseTaskData'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+  post:
+    tags: [Course Task]
+    description: Add, edit, and delete course tasks.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/ModifyCourseTasks'
+    responses:
+      200:
+        description: Course tasks added, edited, or deleted.
+        content:
+          application/json:
+            schema:
+              type: array
+              description: >
+                Potentially empty list of the new IDs of the added course parts.
+              items:
+                $ref: '#/definitions/CoursePartId'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+

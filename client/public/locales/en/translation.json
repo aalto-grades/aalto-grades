@@ -202,6 +202,7 @@
       "select-for-fetching": "Select the course parts you want to fetch grades for from A+.",
       "fetching-grades-wait": "Fetching grades from A+, this may take a few minutes...",
       "saved": "Course parts saved successfully",
+      "a+-disabled": "Adding A+ grade sources is disabled while there are unsaved changes",
       "add-a+-source": "Add A+ grade source",
       "view-a+-sources": "View A+ grade sources",
       "unarchive": "Unarchive course part",
@@ -211,9 +212,9 @@
       "valid-until": "Valid until",
       "archived": "Archived",
       "add-new-task": "Add new course task",
-      "add-new-part": "Add new course part",
       "add-from-a+": "Add course tasks from A+",
       "no-course-parts": "No course parts. Please add course parts to get started.",
+      "add-new-part": "Add new course part",
       "open-part-graph": "Open course part graph",
       "edit-part": "Edit course part",
       "no-expiry-date": "No expiry date"

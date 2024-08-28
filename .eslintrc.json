@@ -32,6 +32,7 @@
       "ignorePackages",
       {"ts": "never", "tsx": "never"}
     ],
+    "import/newline-after-import": "warn",
     "import/no-unresolved": "warn",
     "import/no-named-as-default-member": "off",
     "import/order": [
