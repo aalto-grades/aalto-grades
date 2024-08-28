@@ -28,11 +28,8 @@ import {APLUS_API_URL} from '../configs/environment';
 import AplusGradeSource from '../database/models/aplusGradeSource';
 import {
   ApiError,
-  AplusCoursesRes,
   AplusCoursesResSchema,
-  AplusExercisesRes,
   AplusExercisesResSchema,
-  AplusPointsRes,
   AplusPointsResSchema,
   AplusStudentPoints,
   Endpoint,
@@ -48,7 +45,7 @@ export const fetchAplusCourses: Endpoint<void, AplusCourseData[]> = async (
   res
 ) => {
   const aplusToken = parseAplusToken(req);
-  const coursesRes = await fetchFromAplus<AplusCoursesRes>(
+  const coursesRes = await fetchFromAplus(
     `${APLUS_API_URL}/users/me`,
     aplusToken,
     AplusCoursesResSchema
@@ -82,7 +79,7 @@ export const fetchAplusExerciseData: Endpoint<void, AplusExerciseData> = async (
   const aplusToken = parseAplusToken(req);
   const aplusCourseId = validateAplusCourseId(req.params.aplusCourseId);
 
-  const exercisesRes = await fetchFromAplus<AplusExercisesRes>(
+  const exercisesRes = await fetchFromAplus(
     `${APLUS_API_URL}/courses/${aplusCourseId}/exercises?format=json`,
     aplusToken,
     AplusExercisesResSchema
@@ -277,7 +274,7 @@ export const fetchAplusGrades: Endpoint<void, NewTaskGrade[]> = async (
       const aplusCourseId = gradeSource.aplusCourse.id;
 
       if (!(aplusCourseId in pointsResCache)) {
-        const pointsRes = await fetchFromAplus<AplusPointsRes>(
+        const pointsRes = await fetchFromAplus(
           `${APLUS_API_URL}/courses/${aplusCourseId}/points?format=json`,
           aplusToken,
           AplusPointsResSchema
