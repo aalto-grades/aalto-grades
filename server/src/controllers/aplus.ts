@@ -38,7 +38,7 @@ import {
 /**
  * () => AplusCourseData[]
  *
- * @throws ApiError(502)
+ * @throws ApiError(404|502)
  */
 export const fetchAplusCourses: Endpoint<void, AplusCourseData[]> = async (
   req,
