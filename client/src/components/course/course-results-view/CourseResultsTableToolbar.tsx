@@ -27,8 +27,8 @@ import {type StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateGraph} from '@/common/util';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
-import {useAddFinalGrades} from '@/hooks/api/finalGrade';
 import {
+  useAddFinalGrades,
   useGetAllGradingModels,
   useGetCourse,
   useGetGrades,

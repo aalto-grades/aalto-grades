@@ -26,8 +26,11 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
-import {useGetCourseTasks} from '@/hooks/api/courseTask';
-import {useAddGrades, useFetchAplusGrades} from '@/hooks/useApi';
+import {
+  useAddGrades,
+  useFetchAplusGrades,
+  useGetCourseTasks,
+} from '@/hooks/useApi';
 import {getAplusToken} from '@/utils';
 
 type PropsType = {

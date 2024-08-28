@@ -16,8 +16,7 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import type {NewTaskGrade} from '@/common/types';
-import {useGetCourseTasks} from '@/hooks/api/courseTask';
-import {useAddGrades} from '@/hooks/useApi';
+import {useAddGrades, useGetCourseTasks} from '@/hooks/useApi';
 import UploadDialogConfirm from './UploadDialogConfirm';
 import UploadDialogUpload from './UploadDialogUpload';
 

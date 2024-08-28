@@ -40,8 +40,7 @@ import FormField from '@/components/shared/FormikField';
 import FormLanguagesField from '@/components/shared/FormikLanguageField';
 import SaveBar from '@/components/shared/SaveBar';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
-import {useGetFinalGrades} from '@/hooks/api/finalGrade';
-import {useEditCourse, useGetCourse} from '@/hooks/useApi';
+import {useEditCourse, useGetCourse, useGetFinalGrades} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import {useLocalize} from '@/hooks/useLocalize';
 import {

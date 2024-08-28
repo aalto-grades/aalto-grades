@@ -37,8 +37,9 @@ import {
   useAddFinalGrades,
   useDeleteFinalGrade,
   useEditFinalGrade,
-} from '@/hooks/api/finalGrade';
-import {useGetAllGradingModels, useGetCourse} from '@/hooks/useApi';
+  useGetAllGradingModels,
+  useGetCourse,
+} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import {findBestFinalGrade, getMaxFinalGrade} from '@/utils';
 

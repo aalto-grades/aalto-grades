@@ -51,13 +51,11 @@ import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
   useAddCourseTask,
   useDeleteCourseTask,
-  useEditCourseTask,
-  useGetCourseTasks,
-} from '@/hooks/api/courseTask';
-import {
   useEditCoursePart,
+  useEditCourseTask,
   useGetAllGradingModels,
   useGetCourseParts,
+  useGetCourseTasks,
   useGetGrades,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';

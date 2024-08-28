@@ -18,13 +18,13 @@ import {
 } from '@/common/types';
 import Graph from '@/components/shared/graph/Graph';
 import {simplifyNode} from '@/components/shared/graph/graphUtil';
-import {useGetFinalGrades} from '@/hooks/api/finalGrade';
 import {
   useDeleteGradingModel,
   useEditGradingModel,
   useGetAllGradingModels,
   useGetCourse,
   useGetCourseParts,
+  useGetFinalGrades,
   useGetGrades,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';

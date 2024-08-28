@@ -21,8 +21,11 @@ import type {
 } from '@/common/types';
 import {aplusGradeSourcesEqual} from '@/common/util';
 import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
-import {useAddCourseTask} from '@/hooks/api/courseTask';
-import {useAddAplusGradeSources, useFetchAplusCourses} from '@/hooks/useApi';
+import {
+  useAddAplusGradeSources,
+  useAddCourseTask,
+  useFetchAplusCourses,
+} from '@/hooks/useApi';
 import {getAplusToken} from '@/utils';
 import CreateAplusCourseTasks from './CreateAplusCourseTasks';
 import SelectAplusCourse from './SelectAplusCourse';

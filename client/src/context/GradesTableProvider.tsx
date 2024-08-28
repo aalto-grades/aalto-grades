@@ -43,11 +43,11 @@ import FinalGradeCell from '@/components/course/course-results-view/table/FinalG
 import GradeCell from '@/components/course/course-results-view/table/GradeCell';
 import PredictedGradeCell from '@/components/course/course-results-view/table/PredictedGradeCell';
 import PrettyChip from '@/components/shared/PrettyChip';
-import {useGetCourseTasks} from '@/hooks/api/courseTask';
 import {
   useGetAllGradingModels,
   useGetCourse,
   useGetCourseParts,
+  useGetCourseTasks,
 } from '@/hooks/useApi';
 import {
   findBestFinalGrade,
