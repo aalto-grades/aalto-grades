@@ -87,7 +87,7 @@ const CustomNodeTypesSchema = z.enum([
   'stepper',
   'substitute',
 ]);
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const DropInNodesSchema = CustomNodeTypesSchema.exclude([
   'coursepart',
   'grade',

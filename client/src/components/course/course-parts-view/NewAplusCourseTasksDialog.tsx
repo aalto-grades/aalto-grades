@@ -21,8 +21,11 @@ import {
 } from '@/common/types';
 import {aplusGradeSourcesEqual} from '@/common/util';
 import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
-import {useAddCourseTask} from '@/hooks/api/courseTask';
-import {useAddAplusGradeSources, useFetchAplusCourses} from '@/hooks/useApi';
+import {
+  useAddAplusGradeSources,
+  useFetchAplusCourses,
+  useModifyCourseTasks,
+} from '@/hooks/useApi';
 import {getAplusToken} from '@/utils';
 import CreateAplusCourseTasks from './CreateAplusCourseTasks';
 import SelectAplusCourse from './SelectAplusCourse';
@@ -44,7 +47,7 @@ const NewAplusCourseTasksDialog = ({
   const aplusCourses = useFetchAplusCourses({
     enabled: Boolean(getAplusToken()),
   });
-  const addCourseTask = useAddCourseTask(courseId);
+  const modifyCourseTasks = useModifyCourseTasks(courseId);
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
   const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
@@ -125,15 +128,16 @@ const NewAplusCourseTasksDialog = ({
   };
 
   const handleSubmit = async (): Promise<void> => {
-    const sources: NewAplusGradeSourceData[] = [];
-    for (const [courseTask, source] of courseTasksWithSource) {
-      sources.push({
-        ...source,
-        courseTaskId: await addCourseTask.mutateAsync(courseTask),
-      });
-    }
+    const courseTasks = courseTasksWithSource.map(([courseTask]) => courseTask);
+    const sources = courseTasksWithSource.map(([, source]) => source);
 
-    await addAplusGradeSources.mutateAsync(sources);
+    const newIds = await modifyCourseTasks.mutateAsync({add: courseTasks});
+    const newSources = newIds.map((courseTaskId, i) => ({
+      ...sources[i],
+      courseTaskId,
+    }));
+
+    await addAplusGradeSources.mutateAsync(newSources);
   };
 
   return (
