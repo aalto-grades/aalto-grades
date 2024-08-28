@@ -150,18 +150,18 @@ class CreateData {
   }
 
   async createCourseTask(coursePartId: number): Promise<CourseTaskData> {
-    const newCoursePart = await CourseTask.create({
+    const newCourseTask = await CourseTask.create({
       coursePartId,
       name: `Exercise ${this.freeCourseTaskId++}`,
     });
 
     return {
-      id: newCoursePart.id,
+      id: newCourseTask.id,
       coursePartId,
-      name: newCoursePart.name,
-      daysValid: newCoursePart.daysValid,
-      maxGrade: newCoursePart.maxGrade,
-      archived: newCoursePart.archived,
+      name: newCourseTask.name,
+      daysValid: newCourseTask.daysValid,
+      maxGrade: newCourseTask.maxGrade,
+      archived: newCourseTask.archived,
       aplusGradeSources: [],
     };
   }

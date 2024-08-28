@@ -31,11 +31,11 @@ export const getCourseTasks: Endpoint<void, CourseTaskData[]> = async (
 };
 
 /**
- * (ModifyCourseTasks) => void
+ * (ModifyCourseTasks) => number[]
  *
  * @throws ApiError(400|404|409)
  */
-export const modifyCourseTasks: Endpoint<ModifyCourseTasks, unknown> = async (
+export const modifyCourseTasks: Endpoint<ModifyCourseTasks, number[]> = async (
   req,
   res
 ) => {
