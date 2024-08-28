@@ -213,6 +213,7 @@
       "add-new-task": "Add new course task",
       "add-new-part": "Add new course part",
       "add-from-a+": "Add course tasks from A+",
+      "no-course-parts": "No course parts. Please add course parts to get started.",
       "open-part-graph": "Open course part graph",
       "edit-part": "Edit course part",
       "no-expiry-date": "No expiry date"
