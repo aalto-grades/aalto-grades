@@ -23,7 +23,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["vite/client", "vitest/globals"]
+    "types": ["vite/client"]
   },
   "include": ["src", "translation-utils.ts", "vite-env.d.ts", "vite.config.ts"]
 }

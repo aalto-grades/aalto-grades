@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-/// <reference types="vitest" />
 // import * as path from 'path';
 import react from '@vitejs/plugin-react';
 import fs from 'fs';
@@ -58,14 +57,6 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['common'],
-  },
-  test: {
-    environment: 'jsdom',
-    setupFiles: './src/tests/setup.ts',
-    include: ['./**/*.test.ts', './**/*.test.tsx'],
-    globals: true,
-    testTimeout: 100000,
-    css: true,
   },
   build: {
     outDir: './build',

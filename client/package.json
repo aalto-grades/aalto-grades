@@ -26,7 +26,6 @@
     "i18next": "^23.12.2",
     "i18next-browser-languagedetector": "^8.0.0",
     "i18next-http-backend": "^2.5.2",
-    "msw": "^2.0.13",
     "mui-one-time-password-input": "^2.0.3",
     "notistack": "^3.0.1",
     "papaparse": "^5.4.1",
@@ -42,10 +41,8 @@
   },
   "scripts": {
     "start": "vite",
-    "test": "vitest run",
     "build": "tsc && vite build",
     "preview": "vite preview --port 3005",
-    "vitest-preview": "vitest-preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --fix",
     "trans-parse": "npx i18next 'src/**/*.{ts,tsx}' -c i18next-parser.config.js -o 'public/locales/$LOCALE/$NAMESPACE.json'",
@@ -70,9 +67,6 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.2.0",
-    "@testing-library/react": "^16.0.0",
-    "@testing-library/user-event": "^14.5.2",
     "@types/dompurify": "^3.0.5",
     "@types/node": "^22.1.0",
     "@types/papaparse": "^5.3.14",
@@ -85,7 +79,6 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "i18next-parser": "^9.0.1",
-    "jsdom": "^24.0.0",
     "license-checker-rseidelsohn": "^4.2.6",
     "readline-sync": "^1.4.10",
     "rollup-plugin-license": "^3.2.0",
@@ -94,8 +87,6 @@
     "tsx": "^4.17.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.11",
-    "vite-tsconfig-paths": "^5.0.1",
-    "vitest": "^2.0.3",
-    "vitest-preview": "^0.0.1"
+    "vite-tsconfig-paths": "^5.0.1"
   }
 }
