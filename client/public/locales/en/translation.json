@@ -364,7 +364,7 @@
       "new-model": "New grading model",
       "create-new": "Create new",
       "back": "Back to models",
-      "no-models": "No models",
+      "no-models": "No grading models. Please add grading models in order to calculate the grades of students.",
       "unarchive": "Unarchive grading model",
       "archive": "Archive grading model",
       "cannot-delete-with-final": "Cannot delete a model with final grades",
