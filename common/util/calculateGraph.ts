@@ -87,15 +87,13 @@ export const initNode = (
     case 'sink':
       return {
         value: {type, source: 0, value: 0, courseFail: false},
-        //  TODO: title
-        data: {title: 'Grade'},
+        data: {title: 'unused'}, // This .data should never be used
       };
     case 'source':
       return {
         value: {type, source: 0, value: 0, courseFail: false},
         data: {
-          // TODO: title
-          title: 'Course part',
+          title: 'unused', // This .data should never be used
           settings: {onFailSetting: 'fullfail', minPoints: 0},
         },
       };
@@ -450,7 +448,7 @@ export const batchCalculateGraph = (
     for (const student of studentData) {
       if (!(student.userId in nodeValues)) nodeValues[student.userId] = {};
 
-      const nodeType = node.type as CustomNodeTypes;
+      const nodeType = node.type!;
       nodeValues[student.userId][node.id] = initNode(nodeType).value;
       const nodeValue = nodeValues[student.userId][node.id];
       if (nodeValue.type !== 'source') continue;

@@ -128,7 +128,7 @@ const initGraphFn = (
   const initNodeValues = Object.fromEntries(
     initGraph.nodes.map(node => [
       node.id,
-      initNode(node.type as CustomNodeTypes, node.id, initGraph.edges).value,
+      initNode(node.type!, node.id, initGraph.edges).value,
     ])
   );
 

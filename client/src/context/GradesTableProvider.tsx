@@ -79,10 +79,6 @@ declare module '@tanstack/table-core' {
   }
 }
 
-export type GroupedStudentRow = {
-  latestBestGrade: string;
-} & ExtendedStudentRow;
-
 export type RowError =
   | {
       type: 'Error';
@@ -109,6 +105,10 @@ export type RowErrorType = RowError['type'];
 export type ExtendedStudentRow = StudentRow & {
   predictedFinalGrades?: {[key: number]: {finalGrade: number}};
   errors?: RowError[];
+};
+
+export type GroupedStudentRow = ExtendedStudentRow & {
+  latestBestGrade: string;
 };
 
 /**
@@ -138,7 +138,7 @@ const findPreviouslyExportedToSisu = (
 
 const columnHelper = createColumnHelper<GroupedStudentRow>();
 
-type PropsType = PropsWithChildren & {data: StudentRow[]};
+type PropsType = {data: StudentRow[]} & PropsWithChildren;
 export const GradesTableProvider = ({
   data,
   children,

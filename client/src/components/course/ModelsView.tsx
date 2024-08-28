@@ -76,11 +76,9 @@ const ModelsView = (): JSX.Element => {
   // Sort models by archived status
   const models = useMemo(
     () =>
-      // allGradingModels.data !== undefined
       allGradingModels.data?.toSorted(
         (m1, m2) => Number(m1.archived) - Number(m2.archived)
       ) ?? null,
-    // : undefined,
     [allGradingModels.data]
   );
 
@@ -314,11 +312,6 @@ const ModelsView = (): JSX.Element => {
                   onCreate={() =>
                     setCreateDialogOpen({open: true, coursePart: part})
                   }
-                  // onClick={() => {
-                  //   if (userId !== undefined)
-                  //     navigate(`/${courseId}/models/${model.id}/${userId}`);
-                  //   else navigate(`/${courseId}/models/${model.id}`);
-                  // }}
                 />
               ))}
           </List>

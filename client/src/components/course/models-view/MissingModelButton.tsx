@@ -5,6 +5,8 @@ import {useTranslation} from 'react-i18next';
 
 import type {CoursePartData} from '@/common/types';
 
+// TODO: Clean up
+
 type PropsType = {
   part: CoursePartData;
   onCreate: () => void;
