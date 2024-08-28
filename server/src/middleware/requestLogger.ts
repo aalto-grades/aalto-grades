@@ -5,12 +5,42 @@
 import type {Request, RequestHandler} from 'express';
 import morgan from 'morgan';
 
+import {
+  ChangeOwnAuthDataSchema,
+  LoginDataSchema,
+  ResetOwnPasswordDataSchema,
+} from '@/common/types';
 import httpLogger from '../configs/winston';
 
 morgan.token('remote-addr', req => {
   return (req.headers['x-real-ip'] ||
     req.headers['x-forwarded-for'] ||
     req.socket.remoteAddress) as string;
+});
+morgan.token('user', (req: Request) => JSON.stringify(req.user));
+morgan.token('params', (req: Request) => JSON.stringify(req.params));
+morgan.token('body', (req: Request) => {
+  // Check for request bodies which contain plaintext passwords
+  const login = LoginDataSchema.safeParse(req.body);
+  if (login.success) {
+    return JSON.stringify({...login.data, password: 'omitted'});
+  }
+
+  const resetOwnPassword = ResetOwnPasswordDataSchema.safeParse(req.body);
+  if (resetOwnPassword.success) {
+    return JSON.stringify({
+      ...resetOwnPassword.data,
+      password: 'omitted',
+      newPassword: 'omitted',
+    });
+  }
+
+  const changeOwnAuth = ChangeOwnAuthDataSchema.safeParse(req.body);
+  if (changeOwnAuth.success) {
+    return JSON.stringify({...changeOwnAuth.data, newPassword: 'omitted'});
+  }
+
+  return JSON.stringify(req.body);
 });
 
 /**
@@ -26,11 +56,6 @@ morgan.token('remote-addr', req => {
  * allowing for uniformity in log handling, and enabling any additional
  * configurations (like file logging) made in winston.
  */
-
-morgan.token('user', (req: Request) => JSON.stringify(req.user));
-morgan.token('params', (req: Request) => JSON.stringify(req.params));
-morgan.token('body', (req: Request) => JSON.stringify(req.body));
-
 export const requestLogger: RequestHandler = morgan(
   ':remote-addr :remote-user ":method :url HTTP/:http-version"' +
     ' :status :res[content-length] ":referrer" ":user-agent" ":user" ":params" ":body"',

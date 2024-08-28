@@ -15,9 +15,8 @@ import {
 import {
   type CourseTaskData,
   CourseTaskDataArraySchema,
-  type EditCourseTaskData,
-  IdSchema,
-  type NewCourseTaskData,
+  IdArraySchema,
+  type ModifyCourseTasks,
 } from '@/common/types';
 import type {Numeric} from '@/types';
 import axios from './axios';
@@ -35,74 +34,22 @@ export const useGetCourseTasks = (
     ...options,
   });
 
-export const useAddCourseTask = (
+export const useModifyCourseTasks = (
   courseId: Numeric,
-  options?: UseMutationOptions<number, unknown, NewCourseTaskData>
-): UseMutationResult<number, unknown, NewCourseTaskData> => {
+  options?: UseMutationOptions<number[], unknown, ModifyCourseTasks>
+): UseMutationResult<number[], unknown, ModifyCourseTasks> => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async courseTask =>
-      IdSchema.parse(
-        (await axios.post(`/api/v1/courses/${courseId}/tasks`, courseTask)).data
+    mutationFn: async modifications =>
+      IdArraySchema.parse(
+        (await axios.post(`/api/v1/courses/${courseId}/tasks`, modifications))
+          .data
       ),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['course-tasks', courseId],
-      });
-    },
-    ...options,
-  });
-};
-
-type EditCourseTaskVars = {
-  courseTaskId: Numeric;
-  courseTask: EditCourseTaskData;
-};
-export const useEditCourseTask = (
-  courseId: Numeric,
-  options?: UseMutationOptions<void, unknown, EditCourseTaskVars>
-): UseMutationResult<void, unknown, EditCourseTaskVars> => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async vars =>
-      axios.put(
-        `/api/v1/courses/${courseId}/tasks/${vars.courseTaskId}`,
-        vars.courseTask
-      ),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['course-tasks', courseId],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['all-grading-models', courseId],
-      });
-    },
-    ...options,
-  });
-};
-
-export const useDeleteCourseTask = (
-  courseId: Numeric,
-  options?: UseMutationOptions<void, unknown, Numeric>
-): UseMutationResult<void, unknown, Numeric> => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async courseTaskId =>
-      axios.delete(`/api/v1/courses/${courseId}/tasks/${courseTaskId}`),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['course-tasks', courseId],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['all-grading-models', courseId],
       });
     },
     ...options,

@@ -93,7 +93,7 @@ describe('Test GET /v1/courses/:courseId/parts - get all course parts', () => {
     }
   });
 
-  it('should respond with 400 if id is invalid', async () => {
+  it('should respond with 400 if ID is invalid', async () => {
     const url = '/v1/courses/bad/parts';
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });

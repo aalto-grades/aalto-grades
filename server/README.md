@@ -10,32 +10,29 @@ SPDX-License-Identifier: MIT
 
 ### Setting up the database
 
-> If the command `npm install` fails on Apple Silicon, check that there are NO spaces in the folder path
+> If the command `npm i` fails on Apple Silicon, check that there are NO spaces
+> in the folder path
 
-#### Running the database (and pgAdmin) with docker
+#### Running the database (and pgAdmin) with Docker
 
-For development purposes, you can easily run the database and pgadmin in docker
-and then start node server locally in development mode.
+For development purposes, you can easily run the database and pgAdmin in Docker
+and then start Node server locally in development mode.
 
-Start the database and pgadmin:
+Start the database and pgAdmin:
 
 ```
 docker compose up database pgadmin
 ```
 
-pgAdmin will be available at http://localhost:5050.
-
-When you are done with these stop the container and run:
+When you are done run the following command to remove the containers:
 
 ```
 docker compose down --remove-orphans
 ```
 
-to remove containers.
+#### Running the migrations and seeder
 
-#### Running the migrations and the seed
-
-copy `.env.example` to `.env`:
+Copy `.env.example` to `.env`:
 
 ```
 cp .env.example .env
@@ -47,13 +44,13 @@ Install the packages:
 npm i
 ```
 
-Build the server to be able to run the migrations and the seed:
+Build the server to be able to run the migrations and seeder:
 
 ```
 npm run build
 ```
 
-Run migrations and seeder:
+Run the migrations and seeder:
 
 ```
 npm run migration:up
@@ -72,7 +69,7 @@ The backend will be available at http://localhost:3000.
 
 ### Running with Docker
 
-You can also run the server and database using Docker:
+You can also run both the server and database using Docker simultaneously:
 
 ```
 docker compose up
@@ -82,8 +79,8 @@ docker compose up
 
 The Docker Compose configuration will also start
 [pgAdmin](https://www.pgadmin.org/docs/pgadmin4/latest/index.html)
-for accessing and configuring database using a browser. pgAdmin will be
-available at http://localhost:5050.
+for accessing and configuring the database using a browser. pgAdmin will be
+available at http://localhost:5050 after running it as described previously.
 
 Login credentials for pgAdmin:
 
@@ -99,10 +96,14 @@ Grades database. If prompted, use the password `postgres` to connect.
 framework. Additionally, [supertest](https://www.npmjs.com/package/supertest)
 is used for testing API functionality.
 
-The easiest way to run the tests is with Docker using the Docker Compose
-configuration located in this directory.
+You may run the tests by starting the database as described previously and then
+running:
 
-Execute Docker Compose to run the tests:
+```
+npm run test
+```
+
+You may also run the tests using Docker Compose:
 
 ```
 docker compose -f docker-compose-test.yaml up --abort-on-container-exit --exit-code-from backend

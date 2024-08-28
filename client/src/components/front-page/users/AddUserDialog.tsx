@@ -67,6 +67,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
     if (!values.admin) {
       resetForm();
       onClose();
+      return;
     }
 
     setUserData({...values, temporaryPassword: res.temporaryPassword!});

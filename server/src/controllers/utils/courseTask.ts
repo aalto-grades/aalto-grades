@@ -58,7 +58,7 @@ export const findCourseTaskByCourseId = async (
 };
 
 /**
- * Finds a course task by url param id and also validates the url param.
+ * Finds a course task by url param ID and also validates the URL param.
  *
  * @throws ApiError(400|404) if not found.
  */
@@ -76,7 +76,7 @@ const findAndValidateCourseTaskId = async (
 };
 
 /**
- * Validates that a course task id belongs to a course.
+ * Validates that a course task ID belongs to a course.
  *
  * @throws ApiError(404|409) if course task not found or doesn't belong to the
  *   course.
@@ -99,8 +99,8 @@ export const validateCourseTaskBelongsToCourse = async (
 };
 
 /**
- * Finds the course, course part, and the course task by url param ids and also
- * validates the url params.
+ * Finds the course, course part, and the course task by URL param IDs and also
+ * validates the URL params.
  *
  * @throws ApiError(400|404|409) if either not found or invalid or if the course
  *   task does not belong to the course.

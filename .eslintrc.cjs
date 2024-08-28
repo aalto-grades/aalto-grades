@@ -24,6 +24,7 @@ module.exports = {
       'ignorePackages',
       {ts: 'never', tsx: 'never'},
     ],
+    'import/newline-after-import': 'warn',
     'import/no-named-as-default-member': 'off',
     'import/no-unresolved': 'warn',
     'import/order': [
