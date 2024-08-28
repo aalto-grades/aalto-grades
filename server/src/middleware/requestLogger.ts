@@ -5,6 +5,11 @@
 import {Request, RequestHandler} from 'express';
 import morgan from 'morgan';
 
+import {
+  ChangeOwnAuthDataSchema,
+  LoginDataSchema,
+  ResetOwnPasswordDataSchema,
+} from '@/common/types';
 import httpLogger from '../configs/winston';
 
 morgan.token('remote-addr', req => {
@@ -14,7 +19,29 @@ morgan.token('remote-addr', req => {
 });
 morgan.token('user', (req: Request) => JSON.stringify(req.user));
 morgan.token('params', (req: Request) => JSON.stringify(req.params));
-morgan.token('body', (req: Request) => JSON.stringify(req.body));
+morgan.token('body', (req: Request) => {
+  // Check for request bodies which contain plaintext passwords
+  const login = LoginDataSchema.safeParse(req.body);
+  if (login.success) {
+    return JSON.stringify({...login.data, password: 'omitted'});
+  }
+
+  const resetOwnPassword = ResetOwnPasswordDataSchema.safeParse(req.body);
+  if (resetOwnPassword.success) {
+    return JSON.stringify({
+      ...resetOwnPassword.data,
+      password: 'omitted',
+      newPassword: 'omitted',
+    });
+  }
+
+  const changeOwnAuth = ChangeOwnAuthDataSchema.safeParse(req.body);
+  if (changeOwnAuth.success) {
+    return JSON.stringify({...changeOwnAuth.data, newPassword: 'omitted'});
+  }
+
+  return JSON.stringify(req.body);
+});
 
 /**
  * Log messages for incoming HTTP requests to the Express server. Morgan formats
