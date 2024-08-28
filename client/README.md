@@ -29,19 +29,9 @@ server. Please see `server/README.md` for instructions on running the server.
 
 ## Tests
 
-**The tests are broken and will probably be deleted in the future.**
-
-Install the packages:
-
-```
-npm i
-```
-
-Start the test runner:
-
-```
-npm test
-```
+There are no tests specifically for the client because all of the test cases
+can be covered just as well or better with end-to-end tests. See the
+`e2e-tests` directory at the root of the repository for more information.
 
 ## Translation utils
 
