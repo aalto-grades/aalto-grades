@@ -32,6 +32,7 @@ import StaticPageView from './components/StaticPageView';
 import StudentsView from './components/StudentsView';
 import CourseContainer from './components/course/CourseContainer';
 import CoursePartsView from './components/course/CoursePartsView';
+import CourseRedirect from './components/course/CourseRedirect';
 import CourseResultsView from './components/course/CourseResultsView';
 import EditCourseView from './components/course/EditCourseView';
 import ModelsView from './components/course/ModelsView';
@@ -298,9 +299,8 @@ const router = createBrowserRouter([
             path: '/:courseId',
             children: [
               {
-                // Temporary default view
                 index: true,
-                element: <CourseResultsView />,
+                element: <CourseRedirect />,
               },
               {
                 path: '/:courseId/course-results',

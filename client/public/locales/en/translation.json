@@ -216,6 +216,7 @@
       "add-new-task": "Add new course task",
       "add-from-a+": "Add course tasks from A+",
       "add-new-part": "Add new course part",
+      "no-course-parts": "No course parts. Please add course parts to get started.",
       "open-part-graph": "Open course part graph",
       "edit-part": "Edit course part",
       "no-expiry-date": "No expiry date"
@@ -372,7 +373,7 @@
       "new-model": "New grading model",
       "create-new": "Create new",
       "back": "Back to models",
-      "no-models": "No models"
+      "no-models": "No grading models. Please add grading models in order to calculate the grades of students."
     },
     "list": "Course list"
   },
