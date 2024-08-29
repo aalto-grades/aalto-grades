@@ -309,7 +309,7 @@ const ModelsView = (): JSX.Element => {
                 <MissingModelButton
                   key={part.id}
                   part={part}
-                  onCreate={() =>
+                  onClick={() =>
                     setCreateDialogOpen({open: true, coursePart: part})
                   }
                 />

@@ -169,4 +169,3 @@ definitions:
         $ref: '#/components/responses/NotFound'
       409:
         $ref: '#/components/responses/Conflict'
-
