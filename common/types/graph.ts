@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import type {Node} from 'reactflow';
 import {z} from 'zod';
 
 // Types without schemas (not in API)
@@ -24,13 +25,13 @@ export type MinPointsNodeValue = {
   type: 'minpoints';
   source: number;
   value: number | 'fail';
-  courseFail: boolean;
+  fullFail: boolean;
 };
 export type RequireNodeValue = {
   type: 'require';
   sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
   values: {[key: string]: number | 'fail'};
-  courseFail: boolean;
+  fullFail: boolean;
 };
 export type RoundNodeValue = {
   type: 'round';
@@ -41,13 +42,13 @@ export type SinkNodeValue = {
   type: 'sink';
   source: number;
   value: number;
-  courseFail: boolean;
+  fullFail: boolean;
 };
 export type SourceNodeValue = {
   type: 'source';
   source: number;
   value: number | 'fail';
-  courseFail: boolean;
+  fullFail: boolean;
 };
 export type StepperNodeValue = {
   type: 'stepper';
@@ -187,3 +188,8 @@ export type NodeData = z.infer<typeof NodeDataSchema>;
 export type FullNodeData = z.infer<typeof FullNodeDataSchema>;
 
 export type GraphStructure = z.infer<typeof GraphStructureSchema>;
+
+// Types without schemas
+export type TypedNode = Node<object, CustomNodeTypes>;
+export type GraphSource = {id: number; name: string; archived: boolean};
+export type GraphSourceValue = {id: number; value: number};

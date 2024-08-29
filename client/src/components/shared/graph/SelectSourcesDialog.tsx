@@ -14,10 +14,8 @@ import {
 } from '@mui/material';
 import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import type {Node} from 'reactflow';
 
-import type {CustomNodeTypes} from '@/common/types';
-import type {GraphSource} from '@/components/shared/graph/Graph';
+import type {GraphSource, TypedNode} from '@/common/types';
 
 const SelectSourcesDialog = ({
   nodes,
@@ -26,7 +24,7 @@ const SelectSourcesDialog = ({
   onClose,
   handleSourceSelect,
 }: {
-  nodes: Node<object, CustomNodeTypes>[];
+  nodes: TypedNode[];
   sources: GraphSource[];
   open: boolean;
   onClose: () => void;

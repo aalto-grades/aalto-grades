@@ -332,8 +332,8 @@ const ModelsView = (): JSX.Element => {
           sourceValues={
             currentModel.coursePartId
               ? (currentUserRow?.courseTasks.map(task => ({
-                  sourceId: task.courseTaskId,
-                  sourceValue: findBestGrade(task.grades)?.grade ?? 0,
+                  id: task.courseTaskId,
+                  value: findBestGrade(task.grades)?.grade ?? 0,
                 })) ?? null)
               : null // TODO
           }

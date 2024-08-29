@@ -18,7 +18,7 @@ const SinkNode = (props: NodeProps): JSX.Element => {
   const nodeValue = nodeValues[id] as SinkNodeValue;
 
   return (
-    <BaseNode {...props} courseFail={nodeValue.courseFail}>
+    <BaseNode {...props} fullFail={nodeValue.fullFail}>
       <Handle
         type="target"
         id={id}

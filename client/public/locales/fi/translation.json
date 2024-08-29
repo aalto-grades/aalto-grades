@@ -72,7 +72,7 @@
       "value": "UNTRANSLATED",
       "min-points": "UNTRANSLATED",
       "on-fail": "UNTRANSLATED",
-      "fail-course": "UNTRANSLATED",
+      "full-fail": "UNTRANSLATED",
       "output-fail": "UNTRANSLATED",
       "output": "UNTRANSLATED",
       "allowed-fails": "UNTRANSLATED",

@@ -12,10 +12,8 @@ import {
 } from '@mui/material';
 import {type ChangeEvent, type JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import type {Node} from 'reactflow';
 
-import type {CustomNodeTypes, NodeValues} from '@/common/types';
-import type {GraphSource} from '@/components/shared/graph/Graph';
+import type {GraphSource, NodeValues, TypedNode} from '@/common/types';
 
 const testFloat = (val: string): boolean => /^\d+(?:\.\d+?)?$/.test(val);
 
@@ -27,7 +25,7 @@ const SourceValuesDialog = ({
   onClose,
   handleSetSourceValues,
 }: {
-  nodes: Node<object, CustomNodeTypes>[];
+  nodes: TypedNode[];
   nodeValues: NodeValues;
   sources: GraphSource[];
   open: boolean;

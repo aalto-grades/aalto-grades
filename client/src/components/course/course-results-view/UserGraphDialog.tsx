@@ -71,8 +71,8 @@ const UserGraphDialog = ({
                 )?.archived ?? false,
             }))}
             sourceValues={row.courseTasks.map(task => ({
-              sourceId: task.courseTaskId,
-              sourceValue: findBestGrade(task.grades)?.grade ?? 0,
+              id: task.courseTaskId,
+              value: findBestGrade(task.grades)?.grade ?? 0,
             }))}
             gradeSelectOption={gradeSelectOption}
             readOnly

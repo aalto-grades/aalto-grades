@@ -102,8 +102,11 @@ export type RowError =
     };
 export type RowErrorType = RowError['type'];
 
+export type PredictedGraphValues = {
+  [key: number]: {courseParts: {[key: string]: number}; finalValue: number};
+};
 export type ExtendedStudentRow = StudentRow & {
-  predictedFinalGrades?: {[key: number]: {finalGrade: number}};
+  predictedGraphValues?: PredictedGraphValues;
   errors?: RowError[];
 };
 
@@ -436,13 +439,13 @@ export const GradesTableProvider = ({
         if (modelId === 'any') return 0; // Makes no sense to sort if there is more than one model
 
         const valA =
-          a.getValue<GroupedStudentRow>(columnId).predictedFinalGrades?.[
+          a.getValue<GroupedStudentRow>(columnId).predictedGraphValues?.[
             modelId
-          ].finalGrade;
+          ].finalValue;
         const valB =
-          b.getValue<GroupedStudentRow>(columnId).predictedFinalGrades?.[
+          b.getValue<GroupedStudentRow>(columnId).predictedGraphValues?.[
             modelId
-          ].finalGrade;
+          ].finalValue;
 
         if (valB === undefined) return 1;
         if (valA === undefined) return -1;

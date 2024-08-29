@@ -429,26 +429,25 @@ const CourseResultsTableToolbar = (): JSX.Element => {
 
     enqueueSnackbar(t('course.results.calculating-final'), {variant: 'info'});
     const finalGrades = batchCalculateGraph(
-      model.graphStructure,
+      model,
+      gradingModels!,
       selectedRows.map(selectedRow => ({
         userId: selectedRow.user.id,
-        courseParts: selectedRow.courseTasks.map(courseTask => ({
-          coursePartId: courseTask.courseTaskId, // TODO: Broken
-          grade:
-            findBestGrade(courseTask.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Manage expired course parts
+        courseTasks: selectedRow.courseTasks.map(task => ({
+          id: task.courseTaskId,
+          // TODO: Manage expired course tasks?
+          grade: findBestGrade(task.grades, {gradeSelectOption})?.grade ?? 0,
         })),
       }))
     );
     for (const grade of Object.values(finalGrades)) {
       const maxFinalGrade = getMaxFinalGrade(course.data.gradingScale);
       const Schema = z.number().int().min(0).max(maxFinalGrade);
-      const result = Schema.safeParse(grade.finalGrade);
+      const result = Schema.safeParse(grade.finalValue);
       if (!result.success) {
         enqueueSnackbar(
-          t('course.results.invalid-final', {grade: grade.finalGrade}),
-          {
-            variant: 'error',
-          }
+          t('course.results.invalid-final', {grade: grade.finalValue}),
+          {variant: 'error'}
         );
         return false;
       }
@@ -457,7 +456,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       selectedRows.map(selectedRow => ({
         userId: selectedRow.user.id,
         gradingModelId,
-        grade: finalGrades[selectedRow.user.id].finalGrade,
+        grade: finalGrades[selectedRow.user.id].finalValue,
         date: dateOverride ? gradingDate : findLatestGrade(selectedRow),
         comment: null,
       }))

@@ -72,7 +72,7 @@ const SourceNode = (props: NodeProps): JSX.Element => {
   };
 
   return (
-    <BaseNode {...props} error={error} courseFail={nodeValue.courseFail}>
+    <BaseNode {...props} error={error} fullFail={nodeValue.fullFail}>
       <div>
         <label>{t('shared.graph.min-points')}: </label>
         <input
@@ -89,7 +89,7 @@ const SourceNode = (props: NodeProps): JSX.Element => {
             onChange={handleSelectChange}
             value={localSettings.onFailSetting}
           >
-            <option value="fullfail">{t('shared.graph.fail-course')}</option>
+            <option value="fullfail">{t('shared.graph.full-fail')}</option>
             <option value="fail">{t('shared.graph.output-fail')}</option>
           </select>
         </div>

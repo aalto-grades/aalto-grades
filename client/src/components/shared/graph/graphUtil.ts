@@ -4,13 +4,11 @@
 
 import ElkConstructor from 'elkjs/lib/elk.bundled';
 import type {TFunction} from 'i18next';
-import type {Connection, Edge, Node} from 'reactflow';
+import type {Connection, Edge} from 'reactflow';
 
-import type {CustomNodeTypes, DropInNodes, NodeValues} from '@/common/types';
+import type {DropInNodes, NodeValues, TypedNode} from '@/common/types';
 
-export const simplifyNode = (
-  node: Node<object, CustomNodeTypes>
-): Node<object, CustomNodeTypes> => ({
+export const simplifyNode = (node: TypedNode): TypedNode => ({
   id: node.id,
   type: node.type,
   position: {
@@ -126,7 +124,7 @@ export const isValidConnection = (
 
 export const findDisconnectedEdges = (
   oldNodeValues: NodeValues,
-  nodes: Node<object, CustomNodeTypes>[],
+  nodes: TypedNode[],
   edges: Edge[]
 ): Edge[] => {
   const nodeSources: {[key: string]: Set<string>} = {};
@@ -190,10 +188,10 @@ export const findDisconnectedEdges = (
 const elk = new ElkConstructor();
 
 export const formatGraph = async (
-  nodes: Node<object, CustomNodeTypes>[],
+  nodes: TypedNode[],
   edges: Edge[],
   nodeValues: NodeValues
-): Promise<Node<object, CustomNodeTypes>[]> => {
+): Promise<TypedNode[]> => {
   const nodesForElk = nodes.map(node => ({
     type: node.type,
     id: node.id,

@@ -12,7 +12,7 @@ import {ExtraNodeDataContext, NodeDataContext} from '@/context/GraphProvider';
 type PropsType = PropsWithChildren<
   NodeProps & {
     error?: boolean;
-    courseFail?: boolean;
+    fullFail?: boolean;
   }
 >;
 
@@ -21,7 +21,7 @@ const BaseNode = ({
   type,
   selected,
   error = false,
-  courseFail = false,
+  fullFail = false,
   children,
 }: PropsType): JSX.Element => {
   const {nodeData, setNodeTitle} = useContext(NodeDataContext);
@@ -31,7 +31,7 @@ const BaseNode = ({
   const extraData = extraNodeData[id];
 
   const getBorderColor = (): string => {
-    if (courseFail) return '2px solid #e00';
+    if (fullFail) return '2px solid #e00';
     if (error) return '1px dashed #e00';
     if (extraData?.warning) return '1px solid #ffb833';
     return '1px solid #eee';

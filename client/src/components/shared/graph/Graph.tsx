@@ -41,12 +41,15 @@ import type {
   CustomNodeTypes,
   DropInNodes,
   FullNodeData,
+  GraphSource,
+  GraphSourceValue,
   GraphStructure,
   NodeSettings,
   NodeValues,
   SourceNodeValue,
+  TypedNode,
 } from '@/common/types';
-import {calculateNewNodeValues, initNode} from '@/common/util';
+import {calculateNodeValues, initNode} from '@/common/util';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
   type ExtraNodeData,
@@ -81,8 +84,8 @@ import SubstituteNode from './nodes/SubstituteNode';
 // And show course task / course part
 
 type NodeState = [
-  Node<object, CustomNodeTypes>[],
-  Dispatch<SetStateAction<Node<object, CustomNodeTypes>[]>>,
+  TypedNode[],
+  Dispatch<SetStateAction<TypedNode[]>>,
   (changes: NodeChange[]) => void,
 ];
 
@@ -100,8 +103,6 @@ const nodeTypesMap: {
   stepper: StepperNode,
   substitute: SubstituteNode,
 };
-
-export type GraphSource = {id: number; name: string; archived: boolean};
 
 // Load graph for the first time
 const initGraphFn = (
@@ -138,7 +139,7 @@ const initGraphFn = (
 type GraphProps = {
   initGraph: GraphStructure;
   sources: GraphSource[];
-  sourceValues: {sourceId: number; sourceValue: number}[] | null;
+  sourceValues: GraphSourceValue[] | null;
   gradeSelectOption?: GradeSelectOption;
   onSave?: (graphStructure: GraphStructure) => Promise<void>;
   readOnly?: boolean;
@@ -170,7 +171,7 @@ const Graph = ({
 
   // Used to check for changes
   const [lastState, setLastState] = useState<{
-    nodes: Node<object, CustomNodeTypes>[];
+    nodes: TypedNode[];
     edges: Edge[];
     nodeSettings: {[key: string]: NodeSettings | undefined};
     nodeValues: NodeValues;
@@ -240,7 +241,7 @@ const Graph = ({
         edge => !disconnectedEdges.includes(edge)
       );
 
-      const newNodeValues: NodeValues = calculateNewNodeValues(
+      const newNodeValues: NodeValues = calculateNodeValues(
         nodeValues,
         nodeData,
         nodes,
@@ -292,12 +293,12 @@ const Graph = ({
     let change = false;
 
     for (const sourceValue of sourceValues) {
-      const sourceId = `source-${sourceValue.sourceId}`;
+      const sourceId = `source-${sourceValue.id}`;
       if (!(sourceId in newNodeValues)) continue;
 
       const newValue = newNodeValues[sourceId] as SourceNodeValue;
-      if (newValue.value !== sourceValue.sourceValue) {
-        newValue.source = sourceValue.sourceValue;
+      if (newValue.value !== sourceValue.value) {
+        newValue.source = sourceValue.value;
         change = true;
       }
     }
@@ -423,7 +424,7 @@ const Graph = ({
       while (nodeId in nodeTypeMap) nodeId = `dnd-${type}-${getId()}`; // To prevent duplicates from loading existing graph
 
       const initState = initNode(type);
-      const newNode: Node<object, CustomNodeTypes> = {
+      const newNode: TypedNode = {
         id: nodeId,
         type,
         position,
@@ -443,8 +444,8 @@ const Graph = ({
   );
 
   const dragAndDropNodes = getDragAndDropNodes(t);
-  const courseFail = Object.values(nodeValues).find(
-    nodeVal => 'courseFail' in nodeVal && nodeVal.courseFail
+  const fullFail = Object.values(nodeValues).find(
+    nodeVal => 'fullFail' in nodeVal && nodeVal.fullFail
   );
   return (
     <>
@@ -494,7 +495,7 @@ const Graph = ({
             </Alert>
           </Tooltip>
         )}
-        {courseFail && (
+        {fullFail && (
           <Alert
             sx={{
               position: 'absolute',
