@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Box, Typography} from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {
   useParams,
   unstable_useViewTransitionState as useViewTransitionState,
@@ -22,11 +22,11 @@ const CourseResultsView = (): JSX.Element => {
 
   return (
     <Box textAlign="left" alignItems="left">
-      <Typography width={'fit-content'} variant="h2">
+      <Typography width="fit-content" variant="h2">
         Grades
       </Typography>
 
-      {gradesQuery.data && !isTransitioning && (
+      {gradesQuery.data !== undefined && !isTransitioning && (
         <Delayed>
           <GradesTableProvider data={gradesQuery.data}>
             <CourseResultsTableToolbar />

@@ -4,7 +4,11 @@
 
 import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
 
-import {CourseTaskData, HttpCode, ModifyCourseTasks} from '@/common/types';
+import {
+  type CourseTaskData,
+  HttpCode,
+  type ModifyCourseTasks,
+} from '@/common/types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {validateCoursePartBelongsToCourse} from './utils/coursePart';
 import {
@@ -13,7 +17,7 @@ import {
 } from './utils/courseTask';
 import {sequelize} from '../database';
 import CourseTask from '../database/models/courseTask';
-import {ApiError, Endpoint} from '../types';
+import {ApiError, type Endpoint} from '../types';
 
 /**
  * () => CourseTaskData[]

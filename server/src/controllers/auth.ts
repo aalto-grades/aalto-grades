@@ -4,27 +4,27 @@
 
 import {HashAlgorithms} from '@otplib/core/';
 import * as argon from 'argon2';
-import {Request, RequestHandler} from 'express';
+import type {Request, RequestHandler} from 'express';
 import {readFileSync} from 'fs';
 import generator from 'generate-password';
 import jwt from 'jsonwebtoken';
 import {authenticator} from 'otplib';
 import passport from 'passport';
-import {Strategy as JWTStrategy, VerifiedCallback} from 'passport-jwt';
-import {IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
+import {Strategy as JWTStrategy, type VerifiedCallback} from 'passport-jwt';
+import {type IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
 
 import {
-  AuthData,
-  ChangeOwnAuthData,
-  ChangeOwnAuthResponse,
-  ConfirmMfaData,
+  type AuthData,
+  type ChangeOwnAuthData,
+  type ChangeOwnAuthResponse,
+  type ConfirmMfaData,
   HttpCode,
-  LoginData,
-  LoginResult,
+  type LoginData,
+  type LoginResult,
   PasswordSchema,
-  ResetAuthData,
-  ResetAuthResult,
-  ResetOwnPasswordData,
+  type ResetAuthData,
+  type ResetAuthResult,
+  type ResetOwnPasswordData,
 } from '@/common/types';
 import {validateLogin} from './utils/auth';
 import {getSamlStrategy} from './utils/saml';
@@ -35,10 +35,10 @@ import httpLogger from '../configs/winston';
 import User from '../database/models/user';
 import {
   ApiError,
-  Endpoint,
-  JwtClaims,
-  LoginCallback,
-  SyncEndpoint,
+  type Endpoint,
+  type JwtClaims,
+  type LoginCallback,
+  type SyncEndpoint,
 } from '../types';
 
 // Set TOTP codes to use sha512 instead of sha1

@@ -9,11 +9,11 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {
+import type {
   AplusCourseData,
   AplusGradeSourceData,
   NewAplusGradeSourceData,
@@ -63,14 +63,14 @@ const AddAplusGradeSourceDialog = ({
           <DialogTitle>{t('course.parts.select-grade-source')}</DialogTitle>
         )}
         <DialogContent>
-          {step === 0 && aplusCourses.data && (
+          {step === 0 && aplusCourses.data !== undefined && (
             <SelectAplusCourse
               aplusCourses={aplusCourses.data}
               selectedAplusCourse={aplusCourse}
               setAplusCourse={setAplusCourse}
             />
           )}
-          {step === 1 && aplusCourse && (
+          {step === 1 && aplusCourse !== null && (
             <SelectAplusGradeSource
               aplusCourse={aplusCourse}
               aplusGradeSources={aplusGradeSources}

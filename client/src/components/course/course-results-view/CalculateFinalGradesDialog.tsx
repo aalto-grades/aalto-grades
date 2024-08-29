@@ -20,16 +20,16 @@ import {
 } from '@mui/material';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs, {Dayjs} from 'dayjs';
+import dayjs, {type Dayjs} from 'dayjs';
 import 'dayjs/locale/en-gb';
 import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {GradingModelData, StudentRow} from '@/common/types';
-import {GroupedStudentRow} from '@/context/GradesTableProvider';
+import type {GradingModelData, StudentRow} from '@/common/types';
+import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useGetAllGradingModels} from '@/hooks/useApi';
-import {GradeSelectOption, getErrorTypes} from '@/utils';
+import {type GradeSelectOption, getErrorTypes} from '@/utils';
 
 type PropsType = {
   open: boolean;
@@ -109,12 +109,10 @@ const CalculateFinalGradesDialog = ({
 
   const getWarning = (model: GradingModelData | null): string => {
     if (model === null) return '';
-    if (model.hasArchivedCourseParts && model.hasDeletedCourseParts)
+    if (model.hasArchivedSources && model.hasDeletedSources)
       return t('course.results.model-has-deleted-and-archived');
-    if (model.hasArchivedCourseParts)
-      return t('course.results.model-has-archived');
-    if (model.hasDeletedCourseParts)
-      return t('course.results.model-has-deleted');
+    if (model.hasArchivedSources) return t('course.results.model-has-archived');
+    if (model.hasDeletedSources) return t('course.results.model-has-deleted');
     return '';
   };
 
@@ -139,8 +137,8 @@ const CalculateFinalGradesDialog = ({
         </Collapse>
         <Collapse
           in={
-            selectedModel?.hasDeletedCourseParts ||
-            selectedModel?.hasArchivedCourseParts
+            selectedModel?.hasDeletedSources ||
+            selectedModel?.hasArchivedSources
           }
         >
           <Alert sx={{mb: 2, mt: -1}} severity="warning">

@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AplusDifficulty,
-  AplusExercise,
-  AplusGradeSourceData,
+  type AplusDifficulty,
+  type AplusExercise,
+  type AplusGradeSourceData,
   AplusGradeSourceType,
-  AplusModule,
-  NewAplusGradeSourceData,
+  type AplusModule,
+  type NewAplusGradeSourceData,
 } from '../types';
 
 export const aplusGradeSourcesEqual = (

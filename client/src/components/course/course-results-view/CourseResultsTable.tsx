@@ -4,12 +4,96 @@
 
 import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
 import {Badge, Icon, IconButton} from '@mui/material';
-import {flexRender} from '@tanstack/react-table';
+import {type Cell, type Row, flexRender} from '@tanstack/react-table';
 import {useVirtualizer} from '@tanstack/react-virtual';
-import {JSX, useRef} from 'react';
+import {type JSX, useRef} from 'react';
 
 import PrettyChip from '@/components/shared/PrettyChip';
+import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
+
+const RenderCell = ({
+  row,
+  cell,
+}: {
+  row: Row<GroupedStudentRow>;
+  cell: Cell<GroupedStudentRow, unknown>;
+}): JSX.Element => {
+  // If it's a grouped cell, add an expander and row count
+  if (cell.getIsGrouped()) {
+    return (
+      <>
+        {/* <Badge
+          badgeContent={row.getIsExpanded() ? null : row.subRows.length}
+          color="primary"
+        >
+          <IconButton
+            size="small"
+            color="primary"
+            onClick={row.getToggleExpandedHandler()}
+            disabled={!row.getCanExpand()}
+          >
+            {row.getIsExpanded() ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        </Badge> */}
+        <PrettyChip onClick={row.getToggleExpandedHandler()} position="first">
+          <>
+            <Badge
+              badgeContent={row.getIsExpanded() ? null : row.subRows.length}
+              color="primary"
+            >
+              <IconButton
+                size="small"
+                color="primary"
+                // onClick={row.getToggleExpandedHandler()}
+                disabled={!row.getCanExpand()}
+              >
+                {row.getIsExpanded() ? <ExpandLess /> : <ExpandMore />}
+              </IconButton>
+            </Badge>
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </>
+        </PrettyChip>
+        {/* {flexRender(cell.column.columnDef.cell, cell.getContext())} */}
+        {/* ({row.subRows.length}) */}
+      </>
+    );
+  }
+
+  // If the cell is aggregated, use the Aggregated renderer for cell
+  if (cell.getIsAggregated()) {
+    return (
+      <>
+        {flexRender(
+          cell.column.columnDef.aggregatedCell ?? cell.column.columnDef.cell,
+          cell.getContext()
+        )}
+      </>
+    );
+  }
+
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  if (cell.getIsPlaceholder()) return <></>;
+
+  if (cell.getValue() === undefined) {
+    return <>{flexRender(cell.column.columnDef.cell, cell.getContext())}</>;
+  }
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderBottom: '1px solid lightgray',
+        height: '100%',
+        width: '100%',
+      }}
+    >
+      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+    </div>
+  );
+};
 
 // TODO: Better column definitions
 // TODO: Better typing and freeze how to access data
@@ -107,16 +191,13 @@ const CourseResultsTable = (): JSX.Element => {
                           )}
                           {!header.column.getCanSort() ? null : (
                             <Icon>
-                              <>
-                                {{
-                                  asc: <ArrowUpward />,
-                                  desc: (
-                                    <ArrowUpward style={{rotate: '180deg'}} />
-                                  ),
-                                }[header.column.getIsSorted() as string] ?? (
-                                  <Sort></Sort>
-                                )}
-                              </>
+                              {header.column.getIsSorted() === 'asc' ? (
+                                <ArrowUpward />
+                              ) : header.column.getIsSorted() === 'desc' ? (
+                                <ArrowUpward style={{rotate: '180deg'}} />
+                              ) : (
+                                <Sort />
+                              )}
                             </Icon>
                           )}
                         </>
@@ -151,117 +232,21 @@ const CourseResultsTable = (): JSX.Element => {
                     zIndex: row.getIsGrouped() ? 5 : 'auto',
                   }}
                 >
-                  {row.getVisibleCells().map(cell => {
-                    return (
-                      <td
-                        key={cell.id}
-                        style={{
-                          padding: '0px',
-                          height: '50px',
-                          textAlign: 'center',
-                          display: 'flex',
-                          width: cell.column.getSize(),
-                          zIndex: 1,
-                        }}
-                      >
-                        {cell.getIsGrouped() ? (
-                          // If it's a grouped cell, add an expander and row count
-                          <>
-                            {/* <Badge
-                          badgeContent={
-                            row.getIsExpanded() ? null : row.subRows.length
-                          }
-                          color="primary"
-                        >
-                          <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={row.getToggleExpandedHandler()}
-                            disabled={!row.getCanExpand()}
-                          >
-                            {row.getIsExpanded() ? (
-                              <ExpandLess />
-                            ) : (
-                              <ExpandMore />
-                            )}
-                          </IconButton>
-                        </Badge> */}
-                            <PrettyChip
-                              onClick={row.getToggleExpandedHandler()}
-                              position="first"
-                            >
-                              <>
-                                <Badge
-                                  badgeContent={
-                                    row.getIsExpanded()
-                                      ? null
-                                      : row.subRows.length
-                                  }
-                                  color="primary"
-                                >
-                                  <IconButton
-                                    size="small"
-                                    color="primary"
-                                    // onClick={row.getToggleExpandedHandler()}
-                                    disabled={!row.getCanExpand()}
-                                  >
-                                    {row.getIsExpanded() ? (
-                                      <ExpandLess />
-                                    ) : (
-                                      <ExpandMore />
-                                    )}
-                                  </IconButton>
-                                </Badge>
-                                {flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext()
-                                )}
-                              </>
-                            </PrettyChip>
-                            {/* {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )} */}
-                            {/* ({row.subRows.length}) */}
-                          </>
-                        ) : cell.getIsAggregated() ? (
-                          // If the cell is aggregated, use the Aggregated
-                          // renderer for cell
-                          flexRender(
-                            cell.column.columnDef.aggregatedCell ??
-                              cell.column.columnDef.cell,
-                            cell.getContext()
-                          )
-                        ) : cell.getIsPlaceholder() ? null : ( // For cells with repeated values, render null
-                          // Otherwise, just render the regular cell
-                          <>
-                            {cell.getValue() === undefined ? (
-                              flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext()
-                              )
-                            ) : (
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  borderBottom: '1px solid lightgray',
-                                  height: '100%',
-                                  width: '100%',
-                                }}
-                              >
-                                {flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext()
-                                )}
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </td>
-                    );
-                  })}
+                  {row.getVisibleCells().map(cell => (
+                    <td
+                      key={cell.id}
+                      style={{
+                        padding: '0px',
+                        height: '50px',
+                        textAlign: 'center',
+                        display: 'flex',
+                        width: cell.column.getSize(),
+                        zIndex: 1,
+                      }}
+                    >
+                      <RenderCell row={row} cell={cell} />
+                    </td>
+                  ))}
                 </tr>
               );
             })}

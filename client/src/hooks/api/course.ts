@@ -3,24 +3,24 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult,
+  type UseMutationOptions,
+  type UseMutationResult,
+  type UseQueryOptions,
+  type UseQueryResult,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
 
 import {
-  CourseData,
+  type CourseData,
   CourseDataArraySchema,
   CourseDataSchema,
-  EditCourseData,
+  type EditCourseData,
   IdSchema,
-  NewCourseData,
+  type NewCourseData,
 } from '@/common/types';
-import {Numeric} from '@/types';
+import type {Numeric} from '@/types';
 import axios from './axios';
 
 export const useGetCourse = (
@@ -69,7 +69,7 @@ export const useEditCourse = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: vars =>
+    mutationFn: async vars =>
       axios.put(`/api/v1/courses/${vars.courseId}`, vars.course),
 
     onSuccess: (_data: unknown, vars: EditCourseVars) => {

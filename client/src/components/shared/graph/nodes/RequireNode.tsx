@@ -2,15 +2,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {JSX, useContext, useState} from 'react';
+import {type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
+import {
+  Handle,
+  type NodeProps,
+  Position,
+  useUpdateNodeInternals,
+} from 'reactflow';
 
-import {RequireNodeSettings, RequireNodeValue} from '@/common/types';
+import type {RequireNodeSettings, RequireNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
-type LocalSettings = {numFail: string; onFailSetting: 'coursefail' | 'fail'};
+type LocalSettings = {numFail: string; onFailSetting: 'fullfail' | 'fail'};
 const handleStartHeight = 128.5;
 const rowHeight = 33.9;
 
@@ -19,7 +24,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;
 
   const updateNodeInternals = useUpdateNodeInternals();
-  const {nodeValues} = useContext(NodeValuesContext);
+  const nodeValues = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const settings = nodeData[id].settings as RequireNodeSettings;
@@ -83,7 +88,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
     if (localSettings.onFailSetting === event.target.value) return;
     const newLocalSettings = {
       ...localSettings,
-      onFailSetting: event.target.value as 'coursefail' | 'fail',
+      onFailSetting: event.target.value as 'fullfail' | 'fail',
     };
     setLocalSettings(newLocalSettings);
     if (
@@ -104,7 +109,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
   );
 
   return (
-    <BaseNode {...props} error={error} courseFail={nodeValue.courseFail}>
+    <BaseNode {...props} error={error} fullFail={nodeValue.fullFail}>
       {handles.map((key, index) => (
         <Handle
           key={key}
@@ -137,7 +142,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
           onChange={handleSelectChange}
           value={localSettings.onFailSetting}
         >
-          <option value="coursefail">{t('shared.graph.fail-course')}</option>
+          <option value="fullfail">{t('shared.graph.full-fail')}</option>
           <option value="fail">{t('shared.graph.output-fail')}</option>
         </select>
       </div>
@@ -182,8 +187,8 @@ const RequireNode = (props: NodeProps): JSX.Element => {
               </tr>
             ))}
           <tr style={{height: rowHeight}}>
-            <td></td>
-            <td></td>
+            <td />
+            <td />
           </tr>
         </tbody>
       </table>

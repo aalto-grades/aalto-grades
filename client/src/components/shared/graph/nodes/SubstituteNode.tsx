@@ -2,11 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {JSX, useContext, useEffect, useState} from 'react';
+import {type JSX, useContext, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
+import {
+  Handle,
+  type NodeProps,
+  Position,
+  useUpdateNodeInternals,
+} from 'reactflow';
 
-import {SubstituteNodeSettings, SubstituteNodeValue} from '@/common/types';
+import type {SubstituteNodeSettings, SubstituteNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
@@ -45,7 +50,8 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;
 
   const updateNodeInternals = useUpdateNodeInternals();
-  const {nodeValues} = useContext(NodeValuesContext);
+  const nodeValues = useContext(NodeValuesContext);
+
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const settings = nodeData[id].settings as SubstituteNodeSettings;
@@ -248,8 +254,8 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
               </tr>
             ))}
           <tr style={{height: rowHeight}}>
-            <td></td>
-            <td></td>
+            <td />
+            <td />
           </tr>
         </tbody>
       </table>
@@ -294,8 +300,8 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
               </tr>
             ))}
           <tr style={{height: rowHeight}}>
-            <td></td>
-            <td></td>
+            <td />
+            <td />
           </tr>
         </tbody>
       </table>

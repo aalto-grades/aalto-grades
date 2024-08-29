@@ -2,25 +2,25 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ChangeEvent, JSX, useContext, useState} from 'react';
+import {type ChangeEvent, type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Handle, NodeProps, Position} from 'reactflow';
+import {Handle, type NodeProps, Position} from 'reactflow';
 
-import {CoursePartNodeSettings, CoursePartNodeValue} from '@/common/types';
+import type {SourceNodeSettings, SourceNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
-type OnFailSetting = 'coursefail' | 'fail';
+type OnFailSetting = 'fullfail' | 'fail';
 type LocalSettings = {onFailSetting: OnFailSetting; minPoints: string};
 
-const CoursePartNode = (props: NodeProps): JSX.Element => {
+const SourceNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
   const {id, isConnectable} = props;
 
-  const {nodeValues} = useContext(NodeValuesContext);
+  const nodeValues = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
-  const settings = nodeData[id].settings as CoursePartNodeSettings;
+  const settings = nodeData[id].settings as SourceNodeSettings;
   const initSettings = {
     ...settings,
     minPoints: settings.minPoints !== null ? settings.minPoints.toString() : '',
@@ -29,7 +29,7 @@ const CoursePartNode = (props: NodeProps): JSX.Element => {
     useState<LocalSettings>(initSettings);
   const [error, setError] = useState<boolean>(false);
 
-  const nodeValue = nodeValues[id] as CoursePartNodeValue;
+  const nodeValue = nodeValues[id] as SourceNodeValue;
 
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>): void => {
     if (localSettings.onFailSetting === event.target.value) return;
@@ -72,7 +72,7 @@ const CoursePartNode = (props: NodeProps): JSX.Element => {
   };
 
   return (
-    <BaseNode {...props} error={error} courseFail={nodeValue.courseFail}>
+    <BaseNode {...props} error={error} fullFail={nodeValue.fullFail}>
       <div>
         <label>{t('shared.graph.min-points')}: </label>
         <input
@@ -89,7 +89,7 @@ const CoursePartNode = (props: NodeProps): JSX.Element => {
             onChange={handleSelectChange}
             value={localSettings.onFailSetting}
           >
-            <option value="coursefail">{t('shared.graph.fail-course')}</option>
+            <option value="fullfail">{t('shared.graph.full-fail')}</option>
             <option value="fail">{t('shared.graph.output-fail')}</option>
           </select>
         </div>
@@ -112,4 +112,4 @@ const CoursePartNode = (props: NodeProps): JSX.Element => {
   );
 };
 
-export default CoursePartNode;
+export default SourceNode;

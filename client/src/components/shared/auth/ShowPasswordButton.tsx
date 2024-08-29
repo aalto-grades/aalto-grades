@@ -4,7 +4,7 @@
 
 import {Visibility, VisibilityOff} from '@mui/icons-material';
 import {IconButton, InputAdornment, Tooltip} from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
 type ButtonPropsType = {shown: boolean; onClick: () => void};

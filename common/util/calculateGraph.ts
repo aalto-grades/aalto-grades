@@ -2,310 +2,25 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Edge, Node} from 'reactflow';
+import type {Edge} from 'reactflow';
 
-import {
-  AverageNodeSettings,
-  CoursePartNodeSettings,
-  CustomNodeTypes,
+import {initNodeValues, updateNodeValue} from './graphCalculationUtil';
+import type {GradingModelData} from '../types';
+import type {
   FullNodeData,
-  GraphStructure,
-  MaxNodeSettings,
-  MinPointsNodeSettings,
-  NodeData,
-  NodeValue,
   NodeValues,
-  RequireNodeSettings,
-  RoundNodeSettings,
-  StepperNodeSettings,
-  SubstituteNodeSettings,
+  SinkNodeValue,
+  TypedNode,
 } from '../types/graph';
 
-export const initNode = (
-  type: CustomNodeTypes,
-  id?: string,
-  edges?: Edge[]
-): {
-  value: NodeValue;
-  data: NodeData;
-} => {
-  const sources: {[key: string]: {isConnected: true; value: 0}} = {};
-  const values: {[key: string]: 0} = {};
-  if (edges !== undefined && id !== undefined) {
-    for (const edge of edges) {
-      if (edge.target === id) {
-        sources[edge.targetHandle!] = {
-          isConnected: true,
-          value: 0,
-        };
-      }
-      if (edge.source === id) {
-        values[edge.sourceHandle!] = 0;
-      }
-    }
-  }
-  switch (type) {
-    case 'addition':
-      return {
-        value: {type, sources, value: 0},
-        data: {title: 'Addition'},
-      };
-    case 'coursepart':
-      return {
-        value: {type, source: 0, value: 0, courseFail: false},
-        data: {
-          title: 'Course part',
-          settings: {onFailSetting: 'coursefail', minPoints: 0},
-        },
-      };
-    case 'average':
-      return {
-        value: {type, sources, value: 0},
-        data: {
-          title: 'Average',
-          settings: {weights: {}, percentageMode: false},
-        },
-      };
-    case 'grade':
-      return {
-        value: {type, source: 0, value: 0, courseFail: false},
-        data: {title: 'Grade'},
-      };
-    case 'max':
-      return {
-        value: {type, sources, value: 0},
-        data: {title: 'Max', settings: {minValue: 0}},
-      };
-    case 'minpoints':
-      return {
-        value: {type, source: 0, value: 0, courseFail: false},
-        data: {
-          title: 'Require points',
-          settings: {minPoints: 0, onFailSetting: 'coursefail'},
-        },
-      };
-    case 'require':
-      return {
-        value: {type, sources, values, courseFail: false},
-        data: {
-          title: 'Require',
-          settings: {numFail: 0, onFailSetting: 'coursefail'},
-        },
-      };
-    case 'round':
-      return {
-        value: {type, source: 0, value: 0},
-        data: {title: 'Round', settings: {roundingSetting: 'round-closest'}},
-      };
-    case 'stepper':
-      return {
-        value: {type, source: 0, value: 0},
-        data: {
-          title: 'Stepper',
-          settings: {numSteps: 1, middlePoints: [], outputValues: [0]},
-        },
-      };
-    case 'substitute':
-      return {
-        value: {type, sources, values},
-        data: {
-          title: 'Substitute',
-          settings: {maxSubstitutions: 0, substituteValues: []},
-        },
-      };
-  }
-};
-
-const calculateNodeValue = (
-  nodeId: string,
-  nodeValue: NodeValue,
-  nodeData: FullNodeData
-): void => {
-  switch (nodeValue.type) {
-    case 'addition': {
-      let sum = 0;
-      for (const source of Object.values(nodeValue.sources))
-        sum += source.value;
-      nodeValue.value = sum;
-      break;
-    }
-    case 'coursepart': {
-      const settings = nodeData[nodeId].settings as CoursePartNodeSettings;
-      nodeValue.value = nodeValue.source;
-      nodeValue.courseFail = false;
-      if (
-        settings.minPoints !== null &&
-        nodeValue.source < settings.minPoints
-      ) {
-        switch (settings.onFailSetting) {
-          case 'coursefail':
-            nodeValue.courseFail = true;
-            break;
-          case 'fail':
-            nodeValue.value = 'fail';
-            break;
-        }
-      }
-      break;
-    }
-    case 'average': {
-      const settings = nodeData[nodeId].settings as AverageNodeSettings;
-      let valueSum = 0;
-      let weightSum = 0;
-      for (const key of Object.keys(settings.weights)) {
-        if (!(key in nodeValue.sources)) continue;
-        const source = nodeValue.sources[key];
-        if (!source.isConnected) continue;
-        valueSum += source.value * settings.weights[key];
-        weightSum += settings.weights[key];
-      }
-      nodeValue.value = weightSum === 0 ? 0 : valueSum / weightSum;
-      break;
-    }
-    case 'grade':
-      nodeValue.value = nodeValue.source;
-      nodeValue.courseFail = false;
-      break;
-    case 'max': {
-      const settings = nodeData[nodeId].settings as MaxNodeSettings;
-      let maxValue = settings.minValue;
-
-      for (const value of Object.values(nodeValue.sources)) {
-        if (value.isConnected) maxValue = Math.max(maxValue, value.value);
-      }
-      nodeValue.value = maxValue;
-      break;
-    }
-    case 'minpoints': {
-      const settings = nodeData[nodeId].settings as MinPointsNodeSettings;
-      nodeValue.courseFail = false;
-      nodeValue.value = nodeValue.source;
-      if (nodeValue.source >= settings.minPoints) break;
-
-      if (settings.onFailSetting === 'coursefail') nodeValue.courseFail = true;
-      else nodeValue.value = 'fail';
-      break;
-    }
-    case 'require': {
-      const settings = nodeData[nodeId].settings as RequireNodeSettings;
-      nodeValue.courseFail = false;
-
-      let numFail = 0;
-      for (const [handleId, source] of Object.entries(nodeValue.sources)) {
-        if (!source.isConnected) continue;
-        nodeValue.values[handleId] = source.value === 'fail' ? 0 : source.value;
-        if (source.value === 'fail') numFail++;
-      }
-      if (numFail <= settings.numFail) break;
-
-      if (settings.onFailSetting === 'coursefail') {
-        nodeValue.courseFail = true;
-      } else {
-        for (const [handleId, source] of Object.entries(nodeValue.sources)) {
-          if (!source.isConnected) continue;
-          nodeValue.values[handleId] = 'fail';
-        }
-      }
-      break;
-    }
-    case 'round': {
-      const settings = nodeData[nodeId].settings as RoundNodeSettings;
-      switch (settings.roundingSetting) {
-        case 'round-up':
-          nodeValue.value = Math.ceil(nodeValue.source);
-          break;
-        case 'round-closest':
-          nodeValue.value = Math.round(nodeValue.source);
-          break;
-        case 'round-down':
-          nodeValue.value = Math.floor(nodeValue.source);
-          break;
-      }
-      break;
-    }
-    case 'stepper': {
-      const settings = nodeData[nodeId].settings as StepperNodeSettings;
-      for (let i = 0; i < settings.numSteps; i++) {
-        if (
-          i + 1 !== settings.numSteps &&
-          nodeValue.source > settings.middlePoints[i]
-        )
-          continue;
-
-        const outputValue = settings.outputValues[i];
-        nodeValue.value =
-          outputValue === 'same' ? nodeValue.source : outputValue;
-        break;
-      }
-      break;
-    }
-    case 'substitute': {
-      const settings = nodeData[nodeId].settings as SubstituteNodeSettings;
-      const getKeyType = (key: string): 'substitute' | 'exercise' =>
-        key.split('-')[key.split('-').length - 2] as 'substitute' | 'exercise';
-      let substitutesToUse = 0;
-      let valuesToSubstitute = 0;
-
-      for (const [key, source] of Object.entries(nodeValue.sources)) {
-        if (
-          getKeyType(key) === 'substitute' &&
-          source.isConnected &&
-          source.value !== 'fail'
-        )
-          substitutesToUse += 1;
-        else if (
-          getKeyType(key) === 'exercise' &&
-          source.isConnected &&
-          source.value === 'fail'
-        )
-          valuesToSubstitute += 1;
-      }
-      const totalSubstitutions = Math.min(
-        substitutesToUse,
-        valuesToSubstitute,
-        settings.maxSubstitutions
-      );
-      substitutesToUse = totalSubstitutions;
-      valuesToSubstitute = totalSubstitutions;
-
-      let exerciseIndex = -1;
-      for (const [key, source] of Object.entries(nodeValue.sources)) {
-        if (getKeyType(key) === 'substitute') {
-          if (
-            source.isConnected &&
-            source.value !== 'fail' &&
-            substitutesToUse > 0
-          ) {
-            substitutesToUse -= 1;
-            nodeValue.values[key] = 'fail';
-          } else if (source.isConnected) {
-            nodeValue.values[key] = source.value;
-          }
-        } else {
-          exerciseIndex++;
-          if (
-            source.isConnected &&
-            source.value === 'fail' &&
-            valuesToSubstitute > 0
-          ) {
-            valuesToSubstitute -= 1;
-            nodeValue.values[key] = settings.substituteValues[exerciseIndex];
-          } else if (source.isConnected) {
-            nodeValue.values[key] = source.value;
-          }
-        }
-      }
-      break;
-    }
-  }
-};
-
-export const calculateNewNodeValues = (
-  oldNodeValues: NodeValues,
+/** Calculates new values for all nodes in a graph. */
+export const calculateNodeValues = (
+  nodeValues: NodeValues,
   nodeData: FullNodeData,
-  nodes: Node[],
+  nodes: TypedNode[],
   edges: Edge[]
 ): NodeValues => {
+  // Create helper dictionaries
   const nodeSources: {[key: string]: Set<string>} = {};
   const nodeTargets: {[key: string]: Edge[]} = {};
   for (const edge of edges) {
@@ -315,7 +30,8 @@ export const calculateNewNodeValues = (
     nodeSources[edge.target].add(edge.source);
   }
 
-  const newNodeValues = {...oldNodeValues};
+  // Reset values for everything except source nodes & populate noSources array
+  const newNodeValues = structuredClone(nodeValues);
   const noSources: string[] = [];
   for (const node of nodes) {
     if (!(node.id in nodeSources)) noSources.push(node.id);
@@ -325,11 +41,11 @@ export const calculateNewNodeValues = (
       nodeValue.values = {};
     else nodeValue.value = 0;
     switch (nodeValue.type) {
-      case 'coursepart':
+      case 'source':
         break;
-      case 'grade':
       case 'minpoints':
       case 'round':
+      case 'sink':
       case 'stepper':
         nodeValue.source = 0;
         break;
@@ -346,30 +62,45 @@ export const calculateNewNodeValues = (
     }
   }
 
-  let courseFail = false;
+  // Actual calculation
+  let fullFail = false;
   const alreadyAdded = new Set();
   while (noSources.length > 0) {
-    const sourceId = noSources.shift()!;
-    calculateNodeValue(sourceId, newNodeValues[sourceId], nodeData);
-    const sourceNodeValue = newNodeValues[sourceId];
+    // We always take the next node with no other (uncovered) nodes pointing to it
+    // To always first calculate node parents.
+    const sourceNodeId = noSources.shift()!;
 
-    if ('courseFail' in sourceNodeValue && sourceNodeValue.courseFail)
-      courseFail = true;
-    if (!(sourceId in nodeTargets)) continue;
+    // Update node value
+    updateNodeValue(sourceNodeId, newNodeValues[sourceNodeId], nodeData);
+    const sourceNodeValue = newNodeValues[sourceNodeId];
 
-    for (const edge of nodeTargets[sourceId]) {
-      const sourceValue =
+    // Check for full fail
+    if ('fullFail' in sourceNodeValue && sourceNodeValue.fullFail)
+      fullFail = true;
+
+    // If the node has no targets continue
+    if (!(sourceNodeId in nodeTargets)) continue;
+
+    // Go through all targets and update their sources
+    for (const edge of nodeTargets[sourceNodeId]) {
+      let sourceValue: number | 'fail' = 0;
+
+      // Handle nodes with multiple sources
+      if (
         sourceNodeValue.type === 'require' ||
         sourceNodeValue.type === 'substitute'
-          ? (sourceNodeValue.values[
-              edge
-                .sourceHandle!.replace('-substitute-source', '')
-                .replace('-exercise-source', '')
-                .replace('-source', '')
-            ] ?? 0)
-          : sourceNodeValue.value;
+      ) {
+        const sourceHandleId = edge
+          .sourceHandle!.replace('-substitute-source', '')
+          .replace('-exercise-source', '')
+          .replace('-source', '');
+        sourceValue = sourceNodeValue.values[sourceHandleId];
+      } else {
+        sourceValue = sourceNodeValue.value;
+      }
 
-      nodeSources[edge.target].delete(sourceId);
+      // Remove parent from target and check if all parents have been covered
+      nodeSources[edge.target].delete(sourceNodeId);
       if (
         nodeSources[edge.target].size === 0 &&
         !alreadyAdded.has(edge.target)
@@ -377,13 +108,15 @@ export const calculateNewNodeValues = (
         noSources.push(edge.target);
         alreadyAdded.add(edge.target);
       }
+
+      // Update target node value
       const nodeValue = newNodeValues[edge.target];
       switch (nodeValue.type) {
-        case 'coursepart':
+        case 'source':
           throw new Error('Should not happen');
         case 'minpoints':
-        case 'grade':
         case 'round':
+        case 'sink':
         case 'stepper':
           nodeValue.source = sourceValue === 'fail' ? 0 : sourceValue;
           break;
@@ -405,151 +138,87 @@ export const calculateNewNodeValues = (
       }
     }
   }
-  if (courseFail) {
-    for (const node of nodes) {
-      const nodeValue = newNodeValues[node.id];
 
-      // Failed course
-      if (nodeValue.type === 'grade') {
-        nodeValue.value = 0;
-        nodeValue.courseFail = true;
-      }
-    }
+  // Check for fullfail
+  if (fullFail) {
+    const sinkNode = nodes.find(node => nodeValues[node.id].type === 'sink');
+    const nodeValue = newNodeValues[sinkNode!.id] as SinkNodeValue;
+    nodeValue.value = 0;
+    nodeValue.fullFail = true;
   }
 
   return newNodeValues;
 };
 
-// TODO: Also return other data to later display in grades table
+// TODO: Handle expired course parts?
+// TODO: Stress test?
+/** Calculate course part values and/or final grades for all students. */
 export const batchCalculateGraph = (
-  graphStructure: GraphStructure,
+  finalModel: GradingModelData,
+  models: GradingModelData[],
   studentData: {
     userId: number;
-    courseParts: {coursePartId: number; grade: number}[];
+    courseTasks: {id: number; grade: number}[];
   }[]
-): {[key: number]: {finalGrade: number}} => {
-  const {nodes, edges, nodeData} = graphStructure;
-  const nodeValues: {[key: string]: {[key: string]: NodeValue}} = {}; // {userId: {nodeId: nodeVal, ...}, ...}
-
-  const nodeSources: {[key: string]: Set<string>} = {};
-  const nodeTargets: {[key: string]: Edge[]} = {};
-  for (const edge of edges) {
-    if (!(edge.source in nodeTargets)) nodeTargets[edge.source] = [];
-    nodeTargets[edge.source].push(edge);
-    if (!(edge.target in nodeSources)) nodeSources[edge.target] = new Set();
-    nodeSources[edge.target].add(edge.source);
+): {
+  [key: number]: {courseParts: {[key: string]: number}; finalValue: number};
+} => {
+  // Find course part model Ids
+  const coursePartModelsIds = new Set<number>();
+  for (const node of finalModel.graphStructure.nodes) {
+    if (node.type !== 'source') continue;
+    const partId = parseInt(node.id.split('-')[1]);
+    coursePartModelsIds.add(partId);
   }
 
-  // Init graph values
-  const noSources: string[] = [];
-  for (const node of nodes) {
-    if (!(node.id in nodeSources)) noSources.push(node.id);
+  // Find course part models
+  const coursePartModels = models.filter(
+    model => model.coursePartId && coursePartModelsIds.has(model.coursePartId)
+  );
 
-    for (const student of studentData) {
-      if (!(student.userId in nodeValues)) nodeValues[student.userId] = {};
+  const result: {
+    [key: number]: {courseParts: {[key: string]: number}; finalValue: number};
+  } = {};
 
-      const nodeType = node.type as CustomNodeTypes;
-      nodeValues[student.userId][node.id] = initNode(nodeType).value;
-      const nodeValue = nodeValues[student.userId][node.id];
-      if (nodeValue.type !== 'coursepart') continue;
-
-      // Find matching course part from student data
-      for (const coursePart of student.courseParts) {
-        if (node.id === `coursepart-${coursePart.coursePartId}`)
-          nodeValue.source = coursePart.grade;
-      }
-    }
-  }
-
-  const courseFail: {[key: string]: boolean} = {};
-  for (const student of studentData) courseFail[student.userId] = false;
-  const alreadyAdded = new Set();
-
-  // Calculate values for all nodes
-  while (noSources.length > 0) {
-    const sourceId = noSources.shift()!;
-    // Calculate node value for all students
-    for (const student of studentData) {
-      calculateNodeValue(
-        sourceId,
-        nodeValues[student.userId][sourceId],
-        nodeData
-      );
-      const nodeValue = nodeValues[student.userId][sourceId];
-      if ('courseFail' in nodeValue && nodeValue.courseFail)
-        courseFail[student.userId] = true;
-    }
-    if (!(sourceId in nodeTargets)) continue; // Node has no targets
-
-    // Update values for all node targets
-    for (const edge of nodeTargets[sourceId]) {
-      nodeSources[edge.target].delete(sourceId);
-      if (
-        nodeSources[edge.target].size === 0 &&
-        !alreadyAdded.has(edge.target)
-      ) {
-        noSources.push(edge.target);
-        alreadyAdded.add(edge.target);
-      }
-
-      for (const student of studentData) {
-        const sourceNodeValue = nodeValues[student.userId][sourceId];
-        const sourceValue =
-          sourceNodeValue.type === 'require' ||
-          sourceNodeValue.type === 'substitute'
-            ? (sourceNodeValue.values[
-                edge
-                  .sourceHandle!.replace('-substitute-source', '')
-                  .replace('-exercise-source', '')
-                  .replace('-source', '')
-              ] ?? 0)
-            : sourceNodeValue.value;
-
-        const nodeValue = nodeValues[student.userId][edge.target];
-        switch (nodeValue.type) {
-          case 'coursepart':
-            throw new Error('Should not happen');
-          case 'minpoints':
-          case 'grade':
-          case 'round':
-          case 'stepper':
-            nodeValue.source = sourceValue === 'fail' ? 0 : sourceValue;
-            break;
-          case 'addition':
-          case 'average':
-          case 'max':
-            nodeValue.sources[edge.targetHandle!] = {
-              value: sourceValue === 'fail' ? 0 : sourceValue,
-              isConnected: true,
-            };
-            break;
-          case 'require':
-          case 'substitute':
-            nodeValue.sources[edge.targetHandle!] = {
-              value: sourceValue,
-              isConnected: true,
-            };
-            break;
-        }
-      }
-    }
-  }
-
-  // Create finalGrades object and set the values for it
-  const finalGrades: {[key: string]: {finalGrade: number}} = {};
   for (const student of studentData) {
-    for (const node of nodes) {
-      const nodeValue = nodeValues[student.userId][node.id];
-      if (nodeValue.type !== 'grade') continue;
+    result[student.userId] = {courseParts: {}, finalValue: 0};
+    let sourceValues = student.courseTasks.map(task => ({
+      id: task.id,
+      value: task.grade,
+    }));
 
-      // Failed course
-      if (courseFail[student.userId]) {
-        nodeValue.value = 0;
-        nodeValue.courseFail = true;
+    // Calculate course parts first if necessary
+    if (finalModel.coursePartId === null) {
+      const coursePartValues: {[key: string]: number} = {};
+      for (const model of coursePartModels) {
+        const {nodes, edges, nodeData} = model.graphStructure;
+        const [gradesFound, nodeValues] = initNodeValues(nodes, sourceValues);
+
+        // No grades in course part.
+        if (!gradesFound) continue;
+
+        const graphValues = calculateNodeValues(
+          nodeValues,
+          nodeData,
+          nodes,
+          edges
+        );
+        const finalValue = (graphValues.sink as SinkNodeValue).value;
+        coursePartValues[model.coursePartId!] = finalValue;
+        result[student.userId].courseParts[model.coursePartId!] = finalValue;
       }
-      finalGrades[student.userId] = {finalGrade: nodeValue.value};
+      sourceValues = Object.entries(coursePartValues).map(([id, value]) => ({
+        id: parseInt(id),
+        value,
+      }));
     }
+
+    const {nodes, edges, nodeData} = finalModel.graphStructure;
+    const [_, nodeValues] = initNodeValues(nodes, sourceValues);
+    const graphValues = calculateNodeValues(nodeValues, nodeData, nodes, edges);
+    const finalValue = (graphValues.sink as SinkNodeValue).value;
+    result[student.userId].finalValue = finalValue;
   }
 
-  return finalGrades;
+  return result;
 };

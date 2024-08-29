@@ -16,19 +16,19 @@ import {
   Tooltip,
   useTheme,
 } from '@mui/material';
-import {Row} from '@tanstack/react-table';
+import type {Row} from '@tanstack/react-table';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, forwardRef, useMemo, useState} from 'react';
+import {type JSX, forwardRef, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 
-import {StudentRow, SystemRole} from '@/common/types';
+import {type StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateGraph} from '@/common/util';
-import {GroupedStudentRow} from '@/context/GradesTableProvider';
+import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
-import {useAddFinalGrades} from '@/hooks/api/finalGrade';
 import {
+  useAddFinalGrades,
   useGetAllGradingModels,
   useGetCourse,
   useGetGrades,
@@ -200,13 +200,14 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
 
           // Only add divider between elements
           ...(i !== groupByElements.length - 1
-            ? [<Divider sx={{my: 0}} />]
+            ? [<Divider key={i} sx={{my: 0}} />]
             : []),
         ])}
       </Menu>
     </>
   );
 });
+GroupByButton.displayName = 'GroupByButton';
 
 const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
   (props, ref): JSX.Element => {
@@ -275,9 +276,8 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
               }}
             >
               {isActive
-                ? gradingModels?.filter(
-                    ass => ass.id === selectedGradingModel
-                  )[0]?.name
+                ? gradingModels?.find(ass => ass.id === selectedGradingModel)
+                    ?.name
                 : t('general.grading-model')}
             </div>
 
@@ -344,6 +344,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
     );
   }
 );
+AssessmentFilterButton.displayName = 'AssessmentFilterButton';
 
 const CourseResultsTableToolbar = (): JSX.Element => {
   const {t} = useTranslation();
@@ -428,26 +429,25 @@ const CourseResultsTableToolbar = (): JSX.Element => {
 
     enqueueSnackbar(t('course.results.calculating-final'), {variant: 'info'});
     const finalGrades = batchCalculateGraph(
-      model.graphStructure,
+      model,
+      gradingModels!,
       selectedRows.map(selectedRow => ({
         userId: selectedRow.user.id,
-        courseParts: selectedRow.courseTasks.map(courseTask => ({
-          coursePartId: courseTask.courseTaskId, // TODO: Broken
-          grade:
-            findBestGrade(courseTask.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Manage expired course parts
+        courseTasks: selectedRow.courseTasks.map(task => ({
+          id: task.courseTaskId,
+          // TODO: Manage expired course tasks?
+          grade: findBestGrade(task.grades, {gradeSelectOption})?.grade ?? 0,
         })),
       }))
     );
     for (const grade of Object.values(finalGrades)) {
       const maxFinalGrade = getMaxFinalGrade(course.data.gradingScale);
       const Schema = z.number().int().min(0).max(maxFinalGrade);
-      const result = Schema.safeParse(grade.finalGrade);
+      const result = Schema.safeParse(grade.finalValue);
       if (!result.success) {
         enqueueSnackbar(
-          t('course.results.invalid-final', {grade: grade.finalGrade}),
-          {
-            variant: 'error',
-          }
+          t('course.results.invalid-final', {grade: grade.finalValue}),
+          {variant: 'error'}
         );
         return false;
       }
@@ -456,7 +456,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
       selectedRows.map(selectedRow => ({
         userId: selectedRow.user.id,
         gradingModelId,
-        grade: finalGrades[selectedRow.user.id].finalGrade,
+        grade: finalGrades[selectedRow.user.id].finalValue,
         date: dateOverride ? gradingDate : findLatestGrade(selectedRow),
         comment: null,
       }))
@@ -643,7 +643,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
               .getColumn('user_studentNumber')
               ?.setFilterValue(e.target.value);
           }}
-          placeholder={'Search...'}
+          placeholder="Search..."
           className="w-36 border shadow rounded"
         />
         <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>

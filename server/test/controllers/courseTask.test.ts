@@ -5,18 +5,18 @@
 import supertest from 'supertest';
 
 import {
-  CoursePartData,
-  CourseTaskData,
+  type CoursePartData,
+  type CourseTaskData,
   CourseTaskDataArraySchema,
-  EditCourseTaskData,
+  type EditCourseTaskData,
   HttpCode,
   IdArraySchema,
-  NewCourseTaskData,
+  type NewCourseTaskData,
 } from '@/common/types';
 import {app} from '../../src/app';
 import CourseTask from '../../src/database/models/courseTask';
 import {createData} from '../util/createData';
-import {Cookies, getCookies} from '../util/getCookies';
+import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
 

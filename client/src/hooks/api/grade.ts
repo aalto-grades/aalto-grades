@@ -3,26 +3,26 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult,
+  type UseMutationOptions,
+  type UseMutationResult,
+  type UseQueryOptions,
+  type UseQueryResult,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
 
 import {
-  EditTaskGradeData,
-  LatestGrades,
+  type EditTaskGradeData,
+  type LatestGrades,
   LatestGradesSchema,
-  NewTaskGrade,
-  SisuCsvUpload,
-  StudentRow,
+  type NewTaskGrade,
+  type SisuCsvUpload,
+  type StudentRow,
   StudentRowArraySchema,
-  UserIdArray,
+  type UserIdArray,
 } from '@/common/types';
-import {Numeric} from '@/types';
+import type {Numeric} from '@/types';
 import axios from './axios';
 
 export const useGetGrades = (
@@ -45,7 +45,7 @@ export const useAddGrades = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: newGrades =>
+    mutationFn: async newGrades =>
       axios.post(`/api/v1/courses/${courseId}/grades`, newGrades),
 
     onSuccess: () => {
@@ -63,7 +63,7 @@ export const useEditGrade = (
   options?: UseMutationOptions<void, unknown, EditGradeVars>
 ): UseMutationResult<void, unknown, EditGradeVars> =>
   useMutation({
-    mutationFn: vars =>
+    mutationFn: async vars =>
       axios.put(
         `/api/v1/courses/${courseId}/grades/${vars.gradeId}`,
         vars.data
@@ -78,7 +78,7 @@ export const useDeleteGrade = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: gradeId =>
+    mutationFn: async gradeId =>
       axios.delete(`/api/v1/courses/${courseId}/grades/${gradeId}`),
 
     onSuccess: () => {

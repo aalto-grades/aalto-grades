@@ -4,7 +4,7 @@
 
 import argon from 'argon2';
 
-import {AuthData, HttpCode, SystemRole} from '@/common/types';
+import {type AuthData, HttpCode, type SystemRole} from '@/common/types';
 import httpLogger from '../../configs/winston';
 import User from '../../database/models/user';
 import {ApiError} from '../../types';

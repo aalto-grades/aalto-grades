@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FinalGradeData, HttpCode} from '@/common/types';
+import {type FinalGradeData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
 import {validateUserAndGrader} from './taskGrade';
-import Course from '../../database/models/course';
+import type Course from '../../database/models/course';
 import FinalGrade from '../../database/models/finalGrade';
 import {ApiError, stringToIdSchema} from '../../types';
 

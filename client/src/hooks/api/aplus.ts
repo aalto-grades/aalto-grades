@@ -3,26 +3,26 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult,
+  type UseMutationOptions,
+  type UseMutationResult,
+  type UseQueryOptions,
+  type UseQueryResult,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import {AxiosRequestConfig} from 'axios';
+import type {AxiosRequestConfig} from 'axios';
 
 import {
-  AplusCourseData,
+  type AplusCourseData,
   AplusCourseDataArraySchema,
-  AplusExerciseData,
+  type AplusExerciseData,
   AplusExerciseDataSchema,
-  NewAplusGradeSourceData,
-  NewTaskGrade,
+  type NewAplusGradeSourceData,
+  type NewTaskGrade,
   NewTaskGradeArraySchema,
 } from '@/common/types';
-import {Numeric} from '@/types';
+import type {Numeric} from '@/types';
 import {getAplusToken} from '@/utils';
 import axios from './axios';
 
@@ -67,7 +67,7 @@ export const useAddAplusGradeSources = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: gradeSources =>
+    mutationFn: async gradeSources =>
       axios.post(`/api/v1/courses/${courseId}/aplus-sources`, gradeSources),
 
     onSuccess: () => {
@@ -86,7 +86,7 @@ export const useDeleteAplusGradeSource = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: aplusGradeSourceId =>
+    mutationFn: async aplusGradeSourceId =>
       axios.delete(
         `/api/v1/courses/${courseId}/aplus-sources/${aplusGradeSourceId}`
       ),

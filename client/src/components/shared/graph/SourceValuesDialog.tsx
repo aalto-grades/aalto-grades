@@ -10,56 +10,50 @@ import {
   DialogTitle,
   TextField,
 } from '@mui/material';
-import {ChangeEvent, JSX, useMemo, useState} from 'react';
+import {type ChangeEvent, type JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Node} from 'reactflow';
 
-import {NodeValues} from '@/common/types';
+import type {GraphSource, NodeValues, TypedNode} from '@/common/types';
 
 const testFloat = (val: string): boolean => /^\d+(?:\.\d+?)?$/.test(val);
 
-const CoursePartValuesDialog = ({
+const SourceValuesDialog = ({
   nodes,
   nodeValues,
-  courseParts,
+  sources,
   open,
   onClose,
-  handleSetCoursePartValues,
+  handleSetSourceValues,
 }: {
-  nodes: Node[];
+  nodes: TypedNode[];
   nodeValues: NodeValues;
-  courseParts: {id: number; name: string}[];
+  sources: GraphSource[];
   open: boolean;
   onClose: () => void;
-  handleSetCoursePartValues: (coursePartValues: {
-    [key: number]: number;
-  }) => void;
+  handleSetSourceValues: (sourceValues: {[key: number]: number}) => void;
 }): JSX.Element => {
   const {t} = useTranslation();
-  const coursePartNodeIds = useMemo(
+  const sourceNodeIds = useMemo(
     () =>
       nodes
-        .filter(node => node.type === 'coursepart')
+        .filter(node => node.type === 'source')
         .map(node => parseInt(node.id.split('-')[1])),
     [nodes]
   );
-  const coursePartNames = useMemo(
-    () =>
-      Object.fromEntries(
-        courseParts.map(coursePart => [coursePart.id, coursePart.name])
-      ),
-    [courseParts]
+  const sourceNames = useMemo(
+    () => Object.fromEntries(sources.map(source => [source.id, source.name])),
+    [sources]
   );
   const initValues = useMemo(() => {
     const newInitValues: {[key: number]: string} = {};
     for (const [nodeId, nodeValue] of Object.entries(nodeValues)) {
-      if (nodeValue.type !== 'coursepart') continue;
-      const coursePartId = parseInt(nodeId.split('-')[1]);
-      if (coursePartNodeIds.includes(coursePartId))
-        newInitValues[coursePartId] = nodeValue.source.toString();
+      if (nodeValue.type !== 'source') continue;
+      const sourceId = parseInt(nodeId.split('-')[1]);
+      if (sourceNodeIds.includes(sourceId))
+        newInitValues[sourceId] = nodeValue.source.toString();
     }
     return newInitValues;
-  }, [coursePartNodeIds, nodeValues]);
+  }, [sourceNodeIds, nodeValues]);
 
   const [values, setValues] = useState<{[key: number]: string}>(initValues);
   const [error, setError] = useState<boolean>(false);
@@ -82,7 +76,7 @@ const CoursePartValuesDialog = ({
   };
 
   const onSubmit = (): void => {
-    handleSetCoursePartValues(
+    handleSetSourceValues(
       Object.fromEntries(
         Object.entries(values).map(([key, value]) => [
           parseInt(key),
@@ -98,14 +92,14 @@ const CoursePartValuesDialog = ({
       <DialogTitle>{t('shared.graph.set-test-values')}</DialogTitle>
 
       <DialogContent>
-        {coursePartNodeIds.map(coursePartId => (
+        {sourceNodeIds.map(sourceId => (
           <TextField
-            key={coursePartId}
+            key={sourceId}
             sx={{mt: 2}}
-            value={values[coursePartId] ?? 0}
-            label={coursePartNames[coursePartId]}
-            onChange={e => onChange(coursePartId, e)}
-            error={!testFloat(values[coursePartId])}
+            value={values[sourceId] ?? 0}
+            label={sourceNames[sourceId]}
+            onChange={e => onChange(sourceId, e)}
+            error={!testFloat(values[sourceId])}
           />
         ))}
       </DialogContent>
@@ -126,4 +120,4 @@ const CoursePartValuesDialog = ({
   );
 };
 
-export default CoursePartValuesDialog;
+export default SourceValuesDialog;

@@ -5,18 +5,18 @@
 import supertest from 'supertest';
 
 import {
-  CoursePartData,
+  type CoursePartData,
   CoursePartDataArraySchema,
-  EditCoursePartData,
+  type EditCoursePartData,
   HttpCode,
   IdSchema,
-  NewCoursePartData,
+  type NewCoursePartData,
 } from '@/common/types';
 import {app} from '../../src/app';
 import CoursePart from '../../src/database/models/coursePart';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
-import {Cookies, getCookies} from '../util/getCookies';
+import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
 
@@ -124,7 +124,7 @@ describe('Test POST /v1/courses/:courseId/parts - add a course part', () => {
 
     for (const cookie of testCookies) {
       const coursePart = {
-        name: `coursePart-${++i}`,
+        name: `source-${++i}`,
         daysValid: 350,
         maxGrade: null,
       };
@@ -180,7 +180,7 @@ describe('Test POST /v1/courses/:courseId/parts - add a course part', () => {
 
   it('should respond with 409 if trying to create a course part with duplicate name', async () => {
     const url = `/v1/courses/${courseId}/parts`;
-    const data = {name: 'coursePart-1', daysValid: 365, maxGrade: 5};
+    const data = {name: 'source-1', daysValid: 365, maxGrade: 5};
     await responseTests.testConflict(url, cookies.adminCookie).post(data);
   });
 });
@@ -229,7 +229,7 @@ describe('Test PUT /v1/courses/:courseId/parts/:coursePartId - edit a course par
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${'bad'}/parts/${editCoursePartId}`;
+    let url = `/v1/courses/bad/parts/${editCoursePartId}`;
     const data = {name: 'not edited', daysValid: 365};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
@@ -273,7 +273,7 @@ describe('Test PUT /v1/courses/:courseId/parts/:coursePartId - edit a course par
 
   it('should respond with 409 when trying to edit duplicate course part name', async () => {
     const url = `/v1/courses/${courseId}/parts/${editCoursePartId}`;
-    const data = {name: 'coursePart-1', daysValid: 365};
+    const data = {name: 'source-1', daysValid: 365};
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
 });
@@ -296,7 +296,7 @@ describe('Test Delete /v1/courses/:courseId/parts/:coursePartId - delete a cours
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${'bad'}/parts/${editCoursePartId}`;
+    let url = `/v1/courses/bad/parts/${editCoursePartId}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).delete();
 
     url = `/v1/courses/${courseId}/parts/${-1}`;

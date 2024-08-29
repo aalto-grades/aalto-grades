@@ -13,32 +13,33 @@ import {
 import {
   DataGrid,
   GridActionsCellItem,
-  GridCellParams,
-  GridColDef,
-  GridRowModel,
-  GridRowsProp,
+  type GridCellParams,
+  type GridColDef,
+  type GridRowModel,
+  type GridRowsProp,
   GridToolbarContainer,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useEffect, useMemo, useState} from 'react';
+import {type JSX, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker, useParams} from 'react-router-dom';
 import {z} from 'zod';
 
 import {
-  EditFinalGrade,
-  FinalGradeData,
+  type EditFinalGrade,
+  type FinalGradeData,
   GradingScale,
-  NewFinalGrade,
+  type NewFinalGrade,
 } from '@/common/types';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
   useAddFinalGrades,
   useDeleteFinalGrade,
   useEditFinalGrade,
-} from '@/hooks/api/finalGrade';
-import {useGetAllGradingModels, useGetCourse} from '@/hooks/useApi';
+  useGetAllGradingModels,
+  useGetCourse,
+} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import {findBestFinalGrade, getMaxFinalGrade} from '@/utils';
 
@@ -195,6 +196,7 @@ const EditFinalGradesDialog = ({
       type: 'actions',
       getActions: params => [
         <GridActionsCellItem
+          key={params.id}
           icon={<Delete />}
           label={t('general.delete')}
           onClick={() =>
@@ -273,8 +275,12 @@ const EditFinalGradesDialog = ({
 
     await Promise.all([
       addFinalGrades.mutateAsync(newGrades),
-      ...deletedGrades.map(fGradeId => deleteFinalGrade.mutateAsync(fGradeId)),
-      ...editedGrades.map(editData => editFinalGrade.mutateAsync(editData)),
+      ...deletedGrades.map(async fGradeId =>
+        deleteFinalGrade.mutateAsync(fGradeId)
+      ),
+      ...editedGrades.map(async editData =>
+        editFinalGrade.mutateAsync(editData)
+      ),
     ]);
 
     onClose();

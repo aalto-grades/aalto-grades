@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Includeable, Op} from 'sequelize';
+import {type Includeable, Op} from 'sequelize';
 
-import {HttpCode, TaskGradeData, UserData} from '@/common/types';
+import {HttpCode, type TaskGradeData, type UserData} from '@/common/types';
 import {parseAplusGradeSource} from './aplus';
 import {findAndValidateCourseId, findCourseById} from './course';
 import {findCoursePartById} from './coursePart';
 import httpLogger from '../../configs/winston';
-import Course from '../../database/models/course';
+import type Course from '../../database/models/course';
 import CoursePart from '../../database/models/coursePart';
 import FinalGrade from '../../database/models/finalGrade';
 import TaskGrade from '../../database/models/taskGrade';

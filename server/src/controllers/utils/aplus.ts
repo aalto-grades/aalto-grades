@@ -3,16 +3,16 @@
 // SPDX-License-Identifier: MIT
 
 import axios from 'axios';
-import {Request} from 'express';
-import {ZodSchema, z} from 'zod';
+import type {Request} from 'express';
+import {type ZodSchema, z} from 'zod';
 
-import {AplusGradeSourceData, HttpCode} from '@/common/types';
+import {type AplusGradeSourceData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
 import {validateCourseTaskBelongsToCourse} from './courseTask';
 import {AXIOS_TIMEOUT} from '../../configs/constants';
 import httpLogger from '../../configs/winston';
 import AplusGradeSource from '../../database/models/aplusGradeSource';
-import Course from '../../database/models/course';
+import type Course from '../../database/models/course';
 import {ApiError, stringToIdSchema} from '../../types';
 
 /**
@@ -64,7 +64,7 @@ const findAndValidateAplusGradeSourceId = async (
       HttpCode.BadRequest
     );
   }
-  return await findAplusGradeSourceById(result.data);
+  return findAplusGradeSourceById(result.data);
 };
 
 /**

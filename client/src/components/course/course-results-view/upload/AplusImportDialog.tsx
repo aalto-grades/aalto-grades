@@ -21,13 +21,16 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import {ChangeEvent, JSX, useState} from 'react';
+import {type ChangeEvent, type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
-import {useGetCourseTasks} from '@/hooks/api/courseTask';
-import {useAddGrades, useFetchAplusGrades} from '@/hooks/useApi';
+import {
+  useAddGrades,
+  useFetchAplusGrades,
+  useGetCourseTasks,
+} from '@/hooks/useApi';
 import {getAplusToken} from '@/utils';
 
 type PropsType = {
@@ -96,19 +99,19 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
           <>
             <Typography>{t('course.parts.select-for-fetching')}</Typography>
             <FormGroup>
-              {courseTasks.data &&
-                courseTasks.data
-                  .filter(coursePart => coursePart.aplusGradeSources.length > 0)
-                  .map(coursePart => (
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          onChange={e => handleSelect(e, coursePart.id)}
-                        />
-                      }
-                      label={coursePart.name}
-                    />
-                  ))}
+              {courseTasks.data
+                ?.filter(coursePart => coursePart.aplusGradeSources.length > 0)
+                .map(coursePart => (
+                  <FormControlLabel
+                    key={coursePart.id}
+                    control={
+                      <Checkbox
+                        onChange={e => handleSelect(e, coursePart.id)}
+                      />
+                    }
+                    label={coursePart.name}
+                  />
+                ))}
             </FormGroup>
           </>
         )}
@@ -144,17 +147,16 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {aplusGrades.data &&
-                  aplusGrades.data.map(row => (
-                    <TableRow>
-                      <TableCell>{row.studentNumber}</TableCell>
-                      <TableCell>{row.courseTaskId}</TableCell>
-                      <TableCell>{row.aplusGradeSourceId}</TableCell>
-                      <TableCell>{row.grade}</TableCell>
-                      <TableCell>{row.date.toDateString()}</TableCell>
-                      <TableCell>{row.expiryDate.toDateString()}</TableCell>
-                    </TableRow>
-                  ))}
+                {aplusGrades.data?.map(row => (
+                  <TableRow key={row.courseTaskId}>
+                    <TableCell>{row.studentNumber}</TableCell>
+                    <TableCell>{row.courseTaskId}</TableCell>
+                    <TableCell>{row.aplusGradeSourceId}</TableCell>
+                    <TableCell>{row.grade}</TableCell>
+                    <TableCell>{row.date.toDateString()}</TableCell>
+                    <TableCell>{row.expiryDate.toDateString()}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>

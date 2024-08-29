@@ -14,13 +14,13 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {JSX, useCallback, useMemo, useState} from 'react';
+import {type JSX, useCallback, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
-import {CourseData, CourseRoleType, SystemRole} from '@/common/types';
+import {type CourseData, CourseRoleType, SystemRole} from '@/common/types';
 import useAuth from '@/hooks/useAuth';
-import {HeadCellData} from '@/types';
+import type {HeadCellData} from '@/types';
 import {getCourseRole} from '@/utils';
 
 const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
@@ -119,7 +119,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
             <TableRow
               key={course.id}
               id={`ag-see-instances-tr-${course.id}`}
-              hover={true}
+              hover
               sx={{
                 cursor: 'pointer',
                 '&:focus': {backgroundColor: 'rgba(0, 0, 0, 0.04)'},

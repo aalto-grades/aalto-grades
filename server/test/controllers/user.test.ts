@@ -19,7 +19,7 @@ import {app} from '../../src/app';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
 import {STUDENT_ID, TEACHER_ID} from '../util/general';
-import {Cookies, getCookies} from '../util/getCookies';
+import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
 
@@ -143,7 +143,7 @@ describe('Test GET /v1/users/:userId/courses - get all courses and grades of use
   });
 
   it('should respond with 400 if invalid', async () => {
-    const url = `/v1/users/${'bad'}/courses`;
+    const url = '/v1/users/bad/courses';
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 

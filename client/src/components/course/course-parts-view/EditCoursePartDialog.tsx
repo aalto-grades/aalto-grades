@@ -9,12 +9,12 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import {Formik, FormikHelpers, FormikProps} from 'formik';
+import {Formik, type FormikHelpers, type FormikProps} from 'formik';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 
-import {CoursePartData} from '@/common/types';
+import type {CoursePartData} from '@/common/types';
 import FormField from '@/components/shared/FormikField';
 import {useEditCoursePart} from '@/hooks/useApi';
 import {nullableDateSchema} from '@/types';

@@ -29,21 +29,21 @@ import {grey} from '@mui/material/colors';
 import {
   DataGrid,
   GridActionsCellItem,
-  GridColDef,
-  GridRowParams,
-  GridRowsProp,
+  type GridColDef,
+  type GridRowParams,
+  type GridRowsProp,
   GridToolbarContainer,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useEffect, useMemo, useState} from 'react';
+import {type JSX, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker, useNavigate, useParams} from 'react-router-dom';
 
 import {
-  AplusGradeSourceData,
-  CoursePartData,
-  ModifyCourseTasks,
+  type AplusGradeSourceData,
+  type CoursePartData,
+  type ModifyCourseTasks,
   SystemRole,
 } from '@/common/types';
 import SaveBar from '@/components/shared/SaveBar';
@@ -129,7 +129,7 @@ const CoursePartsView = (): JSX.Element => {
     if (gradingModels.data === undefined) return withModels;
     for (const model of gradingModels.data) {
       for (const node of model.graphStructure.nodes) {
-        if (node.type !== 'coursepart') continue;
+        if (node.type !== 'source') continue;
         withModels.add(parseInt(node.id.split('-')[1]));
       }
     }
@@ -462,7 +462,7 @@ const CoursePartsView = (): JSX.Element => {
       />
 
       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-        <Typography width={'fit-content'} variant="h2">
+        <Typography width="fit-content" variant="h2">
           {t('general.course-parts')}
         </Typography>
         <SaveBar
@@ -476,14 +476,9 @@ const CoursePartsView = (): JSX.Element => {
 
       <Box sx={{display: 'flex', gap: 1, mb: 1, mt: 1}}>
         {editRights && (
-          <>
-            <Button
-              variant="outlined"
-              onClick={() => setAddPartDialogOpen(true)}
-            >
-              {t('course.parts.add-new-part')}
-            </Button>
-          </>
+          <Button variant="outlined" onClick={() => setAddPartDialogOpen(true)}>
+            {t('course.parts.add-new-part')}
+          </Button>
         )}
       </Box>
 

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, {RequestHandler, Router} from 'express';
+import express, {type RequestHandler, Router} from 'express';
 import passport from 'passport';
 import {processRequestBody, validateRequestBody} from 'zod-express-middleware';
 

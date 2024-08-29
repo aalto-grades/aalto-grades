@@ -4,7 +4,8 @@
 
 import {Box, Typography} from '@mui/material';
 import DOMPurify from 'dompurify';
-import React, {useEffect, useState} from 'react';
+import type React from 'react';
+import {useEffect, useState} from 'react';
 
 interface StaticPageProps {
   url: string;
@@ -44,12 +45,13 @@ const StaticPageView: React.FC<StaticPageProps> = ({url, title}) => {
         }}
         className="static-page-container"
       >
-        {title && (
+        {title !== undefined && (
           <Typography variant="h4" sx={{marginBottom: '16px'}}>
             {title}
           </Typography>
         )}
         <span
+          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(htmlContent)}}
         />
       </Box>

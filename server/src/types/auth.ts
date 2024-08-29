@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Response} from 'express';
+import type {Response} from 'express';
 
-import {AuthData} from '@/common/types';
+import type {AuthData} from '@/common/types';
 
 export type LoginCallback = (
   error: unknown,

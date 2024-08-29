@@ -4,12 +4,12 @@
 
 import {AccountTreeRounded, Error} from '@mui/icons-material';
 import {Box, IconButton, Tooltip} from '@mui/material';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {GradingScale} from '@/common/types';
-import {GroupedStudentRow} from '@/context/GradesTableProvider';
+import type {GradingScale} from '@/common/types';
+import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useGetAllGradingModels} from '@/hooks/useApi';
 import {getGradeString} from '@/utils';
 
@@ -83,7 +83,7 @@ const PredictedGradeCell = ({
               getGradeString(
                 t,
                 gradingScale,
-                row.predictedFinalGrades?.[modelId]?.finalGrade
+                row.predictedGraphValues?.[modelId]?.finalValue
               )
             )
             .join(' / ') || 'N/A'}

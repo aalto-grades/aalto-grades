@@ -2,12 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseTaskData, HttpCode} from '@/common/types';
+import {type CourseTaskData, HttpCode} from '@/common/types';
 import {parseAplusGradeSource} from './aplus';
 import {findAndValidateCourseId} from './course';
 import {findCoursePartById} from './coursePart';
 import AplusGradeSource from '../../database/models/aplusGradeSource';
-import Course from '../../database/models/course';
+import type Course from '../../database/models/course';
 import CoursePart from '../../database/models/coursePart';
 import CourseTask from '../../database/models/courseTask';
 import {ApiError, stringToIdSchema} from '../../types';
@@ -72,7 +72,7 @@ const findAndValidateCourseTaskId = async (
       HttpCode.BadRequest
     );
   }
-  return await findCourseTaskById(result.data);
+  return findCourseTaskById(result.data);
 };
 
 /**

@@ -12,36 +12,35 @@ import {
   FormControlLabel,
   FormGroup,
 } from '@mui/material';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Node} from 'reactflow';
 
-import {CoursePartData} from '@/common/types';
+import type {GraphSource, TypedNode} from '@/common/types';
 
-const SelectCoursePartsDialog = ({
+const SelectSourcesDialog = ({
   nodes,
-  courseParts,
+  sources,
   open,
   onClose,
-  handleCoursePartSelect,
+  handleSourceSelect,
 }: {
-  nodes: Node[];
-  courseParts: {id: number; name: string}[];
+  nodes: TypedNode[];
+  sources: GraphSource[];
   open: boolean;
   onClose: () => void;
-  handleCoursePartSelect: (
-    newCourseParts: CoursePartData[],
-    removedCourseParts: CoursePartData[]
+  handleSourceSelect: (
+    newSources: GraphSource[],
+    removedSources: GraphSource[]
   ) => void;
 }): JSX.Element => {
   const {t} = useTranslation();
-  const coursePartNodeIds = new Set(
+  const sourceNodeIds = new Set(
     nodes
-      .filter(node => node.type === 'coursepart')
+      .filter(node => node.type === 'source')
       .map(node => parseInt(node.id.split('-')[1]))
   );
   const startSelected = Object.fromEntries(
-    courseParts.map(({id}) => [id, coursePartNodeIds.has(id)])
+    sources.map(({id}) => [id, sourceNodeIds.has(id)])
   );
 
   const [selected, setSelected] = useState<{[key: number]: boolean}>(
@@ -56,43 +55,35 @@ const SelectCoursePartsDialog = ({
   };
 
   const onSubmit = (): void => {
-    const newCourseParts: CoursePartData[] = [];
-    const removedCourseParts: CoursePartData[] = [];
+    const newSources: GraphSource[] = [];
+    const removedSources: GraphSource[] = [];
     for (const [stringKey, value] of Object.entries(selected)) {
       const key = parseInt(stringKey);
       if (value && !startSelected[key])
-        newCourseParts.push(
-          courseParts.find(
-            coursePart => coursePart.id === key
-          ) as CoursePartData
-        );
+        newSources.push(sources.find(source => source.id === key)!);
       if (!value && startSelected[key])
-        removedCourseParts.push(
-          courseParts.find(
-            coursePart => coursePart.id === key
-          ) as CoursePartData
-        );
+        removedSources.push(sources.find(source => source.id === key)!);
     }
-    handleCoursePartSelect(newCourseParts, removedCourseParts);
+    handleSourceSelect(newSources, removedSources);
     onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>{t('general.select-course-parts')}</DialogTitle>
+      <DialogTitle>{t('shared.graph.select-sources')}</DialogTitle>
 
       <DialogContent>
         <FormGroup>
-          {courseParts.map(coursePart => (
+          {sources.map(source => (
             <FormControlLabel
-              key={coursePart.id}
+              key={source.id}
               control={
                 <Checkbox
-                  checked={selected[coursePart.id]}
-                  onChange={() => onSelect(coursePart.id)}
+                  checked={selected[source.id]}
+                  onChange={() => onSelect(source.id)}
                 />
               }
-              label={coursePart.name}
+              label={source.name}
             />
           ))}
         </FormGroup>
@@ -114,4 +105,4 @@ const SelectCoursePartsDialog = ({
   );
 };
 
-export default SelectCoursePartsDialog;
+export default SelectSourcesDialog;

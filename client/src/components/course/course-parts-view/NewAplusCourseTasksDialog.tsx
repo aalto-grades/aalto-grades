@@ -9,11 +9,11 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import {JSX, useEffect, useState} from 'react';
+import {type JSX, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {
+import type {
   AplusCourseData,
   EditCourseTaskData,
   NewAplusGradeSourceData,
@@ -101,7 +101,7 @@ const NewAplusCourseTasksDialog = ({
 
   const handleCourseTaskChange = (
     index: number,
-    courseTaskEdit: EditCourseTaskData
+    courseTaskEdit: Omit<EditCourseTaskData, 'id'>
   ): void => {
     setCourseTasksWithSource(
       courseTasksWithSource.map(([courseTask, source], i) => {
@@ -148,7 +148,7 @@ const NewAplusCourseTasksDialog = ({
           setAplusTokenDialogOpen(false);
           aplusCourses.refetch();
         }}
-        open={aplusTokenDialogOpen && open}
+        open={open && aplusTokenDialogOpen}
         error={aplusCourses.isError}
       />
       <Dialog
@@ -165,7 +165,7 @@ const NewAplusCourseTasksDialog = ({
           <DialogTitle>{t('course.parts.create-tasks')}</DialogTitle>
         )}
         <DialogContent>
-          {step === 0 && aplusCourses.data && (
+          {step === 0 && aplusCourses.data !== undefined && (
             <SelectAplusCourse
               aplusCourses={aplusCourses.data}
               selectedAplusCourse={aplusCourse}
@@ -175,14 +175,14 @@ const NewAplusCourseTasksDialog = ({
               }}
             />
           )}
-          {step === 1 && aplusCourse && (
+          {step === 1 && aplusCourse !== null && (
             <SelectAplusGradeSources
               aplusCourse={aplusCourse}
               selectedGradeSources={courseTasksWithSource.map(([_, s]) => s)}
               handleChange={handleSelectionChange}
             />
           )}
-          {step === 2 && aplusCourse && (
+          {step === 2 && aplusCourse !== null && (
             <CreateAplusCourseTasks
               courseTasksWithSource={courseTasksWithSource}
               handleChange={handleCourseTaskChange}

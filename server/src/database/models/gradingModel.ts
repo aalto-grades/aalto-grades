@@ -3,15 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional,
+  type CreationOptional,
   DataTypes,
-  ForeignKey,
-  InferAttributes,
-  InferCreationAttributes,
+  type ForeignKey,
+  type InferAttributes,
+  type InferCreationAttributes,
   Model,
 } from 'sequelize';
 
-import {GraphStructure} from '@/common/types';
+import type {GraphStructure} from '@/common/types';
 import Course from './course';
 import CoursePart from './coursePart';
 import {sequelize} from '..';
@@ -22,7 +22,7 @@ export default class GradingModel extends Model<
 > {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
-  declare coursePartId: CreationOptional<ForeignKey<CoursePart['id']> | null>;
+  declare coursePartId: ForeignKey<CoursePart['id']> | null;
   declare name: string;
   declare graphStructure: GraphStructure;
   declare archived: CreationOptional<boolean>;

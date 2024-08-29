@@ -2,13 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {JSX} from 'react';
+import type {JSX} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Navigate, useParams} from 'react-router-dom';
 
-import {useGetCourseTasks} from '@/hooks/api/courseTask';
-import {useGetAllGradingModels, useGetCourseParts} from '@/hooks/useApi';
+import {
+  useGetAllGradingModels,
+  useGetCourseParts,
+  useGetCourseTasks,
+} from '@/hooks/useApi';
 
 const CourseRedirect = (): JSX.Element => {
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const courseParts = useGetCourseParts(courseId);
   const courseTasks = useGetCourseTasks(courseId);
@@ -19,20 +24,16 @@ const CourseRedirect = (): JSX.Element => {
     courseTasks.data === undefined ||
     gradingModels.data === undefined
   )
-    return <></>;
+    return <>{t('general.loading')}</>;
 
-  return (
-    <>
-      {courseParts.data.length > 0 && courseTasks.data.length > 0 ? (
-        gradingModels.data.length > 0 ? (
-          <Navigate to={`/${courseId}/course-results`} />
-        ) : (
-          <Navigate to={`/${courseId}/models`} />
-        )
-      ) : (
-        <Navigate to={`/${courseId}/course-parts`} />
-      )}
-    </>
+  return courseParts.data.length > 0 && courseTasks.data.length > 0 ? (
+    gradingModels.data.length > 0 ? (
+      <Navigate to={`/${courseId}/course-results`} />
+    ) : (
+      <Navigate to={`/${courseId}/models`} />
+    )
+  ) : (
+    <Navigate to={`/${courseId}/course-parts`} />
   );
 };
 

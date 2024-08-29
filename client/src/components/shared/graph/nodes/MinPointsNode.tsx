@@ -2,22 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ChangeEvent, JSX, useContext, useState} from 'react';
+import {type ChangeEvent, type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Handle, NodeProps, Position} from 'reactflow';
+import {Handle, type NodeProps, Position} from 'reactflow';
 
-import {MinPointsNodeSettings, MinPointsNodeValue} from '@/common/types';
+import type {MinPointsNodeSettings, MinPointsNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
-type OnFailSetting = 'coursefail' | 'fail';
+type OnFailSetting = 'fullfail' | 'fail';
 type LocalSettings = {onFailSetting: OnFailSetting; minPoints: string};
 
 const MinPointsNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
   const {id, isConnectable} = props;
 
-  const {nodeValues} = useContext(NodeValuesContext);
+  const nodeValues = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const settings = nodeData[id].settings as MinPointsNodeSettings;
@@ -66,7 +66,7 @@ const MinPointsNode = (props: NodeProps): JSX.Element => {
   };
 
   return (
-    <BaseNode {...props} error={error} courseFail={nodeValue.courseFail}>
+    <BaseNode {...props} error={error} fullFail={nodeValue.fullFail}>
       <Handle
         type="target"
         id={id}
@@ -90,7 +90,7 @@ const MinPointsNode = (props: NodeProps): JSX.Element => {
           onChange={handleSelectChange}
           value={localSettings.onFailSetting}
         >
-          <option value="coursefail">{t('shared.graph.fail-course')}</option>
+          <option value="fullfail">{t('shared.graph.full-fail')}</option>
           <option value="fail">{t('shared.graph.output-fail')}</option>
         </select>
       </div>

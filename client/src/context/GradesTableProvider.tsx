@@ -6,11 +6,11 @@
 
 import {Badge, Checkbox} from '@mui/material';
 import {
-  ExpandedState,
-  GroupingState,
-  RowData,
-  SortingState,
-  VisibilityState,
+  type ExpandedState,
+  type GroupingState,
+  type RowData,
+  type SortingState,
+  type VisibilityState,
   createColumnHelper,
   getCoreRowModel,
   getExpandedRowModel,
@@ -20,10 +20,10 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import {
-  Dispatch,
-  JSX,
-  PropsWithChildren,
-  SetStateAction,
+  type Dispatch,
+  type JSX,
+  type PropsWithChildren,
+  type SetStateAction,
   createContext,
   useCallback,
   useMemo,
@@ -33,21 +33,21 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {
-  CoursePartData,
-  FinalGradeData,
+  type CoursePartData,
+  type FinalGradeData,
   GradingScale,
-  StudentRow,
+  type StudentRow,
 } from '@/common/types';
 import UserGraphDialog from '@/components/course/course-results-view/UserGraphDialog';
 import FinalGradeCell from '@/components/course/course-results-view/table/FinalGradeCell';
 import GradeCell from '@/components/course/course-results-view/table/GradeCell';
 import PredictedGradeCell from '@/components/course/course-results-view/table/PredictedGradeCell';
 import PrettyChip from '@/components/shared/PrettyChip';
-import {useGetCourseTasks} from '@/hooks/api/courseTask';
 import {
   useGetAllGradingModels,
   useGetCourse,
   useGetCourseParts,
+  useGetCourseTasks,
 } from '@/hooks/useApi';
 import {
   findBestFinalGrade,
@@ -70,10 +70,6 @@ export const GradesTableContext = createContext<TableContextProps | undefined>(
   undefined
 );
 
-type PropsType = PropsWithChildren & {
-  data: StudentRow[];
-};
-
 // Table creation
 declare module '@tanstack/table-core' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -82,10 +78,6 @@ declare module '@tanstack/table-core' {
     coursePart?: boolean;
   }
 }
-
-export type GroupedStudentRow = {
-  latestBestGrade: string;
-} & ExtendedStudentRow;
 
 export type RowError =
   | {
@@ -110,9 +102,16 @@ export type RowError =
     };
 export type RowErrorType = RowError['type'];
 
+export type PredictedGraphValues = {
+  [key: number]: {courseParts: {[key: string]: number}; finalValue: number};
+};
 export type ExtendedStudentRow = StudentRow & {
-  predictedFinalGrades?: {[key: number]: {finalGrade: number}};
+  predictedGraphValues?: PredictedGraphValues;
   errors?: RowError[];
+};
+
+export type GroupedStudentRow = ExtendedStudentRow & {
+  latestBestGrade: string;
 };
 
 /**
@@ -142,8 +141,11 @@ const findPreviouslyExportedToSisu = (
 
 const columnHelper = createColumnHelper<GroupedStudentRow>();
 
-// Create a provider component
-export const GradesTableProvider = (props: PropsType): JSX.Element => {
+type PropsType = {data: StudentRow[]} & PropsWithChildren;
+export const GradesTableProvider = ({
+  data,
+  children,
+}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
 
@@ -186,17 +188,13 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     // Here we predict the grades for the students
     let predictedGrades: ReturnType<typeof predictGrades> = [];
     if (gradingModels) {
-      predictedGrades = predictGrades(
-        props.data,
-        gradingModels,
-        gradeSelectOption
-      );
+      predictedGrades = predictGrades(data, gradingModels, gradeSelectOption);
     }
 
     // Add all auxiliary columns to the data
     return groupByLatestBestGrade(
       // Creating the extended rows
-      props.data.map(row => {
+      data.map(row => {
         const studentPredictedGrades = Object.fromEntries(
           Object.entries(predictedGrades).map(([key, value]) => [
             key,
@@ -221,7 +219,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
   }, [
     t,
     gradingModels,
-    props.data,
+    data,
     gradeSelectOption,
     courseTasks.data,
     course.data?.gradingScale,
@@ -316,26 +314,24 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
       id: 'select',
       size: 70,
       meta: {PrettyChipPosition: grouping.length > 0 ? 'last' : 'alone'},
-      header: ({table}) => {
-        return (
-          <>
-            <Checkbox
-              id="select-all"
-              checked={table.getIsAllRowsSelected()}
-              indeterminate={table.getIsSomeRowsSelected()}
-              onChange={table.getToggleAllRowsSelectedHandler()}
+      header: ({table}) => (
+        <>
+          <Checkbox
+            id="select-all"
+            checked={table.getIsAllRowsSelected()}
+            indeterminate={table.getIsSomeRowsSelected()}
+            onChange={table.getToggleAllRowsSelectedHandler()}
+          />
+          <span style={{marginLeft: '4px', marginRight: '15px'}}>
+            <Badge
+              badgeContent={table.getSelectedRowModel().rows.length || '0'}
+              // color="secondary"
+              color="primary"
+              max={999}
             />
-            <span style={{marginLeft: '4px', marginRight: '15px'}}>
-              <Badge
-                badgeContent={table.getSelectedRowModel().rows.length || '0'}
-                // color="secondary"
-                color="primary"
-                max={999}
-              />
-            </span>
-          </>
-        );
-      },
+          </span>
+        </>
+      ),
       aggregatedCell: ({row}) => (
         <PrettyChip position="last">
           <>
@@ -443,13 +439,13 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         if (modelId === 'any') return 0; // Makes no sense to sort if there is more than one model
 
         const valA =
-          a.getValue<GroupedStudentRow>(columnId).predictedFinalGrades?.[
+          a.getValue<GroupedStudentRow>(columnId).predictedGraphValues?.[
             modelId
-          ].finalGrade;
+          ].finalValue;
         const valB =
-          b.getValue<GroupedStudentRow>(columnId).predictedFinalGrades?.[
+          b.getValue<GroupedStudentRow>(columnId).predictedGraphValues?.[
             modelId
-          ].finalGrade;
+          ].finalValue;
 
         if (valB === undefined) return 1;
         if (valA === undefined) return -1;
@@ -548,16 +544,19 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
     // debugAll: true,
   });
 
+  const providerData = useMemo(
+    () => ({
+      table,
+      gradeSelectOption,
+      setGradeSelectOption,
+      selectedGradingModel,
+      setSelectedGradingModel,
+    }),
+    [gradeSelectOption, selectedGradingModel, table]
+  );
+
   return (
-    <GradesTableContext.Provider
-      value={{
-        table,
-        gradeSelectOption,
-        setGradeSelectOption,
-        selectedGradingModel: selectedGradingModel,
-        setSelectedGradingModel: setSelectedGradingModel,
-      }}
-    >
+    <GradesTableContext.Provider value={providerData}>
       <UserGraphDialog
         open={userGraphOpen}
         onClose={() => setUserGraphOpen(false)}
@@ -575,7 +574,7 @@ export const GradesTableProvider = (props: PropsType): JSX.Element => {
         ]} // Very ugly way to sort the selected model to be the first
         row={userGraphData}
       />
-      {props.children}
+      {children}
     </GradesTableContext.Provider>
   );
 };

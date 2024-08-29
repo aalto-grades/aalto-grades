@@ -10,7 +10,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended-type-checked',
     '../node_modules/gts',
-    '../.eslintrc.json',
+    '../.eslintrc.cjs',
   ],
   plugins: ['@typescript-eslint'],
   parser: '@typescript-eslint/parser',

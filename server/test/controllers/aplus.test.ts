@@ -2,30 +2,30 @@
 //
 // SPDX-License-Identifier: MIT
 
-import axios, {AxiosError, AxiosStatic} from 'axios';
+import axios, {AxiosError, type AxiosStatic} from 'axios';
 import supertest from 'supertest';
 
 import {
-  AplusCourseData,
+  type AplusCourseData,
   AplusCourseDataArraySchema,
   AplusExerciseDataSchema,
   AplusGradeSourceType,
-  CoursePartData,
-  CourseTaskData,
+  type CoursePartData,
+  type CourseTaskData,
   HttpCode,
-  NewAplusGradeSourceData,
+  type NewAplusGradeSourceData,
   NewTaskGradeArraySchema,
 } from '@/common/types';
 import {app} from '../../src/app';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
-import {
+import type {
   AplusCoursesRes,
   AplusExercisesRes,
   AplusPointsRes,
 } from '../../src/types/aplus';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
-import {Cookies, getCookies} from '../util/getCookies';
+import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
 

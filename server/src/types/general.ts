@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {NextFunction, Request, Response} from 'express';
+import type {NextFunction, Request, Response} from 'express';
 import {z} from 'zod';
 
-import {CourseRoleType, SystemRole} from '@/common/types';
-import Course from '../database/models/course';
-import CourseTranslation from '../database/models/courseTranslation';
-import User from '../database/models/user';
+import type {CourseRoleType, SystemRole} from '@/common/types';
+import type Course from '../database/models/course';
+import type CourseTranslation from '../database/models/courseTranslation';
+import type User from '../database/models/user';
 
 // Endpoint types
 interface TypedRequestBody<T> extends Request {

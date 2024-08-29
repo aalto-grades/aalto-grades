@@ -10,8 +10,8 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@mui/material';
-import {JSX} from 'react';
-import {IModalProps} from 'react-global-modal';
+import type {JSX} from 'react';
+import type {IModalProps} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 
 type PropsType = IModalProps & {

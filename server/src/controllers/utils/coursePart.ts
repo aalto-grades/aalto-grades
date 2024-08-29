@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CoursePartData, HttpCode} from '@/common/types';
+import {type CoursePartData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
-import Course from '../../database/models/course';
+import type Course from '../../database/models/course';
 import CoursePart from '../../database/models/coursePart';
 import {ApiError, stringToIdSchema} from '../../types';
 
@@ -57,7 +57,7 @@ const findAndValidateCoursePartId = async (
       HttpCode.BadRequest
     );
   }
-  return await findCoursePartById(result.data);
+  return findCoursePartById(result.data);
 };
 
 /**

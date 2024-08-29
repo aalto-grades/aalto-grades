@@ -6,14 +6,14 @@ import * as argon from 'argon2';
 
 import {
   AplusGradeSourceType,
-  CoursePartData,
+  type CoursePartData,
   CourseRoleType,
-  CourseTaskData,
+  type CourseTaskData,
   GradingScale,
   Language,
-  NewCourseData,
+  type NewCourseData,
   SystemRole,
-  UserData,
+  type UserData,
 } from '@/common/types';
 import {initGraph} from '@/common/util';
 import {ASSISTANT_ID, STUDENT_ID, TEACHER_ID} from './general';

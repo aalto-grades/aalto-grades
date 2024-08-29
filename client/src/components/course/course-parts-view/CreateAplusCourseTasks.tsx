@@ -11,10 +11,10 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {
+import type {
   EditCourseTaskData,
   NewAplusGradeSourceData,
   NewCourseTaskData,
@@ -22,7 +22,10 @@ import {
 
 type PropsType = {
   courseTasksWithSource: [NewCourseTaskData, NewAplusGradeSourceData][];
-  handleChange: (index: number, courseTask: EditCourseTaskData) => void;
+  handleChange: (
+    index: number,
+    courseTask: Omit<EditCourseTaskData, 'id'>
+  ) => void;
 };
 const CreateAplusCourseTasks = ({
   courseTasksWithSource,

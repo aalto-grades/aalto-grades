@@ -2,11 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {JSX, useContext, useState} from 'react';
+import {type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Handle, NodeProps, Position, useUpdateNodeInternals} from 'reactflow';
+import {
+  Handle,
+  type NodeProps,
+  Position,
+  useUpdateNodeInternals,
+} from 'reactflow';
 
-import {MaxNodeSettings, MaxNodeValue} from '@/common/types';
+import type {MaxNodeSettings, MaxNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
@@ -19,7 +24,7 @@ const MaxNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;
 
   const updateNodeInternals = useUpdateNodeInternals();
-  const {nodeValues} = useContext(NodeValuesContext);
+  const nodeValues = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const settings = nodeData[id].settings as MaxNodeSettings;
@@ -145,7 +150,7 @@ const MaxNode = (props: NodeProps): JSX.Element => {
               </tr>
             ))}
           <tr style={{height: rowHeight}}>
-            <td></td>
+            <td />
           </tr>
         </tbody>
       </table>

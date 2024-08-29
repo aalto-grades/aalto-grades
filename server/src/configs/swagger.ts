@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {OAS3Definition} from 'swagger-jsdoc';
+import type {OAS3Definition} from 'swagger-jsdoc';
 
 /*
  * This file is used as a base definition for the Swagger compilation in

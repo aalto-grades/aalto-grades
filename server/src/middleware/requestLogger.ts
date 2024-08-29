@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Request, RequestHandler} from 'express';
+import type {Request, RequestHandler} from 'express';
 import morgan from 'morgan';
 
 import {

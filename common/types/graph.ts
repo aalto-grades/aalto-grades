@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import type {Node} from 'reactflow';
 import {z} from 'zod';
 
 // Types without schemas (not in API)
@@ -15,18 +16,6 @@ export type AverageNodeValue = {
   sources: {[key: string]: {isConnected: boolean; value: number}};
   value: number;
 };
-export type CoursePartNodeValue = {
-  type: 'coursepart';
-  source: number;
-  value: number | 'fail';
-  courseFail: boolean;
-};
-export type GradeNodeValue = {
-  type: 'grade';
-  source: number;
-  value: number;
-  courseFail: boolean;
-};
 export type MaxNodeValue = {
   type: 'max';
   sources: {[key: string]: {isConnected: boolean; value: number}};
@@ -36,18 +25,30 @@ export type MinPointsNodeValue = {
   type: 'minpoints';
   source: number;
   value: number | 'fail';
-  courseFail: boolean;
+  fullFail: boolean;
 };
 export type RequireNodeValue = {
   type: 'require';
   sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
   values: {[key: string]: number | 'fail'};
-  courseFail: boolean;
+  fullFail: boolean;
 };
 export type RoundNodeValue = {
   type: 'round';
   source: number;
   value: number;
+};
+export type SinkNodeValue = {
+  type: 'sink';
+  source: number;
+  value: number;
+  fullFail: boolean;
+};
+export type SourceNodeValue = {
+  type: 'source';
+  source: number;
+  value: number | 'fail';
+  fullFail: boolean;
 };
 export type StepperNodeValue = {
   type: 'stepper';
@@ -63,12 +64,12 @@ export type SubstituteNodeValue = {
 export type NodeValue =
   | AdditionNodeValue
   | AverageNodeValue
-  | CoursePartNodeValue
-  | GradeNodeValue
   | MaxNodeValue
   | MinPointsNodeValue
   | RequireNodeValue
   | RoundNodeValue
+  | SinkNodeValue
+  | SourceNodeValue
   | StepperNodeValue
   | SubstituteNodeValue;
 
@@ -78,42 +79,39 @@ export type NodeValues = {[key: string]: NodeValue};
 const CustomNodeTypesSchema = z.enum([
   'addition',
   'average',
-  'coursepart',
-  'grade',
   'max',
   'minpoints',
   'require',
   'round',
+  'sink',
+  'source',
   'stepper',
   'substitute',
 ]);
-
-const DropInNodesSchema = CustomNodeTypesSchema.exclude([
-  'coursepart',
-  'grade',
-]);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const DropInNodesSchema = CustomNodeTypesSchema.exclude(['sink', 'source']);
 
 const AverageNodeSettingsSchema = z.strictObject({
   weights: z.record(z.number()),
   percentageMode: z.boolean(),
-});
-const CoursePartNodeSettingsSchema = z.strictObject({
-  minPoints: z.union([z.number(), z.null()]),
-  onFailSetting: z.enum(['coursefail', 'fail']),
 });
 const MaxNodeSettingsSchema = z.strictObject({
   minValue: z.number(),
 });
 const MinPointsNodeSettingsSchema = z.strictObject({
   minPoints: z.number(),
-  onFailSetting: z.enum(['coursefail', 'fail']),
+  onFailSetting: z.enum(['fullfail', 'fail']),
 });
 const RequireNodeSettingsSchema = z.strictObject({
   numFail: z.number(),
-  onFailSetting: z.enum(['coursefail', 'fail']),
+  onFailSetting: z.enum(['fullfail', 'fail']),
 });
 const RoundNodeSettingsSchema = z.strictObject({
   roundingSetting: z.enum(['round-up', 'round-closest', 'round-down']),
+});
+const SourceNodeSettingsSchema = z.strictObject({
+  minPoints: z.union([z.number(), z.null()]),
+  onFailSetting: z.enum(['fullfail', 'fail']),
 });
 const StepperNodeSettingsSchema = z.strictObject({
   numSteps: z.number(),
@@ -127,11 +125,11 @@ const SubstituteNodeSettingsSchema = z.strictObject({
 
 const NodeSettingsSchema = z.union([
   AverageNodeSettingsSchema,
-  CoursePartNodeSettingsSchema,
   MaxNodeSettingsSchema,
   MinPointsNodeSettingsSchema,
   RequireNodeSettingsSchema,
   RoundNodeSettingsSchema,
+  SourceNodeSettingsSchema,
   StepperNodeSettingsSchema,
   SubstituteNodeSettingsSchema,
 ]);
@@ -148,7 +146,7 @@ export const GraphStructureSchema = z.strictObject({
       id: z.string(),
       position: z.object({x: z.number(), y: z.number()}),
       data: z.object({}),
-      type: z.string().optional(),
+      type: CustomNodeTypesSchema.optional(),
 
       // Will be removed in api
       dragging: z.any().optional(),
@@ -175,13 +173,11 @@ export type DropInNodes = z.infer<typeof DropInNodesSchema>;
 export type CustomNodeTypes = z.infer<typeof CustomNodeTypesSchema>;
 
 export type AverageNodeSettings = z.infer<typeof AverageNodeSettingsSchema>;
-export type CoursePartNodeSettings = z.infer<
-  typeof CoursePartNodeSettingsSchema
->;
 export type MaxNodeSettings = z.infer<typeof MaxNodeSettingsSchema>;
 export type MinPointsNodeSettings = z.infer<typeof MinPointsNodeSettingsSchema>;
 export type RequireNodeSettings = z.infer<typeof RequireNodeSettingsSchema>;
 export type RoundNodeSettings = z.infer<typeof RoundNodeSettingsSchema>;
+export type SourceNodeSettings = z.infer<typeof SourceNodeSettingsSchema>;
 export type StepperNodeSettings = z.infer<typeof StepperNodeSettingsSchema>;
 export type SubstituteNodeSettings = z.infer<
   typeof SubstituteNodeSettingsSchema
@@ -192,3 +188,8 @@ export type NodeData = z.infer<typeof NodeDataSchema>;
 export type FullNodeData = z.infer<typeof FullNodeDataSchema>;
 
 export type GraphStructure = z.infer<typeof GraphStructureSchema>;
+
+// Types without schemas
+export type TypedNode = Node<object, CustomNodeTypes>;
+export type GraphSource = {id: number; name: string; archived: boolean};
+export type GraphSourceValue = {id: number; value: number};

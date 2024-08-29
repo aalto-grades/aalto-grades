@@ -3,15 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional,
+  type CreationOptional,
   DataTypes,
-  ForeignKey,
-  InferAttributes,
-  InferCreationAttributes,
+  type ForeignKey,
+  type InferAttributes,
+  type InferCreationAttributes,
   Model,
 } from 'sequelize';
 
-import {AplusCourseData, AplusGradeSourceType} from '@/common/types';
+import type {AplusCourseData, AplusGradeSourceType} from '@/common/types';
 import CourseTask from './courseTask';
 import {sequelize} from '..';
 

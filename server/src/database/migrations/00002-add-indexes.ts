@@ -2,9 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-/* eslint camelcase: off */
-
-import {QueryInterface} from 'sequelize';
+import type {QueryInterface} from 'sequelize';
 
 import {dbLogger} from '../../configs/winston';
 

@@ -12,24 +12,28 @@ import {
 } from '@mui/material';
 import {
   GridActionsCellItem,
-  GridCellParams,
-  GridColDef,
-  GridRowClassNameParams,
-  GridRowModel,
-  GridRowsProp,
+  type GridCellParams,
+  type GridColDef,
+  type GridRowClassNameParams,
+  type GridRowModel,
+  type GridRowsProp,
   GridToolbarContainer,
-  GridValidRowModel,
+  type GridValidRowModel,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useEffect, useMemo, useState} from 'react';
+import {type JSX, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker, useParams} from 'react-router-dom';
 
-import {EditTaskGradeData, NewTaskGrade, TaskGradeData} from '@/common/types';
+import type {
+  EditTaskGradeData,
+  NewTaskGrade,
+  TaskGradeData,
+} from '@/common/types';
 import StyledDataGrid, {
-  GetRowClassName,
-  ProcessRowUpdate,
+  type GetRowClassName,
+  type ProcessRowUpdate,
 } from '@/components/shared/StyledDataGrid';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {useTableContext} from '@/context/useTableContext';
@@ -186,6 +190,7 @@ const EditGradesDialog = ({
       type: 'actions',
       getActions: params => [
         <GridActionsCellItem
+          key={params.id}
           icon={<Delete />}
           label={t('general.delete')}
           onClick={() =>
@@ -265,8 +270,8 @@ const EditGradesDialog = ({
 
     await Promise.all([
       addGrades.mutateAsync(newGrades),
-      ...deletedGrades.map(gradeId => deleteGrade.mutateAsync(gradeId)),
-      ...editedGrades.map(editData => editGrade.mutateAsync(editData)),
+      ...deletedGrades.map(async gradeId => deleteGrade.mutateAsync(gradeId)),
+      ...editedGrades.map(async editData => editGrade.mutateAsync(editData)),
     ]);
 
     onClose();

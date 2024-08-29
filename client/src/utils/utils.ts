@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AuthData,
-  CourseData,
+  type AuthData,
+  type CourseData,
   CourseRoleType,
   GradingScale,
   Language,
-  LocalizedString,
+  type LocalizedString,
 } from '@/common/types';
-import {LanguageOption} from '@/types';
+import type {LanguageOption} from '@/types';
 
 export const getMaxFinalGrade = (gradingScale: GradingScale): number => {
   switch (gradingScale) {

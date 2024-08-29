@@ -20,11 +20,11 @@ import {
   TableRow,
   Tooltip,
 } from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {AplusGradeSourceData, AplusGradeSourceType} from '@/common/types';
+import {type AplusGradeSourceData, AplusGradeSourceType} from '@/common/types';
 import {useDeleteAplusGradeSource} from '@/hooks/useApi';
 
 type PropsType = {

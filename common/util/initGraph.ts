@@ -2,9 +2,113 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Edge, Node} from 'reactflow';
+import type {Edge} from 'reactflow';
 
-import {CoursePartData, FullNodeData, GraphStructure} from '../types';
+import type {
+  CoursePartData,
+  CourseTaskData,
+  CustomNodeTypes,
+  FullNodeData,
+  GraphStructure,
+  NodeData,
+  NodeValue,
+  TypedNode,
+} from '../types';
+
+export const initNode = (
+  type: CustomNodeTypes,
+  id?: string,
+  edges?: Edge[]
+): {
+  value: NodeValue;
+  data: NodeData;
+} => {
+  const sources: {[key: string]: {isConnected: true; value: 0}} = {};
+  const values: {[key: string]: 0} = {};
+  if (edges !== undefined && id !== undefined) {
+    for (const edge of edges) {
+      if (edge.target === id) {
+        sources[edge.targetHandle!] = {
+          isConnected: true,
+          value: 0,
+        };
+      }
+      if (edge.source === id) {
+        values[edge.sourceHandle!] = 0;
+      }
+    }
+  }
+  switch (type) {
+    case 'addition':
+      return {
+        value: {type, sources, value: 0},
+        data: {title: 'Addition'},
+      };
+    case 'average':
+      return {
+        value: {type, sources, value: 0},
+        data: {
+          title: 'Average',
+          settings: {weights: {}, percentageMode: false},
+        },
+      };
+    case 'max':
+      return {
+        value: {type, sources, value: 0},
+        data: {title: 'Max', settings: {minValue: 0}},
+      };
+    case 'minpoints':
+      return {
+        value: {type, source: 0, value: 0, fullFail: false},
+        data: {
+          title: 'Require points',
+          settings: {minPoints: 0, onFailSetting: 'fullfail'},
+        },
+      };
+    case 'require':
+      return {
+        value: {type, sources, values, fullFail: false},
+        data: {
+          title: 'Require',
+          settings: {numFail: 0, onFailSetting: 'fullfail'},
+        },
+      };
+    case 'round':
+      return {
+        value: {type, source: 0, value: 0},
+        data: {title: 'Round', settings: {roundingSetting: 'round-closest'}},
+      };
+    case 'sink':
+      return {
+        value: {type, source: 0, value: 0, fullFail: false},
+        data: {title: 'unused'}, // This .data should never be used
+      };
+    case 'source':
+      return {
+        value: {type, source: 0, value: 0, fullFail: false},
+        data: {
+          title: 'unused', // This .data should never be used
+          settings: {onFailSetting: 'fullfail', minPoints: 0},
+        },
+      };
+    case 'stepper':
+      return {
+        value: {type, source: 0, value: 0},
+        data: {
+          title: 'Stepper',
+          settings: {numSteps: 1, middlePoints: [], outputValues: [0]},
+        },
+      };
+    case 'substitute':
+      return {
+        value: {type, sources, values},
+        data: {
+          title: 'Substitute',
+          settings: {maxSubstitutions: 0, substituteValues: []},
+        },
+      };
+  }
+};
 
 export type GraphTemplate = 'none' | 'addition' | 'average';
 
@@ -27,32 +131,36 @@ const createEdge = (
 
 export const initGraph = (
   template: GraphTemplate,
-  courseParts: CoursePartData[]
+  sources: CoursePartData[] | CourseTaskData[],
+  coursePart: CoursePartData | null = null
 ): GraphStructure => {
-  const nodes: Node[] = [
+  const nodes: TypedNode[] = [
     {
       id: 'final-grade',
-      type: 'grade',
+      type: 'sink',
       position: {x: 1116, y: 0},
       data: {},
     },
-    ...courseParts.map((coursePart, index) => ({
-      id: `coursepart-${coursePart.id}`,
-      type: 'coursepart',
-
-      position: {x: 12, y: 173 * index},
-      data: {},
-    })),
+    ...sources.map(
+      (source, index): TypedNode => ({
+        id: `source-${source.id}`,
+        type: 'source',
+        position: {x: 12, y: 173 * index},
+        data: {},
+      })
+    ),
   ];
   const edges: Edge[] = [];
   const nodeData: FullNodeData = {
-    'final-grade': {title: 'Final grade'},
+    'final-grade': {
+      title: coursePart !== null ? coursePart.name : 'Final grade',
+    },
     ...Object.fromEntries(
-      courseParts.map(coursePart => [
-        `coursepart-${coursePart.id}`,
+      sources.map(source => [
+        `source-${source.id}`,
         {
-          title: coursePart.name,
-          settings: {onFailSetting: 'coursefail', minPoints: null},
+          title: source.name,
+          settings: {onFailSetting: 'fullfail', minPoints: null},
         },
       ])
     ),
@@ -69,9 +177,9 @@ export const initGraph = (
       position: {x: 437, y: 0},
       data: {},
     });
-    for (let i = 0; i < courseParts.length; i++) {
-      const coursePartNodeId = `coursepart-${courseParts[i].id}`;
-      edges.push(createEdge(coursePartNodeId, middleNodeId, undefined, i));
+    for (let i = 0; i < sources.length; i++) {
+      const sourceNodeId = `source-${sources[i].id}`;
+      edges.push(createEdge(sourceNodeId, middleNodeId, undefined, i));
     }
     nodeData[middleNodeId] =
       template === 'addition'
@@ -80,9 +188,9 @@ export const initGraph = (
             title: 'Average',
             settings: {
               weights: Object.fromEntries(
-                courseParts.map((_, i) => [
+                sources.map((_, i) => [
                   `average-${i}`,
-                  Math.round((100 / courseParts.length) * 10) / 10,
+                  Math.round((100 / sources.length) * 10) / 10,
                 ])
               ),
               percentageMode: true,
@@ -108,8 +216,7 @@ export const initGraph = (
             : Array.from(
                 {length: 5},
                 (_, i) =>
-                  Math.round((((i + 1) * 10 * courseParts.length) / 6) * 10) /
-                  10
+                  Math.round((((i + 1) * 10 * sources.length) / 6) * 10) / 10
               ),
       },
     };

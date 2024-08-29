@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {NextFunction, Request, Response} from 'express';
+import type {NextFunction, Request, Response} from 'express';
 
-import {CourseRoleType, HttpCode, SystemRole} from '@/common/types';
+import {type CourseRoleType, HttpCode, SystemRole} from '@/common/types';
 import {getUserCourseRole} from '../controllers/utils/user';
-import {JwtClaims, stringToIdSchema} from '../types';
+import {type JwtClaims, stringToIdSchema} from '../types';
 
 /**
  * Middleware function to ensure that the user has the necessary role to

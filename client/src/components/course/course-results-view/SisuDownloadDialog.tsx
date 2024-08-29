@@ -23,14 +23,14 @@ import {
 } from '@mui/material';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs, {Dayjs} from 'dayjs';
+import dayjs, {type Dayjs} from 'dayjs';
 import 'dayjs/locale/en-gb';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useMemo, useState} from 'react';
+import {type JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {FinalGradeData, Language, StudentRow} from '@/common/types';
+import type {FinalGradeData, Language, StudentRow} from '@/common/types';
 import {useDownloadSisuGradeCsv} from '@/hooks/useApi';
 import {useLocalize} from '@/hooks/useLocalize';
 import {sisuLanguageOptions} from '@/utils';

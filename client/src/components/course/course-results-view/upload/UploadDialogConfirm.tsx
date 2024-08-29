@@ -17,7 +17,7 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import {
+import type {
   GridColDef,
   GridRowClassNameParams,
   GridRowsProp,
@@ -25,12 +25,12 @@ import {
 } from '@mui/x-data-grid';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
-import {Dayjs} from 'dayjs';
+import type {Dayjs} from 'dayjs';
 import 'dayjs/locale/en-gb';
 import {
-  Dispatch,
-  JSX,
-  SetStateAction,
+  type Dispatch,
+  type JSX,
+  type SetStateAction,
   useEffect,
   useMemo,
   useState,
@@ -38,7 +38,7 @@ import {
 import {useTranslation} from 'react-i18next';
 
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
-import {GradeUploadColTypes} from './UploadDialog';
+import type {GradeUploadColTypes} from './UploadDialog';
 
 type DateType = {
   courseTaskName: string;
@@ -131,6 +131,65 @@ const UploadDialogConfirm = ({
     return hasInvalid ? 'invalid-value-data-grid' : '';
   };
 
+  const DateTable = (): JSX.Element => (
+    <TableContainer>
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell>{t('general.course-part')}</TableCell>
+            <TableCell>{t('course.results.upload.completion-date')}</TableCell>
+            <TableCell>{t('course.results.upload.expiration-date')}</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {dates
+            .filter(date => nonEmptyCols.includes(date.courseTaskName))
+            .map(date => (
+              <TableRow key={date.courseTaskName}>
+                <TableCell>{date.courseTaskName}</TableCell>
+                <TableCell>
+                  <DatePicker
+                    slotProps={{textField: {size: 'small'}}}
+                    value={date.completionDate}
+                    onChange={value =>
+                      handleCompletionDateChange(value, date.courseTaskName)
+                    }
+                  />
+                </TableCell>
+                <TableCell>
+                  <DatePicker
+                    slotProps={{
+                      textField: {
+                        size: 'small',
+                        error: date.expirationDate <= date.completionDate,
+                        helperText:
+                          date.expirationDate <= date.completionDate
+                            ? t(
+                                'course.results.upload.expiration-after-completion'
+                              )
+                            : '',
+                      },
+                    }}
+                    value={date.expirationDate}
+                    onChange={e =>
+                      setDates(oldDates =>
+                        oldDates.map(oldDate =>
+                          oldDate.courseTaskName === date.courseTaskName &&
+                          e !== null
+                            ? {...oldDate, expirationDate: e}
+                            : oldDate
+                        )
+                      )
+                    }
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+
   return (
     <>
       <DialogTitle>Confirm</DialogTitle>
@@ -158,72 +217,7 @@ const UploadDialogConfirm = ({
               dateAdapter={AdapterDayjs}
               adapterLocale="en-gb"
             >
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{t('general.course-part')}</TableCell>
-                      <TableCell>
-                        {t('course.results.upload.completion-date')}
-                      </TableCell>
-                      <TableCell>
-                        {t('course.results.upload.expiration-date')}
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {dates
-                      .filter(date =>
-                        nonEmptyCols.includes(date.courseTaskName)
-                      )
-                      .map(date => (
-                        <TableRow key={date.courseTaskName}>
-                          <TableCell>{date.courseTaskName}</TableCell>
-                          <TableCell>
-                            <DatePicker
-                              slotProps={{textField: {size: 'small'}}}
-                              value={date.completionDate}
-                              onChange={value =>
-                                handleCompletionDateChange(
-                                  value,
-                                  date.courseTaskName
-                                )
-                              }
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <DatePicker
-                              slotProps={{
-                                textField: {
-                                  size: 'small',
-                                  error:
-                                    date.expirationDate <= date.completionDate,
-                                  helperText:
-                                    date.expirationDate <= date.completionDate
-                                      ? t(
-                                          'course.results.upload.expiration-after-completion'
-                                        )
-                                      : '',
-                                },
-                              }}
-                              value={date.expirationDate}
-                              onChange={e =>
-                                setDates(oldDates =>
-                                  oldDates.map(oldDate =>
-                                    oldDate.courseTaskName ===
-                                      date.courseTaskName && e !== null
-                                      ? {...oldDate, expirationDate: e}
-                                      : oldDate
-                                  )
-                                )
-                              }
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+              <DateTable />
             </LocalizationProvider>
           </AccordionDetails>
         </Accordion>

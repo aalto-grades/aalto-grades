@@ -13,15 +13,16 @@ import {
   MenuItem,
   Select,
 } from '@mui/material';
-import {JSX, useEffect, useState} from 'react';
+import {type JSX, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {GradingModelData} from '@/common/types';
+import type {GradingModelData} from '@/common/types';
 import Graph from '@/components/shared/graph/Graph';
-import {GroupedStudentRow} from '@/context/GradesTableProvider';
+import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 import {useGetCourseParts} from '@/hooks/useApi';
+import {findBestGrade} from '@/utils';
 
 type PropsType = {
   open: boolean;
@@ -61,7 +62,7 @@ const UserGraphDialog = ({
           <Graph
             key={selectedModel.id} // Reset graph for each model
             initGraph={selectedModel.graphStructure}
-            courseParts={row.courseTasks.map(rowCourseTask => ({
+            sources={row.courseTasks.map(rowCourseTask => ({
               id: rowCourseTask.courseTaskId,
               name: rowCourseTask.courseTaskName,
               archived:
@@ -69,7 +70,10 @@ const UserGraphDialog = ({
                   coursePart => coursePart.id === rowCourseTask.courseTaskId // TODO: Fix
                 )?.archived ?? false,
             }))}
-            userGrades={row.courseTasks}
+            sourceValues={row.courseTasks.map(task => ({
+              id: task.courseTaskId,
+              value: findBestGrade(task.grades)?.grade ?? 0,
+            }))}
             gradeSelectOption={gradeSelectOption}
             readOnly
           />

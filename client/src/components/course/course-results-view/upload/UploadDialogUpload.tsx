@@ -15,26 +15,25 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Snackbar,
   TextField,
 } from '@mui/material';
 import {
-  GridColDef,
-  GridRowClassNameParams,
-  GridRowModel,
-  GridRowsProp,
+  type GridColDef,
+  type GridRowClassNameParams,
+  type GridRowModel,
+  type GridRowsProp,
   GridToolbarContainer,
-  GridValidRowModel,
+  type GridValidRowModel,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
-import {ParseResult, parse, unparse} from 'papaparse';
-import {Dispatch, JSX, SetStateAction, useState} from 'react';
+import {type ParseResult, parse, unparse} from 'papaparse';
+import {type Dispatch, type JSX, type SetStateAction, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import AplusImportDialog from './AplusImportDialog';
-import {GradeUploadColTypes} from './UploadDialog';
-import MismatchDialog, {MismatchData} from './UploadDialogMismatchDialog';
+import type {GradeUploadColTypes} from './UploadDialog';
+import MismatchDialog, {type MismatchData} from './UploadDialogMismatchDialog';
 
 type PropsType = {
   columns: GridColDef[];
@@ -62,10 +61,6 @@ const UploadDialogUpload = ({
   const [mismatchDialogOpen, setMismatchDialogOpen] = useState<boolean>(false);
   const [mismatchData, setMismatchData] = useState<MismatchData | null>(null);
   const [editText, setEditText] = useState<boolean>(rows.length > 0);
-  const [snackbar, setSnackBar] = useState<{
-    message: string;
-    severity: 'success' | 'error';
-  } | null>(null);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [aplusImportDialogOpen, setAplusImportDialogOpen] =
@@ -262,19 +257,6 @@ const UploadDialogUpload = ({
             {t('course.results.upload.higher-than-max')}
           </Alert>
         </Collapse>
-
-        <Snackbar
-          open={snackbar !== null}
-          autoHideDuration={3000}
-          onClose={() => setSnackBar(null)}
-        >
-          <Alert
-            severity={snackbar?.severity}
-            onClose={() => setSnackBar(null)}
-          >
-            {snackbar?.message}
-          </Alert>
-        </Snackbar>
         <Accordion
           expanded={expanded === 'upload'}
           onChange={(_, newExpanded) =>

@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import {AxiosError} from 'axios';
-import {NextFunction, Request, Response} from 'express';
+import type {NextFunction, Request, Response} from 'express';
 
 import {HttpCode} from '@/common/types';
 import httpLogger from '../configs/winston';
-import {ApiError, Endpoint, SyncEndpoint} from '../types';
+import {ApiError, type Endpoint, type SyncEndpoint} from '../types';
 
 /**
  * Creates a RequestHandler wrapper function that executes a given handler and

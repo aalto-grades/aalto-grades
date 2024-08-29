@@ -5,22 +5,22 @@
 import supertest from 'supertest';
 
 import {
-  CoursePartData,
-  CourseTaskData,
-  EditGradingModelData,
+  type CoursePartData,
+  type CourseTaskData,
+  type EditGradingModelData,
   GradingModelDataArraySchema,
   GradingModelDataSchema,
-  GraphStructure,
+  type GraphStructure,
   HttpCode,
   IdSchema,
-  NewGradingModelData,
+  type NewGradingModelData,
 } from '@/common/types';
 import {initGraph} from '@/common/util';
 import {app} from '../../src/app';
 import GradingModel from '../../src/database/models/gradingModel';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
-import {Cookies, getCookies} from '../util/getCookies';
+import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
 
@@ -110,7 +110,7 @@ describe('Test GET /v1/courses/:courseId/grading-models/:gradingModelId - get gr
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${courseId}/grading-models/${5.5}`;
+    let url = `/v1/courses/${courseId}/grading-models/5.5`;
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
 
     url = `/v1/courses/${-1}/grading-models/${gradingModId}`;
@@ -330,11 +330,11 @@ describe('Test Put /v1/courses/:courseId/grading-models/:gradingModId - edit a g
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${courseId}/grading-models/${'bad'}`;
+    let url = `/v1/courses/${courseId}/grading-models/bad`;
     const data = {name: 'Not added', graphStructure: testStructure};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
-    url = `/v1/courses/${1.5}/grading-models/${gradingModId}`;
+    url = `/v1/courses/1.5/grading-models/${gradingModId}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 
@@ -402,10 +402,10 @@ describe('Test DELETE /v1/courses/:courseId/grading-models/:gradingModId - delet
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${courseId}/grading-models/${'bad'}`;
+    let url = `/v1/courses/${courseId}/grading-models/bad`;
     await responseTests.testBadRequest(url, cookies.adminCookie).delete();
 
-    url = `/v1/courses/${1.5}/grading-models/${gradingModId}`;
+    url = `/v1/courses/1.5/grading-models/${gradingModId}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).delete();
   });
 

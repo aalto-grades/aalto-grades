@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CourseData, CourseRoleType, HttpCode} from '@/common/types';
+import {type CourseData, CourseRoleType, HttpCode} from '@/common/types';
 import httpLogger from '../../configs/winston';
 import Course from '../../database/models/course';
-import CourseRole from '../../database/models/courseRole';
+import type CourseRole from '../../database/models/courseRole';
 import CourseTranslation from '../../database/models/courseTranslation';
 import User from '../../database/models/user';
-import {ApiError, CourseFull, stringToIdSchema} from '../../types';
+import {ApiError, type CourseFull, stringToIdSchema} from '../../types';
 
 /**
  * Finds a course by its ID.
@@ -191,7 +191,7 @@ export const findAndValidateCourseId = async (
   const result = stringToIdSchema.safeParse(courseId);
   if (!result.success)
     throw new ApiError(`Invalid course id ${courseId}`, HttpCode.BadRequest);
-  return await findCourseById(result.data);
+  return findCourseById(result.data);
 };
 
 /**

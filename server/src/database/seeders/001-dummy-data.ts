@@ -4,7 +4,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import {QueryInterface} from 'sequelize';
+import type {QueryInterface} from 'sequelize';
 
 import {dbLogger} from '../../configs/winston';
 
