@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {Archive, Delete, Edit, Unarchive, Warning} from '@mui/icons-material';
 import {
   IconButton,
