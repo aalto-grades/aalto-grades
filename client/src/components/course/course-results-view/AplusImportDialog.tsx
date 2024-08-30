@@ -33,6 +33,8 @@ import {
 } from '@/hooks/useApi';
 import {getAplusToken} from '@/utils';
 
+// TODO: Show and use
+
 type PropsType = {
   handleClose: () => void;
   open: boolean;
@@ -153,8 +155,14 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
                     <TableCell>{row.courseTaskId}</TableCell>
                     <TableCell>{row.aplusGradeSourceId}</TableCell>
                     <TableCell>{row.grade}</TableCell>
-                    <TableCell>{row.date.toDateString()}</TableCell>
-                    <TableCell>{row.expiryDate.toDateString()}</TableCell>
+                    <TableCell>
+                      {row.date === null ? 'null' : row.date.toDateString()}
+                    </TableCell>
+                    <TableCell>
+                      {row.expiryDate === null
+                        ? 'null'
+                        : row.expiryDate.toDateString()}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -30,10 +30,12 @@ export const getDateOfLatestGrade = async (
     include: [{model: CoursePart, where: {courseId: courseId}}],
   });
 
-  const dates = grades.map(grade => new Date(grade.date));
+  const dates = grades.map(grade =>
+    grade.date === null ? null : new Date(grade.date)
+  );
   let maxSoFar = null;
   for (const date of dates) {
-    if (!maxSoFar || date > maxSoFar) {
+    if (date !== null && (!maxSoFar || date > maxSoFar)) {
       maxSoFar = date;
     }
   }
@@ -120,8 +122,9 @@ export const parseTaskGrade = (taskGrade: TaskGrade): TaskGradeData => {
       : null,
     grade: taskGrade.grade,
     exportedToSisu: taskGrade.sisuExportDate,
-    date: new Date(taskGrade.date),
-    expiryDate: new Date(taskGrade.expiryDate),
+    date: taskGrade.date === null ? null : new Date(taskGrade.date),
+    expiryDate:
+      taskGrade.expiryDate === null ? null : new Date(taskGrade.expiryDate),
     comment: taskGrade.comment,
   };
 };

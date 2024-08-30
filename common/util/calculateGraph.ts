@@ -150,6 +150,56 @@ export const calculateNodeValues = (
   return newNodeValues;
 };
 
+// TODO: Stress test?
+/** Calculate course part values for all students. */
+export const batchCalculateCourseParts = (
+  models: GradingModelData[],
+  studentData: {
+    userId: number;
+    courseTasks: {id: number; grade: number}[];
+  }[]
+): {[key: number]: {[key: string]: number | null}} => {
+  // Find course part models
+  const coursePartModels = models.filter(model => model.coursePartId !== null);
+
+  const result: {[key: number]: {[key: string]: number | null}} = {};
+
+  for (const student of studentData) {
+    result[student.userId] = {};
+    let sourceValues = student.courseTasks.map(task => ({
+      id: task.id,
+      value: task.grade,
+    }));
+
+    const coursePartValues: {[key: string]: number} = {};
+    for (const model of coursePartModels) {
+      result[student.userId][model.coursePartId!] = null;
+      const {nodes, edges, nodeData} = model.graphStructure;
+      const [gradesFound, nodeValues] = initNodeValues(nodes, sourceValues);
+
+      // No grades in course part.
+      if (!gradesFound) continue;
+
+      const graphValues = calculateNodeValues(
+        nodeValues,
+        nodeData,
+        nodes,
+        edges
+      );
+      const finalValue = (graphValues.sink as SinkNodeValue).value;
+      coursePartValues[model.coursePartId!] = finalValue;
+      result[student.userId][model.coursePartId!] = finalValue;
+    }
+    sourceValues = Object.entries(coursePartValues).map(([id, value]) => ({
+      id: parseInt(id),
+      value,
+    }));
+  }
+
+  return result;
+};
+
+// TODO: Only use for final grades?
 // TODO: Handle expired course parts?
 // TODO: Stress test?
 /** Calculate course part values and/or final grades for all students. */

@@ -202,6 +202,7 @@ const UploadDialogConfirm = ({
 
         <Accordion
           expanded={expanded === 'date'}
+          disabled={dates.length === 0}
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'date' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>

@@ -31,7 +31,6 @@ import {type Dispatch, type JSX, type SetStateAction, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
-import AplusImportDialog from './AplusImportDialog';
 import type {GradeUploadColTypes} from './UploadDialog';
 import MismatchDialog, {type MismatchData} from './UploadDialogMismatchDialog';
 
@@ -63,8 +62,6 @@ const UploadDialogUpload = ({
   const [editText, setEditText] = useState<boolean>(rows.length > 0);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
-  const [aplusImportDialogOpen, setAplusImportDialogOpen] =
-    useState<boolean>(false);
 
   const DataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
@@ -246,11 +243,6 @@ const UploadDialogUpload = ({
         }
       />
 
-      <AplusImportDialog
-        handleClose={() => setAplusImportDialogOpen(false)}
-        open={aplusImportDialogOpen}
-      />
-
       <DialogContent sx={{minHeight: 500}}>
         <Collapse in={invalidValues}>
           <Alert severity="warning" sx={{mb: 2}}>
@@ -282,13 +274,6 @@ const UploadDialogUpload = ({
               <Button variant="outlined" onClick={downloadTemplate}>
                 {t('course.results.upload.download-template')}
               </Button>
-              <Button
-                variant="outlined"
-                onClick={() => setAplusImportDialogOpen(true)}
-              >
-                {t('course.results.upload.a+-import')}
-              </Button>
-              <Button variant="outlined">Import from MyCourses</Button>
               <Button variant="outlined" onClick={() => setTextFieldOpen(true)}>
                 {t('course.results.upload.paste-text')}
               </Button>

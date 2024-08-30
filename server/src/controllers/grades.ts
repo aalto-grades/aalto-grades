@@ -102,7 +102,7 @@ export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
       studentData.set(user.id, {user, grades: {}, finalGrades: []});
 
     const userGrades = (studentData.get(user.id) as StudentData).grades;
-    if (!Object.hasOwn(userGrades[grade.courseTaskId], grade.courseTaskId))
+    if (!Object.hasOwn(userGrades, grade.courseTaskId))
       userGrades[grade.courseTaskId] = [];
 
     userGrades[grade.courseTaskId].push(parseTaskGrade(grade));
@@ -240,7 +240,7 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
 
       preparedBulkCreate.push({
         userId: userId,
-        coursePartId: gradeEntry.courseTaskId,
+        courseTaskId: gradeEntry.courseTaskId,
         graderId: grader.id,
         aplusGradeSourceId: gradeEntry.aplusGradeSourceId,
         date: gradeEntry.date,
@@ -296,8 +296,9 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
   const {grade, date, expiryDate, comment} = req.body;
 
   if (
-    date !== undefined &&
+    date &&
     expiryDate === undefined &&
+    gradeData.expiryDate !== null &&
     date > new Date(gradeData.expiryDate)
   ) {
     throw new ApiError(
@@ -306,8 +307,9 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
       HttpCode.BadRequest
     );
   } else if (
-    expiryDate !== undefined &&
+    expiryDate &&
     date === undefined &&
+    gradeData.date !== null &&
     new Date(gradeData.date) > expiryDate
   ) {
     throw new ApiError(
@@ -376,7 +378,7 @@ export const getLatestGrades: Endpoint<UserIdArray, LatestGrades> = async (
   });
   const latestGrades: LatestGrades = dbGrades.map(item => ({
     userId: item.userId,
-    date: new Date(item.date),
+    date: item.date === null ? null : new Date(item.date),
   }));
 
   const missingStudents = new Set<number>(req.body);

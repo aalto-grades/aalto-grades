@@ -136,7 +136,7 @@ export const initGraph = (
 ): GraphStructure => {
   const nodes: TypedNode[] = [
     {
-      id: 'final-grade',
+      id: 'sink',
       type: 'sink',
       position: {x: 1116, y: 0},
       data: {},
@@ -152,7 +152,7 @@ export const initGraph = (
   ];
   const edges: Edge[] = [];
   const nodeData: FullNodeData = {
-    'final-grade': {
+    sink: {
       title: coursePart !== null ? coursePart.name : 'Final grade',
     },
     ...Object.fromEntries(
@@ -221,7 +221,7 @@ export const initGraph = (
       },
     };
 
-    edges.push(createEdge('stepper', 'final-grade'));
+    edges.push(createEdge('stepper', 'sink'));
   }
 
   return {nodes, edges, nodeData};

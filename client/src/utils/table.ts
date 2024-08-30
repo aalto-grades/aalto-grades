@@ -39,8 +39,9 @@ export const groupByLatestBestGrade = (
         expiredOption: 'prefer_non_expired',
         gradeSelectOption,
       });
-      const bestGradeDate =
-        bestGrade === null ? new Date('1970-01-01') : new Date(bestGrade.date);
+      const bestGradeDate = !bestGrade?.date
+        ? new Date('1970-01-01')
+        : new Date(bestGrade.date);
 
       // Get best grade date for each course part and get the newest
       if (bestGradeDate > newestDate) newestDate = bestGradeDate;
@@ -60,7 +61,8 @@ export const findLatestGrade = (row: StudentRow): Date => {
   let latestDate = new Date(1970, 0, 1);
   for (const courseTask of row.courseTasks) {
     for (const grade of courseTask.grades) {
-      if (grade.date.getTime() > latestDate.getTime()) latestDate = grade.date;
+      if (grade.date && grade.date.getTime() > latestDate.getTime())
+        latestDate = grade.date;
     }
   }
   return latestDate;

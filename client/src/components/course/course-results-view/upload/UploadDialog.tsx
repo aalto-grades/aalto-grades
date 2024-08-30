@@ -62,12 +62,11 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
 
   const invalidValues = useMemo(() => {
     for (const row of rows) {
-      for (const coursePart of courseTaskData) {
-        const grade = row[coursePart.name];
-        if (!(coursePart.name in row) || grade === null) continue; // Skip empty cells
+      for (const task of courseTaskData) {
+        const grade = row[task.name];
+        if (!(task.name in row) || grade === null) continue; // Skip empty cells
 
-        if (coursePart.maxGrade !== null && grade > coursePart.maxGrade)
-          return true;
+        if (task.maxGrade !== null && grade > task.maxGrade) return true;
       }
     }
     return false;
@@ -76,11 +75,13 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   useEffect(() => {
     if (courseTaskData.length === dates.length) return;
     setDates(
-      courseTaskData.map(courseTask => ({
-        courseTaskName: courseTask.name,
-        completionDate: dayjs(),
-        expirationDate: dayjs().add(courseTask.daysValid ?? 0, 'day'), // TODO: Fix
-      }))
+      courseTaskData
+        .filter(task => task.daysValid !== null)
+        .map(task => ({
+          courseTaskName: task.name,
+          completionDate: dayjs(),
+          expirationDate: dayjs().add(task.daysValid!, 'day'),
+        }))
     );
   }, [courseTaskData, dates.length]);
 
@@ -93,9 +94,9 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       editable: true,
     },
     ...courseTaskData.map(
-      (coursePart): GridColDef<GradeUploadColTypes> => ({
-        field: coursePart.name,
-        headerName: coursePart.name,
+      (task): GridColDef<GradeUploadColTypes> => ({
+        field: task.name,
+        headerName: task.name,
         type: 'number',
         editable: true,
       })
@@ -122,9 +123,9 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       type: 'string',
     },
     ...courseTaskData.map(
-      (coursePart): GridColDef<GradeUploadColTypes> => ({
-        field: coursePart.name,
-        headerName: coursePart.name,
+      (task): GridColDef<GradeUploadColTypes> => ({
+        field: task.name,
+        headerName: task.name,
         type: 'number',
       })
     ),
@@ -141,16 +142,12 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
         const dateData = dates.find(
           date => date.courseTaskName === courseTask.name
         );
-        if (dateData === undefined) {
-          console.error('DateData was undefined');
-          continue;
-        }
         gradeData.push({
           studentNumber: row.studentNo,
           courseTaskId: courseTask.id,
           grade: grade,
-          date: dateData.completionDate.toDate(),
-          expiryDate: dateData.expirationDate.toDate(),
+          date: dateData?.completionDate.toDate() ?? null,
+          expiryDate: dateData?.expirationDate.toDate() ?? null,
           comment: '',
         });
       }
@@ -205,7 +202,10 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       <DialogActions>
         {currentStep === 1 && (
           <Button
-            onClick={() => setCurrentStep(cur => cur - 1)}
+            onClick={() => {
+              setCurrentStep(cur => cur - 1);
+              setReady(true);
+            }}
             sx={{mr: 'auto'}}
           >
             {t('general.back')}
@@ -213,7 +213,10 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
         )}
         {currentStep === 0 && (
           <Button
-            onClick={() => setCurrentStep(cur => cur + 1)}
+            onClick={() => {
+              setCurrentStep(cur => cur + 1);
+              if (dates.length === 0) setConfirmExpanded('confirm');
+            }}
             disabled={!ready || rows.length === 0}
           >
             {t('general.next')}

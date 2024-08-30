@@ -5,12 +5,12 @@
 type BaseType = {
   gradeId: number;
   grade: number;
-  date: Date;
-  expiryDate: Date;
+  date: Date | null;
+  expiryDate: Date | null;
 };
 
 export const gradeIsExpired = (grade: BaseType | null): boolean => {
-  if (grade === null) return false;
+  if (!grade?.expiryDate) return false;
   return Date.now() > grade.expiryDate.getTime();
 };
 
@@ -18,9 +18,10 @@ const gradeIsNewer = (
   newGrade: BaseType,
   oldGrade: BaseType | null
 ): boolean => {
-  if (oldGrade === null) return true;
-  const newDateTime = new Date(newGrade.date).getTime();
-  const oldDateTime = new Date(oldGrade.date).getTime();
+  if (!oldGrade?.date) return true;
+  if (newGrade.date === null) return false;
+  const newDateTime = newGrade.date.getTime();
+  const oldDateTime = oldGrade.date.getTime();
   if (newDateTime !== oldDateTime) return newDateTime > oldDateTime;
   return newGrade.gradeId > oldGrade.gradeId;
 };
@@ -37,6 +38,7 @@ const gradeIsBetter = (
 
 // The type is a template to be able to use with EditGradesDialog rows.
 
+// TODO: Remove option latest?
 export type GradeSelectOption = 'best' | 'latest';
 /**
  * Finds the best grade from a list of grades based on provided search options.

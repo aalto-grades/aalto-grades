@@ -35,15 +35,12 @@ export const initNodeValues = (
 
     // Find matching course part from student data
     const sourceValue = sourceValues.find(
-      source => node.id === `source-${source.id}`
+      source => node.id === source.id.toString()
     );
     if (sourceValue !== undefined) {
       valuesFound = true;
       nodeValue.source = sourceValue.value;
     }
-    // for (const source of sourceValues) {
-    //   if (node.id === `source-${source.id}`) nodeValue.source = source.value;
-    // }
   }
 
   return [valuesFound, nodeValues];
