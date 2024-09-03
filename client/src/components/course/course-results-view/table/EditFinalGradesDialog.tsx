@@ -174,7 +174,7 @@ const EditFinalGradesDialog = ({
     },
     {
       field: 'gradingModel',
-      headerName: t('general.grading-model-name'),
+      headerName: t('general.grading-model'),
       type: 'string',
       editable: false,
     },

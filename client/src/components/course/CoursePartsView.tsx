@@ -375,7 +375,6 @@ const CoursePartsView = (): JSX.Element => {
     const handleClick = (): void => {
       setRows(oldRows => {
         const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
-        console.log(freeId);
         const newRow: ColTypes = {
           id: freeId,
           coursePartId: selectedPart!,

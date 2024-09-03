@@ -116,7 +116,6 @@ const initGraphFn = (
     if (node.type !== 'source') continue;
     const sourceId = parseInt(node.id.split('-')[1]);
 
-    console.log(JSON.stringify({sources, id: node.id}, null, 4));
     const nodeSource = sources.find(source => source.id === sourceId);
     if (nodeSource === undefined) {
       extraNodeData[node.id] = {warning: t('shared.graph.source-deleted')};

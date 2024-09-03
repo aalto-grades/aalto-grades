@@ -237,10 +237,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
       [allGradingModels.data]
     );
 
-    const isActive = useMemo<boolean>(
-      () => Boolean(selectedGradingModel) && selectedGradingModel !== 'any',
-      [selectedGradingModel]
-    );
+    const modelSelected = selectedGradingModel !== 'any';
 
     return (
       <>
@@ -260,7 +257,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
               cursor: 'pointer',
               position: 'relative',
               backgroundColor: 'transparent',
-              ...(isActive && {
+              ...(modelSelected && {
                 backgroundColor: theme.vars.palette.info.light,
                 border: 'none',
                 borderRadius: '8px 0px 0px 8px',
@@ -275,19 +272,18 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
                 width: 'max-content',
               }}
             >
-              {isActive
-                ? gradingModels?.find(ass => ass.id === selectedGradingModel)
-                    ?.name
+              {modelSelected
+                ? selectedGradingModel.name
                 : t('general.grading-model')}
             </div>
 
-            {!isActive && (
+            {!modelSelected && (
               <ArrowDropDownIcon
                 style={{alignContent: 'center', fontSize: '18px'}}
               />
             )}
           </ButtonBase>
-          {isActive && (
+          {modelSelected && (
             <ButtonBase
               style={{
                 display: 'flex',
@@ -308,9 +304,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
                 border: 'none',
                 // }),
               }}
-              onClick={() => {
-                setSelectedGradingModel('any');
-              }}
+              onClick={() => setSelectedGradingModel('any')}
             >
               <ClearIcon style={{alignContent: 'center', fontSize: '18px'}} />
             </ButtonBase>
@@ -330,11 +324,11 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
               key={model.id}
               onClick={() => {
                 table.resetColumnFilters();
-                setSelectedGradingModel(model.id);
+                setSelectedGradingModel(model);
                 handleClose();
               }}
               value={model.id}
-              selected={selectedGradingModel === model.id}
+              selected={modelSelected && model.id === selectedGradingModel.id}
             >
               {model.name}
             </MenuItem>

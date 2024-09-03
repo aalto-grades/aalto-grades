@@ -139,15 +139,17 @@
     "course-url": "Course URL",
     "source-name": "Source name",
     "date": "Date",
+    "select-course-parts": "Select course parts",
+    "confirm": "Confirm",
+    "student-number": "Student number",
+    "course-part-id": "Course part ID",
+    "a+-grade-source-id": "A+ grade source ID",
+    "grade": "Grade",
     "grading-model": "Grading model",
     "grading-date": "Grading date",
-    "confirm": "Confirm",
     "final-grade": "Final grade",
-    "student-number": "Student number",
     "download": "Download",
     "grader": "Grader",
-    "grade": "Grade",
-    "grading-model-name": "Grading model name",
     "export-date": "Export date",
     "comment": "Comment",
     "delete": "Delete",
@@ -155,9 +157,6 @@
     "close": "Close",
     "exported": "Exported",
     "grades-saved": "Grades saved",
-    "select-course-parts": "Select course parts",
-    "course-part-id": "Course part ID",
-    "a+-grade-source-id": "A+ grade source ID",
     "course-part": "Course part",
     "import": "Import",
     "add-row": "Add row",
@@ -187,6 +186,7 @@
     "in-swedish": "in Swedish",
     "done": "Done",
     "final-grades": "Final grades",
+    "course-part-grade": "Course Part Value",
     "not-int": "Value must be a valid integer"
   },
   "course": {
@@ -235,8 +235,8 @@
       "table": {
         "latest-grade": "Latest part grade",
         "exported": "Exported to Sisu",
-        "errors": "Errors",
-        "preview": "Grade preview"
+        "preview": "Grade preview",
+        "errors": "Errors"
       },
       "group-by-latest-grade": "Group by the latest obtainment date of all course parts",
       "group-by": "Group by {{grouping}}",
@@ -307,7 +307,6 @@
         "paste-text": "Paste text",
         "upload-csv": "Upload CSV",
         "download-template": "Download CSV template",
-        "a+-import": "Import from A+",
         "add-manually": "Or add them manually",
         "student-number-empty": "Student number cannot be empty"
       },
@@ -353,10 +352,10 @@
         "select-template": "Select template",
         "none": "None"
       },
+      "missing-part-model-create": "This course part does not have a model yet. Click to create one",
       "has-deleted-and-archived": "Contains deleted & archived course parts",
       "has-archived": "Contains archived course parts",
       "has-deleted": "Contains deleted course parts",
-      "missing-part-model-create": "This course part does not have a model yet. Click to create one",
       "rename": {
         "title": "Rename grading model",
         "saved": "Grading model saved"
@@ -377,6 +376,7 @@
     },
     "list": "Course list"
   },
+  "not-participated": "Not participated",
   "front-page": {
     "not-logged-in": "Not logged in",
     "search": "search",

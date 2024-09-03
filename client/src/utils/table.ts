@@ -146,10 +146,7 @@ export const predictedGradesErrorCheck = (
       errors.push({
         message: t('utils.grade-not-an-int'),
         type: 'InvalidPredictedGrade',
-        info: {
-          columnId: 'predictedFinalGrades',
-          modelId: modelId,
-        },
+        info: {modelId: parseInt(modelId)},
       });
     }
     // if grade is out of range
@@ -164,10 +161,7 @@ export const predictedGradesErrorCheck = (
       errors.push({
         message: t('utils.grade-out-of-range'),
         type: 'OutOfRangePredictedGrade',
-        info: {
-          columnId: 'predictedFinalGrades',
-          modelId: modelId,
-        },
+        info: {modelId: parseInt(modelId)},
       });
     }
   }
@@ -244,7 +238,7 @@ export const getErrorTypes = (
  */
 export const getErrorCount = (
   rowModel: GroupedStudentRow[],
-  selectedGradingModel: 'any' | number
+  selectedGradingModel: GradingModelData | 'any'
 ): number => {
   let totalErrors = 0;
 
@@ -256,7 +250,7 @@ export const getErrorCount = (
           case 'InvalidPredictedGrade':
             if (
               selectedGradingModel === 'any' ||
-              selectedGradingModel === Number(error.info.modelId)
+              error.info.modelId === selectedGradingModel.id
             ) {
               totalErrors += 1;
             }

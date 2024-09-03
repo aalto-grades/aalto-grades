@@ -139,15 +139,17 @@
     "course-url": "UNTRANSLATED",
     "source-name": "UNTRANSLATED",
     "date": "UNTRANSLATED",
+    "select-course-parts": "UNTRANSLATED",
+    "confirm": "UNTRANSLATED",
+    "student-number": "UNTRANSLATED",
+    "course-part-id": "UNTRANSLATED",
+    "a+-grade-source-id": "UNTRANSLATED",
+    "grade": "UNTRANSLATED",
     "grading-model": "UNTRANSLATED",
     "grading-date": "UNTRANSLATED",
-    "confirm": "UNTRANSLATED",
     "final-grade": "UNTRANSLATED",
-    "student-number": "UNTRANSLATED",
     "download": "UNTRANSLATED",
     "grader": "UNTRANSLATED",
-    "grade": "UNTRANSLATED",
-    "grading-model-name": "UNTRANSLATED",
     "export-date": "UNTRANSLATED",
     "comment": "UNTRANSLATED",
     "delete": "UNTRANSLATED",
@@ -155,9 +157,6 @@
     "close": "UNTRANSLATED",
     "exported": "UNTRANSLATED",
     "grades-saved": "UNTRANSLATED",
-    "select-course-parts": "UNTRANSLATED",
-    "course-part-id": "UNTRANSLATED",
-    "a+-grade-source-id": "UNTRANSLATED",
     "course-part": "UNTRANSLATED",
     "import": "UNTRANSLATED",
     "add-row": "UNTRANSLATED",
@@ -187,6 +186,7 @@
     "in-swedish": "UNTRANSLATED",
     "done": "UNTRANSLATED",
     "final-grades": "UNTRANSLATED",
+    "course-part-grade": "UNTRANSLATED",
     "not-int": "UNTRANSLATED"
   },
   "course": {
@@ -235,8 +235,8 @@
       "table": {
         "latest-grade": "UNTRANSLATED",
         "exported": "UNTRANSLATED",
-        "errors": "UNTRANSLATED",
-        "preview": "UNTRANSLATED"
+        "preview": "UNTRANSLATED",
+        "errors": "UNTRANSLATED"
       },
       "group-by-latest-grade": "UNTRANSLATED",
       "group-by": "UNTRANSLATED",
@@ -307,7 +307,6 @@
         "paste-text": "UNTRANSLATED",
         "upload-csv": "UNTRANSLATED",
         "download-template": "UNTRANSLATED",
-        "a+-import": "UNTRANSLATED",
         "add-manually": "UNTRANSLATED",
         "student-number-empty": "UNTRANSLATED"
       },
@@ -353,10 +352,10 @@
         "select-template": "UNTRANSLATED",
         "none": "UNTRANSLATED"
       },
+      "missing-part-model-create": "UNTRANSLATED",
       "has-deleted-and-archived": "UNTRANSLATED",
       "has-archived": "UNTRANSLATED",
       "has-deleted": "UNTRANSLATED",
-      "missing-part-model-create": "UNTRANSLATED",
       "rename": {
         "title": "UNTRANSLATED",
         "saved": "UNTRANSLATED"
@@ -377,6 +376,7 @@
     },
     "list": "UNTRANSLATED"
   },
+  "not-participated": "UNTRANSLATED",
   "front-page": {
     "not-logged-in": "UNTRANSLATED",
     "search": "UNTRANSLATED",
