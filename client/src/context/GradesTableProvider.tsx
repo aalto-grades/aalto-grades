@@ -162,9 +162,10 @@ export const GradesTableProvider = ({
   });
   const [sorting, setSorting] = useState<SortingState>([]);
   const [userGraphOpen, setUserGraphOpen] = useState<boolean>(false);
-  const [userGraphData, setUserGraphData] = useState<GroupedStudentRow | null>(
-    null
-  );
+  const [userGraphData, setUserGraphData] = useState<{
+    row: GroupedStudentRow;
+    gradingModel: GradingModelData | null;
+  } | null>(null);
 
   const [gradeSelectOption, setGradeSelectOption] = useState<'best' | 'latest'>(
     'best'
@@ -172,12 +173,6 @@ export const GradesTableProvider = ({
   const [selectedGradingModel, setSelectedGradingModel] = useState<
     GradingModelData | 'any'
   >('any');
-  const selectedModelType =
-    selectedGradingModel === 'any'
-      ? 'any'
-      : selectedGradingModel.coursePartId === null
-        ? 'final-grade'
-        : 'course-part';
 
   // Filter out archived models
   const gradingModels = useMemo(
@@ -284,43 +279,45 @@ export const GradesTableProvider = ({
     return courseParts.data.filter(part => sourceIds.has(part.id));
   }, [courseParts.data, courseTasks.data, selectedGradingModel]);
 
-  const sourceColumns = useMemo(() => {
-    return selectedModelSources.map(source =>
-      columnHelper.accessor(
-        (row): GradeCellSourceValue => {
-          if (
-            selectedGradingModel !== 'any' &&
-            selectedGradingModel.coursePartId !== null
-          ) {
+  const sourceColumns = useMemo(
+    () =>
+      selectedModelSources.map(source =>
+        columnHelper.accessor(
+          (row): GradeCellSourceValue => {
+            if (
+              selectedGradingModel !== 'any' &&
+              selectedGradingModel.coursePartId !== null
+            ) {
+              return {
+                type: 'courseTask',
+                task: row.courseTasks.find(
+                  rowCourseTask => rowCourseTask.courseTaskId === source.id
+                )!,
+                maxGrade: (source as CourseTaskData).maxGrade,
+              };
+            }
             return {
-              type: 'courseTask',
-              task: row.courseTasks.find(
-                rowCourseTask => rowCourseTask.courseTaskId === source.id
-              )!,
-              maxGrade: (source as CourseTaskData).maxGrade,
+              type: 'coursePart',
+              grade: coursePartValues[row.user.id][source.id],
             };
+          },
+          {
+            header: source.name,
+            meta: {PrettyChipPosition: 'alone', coursePart: true},
+            enableSorting: false,
+            size: 80,
+            cell: ({getValue, row}) => (
+              <GradeCell
+                studentNumber={row.original.user.studentNumber ?? 'N/A'}
+                sourceValue={getValue()}
+              />
+            ),
+            footer: source.name,
           }
-          return {
-            type: 'coursePart',
-            grade: coursePartValues[row.user.id][source.id],
-          };
-        },
-        {
-          header: source.name,
-          meta: {PrettyChipPosition: 'alone', coursePart: true},
-          enableSorting: false,
-          size: 80,
-          cell: ({getValue, row}) => (
-            <GradeCell
-              studentNumber={row.original.user.studentNumber ?? 'N/A'}
-              sourceValue={getValue()}
-            />
-          ),
-          footer: source.name,
-        }
-      )
-    );
-  }, [coursePartValues, selectedGradingModel, selectedModelSources]);
+        )
+      ),
+    [coursePartValues, selectedGradingModel, selectedModelSources]
+  );
 
   // --- Predicted grade column ---
   const sortPredictedGrades = (
@@ -352,9 +349,9 @@ export const GradesTableProvider = ({
     header: t('course.results.table.preview'),
     meta: {PrettyChipPosition: 'middle'},
     sortingFn: sortPredictedGrades,
-    cell: info => (
+    cell: ({getValue}) => (
       <PredictedGradeCell
-        row={info.getValue()}
+        row={getValue()}
         gradingModelIds={
           selectedGradingModel === 'any'
             ? finalGradeModels?.map(model => model.id)
@@ -363,8 +360,7 @@ export const GradesTableProvider = ({
         onClick={() => {
           if (finalGradeModels === undefined || finalGradeModels.length === 0)
             return;
-          // TODO: Fix user graph
-          setUserGraphData(info.getValue());
+          setUserGraphData({row: getValue(), gradingModel: null});
           setUserGraphOpen(true);
         }}
         gradingScale={course.data?.gradingScale ?? GradingScale.Numerical}
@@ -372,6 +368,59 @@ export const GradesTableProvider = ({
     ),
     aggregatedCell: () => null,
   });
+
+  // --- Model specific columns ---
+  let modelColumns = [];
+  if (
+    selectedGradingModel === 'any' ||
+    selectedGradingModel.coursePartId === null
+  ) {
+    modelColumns = [
+      columnHelper.accessor(row => row.finalGrades, {
+        header: t('general.final-grade'),
+        id: 'finalGrade',
+        enableSorting: false,
+        getGroupingValue: row => findBestFinalGrade(row.finalGrades)?.grade,
+        cell: ({getValue, row}) => (
+          <FinalGradeCell
+            userId={row.original.user.id}
+            studentNumber={row.original.user.studentNumber ?? 'N/A'}
+            finalGrades={getValue()}
+            gradingScale={course.data?.gradingScale ?? GradingScale.Numerical}
+          />
+        ),
+      }),
+
+      predictedGradeColumn,
+    ];
+  } else {
+    modelColumns = [
+      columnHelper.accessor(row => row, {
+        header: t('general.course-part-grade'),
+        id: 'coursePartGrade',
+        enableSorting: false,
+        getGroupingValue: row => findBestFinalGrade(row.finalGrades)?.grade,
+        cell: ({getValue}) => (
+          <PredictedGradeCell
+            row={getValue()}
+            gradingModelIds={[selectedGradingModel.id]}
+            onClick={() => {
+              setUserGraphData({
+                row: getValue(),
+                gradingModel: selectedGradingModel,
+              });
+              setUserGraphOpen(true);
+            }}
+            value={
+              coursePartValues[getValue().user.id][
+                selectedGradingModel.coursePartId!
+              ]
+            }
+          />
+        ),
+      }),
+    ];
+  }
 
   // This columns are used to group by data that is not directly shown
   // For example calculating the latest attainment date
@@ -385,7 +434,7 @@ export const GradesTableProvider = ({
         header: () => {
           return t('course.results.table.latest-grade') as string; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
         },
-        cell: prop => prop.getValue(),
+        cell: ({getValue}) => getValue(),
       }),
     ].filter(column => grouping.includes(column.id ?? ''));
 
@@ -495,48 +544,7 @@ export const GradesTableProvider = ({
       header: t('general.student-number'),
       meta: {PrettyChipPosition: 'first'},
     }),
-    ...(selectedModelType !== 'course-part'
-      ? [
-          columnHelper.accessor(row => row.finalGrades, {
-            header: t('general.final-grade'),
-            id: 'finalGrade',
-            enableSorting: false,
-            getGroupingValue: row => findBestFinalGrade(row.finalGrades)?.grade,
-            cell: ({getValue, row}) => (
-              <FinalGradeCell
-                userId={row.original.user.id}
-                studentNumber={row.original.user.studentNumber ?? 'N/A'}
-                finalGrades={getValue()}
-                gradingScale={
-                  course.data?.gradingScale ?? GradingScale.Numerical
-                }
-              />
-            ),
-          }),
-
-          predictedGradeColumn,
-        ]
-      : [
-          columnHelper.accessor(
-            (row): GradeCellSourceValue => ({
-              type: 'coursePart',
-              grade:
-                coursePartValues[row.user.id][
-                  (selectedGradingModel as GradingModelData).coursePartId!
-                ],
-            }),
-            {
-              header: t('general.course-part-grade'),
-              id: 'coursePartGrade',
-              enableSorting: false,
-              getGroupingValue: row =>
-                findBestFinalGrade(row.finalGrades)?.grade,
-              cell: ({getValue}) => (
-                <GradeCell studentNumber="N/A" sourceValue={getValue()} />
-              ),
-            }
-          ),
-        ]),
+    ...modelColumns,
     columnHelper.accessor(
       row => {
         // ATTENTION this function needs to have the same parameters of the one inside the grade cell
@@ -551,7 +559,7 @@ export const GradesTableProvider = ({
       {
         header: t('course.results.table.exported'),
         meta: {PrettyChipPosition: 'last'},
-        cell: info => info.getValue(),
+        cell: ({getValue}) => getValue(),
         aggregatedCell: () => null,
       }
     ),
@@ -629,7 +637,7 @@ export const GradesTableProvider = ({
           return a.id - b.id;
         })}
         coursePartValues={coursePartValues}
-        row={userGraphData}
+        data={userGraphData}
       />
       {children}
     </GradesTableContext.Provider>

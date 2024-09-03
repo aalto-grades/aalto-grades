@@ -33,14 +33,18 @@ type PropsType = {
   gradingModels: GradingModelData[] | undefined;
   coursePartValues: {[key: number]: {[key: string]: number | null}};
 
-  row: GroupedStudentRow | null;
+  data: {
+    row: GroupedStudentRow;
+    // If gradingModel is set, we are viewing a course part model
+    gradingModel: GradingModelData | null;
+  } | null;
 };
 const UserGraphDialog = ({
   open,
   onClose,
   gradingModels,
   coursePartValues,
-  row,
+  data,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
@@ -52,10 +56,14 @@ const UserGraphDialog = ({
   );
 
   const [oldModels, setOldModels] = useState<typeof gradingModels>(undefined);
-  if (gradingModels !== oldModels) {
+  const [oldData, setOldData] = useState<typeof data>(null);
+  if (gradingModels !== oldModels || data !== oldData) {
     setOldModels(gradingModels);
+    setOldData(data);
 
-    if (gradingModels !== undefined && gradingModels.length > 0)
+    if (data?.gradingModel) {
+      setSelectedModel(data.gradingModel);
+    } else if (gradingModels !== undefined && gradingModels.length > 0)
       setSelectedModel(gradingModels[0]);
   }
 
@@ -65,7 +73,7 @@ const UserGraphDialog = ({
     selectedModel !== null &&
     courseParts.data !== undefined &&
     courseTasks.data !== undefined &&
-    row !== null
+    data !== null
   ) {
     if (selectedModel.coursePartId === null) {
       // Final grade model
@@ -74,7 +82,7 @@ const UserGraphDialog = ({
         name: part.name,
         archived: part.archived,
       }));
-      sourceValues = Object.entries(coursePartValues[row.user.id]).map(
+      sourceValues = Object.entries(coursePartValues[data.row.user.id]).map(
         ([id, value]) => ({id: parseInt(id), value: value ?? 0})
       );
     } else {
@@ -82,7 +90,7 @@ const UserGraphDialog = ({
       sources = courseTasks.data.filter(
         task => task.coursePartId === selectedModel.coursePartId
       );
-      sourceValues = row.courseTasks.map(task => ({
+      sourceValues = data.row.courseTasks.map(task => ({
         id: task.courseTaskId,
         value: findBestGrade(task.grades)?.grade ?? 0,
       }));
@@ -91,9 +99,13 @@ const UserGraphDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
-      <DialogTitle>Final grade preview</DialogTitle>
+      <DialogTitle>
+        {data?.gradingModel
+          ? t('course.results.final-grade-preview')
+          : t('course.results.course-part-value-preview')}
+      </DialogTitle>
       <DialogContent>
-        {row === null ? (
+        {data === null ? (
           <>{t('course.results.data-undefined')}</>
         ) : selectedModel === null || courseParts.data === undefined ? (
           <>{t('general.loading')}</>
@@ -108,30 +120,34 @@ const UserGraphDialog = ({
         )}
       </DialogContent>
       <DialogActions>
-        {gradingModels !== undefined && gradingModels.length > 0 && (
-          <FormControl size="small">
-            <InputLabel id="grading-model-select-label">
-              {t('general.grading-model')}
-            </InputLabel>
-            <Select
-              labelId="grading-model-select-label"
-              sx={{minWidth: '150px'}}
-              value={selectedModel?.id ?? gradingModels[0].id}
-              label="Grading model"
-              onChange={event => {
-                setSelectedModel(
-                  gradingModels.find(model => model.id === event.target.value)!
-                );
-              }}
-            >
-              {gradingModels.map(model => (
-                <MenuItem key={model.id} value={model.id}>
-                  {model.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
+        {gradingModels !== undefined &&
+          gradingModels.length > 0 &&
+          !data?.gradingModel && (
+            <FormControl size="small">
+              <InputLabel id="grading-model-select-label">
+                {t('general.grading-model')}
+              </InputLabel>
+              <Select
+                labelId="grading-model-select-label"
+                sx={{minWidth: '150px'}}
+                value={selectedModel?.id ?? gradingModels[0].id}
+                label="Grading model"
+                onChange={event => {
+                  setSelectedModel(
+                    gradingModels.find(
+                      model => model.id === event.target.value
+                    )!
+                  );
+                }}
+              >
+                {gradingModels.map(model => (
+                  <MenuItem key={model.id} value={model.id}>
+                    {model.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
         <Button onClick={onClose} variant="contained">
           {t('general.close')}
         </Button>
