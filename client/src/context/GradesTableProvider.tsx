@@ -628,6 +628,7 @@ export const GradesTableProvider = ({
           if (b.id === selectedGradingModel.id) return 1;
           return a.id - b.id;
         })}
+        coursePartValues={coursePartValues}
         row={userGraphData}
       />
       {children}

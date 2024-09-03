@@ -26,7 +26,6 @@ import {
   Controls,
   type Edge,
   MiniMap,
-  type Node,
   type NodeChange,
   type NodeProps,
   ReactFlow,
@@ -57,7 +56,6 @@ import {
   NodeDataContext,
   NodeValuesContext,
 } from '@/context/GraphProvider';
-import type {GradeSelectOption} from '@/utils';
 import SelectSourcesDialog from './SelectSourcesDialog';
 import SourceValuesDialog from './SourceValuesDialog';
 import './flow.scss'; // Import styles
@@ -108,6 +106,7 @@ const nodeTypesMap: {
 const initGraphFn = (
   initGraph: GraphStructure,
   sources: GraphSource[],
+  sourceValues: GraphSourceValue[] | null,
   t: TFunction
 ): {initNodeValues: NodeValues; extraNodeData: ExtraNodeData} => {
   // Check for deleted & archived sources (edit extra data)
@@ -132,6 +131,18 @@ const initGraphFn = (
     ])
   );
 
+  if (sourceValues !== null) {
+    for (const sourceValue of sourceValues) {
+      const sourceId = `source-${sourceValue.id}`;
+      if (!(sourceId in initNodeValues)) continue;
+
+      const newValue = initNodeValues[sourceId] as SourceNodeValue;
+      if (newValue.value !== sourceValue.value) {
+        newValue.source = sourceValue.value;
+      }
+    }
+  }
+
   return {initNodeValues, extraNodeData};
 };
 
@@ -139,7 +150,6 @@ type GraphProps = {
   initGraph: GraphStructure;
   sources: GraphSource[];
   sourceValues: GraphSourceValue[] | null;
-  gradeSelectOption?: GradeSelectOption;
   onSave?: (graphStructure: GraphStructure) => Promise<void>;
   readOnly?: boolean;
   modelHasFinalGrades?: boolean;
@@ -148,7 +158,6 @@ const Graph = ({
   initGraph,
   sources,
   sourceValues,
-  gradeSelectOption,
   onSave: onParentSave,
   readOnly = false,
   modelHasFinalGrades = false,
@@ -156,8 +165,8 @@ const Graph = ({
   const {t} = useTranslation();
 
   const {initNodeValues, extraNodeData} = useMemo(
-    () => initGraphFn(initGraph, sources, t),
-    [sources, initGraph, t]
+    () => initGraphFn(initGraph, sources, sourceValues, t),
+    [initGraph, sources, sourceValues, t]
   );
   const [nodes, setNodes, onNodesChange] = useNodesState(
     initGraph.nodes
@@ -176,7 +185,7 @@ const Graph = ({
     nodeValues: NodeValues;
   } | null>(null);
 
-  const [selected, setSelected] = useState<Node[]>([]);
+  const [selected, setSelected] = useState<TypedNode[]>([]);
   const [sourcesSelectOpen, setSourcesSelectOpen] = useState<boolean>(false);
   const [sourceValuesOpen, setSourceValuesOpen] = useState<boolean>(false);
   const [originalGraphStructure, setOriginalGraphStructure] =
@@ -285,24 +294,6 @@ const Graph = ({
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [unsaved]);
-
-  useEffect(() => {
-    if (sourceValues === null) return;
-    const newNodeValues = {...nodeValues};
-    let change = false;
-
-    for (const sourceValue of sourceValues) {
-      const sourceId = `source-${sourceValue.id}`;
-      if (!(sourceId in newNodeValues)) continue;
-
-      const newValue = newNodeValues[sourceId] as SourceNodeValue;
-      if (newValue.value !== sourceValue.value) {
-        newValue.source = sourceValue.value;
-        change = true;
-      }
-    }
-    if (change) setNodeValues(newNodeValues);
-  }, [gradeSelectOption, nodeValues, sourceValues]);
 
   const onSave = async (): Promise<void> => {
     if (onParentSave === undefined) return;
@@ -562,7 +553,9 @@ const Graph = ({
                     )
                   )
                 }
-                onSelectionChange={changes => setSelected(changes.nodes)}
+                onSelectionChange={changes =>
+                  setSelected(changes.nodes as TypedNode[])
+                }
                 minZoom={0.25}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}

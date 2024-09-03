@@ -13,42 +13,81 @@ import {
   MenuItem,
   Select,
 } from '@mui/material';
-import {type JSX, useEffect, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import type {GradingModelData} from '@/common/types';
+import type {
+  GradingModelData,
+  GraphSource,
+  GraphSourceValue,
+} from '@/common/types';
 import Graph from '@/components/shared/graph/Graph';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
-import {useTableContext} from '@/context/useTableContext';
-import {useGetCourseParts} from '@/hooks/useApi';
+import {useGetCourseParts, useGetCourseTasks} from '@/hooks/useApi';
 import {findBestGrade} from '@/utils';
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
   gradingModels: GradingModelData[] | undefined;
+  coursePartValues: {[key: number]: {[key: string]: number | null}};
+
   row: GroupedStudentRow | null;
 };
 const UserGraphDialog = ({
   open,
   onClose,
   gradingModels,
+  coursePartValues,
   row,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
-  const {gradeSelectOption} = useTableContext();
   const courseParts = useGetCourseParts(courseId);
+  const courseTasks = useGetCourseTasks(courseId);
 
   const [selectedModel, setSelectedModel] = useState<GradingModelData | null>(
     null
   );
 
-  useEffect(() => {
+  const [oldModels, setOldModels] = useState<typeof gradingModels>(undefined);
+  if (gradingModels !== oldModels) {
+    setOldModels(gradingModels);
+
     if (gradingModels !== undefined && gradingModels.length > 0)
       setSelectedModel(gradingModels[0]);
-  }, [gradingModels]);
+  }
+
+  let sources: GraphSource[] = [];
+  let sourceValues: GraphSourceValue[] = [];
+  if (
+    selectedModel !== null &&
+    courseParts.data !== undefined &&
+    courseTasks.data !== undefined &&
+    row !== null
+  ) {
+    if (selectedModel.coursePartId === null) {
+      // Final grade model
+      sources = courseParts.data.map(part => ({
+        id: part.id,
+        name: part.name,
+        archived: part.archived,
+      }));
+      sourceValues = Object.entries(coursePartValues[row.user.id]).map(
+        ([id, value]) => ({id: parseInt(id), value: value ?? 0})
+      );
+    } else {
+      // Course part model
+      sources = courseTasks.data.filter(
+        task => task.coursePartId === selectedModel.coursePartId
+      );
+      sourceValues = row.courseTasks.map(task => ({
+        id: task.courseTaskId,
+        value: findBestGrade(task.grades)?.grade ?? 0,
+      }));
+    }
+  }
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
@@ -62,19 +101,8 @@ const UserGraphDialog = ({
           <Graph
             key={selectedModel.id} // Reset graph for each model
             initGraph={selectedModel.graphStructure}
-            sources={row.courseTasks.map(rowCourseTask => ({
-              id: rowCourseTask.courseTaskId,
-              name: rowCourseTask.courseTaskName,
-              archived:
-                courseParts.data.find(
-                  coursePart => coursePart.id === rowCourseTask.courseTaskId // TODO: Fix
-                )?.archived ?? false,
-            }))}
-            sourceValues={row.courseTasks.map(task => ({
-              id: task.courseTaskId,
-              value: findBestGrade(task.grades)?.grade ?? 0,
-            }))}
-            gradeSelectOption={gradeSelectOption}
+            sources={sources}
+            sourceValues={sourceValues}
             readOnly
           />
         )}
