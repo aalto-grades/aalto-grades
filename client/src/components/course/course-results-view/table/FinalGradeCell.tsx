@@ -75,13 +75,15 @@ const FinalGradeCell = ({
           </IconButton>
         </Tooltip>
       )}
-      <EditFinalGradesDialog
-        open={gradeDialogOpen}
-        onClose={() => setGradeDialogOpen(false)}
-        userId={userId}
-        finalGrades={finalGrades}
-        title={t('course.results.final-of', {user: studentNumber})}
-      />
+      {gradeDialogOpen && (
+        <EditFinalGradesDialog
+          open={gradeDialogOpen}
+          onClose={() => setGradeDialogOpen(false)}
+          userId={userId}
+          finalGrades={finalGrades}
+          title={t('course.results.final-of', {user: studentNumber})}
+        />
+      )}
       {bestFinalGrade?.date !== undefined && (
         <Tooltip
           placement="top"

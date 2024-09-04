@@ -46,7 +46,7 @@ type ColTypes = {
   gradeId: number;
   grader: string;
   grade: number;
-  date: Date | null;
+  date: Date;
   expiryDate: Date | null;
   exported: boolean;
   comment: string;
@@ -281,12 +281,7 @@ const EditGradesDialog = ({
 
   type RowType = GridRowModel<ColTypes>;
   const processRowUpdate = (newRow: RowType, oldRow: RowType): RowType => {
-    if (
-      !newRow.date ||
-      !newRow.expiryDate ||
-      !oldRow.date ||
-      !oldRow.expiryDate
-    ) {
+    if (!newRow.expiryDate || !oldRow.expiryDate) {
       setError(false);
       return newRow;
     }

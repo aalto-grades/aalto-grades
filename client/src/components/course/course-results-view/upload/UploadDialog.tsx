@@ -9,7 +9,7 @@ import {
   type GridColDef,
   type GridRowsProp,
 } from '@mui/x-data-grid';
-import dayjs, {type Dayjs} from 'dayjs';
+import dayjs from 'dayjs';
 import {enqueueSnackbar} from 'notistack';
 import {useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
@@ -18,7 +18,7 @@ import {useParams} from 'react-router-dom';
 
 import type {CoursePartData, NewTaskGrade} from '@/common/types';
 import {useAddGrades, useGetCourseTasks} from '@/hooks/useApi';
-import UploadDialogConfirm from './UploadDialogConfirm';
+import UploadDialogConfirm, {type DateType} from './UploadDialogConfirm';
 import UploadDialogSelectCoursePart from './UploadDialogSelectCoursePart';
 import UploadDialogUpload from './UploadDialogUpload';
 
@@ -47,19 +47,20 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const [coursePart, setCoursePart] = useState<CoursePartData | null>(null);
   const [rows, setRows] = useState<GridRowsProp<GradeUploadColTypes>>([]);
   const [ready, setReady] = useState<boolean>(true);
-  const [dates, setDates] = useState<
-    {courseTaskName: string; completionDate: Dayjs; expirationDate: Dayjs}[]
-  >([]);
+  const [dates, setDates] = useState<DateType[]>([]);
 
   const courseTaskData = useMemo(
-    () => courseTasks.data?.filter(courseTask => !courseTask.archived) ?? [],
-    [courseTasks.data]
+    () =>
+      courseTasks.data?.filter(
+        task => task.coursePartId === coursePart?.id && !task.archived
+      ) ?? [],
+    [coursePart?.id, courseTasks.data]
   );
 
   const maxGrades = useMemo(
     () =>
       Object.fromEntries(
-        courseTaskData.map(courseTask => [courseTask.name, courseTask.maxGrade])
+        courseTaskData.map(task => [task.name, task.maxGrade])
       ),
     [courseTaskData]
   );
@@ -79,13 +80,12 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   useEffect(() => {
     if (courseTaskData.length === dates.length) return;
     setDates(
-      courseTaskData
-        .filter(task => task.daysValid !== null)
-        .map(task => ({
-          courseTaskName: task.name,
-          completionDate: dayjs(),
-          expirationDate: dayjs().add(task.daysValid!, 'day'),
-        }))
+      courseTaskData.map(task => ({
+        courseTaskName: task.name,
+        completionDate: dayjs(),
+        expirationDate:
+          task.daysValid === null ? null : dayjs().add(task.daysValid, 'day'),
+      }))
     );
   }, [courseTaskData, dates.length]);
 
@@ -97,16 +97,14 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       width: 120,
       editable: true,
     },
-    ...courseTaskData
-      .filter(task => task.coursePartId === coursePart?.id)
-      .map(
-        (task): GridColDef<GradeUploadColTypes> => ({
-          field: task.name,
-          headerName: task.name,
-          type: 'number',
-          editable: true,
-        })
-      ),
+    ...courseTaskData.map(
+      (task): GridColDef<GradeUploadColTypes> => ({
+        field: task.name,
+        headerName: task.name,
+        type: 'number',
+        editable: true,
+      })
+    ),
     {
       field: 'actions',
       type: 'actions',
@@ -128,15 +126,13 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       headerName: t('general.student-number'),
       type: 'string',
     },
-    ...courseTaskData
-      .filter(task => task.coursePartId === coursePart?.id)
-      .map(
-        (task): GridColDef<GradeUploadColTypes> => ({
-          field: task.name,
-          headerName: task.name,
-          type: 'number',
-        })
-      ),
+    ...courseTaskData.map(
+      (task): GridColDef<GradeUploadColTypes> => ({
+        field: task.name,
+        headerName: task.name,
+        type: 'number',
+      })
+    ),
   ];
 
   const reset = (): void => {
@@ -146,13 +142,12 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     setConfirmExpanded('date');
     setRows([]);
     setDates(
-      courseTaskData
-        .filter(task => task.daysValid !== null)
-        .map(task => ({
-          courseTaskName: task.name,
-          completionDate: dayjs(),
-          expirationDate: dayjs().add(task.daysValid!, 'day'),
-        }))
+      courseTaskData.map(task => ({
+        courseTaskName: task.name,
+        completionDate: dayjs(),
+        expirationDate:
+          task.daysValid === null ? null : dayjs().add(task.daysValid, 'day'),
+      }))
     );
   };
 
@@ -166,13 +161,13 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
 
         const dateData = dates.find(
           date => date.courseTaskName === courseTask.name
-        );
+        )!;
         gradeData.push({
           studentNumber: row.studentNo,
           courseTaskId: courseTask.id,
           grade: grade,
-          date: dateData?.completionDate.toDate() ?? null,
-          expiryDate: dateData?.expirationDate.toDate() ?? null,
+          date: dateData.completionDate.toDate(),
+          expiryDate: dateData.expirationDate?.toDate() ?? null,
           comment: '',
         });
       }
@@ -245,10 +240,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
         )}
         {currentStep === 1 && (
           <Button
-            onClick={() => {
-              setCurrentStep(cur => cur + 1);
-              if (dates.length === 0) setConfirmExpanded('confirm');
-            }}
+            onClick={() => setCurrentStep(cur => cur + 1)}
             disabled={!ready || rows.length === 0}
           >
             {t('general.next')}

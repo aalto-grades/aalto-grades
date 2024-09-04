@@ -20,7 +20,7 @@ export type NewDbGradeData = {
   aplusGradeSourceId?: number;
   grade: number;
   sisuExportDate?: Date | null;
-  date: Date | null;
+  date: Date;
   expiryDate: Date | null;
   comment?: string | null;
 };

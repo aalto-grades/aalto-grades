@@ -364,7 +364,7 @@ export default {
           },
           date: {
             type: DataTypes.DATEONLY,
-            allowNull: true,
+            allowNull: false,
           },
           expiry_date: {
             type: DataTypes.DATEONLY,
