@@ -102,7 +102,7 @@ export const useDeleteAplusGradeSource = (
 
 export const useFetchAplusGrades = (
   courseId: Numeric,
-  coursePartIds: number[],
+  courseTaskIds: number[],
   options?: Partial<UseQueryOptions<NewTaskGrade[]>>
 ): UseQueryResult<NewTaskGrade[]> =>
   useQuery({
@@ -111,8 +111,8 @@ export const useFetchAplusGrades = (
       NewTaskGradeArraySchema.parse(
         (
           await axios.get(
-            `/api/v1/courses/${courseId}/aplus-fetch?course-parts=${JSON.stringify(
-              coursePartIds
+            `/api/v1/courses/${courseId}/aplus-fetch?course-tasks=${JSON.stringify(
+              courseTaskIds
             )}`,
             getHeaders()
           )

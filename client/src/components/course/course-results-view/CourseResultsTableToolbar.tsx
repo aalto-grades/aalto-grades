@@ -40,6 +40,7 @@ import {
   getErrorCount,
   getMaxFinalGrade,
 } from '@/utils';
+import AplusImportDialog from './AplusImportDialog';
 import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
 import SisuDownloadDialog from './SisuDownloadDialog';
 import UploadDialog from './upload/UploadDialog';
@@ -358,6 +359,8 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
 
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
+  const [aplusImportDialogOpen, setAplusImportDialogOpen] =
+    useState<boolean>(false);
 
   // Filter out archived models
   const gradingModels = useMemo(
@@ -464,6 +467,25 @@ const CourseResultsTableToolbar = (): JSX.Element => {
 
   return (
     <>
+      <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} />
+      <AplusImportDialog
+        onClose={() => setAplusImportDialogOpen(false)}
+        open={aplusImportDialogOpen}
+      />
+      <CalculateFinalGradesDialog
+        open={showCalculateDialog}
+        onClose={() => setShowCalculateDialog(false)}
+        selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
+        gradeSelectOption={gradeSelectOption}
+        calculateFinalGrades={handleCalculateFinalGrades}
+      />
+      <SisuDownloadDialog
+        open={showSisuDialog}
+        handleClose={() => setShowSisuDialog(false)}
+        handleExited={handleExitedSisuDialog}
+        selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
+      />
+
       {table.getSelectedRowModel().rows.length === 0 ? (
         <Box
           sx={{
@@ -485,7 +507,15 @@ const CourseResultsTableToolbar = (): JSX.Element => {
             startIcon={<Add />}
             color="primary"
           >
-            {t('course.results.add-grades')}
+            {t('course.results.add-grades-manually')}
+          </Button>
+          <Button
+            variant="tonal"
+            onClick={() => setAplusImportDialogOpen(true)}
+            startIcon={<Add />}
+            color="primary"
+          >
+            {t('course.results.import-from-aplus')}
           </Button>
         </Box>
       ) : (
@@ -721,20 +751,6 @@ const CourseResultsTableToolbar = (): JSX.Element => {
           </Select>
         </FormControl>
       </Box> */}
-      <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} />
-      <CalculateFinalGradesDialog
-        open={showCalculateDialog}
-        onClose={() => setShowCalculateDialog(false)}
-        selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
-        gradeSelectOption={gradeSelectOption}
-        calculateFinalGrades={handleCalculateFinalGrades}
-      />
-      <SisuDownloadDialog
-        open={showSisuDialog}
-        handleClose={() => setShowSisuDialog(false)}
-        handleExited={handleExitedSisuDialog}
-        selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
-      />
     </>
   );
 };

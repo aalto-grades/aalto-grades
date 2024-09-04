@@ -161,10 +161,7 @@ const MismatchDialog = ({
                             {field}
                           </MenuItem>
                         ))}
-                        <MenuItem
-                          key="ignoreColumn"
-                          value={t('course.results.upload.ignore-column')}
-                        >
+                        <MenuItem key="ignoreColumn" value="ignoreColumn">
                           {t('course.results.upload.ignore-column')}
                         </MenuItem>
                       </Select>

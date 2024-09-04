@@ -341,8 +341,8 @@ export const fetchAplusGrades: Endpoint<void, NewTaskGrade[]> = async (
           courseTaskId: courseTask.id,
           aplusGradeSourceId: gradeSource.id,
           grade: grade,
-          date: date,
-          expiryDate: expiryDate,
+          date: courseTask.daysValid !== null ? date : null,
+          expiryDate: courseTask.daysValid !== null ? expiryDate : null,
           comment: null,
         });
       }

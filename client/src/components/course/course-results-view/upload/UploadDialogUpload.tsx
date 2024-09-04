@@ -30,11 +30,13 @@ import {type ParseResult, parse, unparse} from 'papaparse';
 import {type Dispatch, type JSX, type SetStateAction, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
+import type {CoursePartData} from '@/common/types';
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import type {GradeUploadColTypes} from './UploadDialog';
 import MismatchDialog, {type MismatchData} from './UploadDialogMismatchDialog';
 
 type PropsType = {
+  coursePart: CoursePartData | null;
   columns: GridColDef[];
   rows: GridRowsProp<GradeUploadColTypes>;
   maxGrades: {[key: string]: number | null};
@@ -45,6 +47,7 @@ type PropsType = {
   invalidValues: boolean;
 };
 const UploadDialogUpload = ({
+  coursePart,
   columns,
   rows,
   maxGrades,
@@ -198,7 +201,11 @@ const UploadDialogUpload = ({
 
   return (
     <>
-      <DialogTitle>{t('course.results.upload.upload-grades')}</DialogTitle>
+      <DialogTitle>
+        {t('course.results.upload.upload-grades-to-part', {
+          part: coursePart?.name,
+        })}
+      </DialogTitle>
       <Dialog
         open={textFieldOpen}
         fullWidth
