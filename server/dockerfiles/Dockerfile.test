@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 RUN mkdir common server && chown node:node server

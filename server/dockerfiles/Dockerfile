@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 # Build stage
-FROM node:18-alpine AS build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 RUN mkdir common server
@@ -30,7 +30,7 @@ COPY server/src ./src
 RUN npm run build
 
 # Run stage
-FROM node:18-alpine AS run
+FROM node:20-alpine AS run
 
 WORKDIR /app
 RUN mkdir logs && chown node:node logs

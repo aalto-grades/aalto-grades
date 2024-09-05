@@ -1,19 +1,19 @@
 {
-  "author": "The Aalto Grades Developers",
   "license": "Expat (MIT)",
+  "author": "The Aalto Grades Developers",
   "scripts": {
     "lint": "eslint . --ext ts --report-unused-disable-directives"
   },
-  "engines": {
-    "node": ">=18.0.0"
+  "dependencies": {
+    "zod": "^3.22.4",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
     "@types/zxcvbn": "^4.4.4",
     "reactflow": "^11.10.4"
   },
-  "dependencies": {
-    "zod": "^3.22.4",
-    "zxcvbn": "^4.4.2"
+  "engines": {
+    "node": ">=20"
   }
 }

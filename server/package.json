@@ -1,25 +1,22 @@
 {
   "name": "aalto-grades-server",
-  "author": "The Aalto Grades Developers",
-  "license": "Expat (MIT)",
   "description": "",
+  "license": "Expat (MIT)",
+  "author": "The Aalto Grades Developers",
   "main": "",
   "scripts": {
     "build": "tsc && tsc-alias",
-    "start": "node build/server/src/server.js",
-    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
-    "test": "jest --verbose --detectOpenHandles --coverage",
     "citest": "GITHUB_ACTIONS=1 jest --detectOpenHandles",
+    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
     "lint": "eslint . --ext ts --report-unused-disable-directives",
     "lint:fix": "eslint . --ext ts --report-unused-disable-directives --fix",
-    "migration:up": "npx sequelize-cli db:migrate",
     "migration:down": "npx sequelize-cli db:migrate:undo",
     "migration:down:all": "npx sequelize-cli db:migrate:undo:all",
+    "migration:up": "npx sequelize-cli db:migrate",
+    "seed:down": "npx sequelize-cli db:seed:undo",
     "seed:up": "npx sequelize-cli db:seed:all",
-    "seed:down": "npx sequelize-cli db:seed:undo"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "start": "node build/server/src/server.js",
+    "test": "jest --verbose --detectOpenHandles --coverage"
   },
   "dependencies": {
     "@node-saml/passport-saml": "^4.0.4",
@@ -59,7 +56,7 @@
     "@types/jest": "^29.2.3",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/morgan": "^1.9.4",
-    "@types/node": "^18.11.9",
+    "@types/node": "^20.16.5",
     "@types/passport": "^1.0.11",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.34",
@@ -77,5 +74,8 @@
     "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

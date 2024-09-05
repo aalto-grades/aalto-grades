@@ -1,9 +1,33 @@
 {
   "name": "aalto-grades-client",
-  "author": "The Aalto Grades Developers",
-  "license": "Expat (MIT)",
   "private": true,
+  "license": "Expat (MIT)",
+  "author": "The Aalto Grades Developers",
   "type": "module",
+  "scripts": {
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
+    "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --fix",
+    "preview": "vite preview --port 3005",
+    "prod-licenses": "npx license-checker-rseidelsohn --excludePrivatePackages --production --summary",
+    "start": "vite",
+    "trans-copy": "cp public/locales/en/translation.json ./",
+    "trans-merge": "npx tsx translation-utils.ts merge",
+    "trans-parse": "npx i18next 'src/**/*.{ts,tsx}' -c i18next-parser.config.js -o 'public/locales/$LOCALE/$NAMESPACE.json'",
+    "trans-rename": "npx tsx translation-utils.ts rename"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
@@ -39,36 +63,9 @@
     "styled-components": "^6.1.8",
     "zod": "^3.22.4"
   },
-  "scripts": {
-    "start": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview --port 3005",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
-    "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --fix",
-    "trans-parse": "npx i18next 'src/**/*.{ts,tsx}' -c i18next-parser.config.js -o 'public/locales/$LOCALE/$NAMESPACE.json'",
-    "trans-copy": "cp public/locales/en/translation.json ./",
-    "trans-rename": "npx tsx translation-utils.ts rename",
-    "trans-merge": "npx tsx translation-utils.ts merge",
-    "prod-licenses": "npx license-checker-rseidelsohn --excludePrivatePackages --production --summary"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
     "@types/dompurify": "^3.0.5",
-    "@types/node": "^22.1.0",
+    "@types/node": "^20.16.5",
     "@types/papaparse": "^5.3.14",
     "@types/react": "^18.2.8",
     "@types/react-dom": "^18.2.4",
@@ -88,5 +85,8 @@
     "typescript": "^5.3.3",
     "vite": "^5.0.11",
     "vite-tsconfig-paths": "^5.0.1"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
