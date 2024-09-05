@@ -47,7 +47,7 @@ type ColTypes = {
   grader: string;
   grade: number;
   date: Date;
-  expiryDate: Date;
+  expiryDate: Date | null;
   exported: boolean;
   comment: string;
   selected: string;
@@ -281,6 +281,11 @@ const EditGradesDialog = ({
 
   type RowType = GridRowModel<ColTypes>;
   const processRowUpdate = (newRow: RowType, oldRow: RowType): RowType => {
+    if (!newRow.expiryDate || !oldRow.expiryDate) {
+      setError(false);
+      return newRow;
+    }
+
     const diff = newRow.date.getTime() - oldRow.date.getTime(); // Diff to update expiration date with
 
     if (

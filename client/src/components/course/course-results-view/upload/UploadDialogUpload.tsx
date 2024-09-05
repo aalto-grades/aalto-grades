@@ -30,12 +30,13 @@ import {type ParseResult, parse, unparse} from 'papaparse';
 import {type Dispatch, type JSX, type SetStateAction, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
+import type {CoursePartData} from '@/common/types';
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
-import AplusImportDialog from './AplusImportDialog';
+import MismatchDialog, {type MismatchData} from './MismatchDialog';
 import type {GradeUploadColTypes} from './UploadDialog';
-import MismatchDialog, {type MismatchData} from './UploadDialogMismatchDialog';
 
 type PropsType = {
+  coursePart: CoursePartData | null;
   columns: GridColDef[];
   rows: GridRowsProp<GradeUploadColTypes>;
   maxGrades: {[key: string]: number | null};
@@ -46,6 +47,7 @@ type PropsType = {
   invalidValues: boolean;
 };
 const UploadDialogUpload = ({
+  coursePart,
   columns,
   rows,
   maxGrades,
@@ -63,8 +65,6 @@ const UploadDialogUpload = ({
   const [editText, setEditText] = useState<boolean>(rows.length > 0);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
-  const [aplusImportDialogOpen, setAplusImportDialogOpen] =
-    useState<boolean>(false);
 
   const DataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
@@ -201,7 +201,11 @@ const UploadDialogUpload = ({
 
   return (
     <>
-      <DialogTitle>{t('course.results.upload.upload-grades')}</DialogTitle>
+      <DialogTitle>
+        {t('course.results.upload.upload-grades-to-part', {
+          part: coursePart?.name,
+        })}
+      </DialogTitle>
       <Dialog
         open={textFieldOpen}
         fullWidth
@@ -246,11 +250,6 @@ const UploadDialogUpload = ({
         }
       />
 
-      <AplusImportDialog
-        handleClose={() => setAplusImportDialogOpen(false)}
-        open={aplusImportDialogOpen}
-      />
-
       <DialogContent sx={{minHeight: 500}}>
         <Collapse in={invalidValues}>
           <Alert severity="warning" sx={{mb: 2}}>
@@ -282,13 +281,6 @@ const UploadDialogUpload = ({
               <Button variant="outlined" onClick={downloadTemplate}>
                 {t('course.results.upload.download-template')}
               </Button>
-              <Button
-                variant="outlined"
-                onClick={() => setAplusImportDialogOpen(true)}
-              >
-                {t('course.results.upload.a+-import')}
-              </Button>
-              <Button variant="outlined">Import from MyCourses</Button>
               <Button variant="outlined" onClick={() => setTextFieldOpen(true)}>
                 {t('course.results.upload.paste-text')}
               </Button>

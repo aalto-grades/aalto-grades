@@ -31,7 +31,7 @@ export default class TaskGrade extends Model<
   declare sisuExportDate: CreationOptional<Date | null>;
   // Date when course part is completed (e.g., deadline or exam date)
   declare date: Date | string; // Database outputs 'yyyy-mm-dd' but inserting date is allowed
-  declare expiryDate: Date | string; // Database outputs 'yyyy-mm-dd' but inserting date is allowed
+  declare expiryDate: Date | string | null; // Database outputs 'yyyy-mm-dd' but inserting date is allowed
   declare comment: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -50,6 +50,7 @@ TaskGrade.init(
     },
     userId: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       references: {
         model: 'user',
         key: 'id',
@@ -57,6 +58,7 @@ TaskGrade.init(
     },
     courseTaskId: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       references: {
         model: 'course_part',
         key: 'id',
@@ -92,7 +94,7 @@ TaskGrade.init(
     },
     expiryDate: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
     },
     comment: {
       type: DataTypes.STRING,

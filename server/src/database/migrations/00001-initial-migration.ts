@@ -316,6 +316,7 @@ export default {
           },
           user_id: {
             type: DataTypes.INTEGER,
+            allowNull: false,
             references: {
               model: 'user',
               key: 'id',
@@ -325,6 +326,7 @@ export default {
           },
           course_task_id: {
             type: DataTypes.INTEGER,
+            allowNull: false,
             references: {
               model: 'course_task',
               key: 'id',
@@ -366,7 +368,7 @@ export default {
           },
           expiry_date: {
             type: DataTypes.DATEONLY,
-            allowNull: false,
+            allowNull: true,
           },
           comment: {
             type: DataTypes.STRING,

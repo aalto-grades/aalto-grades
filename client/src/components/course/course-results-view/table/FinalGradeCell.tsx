@@ -28,7 +28,7 @@ const FinalGradeCell = ({
   const theme = useTheme();
 
   const [hover, setHover] = useState<boolean>(false);
-  const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const bestFinalGrade = findBestFinalGrade(finalGrades);
 
@@ -69,19 +69,21 @@ const FinalGradeCell = ({
               right: '0px',
               top: 'calc(50% - 20px)',
             }}
-            onClick={(): void => setGradeDialogOpen(true)}
+            onClick={(): void => setEditDialogOpen(true)}
           >
             <MoreVert />
           </IconButton>
         </Tooltip>
       )}
-      <EditFinalGradesDialog
-        open={gradeDialogOpen}
-        onClose={() => setGradeDialogOpen(false)}
-        userId={userId}
-        finalGrades={finalGrades}
-        title={t('course.results.final-of', {user: studentNumber})}
-      />
+      {editDialogOpen && (
+        <EditFinalGradesDialog
+          open={editDialogOpen}
+          onClose={() => setEditDialogOpen(false)}
+          userId={userId}
+          finalGrades={finalGrades}
+          title={t('course.results.final-of', {user: studentNumber})}
+        />
+      )}
       {bestFinalGrade?.date !== undefined && (
         <Tooltip
           placement="top"

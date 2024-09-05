@@ -17,13 +17,15 @@ type PropsType = {
   row: GroupedStudentRow;
   gradingModelIds: number[] | undefined;
   onClick: () => void;
-  gradingScale: GradingScale;
+  gradingScale?: GradingScale | null;
+  value?: number | null;
 };
 const PredictedGradeCell = ({
   row,
   gradingModelIds,
   onClick,
-  gradingScale,
+  gradingScale = null,
+  value = null,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const [hover, setHover] = useState<boolean>(false);
@@ -78,15 +80,17 @@ const PredictedGradeCell = ({
         disableInteractive
       >
         <p style={{margin: 0, display: 'inline'}}>
-          {gradingModelIds
-            ?.map(modelId =>
-              getGradeString(
-                t,
-                gradingScale,
-                row.predictedGraphValues?.[modelId]?.finalValue
-              )
-            )
-            .join(' / ') || 'N/A'}
+          {gradingScale !== null
+            ? gradingModelIds
+                ?.map(modelId =>
+                  getGradeString(
+                    t,
+                    gradingScale,
+                    row.predictedGraphValues?.[modelId]?.finalValue
+                  )
+                )
+                .join(' / ') || 'N/A'
+            : value!}
         </p>
       </Tooltip>
       {gradingModelIds !== undefined && gradingModelIds.length > 0 && hover && (

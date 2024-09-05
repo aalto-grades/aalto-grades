@@ -66,7 +66,9 @@ const CalculateFinalGradesDialog = ({
   const modelList = useMemo(
     () =>
       allGradingModels.data !== undefined
-        ? allGradingModels.data.filter(model => !model.archived)
+        ? allGradingModels.data.filter(
+            model => model.coursePartId === null && !model.archived
+          )
         : [],
     [allGradingModels.data]
   );
@@ -79,7 +81,7 @@ const CalculateFinalGradesDialog = ({
   useEffect(() => {
     if (!open) return;
 
-    let latestDate = new Date(1970, 0, 1);
+    let latestDate = new Date(0);
     for (const row of selectedRows) {
       for (const courseTask of row.courseTasks) {
         for (const grade of courseTask.grades) {

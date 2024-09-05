@@ -21,7 +21,7 @@ import {
   getGrades,
   getLatestGrades,
   getSisuFormattedGradingCSV,
-} from '../controllers/grades';
+} from '../controllers/taskGrade';
 import {handleInvalidRequestJson} from '../middleware';
 import {authorization, courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';

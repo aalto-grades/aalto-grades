@@ -40,10 +40,10 @@ import {useTranslation} from 'react-i18next';
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import type {GradeUploadColTypes} from './UploadDialog';
 
-type DateType = {
+export type DateType = {
   courseTaskName: string;
   completionDate: Dayjs;
-  expirationDate: Dayjs;
+  expirationDate: Dayjs | null;
 };
 type PropsType = {
   columns: GridColDef[];
@@ -85,7 +85,8 @@ const UploadDialogConfirm = ({
   useEffect(() => {
     let newError = false;
     for (const date of dates) {
-      if (date.expirationDate <= date.completionDate) newError = true;
+      if (date.expirationDate && date.expirationDate <= date.completionDate)
+        newError = true;
     }
     if (newError !== error) {
       setError(newError);
@@ -107,9 +108,10 @@ const UploadDialogConfirm = ({
           ? {
               ...oldDate,
               completionDate: newCompletionDate,
-              expirationDate: oldDate.expirationDate.add(
-                newCompletionDate.diff(oldDate.completionDate)
-              ),
+              expirationDate:
+                oldDate.expirationDate?.add(
+                  newCompletionDate.diff(oldDate.completionDate)
+                ) ?? null,
             }
           : oldDate
       )
@@ -158,11 +160,15 @@ const UploadDialogConfirm = ({
                 </TableCell>
                 <TableCell>
                   <DatePicker
+                    disabled={date.expirationDate === null}
                     slotProps={{
                       textField: {
                         size: 'small',
-                        error: date.expirationDate <= date.completionDate,
+                        error:
+                          date.expirationDate !== null &&
+                          date.expirationDate <= date.completionDate,
                         helperText:
+                          date.expirationDate !== null &&
                           date.expirationDate <= date.completionDate
                             ? t(
                                 'course.results.upload.expiration-after-completion'

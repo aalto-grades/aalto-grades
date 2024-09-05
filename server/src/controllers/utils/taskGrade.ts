@@ -11,6 +11,7 @@ import {findCoursePartById} from './coursePart';
 import httpLogger from '../../configs/winston';
 import type Course from '../../database/models/course';
 import CoursePart from '../../database/models/coursePart';
+import CourseTask from '../../database/models/courseTask';
 import FinalGrade from '../../database/models/finalGrade';
 import TaskGrade from '../../database/models/taskGrade';
 import User from '../../database/models/user';
@@ -26,24 +27,28 @@ export const getDateOfLatestGrade = async (
   courseId: number
 ): Promise<Date> => {
   const grades = await TaskGrade.findAll({
-    where: {userId: userId},
-    include: [{model: CoursePart, where: {courseId: courseId}}],
+    where: {userId},
+    include: [
+      {
+        model: CourseTask,
+        include: [{model: CoursePart, where: {courseId}}],
+      },
+    ],
   });
 
-  const dates = grades.map(grade => new Date(grade.date));
-  let maxSoFar = null;
-  for (const date of dates) {
-    if (!maxSoFar || date > maxSoFar) {
-      maxSoFar = date;
-    }
+  if (grades.length === 0) {
+    throw new ApiError(
+      `Failed to find the date of the latest grade, user ${userId} has` +
+        ` no grades for course ${courseId}.`,
+      HttpCode.BadRequest
+    );
   }
 
-  if (maxSoFar) return maxSoFar;
-  throw new ApiError(
-    `Failed to find the date of the latest grade, user ${userId} has` +
-      ` no grades for course ${courseId}.`,
-    HttpCode.BadRequest
-  );
+  let maxSoFar = new Date(0);
+  for (const grade of grades) {
+    if (new Date(grade.date) > maxSoFar) maxSoFar = new Date(grade.date);
+  }
+  return maxSoFar;
 };
 
 /**
@@ -121,7 +126,8 @@ export const parseTaskGrade = (taskGrade: TaskGrade): TaskGradeData => {
     grade: taskGrade.grade,
     exportedToSisu: taskGrade.sisuExportDate,
     date: new Date(taskGrade.date),
-    expiryDate: new Date(taskGrade.expiryDate),
+    expiryDate:
+      taskGrade.expiryDate === null ? null : new Date(taskGrade.expiryDate),
     comment: taskGrade.comment,
   };
 };

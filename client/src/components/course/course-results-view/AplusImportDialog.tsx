@@ -34,22 +34,21 @@ import {
 import {getAplusToken} from '@/utils';
 
 type PropsType = {
-  handleClose: () => void;
   open: boolean;
+  onClose: () => void;
 };
-
-const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
+const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const courseTasks = useGetCourseTasks(courseId);
 
   const [step, setStep] = useState<number>(0);
-  const [coursePartIds, setCoursePartIds] = useState<number[]>([]);
+  const [courseTaskIds, setCourseTaskIds] = useState<number[]>([]);
   const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
     useState<boolean>(false);
 
   const addGrades = useAddGrades(courseId);
-  const aplusGrades = useFetchAplusGrades(courseId, coursePartIds, {
+  const aplusGrades = useFetchAplusGrades(courseId, courseTaskIds, {
     enabled: false,
   });
 
@@ -70,53 +69,52 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
 
   const handleSelect = (
     event: ChangeEvent<HTMLInputElement>,
-    coursePartId: number
+    courseTaskId: number
   ): void =>
-    setCoursePartIds(
+    setCourseTaskIds(
       event.target.checked
-        ? [...coursePartIds, coursePartId]
-        : coursePartIds.filter(id => id !== coursePartId)
+        ? [...courseTaskIds, courseTaskId]
+        : courseTaskIds.filter(id => id !== courseTaskId)
     );
 
   const handleResetAndClose = (): void => {
     setStep(0);
-    setCoursePartIds([]);
+    setCourseTaskIds([]);
     setAplusTokenDialogOpen(false);
-    handleClose();
+    onClose();
   };
 
+  const gradesHaveExpiryDates = aplusGrades.data?.some(
+    row => row.expiryDate !== null
+  );
+
   return (
-    <Dialog open={open} onClose={handleResetAndClose}>
+    <Dialog open={open} onClose={handleResetAndClose} maxWidth="md" fullWidth>
       {step === 0 && (
-        <DialogTitle>{t('general.select-course-parts')}</DialogTitle>
-      )}
-      {step === 1 && (
-        <DialogTitle>{t('course.parts.fetching-grades')}</DialogTitle>
-      )}
-      {step === 2 && <DialogTitle>{t('general.confirm')}</DialogTitle>}
-      <DialogContent>
-        {step === 0 && (
-          <>
+        <>
+          <DialogTitle>{t('course.parts.select-course-tasks')}</DialogTitle>
+          <DialogContent>
             <Typography>{t('course.parts.select-for-fetching')}</Typography>
             <FormGroup>
               {courseTasks.data
-                ?.filter(coursePart => coursePart.aplusGradeSources.length > 0)
-                .map(coursePart => (
+                ?.filter(task => task.aplusGradeSources.length > 0)
+                .map(task => (
                   <FormControlLabel
-                    key={coursePart.id}
+                    key={task.id}
                     control={
-                      <Checkbox
-                        onChange={e => handleSelect(e, coursePart.id)}
-                      />
+                      <Checkbox onChange={e => handleSelect(e, task.id)} />
                     }
-                    label={coursePart.name}
+                    label={task.name}
                   />
                 ))}
             </FormGroup>
-          </>
-        )}
-        {step === 1 && (
-          <>
+          </DialogContent>
+        </>
+      )}
+      {step === 1 && (
+        <>
+          <DialogTitle>{t('course.parts.fetching-grades')}</DialogTitle>
+          <DialogContent>
             <AplusTokenDialog
               handleClose={handleResetAndClose}
               handleSubmit={() => {
@@ -128,40 +126,54 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
             />
             <Typography>{t('course.parts.fetching-grades-wait')}</Typography>
             <LinearProgress sx={{mt: 2}} />
-          </>
-        )}
-        {step === 2 && (
-          // TODO: We probably want to show a preview in the same table as all
-          // other grade uploads, for now this is a simple solution to have
-          // some kind of preview.
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t('general.student-number')}</TableCell>
-                  <TableCell>{t('general.course-part-id')}</TableCell>
-                  <TableCell>{t('general.a+-grade-source-id')}</TableCell>
-                  <TableCell>{t('general.grade')}</TableCell>
-                  <TableCell>{t('general.date')}</TableCell>
-                  <TableCell>{t('general.expiry-date')}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {aplusGrades.data?.map(row => (
-                  <TableRow key={row.courseTaskId}>
-                    <TableCell>{row.studentNumber}</TableCell>
-                    <TableCell>{row.courseTaskId}</TableCell>
-                    <TableCell>{row.aplusGradeSourceId}</TableCell>
-                    <TableCell>{row.grade}</TableCell>
-                    <TableCell>{row.date.toDateString()}</TableCell>
-                    <TableCell>{row.expiryDate.toDateString()}</TableCell>
+          </DialogContent>
+        </>
+      )}
+      {step === 2 && (
+        <>
+          <DialogTitle>{t('general.confirm')}</DialogTitle>
+          <DialogContent>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{t('general.student-number')}</TableCell>
+                    <TableCell>{t('general.course-task')}</TableCell>
+                    <TableCell>{t('general.grade')}</TableCell>
+                    <TableCell>{t('general.date')}</TableCell>
+                    {gradesHaveExpiryDates && (
+                      <TableCell>{t('general.expiry-date')}</TableCell>
+                    )}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DialogContent>
+                </TableHead>
+                <TableBody>
+                  {aplusGrades.data?.map(row => (
+                    <TableRow key={row.studentNumber}>
+                      <TableCell>{row.studentNumber}</TableCell>
+                      <TableCell>
+                        {
+                          courseTasks.data!.find(
+                            task => task.id === row.courseTaskId
+                          )!.name
+                        }
+                      </TableCell>
+                      <TableCell>{row.grade}</TableCell>
+                      <TableCell>{row.date.toDateString()}</TableCell>
+                      {gradesHaveExpiryDates && (
+                        <TableCell>
+                          {row.expiryDate === null
+                            ? ''
+                            : row.expiryDate.toDateString()}
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+        </>
+      )}
       <DialogActions>
         {step === 0 && (
           <Button
@@ -171,7 +183,7 @@ const AplusImportDialog = ({handleClose, open}: PropsType): JSX.Element => {
                 aplusGrades.refetch();
               }
             }}
-            disabled={coursePartIds.length === 0}
+            disabled={courseTaskIds.length === 0}
           >
             {t('general.next')}
           </Button>

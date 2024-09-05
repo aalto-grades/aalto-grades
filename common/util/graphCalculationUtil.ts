@@ -41,9 +41,6 @@ export const initNodeValues = (
       valuesFound = true;
       nodeValue.source = sourceValue.value;
     }
-    // for (const source of sourceValues) {
-    //   if (node.id === `source-${source.id}`) nodeValue.source = source.value;
-    // }
   }
 
   return [valuesFound, nodeValues];

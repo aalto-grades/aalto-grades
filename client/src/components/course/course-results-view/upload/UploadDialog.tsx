@@ -9,15 +9,17 @@ import {
   type GridColDef,
   type GridRowsProp,
 } from '@mui/x-data-grid';
-import dayjs, {type Dayjs} from 'dayjs';
+import dayjs from 'dayjs';
 import {enqueueSnackbar} from 'notistack';
 import {useEffect, useMemo, useState} from 'react';
+import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import type {NewTaskGrade} from '@/common/types';
+import type {CoursePartData, NewTaskGrade} from '@/common/types';
 import {useAddGrades, useGetCourseTasks} from '@/hooks/useApi';
-import UploadDialogConfirm from './UploadDialogConfirm';
+import UploadDialogConfirm, {type DateType} from './UploadDialogConfirm';
+import UploadDialogSelectCoursePart from './UploadDialogSelectCoursePart';
 import UploadDialogUpload from './UploadDialogUpload';
 
 export type GradeUploadColTypes = {[key: string]: number | null} & {
@@ -41,33 +43,35 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const [confirmExpanded, setConfirmExpanded] = useState<
     '' | 'date' | 'confirm'
   >('date');
+
+  const [coursePart, setCoursePart] = useState<CoursePartData | null>(null);
   const [rows, setRows] = useState<GridRowsProp<GradeUploadColTypes>>([]);
   const [ready, setReady] = useState<boolean>(true);
-  const [dates, setDates] = useState<
-    {courseTaskName: string; completionDate: Dayjs; expirationDate: Dayjs}[]
-  >([]);
+  const [dates, setDates] = useState<DateType[]>([]);
 
   const courseTaskData = useMemo(
-    () => courseTasks.data?.filter(courseTask => !courseTask.archived) ?? [],
-    [courseTasks.data]
+    () =>
+      courseTasks.data?.filter(
+        task => task.coursePartId === coursePart?.id && !task.archived
+      ) ?? [],
+    [coursePart?.id, courseTasks.data]
   );
 
   const maxGrades = useMemo(
     () =>
       Object.fromEntries(
-        courseTaskData.map(courseTask => [courseTask.name, courseTask.maxGrade])
+        courseTaskData.map(task => [task.name, task.maxGrade])
       ),
     [courseTaskData]
   );
 
   const invalidValues = useMemo(() => {
     for (const row of rows) {
-      for (const coursePart of courseTaskData) {
-        const grade = row[coursePart.name];
-        if (!(coursePart.name in row) || grade === null) continue; // Skip empty cells
+      for (const task of courseTaskData) {
+        const grade = row[task.name];
+        if (!(task.name in row) || grade === null) continue; // Skip empty cells
 
-        if (coursePart.maxGrade !== null && grade > coursePart.maxGrade)
-          return true;
+        if (task.maxGrade !== null && grade > task.maxGrade) return true;
       }
     }
     return false;
@@ -76,10 +80,11 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   useEffect(() => {
     if (courseTaskData.length === dates.length) return;
     setDates(
-      courseTaskData.map(courseTask => ({
-        courseTaskName: courseTask.name,
+      courseTaskData.map(task => ({
+        courseTaskName: task.name,
         completionDate: dayjs(),
-        expirationDate: dayjs().add(courseTask.daysValid ?? 0, 'day'), // TODO: Fix
+        expirationDate:
+          task.daysValid === null ? null : dayjs().add(task.daysValid, 'day'),
       }))
     );
   }, [courseTaskData, dates.length]);
@@ -93,9 +98,9 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       editable: true,
     },
     ...courseTaskData.map(
-      (coursePart): GridColDef<GradeUploadColTypes> => ({
-        field: coursePart.name,
-        headerName: coursePart.name,
+      (task): GridColDef<GradeUploadColTypes> => ({
+        field: task.name,
+        headerName: task.name,
         type: 'number',
         editable: true,
       })
@@ -122,13 +127,29 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       type: 'string',
     },
     ...courseTaskData.map(
-      (coursePart): GridColDef<GradeUploadColTypes> => ({
-        field: coursePart.name,
-        headerName: coursePart.name,
+      (task): GridColDef<GradeUploadColTypes> => ({
+        field: task.name,
+        headerName: task.name,
         type: 'number',
       })
     ),
   ];
+
+  const reset = (): void => {
+    setCurrentStep(0);
+    setCoursePart(null);
+    setUploadExpanded('upload');
+    setConfirmExpanded('date');
+    setRows([]);
+    setDates(
+      courseTaskData.map(task => ({
+        courseTaskName: task.name,
+        completionDate: dayjs(),
+        expirationDate:
+          task.daysValid === null ? null : dayjs().add(task.daysValid, 'day'),
+      }))
+    );
+  };
 
   const onSubmit = async (): Promise<void> => {
     const gradeData: NewTaskGrade[] = [];
@@ -140,17 +161,13 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
 
         const dateData = dates.find(
           date => date.courseTaskName === courseTask.name
-        );
-        if (dateData === undefined) {
-          console.error('DateData was undefined');
-          continue;
-        }
+        )!;
         gradeData.push({
           studentNumber: row.studentNo,
           courseTaskId: courseTask.id,
           grade: grade,
           date: dateData.completionDate.toDate(),
-          expiryDate: dateData.expirationDate.toDate(),
+          expiryDate: dateData.expirationDate?.toDate() ?? null,
           comment: '',
         });
       }
@@ -162,24 +179,23 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       variant: 'success',
     });
 
-    setCurrentStep(0);
-    setUploadExpanded('upload');
-    setConfirmExpanded('date');
-    setRows([]);
-    setDates(
-      courseTaskData.map(courseTask => ({
-        courseTaskName: courseTask.name,
-        completionDate: dayjs(),
-        expirationDate: dayjs().add(courseTask.daysValid ?? 0, 'day'), // TODO: Fix
-      }))
-    );
+    reset();
     onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
       {currentStep === 0 ? (
+        <UploadDialogSelectCoursePart
+          setCoursePart={newCoursePart => {
+            setCoursePart(newCoursePart);
+            setCurrentStep(1);
+            setReady(true);
+          }}
+        />
+      ) : currentStep === 1 ? (
         <UploadDialogUpload
+          coursePart={coursePart}
           columns={columns}
           rows={rows}
           maxGrades={maxGrades}
@@ -203,15 +219,26 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
         />
       )}
       <DialogActions>
-        {currentStep === 1 && (
+        {currentStep > 0 && (
           <Button
-            onClick={() => setCurrentStep(cur => cur - 1)}
+            onClick={async () => {
+              if (currentStep === 1 && rows.length > 0) {
+                const result = await AsyncConfirmationModal({
+                  confirmDiscard: true,
+                });
+                if (!result) return;
+                reset();
+                return;
+              }
+              setCurrentStep(cur => cur - 1);
+              setReady(true);
+            }}
             sx={{mr: 'auto'}}
           >
             {t('general.back')}
           </Button>
         )}
-        {currentStep === 0 && (
+        {currentStep === 1 && (
           <Button
             onClick={() => setCurrentStep(cur => cur + 1)}
             disabled={!ready || rows.length === 0}
@@ -219,7 +246,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
             {t('general.next')}
           </Button>
         )}
-        {currentStep === 1 && confirmExpanded === 'date' && (
+        {currentStep === 2 && confirmExpanded === 'date' && (
           <Button
             onClick={() => setConfirmExpanded('confirm')}
             disabled={!ready}
@@ -227,7 +254,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
             {t('general.confirm')}
           </Button>
         )}
-        {currentStep === 1 && confirmExpanded === 'confirm' && (
+        {currentStep === 2 && confirmExpanded === 'confirm' && (
           <Button onClick={onSubmit}>{t('general.submit')}</Button>
         )}
       </DialogActions>

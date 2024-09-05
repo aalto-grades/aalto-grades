@@ -97,7 +97,7 @@ const RenderCell = ({
 
 // TODO: Better column definitions
 // TODO: Better typing and freeze how to access data
-const CourseResultsTable = (): JSX.Element => {
+const GradesTable = (): JSX.Element => {
   const {table} = useTableContext();
   const {rows} = table.getRowModel();
 
@@ -279,4 +279,4 @@ const CourseResultsTable = (): JSX.Element => {
     </div>
   );
 };
-export default CourseResultsTable;
+export default GradesTable;

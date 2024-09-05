@@ -16,7 +16,7 @@ import {
   deleteFinalGrade,
   editFinalGrade,
   getFinalGrades,
-} from '../controllers/finalGrades';
+} from '../controllers/finalGrade';
 import {handleInvalidRequestJson} from '../middleware';
 import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';

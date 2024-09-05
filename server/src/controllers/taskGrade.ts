@@ -102,7 +102,7 @@ export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
       studentData.set(user.id, {user, grades: {}, finalGrades: []});
 
     const userGrades = (studentData.get(user.id) as StudentData).grades;
-    if (!Object.hasOwn(userGrades[grade.courseTaskId], grade.courseTaskId))
+    if (!Object.hasOwn(userGrades, grade.courseTaskId))
       userGrades[grade.courseTaskId] = [];
 
     userGrades[grade.courseTaskId].push(parseTaskGrade(grade));
@@ -240,7 +240,7 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
 
       preparedBulkCreate.push({
         userId: userId,
-        coursePartId: gradeEntry.courseTaskId,
+        courseTaskId: gradeEntry.courseTaskId,
         graderId: grader.id,
         aplusGradeSourceId: gradeEntry.aplusGradeSourceId,
         date: gradeEntry.date,
@@ -298,6 +298,7 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
   if (
     date !== undefined &&
     expiryDate === undefined &&
+    gradeData.expiryDate !== null &&
     date > new Date(gradeData.expiryDate)
   ) {
     throw new ApiError(
@@ -306,7 +307,7 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
       HttpCode.BadRequest
     );
   } else if (
-    expiryDate !== undefined &&
+    expiryDate &&
     date === undefined &&
     new Date(gradeData.date) > expiryDate
   ) {
@@ -403,8 +404,6 @@ export const getSisuFormattedGradingCSV: Endpoint<
 > = async (req, res) => {
   const course = await findAndValidateCourseId(req.params.courseId);
   await studentNumbersExist(req.body.studentNumbers);
-
-  const sisuExportDate = new Date();
 
   // TODO: Only one grade per user per instance is allowed
   const finalGrades = await getFinalGradesFor(
@@ -537,7 +536,7 @@ export const getSisuFormattedGradingCSV: Endpoint<
   }
 
   await FinalGrade.update(
-    {sisuExportDate},
+    {sisuExportDate: new Date()},
     {
       where: {
         id: {

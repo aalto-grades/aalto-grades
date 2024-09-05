@@ -10,7 +10,7 @@ import {
   GradingScale,
   type StudentRow,
 } from '@/common/types';
-import {batchCalculateGraph} from '@/common/util';
+import {batchCalculateFinalGrades} from '@/common/util';
 import type {
   ExtendedStudentRow,
   GroupedStudentRow,
@@ -32,7 +32,7 @@ export const groupByLatestBestGrade = (
   gradeSelectOption: GradeSelectOption
 ): GroupedStudentRow[] => {
   const findLatestBestGradeDate = (row: StudentRow): string => {
-    let newestDate = new Date('1970-01-01');
+    let newestDate = new Date(0);
 
     for (const courseTask of row.courseTasks) {
       const bestGrade = findBestGrade(courseTask.grades, {
@@ -40,7 +40,7 @@ export const groupByLatestBestGrade = (
         gradeSelectOption,
       });
       const bestGradeDate =
-        bestGrade === null ? new Date('1970-01-01') : new Date(bestGrade.date);
+        bestGrade === null ? new Date(0) : new Date(bestGrade.date);
 
       // Get best grade date for each course part and get the newest
       if (bestGradeDate > newestDate) newestDate = bestGradeDate;
@@ -57,10 +57,10 @@ export const groupByLatestBestGrade = (
 };
 
 export const findLatestGrade = (row: StudentRow): Date => {
-  let latestDate = new Date(1970, 0, 1);
+  let latestDate = new Date(0);
   for (const courseTask of row.courseTasks) {
     for (const grade of courseTask.grades) {
-      if (grade.date.getTime() > latestDate.getTime()) latestDate = grade.date;
+      if (grade.date > latestDate) latestDate = grade.date;
     }
   }
   return latestDate;
@@ -79,13 +79,13 @@ export const predictGrades = (
   gradingModels: GradingModelData[],
   gradeSelectOption: GradeSelectOption
 ): {
-  [key: GradingModelData['id']]: ReturnType<typeof batchCalculateGraph>;
+  [key: GradingModelData['id']]: ReturnType<typeof batchCalculateFinalGrades>;
 } => {
   const result: {
-    [key: GradingModelData['id']]: ReturnType<typeof batchCalculateGraph>;
+    [key: GradingModelData['id']]: ReturnType<typeof batchCalculateFinalGrades>;
   } = {};
   for (const gradingModel of gradingModels) {
-    result[gradingModel.id] = batchCalculateGraph(
+    result[gradingModel.id] = batchCalculateFinalGrades(
       gradingModel,
       gradingModels,
       rows.map(row => ({
@@ -144,10 +144,7 @@ export const predictedGradesErrorCheck = (
       errors.push({
         message: t('utils.grade-not-an-int'),
         type: 'InvalidPredictedGrade',
-        info: {
-          columnId: 'predictedFinalGrades',
-          modelId: modelId,
-        },
+        info: {modelId: parseInt(modelId)},
       });
     }
     // if grade is out of range
@@ -162,10 +159,7 @@ export const predictedGradesErrorCheck = (
       errors.push({
         message: t('utils.grade-out-of-range'),
         type: 'OutOfRangePredictedGrade',
-        info: {
-          columnId: 'predictedFinalGrades',
-          modelId: modelId,
-        },
+        info: {modelId: parseInt(modelId)},
       });
     }
   }
@@ -242,7 +236,7 @@ export const getErrorTypes = (
  */
 export const getErrorCount = (
   rowModel: GroupedStudentRow[],
-  selectedGradingModel: 'any' | number
+  selectedGradingModel: GradingModelData | 'any'
 ): number => {
   let totalErrors = 0;
 
@@ -254,7 +248,7 @@ export const getErrorCount = (
           case 'InvalidPredictedGrade':
             if (
               selectedGradingModel === 'any' ||
-              selectedGradingModel === Number(error.info.modelId)
+              error.info.modelId === selectedGradingModel.id
             ) {
               totalErrors += 1;
             }

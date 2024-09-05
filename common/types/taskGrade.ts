@@ -16,11 +16,11 @@ const BaseGradeDataSchema = z.strictObject({
   grade: z.number(),
   exportedToSisu: DateSchema.nullable(),
   date: DateSchema,
-  expiryDate: DateSchema,
+  expiryDate: DateSchema.nullable(),
   comment: z.string().nullable(),
 });
 export const TaskGradeDataSchema = BaseGradeDataSchema.refine(
-  val => val.expiryDate >= val.date,
+  val => !val.expiryDate || val.expiryDate >= val.date,
   {path: ['date']}
 );
 export const NewTaskGradeSchema = z
@@ -30,10 +30,12 @@ export const NewTaskGradeSchema = z
     aplusGradeSourceId: z.number().int().optional(),
     grade: z.number(),
     date: DateSchema,
-    expiryDate: DateSchema,
+    expiryDate: DateSchema.nullable(),
     comment: z.string().nullable(),
   })
-  .refine(val => val.expiryDate >= val.date, {path: ['date']});
+  .refine(val => !val.expiryDate || val.expiryDate >= val.date, {
+    path: ['date'],
+  });
 export const EditTaskGradeDataSchema = BaseGradeDataSchema.omit({
   gradeId: true,
   aplusGradeSource: true,
@@ -41,13 +43,9 @@ export const EditTaskGradeDataSchema = BaseGradeDataSchema.omit({
 })
   .strict()
   .partial()
-  .refine(
-    val =>
-      val.date === undefined ||
-      val.expiryDate === undefined ||
-      val.expiryDate >= val.date,
-    {path: ['date']}
-  );
+  .refine(val => !val.date || !val.expiryDate || val.expiryDate >= val.date, {
+    path: ['date'],
+  });
 
 export const NewTaskGradeArraySchema = z.array(NewTaskGradeSchema);
 

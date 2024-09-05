@@ -24,13 +24,14 @@ import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 
 import {type StudentRow, SystemRole} from '@/common/types';
-import {batchCalculateGraph} from '@/common/util';
+import {batchCalculateFinalGrades} from '@/common/util';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 import {
   useAddFinalGrades,
   useGetAllGradingModels,
   useGetCourse,
+  useGetCourseTasks,
   useGetGrades,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
@@ -40,6 +41,7 @@ import {
   getErrorCount,
   getMaxFinalGrade,
 } from '@/utils';
+import AplusImportDialog from './AplusImportDialog';
 import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
 import SisuDownloadDialog from './SisuDownloadDialog';
 import UploadDialog from './upload/UploadDialog';
@@ -237,10 +239,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
       [allGradingModels.data]
     );
 
-    const isActive = useMemo<boolean>(
-      () => Boolean(selectedGradingModel) && selectedGradingModel !== 'any',
-      [selectedGradingModel]
-    );
+    const modelSelected = selectedGradingModel !== 'any';
 
     return (
       <>
@@ -260,7 +259,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
               cursor: 'pointer',
               position: 'relative',
               backgroundColor: 'transparent',
-              ...(isActive && {
+              ...(modelSelected && {
                 backgroundColor: theme.vars.palette.info.light,
                 border: 'none',
                 borderRadius: '8px 0px 0px 8px',
@@ -275,19 +274,18 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
                 width: 'max-content',
               }}
             >
-              {isActive
-                ? gradingModels?.find(ass => ass.id === selectedGradingModel)
-                    ?.name
+              {modelSelected
+                ? selectedGradingModel.name
                 : t('general.grading-model')}
             </div>
 
-            {!isActive && (
+            {!modelSelected && (
               <ArrowDropDownIcon
                 style={{alignContent: 'center', fontSize: '18px'}}
               />
             )}
           </ButtonBase>
-          {isActive && (
+          {modelSelected && (
             <ButtonBase
               style={{
                 display: 'flex',
@@ -308,9 +306,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
                 border: 'none',
                 // }),
               }}
-              onClick={() => {
-                setSelectedGradingModel('any');
-              }}
+              onClick={() => setSelectedGradingModel('any')}
             >
               <ClearIcon style={{alignContent: 'center', fontSize: '18px'}} />
             </ButtonBase>
@@ -330,11 +326,11 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
               key={model.id}
               onClick={() => {
                 table.resetColumnFilters();
-                setSelectedGradingModel(model.id);
+                setSelectedGradingModel(model);
                 handleClose();
               }}
               value={model.id}
-              selected={selectedGradingModel === model.id}
+              selected={modelSelected && model.id === selectedGradingModel.id}
             >
               {model.name}
             </MenuItem>
@@ -346,7 +342,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
 );
 AssessmentFilterButton.displayName = 'AssessmentFilterButton';
 
-const CourseResultsTableToolbar = (): JSX.Element => {
+const GradesTableToolbar = (): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
@@ -357,6 +353,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   const addFinalGrades = useAddFinalGrades(courseId);
   const getGrades = useGetGrades(courseId);
   const course = useGetCourse(courseId);
+  const courseTasks = useGetCourseTasks(courseId);
 
   const [showCalculateDialog, setShowCalculateDialog] =
     useState<boolean>(false);
@@ -364,6 +361,8 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
 
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
+  const [aplusImportDialogOpen, setAplusImportDialogOpen] =
+    useState<boolean>(false);
 
   // Filter out archived models
   const gradingModels = useMemo(
@@ -377,6 +376,14 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge,
     [auth?.role, isTeacherInCharge]
+  );
+
+  const hasAplusSources = useMemo(
+    () =>
+      courseTasks.data?.some(
+        task => !task.archived && task.aplusGradeSources.length > 0
+      ),
+    [courseTasks.data]
   );
 
   const [oldRows, setOldRows] = useState<Row<GroupedStudentRow>[] | null>(null);
@@ -428,7 +435,7 @@ const CourseResultsTableToolbar = (): JSX.Element => {
     if (model === undefined || course.data === undefined) return false;
 
     enqueueSnackbar(t('course.results.calculating-final'), {variant: 'info'});
-    const finalGrades = batchCalculateGraph(
+    const finalGrades = batchCalculateFinalGrades(
       model,
       gradingModels!,
       selectedRows.map(selectedRow => ({
@@ -470,6 +477,25 @@ const CourseResultsTableToolbar = (): JSX.Element => {
 
   return (
     <>
+      <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} />
+      <AplusImportDialog
+        onClose={() => setAplusImportDialogOpen(false)}
+        open={aplusImportDialogOpen}
+      />
+      <CalculateFinalGradesDialog
+        open={showCalculateDialog}
+        onClose={() => setShowCalculateDialog(false)}
+        selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
+        gradeSelectOption={gradeSelectOption}
+        calculateFinalGrades={handleCalculateFinalGrades}
+      />
+      <SisuDownloadDialog
+        open={showSisuDialog}
+        handleClose={() => setShowSisuDialog(false)}
+        handleExited={handleExitedSisuDialog}
+        selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
+      />
+
       {table.getSelectedRowModel().rows.length === 0 ? (
         <Box
           sx={{
@@ -491,8 +517,27 @@ const CourseResultsTableToolbar = (): JSX.Element => {
             startIcon={<Add />}
             color="primary"
           >
-            {t('course.results.add-grades')}
+            {t('course.results.add-grades-manually')}
           </Button>
+          <Tooltip
+            title={
+              hasAplusSources
+                ? t('course.results.import-from-aplus')
+                : t('course.results.no-aplus-sources')
+            }
+          >
+            <span>
+              <Button
+                variant="tonal"
+                disabled={!hasAplusSources}
+                onClick={() => setAplusImportDialogOpen(true)}
+                startIcon={<Add />}
+                color="primary"
+              >
+                {t('course.results.import-from-aplus')}
+              </Button>
+            </span>
+          </Tooltip>
         </Box>
       ) : (
         <Fade in={table.getSelectedRowModel().rows.length > 0}>
@@ -727,22 +772,8 @@ const CourseResultsTableToolbar = (): JSX.Element => {
           </Select>
         </FormControl>
       </Box> */}
-      <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} />
-      <CalculateFinalGradesDialog
-        open={showCalculateDialog}
-        onClose={() => setShowCalculateDialog(false)}
-        selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
-        gradeSelectOption={gradeSelectOption}
-        calculateFinalGrades={handleCalculateFinalGrades}
-      />
-      <SisuDownloadDialog
-        open={showSisuDialog}
-        handleClose={() => setShowSisuDialog(false)}
-        handleExited={handleExitedSisuDialog}
-        selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
-      />
     </>
   );
 };
 
-export default CourseResultsTableToolbar;
+export default GradesTableToolbar;

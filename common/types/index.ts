@@ -11,5 +11,5 @@ export * from './finalGrade';
 export * from './general';
 export * from './gradingModel';
 export * from './graph';
-export * from './taskGrades';
+export * from './taskGrade';
 export * from './user';
