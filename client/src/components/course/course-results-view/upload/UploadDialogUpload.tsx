@@ -32,8 +32,8 @@ import {useTranslation} from 'react-i18next';
 
 import type {CoursePartData} from '@/common/types';
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
+import MismatchDialog, {type MismatchData} from './MismatchDialog';
 import type {GradeUploadColTypes} from './UploadDialog';
-import MismatchDialog, {type MismatchData} from './UploadDialogMismatchDialog';
 
 type PropsType = {
   coursePart: CoursePartData | null;

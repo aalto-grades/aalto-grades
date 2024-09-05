@@ -12,10 +12,10 @@ import {
 import Delayed from '@/components/shared/Delay';
 import {GradesTableProvider} from '@/context/GradesTableProvider';
 import {useGetGrades} from '@/hooks/useApi';
-import CourseResultsTable from './course-results-view/CourseResultsTable';
-import CourseResultsTableToolbar from './course-results-view/CourseResultsTableToolbar';
+import GradesTable from './course-results-view/GradesTable';
+import GradesTableToolbar from './course-results-view/GradesTableToolbar';
 
-const CourseResultsView = (): JSX.Element => {
+const GradesView = (): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const isTransitioning = useViewTransitionState('');
   const gradesQuery = useGetGrades(courseId);
@@ -29,8 +29,8 @@ const CourseResultsView = (): JSX.Element => {
       {gradesQuery.data !== undefined && !isTransitioning && (
         <Delayed>
           <GradesTableProvider data={gradesQuery.data}>
-            <CourseResultsTableToolbar />
-            <CourseResultsTable />
+            <GradesTableToolbar />
+            <GradesTable />
           </GradesTableProvider>
         </Delayed>
       )}
@@ -38,4 +38,4 @@ const CourseResultsView = (): JSX.Element => {
   );
 };
 
-export default CourseResultsView;
+export default GradesView;

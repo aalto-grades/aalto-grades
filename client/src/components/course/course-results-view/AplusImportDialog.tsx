@@ -84,7 +84,9 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
     onClose();
   };
 
-  const gradesHaveDates = aplusGrades.data?.some(row => row.date !== null);
+  const gradesHaveExpiryDates = aplusGrades.data?.some(
+    row => row.expiryDate !== null
+  );
 
   return (
     <Dialog open={open} onClose={handleResetAndClose} maxWidth="md" fullWidth>
@@ -138,11 +140,9 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
                     <TableCell>{t('general.student-number')}</TableCell>
                     <TableCell>{t('general.course-task')}</TableCell>
                     <TableCell>{t('general.grade')}</TableCell>
-                    {gradesHaveDates && (
-                      <>
-                        <TableCell>{t('general.date')}</TableCell>
-                        <TableCell>{t('general.expiry-date')}</TableCell>
-                      </>
+                    <TableCell>{t('general.date')}</TableCell>
+                    {gradesHaveExpiryDates && (
+                      <TableCell>{t('general.expiry-date')}</TableCell>
                     )}
                   </TableRow>
                 </TableHead>
@@ -158,17 +158,13 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
                         }
                       </TableCell>
                       <TableCell>{row.grade}</TableCell>
-                      {gradesHaveDates && (
-                        <>
-                          <TableCell>
-                            {row.date === null ? '' : row.date.toDateString()}
-                          </TableCell>
-                          <TableCell>
-                            {row.expiryDate === null
-                              ? ''
-                              : row.expiryDate.toDateString()}
-                          </TableCell>
-                        </>
+                      <TableCell>{row.date.toDateString()}</TableCell>
+                      {gradesHaveExpiryDates && (
+                        <TableCell>
+                          {row.expiryDate === null
+                            ? ''
+                            : row.expiryDate.toDateString()}
+                        </TableCell>
                       )}
                     </TableRow>
                   ))}

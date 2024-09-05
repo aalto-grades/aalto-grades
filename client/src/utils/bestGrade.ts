@@ -5,7 +5,7 @@
 type BaseType = {
   gradeId: number;
   grade: number;
-  date: Date | null;
+  date: Date;
   expiryDate: Date | null;
 };
 
@@ -19,7 +19,6 @@ const gradeIsNewer = (
   oldGrade: BaseType | null
 ): boolean => {
   if (!oldGrade?.date) return true;
-  if (newGrade.date === null) return false;
   const newDateTime = newGrade.date.getTime();
   const oldDateTime = oldGrade.date.getTime();
   if (newDateTime !== oldDateTime) return newDateTime > oldDateTime;

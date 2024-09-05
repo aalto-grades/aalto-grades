@@ -25,7 +25,7 @@ type PropsType = {
   open: boolean;
   onClose: () => void;
 };
-const AddCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
+const NewCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const addCoursePart = useAddCoursePart(courseId);
@@ -125,4 +125,4 @@ const AddCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
   );
 };
 
-export default AddCoursePartDialog;
+export default NewCoursePartDialog;

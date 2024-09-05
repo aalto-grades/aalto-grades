@@ -341,7 +341,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
 );
 AssessmentFilterButton.displayName = 'AssessmentFilterButton';
 
-const CourseResultsTableToolbar = (): JSX.Element => {
+const GradesTableToolbar = (): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
@@ -755,4 +755,4 @@ const CourseResultsTableToolbar = (): JSX.Element => {
   );
 };
 
-export default CourseResultsTableToolbar;
+export default GradesTableToolbar;
