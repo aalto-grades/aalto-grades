@@ -118,31 +118,41 @@ const ModelsView = (): JSX.Element => {
     }
   }, [courseId, loadGraphId, models, navigate]);
 
-  const renameCourseParts = useCallback(
+  const renameSources = useCallback(
     (model: GradingModelData): GradingModelData => {
-      if (courseParts.data === undefined) return model;
+      if (courseTasks.data === undefined || courseParts.data === undefined)
+        return model;
 
       for (const node of model.graphStructure.nodes) {
         if (node.type !== 'source') continue;
-        const coursePartId = parseInt(node.id.split('-')[1]);
+        const sourceId = parseInt(node.id.split('-')[1]);
 
-        const nodeCoursePart = courseParts.data.find(
-          coursePart => coursePart.id === coursePartId
-        );
-        if (nodeCoursePart !== undefined)
-          model.graphStructure.nodeData[node.id].title = nodeCoursePart.name;
+        let sourceName = null;
+        if (model.coursePartId !== null) {
+          const sourceTask = courseTasks.data.find(
+            task => task.id === sourceId
+          );
+          sourceName = sourceTask?.name;
+        } else {
+          const sourcePart = courseParts.data.find(
+            task => task.id === sourceId
+          );
+          sourceName = sourcePart?.name;
+        }
+        if (sourceName)
+          model.graphStructure.nodeData[node.id].title = sourceName;
       }
       return model;
     },
-    [courseParts.data]
+    [courseParts.data, courseTasks.data]
   );
 
   const loadGraph = useCallback(
     (model: GradingModelData): void => {
-      setCurrentModel(renameCourseParts(structuredClone(model))); // To remove references
+      setCurrentModel(renameSources(structuredClone(model))); // To remove references
       setGraphOpen(true);
     },
-    [renameCourseParts]
+    [renameSources]
   );
 
   // Load modelId url param
@@ -216,6 +226,7 @@ const ModelsView = (): JSX.Element => {
       ...graphStructure,
       nodes: graphStructure.nodes.map(simplifyNode),
     };
+    console.log(JSON.stringify(simplifiedGraphStructure));
     await editModel.mutateAsync({
       courseId,
       gradingModelId: currentModel.id,

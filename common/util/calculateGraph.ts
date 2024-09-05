@@ -37,11 +37,15 @@ export const calculateNodeValues = (
     if (!(node.id in nodeSources)) noSources.push(node.id);
 
     const nodeValue = newNodeValues[node.id];
+
+    // Set value to 0
     if (nodeValue.type === 'require' || nodeValue.type === 'substitute')
       nodeValue.values = {};
     else nodeValue.value = 0;
+
+    // Set sources to 0
     switch (nodeValue.type) {
-      case 'source':
+      case 'source': // Except for sources
         break;
       case 'minpoints':
       case 'round':

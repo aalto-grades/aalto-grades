@@ -177,12 +177,15 @@ const RequireNode = (props: NodeProps): JSX.Element => {
                     : Math.round(source.value * 100) / 100}
                 </td>
                 <td>
-                  {numFail > settings.numFail ||
-                  nodeValue.values[key] === 'fail'
-                    ? nodeValue.values[key]
-                    : Math.round(
-                        (nodeValue.values[key] as number) * 100 // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
-                      ) / 100}
+                  {/* Happens when loading. TODO: Fix? */}
+                  {!Object.hasOwn(nodeValue.values, key)
+                    ? ''
+                    : numFail > settings.numFail ||
+                        nodeValue.values[key] === 'fail'
+                      ? nodeValue.values[key]
+                      : Math.round(
+                          (nodeValue.values[key] as number) * 100 // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+                        ) / 100}
                 </td>
               </tr>
             ))}

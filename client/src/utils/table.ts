@@ -85,6 +85,7 @@ export const predictGrades = (
     [key: GradingModelData['id']]: ReturnType<typeof batchCalculateFinalGrades>;
   } = {};
   for (const gradingModel of gradingModels) {
+    if (gradingModel.coursePartId !== null) continue;
     result[gradingModel.id] = batchCalculateFinalGrades(
       gradingModel,
       gradingModels,
