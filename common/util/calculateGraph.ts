@@ -201,7 +201,7 @@ export const batchCalculateCourseParts = (
 
 // TODO: Handle expired course parts?
 // TODO: Stress test?
-/** Calculate course part values and/or final grades for all students. */
+/** Calculate course part values and final grades for all students. */
 export const batchCalculateFinalGrades = (
   finalModel: GradingModelData,
   models: GradingModelData[],
@@ -212,6 +212,11 @@ export const batchCalculateFinalGrades = (
 ): {
   [key: number]: {courseParts: {[key: string]: number}; finalValue: number};
 } => {
+  if (finalModel.coursePartId !== null)
+    throw new Error(
+      'Tried to call batchCalculateFinalGrades with a course part model'
+    );
+
   // Find course part model Ids
   const coursePartModelsIds = new Set<number>();
   for (const node of finalModel.graphStructure.nodes) {
@@ -236,32 +241,31 @@ export const batchCalculateFinalGrades = (
       value: task.grade,
     }));
 
-    // Calculate course parts first if necessary
-    if (finalModel.coursePartId === null) {
-      const coursePartValues: {[key: string]: number} = {};
-      for (const model of coursePartModels) {
-        const {nodes, edges, nodeData} = model.graphStructure;
-        const [gradesFound, nodeValues] = initNodeValues(nodes, sourceValues);
+    // Calculate course parts first
+    const coursePartValues: {[key: string]: number} = {};
+    for (const model of coursePartModels) {
+      const {nodes, edges, nodeData} = model.graphStructure;
+      const [gradesFound, nodeValues] = initNodeValues(nodes, sourceValues);
 
-        // No grades in course part.
-        if (!gradesFound) continue;
+      // No grades in course part.
+      if (!gradesFound) continue;
 
-        const graphValues = calculateNodeValues(
-          nodeValues,
-          nodeData,
-          nodes,
-          edges
-        );
-        const finalValue = (graphValues.sink as SinkNodeValue).value;
-        coursePartValues[model.coursePartId!] = finalValue;
-        result[student.userId].courseParts[model.coursePartId!] = finalValue;
-      }
-      sourceValues = Object.entries(coursePartValues).map(([id, value]) => ({
-        id: parseInt(id),
-        value,
-      }));
+      const graphValues = calculateNodeValues(
+        nodeValues,
+        nodeData,
+        nodes,
+        edges
+      );
+      const finalValue = (graphValues.sink as SinkNodeValue).value;
+      coursePartValues[model.coursePartId!] = finalValue;
+      result[student.userId].courseParts[model.coursePartId!] = finalValue;
     }
+    sourceValues = Object.entries(coursePartValues).map(([id, value]) => ({
+      id: parseInt(id),
+      value,
+    }));
 
+    // Calculate final grade
     const {nodes, edges, nodeData} = finalModel.graphStructure;
     const [_, nodeValues] = initNodeValues(nodes, sourceValues);
     const graphValues = calculateNodeValues(nodeValues, nodeData, nodes, edges);
