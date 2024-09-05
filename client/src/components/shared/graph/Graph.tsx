@@ -136,10 +136,7 @@ const initGraphFn = (
       const sourceId = `source-${sourceValue.id}`;
       if (!(sourceId in initNodeValues)) continue;
 
-      const newValue = initNodeValues[sourceId] as SourceNodeValue;
-      if (newValue.value !== sourceValue.value) {
-        newValue.source = sourceValue.value;
-      }
+      (initNodeValues[sourceId] as SourceNodeValue).value = sourceValue.value;
     }
   }
 

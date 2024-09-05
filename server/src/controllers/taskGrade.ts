@@ -296,7 +296,7 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
   const {grade, date, expiryDate, comment} = req.body;
 
   if (
-    date &&
+    date !== undefined &&
     expiryDate === undefined &&
     gradeData.expiryDate !== null &&
     date > new Date(gradeData.expiryDate)

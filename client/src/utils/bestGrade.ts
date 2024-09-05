@@ -18,7 +18,7 @@ const gradeIsNewer = (
   newGrade: BaseType,
   oldGrade: BaseType | null
 ): boolean => {
-  if (!oldGrade?.date) return true;
+  if (oldGrade === null) return true;
   const newDateTime = newGrade.date.getTime();
   const oldDateTime = oldGrade.date.getTime();
   if (newDateTime !== oldDateTime) return newDateTime > oldDateTime;

@@ -24,7 +24,7 @@ import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 
 import {type StudentRow, SystemRole} from '@/common/types';
-import {batchCalculateGraph} from '@/common/util';
+import {batchCalculateFinalGrades} from '@/common/util';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 import {
@@ -435,7 +435,7 @@ const GradesTableToolbar = (): JSX.Element => {
     if (model === undefined || course.data === undefined) return false;
 
     enqueueSnackbar(t('course.results.calculating-final'), {variant: 'info'});
-    const finalGrades = batchCalculateGraph(
+    const finalGrades = batchCalculateFinalGrades(
       model,
       gradingModels!,
       selectedRows.map(selectedRow => ({

@@ -199,11 +199,10 @@ export const batchCalculateCourseParts = (
   return result;
 };
 
-// TODO: Only use for final grades?
 // TODO: Handle expired course parts?
 // TODO: Stress test?
 /** Calculate course part values and/or final grades for all students. */
-export const batchCalculateGraph = (
+export const batchCalculateFinalGrades = (
   finalModel: GradingModelData,
   models: GradingModelData[],
   studentData: {

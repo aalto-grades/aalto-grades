@@ -10,7 +10,7 @@ import {
   GradingScale,
   type StudentRow,
 } from '@/common/types';
-import {batchCalculateGraph} from '@/common/util';
+import {batchCalculateFinalGrades} from '@/common/util';
 import type {
   ExtendedStudentRow,
   GroupedStudentRow,
@@ -32,16 +32,15 @@ export const groupByLatestBestGrade = (
   gradeSelectOption: GradeSelectOption
 ): GroupedStudentRow[] => {
   const findLatestBestGradeDate = (row: StudentRow): string => {
-    let newestDate = new Date('1970-01-01');
+    let newestDate = new Date(0);
 
     for (const courseTask of row.courseTasks) {
       const bestGrade = findBestGrade(courseTask.grades, {
         expiredOption: 'prefer_non_expired',
         gradeSelectOption,
       });
-      const bestGradeDate = !bestGrade?.date
-        ? new Date('1970-01-01')
-        : new Date(bestGrade.date);
+      const bestGradeDate =
+        bestGrade === null ? new Date(0) : new Date(bestGrade.date);
 
       // Get best grade date for each course part and get the newest
       if (bestGradeDate > newestDate) newestDate = bestGradeDate;
@@ -80,13 +79,13 @@ export const predictGrades = (
   gradingModels: GradingModelData[],
   gradeSelectOption: GradeSelectOption
 ): {
-  [key: GradingModelData['id']]: ReturnType<typeof batchCalculateGraph>;
+  [key: GradingModelData['id']]: ReturnType<typeof batchCalculateFinalGrades>;
 } => {
   const result: {
-    [key: GradingModelData['id']]: ReturnType<typeof batchCalculateGraph>;
+    [key: GradingModelData['id']]: ReturnType<typeof batchCalculateFinalGrades>;
   } = {};
   for (const gradingModel of gradingModels) {
-    result[gradingModel.id] = batchCalculateGraph(
+    result[gradingModel.id] = batchCalculateFinalGrades(
       gradingModel,
       gradingModels,
       rows.map(row => ({
