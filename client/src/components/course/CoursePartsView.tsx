@@ -9,7 +9,6 @@ import {
   Delete,
   Edit,
   More,
-  OpenInNew,
   Unarchive,
 } from '@mui/icons-material';
 import {
@@ -38,7 +37,7 @@ import {enqueueSnackbar} from 'notistack';
 import {type JSX, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
-import {useBlocker, useNavigate, useParams} from 'react-router-dom';
+import {useBlocker, useParams} from 'react-router-dom';
 
 import {
   type AplusGradeSourceData,
@@ -78,7 +77,6 @@ const CoursePartsView = (): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
-  const navigate = useNavigate();
 
   const gradingModels = useGetAllGradingModels(courseId);
   const courseParts = useGetCourseParts(courseId);
@@ -503,20 +501,6 @@ const CoursePartsView = (): JSX.Element => {
                 secondaryAction={
                   editRights ? (
                     <>
-                      <Tooltip
-                        placement="top"
-                        title={t('course.parts.open-part-graph')}
-                      >
-                        <IconButton
-                          onClick={() => {
-                            navigate(
-                              `/courses/${courseId}/models/course-part/${coursePart.id}`
-                            );
-                          }}
-                        >
-                          <OpenInNew />
-                        </IconButton>
-                      </Tooltip>
                       <Tooltip
                         placement="top"
                         title={t('course.parts.edit-part')}
