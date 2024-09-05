@@ -31,6 +31,7 @@ import {
   useAddFinalGrades,
   useGetAllGradingModels,
   useGetCourse,
+  useGetCourseTasks,
   useGetGrades,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
@@ -352,6 +353,7 @@ const GradesTableToolbar = (): JSX.Element => {
   const addFinalGrades = useAddFinalGrades(courseId);
   const getGrades = useGetGrades(courseId);
   const course = useGetCourse(courseId);
+  const courseTasks = useGetCourseTasks(courseId);
 
   const [showCalculateDialog, setShowCalculateDialog] =
     useState<boolean>(false);
@@ -374,6 +376,14 @@ const GradesTableToolbar = (): JSX.Element => {
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge,
     [auth?.role, isTeacherInCharge]
+  );
+
+  const hasAplusSources = useMemo(
+    () =>
+      courseTasks.data?.some(
+        task => !task.archived && task.aplusGradeSources.length > 0
+      ),
+    [courseTasks.data]
   );
 
   const [oldRows, setOldRows] = useState<Row<GroupedStudentRow>[] | null>(null);
@@ -509,14 +519,25 @@ const GradesTableToolbar = (): JSX.Element => {
           >
             {t('course.results.add-grades-manually')}
           </Button>
-          <Button
-            variant="tonal"
-            onClick={() => setAplusImportDialogOpen(true)}
-            startIcon={<Add />}
-            color="primary"
+          <Tooltip
+            title={
+              hasAplusSources
+                ? t('course.results.import-from-aplus')
+                : t('course.results.no-aplus-sources')
+            }
           >
-            {t('course.results.import-from-aplus')}
-          </Button>
+            <span>
+              <Button
+                variant="tonal"
+                disabled={!hasAplusSources}
+                onClick={() => setAplusImportDialogOpen(true)}
+                startIcon={<Add />}
+                color="primary"
+              >
+                {t('course.results.import-from-aplus')}
+              </Button>
+            </span>
+          </Tooltip>
         </Box>
       ) : (
         <Fade in={table.getSelectedRowModel().rows.length > 0}>
