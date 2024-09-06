@@ -306,8 +306,8 @@ describe('Test POST /v1/courses/:courseId/final-grades - add final grades', () =
 
   it('should respond with 409 when grading model does not belong to the course', async () => {
     const student = await createStudent();
-    const [, , otherCourseModelId] = await createData.createCourse({});
-    const data = [
+    const [, , , otherCourseModelId] = await createData.createCourse({});
+    const data: NewFinalGrade[] = [
       {
         userId: student.id,
         gradingModelId: otherCourseModelId,

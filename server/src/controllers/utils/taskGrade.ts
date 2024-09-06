@@ -6,8 +6,9 @@ import {type Includeable, Op} from 'sequelize';
 
 import {HttpCode, type TaskGradeData, type UserData} from '@/common/types';
 import {parseAplusGradeSource} from './aplus';
-import {findAndValidateCourseId, findCourseById} from './course';
+import {findAndValidateCourseId} from './course';
 import {findCoursePartById} from './coursePart';
+import {findCourseTaskById} from './courseTask';
 import httpLogger from '../../configs/winston';
 import type Course from '../../database/models/course';
 import CoursePart from '../../database/models/coursePart';
@@ -239,14 +240,13 @@ export const findAndValidateGradePath = async (
   if (!result.success) {
     throw new ApiError(`Invalid grade ID ${gradeId}`, HttpCode.BadRequest);
   }
-  const targetCourse = await findAndValidateCourseId(courseId);
+
+  const course = await findAndValidateCourseId(courseId);
   const grade = await findGradeById(result.data);
+  const courseTask = await findCourseTaskById(grade.courseTaskId);
+  const coursePart = await findCoursePartById(courseTask.coursePartId);
 
-  const coursePart = await findCoursePartById(grade.courseTaskId);
-  const course = await findCourseById(coursePart.courseId);
-
-  // Check that grading model belongs to the course.
-  if (course.id !== targetCourse.id) {
+  if (coursePart.courseId !== course.id) {
     throw new ApiError(
       `Grade with ID ${gradeId} ` +
         `does not belong to the course with ID ${courseId}`,

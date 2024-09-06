@@ -34,9 +34,11 @@ definitions:
         type: array
         description: Student numbers to download csv for
         items:
-          type: string
-          description: User's student number
-          example: 1234567
+          $ref: '#/definitions/StudentNumber'
+    required:
+      - assessmentDate
+      - completionLanguage
+      - studentNumbers
 
   GradeData:
     type: object
@@ -191,7 +193,7 @@ definitions:
 
 /v1/courses/{courseId}/grades:
   get:
-    tags: [Grades]
+    tags: [Task Grade]
     description: >
       Get the grades of all students.
       Available only to admin users and teachers & assistants of the course.
@@ -217,7 +219,7 @@ definitions:
     security:
       - cookieAuth: []
   post:
-    tags: [Grades]
+    tags: [Task Grade]
     description: >
       Add new grades to the course.
       Available only to admin users and teachers & assistants of the course.
@@ -248,7 +250,7 @@ definitions:
 
 /v1/courses/{courseId}/grades/{gradeId}:
   put:
-    tags: [Grades]
+    tags: [Task Grade]
     description: >
       Edit grade.
       Available only to admin users and teachers & assistants of the course.
@@ -276,7 +278,7 @@ definitions:
     security:
       - cookieAuth: []
   delete:
-    tags: [Grades]
+    tags: [Task Grade]
     description: >
       Delete grade.
       Available only to admin users and teachers & assistants of the course.
@@ -301,7 +303,7 @@ definitions:
 
 /v1/latest-grades:
   get:
-    tags: [Grades]
+    tags: [Task Grade]
     description: Get latest grade date for each student
     requestBody:
       content:
@@ -331,7 +333,7 @@ definitions:
 
 /v1/courses/{courseId}/grading-models/{gradingModelId}/grades/csv/sisu:
   get:
-    tags: [Grades]
+    tags: [Task Grade]
     description: >
       Get the final grades of all students in a Sisu compatible CSV format.
       Results can be filtered by student numbers or particular instance ID.
