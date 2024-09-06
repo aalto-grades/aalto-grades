@@ -106,5 +106,5 @@ npm run test
 You may also run the tests using Docker Compose:
 
 ```
-docker compose -f docker-compose-test.yaml up --abort-on-container-exit --exit-code-from backend
+docker compose -f docker-compose-test.yaml up --build --abort-on-container-exit --exit-code-from backend
 ```

@@ -34,7 +34,7 @@ RUN npm run build
 # Sleep 10s to wait for the database to come up. Not optimal but works
 EXPOSE 3000
 CMD ["/bin/sh", "-c", "\
-    sleep 10 \
+    sleep 10 && \
     npm run migration:up && \
     npm run seed:up && \
     npm run citest"]
