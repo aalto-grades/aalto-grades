@@ -32,7 +32,7 @@ test.describe('Test courses as Assistant', () => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page.getByRole('button', {name: 'Grading models'}).click();
 
-    await page.getByRole('button', {name: 'O1 Grading'}).click();
+    await page.getByRole('button', {name: 'Exercises 2024'}).click();
     await expect(page.getByTestId('rf__wrapper')).toBeVisible();
   });
 
@@ -42,6 +42,6 @@ test.describe('Test courses as Assistant', () => {
       .getByRole('link', {name: 'Course parts'})
       .getByRole('button')
       .click();
-    await expect(page.getByText('Tier A')).toBeVisible();
+    await expect(page.getByText('Exercises 2024')).toBeVisible();
   });
 });
