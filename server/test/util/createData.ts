@@ -203,18 +203,19 @@ class CreateData {
       instance: '1970',
       url: 'https://plus.cs.aalto.fi',
     };
+    const coursePart = await this.createCoursePart(courseId);
 
-    const fullPointsCoursePart = await this.createCoursePart(courseId);
+    const fullPointsCourseTask = await this.createCourseTask(coursePart.id);
     const fullPointsGradeSource = await AplusGradeSource.create({
-      courseTaskId: fullPointsCoursePart.id,
+      courseTaskId: fullPointsCourseTask.id,
       aplusCourse: aplusCourse,
       sourceType: AplusGradeSourceType.FullPoints,
       date: new Date(),
     });
 
-    const moduleCoursePart = await this.createCoursePart(courseId);
+    const moduleCourseTask = await this.createCourseTask(coursePart.id);
     const moduleGradeSource = await AplusGradeSource.create({
-      courseTaskId: moduleCoursePart.id,
+      courseTaskId: moduleCourseTask.id,
       aplusCourse: aplusCourse,
       sourceType: AplusGradeSourceType.Module,
       moduleId: 1,
@@ -222,9 +223,9 @@ class CreateData {
       date: new Date(),
     });
 
-    const exerciseCoursePart = await this.createCoursePart(courseId);
+    const exerciseCourseTask = await this.createCourseTask(coursePart.id);
     const exerciseGradeSource = await AplusGradeSource.create({
-      courseTaskId: exerciseCoursePart.id,
+      courseTaskId: exerciseCourseTask.id,
       aplusCourse: aplusCourse,
       sourceType: AplusGradeSourceType.Exercise,
       exerciseId: 1,
@@ -232,9 +233,9 @@ class CreateData {
       date: new Date(),
     });
 
-    const difficultyCoursePart = await this.createCoursePart(courseId);
+    const difficultyCourseTask = await this.createCourseTask(coursePart.id);
     const difficultyGradeSource = await AplusGradeSource.create({
-      courseTaskId: difficultyCoursePart.id,
+      courseTaskId: difficultyCourseTask.id,
       aplusCourse: aplusCourse,
       sourceType: AplusGradeSourceType.Difficulty,
       difficulty: 'A',
@@ -242,10 +243,10 @@ class CreateData {
     });
 
     return [
-      [fullPointsCoursePart.id, fullPointsGradeSource.id],
-      [moduleCoursePart.id, moduleGradeSource.id],
-      [exerciseCoursePart.id, exerciseGradeSource.id],
-      [difficultyCoursePart.id, difficultyGradeSource.id],
+      [fullPointsCourseTask.id, fullPointsGradeSource.id],
+      [moduleCourseTask.id, moduleGradeSource.id],
+      [exerciseCourseTask.id, exerciseGradeSource.id],
+      [difficultyCourseTask.id, difficultyGradeSource.id],
     ];
   }
 

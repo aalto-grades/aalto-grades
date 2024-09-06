@@ -208,7 +208,7 @@ export const deleteAplusGradeSource: Endpoint<void, void> = async (
   } catch (error) {
     if (
       error instanceof ForeignKeyConstraintError &&
-      error.index === 'attainment_grade_aplus_grade_source_id_fkey'
+      error.index === 'task_grade_aplus_grade_source_id_fkey'
     ) {
       throw new ApiError(
         'Tried to delete an A+ grade source with grades',

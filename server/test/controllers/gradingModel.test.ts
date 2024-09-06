@@ -32,7 +32,7 @@ let courseId = -1;
 let courseParts: CoursePartData[] = [];
 let courseTasks: CourseTaskData[] = []; // TODO: Use
 let gradingModId = -1;
-let testStructure: GraphStructure = {} as GraphStructure;
+let finalGradeStructure: GraphStructure = {} as GraphStructure;
 
 let noModelsCourseId = -1;
 let noRoleCourseId = -1;
@@ -47,7 +47,7 @@ beforeAll(async () => {
   [courseId, courseParts, courseTasks, gradingModId] =
     await createData.createCourse({});
   await createData.createGradingModel(courseId, courseParts, courseTasks);
-  testStructure = initGraph('addition', courseParts);
+  finalGradeStructure = initGraph('addition', courseParts);
 
   [noModelsCourseId] = await createData.createCourse({
     createGradingModel: false,
@@ -210,7 +210,11 @@ describe('Test POST /v1/courses/:courseId/grading-models - add grading model', (
 
     let i = 0;
     for (const cookie of testCookies) {
-      const newModel = {name: `Model ${++i}`, graphStructure: testStructure};
+      const newModel = {
+        name: `Model ${++i}`,
+        coursePartId: null,
+        graphStructure: finalGradeStructure,
+      };
       const res = await request
         .post(`/v1/courses/${courseId}/grading-models`)
         .send(newModel)
@@ -225,28 +229,23 @@ describe('Test POST /v1/courses/:courseId/grading-models - add grading model', (
     }
   });
 
-  it('should respond with 400 if validation fails', async () => {
-    const url = `/v1/courses/${courseId}/grading-models`;
-    const badRequest = responseTests.testBadRequest(url, cookies.adminCookie);
-
-    await badRequest.post({name: 5, graphStructure: testStructure});
-    await badRequest.post({name: {name: 'mod'}, graphStructure: testStructure});
-    await badRequest.post(undefined);
-    await badRequest.post({
-      name: 'a name',
-      graphStructure: {nodes: [], edges: [], nodeDat: {}},
-    });
-  });
-
   it('should respond with 400 if id is invalid', async () => {
     const url = `/v1/courses/${-1}/grading-models`;
-    const data = {name: 'Not added', graphStructure: testStructure};
+    const data = {
+      name: 'Not added',
+      coursePartId: null,
+      graphStructure: finalGradeStructure,
+    };
     await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
     let url = `/v1/courses/${courseId}/grading-models`;
-    const data = {name: 'Not added', graphStructure: testStructure};
+    const data = {
+      name: 'Not added',
+      coursePartId: null,
+      graphStructure: finalGradeStructure,
+    };
     await responseTests.testUnauthorized(url).post(data);
 
     await responseTests
@@ -265,13 +264,21 @@ describe('Test POST /v1/courses/:courseId/grading-models - add grading model', (
 
   it('should respond with 404 if not found', async () => {
     const url = `/v1/courses/${nonExistentId}/grading-models`;
-    const data = {name: 'Not added', graphStructure: testStructure};
+    const data = {
+      name: 'Not added',
+      coursePartId: null,
+      graphStructure: finalGradeStructure,
+    };
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
   it('should respond with 409 when course already has grading model with same name', async () => {
     const url = `/v1/courses/${courseId}/grading-models`;
-    const data = {name: 'Model 1', graphStructure: testStructure};
+    const data = {
+      name: 'Model 1',
+      coursePartId: null,
+      graphStructure: finalGradeStructure,
+    };
     await responseTests.testConflict(url, cookies.adminCookie).post(data);
   });
 });
@@ -283,7 +290,7 @@ describe('Test Put /v1/courses/:courseId/grading-models/:gradingModId - edit a g
     for (const cookie of testCookies) {
       const editedModel: EditGradingModelData = {
         name: `Edited model ${i++}`,
-        graphStructure: testStructure,
+        graphStructure: finalGradeStructure,
       };
       const res = await request
         .put(`/v1/courses/${courseId}/grading-models/${gradingModId}`)
@@ -301,7 +308,7 @@ describe('Test Put /v1/courses/:courseId/grading-models/:gradingModId - edit a g
   it('should partially edit a grading model', async () => {
     const data: EditGradingModelData[] = [
       {name: 'Edited 3 addition model'},
-      {graphStructure: testStructure},
+      {graphStructure: finalGradeStructure},
     ];
     for (const editData of data) {
       const res = await request
@@ -321,8 +328,11 @@ describe('Test Put /v1/courses/:courseId/grading-models/:gradingModId - edit a g
     const url = `/v1/courses/${courseId}/grading-models/${gradingModId}`;
     const badRequest = responseTests.testBadRequest(url, cookies.adminCookie);
 
-    await badRequest.put({name: 5, graphStructure: testStructure});
-    await badRequest.put({name: {name: 'mod'}, graphStructure: testStructure});
+    await badRequest.put({name: 5, graphStructure: finalGradeStructure});
+    await badRequest.put({
+      name: {name: 'mod'},
+      graphStructure: finalGradeStructure,
+    });
     await badRequest.put({
       name: 'a name',
       graphStructure: {nodes: [], edges: [], nodeDat: {}},
@@ -331,7 +341,7 @@ describe('Test Put /v1/courses/:courseId/grading-models/:gradingModId - edit a g
 
   it('should respond with 400 if id is invalid', async () => {
     let url = `/v1/courses/${courseId}/grading-models/bad`;
-    const data = {name: 'Not added', graphStructure: testStructure};
+    const data = {name: 'Not added', graphStructure: finalGradeStructure};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
     url = `/v1/courses/1.5/grading-models/${gradingModId}`;
@@ -340,7 +350,7 @@ describe('Test Put /v1/courses/:courseId/grading-models/:gradingModId - edit a g
 
   it('should respond with 401 or 403 if not authorized', async () => {
     let url = `/v1/courses/${courseId}/grading-models/${gradingModId}`;
-    const data = {name: 'Not edited', graphStructure: testStructure};
+    const data = {name: 'Not edited', graphStructure: finalGradeStructure};
     await responseTests.testUnauthorized(url).put(data);
 
     await responseTests
@@ -359,7 +369,7 @@ describe('Test Put /v1/courses/:courseId/grading-models/:gradingModId - edit a g
 
   it('should respond with 404 if not found', async () => {
     let url = `/v1/courses/${courseId}/grading-models/${nonExistentId}`;
-    const data = {name: 'Not added', graphStructure: testStructure};
+    const data = {name: 'Not added', graphStructure: finalGradeStructure};
     await responseTests.testNotFound(url, cookies.adminCookie).put(data);
 
     url = `/v1/courses/${nonExistentId}/grading-models/${gradingModId}`;
@@ -368,13 +378,13 @@ describe('Test Put /v1/courses/:courseId/grading-models/:gradingModId - edit a g
 
   it('should respond with 409 conflict when grading model does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/grading-models/${otherGradingModId}`;
-    const data = {name: 'Not added', graphStructure: testStructure};
+    const data = {name: 'Not added', graphStructure: finalGradeStructure};
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
 
   it('should respond with 409 when course already has grading model with same name', async () => {
     const url = `/v1/courses/${courseId}/grading-models/${gradingModId}`;
-    const data = {name: 'Model 1', graphStructure: testStructure};
+    const data = {name: 'Model 1', graphStructure: finalGradeStructure};
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
 });

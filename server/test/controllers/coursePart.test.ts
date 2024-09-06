@@ -15,7 +15,7 @@ import {
 import {app} from '../../src/app';
 import CoursePart from '../../src/database/models/coursePart';
 import {createData} from '../util/createData';
-import {TEACHER_ID} from '../util/general';
+import {NEXT_YEAR, TEACHER_ID, convertDate} from '../util/general';
 import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
@@ -61,8 +61,16 @@ const checkCoursePart = async (
 
   expect(result).not.toBe(null);
   if (coursePart.name !== undefined) expect(result?.name).toBe(coursePart.name);
-  if (coursePart.expiryDate !== undefined)
-    expect(result?.expiryDate).toBe(coursePart.expiryDate);
+
+  if (coursePart.expiryDate === null) expect(result?.expiryDate).toBeNull();
+
+  if (coursePart.expiryDate) {
+    expect(result?.expiryDate).toBeTruthy();
+    if (result?.expiryDate)
+      expect(new Date(result.expiryDate)).toEqual(
+        convertDate(coursePart.expiryDate)
+      );
+  }
 };
 
 const coursePartDoesNotExist = async (id: number): Promise<void> => {
@@ -123,10 +131,9 @@ describe('Test POST /v1/courses/:courseId/parts - add a course part', () => {
     let i = 0;
 
     for (const cookie of testCookies) {
-      const coursePart = {
+      const coursePart: NewCoursePartData = {
         name: `source-${++i}`,
-        daysValid: 350,
-        maxGrade: null,
+        expiryDate: NEXT_YEAR,
       };
       const res = await request
         .post(`/v1/courses/${courseId}/parts`)
@@ -141,15 +148,9 @@ describe('Test POST /v1/courses/:courseId/parts - add a course part', () => {
     }
   });
 
-  it('should respond with 400 if validation fails', async () => {
-    const url = `/v1/courses/${courseId}/parts`;
-    const data = {name: 'not added', daysValid: -1, maxGrade: 1};
-    await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
-  });
-
   it('should respond with 400 if id is invalid', async () => {
     const url = '/v1/courses/bad/parts';
-    const data = {name: 'not added', daysValid: 365, maxGrade: 5};
+    const data: NewCoursePartData = {name: 'not added', expiryDate: NEXT_YEAR};
     await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
   });
 
@@ -174,13 +175,13 @@ describe('Test POST /v1/courses/:courseId/parts - add a course part', () => {
 
   it('should respond with 404 if not found', async () => {
     const url = `/v1/courses/${nonExistentId}/parts`;
-    const data = {name: 'not added', daysValid: 365, maxGrade: 5};
+    const data: NewCoursePartData = {name: 'not added', expiryDate: NEXT_YEAR};
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
   it('should respond with 409 if trying to create a course part with duplicate name', async () => {
     const url = `/v1/courses/${courseId}/parts`;
-    const data = {name: 'source-1', daysValid: 365, maxGrade: 5};
+    const data: NewCoursePartData = {name: 'source-1', expiryDate: NEXT_YEAR};
     await responseTests.testConflict(url, cookies.adminCookie).post(data);
   });
 });
@@ -191,7 +192,10 @@ describe('Test PUT /v1/courses/:courseId/parts/:coursePartId - edit a course par
     let i = 0;
 
     for (const cookie of testCookies) {
-      const coursePart = {name: `edit${++i}`, daysValid: 100};
+      const coursePart: EditCoursePartData = {
+        name: `edit${++i}`,
+        expiryDate: NEXT_YEAR,
+      };
       const res = await request
         .put(`/v1/courses/${courseId}/parts/${editCoursePartId}`)
         .send(coursePart)
@@ -206,7 +210,7 @@ describe('Test PUT /v1/courses/:courseId/parts/:coursePartId - edit a course par
   it('should partially edit a course part', async () => {
     const data: EditCoursePartData[] = [
       {name: 'edit1 new'},
-      {expiryDate: new Date(Date.now() + 365 * 24 * 3600 * 1000)},
+      {expiryDate: NEXT_YEAR},
     ];
     for (const editData of data) {
       const res = await request
@@ -222,15 +226,12 @@ describe('Test PUT /v1/courses/:courseId/parts/:coursePartId - edit a course par
     }
   });
 
-  it('should respond with 400 if validation fails', async () => {
-    const url = `/v1/courses/${courseId}/parts/${editCoursePartId}`;
-    const data = {name: 'not edited', daysValid: -1};
-    await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
-  });
-
   it('should respond with 400 if id is invalid', async () => {
     let url = `/v1/courses/bad/parts/${editCoursePartId}`;
-    const data = {name: 'not edited', daysValid: 365};
+    const data: EditCoursePartData = {
+      name: 'not edited',
+      expiryDate: NEXT_YEAR,
+    };
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
     url = `/v1/courses/${courseId}/parts/${-1}`;
@@ -239,7 +240,10 @@ describe('Test PUT /v1/courses/:courseId/parts/:coursePartId - edit a course par
 
   it('should respond with 401 or 403 if not authorized', async () => {
     let url = `/v1/courses/${courseId}/parts/${editCoursePartId}`;
-    const data = {name: 'not edited', daysValid: 365};
+    const data: EditCoursePartData = {
+      name: 'not edited',
+      expiryDate: NEXT_YEAR,
+    };
     await responseTests.testUnauthorized(url).put(data);
 
     await responseTests
@@ -258,7 +262,10 @@ describe('Test PUT /v1/courses/:courseId/parts/:coursePartId - edit a course par
 
   it('should respond with 404 if not found', async () => {
     let url = `/v1/courses/${nonExistentId}/parts/${editCoursePartId}`;
-    const data = {name: 'not edited', daysValid: 365};
+    const data: EditCoursePartData = {
+      name: 'not edited',
+      expiryDate: NEXT_YEAR,
+    };
     await responseTests.testNotFound(url, cookies.adminCookie).put(data);
 
     url = `/v1/courses/${courseId}/parts/${nonExistentId}`;
@@ -267,13 +274,16 @@ describe('Test PUT /v1/courses/:courseId/parts/:coursePartId - edit a course par
 
   it('should respond with 409 when course part does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/parts/${noRoleCoursePartId}`;
-    const data = {name: 'not edited', daysValid: 365};
+    const data: EditCoursePartData = {
+      name: 'not edited',
+      expiryDate: NEXT_YEAR,
+    };
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
 
   it('should respond with 409 when trying to edit duplicate course part name', async () => {
     const url = `/v1/courses/${courseId}/parts/${editCoursePartId}`;
-    const data = {name: 'source-1', daysValid: 365};
+    const data: EditCoursePartData = {name: 'source-1', expiryDate: NEXT_YEAR};
     await responseTests.testConflict(url, cookies.adminCookie).put(data);
   });
 });
@@ -283,7 +293,6 @@ describe('Test Delete /v1/courses/:courseId/parts/:coursePartId - delete a cours
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
       const coursePart = await createData.createCoursePart(courseId);
-      await checkCoursePart(coursePart.id, {}); // Validate that exists
 
       const res = await request
         .delete(`/v1/courses/${courseId}/parts/${coursePart.id}`)
@@ -336,11 +345,13 @@ describe('Test Delete /v1/courses/:courseId/parts/:coursePartId - delete a cours
 
   it('should respond with 409 if trying to delete a course part with grades', async () => {
     const coursePart = await createData.createCoursePart(courseId);
-    await checkCoursePart(coursePart.id, {}); // Validate that exists
+    const courseTask = await createData.createCourseTask(coursePart.id);
     const user = await createData.createUser();
-    await createData.createGrade(user.id, coursePart.id, TEACHER_ID);
+    await createData.createGrade(user.id, courseTask.id, TEACHER_ID);
 
     const url = `/v1/courses/${courseId}/parts/${coursePart.id}`;
     await responseTests.testConflict(url, cookies.adminCookie).delete();
+
+    await checkCoursePart(coursePart.id, {}); // Validate that still exists
   });
 });

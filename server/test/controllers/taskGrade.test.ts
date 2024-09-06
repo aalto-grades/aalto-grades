@@ -6,7 +6,6 @@ import assert from 'assert';
 import supertest from 'supertest';
 
 import {
-  type CoursePartData,
   type CourseTaskData,
   type EditTaskGradeData,
   GradingScale,
@@ -20,7 +19,7 @@ import * as gradesUtil from '../../src/controllers/utils/taskGrade';
 import TaskGrade from '../../src/database/models/taskGrade';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
-import {TEACHER_ID} from '../util/general';
+import {NEXT_YEAR, TEACHER_ID, convertDate} from '../util/general';
 import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
@@ -30,13 +29,12 @@ const responseTests = new ResponseTests(request);
 
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
-let courseParts: CoursePartData[] = [];
-let _courseTasks: CourseTaskData[] = []; // TODO: Use
+let courseTasks: CourseTaskData[] = [];
 let editGradeId = -1;
 let aplusGradeSourceId = -1;
-let aplusCoursePartId = -1;
+let aplusCourseTaskId = -1;
 let noRoleCourseId = -1;
-let noRoleCourseParts: CoursePartData[] = [];
+let noRoleCourseTasks: CourseTaskData[] = [];
 let noRoleGradeId = -1;
 const nonExistentId = 1000000;
 const newStudentNumber = '867493';
@@ -60,10 +58,9 @@ beforeAll(async () => {
   studentNumbers = students.map(student => student.studentNumber);
 
   let gradingModelId: number;
-  [courseId, courseParts, _courseTasks, gradingModelId] =
-    await createData.createCourse({
-      courseData: {maxCredits: 5, courseCode: 'CS-A????'},
-    });
+  [courseId, , courseTasks, gradingModelId] = await createData.createCourse({
+    courseData: {maxCredits: 5, courseCode: 'CS-A????'},
+  });
   for (const student of students) {
     // Create a worse final grade before the actual one
     if (student.finalGrade > 0) {
@@ -99,22 +96,22 @@ beforeAll(async () => {
   }
   editGradeId = await createData.createGrade(
     students[0].id,
-    courseParts[0].id,
+    courseTasks[0].id,
     TEACHER_ID
   );
 
-  [noRoleCourseId, noRoleCourseParts] = await createData.createCourse({
+  [noRoleCourseId, , noRoleCourseTasks] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
   });
   noRoleGradeId = await createData.createGrade(
     students[0].id,
-    noRoleCourseParts[0].id,
+    noRoleCourseTasks[0].id,
     TEACHER_ID
   );
 
-  [[aplusCoursePartId, aplusGradeSourceId]] =
+  [[aplusCourseTaskId, aplusGradeSourceId]] =
     await createData.createAplusGradeSources(courseId);
 });
 
@@ -184,35 +181,35 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     return [
       {
         studentNumber: studentNumber,
-        courseTaskId: courseParts[0].id,
+        courseTaskId: courseTasks[0].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
-        expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        expiryDate: NEXT_YEAR,
         comment: '',
       },
       {
         studentNumber: studentNumber,
-        courseTaskId: courseParts[1].id,
+        courseTaskId: courseTasks[1].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
-        expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        expiryDate: NEXT_YEAR,
         comment: '',
       },
       {
         studentNumber: studentNumber,
-        courseTaskId: courseParts[2].id,
+        courseTaskId: courseTasks[2].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
-        expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        expiryDate: NEXT_YEAR,
         comment: '',
       },
       {
         studentNumber: studentNumber,
-        courseTaskId: aplusCoursePartId,
+        courseTaskId: aplusCourseTaskId,
         aplusGradeSourceId: aplusGradeSourceId,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
-        expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        expiryDate: NEXT_YEAR,
         comment: '',
       },
     ];
@@ -269,14 +266,14 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
 
     expect(JSON.stringify(res.body)).toBe('{}');
 
-    const userCoursePart = await TaskGrade.findOne({
+    const taskGrade = await TaskGrade.findOne({
       where: {
         userId: student.id,
-        courseTaskId: courseParts[0].id,
+        courseTaskId: courseTasks[0].id,
       },
     });
 
-    expect(userCoursePart?.graderId).toBe(1);
+    expect(taskGrade?.graderId).toBe(1);
   });
 
   it('grades should be in the database', async () => {
@@ -292,15 +289,15 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     const grade = await TaskGrade.findOne({
       where: {
         userId: student.id,
-        courseTaskId: courseParts[0].id,
+        courseTaskId: courseTasks[0].id,
       },
     });
     expect(grade?.grade).toEqual(data[0].grade);
     expect(grade?.userId).toEqual(student.id);
-    expect(grade?.courseTaskId).toEqual(courseParts[0].id);
+    expect(grade?.courseTaskId).toEqual(courseTasks[0].id);
   });
 
-  it('should allow uploading multiple grades to the same course part for a student', async () => {
+  it('should allow uploading multiple grades to the same course task for a student', async () => {
     const student = await genStudent();
 
     const upload = async (): Promise<NewTaskGrade[]> => {
@@ -318,14 +315,14 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
 
     const data1 = await upload();
     let grades = await TaskGrade.findAll({
-      where: {userId: student.id, courseTaskId: courseParts[0].id},
+      where: {userId: student.id, courseTaskId: courseTasks[0].id},
     });
     expect(grades.length).toEqual(1);
     expect(grades[0].grade).toEqual(data1[0].grade);
 
     const data2 = await upload();
     grades = await TaskGrade.findAll({
-      where: {userId: student.id, courseTaskId: courseParts[0].id},
+      where: {userId: student.id, courseTaskId: courseTasks[0].id},
     });
     expect(grades.length).toEqual(2);
     expect(grades.find(val => val.grade === data1[0].grade)).toBeDefined();
@@ -353,14 +350,14 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
 
     let data = await upload();
     let grades = await TaskGrade.findAll({
-      where: {userId: student.id, courseTaskId: aplusCoursePartId},
+      where: {userId: student.id, courseTaskId: aplusCourseTaskId},
     });
     expect(grades.length).toEqual(1);
     expect(grades[0].grade).toEqual(data[0].grade);
 
     data = await upload();
     grades = await TaskGrade.findAll({
-      where: {userId: student.id, courseTaskId: aplusCoursePartId},
+      where: {userId: student.id, courseTaskId: aplusCourseTaskId},
     });
     expect(grades.length).toEqual(1);
     expect(grades[0].grade).toEqual(data[0].grade);
@@ -427,16 +424,16 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
-  it('should respond with 409 when course part does not belong to course', async () => {
+  it('should respond with 409 when course task does not belong to course', async () => {
     const url = `/v1/courses/${courseId}/grades`;
     const student = await genStudent();
-    const data = [
+    const data: NewTaskGrade[] = [
       {
         studentNumber: student.studentNumber,
-        coursePartId: noRoleCourseParts[0].id,
+        courseTaskId: noRoleCourseTasks[0].id,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
-        expiryDate: new Date(Date.now() + 365 * 24 * 3600 * 1000),
+        expiryDate: NEXT_YEAR,
         comment: '',
       },
     ];
@@ -444,17 +441,17 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
     await responseTests.testConflict(url, cookies.adminCookie).post(data);
   });
 
-  it('should respond with 409 when A+ grade source does not belong to course part', async () => {
+  it('should respond with 409 when A+ grade source does not belong to course task', async () => {
     const url = `/v1/courses/${courseId}/grades`;
     const student = await genStudent();
-    const data = [
+    const data: NewTaskGrade[] = [
       {
         studentNumber: student.studentNumber,
-        coursePartId: courseParts[0].id,
+        courseTaskId: courseTasks[0].id,
         aplusGradeSourceId: aplusGradeSourceId,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
-        expiryDate: new Date(Date.now() + 365 * 24 * 3600 * 1000),
+        expiryDate: NEXT_YEAR,
         comment: '',
       },
     ];
@@ -476,7 +473,7 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
         .send({
           grade: Math.floor(Math.random() * 11),
           date: new Date(),
-          expiryDate: new Date(Date.now() + 365 * 24 * 3600 * 1000),
+          expiryDate: NEXT_YEAR,
           comment: `testing ${Math.random()}`,
         })
         .set('Cookie', cookie)
@@ -535,7 +532,7 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
     const data = {comment: 'not edited'};
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
 
-    url = `/v1/courses/${courseId}/parts/${-1}`;
+    url = `/v1/courses/${courseId}/grades/${-1}`;
     await responseTests.testBadRequest(url, cookies.adminCookie).put(data);
   });
 
@@ -543,7 +540,7 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
     const user = await createData.createUser();
     const gradeId = await createData.createGrade(
       user.id,
-      aplusCoursePartId,
+      aplusCourseTaskId,
       TEACHER_ID,
       undefined,
       undefined,
@@ -593,7 +590,7 @@ describe('Test PUT /v1/courses/:courseId/grades/:gradeId - edit a grade', () => 
 describe('Test Delete/v1/courses/:courseId/grades/:gradeId - delete a grade', () => {
   const createGrade = async (): Promise<number> => {
     const user = await createData.createUser();
-    return createData.createGrade(user.id, courseParts[0].id, TEACHER_ID);
+    return createData.createGrade(user.id, courseTasks[0].id, TEACHER_ID);
   };
   const gradeDoesNotExist = async (id: number): Promise<void> => {
     const result = await TaskGrade.findOne({where: {id: id}});
@@ -668,10 +665,9 @@ describe('Test POST /v1/latest-grades - fetch latest grades for multiple student
       const gradeDate = new Date(
         start.getTime() + Math.random() * (end.getTime() - start.getTime())
       );
-      // gradeDate.setHours(0, 0, 0, 0);
       await createData.createGrade(
         user.id,
-        courseParts[0].id,
+        courseTasks[0].id,
         TEACHER_ID,
         undefined,
         gradeDate
@@ -703,18 +699,8 @@ describe('Test POST /v1/latest-grades - fetch latest grades for multiple student
       );
 
       for (const item of data) {
-        // Set date time portion to UTC midnight.
-        // Example: 03:00:00 +3:00 / 02:00:00 +2:00
-        const gradeDate =
-          item[1] === null
-            ? item[1]
-            : new Date(
-                Date.UTC(
-                  item[1].getFullYear(),
-                  item[1].getMonth(),
-                  item[1].getDate()
-                )
-              );
+        const gradeDate = item[1] === null ? item[1] : convertDate(item[1]);
+
         expect(gradeDate).toEqual(resMap.get(item[0]));
       }
     }
@@ -778,7 +764,7 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
     for (const cookie of testCookies) {
       const res = await request
         .post(`/v1/courses/${courseId}/grades/csv/sisu`)
-        .send({studentNumbers})
+        .send({studentNumbers, assessmentDate: null, completionLanguage: null})
         .set('Cookie', cookie)
         .set('Accept', 'text/csv')
         .expect(HttpCode.Ok);
@@ -799,6 +785,8 @@ ${createCSVString(students, '21.6.2023', 'en').join(',\n')},\n`);
       .post(`/v1/courses/${courseId}/grades/csv/sisu`)
       .send({
         studentNumbers: selectedStudents.map(student => student.studentNumber),
+        assessmentDate: null,
+        completionLanguage: null,
       })
       .set('Cookie', cookies.adminCookie)
       .set('Accept', 'text/csv')
@@ -855,7 +843,11 @@ ${createCSVString(students, '12.5.2023', 'ja').join(',\n')},\n`);
     }
     const res = await request
       .post(`/v1/courses/${passFailCourseId}/grades/csv/sisu`)
-      .send({studentNumbers: studentNums})
+      .send({
+        studentNumbers: studentNums,
+        assessmentDate: null,
+        completionLanguage: null,
+      })
       .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'text/csv')
       .expect(HttpCode.Ok);
@@ -891,7 +883,11 @@ ${students[1].studentNumber},pass,5,21.6.2023,en,\n`);
     }
     const res = await request
       .post(`/v1/courses/${passFailCourseId}/grades/csv/sisu`)
-      .send({studentNumbers: studentNums})
+      .send({
+        studentNumbers: studentNums,
+        assessmentDate: null,
+        completionLanguage: null,
+      })
       .set('Cookie', cookies.teacherCookie)
       .set('Accept', 'text/csv')
       .expect(HttpCode.Ok);
@@ -911,7 +907,11 @@ ${students[2].studentNumber},G,5,21.6.2023,en,\n`);
     const url = `/v1/courses/${courseId}/grades/csv/sisu`;
     const badRequest = responseTests.testBadRequest(url, cookies.adminCookie);
 
-    await badRequest.post({studentNumbers, completionLanguage: 'ja'});
+    await badRequest.post({
+      studentNumbers,
+      assessmentDate: null,
+      completionLanguage: 'ja',
+    });
     await badRequest.post({
       studentNumbers,
       assessmentDate: '2024-12-00T00:00:00.000Z',
@@ -920,13 +920,21 @@ ${students[2].studentNumber},G,5,21.6.2023,en,\n`);
 
   it('should respond with 400 if id is invalid', async () => {
     const url = '/v1/courses/bad/grades/csv/sisu';
-    const data = {studentNumbers};
+    const data = {
+      studentNumbers,
+      assessmentDate: null,
+      completionLanguage: null,
+    };
     await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
     let url = `/v1/courses/${courseId}/grades/csv/sisu`;
-    const data = {studentNumbers};
+    const data = {
+      studentNumbers,
+      assessmentDate: null,
+      completionLanguage: null,
+    };
     await responseTests.testUnauthorized(url).post(data);
 
     await responseTests
@@ -945,21 +953,33 @@ ${students[2].studentNumber},G,5,21.6.2023,en,\n`);
 
   it('should respond with 404 if grades have not been calculated yet', async () => {
     const url = `/v1/courses/${noRoleCourseId}/grades/csv/sisu`;
-    const data = {studentNumbers: [studentNumbers[0]]};
+    const data = {
+      studentNumbers: [studentNumbers[0]],
+      assessmentDate: null,
+      completionLanguage: null,
+    };
 
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
   it('should respond with 404 if student number not found', async () => {
     const url = `/v1/courses/${noRoleCourseId}/grades/csv/sisu`;
-    const data = {studentNumbers: [nonExistentStudentNumber]};
+    const data = {
+      studentNumbers: [nonExistentStudentNumber],
+      assessmentDate: null,
+      completionLanguage: null,
+    };
 
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 
   it('should respond with 404 if not found', async () => {
     const url = `/v1/courses/${nonExistentId}/grades/csv/sisu`;
-    const data = {studentNumbers};
+    const data = {
+      studentNumbers,
+      assessmentDate: null,
+      completionLanguage: null,
+    };
 
     await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });

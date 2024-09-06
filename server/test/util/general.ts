@@ -19,3 +19,12 @@ export const ZodErrorSchema = z.array(
     errors: z.object({issues: z.array(z.any()).nonempty()}),
   })
 );
+
+/**
+ * Convert date to match dateonly type of the database by setting the time
+ * portion to UTC midnight. Example: 03:00:00 +3:00 / 02:00:00 +2:00
+ */
+export const convertDate = (date: Date): Date =>
+  new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+
+export const NEXT_YEAR = new Date(Date.now() + 365 * 24 * 3600 * 1000);
