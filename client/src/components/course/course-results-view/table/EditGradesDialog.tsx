@@ -210,7 +210,7 @@ const EditGradesDialog = ({
   const dataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
       setRows(oldRows => {
-        const freeId = Math.max(1, ...oldRows.map(row => row.id)) + 1;
+        const freeId = Math.max(0, ...oldRows.map(row => row.id)) + 1;
         const newRow: ColTypes = {
           id: freeId,
           gradeId: -1,
