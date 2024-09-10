@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import ElkConstructor from 'elkjs/lib/elk.bundled';
-import {TFunction} from 'i18next';
-import {Connection, Edge, Node} from 'reactflow';
+import type {TFunction} from 'i18next';
+import type {Connection, Edge} from 'reactflow';
 
-import {DropInNodes, NodeValues} from '@/common/types/graph';
+import type {DropInNodes, NodeValues, TypedNode} from '@/common/types';
 
-export const simplifyNode = (node: Node): Node => ({
+export const simplifyNode = (node: TypedNode): TypedNode => ({
   id: node.id,
   type: node.type,
   position: {
@@ -19,7 +19,7 @@ export const simplifyNode = (node: Node): Node => ({
 });
 
 export const getDragAndDropNodes = (
-  t: TFunction<'translation', undefined>
+  t: TFunction
 ): {
   type: DropInNodes;
   title: string;
@@ -124,7 +124,7 @@ export const isValidConnection = (
 
 export const findDisconnectedEdges = (
   oldNodeValues: NodeValues,
-  nodes: Node[],
+  nodes: TypedNode[],
   edges: Edge[]
 ): Edge[] => {
   const nodeSources: {[key: string]: Set<string>} = {};
@@ -188,10 +188,10 @@ export const findDisconnectedEdges = (
 const elk = new ElkConstructor();
 
 export const formatGraph = async (
-  nodes: Node[],
+  nodes: TypedNode[],
   edges: Edge[],
   nodeValues: NodeValues
-): Promise<Node[]> => {
+): Promise<TypedNode[]> => {
   const nodesForElk = nodes.map(node => ({
     type: node.type,
     id: node.id,
@@ -209,12 +209,12 @@ export const formatGraph = async (
     },
     children: nodesForElk.map(node => {
       const nodeValue = nodeValues[node.id];
-      if (nodeValue.type === 'coursepart') {
+      if (nodeValue.type === 'source') {
         return {
           ...node,
           ports: [{id: `${node.id}-source`, properties: {side: 'EAST'}}],
         };
-      } else if (nodeValue.type === 'grade') {
+      } else if (nodeValue.type === 'sink') {
         return {
           ...node,
           ports: [{id: node.id, properties: {side: 'WEST'}}],
@@ -260,7 +260,7 @@ export const formatGraph = async (
             parseInt(key2.split('-').at(-1)!)
         );
       }
-      const sourcePorts = sortedKeys.toReversed().map(key => ({
+      const sourcePorts = [...sortedKeys].reverse().map(key => ({
         id: key,
         properties: {side: 'WEST'},
       }));

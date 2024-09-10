@@ -34,7 +34,7 @@ services:
       - database
 
   database:
-    image: postgres:15
+    image: postgres:16-alpine
     container_name: aalto-grades-database-dev
     ports:
       - 5432:5432 # Exposed for e2e tests to work

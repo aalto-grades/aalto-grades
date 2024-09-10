@@ -5,9 +5,9 @@
 import supertest from 'supertest';
 
 import {app} from '../../src/app';
-import {getDateOfLatestGrade} from '../../src/controllers/utils/grades';
+import {getDateOfLatestGrade} from '../../src/controllers/utils/taskGrade';
 import {createData} from '../util/createData';
-import {TEACHER_ID} from '../util/general';
+import {TEACHER_ID, convertDate} from '../util/general';
 import {resetDb} from '../util/resetDb';
 
 let courseId = -1;
@@ -65,18 +65,8 @@ supertest(app);
 describe('Test latest date finder', () => {
   it('should return the correct date', async () => {
     for (const student of students) {
-      // Set date time portion to UTC midnight.
-      // Example: 03:00:00 +3:00 / 02:00:00 +2:00
-      const gradeDate = new Date(
-        Date.UTC(
-          student.latestGrade.getFullYear(),
-          student.latestGrade.getMonth(),
-          student.latestGrade.getDate()
-        )
-      );
-
       const resultDate = await getDateOfLatestGrade(student.id, courseId);
-      expect(resultDate).toEqual(gradeDate);
+      expect(resultDate).toEqual(convertDate(student.latestGrade));
     }
   });
 

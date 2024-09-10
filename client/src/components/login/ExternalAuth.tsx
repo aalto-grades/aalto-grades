@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {Box, Button, Typography} from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
 const ExternalAuth = (): JSX.Element => {

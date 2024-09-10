@@ -1,22 +1,22 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
 
 import {
-  CoursePartData,
-  EditCoursePartData,
+  type CoursePartData,
+  type EditCoursePartData,
   HttpCode,
-  NewCoursePartData,
+  type NewCoursePartData,
 } from '@/common/types';
+import CoursePart from '../database/models/coursePart';
+import {ApiError, type Endpoint} from '../types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
   findCoursePartByCourseId,
   validateCoursePartPath,
 } from './utils/coursePart';
-import CoursePart from '../database/models/coursePart';
-import {ApiError, Endpoint} from '../types';
 
 /**
  * () => CoursePartData[]
@@ -51,8 +51,7 @@ export const addCoursePart: Endpoint<NewCoursePartData, number> = async (
     },
     defaults: {
       name: req.body.name,
-      daysValid: req.body.daysValid,
-      maxGrade: req.body.maxGrade,
+      expiryDate: req.body.expiryDate,
     },
   });
 
@@ -84,11 +83,10 @@ export const editCoursePart: Endpoint<EditCoursePartData, void> = async (
     await coursePart
       .set({
         name: req.body.name ?? coursePart.name,
-        daysValid: req.body.daysValid ?? coursePart.daysValid,
-        maxGrade:
-          req.body.maxGrade !== undefined
-            ? req.body.maxGrade
-            : coursePart.maxGrade,
+        expiryDate:
+          req.body.expiryDate !== undefined
+            ? req.body.expiryDate
+            : coursePart.expiryDate,
         archived: req.body.archived ?? coursePart.archived,
       })
       .save();
@@ -125,7 +123,7 @@ export const deleteCoursePart: Endpoint<void, void> = async (req, res) => {
     // Catch deletion of course part with grades
     if (
       error instanceof ForeignKeyConstraintError &&
-      error.index === 'attainment_grade_course_part_id_fkey'
+      error.index === 'task_grade_course_task_id_fkey'
     ) {
       throw new ApiError(
         'Tried to delete a course part with grades',

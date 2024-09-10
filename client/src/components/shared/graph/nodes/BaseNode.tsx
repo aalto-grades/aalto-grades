@@ -4,15 +4,15 @@
 
 import WarningIcon from '@mui/icons-material/Warning';
 import {Tooltip} from '@mui/material';
-import {JSX, PropsWithChildren, useContext} from 'react';
-import {NodeProps} from 'reactflow';
+import {type JSX, type PropsWithChildren, useContext} from 'react';
+import type {NodeProps} from 'reactflow';
 
 import {ExtraNodeDataContext, NodeDataContext} from '@/context/GraphProvider';
 
 type PropsType = PropsWithChildren<
   NodeProps & {
     error?: boolean;
-    courseFail?: boolean;
+    fullFail?: boolean;
   }
 >;
 
@@ -21,17 +21,17 @@ const BaseNode = ({
   type,
   selected,
   error = false,
-  courseFail = false,
+  fullFail = false,
   children,
 }: PropsType): JSX.Element => {
   const {nodeData, setNodeTitle} = useContext(NodeDataContext);
-  const {extraNodeData} = useContext(ExtraNodeDataContext);
+  const extraNodeData = useContext(ExtraNodeDataContext);
 
   const title = nodeData[id].title;
   const extraData = extraNodeData[id];
 
   const getBorderColor = (): string => {
-    if (courseFail) return '2px solid #e00';
+    if (fullFail) return '2px solid #e00';
     if (error) return '1px dashed #e00';
     if (extraData?.warning) return '1px solid #ffb833';
     return '1px solid #eee';
@@ -63,7 +63,7 @@ const BaseNode = ({
         >
           {title}
         </h4>
-        {extraData?.warning && (
+        {extraData?.warning !== undefined && (
           <div style={{position: 'absolute', top: '5px', right: '5px'}}>
             <Tooltip title={extraData.warning} placement="top">
               <WarningIcon color="warning" sx={{fontSize: '16px'}} />

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -7,7 +7,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended-type-checked',
     '../node_modules/gts',
-    '../.eslintrc.json',
+    '../.eslintrc.cjs',
   ],
   plugins: ['@typescript-eslint'],
   parser: '@typescript-eslint/parser',

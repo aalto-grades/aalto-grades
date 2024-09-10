@@ -7,26 +7,31 @@ import generator from 'generate-password';
 import {Op} from 'sequelize';
 
 import {
-  CourseData,
+  type CourseData,
   CourseRoleType,
-  CourseWithFinalGrades,
-  FullUserData,
+  type CourseWithFinalGrades,
+  type FullUserData,
   HttpCode,
-  NewUser,
-  NewUserResponse,
+  type NewUser,
+  type NewUserResponse,
   SystemRole,
-  UserData,
-  UserIdArray,
+  type UserData,
+  type UserIdArray,
 } from '@/common/types';
-import {parseCourseFull} from './utils/course';
-import {validateUserAndGrader} from './utils/grades';
-import {findAndValidateUserId, validateUserId} from './utils/user';
 import Course from '../database/models/course';
 import CourseRole from '../database/models/courseRole';
 import CourseTranslation from '../database/models/courseTranslation';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
-import {ApiError, CourseFull, Endpoint, JwtClaims} from '../types';
+import {
+  ApiError,
+  type CourseFull,
+  type Endpoint,
+  type JwtClaims,
+} from '../types';
+import {parseCourseFull} from './utils/course';
+import {validateUserAndGrader} from './utils/taskGrade';
+import {findAndValidateUserId, validateUserId} from './utils/user';
 
 /** () => CourseData[] */
 export const getOwnCourses: Endpoint<void, CourseData[]> = async (req, res) => {

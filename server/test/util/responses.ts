@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import TestAgent from 'supertest/lib/agent';
-import Test from 'supertest/lib/test';
+import type TestAgent from 'supertest/lib/agent';
+import type Test from 'supertest/lib/test';
 import {z} from 'zod';
 
 import {HttpCode} from '@/common/types';
@@ -40,12 +40,12 @@ export class ResponseTests {
     return {
       set: (field: string, val: string) =>
         this.next(call, url, [...headers, {field: field, val: val}]),
-      get: async () => await call(setHeaders(this.request.get(url))),
+      get: async () => call(setHeaders(this.request.get(url))),
       post: async (data: ReqData) =>
-        await call(setHeaders(this.request.post(url).send(data))),
+        call(setHeaders(this.request.post(url).send(data))),
       put: async (data: ReqData) =>
-        await call(setHeaders(this.request.put(url).send(data))),
-      delete: async () => await call(setHeaders(this.request.delete(url))),
+        call(setHeaders(this.request.put(url).send(data))),
+      delete: async () => call(setHeaders(this.request.delete(url))),
     };
   }
 

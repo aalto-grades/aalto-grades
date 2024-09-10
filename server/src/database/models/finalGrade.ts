@@ -1,20 +1,20 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional,
+  type CreationOptional,
   DataTypes,
-  ForeignKey,
-  InferAttributes,
-  InferCreationAttributes,
+  type ForeignKey,
+  type InferAttributes,
+  type InferCreationAttributes,
   Model,
 } from 'sequelize';
 
+import {sequelize} from '..';
 import Course from './course';
 import GradingModel from './gradingModel';
 import User from './user';
-import {sequelize} from '..';
 
 export default class FinalGrade extends Model<
   InferAttributes<FinalGrade>,

@@ -1,0 +1,202 @@
+# SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+---
+definitions:
+  FinalGradeId:
+    type: integer
+    description: Internal final grade database ID.
+    format: int32
+    minimum: 0
+    maximum: 5
+    example: 1
+  FinalGrade:
+    type: number
+    description: The numerical final grade of a student.
+    format: int32
+    minimum: 0
+    example: 5
+  FinalGradeDate:
+    type: string
+    format: date
+    description: Date when the student "completed the course"
+    example: 2024-04-01T00:00:00.000Z
+  SisuExportDate:
+    type: string
+    nullable: true
+    format: date
+    description: Date when the grade was exported to sisu.
+    example: 2025-04-01T00:00:00.000Z
+
+  FinalGradeData:
+    type: object
+    description: Final grade data.
+    properties:
+      finalGradeId:
+        $ref: '#/definitions/FinalGradeId'
+      user:
+        $ref: '#/definitions/UserData'
+      courseId:
+        $ref: '#/definitions/CourseId'
+      gradingModelId:
+        nullable: true
+        allOf:
+          - $ref: '#/definitions/gradingModelId'
+      grader:
+        $ref: '#/definitions/UserData'
+      grade:
+        $ref: '#/definitions/FinalGrade'
+      date:
+        $ref: '#/definitions/FinalGradeDate'
+      sisuExportDate:
+        $ref: '#/definitions/SisuExportDate'
+    required:
+      - finalGradeId
+      - userId
+      - courseId
+      - gradingModelId
+      - graderId
+      - grade
+      - date
+      - sisuExportDate
+
+  NewFinalGrade:
+    type: object
+    description: Final grade data.
+    properties:
+      userId:
+        $ref: '#/definitions/UserId'
+      gradingModelId:
+        nullable: true
+        allOf:
+          - $ref: '#/definitions/gradingModelId'
+      grade:
+        $ref: '#/definitions/FinalGrade'
+      date:
+        $ref: '#/definitions/FinalGradeDate'
+    required:
+      - userId
+      - gradingModelId
+      - grade
+      - date
+
+  EditFinalGrade:
+    type: object
+    description: Final grade data.
+    properties:
+      grade:
+        $ref: '#/definitions/FinalGrade'
+      date:
+        $ref: '#/definitions/FinalGradeDate'
+      sisuExportDate:
+        $ref: '#/definitions/SisuExportDate'
+
+/v1/courses/{courseId}/final-grades:
+  get:
+    tags: [Final Grade]
+    description: >
+      Get the final grades of all students.
+      Available only to admin users and teachers in charge of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+    responses:
+      200:
+        description: Returns all final grades of the course.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/FinalGradeData'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+    security:
+      - cookieAuth: []
+  post:
+    tags: [Final Grade]
+    description: >
+      Add new final grades to the course.
+      Available only to admin users and teachers in charge of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/NewFinalGrade'
+    responses:
+      201:
+        description: Final grades added.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+
+/v1/courses/{courseId}/final-grades/{finalGradeId}:
+  put:
+    tags: [Final Grade]
+    description: >
+      Edit a final grade.
+      Available only to admin users and teachers in charge of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/components/parameters/finalGradeId'
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/EditFinalGrade'
+    responses:
+      200:
+        description: Final grade edited.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+  delete:
+    tags: [Final Grade]
+    description: >
+      Delete a final grade.
+      Available only to admin users and teachers in charge of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/components/parameters/finalGradeId'
+    responses:
+      200:
+        description: Final grade deleted.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []

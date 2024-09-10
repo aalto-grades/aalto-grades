@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+# SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 #
 # SPDX-License-Identifier: MIT
 
@@ -20,7 +20,7 @@ services:
       - database
 
   database:
-    image: postgres:15
+    image: postgres:16-alpine
     container_name: 'aalto-grades-database-test'
     environment:
       POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'

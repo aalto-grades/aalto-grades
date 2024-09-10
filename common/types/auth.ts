@@ -5,6 +5,8 @@
 import {z} from 'zod';
 import zxcvbn from 'zxcvbn';
 
+import {IdSchema} from './general';
+
 export enum SystemRole {
   User = 'USER',
   Admin = 'ADMIN',
@@ -37,7 +39,7 @@ export const PasswordSchema = z.string().superRefine((password, ctx) => {
 });
 
 export const AuthDataSchema = z.strictObject({
-  id: z.number().int(),
+  id: IdSchema,
   name: z.string(),
   role: SystemRoleSchema,
 });
@@ -58,11 +60,8 @@ export const LoginResultSchema = z.discriminatedUnion('status', [
   z.strictObject({
     status: z.literal('enterMfa'),
   }),
-  z.strictObject({
+  AuthDataSchema.extend({
     status: z.literal('ok'),
-    id: z.number().int(),
-    name: z.string(),
-    role: SystemRoleSchema,
   }),
 ]);
 

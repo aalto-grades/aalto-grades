@@ -1,18 +1,18 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional,
+  type CreationOptional,
   DataTypes,
-  ForeignKey,
-  InferAttributes,
-  InferCreationAttributes,
+  type ForeignKey,
+  type InferAttributes,
+  type InferCreationAttributes,
   Model,
 } from 'sequelize';
 
-import Course from './course';
 import {sequelize} from '..';
+import Course from './course';
 
 export default class CoursePart extends Model<
   InferAttributes<CoursePart>,
@@ -21,9 +21,7 @@ export default class CoursePart extends Model<
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare name: string;
-  // Default value, expiry date in grade takes precedence
-  declare daysValid: number;
-  declare maxGrade: number | null;
+  declare expiryDate: CreationOptional<Date | string | null>;
   declare archived: CreationOptional<boolean>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -48,19 +46,14 @@ CoursePart.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    daysValid: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 365,
-    },
-    maxGrade: {
-      type: DataTypes.FLOAT,
+    expiryDate: {
+      type: DataTypes.DATEONLY,
       allowNull: true,
     },
     archived: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false,
       allowNull: false,
+      defaultValue: false,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

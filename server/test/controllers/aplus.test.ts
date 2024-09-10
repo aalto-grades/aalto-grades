@@ -2,29 +2,30 @@
 //
 // SPDX-License-Identifier: MIT
 
-import axios, {AxiosError, AxiosStatic} from 'axios';
+/* eslint-disable camelcase */
+
+import axios, {AxiosError, type AxiosStatic} from 'axios';
 import supertest from 'supertest';
 
 import {
-  AplusCourseData,
+  type AplusCourseData,
   AplusCourseDataArraySchema,
   AplusExerciseDataSchema,
   AplusGradeSourceType,
-  CoursePartData,
   HttpCode,
-  NewAplusGradeSourceData,
-  NewGradeArraySchema,
+  type NewAplusGradeSourceData,
+  NewTaskGradeArraySchema,
 } from '@/common/types';
 import {app} from '../../src/app';
 import AplusGradeSource from '../../src/database/models/aplusGradeSource';
-import {
+import type {
   AplusCoursesRes,
   AplusExercisesRes,
   AplusPointsRes,
 } from '../../src/types/aplus';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
-import {Cookies, getCookies} from '../util/getCookies';
+import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
 
@@ -42,15 +43,15 @@ const invalidAuthorization = [
 
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
-let addGradeSourceCoursePartId = -1;
-let noGradeSourceCoursePartId = -1;
-let fullPointsCoursePartId = -1;
+let addGradeSourceCourseTaskId = -1;
+let noGradeSourceCourseTaskId = -1;
+let fullPointsCourseTaskId = -1;
 let fullPointsGradeSourceId = -1;
-let moduleCoursePartId = -1;
-let exerciseCoursePartId = -1;
-let difficultyCoursePartId = -1;
+let moduleCourseTaskId = -1;
+let exerciseCourseTaskId = -1;
+let difficultyCourseTaskId = -1;
 let noRoleCourseId = -1;
-let differentCoursePartId = -1;
+let differentCourseTaskId = -1;
 let differentGradeSourceId = -1;
 
 const nonExistentId = 1000000;
@@ -61,32 +62,33 @@ const mockedAxios = axios as jest.Mocked<AxiosStatic>;
 beforeAll(async () => {
   cookies = await getCookies();
 
-  let courseParts: CoursePartData[];
-  [courseId, courseParts] = await createData.createCourse({});
+  let courseTasks;
+  [courseId, , courseTasks] = await createData.createCourse({});
   [
-    [fullPointsCoursePartId, fullPointsGradeSourceId],
-    [moduleCoursePartId],
-    [exerciseCoursePartId],
-    [difficultyCoursePartId],
+    [fullPointsCourseTaskId, fullPointsGradeSourceId],
+    [moduleCourseTaskId],
+    [exerciseCourseTaskId],
+    [difficultyCourseTaskId],
   ] = await createData.createAplusGradeSources(courseId);
-  addGradeSourceCoursePartId = courseParts[0].id;
-  noGradeSourceCoursePartId = courseParts[2].id;
+  addGradeSourceCourseTaskId = courseTasks[0].id;
+  noGradeSourceCourseTaskId = courseTasks[2].id;
 
-  let otherCourseParts: CoursePartData[];
+  let otherCourseParts;
   [noRoleCourseId, otherCourseParts] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,
     hasStudent: false,
   });
-  differentCoursePartId = otherCourseParts[0].id;
-  let _ = -1;
-  [[_, differentGradeSourceId]] =
+  differentCourseTaskId = (
+    await createData.createCourseTask(otherCourseParts[0].id)
+  ).id;
+
+  [[, differentGradeSourceId]] =
     await createData.createAplusGradeSources(noRoleCourseId);
 
   // eslint-disable-next-line @typescript-eslint/require-await
   mockedAxios.get.mockImplementation(async url => {
     if (url.endsWith('/points?format=json')) {
-      /* eslint-disable camelcase */
       const data: AplusPointsRes = {
         results: [
           {
@@ -109,7 +111,6 @@ beforeAll(async () => {
           },
         ],
       };
-      /* eslint-enable camelcase */
 
       return {data};
     }
@@ -122,7 +123,6 @@ afterAll(async () => {
 
 describe('Test GET /v1/aplus/courses - get A+ courses', () => {
   it('should respond with correct data', async () => {
-    /* eslint-disable camelcase */
     const data: AplusCoursesRes = {
       staff_courses: [
         {
@@ -141,7 +141,6 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
         },
       ],
     };
-    /* eslint-enable camelcase */
     mockedAxios.get.mockResolvedValueOnce({data});
 
     const res = await request
@@ -174,9 +173,7 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
 
   it('should respond with 404 when not found', async () => {
     mockedAxios.get.mockResolvedValueOnce({
-      data: {
-        staff_courses: [], // eslint-disable-line camelcase
-      },
+      data: {staff_courses: []},
     });
 
     const url = '/v1/aplus/courses';
@@ -201,7 +198,6 @@ describe('Test GET /v1/aplus/courses - get A+ courses', () => {
 
 describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () => {
   it('should respond with correct data', async () => {
-    /* eslint-disable camelcase */
     const data: AplusExercisesRes = {
       results: [
         {
@@ -238,8 +234,11 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
         },
       ],
     };
-    /* eslint-enable camelcase */
-    mockedAxios.get.mockResolvedValueOnce({data});
+
+    // More closely match actual response by stringifying and parsing
+    mockedAxios.get.mockResolvedValueOnce({
+      data: JSON.parse(JSON.stringify(data)) as AplusExercisesRes,
+    });
 
     const res = await request
       .get('/v1/aplus/courses/1')
@@ -291,7 +290,7 @@ describe('Test GET /v1/aplus/courses/:aplusCourseId - get A+ exercise data', () 
 
 describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources', () => {
   type NewAplusGradeSourceAny = {
-    coursePartId: number;
+    courseTaskId: number;
     aplusCourse: AplusCourseData;
     sourceType: AplusGradeSourceType;
     moduleId?: number;
@@ -310,10 +309,10 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
       withModuleId = false,
       withExerciseId = false,
       withDifficulty = false,
-      coursePartId = addGradeSourceCoursePartId,
+      courseTaskId = addGradeSourceCourseTaskId,
     }
   ): NewAplusGradeSourceAny => ({
-    coursePartId,
+    courseTaskId,
     aplusCourse: {
       id: 1,
       courseCode: 'CS-789',
@@ -330,27 +329,27 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
     date: date,
   });
 
-  const getFullPoints = (coursePartId?: number): NewAplusGradeSourceData =>
+  const getFullPoints = (courseTaskId?: number): NewAplusGradeSourceData =>
     getGradeSource(AplusGradeSourceType.FullPoints, {
-      coursePartId,
+      courseTaskId,
     }) as NewAplusGradeSourceData;
 
-  const getModule = (coursePartId?: number): NewAplusGradeSourceData =>
+  const getModule = (courseTaskId?: number): NewAplusGradeSourceData =>
     getGradeSource(AplusGradeSourceType.Module, {
       withModuleId: true,
-      coursePartId,
+      courseTaskId,
     }) as NewAplusGradeSourceData;
 
-  const getExercise = (coursePartId?: number): NewAplusGradeSourceData =>
+  const getExercise = (courseTaskId?: number): NewAplusGradeSourceData =>
     getGradeSource(AplusGradeSourceType.Exercise, {
       withExerciseId: true,
-      coursePartId,
+      courseTaskId,
     }) as NewAplusGradeSourceData;
 
-  const getDifficulty = (coursePartId?: number): NewAplusGradeSourceData =>
+  const getDifficulty = (courseTaskId?: number): NewAplusGradeSourceData =>
     getGradeSource(AplusGradeSourceType.Difficulty, {
       withDifficulty: true,
-      coursePartId,
+      courseTaskId,
     }) as NewAplusGradeSourceData;
 
   const checkAplusGradeSource = async (
@@ -359,7 +358,7 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
     const sourceType = gradeSource.sourceType;
     const result = await AplusGradeSource.findOne({
       where: {
-        coursePartId: gradeSource.coursePartId,
+        courseTaskId: gradeSource.courseTaskId,
         aplusCourse: gradeSource.aplusCourse,
         sourceType: sourceType,
         moduleId:
@@ -393,22 +392,23 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
       const coursePart = await createData.createCoursePart(courseId);
+      const courseTask = await createData.createCourseTask(coursePart.id);
       const res = await request
         .post(`/v1/courses/${courseId}/aplus-sources`)
         .send([
-          getFullPoints(coursePart.id),
-          getModule(coursePart.id),
-          getExercise(coursePart.id),
-          getDifficulty(coursePart.id),
+          getFullPoints(courseTask.id),
+          getModule(courseTask.id),
+          getExercise(courseTask.id),
+          getDifficulty(courseTask.id),
         ])
         .set('Cookie', cookie)
         .expect(HttpCode.Created);
 
       expect(JSON.stringify(res.body)).toBe('{}');
-      await checkAplusGradeSource(getFullPoints(coursePart.id));
-      await checkAplusGradeSource(getModule(coursePart.id));
-      await checkAplusGradeSource(getExercise(coursePart.id));
-      await checkAplusGradeSource(getDifficulty(coursePart.id));
+      await checkAplusGradeSource(getFullPoints(courseTask.id));
+      await checkAplusGradeSource(getModule(courseTask.id));
+      await checkAplusGradeSource(getExercise(courseTask.id));
+      await checkAplusGradeSource(getDifficulty(courseTask.id));
     }
   });
 
@@ -488,25 +488,26 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
     const url = `/v1/courses/${courseId}/aplus-sources`;
     await responseTests.testNotFound(url, cookies.adminCookie).post([
       getGradeSource(AplusGradeSourceType.FullPoints, {
-        coursePartId: nonExistentId,
+        courseTaskId: nonExistentId,
       }),
     ]);
   });
 
-  it('should respond with 409 when course part does not belong to the course', async () => {
+  it('should respond with 409 when course task does not belong to the course', async () => {
     const url = `/v1/courses/${courseId}/aplus-sources`;
     await responseTests.testConflict(url, cookies.adminCookie).post([
       getGradeSource(AplusGradeSourceType.FullPoints, {
-        coursePartId: differentCoursePartId,
+        courseTaskId: differentCourseTaskId,
       }),
     ]);
   });
 
-  it('should respond with 409 when attempting to add the same grade source multiple time to the same course part', async () => {
+  it('should respond with 409 when attempting to add the same grade source multiple time to the same course task', async () => {
     const url = `/v1/courses/${courseId}/aplus-sources`;
     const coursePart = await createData.createCoursePart(courseId);
+    const courseTask = await createData.createCourseTask(coursePart.id);
     for (const get of [getFullPoints, getModule, getExercise, getDifficulty]) {
-      const source = get(coursePart.id);
+      const source = get(courseTask.id);
 
       // Adding the same grade source twice in the same request
       await responseTests
@@ -592,7 +593,7 @@ describe('Test DELETE /v1/courses/:courseId/aplus-sources/:aplusGradeSourceId - 
     const user = await createData.createUser();
     await createData.createGrade(
       user.id,
-      fullPointsCoursePartId,
+      fullPointsCourseTaskId,
       TEACHER_ID,
       5,
       new Date(),
@@ -605,53 +606,53 @@ describe('Test DELETE /v1/courses/:courseId/aplus-sources/:aplusGradeSourceId - 
 });
 
 describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', () => {
-  const successTest = async (courseParts: number[]): Promise<void> => {
+  const successTest = async (courseTasks: number[]): Promise<void> => {
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
       const res = await request
         .get(
-          `/v1/courses/${courseId}/aplus-fetch?course-parts=${JSON.stringify(courseParts)}`
+          `/v1/courses/${courseId}/aplus-fetch?course-tasks=${JSON.stringify(courseTasks)}`
         )
         .set('Cookie', cookie)
         .set('Authorization', authorization)
         .set('Accept', 'application/json')
         .expect(HttpCode.Ok);
 
-      const Schema = NewGradeArraySchema.nonempty();
+      const Schema = NewTaskGradeArraySchema.nonempty();
       const result = Schema.safeParse(res.body);
       expect(result.success).toBeTruthy();
     }
   };
 
   it('should fetch grades for full points', async () => {
-    await successTest([fullPointsCoursePartId]);
+    await successTest([fullPointsCourseTaskId]);
   });
 
   it('should fetch grades for module', async () => {
-    await successTest([moduleCoursePartId]);
+    await successTest([moduleCourseTaskId]);
   });
 
   it('should fetch grades for exercise', async () => {
-    await successTest([exerciseCoursePartId]);
+    await successTest([exerciseCourseTaskId]);
   });
 
   it('should fetch grades for difficulty', async () => {
-    await successTest([difficultyCoursePartId]);
+    await successTest([difficultyCourseTaskId]);
   });
 
-  it('should fetch grades for multiple course parts', async () => {
+  it('should fetch grades for multiple course tasks', async () => {
     await successTest([
-      fullPointsCoursePartId,
-      moduleCoursePartId,
-      exerciseCoursePartId,
-      difficultyCoursePartId,
+      fullPointsCourseTaskId,
+      moduleCourseTaskId,
+      exerciseCourseTaskId,
+      difficultyCourseTaskId,
     ]);
   });
 
   it('should fetch grades from multiple sources', async () => {
-    const [[coursePartId]] = await createData.createAplusGradeSources(courseId);
+    const [[courseTaskId]] = await createData.createAplusGradeSources(courseId);
     await AplusGradeSource.create({
-      coursePartId,
+      courseTaskId: courseTaskId,
       aplusCourse: {
         id: 2,
         courseCode: 'CS-123',
@@ -663,11 +664,11 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
       date: new Date(),
     });
 
-    await successTest([coursePartId]);
+    await successTest([courseTaskId]);
   });
 
   it('should respond with 400 if A+ token parsing fails', async () => {
-    const url = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`;
+    const url = `/v1/courses/${courseId}/aplus-fetch?course-tasks=[${fullPointsCourseTaskId}]`;
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
     for (const invalid of invalidAuthorization) {
       await responseTests
@@ -678,21 +679,21 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
   });
 
   it('should respond with 400 if course ID is invalid', async () => {
-    const url = `/v1/courses/abc/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`;
+    const url = `/v1/courses/abc/aplus-fetch?course-tasks=[${fullPointsCourseTaskId}]`;
     await responseTests
       .testBadRequest(url, cookies.adminCookie)
       .set('Authorization', authorization)
       .get();
   });
 
-  it('should respond with 400 if course part list is invalid', async () => {
+  it('should respond with 400 if course task list is invalid', async () => {
     const url = '/v1/courses/{courseId}/aplus-fetch';
     const invalid = [
-      '?course-parts=["abc"]',
-      '?course-parts=[abc]',
-      '?course-parts=5',
-      '?course-parts=["5"]',
-      '?course-parts',
+      '?course-tasks=["abc"]',
+      '?course-tasks=[abc]',
+      '?course-tasks=5',
+      '?course-tasks=["5"]',
+      '?course-tasks',
       '?',
       '',
     ];
@@ -719,27 +720,27 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
   });
 
   it('should respond with 404 when not found', async () => {
-    const urlNoCourse = `/v1/courses/${nonExistentId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`;
+    const urlNoCourse = `/v1/courses/${nonExistentId}/aplus-fetch?course-tasks=[${fullPointsCourseTaskId}]`;
     await responseTests
       .testNotFound(urlNoCourse, cookies.adminCookie)
       .set('Authorization', authorization)
       .get();
 
-    const urlNoCoursePart = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${nonExistentId}]`;
+    const urlNoCourseTask = `/v1/courses/${courseId}/aplus-fetch?course-tasks=[${nonExistentId}]`;
     await responseTests
-      .testNotFound(urlNoCoursePart, cookies.adminCookie)
+      .testNotFound(urlNoCourseTask, cookies.adminCookie)
       .set('Authorization', authorization)
       .get();
 
-    const urlNoGradeSource = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${noGradeSourceCoursePartId}]`;
+    const urlNoGradeSource = `/v1/courses/${courseId}/aplus-fetch?course-tasks=[${noGradeSourceCourseTaskId}]`;
     await responseTests
       .testNotFound(urlNoGradeSource, cookies.adminCookie)
       .set('Authorization', authorization)
       .get();
   });
 
-  it('should respond with 409 when course part does not belong to the course', async () => {
-    const url = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${differentCoursePartId}]`;
+  it('should respond with 409 when course task does not belong to the course', async () => {
+    const url = `/v1/courses/${courseId}/aplus-fetch?course-tasks=[${differentCourseTaskId}]`;
     await responseTests
       .testConflict(url, cookies.adminCookie)
       .set('Authorization', authorization)
@@ -751,7 +752,7 @@ describe('Test GET /v1/courses/:courseId/aplus-fetch - Fetch grades from A+', ()
       throw new AxiosError();
     });
 
-    const url = `/v1/courses/${courseId}/aplus-fetch?course-parts=[${fullPointsCoursePartId}]`;
+    const url = `/v1/courses/${courseId}/aplus-fetch?course-tasks=[${fullPointsCourseTaskId}]`;
     await responseTests
       .testBadGateway(url, cookies.adminCookie)
       .set('Authorization', authorization)

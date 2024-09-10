@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {JSX, useContext, useState} from 'react';
+import {type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Handle, NodeProps, Position} from 'reactflow';
+import {Handle, type NodeProps, Position} from 'reactflow';
 
-import {StepperNodeSettings, StepperNodeValue} from '@/common/types/graph';
+import type {StepperNodeSettings, StepperNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
@@ -44,7 +44,7 @@ const StepperNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
   const {id, isConnectable} = props;
 
-  const {nodeValues} = useContext(NodeValuesContext);
+  const nodeValues = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const settings = nodeData[id].settings as StepperNodeSettings;
@@ -188,10 +188,15 @@ const StepperNode = (props: NodeProps): JSX.Element => {
           ))}
         </tbody>
       </table>
-      <button style={{float: 'left', marginRight: '5px'}} onClick={handleAdd}>
+      <button
+        type="button"
+        style={{float: 'left', marginRight: '5px'}}
+        onClick={handleAdd}
+      >
         {t('shared.graph.new-row')}
       </button>
       <button
+        type="button"
         style={{float: 'right'}}
         disabled={localSettings.numSteps === 1}
         onClick={handleRemove}

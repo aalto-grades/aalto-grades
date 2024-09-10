@@ -4,10 +4,13 @@
 
 import {RateLimiterMemory} from 'rate-limiter-flexible';
 
-import {HttpCode} from '@/common/types';
-import {LoginData, ResetOwnPasswordData} from '@/common/types/auth';
+import {
+  HttpCode,
+  type LoginData,
+  type ResetOwnPasswordData,
+} from '@/common/types';
 import logger from '../configs/winston';
-import {SyncEndpoint} from '../types';
+import type {SyncEndpoint} from '../types';
 
 const rateLimiter = new RateLimiterMemory({
   keyPrefix: 'ip_',
@@ -22,14 +25,14 @@ export const rateLimiterMemoryMiddleware: SyncEndpoint<
 > = (req, res, next) => {
   // Override res.send
   const originalSend = res.send;
-  res.send = function (body) {
-    if (this.statusCode === 200) {
+  res.send = body => {
+    if (res.statusCode === 200) {
       rateLimiter.delete(req.ip ?? '').catch(error => {
         logger.error(error);
       });
     }
     // Call the original res.send method with the body
-    return originalSend.call(this, body);
+    return originalSend.call(res, body);
   };
 
   rateLimiter

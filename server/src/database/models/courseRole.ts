@@ -1,21 +1,21 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional,
+  type CreationOptional,
   DataTypes,
-  ForeignKey,
-  InferAttributes,
-  InferCreationAttributes,
+  type ForeignKey,
+  type InferAttributes,
+  type InferCreationAttributes,
   Model,
   Op,
 } from 'sequelize';
 
 import {CourseRoleType} from '@/common/types';
+import {sequelize} from '..';
 import Course from './course';
 import User from './user';
-import {sequelize} from '..';
 
 export default class CourseRole extends Model<
   InferAttributes<CourseRole>,

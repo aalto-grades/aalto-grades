@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {AppBar, Box, Typography, useTheme} from '@mui/material';
-import {useState} from 'react';
+import {useMemo} from 'react';
 import {NavLink, useParams} from 'react-router-dom';
 
 import {useGetCourse} from '@/hooks/useApi';
@@ -19,44 +19,44 @@ const Header = (): JSX.Element => {
 
   // The logo variants are intended to be used randomly, so why not?
   // https://brand.aalto.fi/visual-identity/about/logo/
-  const [logoVariant] = useState(
-    ['!', '?', '”'][Math.floor(Math.random() * 3)]
+  const logoVariant = useMemo(
+    () => ['!', '?', '”'][Math.floor(Math.random() * 3)],
+    []
   );
 
   return (
-    <>
-      <AppBar
-        position="static"
+    <AppBar
+      position="static"
+      sx={{
+        backgroundColor: theme.vars.palette.primary.light,
+        boxShadow: 'none',
+        //   color: theme.vars.palette.primary.main,
+        color: 'black',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        flexDirection: 'row',
+        px: 3,
+      }}
+    >
+      <Typography
+        variant="h2"
+        component={NavLink}
+        to="/"
         sx={{
-          backgroundColor: theme.vars.palette.primary.light,
-          boxShadow: 'none',
-          //   color: theme.vars.palette.primary.main,
-          color: 'black',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          flexDirection: 'row',
-          px: 3,
+          textDecoration: 'none',
+          mr: 2,
+          width: '184px',
+          cursor: 'pointer',
+          fontWeight: 'bold',
+          color: 'primary.main',
         }}
+        data-testid="a-grades-header-link"
+        unstable_viewTransition
       >
-        <Typography
-          variant="h2"
-          component={NavLink}
-          to="/"
-          sx={{
-            textDecoration: 'none',
-            mr: 2,
-            width: '184px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            color: 'primary.main',
-          }}
-          data-testid="a-grades-header-link"
-          unstable_viewTransition
-        >
-          A{logoVariant} Grades
-        </Typography>
-        {/* <Box
+        A{logoVariant} Grades
+      </Typography>
+      {/* <Box
             sx={{
               //   //   backgroundColor: theme.vars.palette.background.paper,
               //   //   backgroundColor: theme.vars.palette.background.paper,
@@ -116,31 +116,31 @@ const Header = (): JSX.Element => {
             </NavLink>
           </Box> */}
 
-        {course.data && (
-          <>
-            <Box
-              sx={{
-                // backgroundColor: theme.vars.palette.background.paper,
-                backgroundColor: theme.vars.palette.background.paper,
-                px: 2,
-                py: 0,
-                mr: 1,
-                //   border: '1px solid gray',
-                width: 'fit-content',
-                borderRadius: '15px',
-                // translateY: '-50%',
-                height: '40px',
+      {course.data !== undefined && (
+        <>
+          <Box
+            sx={{
+              // backgroundColor: theme.vars.palette.background.paper,
+              backgroundColor: theme.vars.palette.background.paper,
+              px: 2,
+              py: 0,
+              mr: 1,
+              //   border: '1px solid gray',
+              width: 'fit-content',
+              borderRadius: '15px',
+              // translateY: '-50%',
+              height: '40px',
+              alignItems: 'center',
+            }}
+          >
+            <span
+              style={{
+                display: 'flex',
                 alignItems: 'center',
+                height: '100%',
               }}
             >
-              <span
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  height: '100%',
-                }}
-              >
-                {/* <div
+              {/* <div
                 style={{
                   padding: '0px 5px',
                   border: '1px solid black',
@@ -156,41 +156,41 @@ const Header = (): JSX.Element => {
                 <Typography align="left">{course.data.courseCode}</Typography>
               </div> */}
 
-                <Typography
-                  align="left"
-                  variant="body1"
-                  sx={{color: 'primary.main'}}
-                >
-                  <b>{course.data.courseCode}</b>
-                </Typography>
-              </span>
-            </Box>
-            <Typography variant="h2" sx={{mr: 1}}>
-              {' - '}
-            </Typography>
-            <Box
-              sx={{
-                // backgroundColor: theme.vars.palette.background.paper,
-                backgroundColor: theme.vars.palette.background.paper,
-                px: 2,
-                py: 0,
-                mr: 1,
-                //   border: '1px solid gray',
-                width: 'fit-content',
-                borderRadius: '15px',
-                // translateY: '-50%',
-                height: '40px',
+              <Typography
+                align="left"
+                variant="body1"
+                sx={{color: 'primary.main'}}
+              >
+                <b>{course.data.courseCode}</b>
+              </Typography>
+            </span>
+          </Box>
+          <Typography variant="h2" sx={{mr: 1}}>
+            {' - '}
+          </Typography>
+          <Box
+            sx={{
+              // backgroundColor: theme.vars.palette.background.paper,
+              backgroundColor: theme.vars.palette.background.paper,
+              px: 2,
+              py: 0,
+              mr: 1,
+              //   border: '1px solid gray',
+              width: 'fit-content',
+              borderRadius: '15px',
+              // translateY: '-50%',
+              height: '40px',
+              alignItems: 'center',
+            }}
+          >
+            <span
+              style={{
+                display: 'flex',
                 alignItems: 'center',
+                height: '100%',
               }}
             >
-              <span
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  height: '100%',
-                }}
-              >
-                {/* <div
+              {/* <div
                   style={{
                     padding: '0px 5px',
                     border: '1px solid black',
@@ -206,35 +206,34 @@ const Header = (): JSX.Element => {
                   <Typography align="left">{course.data.courseCode}</Typography>
                 </div> */}
 
-                <Typography
-                  variant="h2"
-                  align="left"
-                  sx={{
-                    viewTransitionName: `course-name-${course.data.id}`,
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    maxWidth: '300px',
-                  }}
-                >
-                  {localize(course.data.name)}
-                </Typography>
-                {/* <Typography
+              <Typography
+                variant="h2"
+                align="left"
+                sx={{
+                  viewTransitionName: `course-name-${course.data.id}`,
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  maxWidth: '300px',
+                }}
+              >
+                {localize(course.data.name)}
+              </Typography>
+              {/* <Typography
                     align="left"
                     type="body2"
                     sx={{color: 'primary.main', mr: 1}}
                   >
                     {course.data.courseCode}
                   </Typography> */}
-              </span>
-            </Box>
-          </>
-        )}
-        <Box sx={{flexGrow: 1}} />
-        <LanguageSelectButton />
-        <UserButton />
-      </AppBar>
-    </>
+            </span>
+          </Box>
+        </>
+      )}
+      <Box sx={{flexGrow: 1}} />
+      <LanguageSelectButton />
+      <UserButton />
+    </AppBar>
   );
 };
 

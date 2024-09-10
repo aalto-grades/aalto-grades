@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {Box, Button, Typography, useTheme} from '@mui/material';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import {SystemRole} from '@/common/types';
@@ -83,7 +83,7 @@ const FrontPageView = (): JSX.Element => {
               {t('front-page.create-new-course')}
             </Button>
           </Box>
-          {courses.data && <CourseTable courses={courses.data} />}
+          {courses.data !== undefined && <CourseTable courses={courses.data} />}
           <Users />
         </>
       )}

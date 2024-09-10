@@ -4,7 +4,10 @@
 
 import {useContext} from 'react';
 
-import {GradesTableContext, TableContextProps} from './GradesTableProvider';
+import {
+  GradesTableContext,
+  type TableContextProps,
+} from './GradesTableProvider';
 
 export const useTableContext = (): TableContextProps => {
   const context = useContext(GradesTableContext);

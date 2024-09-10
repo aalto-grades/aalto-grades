@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -6,7 +6,7 @@ import 'react-global-modal/dist/style.css';
 
 import {
   Experimental_CssVarsProvider as CssVarsProvider,
-  CssVarsTheme,
+  type CssVarsTheme,
   experimental_extendTheme as extendTheme,
 } from '@mui/material/styles';
 import {
@@ -17,7 +17,7 @@ import {
 } from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
 import {enqueueSnackbar} from 'notistack';
-import {CSSProperties, JSX, Ref, useEffect} from 'react';
+import {type CSSProperties, type JSX, type Ref, useEffect} from 'react';
 import {GlobalModal, GlobalModalWrapper} from 'react-global-modal';
 import {RouterProvider, createBrowserRouter} from 'react-router-dom';
 
@@ -32,8 +32,9 @@ import StaticPageView from './components/StaticPageView';
 import StudentsView from './components/StudentsView';
 import CourseContainer from './components/course/CourseContainer';
 import CoursePartsView from './components/course/CoursePartsView';
-import CourseResultsView from './components/course/CourseResultsView';
+import CourseRedirect from './components/course/CourseRedirect';
 import EditCourseView from './components/course/EditCourseView';
+import GradesView from './components/course/GradesView';
 import ModelsView from './components/course/ModelsView';
 import ConfirmDialog from './components/shared/ConfirmDialog';
 import NotistackWrapper from './context/NotistackWrapper';
@@ -250,10 +251,10 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       {path: '/login', element: <LoginView />},
-      ...['/licenses', '/licences'].map(path => ({
-        path,
-        element: <StaticPageView url={'/javascript.html'} title="Licences" />,
-      })),
+      {
+        path: '/licenses',
+        element: <StaticPageView url="/javascript.html" title="Licenses" />,
+      },
       {
         path: '/accessibility-statement',
         element: <StaticPageView url="/accessibility-statement.html" />,
@@ -298,13 +299,12 @@ const router = createBrowserRouter([
             path: '/:courseId',
             children: [
               {
-                // Temporary default view
                 index: true,
-                element: <CourseResultsView />,
+                element: <CourseRedirect />,
               },
               {
                 path: '/:courseId/course-results',
-                element: <CourseResultsView />,
+                element: <GradesView />,
               },
               {
                 path: '/:courseId/models/:modelId?/:userId?',

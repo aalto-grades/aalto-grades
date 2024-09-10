@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-/* eslint camelcase: off */
+/* eslint-disable camelcase */
 
-import {DataTypes, QueryInterface} from 'sequelize';
+import {DataTypes, type QueryInterface} from 'sequelize';
 
 import {dbLogger} from '../../configs/winston';
 
@@ -50,6 +50,19 @@ export default {
           password: {
             type: new DataTypes.CHAR(255),
             allowNull: true,
+          },
+          force_password_reset: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true,
+          },
+          mfa_secret: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          mfa_confirmed: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
           },
           created_at: DataTypes.DATE,
           updated_at: DataTypes.DATE,
@@ -106,9 +119,8 @@ export default {
         {transaction}
       );
 
-      // Renamed to grading_model in the future
       await queryInterface.createTable(
-        'assessment_model',
+        'course_part',
         {
           id: {
             type: DataTypes.INTEGER,
@@ -120,6 +132,54 @@ export default {
             allowNull: false,
             references: {
               model: 'course',
+              key: 'id',
+            },
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+          },
+          name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          expiry_date: {
+            type: DataTypes.DATEONLY,
+            allowNull: true,
+          },
+          archived: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+            allowNull: false,
+          },
+          created_at: DataTypes.DATE,
+          updated_at: DataTypes.DATE,
+        },
+        {transaction}
+      );
+
+      await queryInterface.createTable(
+        'grading_model',
+        {
+          id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+          },
+          course_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+              model: 'course',
+              key: 'id',
+            },
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+          },
+          course_part_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            unique: true,
+            references: {
+              model: 'course_part',
               key: 'id',
             },
             onDelete: 'CASCADE',
@@ -133,26 +193,30 @@ export default {
             type: DataTypes.JSONB,
             allowNull: false,
           },
+          archived: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+            allowNull: false,
+          },
           created_at: DataTypes.DATE,
           updated_at: DataTypes.DATE,
         },
         {transaction}
       );
 
-      // Renamed to course_part in the future
       await queryInterface.createTable(
-        'attainment',
+        'course_task',
         {
           id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
           },
-          course_id: {
+          course_part_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-              model: 'course',
+              model: 'course_part',
               key: 'id',
             },
             onDelete: 'CASCADE',
@@ -164,8 +228,16 @@ export default {
           },
           days_valid: {
             type: DataTypes.INTEGER,
+            allowNull: true,
+          },
+          max_grade: {
+            type: DataTypes.FLOAT,
+            allowNull: true,
+          },
+          archived: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
             allowNull: false,
-            defaultValue: 365,
           },
           created_at: DataTypes.DATE,
           updated_at: DataTypes.DATE,
@@ -174,7 +246,68 @@ export default {
       );
 
       await queryInterface.createTable(
-        'attainment_grade',
+        'aplus_grade_source',
+        {
+          id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+          },
+          course_task_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+              model: 'course_task',
+              key: 'id',
+            },
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+          },
+          aplus_course: {
+            type: DataTypes.JSONB,
+            allowNull: false,
+          },
+          source_type: {
+            type: DataTypes.ENUM(
+              'FULL_POINTS',
+              'MODULE',
+              'EXERCISE',
+              'DIFFICULTY'
+            ),
+            allowNull: false,
+          },
+          module_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+          },
+          module_name: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          exercise_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+          },
+          exercise_name: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          difficulty: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          date: {
+            type: DataTypes.DATEONLY,
+            allowNull: false,
+          },
+          created_at: DataTypes.DATE,
+          updated_at: DataTypes.DATE,
+        },
+        {transaction}
+      );
+
+      await queryInterface.createTable(
+        'task_grade',
         {
           id: {
             type: DataTypes.INTEGER,
@@ -183,6 +316,7 @@ export default {
           },
           user_id: {
             type: DataTypes.INTEGER,
+            allowNull: false,
             references: {
               model: 'user',
               key: 'id',
@@ -190,13 +324,14 @@ export default {
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE',
           },
-          attainment_id: {
+          course_task_id: {
             type: DataTypes.INTEGER,
+            allowNull: false,
             references: {
-              model: 'attainment',
+              model: 'course_task',
               key: 'id',
             },
-            onDelete: 'CASCADE',
+            onDelete: 'RESTRICT',
             onUpdate: 'CASCADE',
           },
           grader_id: {
@@ -206,7 +341,17 @@ export default {
               model: 'user',
               key: 'id',
             },
-            onDelete: 'CASCADE',
+            onDelete: 'NO ACTION',
+            onUpdate: 'CASCADE',
+          },
+          aplus_grade_source_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+              model: 'aplus_grade_source',
+              key: 'id',
+            },
+            onDelete: 'RESTRICT',
             onUpdate: 'CASCADE',
           },
           grade: {
@@ -223,7 +368,7 @@ export default {
           },
           expiry_date: {
             type: DataTypes.DATEONLY,
-            allowNull: false,
+            allowNull: true,
           },
           comment: {
             type: DataTypes.STRING,
@@ -238,9 +383,13 @@ export default {
       await queryInterface.createTable(
         'course_role',
         {
+          id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+          },
           user_id: {
             type: DataTypes.INTEGER,
-            primaryKey: true,
             references: {
               model: 'user',
               key: 'id',
@@ -250,7 +399,6 @@ export default {
           },
           course_id: {
             type: DataTypes.INTEGER,
-            primaryKey: true,
             references: {
               model: 'course',
               key: 'id',
@@ -259,7 +407,7 @@ export default {
             onUpdate: 'CASCADE',
           },
           role: {
-            type: DataTypes.ENUM('TEACHER', 'ASSISTANT', 'STUDENT'),
+            type: DataTypes.ENUM('STUDENT', 'TEACHER', 'ASSISTANT'),
             allowNull: false,
           },
           created_at: DataTypes.DATE,
@@ -314,7 +462,6 @@ export default {
           },
           user_id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
             references: {
               model: 'user',
               key: 'id',
@@ -329,17 +476,17 @@ export default {
               model: 'course',
               key: 'id',
             },
-            onDelete: 'NO ACTION',
+            onDelete: 'RESTRICT',
             onUpdate: 'CASCADE',
           },
-          assessment_model_id: {
+          grading_model_id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             references: {
-              model: 'assessment_model',
+              model: 'grading_model',
               key: 'id',
             },
-            onDelete: 'NO ACTION',
+            onDelete: 'RESTRICT',
             onUpdate: 'CASCADE',
           },
           grader_id: {
@@ -352,16 +499,20 @@ export default {
             onDelete: 'NO ACTION',
             onUpdate: 'CASCADE',
           },
-          date: {
-            type: DataTypes.DATEONLY,
-            allowNull: false,
-          },
           grade: {
             type: DataTypes.FLOAT,
             allowNull: false,
           },
           sisu_export_date: {
             type: DataTypes.DATE,
+            allowNull: true,
+          },
+          date: {
+            type: DataTypes.DATEONLY,
+            allowNull: false,
+          },
+          comment: {
+            type: DataTypes.STRING,
             allowNull: true,
           },
           created_at: DataTypes.DATE,
@@ -382,37 +533,42 @@ export default {
       await queryInterface.dropTable('final_grade', {transaction});
       await queryInterface.dropTable('course_translation', {transaction});
       await queryInterface.dropTable('course_role', {transaction});
-      await queryInterface.dropTable('attainment_grade', {transaction});
-      await queryInterface.dropTable('attainment', {transaction});
-      await queryInterface.dropTable('assessment_model', {transaction});
+      await queryInterface.dropTable('task_grade', {transaction});
+      await queryInterface.dropTable('aplus_grade_source', {transaction});
+      await queryInterface.dropTable('course_task', {transaction});
+      await queryInterface.dropTable('grading_model', {transaction});
+      await queryInterface.dropTable('course_part', {transaction});
       await queryInterface.dropTable('course', {transaction});
       await queryInterface.dropTable('user', {transaction});
 
       await queryInterface.dropTable('migrations', {transaction});
       await queryInterface.dropTable('seeds', {transaction});
 
+      await queryInterface.sequelize.query('DROP TYPE enum_user_role;', {
+        transaction,
+      });
+
       await queryInterface.sequelize.query(
-        'DROP TYPE IF EXISTS enum_user_role;',
+        'DROP TYPE enum_course_language_of_instruction;',
         {transaction}
       );
 
       await queryInterface.sequelize.query(
-        'DROP TYPE IF EXISTS enum_course_language_of_instruction;',
+        'DROP TYPE enum_course_grading_scale;',
         {transaction}
       );
 
       await queryInterface.sequelize.query(
-        'DROP TYPE IF EXISTS enum_course_grading_scale;',
+        'DROP TYPE enum_course_translation_language;',
         {transaction}
       );
 
-      await queryInterface.sequelize.query(
-        'DROP TYPE IF EXISTS enum_course_translation_language;',
-        {transaction}
-      );
+      await queryInterface.sequelize.query('DROP TYPE enum_course_role_role;', {
+        transaction,
+      });
 
       await queryInterface.sequelize.query(
-        'DROP TYPE IF EXISTS enum_course_role_role;',
+        'DROP TYPE enum_aplus_grade_source_source_type;',
         {transaction}
       );
 

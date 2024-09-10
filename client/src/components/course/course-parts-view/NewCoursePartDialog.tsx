@@ -4,55 +4,60 @@
 
 import {
   Button,
-  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControlLabel,
-  Switch,
 } from '@mui/material';
-import {Formik, FormikHelpers, FormikProps} from 'formik';
-import {useState} from 'react';
+import {Formik, type FormikHelpers, type FormikProps} from 'formik';
 import {useTranslation} from 'react-i18next';
+import {useParams} from 'react-router-dom';
+import {z} from 'zod';
 
-import {NewCoursePartDataSchema} from '@/common/types';
 import FormField from '@/components/shared/FormikField';
+import {useAddCoursePart} from '@/hooks/useApi';
+import {nullableDateSchema} from '@/types';
 
-type FormData = {name: string; daysValid: number; maxGrade: number};
-const ValidationSchema = NewCoursePartDataSchema;
-const initialValues: FormData = {name: '', daysValid: 365, maxGrade: 0};
+type FormData = {name: string; expiryDate: Date | '' | null};
+const initialValues: FormData = {name: '', expiryDate: null};
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
-  onSave: (name: string, daysValid: number, maxGrade: number | null) => void;
 };
-const AddCoursePartDialog = ({
-  open,
-  onClose,
-  onSave,
-}: PropsType): JSX.Element => {
+const NewCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
   const {t} = useTranslation();
-  const [showMaxGrade, setShowMaxGrade] = useState<boolean>(false);
+  const {courseId} = useParams() as {courseId: string};
+  const addCoursePart = useAddCoursePart(courseId);
 
-  const onSubmit = (
+  const ValidationSchema = z.strictObject({
+    name: z.string().min(1),
+    expiryDate: nullableDateSchema(t),
+  });
+
+  const onSubmit = async (
     values: FormData,
-    {resetForm}: FormikHelpers<FormData>
-  ): void => {
-    onSave(
-      values.name,
-      values.daysValid,
-      showMaxGrade ? values.maxGrade : null
-    );
+    {resetForm, setSubmitting}: FormikHelpers<FormData>
+  ): Promise<void> => {
+    const parsedValues = ValidationSchema.parse(values);
+    try {
+      await addCoursePart.mutateAsync({
+        name: parsedValues.name,
+        expiryDate: parsedValues.expiryDate,
+      });
+    } catch {
+      setSubmitting(false);
+      return;
+    }
     onClose();
     resetForm();
-    setShowMaxGrade(false);
   };
 
   const validateForm = (
     values: FormData
   ): {[key in keyof FormData]?: string[]} | undefined => {
+    if (values.expiryDate === '') values.expiryDate = null;
+
     const result = ValidationSchema.safeParse(values);
     if (result.success) return;
 
@@ -89,29 +94,11 @@ const AddCoursePartDialog = ({
             />
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
-              value="daysValid"
-              label={`${t('general.days-valid')}*`}
-              helperText={t('course.parts.create.days-valid-help')}
-              type="number"
+              value="expiryDate"
+              label={t('general.expiry-date')}
+              helperText={t('course.parts.create.expiry-date-valid-help')}
+              type="date"
             />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={showMaxGrade}
-                  onChange={e => setShowMaxGrade(e.target.checked)}
-                />
-              }
-              label={t('course.parts.create.set-max-grade')}
-            />
-            <Collapse in={showMaxGrade}>
-              <FormField
-                form={form as unknown as FormikProps<{[key: string]: unknown}>}
-                value="maxGrade"
-                label={`${t('general.max-grade')}*`}
-                helperText={t('course.parts.create.max-grade-help')}
-                type="number"
-              />
-            </Collapse>
           </DialogContent>
           <DialogActions>
             <Button
@@ -120,7 +107,6 @@ const AddCoursePartDialog = ({
               onClick={() => {
                 onClose();
                 form.resetForm();
-                setShowMaxGrade(false);
               }}
             >
               {t('general.cancel')}
@@ -139,4 +125,4 @@ const AddCoursePartDialog = ({
   );
 };
 
-export default AddCoursePartDialog;
+export default NewCoursePartDialog;

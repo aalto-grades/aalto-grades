@@ -5,8 +5,8 @@
 import axios from 'axios';
 import {load} from 'cheerio';
 import fs from 'fs';
-import parse, {Info} from 'spdx-expression-parse';
-import {Plugin} from 'vite';
+import parse, {type Info} from 'spdx-expression-parse';
+import type {Plugin} from 'vite';
 
 type Dependency = {
   name: string;

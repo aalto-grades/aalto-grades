@@ -1,8 +1,8 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
-import {HttpCode} from '@/common/types';
+import type {HttpCode} from '@/common/types';
 
 /**
  * ApiError class represents a custom API related error, extends the native

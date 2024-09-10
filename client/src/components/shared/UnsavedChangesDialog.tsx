@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -9,9 +9,9 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Blocker} from 'react-router-dom';
+import type {Blocker} from 'react-router-dom';
 
 const UnsavedChangesDialog = ({
   blocker,

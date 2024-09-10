@@ -1,19 +1,20 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional,
+  type CreationOptional,
   DataTypes,
-  ForeignKey,
-  InferAttributes,
-  InferCreationAttributes,
+  type ForeignKey,
+  type InferAttributes,
+  type InferCreationAttributes,
   Model,
 } from 'sequelize';
 
-import {GraphStructure} from '@/common/types';
-import Course from './course';
+import type {GraphStructure} from '@/common/types';
 import {sequelize} from '..';
+import Course from './course';
+import CoursePart from './coursePart';
 
 export default class GradingModel extends Model<
   InferAttributes<GradingModel>,
@@ -21,6 +22,7 @@ export default class GradingModel extends Model<
 > {
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
+  declare coursePartId: ForeignKey<CoursePart['id']> | null;
   declare name: string;
   declare graphStructure: GraphStructure;
   declare archived: CreationOptional<boolean>;
@@ -40,6 +42,15 @@ GradingModel.init(
       allowNull: false,
       references: {
         model: 'course',
+        key: 'id',
+      },
+    },
+    coursePartId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      unique: true,
+      references: {
+        model: 'course_part',
         key: 'id',
       },
     },
@@ -67,3 +78,6 @@ GradingModel.init(
 
 Course.hasMany(GradingModel, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
 GradingModel.belongsTo(Course, {foreignKey: 'courseId'});
+
+CoursePart.hasOne(GradingModel, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+GradingModel.belongsTo(CoursePart, {foreignKey: 'coursePartId'});

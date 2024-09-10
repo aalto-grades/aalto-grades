@@ -10,17 +10,17 @@ import {
   Button,
   FormGroup,
 } from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {
+import type {
   AplusCourseData,
   AplusGradeSourceData,
   NewAplusGradeSourceData,
 } from '@/common/types';
-import {aplusGradeSourcesEqual} from '@/common/util/aplus';
+import {aplusGradeSourcesEqual} from '@/common/util';
 import {useFetchAplusExerciseData} from '@/hooks/useApi';
-import {getLatestAplusModuleDate, newAplusGradeSource} from '@/utils/utils';
+import {getLatestAplusModuleDate, newAplusGradeSource} from '@/utils';
 
 type PropsType = {
   aplusCourse: AplusCourseData;
@@ -45,7 +45,7 @@ const SelectAplusGradeSource = ({
     return false;
   };
 
-  if (aplusExerciseData.data === undefined) return <></>;
+  if (aplusExerciseData.data === undefined) return <>{t('general.loading')}</>;
 
   return (
     <>
@@ -84,6 +84,7 @@ const SelectAplusGradeSource = ({
           <FormGroup>
             {aplusExerciseData.data.modules.map(module => (
               <Button
+                key={module.id}
                 disabled={isDisabled(
                   newAplusGradeSource(aplusCourse, module.closingDate, {module})
                 )}
@@ -110,6 +111,7 @@ const SelectAplusGradeSource = ({
             {aplusExerciseData.data.modules.map(module =>
               module.exercises.map(exercise => (
                 <Button
+                  key={exercise.id}
                   disabled={isDisabled(
                     newAplusGradeSource(aplusCourse, module.closingDate, {
                       exercise,
@@ -139,6 +141,7 @@ const SelectAplusGradeSource = ({
             <FormGroup>
               {aplusExerciseData.data.difficulties.map(difficulty => (
                 <Button
+                  key={difficulty.difficulty}
                   disabled={isDisabled(
                     newAplusGradeSource(
                       aplusCourse,

@@ -1,9 +1,21 @@
 {
   "name": "aalto-grades-client",
-  "author": "The Aalto Grades Developers",
-  "license": "Expat (MIT)",
   "private": true,
-  "type": "module",
+  "license": "Expat (MIT)",
+  "author": "The Aalto Grades Developers",
+  "scripts": {
+    "build": "tsc -b && vite build",
+    "postinstall": "patch-package",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
+    "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --fix",
+    "preview": "vite preview --port 3005",
+    "prod-licenses": "npx license-checker-rseidelsohn --excludePrivatePackages --production --summary",
+    "start": "vite",
+    "trans-copy": "cp public/locales/en/translation.json ./",
+    "trans-merge": "npx tsx translation-utils.ts merge",
+    "trans-parse": "npx i18next 'src/**/*.{ts,tsx}' -c i18next-parser.config.js -o 'public/locales/$LOCALE/$NAMESPACE.json'",
+    "trans-rename": "npx tsx translation-utils.ts rename"
+  },
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
@@ -26,13 +38,12 @@
     "i18next": "^23.12.2",
     "i18next-browser-languagedetector": "^8.0.0",
     "i18next-http-backend": "^2.5.2",
-    "msw": "^2.0.13",
     "mui-one-time-password-input": "^2.0.3",
     "notistack": "^3.0.1",
     "papaparse": "^5.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-global-modal": "^0.0.27",
+    "react-global-modal": "0.0.27",
     "react-i18next": "^15.0.0",
     "react-qr-code": "^2.0.15",
     "react-router-dom": "^6.11.2",
@@ -40,52 +51,21 @@
     "styled-components": "^6.1.8",
     "zod": "^3.22.4"
   },
-  "scripts": {
-    "start": "vite",
-    "test": "vitest run",
-    "build": "tsc && vite build",
-    "preview": "vite preview --port 3005",
-    "vitest-preview": "vitest-preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
-    "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --fix",
-    "trans-parse": "npx i18next 'src/**/*.{ts,tsx}' -c i18next-parser.config.js -o 'public/locales/$LOCALE/$NAMESPACE.json'",
-    "trans-copy": "cp public/locales/en/translation.json ./",
-    "trans-rename": "npx tsx translation-utils.ts rename",
-    "trans-merge": "npx tsx translation-utils.ts merge",
-    "prod-licenses": "npx license-checker-rseidelsohn --excludePrivatePackages --production --summary"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.2.0",
-    "@testing-library/react": "^16.0.0",
-    "@testing-library/user-event": "^14.5.2",
     "@types/dompurify": "^3.0.5",
-    "@types/node": "^22.1.0",
+    "@types/node": "^20.16.5",
     "@types/papaparse": "^5.3.14",
     "@types/react": "^18.2.8",
     "@types/react-dom": "^18.2.4",
     "@types/readline-sync": "^1.4.8",
     "@vitejs/plugin-react": "^4.2.1",
     "eslint-plugin-no-relative-import-paths": "^1.5.5",
+    "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "i18next-parser": "^9.0.1",
-    "jsdom": "^24.0.0",
     "license-checker-rseidelsohn": "^4.2.6",
+    "patch-package": "^8.0.0",
     "readline-sync": "^1.4.10",
     "rollup-plugin-license": "^3.2.0",
     "sass": "^1.75.0",
@@ -93,8 +73,9 @@
     "tsx": "^4.17.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.11",
-    "vite-tsconfig-paths": "^5.0.1",
-    "vitest": "^2.0.3",
-    "vitest-preview": "^0.0.1"
+    "vite-tsconfig-paths": "^5.0.1"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

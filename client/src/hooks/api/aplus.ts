@@ -3,27 +3,27 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult,
+  type UseMutationOptions,
+  type UseMutationResult,
+  type UseQueryOptions,
+  type UseQueryResult,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import {AxiosRequestConfig} from 'axios';
+import type {AxiosRequestConfig} from 'axios';
 
 import {
-  AplusCourseData,
+  type AplusCourseData,
   AplusCourseDataArraySchema,
-  AplusExerciseData,
+  type AplusExerciseData,
   AplusExerciseDataSchema,
-  NewAplusGradeSourceData,
-  NewGrade,
-  NewGradeArraySchema,
+  type NewAplusGradeSourceData,
+  type NewTaskGrade,
+  NewTaskGradeArraySchema,
 } from '@/common/types';
-import {Numeric} from '@/types';
-import {getAplusToken} from '@/utils/utils';
+import type {Numeric} from '@/types';
+import {getAplusToken} from '@/utils';
 import axios from './axios';
 
 const getHeaders = (): AxiosRequestConfig => ({
@@ -67,12 +67,12 @@ export const useAddAplusGradeSources = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: gradeSources =>
+    mutationFn: async gradeSources =>
       axios.post(`/api/v1/courses/${courseId}/aplus-sources`, gradeSources),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['course-parts', courseId],
+        queryKey: ['course-tasks', courseId],
       });
     },
     ...options,
@@ -86,14 +86,14 @@ export const useDeleteAplusGradeSource = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: aplusGradeSourceId =>
+    mutationFn: async aplusGradeSourceId =>
       axios.delete(
         `/api/v1/courses/${courseId}/aplus-sources/${aplusGradeSourceId}`
       ),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['course-parts', courseId],
+        queryKey: ['course-tasks', courseId],
       });
     },
     ...options,
@@ -102,17 +102,17 @@ export const useDeleteAplusGradeSource = (
 
 export const useFetchAplusGrades = (
   courseId: Numeric,
-  coursePartIds: number[],
-  options?: Partial<UseQueryOptions<NewGrade[]>>
-): UseQueryResult<NewGrade[]> =>
+  courseTaskIds: number[],
+  options?: Partial<UseQueryOptions<NewTaskGrade[]>>
+): UseQueryResult<NewTaskGrade[]> =>
   useQuery({
     queryKey: ['a+-grades', courseId],
     queryFn: async () =>
-      NewGradeArraySchema.parse(
+      NewTaskGradeArraySchema.parse(
         (
           await axios.get(
-            `/api/v1/courses/${courseId}/aplus-fetch?course-parts=${JSON.stringify(
-              coursePartIds
+            `/api/v1/courses/${courseId}/aplus-fetch?course-tasks=${JSON.stringify(
+              courseTaskIds
             )}`,
             getHeaders()
           )

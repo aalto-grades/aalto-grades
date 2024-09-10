@@ -1,8 +1,8 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
-import express, {RequestHandler, Router} from 'express';
+import express, {type RequestHandler, Router} from 'express';
 import passport from 'passport';
 import {processRequestBody} from 'zod-express-middleware';
 

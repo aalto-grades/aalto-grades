@@ -2,46 +2,71 @@
 //
 // SPDX-License-Identifier: MIT
 
-export type AplusCoursesRes = {
-  staff_courses: {
-    id: number;
-    code: string;
-    name: string;
-    instance_name: string;
-    html_url: string;
-  }[];
-};
+/* eslint-disable camelcase */
 
-export type AplusExercisesRes = {
-  results: {
-    id: number;
-    display_name: string;
-    closing_time: Date;
-    exercises: {
-      id: number;
-      display_name: string;
-      max_points: number;
-      difficulty: string;
-    }[];
-  }[];
-};
+import {z} from 'zod';
 
-export type AplusStudentPoints = {
-  student_id: string | null;
-  points: number;
-  points_by_difficulty: {
-    [key: string]: number;
-  };
-  modules: {
-    id: number;
-    points: number;
-    exercises: {
-      id: number;
-      points: number;
-    }[];
-  }[];
-};
+import {DateSchema} from '@/common/types';
 
-export type AplusPointsRes = {
-  results: AplusStudentPoints[];
-};
+// This file contains validation schemas and types for data returned by the A+
+// API.
+
+// GET /users/me
+export const AplusCoursesResSchema = z.object({
+  staff_courses: z.array(
+    z.object({
+      id: z.number().int(),
+      code: z.string(),
+      name: z.string(),
+      instance_name: z.string(),
+      html_url: z.string().url(),
+    })
+  ),
+});
+
+// GET /courses/<course_id>/exercises
+export const AplusExercisesResSchema = z.object({
+  results: z.array(
+    z.object({
+      id: z.number().int(),
+      display_name: z.string(),
+      closing_time: DateSchema,
+      exercises: z.array(
+        z.object({
+          id: z.number().int(),
+          display_name: z.string(),
+          max_points: z.number().int(),
+          difficulty: z.string(),
+        })
+      ),
+    })
+  ),
+});
+
+const AplusStudentPointsSchema = z.object({
+  student_id: z.string().nullable(),
+  points: z.number().int(),
+  points_by_difficulty: z.record(z.number().int()),
+  modules: z.array(
+    z.object({
+      id: z.number().int(),
+      points: z.number().int(),
+      exercises: z.array(
+        z.object({
+          id: z.number().int(),
+          points: z.number().int(),
+        })
+      ),
+    })
+  ),
+});
+
+// GET /courses/<course_id>/points
+export const AplusPointsResSchema = z.object({
+  results: z.array(AplusStudentPointsSchema),
+});
+
+export type AplusCoursesRes = z.infer<typeof AplusCoursesResSchema>;
+export type AplusExercisesRes = z.infer<typeof AplusExercisesResSchema>;
+export type AplusStudentPoints = z.infer<typeof AplusStudentPointsSchema>;
+export type AplusPointsRes = z.infer<typeof AplusPointsResSchema>;

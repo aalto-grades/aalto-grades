@@ -3,36 +3,29 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AplusGradeSourceData,
+  type AplusDifficulty,
+  type AplusExercise,
+  type AplusGradeSourceData,
   AplusGradeSourceType,
-  NewAplusGradeSourceData,
+  type AplusModule,
+  type NewAplusGradeSourceData,
 } from '../types';
 
 export const aplusGradeSourcesEqual = (
   a: AplusGradeSourceData | NewAplusGradeSourceData,
   b: AplusGradeSourceData | NewAplusGradeSourceData
 ): boolean => {
-  if (a.sourceType === b.sourceType && a.aplusCourse.id === b.aplusCourse.id) {
-    switch (a.sourceType) {
-      case AplusGradeSourceType.FullPoints:
-        return true;
-      case AplusGradeSourceType.Module:
-        if (a.moduleId === (b as {moduleId: number}).moduleId) {
-          return true;
-        }
-        break;
-      case AplusGradeSourceType.Exercise:
-        if (a.exerciseId === (b as {exerciseId: number}).exerciseId) {
-          return true;
-        }
-        break;
-      case AplusGradeSourceType.Difficulty:
-        if (a.difficulty === (b as {difficulty: string}).difficulty) {
-          return true;
-        }
-        break;
-    }
-  }
+  if (a.sourceType !== b.sourceType || a.aplusCourse.id !== b.aplusCourse.id)
+    return false;
 
-  return false;
+  switch (a.sourceType) {
+    case AplusGradeSourceType.FullPoints:
+      return true;
+    case AplusGradeSourceType.Module:
+      return a.moduleId === (b as AplusModule).moduleId;
+    case AplusGradeSourceType.Exercise:
+      return a.exerciseId === (b as AplusExercise).exerciseId;
+    case AplusGradeSourceType.Difficulty:
+      return a.difficulty === (b as AplusDifficulty).difficulty;
+  }
 };

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -23,17 +23,17 @@ import {
 } from '@mui/material';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs, {Dayjs} from 'dayjs';
+import dayjs, {type Dayjs} from 'dayjs';
 import 'dayjs/locale/en-gb';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useMemo, useState} from 'react';
+import {type JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {FinalGradeData, Language, StudentRow} from '@/common/types';
+import type {FinalGradeData, Language, StudentRow} from '@/common/types';
 import {useDownloadSisuGradeCsv} from '@/hooks/useApi';
 import {useLocalize} from '@/hooks/useLocalize';
-import {sisuLanguageOptions} from '@/utils/utils';
+import {sisuLanguageOptions} from '@/utils';
 
 type DownloadOption = 'all' | 'exported' | 'unexported';
 
@@ -80,7 +80,7 @@ const SisuDownloadDialog = ({
 
   const selectedStudents = selectedRows.map(row => ({
     studentNumber: row.user.studentNumber!,
-    grades: row.finalGrades ?? [],
+    grades: row.finalGrades,
   }));
 
   const userGradeAlreadyExported = (grades: FinalGradeData[]): boolean =>
@@ -88,7 +88,7 @@ const SisuDownloadDialog = ({
 
   const exportedValuesInList = useMemo(() => {
     for (const row of selectedRows) {
-      if (userGradeAlreadyExported(row.finalGrades ?? [])) {
+      if (userGradeAlreadyExported(row.finalGrades)) {
         return true;
       }
     }
@@ -126,11 +126,11 @@ const SisuDownloadDialog = ({
     await downloadSisuGradeCsv.mutateAsync({
       courseId,
       data: {
-        completionLanguage,
+        completionLanguage: completionLanguage ?? null,
         assessmentDate:
           dateOverride && assessmentDate !== null
             ? assessmentDate.toDate()
-            : undefined,
+            : null,
         studentNumbers: studentNumbers as [string, ...string[]], // Non-empty array
       },
     });
@@ -238,7 +238,7 @@ const SisuDownloadDialog = ({
                 <ListItemText
                   primary={`${t('general.student-number')}: ${row.user.studentNumber}`}
                   secondary={
-                    userGradeAlreadyExported(row.finalGrades ?? [])
+                    userGradeAlreadyExported(row.finalGrades)
                       ? t('course.results.exported-already')
                       : ''
                   }

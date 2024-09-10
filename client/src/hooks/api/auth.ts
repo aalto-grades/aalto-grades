@@ -1,32 +1,32 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult,
+  type UseMutationOptions,
+  type UseMutationResult,
+  type UseQueryOptions,
+  type UseQueryResult,
   useMutation,
   useQuery,
 } from '@tanstack/react-query';
 
 import {
-  AuthData,
+  type AuthData,
   AuthDataSchema,
-  ChangeOwnAuthData,
-  ChangeOwnAuthResponse,
+  type ChangeOwnAuthData,
+  type ChangeOwnAuthResponse,
   ChangeOwnAuthResponseSchema,
-  ConfirmMfaData,
-  LoginData,
-  LoginResult,
+  type ConfirmMfaData,
+  type LoginData,
+  type LoginResult,
   LoginResultSchema,
-  ResetAuthData,
-  ResetAuthResult,
+  type ResetAuthData,
+  type ResetAuthResult,
   ResetAuthResultSchema,
-  ResetOwnPasswordData,
+  type ResetOwnPasswordData,
 } from '@/common/types';
-import {Numeric} from '@/types';
+import type {Numeric} from '@/types';
 import axios from './axios';
 
 export const useGetRefreshToken = (
@@ -54,10 +54,10 @@ export const useLogIn = (
   });
 
 export const useLogOut = (
-  options?: UseMutationOptions<void, unknown, void>
+  options?: UseMutationOptions<void, unknown>
 ): UseMutationResult<void, unknown, void> =>
   useMutation({
-    mutationFn: () => axios.post('/api/v1/auth/logout'),
+    mutationFn: async () => axios.post('/api/v1/auth/logout'),
     ...options,
   });
 

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {JSX, useEffect, useState} from 'react';
+import {type JSX, useEffect, useState} from 'react';
 
 type Props = {
   children: JSX.Element;

@@ -3,24 +3,24 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional,
+  type CreationOptional,
   DataTypes,
-  ForeignKey,
-  InferAttributes,
-  InferCreationAttributes,
+  type ForeignKey,
+  type InferAttributes,
+  type InferCreationAttributes,
   Model,
 } from 'sequelize';
 
-import {AplusCourseData, AplusGradeSourceType} from '@/common/types';
-import CoursePart from './coursePart';
+import type {AplusCourseData, AplusGradeSourceType} from '@/common/types';
 import {sequelize} from '..';
+import CourseTask from './courseTask';
 
 export default class AplusGradeSource extends Model<
   InferAttributes<AplusGradeSource>,
   InferCreationAttributes<AplusGradeSource>
 > {
   declare id: CreationOptional<number>;
-  declare coursePartId: ForeignKey<CoursePart['id']>;
+  declare courseTaskId: ForeignKey<CourseTask['id']>;
   declare aplusCourse: AplusCourseData; // TODO: Store as a table? Or individual fields?
   declare sourceType: AplusGradeSourceType;
   declare moduleId: CreationOptional<number | null>;
@@ -40,11 +40,11 @@ AplusGradeSource.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    coursePartId: {
+    courseTaskId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'course_part',
+        model: 'course_task',
         key: 'id',
       },
     },
@@ -89,8 +89,8 @@ AplusGradeSource.init(
   }
 );
 
-CoursePart.hasMany(AplusGradeSource, {
+CourseTask.hasMany(AplusGradeSource, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });
-AplusGradeSource.belongsTo(CoursePart, {foreignKey: 'coursePartId'});
+AplusGradeSource.belongsTo(CourseTask, {foreignKey: 'courseTaskId'});

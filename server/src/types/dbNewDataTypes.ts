@@ -15,12 +15,12 @@ export type NewDbFinalGradeData = {
 
 export type NewDbGradeData = {
   userId: number;
-  coursePartId: number;
+  courseTaskId: number;
   graderId: number;
   aplusGradeSourceId?: number;
   grade: number;
   sisuExportDate?: Date | null;
   date: Date;
-  expiryDate: Date;
+  expiryDate: Date | null;
   comment?: string | null;
 };

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -15,40 +15,55 @@ import {
   Select,
   TextField,
 } from '@mui/material';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {GraphTemplate, initGraph} from '@/common/util/initGraph';
-import {useAddGradingModel, useGetCourseParts} from '@/hooks/useApi';
+import type {CoursePartData} from '@/common/types';
+import {type GraphTemplate, initGraph} from '@/common/util';
+import {
+  useAddGradingModel,
+  useGetCourseParts,
+  useGetCourseTasks,
+} from '@/hooks/useApi';
 
 const CreateGradingModelDialog = ({
-  onClose,
   open,
+  onClose,
+  coursePart,
   onSubmit,
 }: {
-  onClose: () => void;
   open: boolean;
+  onClose: () => void;
+  coursePart?: CoursePartData;
   onSubmit: (id: number) => void;
 }): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const courseParts = useGetCourseParts(courseId);
+  const courseTasks = useGetCourseTasks(courseId);
   const addGradingModel = useAddGradingModel();
 
   const [name, setName] = useState<string>('');
   const [template, setTemplate] = useState<GraphTemplate>('none');
 
   const handleSubmit = (): void => {
-    if (courseParts.data === undefined) return;
+    if (courseParts.data === undefined || courseTasks.data === undefined)
+      return;
     addGradingModel.mutate(
       {
         courseId: courseId,
         gradingModel: {
+          coursePartId: coursePart?.id ?? null,
           name,
           graphStructure: initGraph(
             template,
-            courseParts.data.filter(coursePart => !coursePart.archived)
+            coursePart !== undefined
+              ? courseTasks.data.filter(
+                  task => task.coursePartId === coursePart.id && !task.archived
+                )
+              : courseParts.data.filter(part => !part.archived),
+            coursePart ?? null
           ),
         },
       },
@@ -63,9 +78,19 @@ const CreateGradingModelDialog = ({
     );
   };
 
+  const [oldOpen, setOldOpen] = useState<boolean>(false);
+  if (open !== oldOpen) {
+    setOldOpen(open);
+    if (coursePart !== undefined) setName(coursePart.name);
+  }
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>{t('course.models.create-model.title')}</DialogTitle>
+      <DialogTitle>
+        {coursePart !== undefined
+          ? t('course.models.create-model.part-title', {part: coursePart.name})
+          : t('course.models.create-model.final-grade-title')}
+      </DialogTitle>
       <DialogContent>
         <TextField
           sx={{mt: 1}}
@@ -90,11 +115,11 @@ const CreateGradingModelDialog = ({
             label={t('course.models.create-model.select-template')}
             onChange={e => setTemplate(e.target.value as GraphTemplate)}
           >
-            <MenuItem value={'none'}>
+            <MenuItem value="none">
               {t('course.models.create-model.none')}
             </MenuItem>
-            <MenuItem value={'addition'}>{t('shared.graph.node.add')}</MenuItem>
-            <MenuItem value={'average'}>
+            <MenuItem value="addition">{t('shared.graph.node.add')}</MenuItem>
+            <MenuItem value="average">
               {t('shared.graph.node.average')}
             </MenuItem>
           </Select>

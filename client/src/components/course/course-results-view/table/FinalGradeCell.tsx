@@ -1,16 +1,15 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {MoreVert} from '@mui/icons-material';
 import {Box, IconButton, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {FinalGradeData, GradingScale} from '@/common/types';
-import {findBestFinalGrade} from '@/utils/bestGrade';
-import {getGradeString} from '@/utils/textFormat';
+import type {FinalGradeData, GradingScale} from '@/common/types';
+import {findBestFinalGrade, getGradeString} from '@/utils';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
 
 type FinalGradeCellProps = {
@@ -29,7 +28,7 @@ const FinalGradeCell = ({
   const theme = useTheme();
 
   const [hover, setHover] = useState<boolean>(false);
-  const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const bestFinalGrade = findBestFinalGrade(finalGrades);
 
@@ -55,39 +54,37 @@ const FinalGradeCell = ({
       <span>{getGradeString(t, gradingScale, bestFinalGrade?.grade)}</span>
       {/* If there are multiple final grades "show more" icon*/}
       {(finalGrades.length > 1 || hover) && (
-        <>
-          <Tooltip
-            placement="top"
-            title={
-              finalGrades.length <= 1
-                ? t('course.results.edit-final')
-                : t('course.results.multiple-final')
-            }
+        <Tooltip
+          placement="top"
+          title={
+            finalGrades.length <= 1
+              ? t('course.results.edit-final')
+              : t('course.results.multiple-final')
+          }
+        >
+          <IconButton
+            color="primary"
+            sx={{
+              position: 'absolute',
+              right: '0px',
+              top: 'calc(50% - 20px)',
+            }}
+            onClick={(): void => setEditDialogOpen(true)}
           >
-            <IconButton
-              color="primary"
-              sx={{
-                position: 'absolute',
-                right: '0px',
-                top: 'calc(50% - 20px)',
-              }}
-              onClick={(): void => setGradeDialogOpen(true)}
-            >
-              <MoreVert />
-            </IconButton>
-          </Tooltip>
-        </>
+            <MoreVert />
+          </IconButton>
+        </Tooltip>
       )}
-      {
+      {editDialogOpen && (
         <EditFinalGradesDialog
-          open={gradeDialogOpen}
-          onClose={() => setGradeDialogOpen(false)}
+          open={editDialogOpen}
+          onClose={() => setEditDialogOpen(false)}
           userId={userId}
           finalGrades={finalGrades}
           title={t('course.results.final-of', {user: studentNumber})}
         />
-      }
-      {bestFinalGrade?.date && (
+      )}
+      {bestFinalGrade?.date !== undefined && (
         <Tooltip
           placement="top"
           title={t('course.results.final-on-date', {

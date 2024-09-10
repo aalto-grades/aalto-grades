@@ -1,18 +1,18 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {
-  Profile,
+  type Profile,
   Strategy as SamlStrategy,
-  VerifiedCallback as SamlVerifiedCallback,
+  type VerifiedCallback as SamlVerifiedCallback,
 } from '@node-saml/passport-saml';
 import {DOMParser} from '@xmldom/xmldom';
 import axios from 'axios';
-import {Request} from 'express';
-import {SelectReturnType, isArrayOfNodes, useNamespaces} from 'xpath';
+import type {Request} from 'express';
+import {type SelectReturnType, isArrayOfNodes, useNamespaces} from 'xpath';
 
-import {HttpCode, SystemRole} from '@/common/types';
+import {HttpCode, type SystemRole} from '@/common/types';
 import {
   DEV_SAML_IDP_CERT,
   NODE_ENV,

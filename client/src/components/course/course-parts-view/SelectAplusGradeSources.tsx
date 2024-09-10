@@ -11,13 +11,13 @@ import {
   FormControlLabel,
   FormGroup,
 } from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {AplusCourseData, NewAplusGradeSourceData} from '@/common/types';
-import {aplusGradeSourcesEqual} from '@/common/util/aplus';
+import type {AplusCourseData, NewAplusGradeSourceData} from '@/common/types';
+import {aplusGradeSourcesEqual} from '@/common/util';
 import {useFetchAplusExerciseData} from '@/hooks/useApi';
-import {getLatestAplusModuleDate, newAplusGradeSource} from '@/utils/utils';
+import {getLatestAplusModuleDate, newAplusGradeSource} from '@/utils';
 
 type PropsType = {
   aplusCourse: AplusCourseData;
@@ -38,16 +38,12 @@ const SelectAplusGradeSources = ({
   const {t} = useTranslation();
   const aplusExerciseData = useFetchAplusExerciseData(aplusCourse.id);
 
-  const isChecked = (newSource: NewAplusGradeSourceData): boolean => {
-    for (const source of selectedGradeSources) {
-      if (aplusGradeSourcesEqual(newSource, source)) {
-        return true;
-      }
-    }
-    return false;
-  };
+  const isChecked = (newSource: NewAplusGradeSourceData): boolean =>
+    selectedGradeSources.some(source =>
+      aplusGradeSourcesEqual(newSource, source)
+    );
 
-  if (aplusExerciseData.data === undefined) return <></>;
+  if (aplusExerciseData.data === undefined) return <>{t('general.loading')}</>;
 
   return (
     <>
@@ -57,9 +53,10 @@ const SelectAplusGradeSources = ({
         </AccordionSummary>
         <AccordionDetails>
           <FormControlLabel
+            label={t('general.full-points')}
             control={
               <Checkbox
-                defaultChecked={isChecked(
+                checked={isChecked(
                   newAplusGradeSource(
                     aplusCourse,
                     getLatestAplusModuleDate(aplusExerciseData.data),
@@ -80,7 +77,6 @@ const SelectAplusGradeSources = ({
                 }
               />
             }
-            label={t('general.full-points')}
           />
         </AccordionDetails>
       </Accordion>
@@ -93,9 +89,10 @@ const SelectAplusGradeSources = ({
             {aplusExerciseData.data.modules.map(module => (
               <FormControlLabel
                 key={module.id}
+                label={module.name}
                 control={
                   <Checkbox
-                    defaultChecked={isChecked(
+                    checked={isChecked(
                       newAplusGradeSource(aplusCourse, module.closingDate, {
                         module,
                       })
@@ -112,7 +109,6 @@ const SelectAplusGradeSources = ({
                     }
                   />
                 }
-                label={module.name}
               />
             ))}
           </FormGroup>
@@ -128,9 +124,10 @@ const SelectAplusGradeSources = ({
               module.exercises.map(exercise => (
                 <FormControlLabel
                   key={exercise.id}
+                  label={exercise.name}
                   control={
                     <Checkbox
-                      defaultChecked={isChecked(
+                      checked={isChecked(
                         newAplusGradeSource(aplusCourse, module.closingDate, {
                           exercise,
                         })
@@ -147,7 +144,6 @@ const SelectAplusGradeSources = ({
                       }
                     />
                   }
-                  label={exercise.name}
                 />
               ))
             )}
@@ -164,9 +160,10 @@ const SelectAplusGradeSources = ({
               {aplusExerciseData.data.difficulties.map(difficulty => (
                 <FormControlLabel
                   key={difficulty.difficulty}
+                  label={difficulty.difficulty}
                   control={
                     <Checkbox
-                      defaultChecked={isChecked(
+                      checked={isChecked(
                         newAplusGradeSource(
                           aplusCourse,
                           getLatestAplusModuleDate(aplusExerciseData.data),
@@ -187,7 +184,6 @@ const SelectAplusGradeSources = ({
                       }
                     />
                   }
-                  label={difficulty.difficulty}
                 />
               ))}
             </FormGroup>

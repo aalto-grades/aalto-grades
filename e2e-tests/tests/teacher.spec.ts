@@ -32,7 +32,7 @@ test.describe('Test courses as teacher', () => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page.getByRole('button', {name: 'Grading models'}).click();
 
-    await page.getByRole('button', {name: 'O1 Grading'}).click();
+    await page.getByRole('button', {name: 'Exercises 2024'}).click();
     await expect(page.getByTestId('rf__wrapper')).toBeVisible();
   });
 
@@ -64,7 +64,7 @@ test.describe('Test courses as teacher', () => {
       .getByRole('button')
       .click();
     await expect(page.getByText('Days valid')).toBeVisible();
-    await expect(page.getByText('Tier A')).toBeVisible();
+    await expect(page.getByText('Exercises 2024')).toBeVisible();
   });
 
   test('Add Course Part', async ({page}) => {
@@ -74,11 +74,13 @@ test.describe('Test courses as teacher', () => {
       .getByRole('button')
       .click();
     await expect(page.getByText('Days valid')).toBeVisible();
-    await expect(page.getByText('Tier A')).toBeVisible();
-    await page.getByRole('button', {name: 'Add new'}).click();
-    await page.getByRole('textbox', {name: 'Name'}).fill('test Tier D');
+    await expect(page.getByText('Exercises 2024')).toBeVisible();
+    await page.getByRole('button', {name: 'Add new course part'}).click();
+    await page.getByLabel('Name*').click();
+    await page.getByLabel('Name*').fill('Exercises 2025');
     await page.getByRole('button', {name: 'Save'}).click();
-    await page.getByRole('button', {name: 'Save'}).click();
-    await expect(page.getByText('test Tier D')).toBeVisible();
+    await expect(
+      page.getByRole('button', {name: 'Exercises 2025 No expiry date'})
+    ).toBeVisible();
   });
 });

@@ -1,12 +1,10 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
-import {CoursePartData, HttpCode} from '@/common/types';
-import {parseAplusGradeSource} from './aplus';
+import {type CoursePartData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
-import AplusGradeSource from '../../database/models/aplusGradeSource';
-import Course from '../../database/models/course';
+import type Course from '../../database/models/course';
 import CoursePart from '../../database/models/coursePart';
 import {ApiError, stringToIdSchema} from '../../types';
 
@@ -26,35 +24,26 @@ export const findCoursePartById = async (id: number): Promise<CoursePart> => {
   return coursePart;
 };
 
-/** Finds all course parts of a specific grading model. */
+/** Finds all course parts of a specific course id. */
 export const findCoursePartByCourseId = async (
   courseId: number
 ): Promise<CoursePartData[]> => {
-  const courseParts = (await CoursePart.findAll({
-    where: {courseId: courseId},
-    include: AplusGradeSource,
-    order: [['id', 'ASC']],
-  })) as (CoursePart & {
-    AplusGradeSources: AplusGradeSource[];
-  })[];
+  const courseParts = await CoursePart.findAll({where: {courseId: courseId}});
 
   return courseParts.map(
     (coursePart): CoursePartData => ({
       id: coursePart.id,
       courseId: coursePart.courseId,
       name: coursePart.name,
-      daysValid: coursePart.daysValid,
-      maxGrade: coursePart.maxGrade,
+      expiryDate:
+        coursePart.expiryDate !== null ? new Date(coursePart.expiryDate) : null,
       archived: coursePart.archived,
-      aplusGradeSources: coursePart.AplusGradeSources.map(gradeSource =>
-        parseAplusGradeSource(gradeSource)
-      ),
     })
   );
 };
 
 /**
- * Finds a grading model by url param id and also validates the url param.
+ * Finds a course part by url param id and also validates the url param.
  *
  * @throws ApiError(400|404) if not found.
  */
@@ -68,7 +57,7 @@ const findAndValidateCoursePartId = async (
       HttpCode.BadRequest
     );
   }
-  return await findCoursePartById(result.data);
+  return findCoursePartById(result.data);
 };
 
 /**
@@ -83,7 +72,7 @@ export const validateCoursePartBelongsToCourse = async (
 ): Promise<void> => {
   const coursePart = await findCoursePartById(coursePartId);
 
-  // Check that grading model belongs to the course.
+  // Check that course part belongs to the course.
   if (coursePart.courseId !== courseId) {
     throw new ApiError(
       `Course part ID ${coursePart.id} ` +
@@ -94,8 +83,8 @@ export const validateCoursePartBelongsToCourse = async (
 };
 
 /**
- * Finds the course and the grading model by url param ids and also validates
- * the url params.
+ * Finds the course and the course part by url param ids and also validates the
+ * url params.
  *
  * @throws ApiError(400|404|409) if either not found or invalid or if the course
  *   part does not belong to the course.
@@ -107,7 +96,7 @@ export const validateCoursePartPath = async (
   const course = await findAndValidateCourseId(courseId);
   const coursePart = await findAndValidateCoursePartId(coursePartId);
 
-  // Check that grading model belongs to the course.
+  // Check that course part belongs to the course.
   if (coursePart.courseId !== course.id) {
     throw new ApiError(
       `Course part ID ${coursePart.id} ` +

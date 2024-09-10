@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import cors from 'cors';
-import express, {Request} from 'express';
+import express, {type Request} from 'express';
 import helmet from 'helmet';
 
 import {HttpCode} from '@/common/types';

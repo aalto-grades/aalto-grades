@@ -13,10 +13,10 @@ import {
   AuthDataSchema,
   ChangeOwnAuthResponseSchema,
   HttpCode,
-  LoginResult,
+  type LoginResult,
   LoginResultSchema,
   ResetAuthResultSchema,
-  UserData,
+  type UserData,
 } from '@/common/types';
 import {app} from '../../src/app';
 import {
@@ -25,7 +25,7 @@ import {
 } from '../../src/configs/constants';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
-import {Cookies, getCookies} from '../util/getCookies';
+import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
 

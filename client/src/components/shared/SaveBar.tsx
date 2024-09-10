@@ -1,25 +1,26 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {ClearRounded, SaveOutlined} from '@mui/icons-material';
 import {Box, Button, Fade, Typography, useTheme} from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
-const SaveBar = ({
-  show,
-  handleSave,
-  handleDiscard,
-  loading,
-  disabled,
-}: {
+type PropsType = {
   show: boolean;
   loading?: boolean;
   disabled?: boolean;
   handleSave?: () => void;
   handleDiscard: () => void;
-}): JSX.Element => {
+};
+const SaveBar = ({
+  show,
+  handleSave,
+  handleDiscard,
+  loading = false,
+  disabled,
+}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const theme = useTheme();
   return (

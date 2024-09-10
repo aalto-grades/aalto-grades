@@ -6,16 +6,26 @@ import {ForeignKeyConstraintError} from 'sequelize';
 import {z} from 'zod';
 
 import {
-  AplusCourseData,
-  AplusExerciseData,
-  AplusGradeSourceData,
+  type AplusCourseData,
+  type AplusExerciseData,
+  type AplusGradeSourceData,
   AplusGradeSourceType,
   HttpCode,
   IdSchema,
-  NewAplusGradeSourceData,
-  NewGrade,
+  type NewAplusGradeSourceData,
+  type NewTaskGrade,
 } from '@/common/types';
-import {aplusGradeSourcesEqual} from '@/common/util/aplus';
+import {aplusGradeSourcesEqual} from '@/common/util';
+import {APLUS_API_URL} from '../configs/environment';
+import AplusGradeSource from '../database/models/aplusGradeSource';
+import {
+  ApiError,
+  AplusCoursesResSchema,
+  AplusExercisesResSchema,
+  AplusPointsResSchema,
+  type AplusStudentPoints,
+  type Endpoint,
+} from '../types';
 import {
   fetchFromAplus,
   parseAplusGradeSource,
@@ -23,34 +33,25 @@ import {
   validateAplusCourseId,
   validateAplusGradeSourcePath,
 } from './utils/aplus';
-import {validateCoursePartPath} from './utils/coursePart';
-import {APLUS_API_URL} from '../configs/environment';
-import AplusGradeSource from '../database/models/aplusGradeSource';
-import {
-  ApiError,
-  AplusCoursesRes,
-  AplusExercisesRes,
-  AplusPointsRes,
-  AplusStudentPoints,
-  Endpoint,
-} from '../types';
+import {validateCourseTaskPath} from './utils/courseTask';
 
 /**
  * () => AplusCourseData[]
  *
- * @throws ApiError(502)
+ * @throws ApiError(404|502)
  */
 export const fetchAplusCourses: Endpoint<void, AplusCourseData[]> = async (
   req,
   res
 ) => {
   const aplusToken = parseAplusToken(req);
-  const coursesRes = await fetchFromAplus<AplusCoursesRes>(
+  const coursesRes = await fetchFromAplus(
     `${APLUS_API_URL}/users/me`,
-    aplusToken
+    aplusToken,
+    AplusCoursesResSchema
   );
 
-  const staffCourses = coursesRes.data.staff_courses;
+  const staffCourses = coursesRes.staff_courses;
   if (staffCourses.length === 0) {
     throw new ApiError('no staff courses found in A+', HttpCode.NotFound);
   }
@@ -78,9 +79,10 @@ export const fetchAplusExerciseData: Endpoint<void, AplusExerciseData> = async (
   const aplusToken = parseAplusToken(req);
   const aplusCourseId = validateAplusCourseId(req.params.aplusCourseId);
 
-  const exercisesRes = await fetchFromAplus<AplusExercisesRes>(
+  const exercisesRes = await fetchFromAplus(
     `${APLUS_API_URL}/courses/${aplusCourseId}/exercises?format=json`,
-    aplusToken
+    aplusToken,
+    AplusExercisesResSchema
   );
 
   // Map from exercise IDs to difficulties
@@ -88,7 +90,7 @@ export const fetchAplusExerciseData: Endpoint<void, AplusExerciseData> = async (
 
   // There doesn't appear to be a better way to get difficulties
   const difficulties = new Set<string>();
-  for (const module of exercisesRes.data.results) {
+  for (const module of exercisesRes.results) {
     for (const exercise of module.exercises) {
       if (exercise.difficulty) {
         difficulties.add(exercise.difficulty);
@@ -101,7 +103,7 @@ export const fetchAplusExerciseData: Endpoint<void, AplusExerciseData> = async (
 
   const exerciseData: AplusExerciseData = {
     maxGrade: 0,
-    modules: exercisesRes.data.results.map(module => ({
+    modules: exercisesRes.results.map(module => ({
       id: module.id,
       name: module.display_name,
       closingDate: module.closing_time,
@@ -144,13 +146,13 @@ export const addAplusGradeSources: Endpoint<
   NewAplusGradeSourceData[],
   void
 > = async (req, res) => {
-  const partGradeSourcesById: {[key: number]: AplusGradeSource[]} = {};
+  const taskGradeSourcesById: {[key: number]: AplusGradeSource[]} = {};
   const newGradeSources: NewAplusGradeSourceData[] = req.body;
 
   for (const newGradeSource of newGradeSources) {
-    const [_, coursePart] = await validateCoursePartPath(
+    const [, , courseTask] = await validateCourseTaskPath(
       req.params.courseId,
-      String(newGradeSource.coursePartId)
+      String(newGradeSource.courseTaskId)
     );
 
     for (const other of newGradeSources.filter(
@@ -164,17 +166,17 @@ export const addAplusGradeSources: Endpoint<
       }
     }
 
-    if (!(coursePart.id in partGradeSourcesById)) {
-      partGradeSourcesById[coursePart.id] = await AplusGradeSource.findAll({
-        where: {coursePartId: coursePart.id},
+    if (!(courseTask.id in taskGradeSourcesById)) {
+      taskGradeSourcesById[courseTask.id] = await AplusGradeSource.findAll({
+        where: {courseTaskId: courseTask.id},
       });
     }
 
-    for (const partGradeSource of partGradeSourcesById[coursePart.id]) {
-      const parsed = parseAplusGradeSource(partGradeSource);
+    for (const taskGradeSource of taskGradeSourcesById[courseTask.id]) {
+      const parsed = parseAplusGradeSource(taskGradeSource);
       if (aplusGradeSourcesEqual(newGradeSource, parsed)) {
         throw new ApiError(
-          `course part with ID ${partGradeSource.coursePartId} ` +
+          `course task with ID ${taskGradeSource.courseTaskId} ` +
             `already has the A+ grade source ${JSON.stringify(newGradeSource)}`,
           HttpCode.Conflict
         );
@@ -206,7 +208,7 @@ export const deleteAplusGradeSource: Endpoint<void, void> = async (
   } catch (error) {
     if (
       error instanceof ForeignKeyConstraintError &&
-      error.index === 'attainment_grade_aplus_grade_source_id_fkey'
+      error.index === 'task_grade_aplus_grade_source_id_fkey'
     ) {
       throw new ApiError(
         'Tried to delete an A+ grade source with grades',
@@ -221,21 +223,21 @@ export const deleteAplusGradeSource: Endpoint<void, void> = async (
 };
 
 /**
- * () => NewGrade[]
+ * () => NewTaskGrade[]
  *
  * @throws ApiError(400|404|409|502)
  */
-export const fetchAplusGrades: Endpoint<void, NewGrade[]> = async (
+export const fetchAplusGrades: Endpoint<void, NewTaskGrade[]> = async (
   req,
   res
 ) => {
   const aplusToken = parseAplusToken(req);
-  let coursePartIds: number[] = [];
+  let courseTaskIds: number[] = [];
 
   try {
-    coursePartIds = z
+    courseTaskIds = z
       .array(IdSchema)
-      .parse(JSON.parse(String(req.query['course-parts'])));
+      .parse(JSON.parse(String(req.query['course-tasks'])));
   } catch (error) {
     if (error instanceof Error) {
       throw new ApiError(error.message, HttpCode.BadRequest);
@@ -250,20 +252,20 @@ export const fetchAplusGrades: Endpoint<void, NewGrade[]> = async (
    */
   const pointsResCache: {[key: number]: AplusStudentPoints[]} = {};
 
-  const newGrades: NewGrade[] = [];
-  for (const coursePartId of coursePartIds) {
-    const [, coursePart] = await validateCoursePartPath(
+  const newGrades: NewTaskGrade[] = [];
+  for (const courseTaskId of courseTaskIds) {
+    const [, , courseTask] = await validateCourseTaskPath(
       req.params.courseId,
-      String(coursePartId)
+      String(courseTaskId)
     );
 
     const gradeSources = (await AplusGradeSource.findAll({
-      where: {coursePartId: coursePart.id},
+      where: {courseTaskId: courseTask.id},
     })) as AplusGradeSourceData[];
 
     if (gradeSources.length === 0) {
       throw new ApiError(
-        `Course part with ID ${coursePart.id} has no A+ grade sources`,
+        `Course task with ID ${courseTask.id} has no A+ grade sources`,
         HttpCode.NotFound
       );
     }
@@ -272,12 +274,13 @@ export const fetchAplusGrades: Endpoint<void, NewGrade[]> = async (
       const aplusCourseId = gradeSource.aplusCourse.id;
 
       if (!(aplusCourseId in pointsResCache)) {
-        const pointsRes = await fetchFromAplus<AplusPointsRes>(
+        const pointsRes = await fetchFromAplus(
           `${APLUS_API_URL}/courses/${aplusCourseId}/points?format=json`,
-          aplusToken
+          aplusToken,
+          AplusPointsResSchema
         );
 
-        pointsResCache[aplusCourseId] = pointsRes.data.results;
+        pointsResCache[aplusCourseId] = pointsRes.results;
       }
 
       const points = pointsResCache[aplusCourseId];
@@ -331,15 +334,15 @@ export const fetchAplusGrades: Endpoint<void, NewGrade[]> = async (
 
         const date = new Date(gradeSource.date);
         const expiryDate = new Date(gradeSource.date);
-        expiryDate.setDate(date.getDate() + coursePart.daysValid);
+        expiryDate.setDate(date.getDate() + (courseTask.daysValid ?? 0));
 
         newGrades.push({
           studentNumber: student.student_id,
-          coursePartId: coursePart.id,
+          courseTaskId: courseTask.id,
           aplusGradeSourceId: gradeSource.id,
           grade: grade,
           date: date,
-          expiryDate: expiryDate,
+          expiryDate: courseTask.daysValid !== null ? expiryDate : null,
           comment: null,
         });
       }

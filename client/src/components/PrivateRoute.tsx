@@ -1,14 +1,14 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 // Used to determine if a user is authenticated and if they are allowed to access a page
 // if not, the user is redirected to the login page
 
-import {JSX, useEffect, useState} from 'react';
+import {type JSX, useEffect, useState} from 'react';
 import {Navigate, Outlet} from 'react-router-dom';
 
-import {SystemRole} from '@/common/types';
+import type {SystemRole} from '@/common/types';
 import {useGetRefreshToken} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 
@@ -36,7 +36,7 @@ const PrivateRoute = ({children, roles}: PropsType): JSX.Element | null => {
   if (!roles.includes(auth.role) && !isTeacherInCharge)
     return <Navigate to="/" />;
 
-  return <>{children ?? <Outlet />}</>;
+  return children ?? <Outlet />;
 };
 
 export default PrivateRoute;

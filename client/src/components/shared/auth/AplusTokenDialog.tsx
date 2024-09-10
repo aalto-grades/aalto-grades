@@ -12,10 +12,10 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {getAplusToken, setAplusToken} from '@/utils/utils';
+import {getAplusToken, setAplusToken} from '@/utils';
 
 type PropsType = {
   handleClose: () => void;
@@ -47,7 +47,7 @@ const AplusTokenDialog = ({
             https://plus.cs.aalto.fi/accounts/accounts/
           </Link>
         </Typography>
-        {currentToken && (
+        {currentToken !== null && (
           <Typography sx={{mt: 1}}>
             {t('shared.auth.a+-token.current')}: {currentToken}
           </Typography>
@@ -57,7 +57,7 @@ const AplusTokenDialog = ({
           label={t('shared.auth.a+-token.label')}
           value={token}
           onChange={e => setToken(e.target.value)}
-          required={true}
+          required
           error={
             (error && token.length === 0) ||
             (token.length > 0 && token.length !== 40)

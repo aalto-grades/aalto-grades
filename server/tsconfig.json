@@ -12,6 +12,7 @@
     "outDir": "build",
     "types": ["node", "jest"],
     "esModuleInterop": true,
+    "lib": ["es2022"],
     "strict": true,
     "target": "es6"
   },

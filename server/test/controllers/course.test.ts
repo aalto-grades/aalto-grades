@@ -5,16 +5,16 @@
 import supertest from 'supertest';
 
 import {
-  CourseData,
+  type CourseData,
   CourseDataArraySchema,
   CourseDataSchema,
-  EditCourseData,
+  type EditCourseData,
   GradingScale,
   HttpCode,
   IdSchema,
   Language,
-  NewCourseData,
-  TeacherData,
+  type NewCourseData,
+  type TeacherData,
 } from '@/common/types';
 import {app} from '../../src/app';
 import {
@@ -23,7 +23,7 @@ import {
 } from '../../src/controllers/utils/course';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
-import {Cookies, getCookies} from '../util/getCookies';
+import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
 
@@ -93,10 +93,10 @@ describe('Test GET /v1/courses/:courseId - get a course', () => {
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    let url = `/v1/courses/${1.2}`;
+    let url = '/v1/courses/1.2';
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
 
-    url = `/v1/courses/${'abc'}`;
+    url = '/v1/courses/abc';
     await responseTests.testBadRequest(url, cookies.adminCookie).get();
   });
 
@@ -494,7 +494,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
   });
 
   it('should respond with 400 if trying to edit grading scale of a course with final grades', async () => {
-    const [tmpCourseId, , modelId] = await createData.createCourse({});
+    const [tmpCourseId, , , modelId] = await createData.createCourse({});
     const student = await createData.createUser();
     await createData.createFinalGrade(
       tmpCourseId,

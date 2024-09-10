@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import axios from 'axios';
-import {ZodError} from 'zod';
+import type {ZodError} from 'zod';
 
 const axiosInstance = axios.create({
   withCredentials: true,

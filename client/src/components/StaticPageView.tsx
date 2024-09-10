@@ -1,17 +1,13 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {Box, Typography} from '@mui/material';
 import DOMPurify from 'dompurify';
-import React, {useEffect, useState} from 'react';
+import {type JSX, useEffect, useState} from 'react';
 
-interface StaticPageProps {
-  url: string;
-  title?: string;
-}
-
-const StaticPageView: React.FC<StaticPageProps> = ({url, title}) => {
+type PropsType = {url: string; title?: string};
+const StaticPageView = ({url, title}: PropsType): JSX.Element => {
   const [htmlContent, setHtmlContent] = useState<string>('');
 
   useEffect(() => {
@@ -44,12 +40,13 @@ const StaticPageView: React.FC<StaticPageProps> = ({url, title}) => {
         }}
         className="static-page-container"
       >
-        {title && (
+        {title !== undefined && (
           <Typography variant="h4" sx={{marginBottom: '16px'}}>
             {title}
           </Typography>
         )}
         <span
+          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(htmlContent)}}
         />
       </Box>

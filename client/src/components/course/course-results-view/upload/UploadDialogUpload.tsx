@@ -15,28 +15,28 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Snackbar,
   TextField,
 } from '@mui/material';
 import {
-  GridColDef,
-  GridRowClassNameParams,
-  GridRowModel,
-  GridRowsProp,
+  type GridColDef,
+  type GridRowClassNameParams,
+  type GridRowModel,
+  type GridRowsProp,
   GridToolbarContainer,
-  GridValidRowModel,
+  type GridValidRowModel,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
-import {ParseResult, parse, unparse} from 'papaparse';
-import {Dispatch, JSX, SetStateAction, useState} from 'react';
+import {type ParseResult, parse, unparse} from 'papaparse';
+import {type Dispatch, type JSX, type SetStateAction, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
+import type {CoursePartData} from '@/common/types';
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
-import AplusImportDialog from './AplusImportDialog';
-import {GradeUploadColTypes} from './UploadDialog';
-import MismatchDialog, {MismatchData} from './UploadDialogMismatchDialog';
+import MismatchDialog, {type MismatchData} from './MismatchDialog';
+import type {GradeUploadColTypes} from './UploadDialog';
 
 type PropsType = {
+  coursePart: CoursePartData | null;
   columns: GridColDef[];
   rows: GridRowsProp<GradeUploadColTypes>;
   maxGrades: {[key: string]: number | null};
@@ -47,6 +47,7 @@ type PropsType = {
   invalidValues: boolean;
 };
 const UploadDialogUpload = ({
+  coursePart,
   columns,
   rows,
   maxGrades,
@@ -62,33 +63,27 @@ const UploadDialogUpload = ({
   const [mismatchDialogOpen, setMismatchDialogOpen] = useState<boolean>(false);
   const [mismatchData, setMismatchData] = useState<MismatchData | null>(null);
   const [editText, setEditText] = useState<boolean>(rows.length > 0);
-  const [snackbar, setSnackBar] = useState<{
-    message: string;
-    severity: 'success' | 'error';
-  } | null>(null);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
-  const [aplusImportDialogOpen, setAplusImportDialogOpen] =
-    useState<boolean>(false);
 
-  const dataGridToolbar = (): JSX.Element => {
+  const DataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
       setRows(oldRows => {
-        const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
-        const fieldValues: GradeUploadColTypes = {
+        const freeId = Math.max(0, ...oldRows.map(row => row.id)) + 1;
+        const newRow: GradeUploadColTypes = {
           id: freeId,
         } as GradeUploadColTypes;
         for (const column of columns) {
-          if (column.field === 'studentNo') fieldValues[column.field] = '-';
-          else fieldValues[column.field] = 0;
+          if (column.field === 'studentNo') newRow[column.field] = '-';
+          else newRow[column.field] = 0;
         }
-        return oldRows.concat(fieldValues);
+        return oldRows.concat(newRow);
       });
     };
     return (
       <GridToolbarContainer>
         <Button startIcon={<Add />} onClick={handleClick}>
-          Add row
+          {t('general.add-row')}
         </Button>
       </GridToolbarContainer>
     );
@@ -206,7 +201,11 @@ const UploadDialogUpload = ({
 
   return (
     <>
-      <DialogTitle>{t('course.results.upload.upload-grades')}</DialogTitle>
+      <DialogTitle>
+        {t('course.results.upload.upload-grades-to-part', {
+          part: coursePart?.name,
+        })}
+      </DialogTitle>
       <Dialog
         open={textFieldOpen}
         fullWidth
@@ -251,30 +250,12 @@ const UploadDialogUpload = ({
         }
       />
 
-      <AplusImportDialog
-        handleClose={() => setAplusImportDialogOpen(false)}
-        open={aplusImportDialogOpen}
-      />
-
       <DialogContent sx={{minHeight: 500}}>
         <Collapse in={invalidValues}>
           <Alert severity="warning" sx={{mb: 2}}>
             {t('course.results.upload.higher-than-max')}
           </Alert>
         </Collapse>
-
-        <Snackbar
-          open={snackbar !== null}
-          autoHideDuration={3000}
-          onClose={() => setSnackBar(null)}
-        >
-          <Alert
-            severity={snackbar?.severity}
-            onClose={() => setSnackBar(null)}
-          >
-            {snackbar?.message}
-          </Alert>
-        </Snackbar>
         <Accordion
           expanded={expanded === 'upload'}
           onChange={(_, newExpanded) =>
@@ -300,13 +281,6 @@ const UploadDialogUpload = ({
               <Button variant="outlined" onClick={downloadTemplate}>
                 {t('course.results.upload.download-template')}
               </Button>
-              <Button
-                variant="outlined"
-                onClick={() => setAplusImportDialogOpen(true)}
-              >
-                {t('course.results.upload.a+-import')}
-              </Button>
-              <Button variant="outlined">Import from MyCourses</Button>
               <Button variant="outlined" onClick={() => setTextFieldOpen(true)}>
                 {t('course.results.upload.paste-text')}
               </Button>
@@ -332,7 +306,7 @@ const UploadDialogUpload = ({
                 editMode="row"
                 rowSelection={false}
                 disableColumnSelector
-                slots={{toolbar: dataGridToolbar}}
+                slots={{toolbar: DataGridToolbar}}
                 onRowEditStart={() => {
                   setEditing(true);
                   setReady(false);

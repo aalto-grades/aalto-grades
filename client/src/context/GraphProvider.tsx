@@ -4,9 +4,9 @@
 
 import {createContext} from 'react';
 
-import {NodeData, NodeSettings, NodeValues} from '@/common/types/graph';
+import type {NodeData, NodeSettings, NodeValues} from '@/common/types';
 
-type NodeValuesContext = {nodeValues: NodeValues};
+type NodeValuesContext = NodeValues;
 export const NodeValuesContext = createContext<NodeValuesContext>(
   {} as NodeValuesContext
 );
@@ -23,9 +23,7 @@ export const NodeDataContext = createContext<NodeDataContext>(
 export type ExtraNodeData = {
   [key: string]: {warning?: string} | undefined;
 };
-type ExtraNodeDataContext = {
-  extraNodeData: ExtraNodeData;
-};
+type ExtraNodeDataContext = ExtraNodeData;
 export const ExtraNodeDataContext = createContext<ExtraNodeDataContext>(
   {} as ExtraNodeDataContext
 );

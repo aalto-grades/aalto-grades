@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  CreationOptional,
+  type CreationOptional,
   DataTypes,
-  InferAttributes,
-  InferCreationAttributes,
+  type InferAttributes,
+  type InferCreationAttributes,
   Model,
 } from 'sequelize';
 
-import {GradingScale, Language} from '@/common/types';
+import type {GradingScale, Language} from '@/common/types';
 import {sequelize} from '..';
 
 export default class Course extends Model<

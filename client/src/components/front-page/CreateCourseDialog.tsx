@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -24,8 +24,8 @@ import {
   MenuItem,
   TextField,
 } from '@mui/material';
-import {Formik, FormikHelpers, FormikProps} from 'formik';
-import {JSX, useState} from 'react';
+import {Formik, type FormikHelpers, type FormikProps} from 'formik';
+import {type JSX, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
@@ -35,14 +35,17 @@ import {
   AaltoEmailSchema,
   GradingScale,
   Language,
-  NewCourseData,
+  type NewCourseData,
 } from '@/common/types';
 import FormField from '@/components/shared/FormikField';
 import FormLanguagesField from '@/components/shared/FormikLanguageField';
 import {useAddCourse} from '@/hooks/useApi';
 import {useLocalize} from '@/hooks/useLocalize';
-import {convertToClientGradingScale} from '@/utils/textFormat';
-import {departments, sisuLanguageOptions} from '@/utils/utils';
+import {
+  convertToClientGradingScale,
+  departments,
+  sisuLanguageOptions,
+} from '@/utils';
 
 type FormData = {
   courseCode: string;
@@ -212,7 +215,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               select
             >
               {departments.map((department, i) => (
-                <MenuItem key={i} value={i}>
+                <MenuItem key={department.en} value={i}>
                   {localize(department)}
                 </MenuItem>
               ))}
@@ -375,7 +378,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               {assistants.length === 0 ? (
                 t('course.edit.no-assistants')
               ) : (
-                <List dense={true}>
+                <List dense>
                   {assistants.map((emailAssistant: string) => (
                     <ListItem
                       key={emailAssistant}

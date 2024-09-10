@@ -1,0 +1,371 @@
+# SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+---
+definitions:
+  GradeId:
+    type: integer
+    description: Internal grade database ID.
+    format: int32
+    minimum: 0
+    example: 1
+  Grade:
+    type: number
+    description: The numerical grade of a student for a course part.
+    format: int32
+    minimum: 0
+    example: 5
+
+  SisuUploadData:
+    type: object
+    description: Sisu CSV options
+    properties:
+      assessmentDate:
+        type: string
+        format: date
+        description: Override existing assessment date
+        example: 2024-05-01T00:00:00.000Z
+      completionLanguage:
+        type: string
+        enum: [FI, SV, EN, ES, JA, ZH, PT, FR, DE, RU]
+        description: Override existing completion language
+        example: EN
+      studentNumbers:
+        type: array
+        description: Student numbers to download csv for
+        items:
+          $ref: '#/definitions/StudentNumber'
+    required:
+      - assessmentDate
+      - completionLanguage
+      - studentNumbers
+
+  GradeData:
+    type: object
+    description: Grade data.
+    properties:
+      gradeId:
+        $ref: '#/definitions/GradeId'
+      grader:
+        $ref: '#/definitions/UserData'
+      aplusGradeSource:
+        nullable: true
+        allOf:
+          - $ref: '#/definitions/AplusGradeSourceData'
+      grade:
+        $ref: '#/definitions/Grade'
+      exportedToSisu:
+        type: string
+        nullable: true
+        format: date
+        description: Date when grade was exported to sisu
+        example: 2024-05-01T00:00:00.000Z
+      date:
+        type: string
+        format: date
+        description: Date when grade was graded (e.g., deadline or exam date)
+        example: 2024-04-01T00:00:00.000Z
+      expiryDate:
+        type: string
+        format: date
+        description: Date when the grade expires.
+        example: 2025-04-01T00:00:00.000Z
+      comment:
+        type: string
+        nullable: true
+        description: Comment for grade.
+        example: Good job!
+    required:
+      - gradeId
+      - grader
+      - aplusGradeSourceId
+      - grade
+      - exportedToSisu
+      - date
+      - expiryDate
+      - comment
+
+  NewGrade:
+    type: object
+    description: Grade data.
+    properties:
+      studentNumber:
+        type: string
+        description: User's student number
+        example: 1234567
+      coursePartId:
+        $ref: '#/definitions/CoursePartId'
+      aplusGradeSourceId:
+        $ref: '#/definitions/AplusGradeSourceId'
+      grade:
+        $ref: '#/definitions/Grade'
+      date:
+        type: string
+        format: date
+        description: Date when grade was graded (e.g., deadline or exam date)
+        example: 2024-04-01T00:00:00.000Z
+      expiryDate:
+        type: string
+        format: date
+        description: Date when the grade expires.
+        example: 2025-04-01T00:00:00.000Z
+      comment:
+        type: string
+        nullable: true
+        description: Comment for grade.
+        example: Good job!
+    required:
+      - studentNumber
+      - coursePartId
+      - grade
+      - date
+      - expiryDate
+      - comment
+
+  EditGrade:
+    type: object
+    description: Grade data.
+    properties:
+      grade:
+        $ref: '#/definitions/Grade'
+      exportedToSisu:
+        type: string
+        nullable: true
+        format: date
+        description: Date when grade was exported to sisu
+        example: 2024-05-01T00:00:00.000Z
+      date:
+        type: string
+        format: date
+        description: Date when grade was graded (e.g., deadline or exam date)
+        example: 2024-04-01T00:00:00.000Z
+      expiryDate:
+        type: string
+        format: date
+        description: Date when the grade expires.
+        example: 2025-04-01T00:00:00.000Z
+      comment:
+        type: string
+        nullable: true
+        description: Comment for grade.
+        example: Good job!
+
+  StudentRow:
+    type: object
+    description:
+    properties:
+      user:
+        $ref: '#/definitions/UserData'
+      finalGrades:
+        type: array
+        items:
+          $ref: '#/definitions/FinalGradeData'
+      courseParts:
+        type: array
+        items:
+          type: object
+          properties:
+            coursePartId:
+              $ref: '#/definitions/CoursePartId'
+            coursePartName:
+              $ref: '#/definitions/CoursePartName'
+            grades:
+              type: array
+              items:
+                $ref: '#/definitions/GradeData'
+
+  LatestGrades:
+    type: array
+    description: Latest grades for each student
+    items:
+      type: object
+      properties:
+        userId:
+          $ref: '#/definitions/UserId'
+        date:
+          type: string
+          format: date
+          description: Date of the latest grade
+          example: 2024-05-01T00:00:00.000Z
+      required:
+        - userId
+        - date
+
+/v1/courses/{courseId}/grades:
+  get:
+    tags: [Task Grade]
+    description: >
+      Get the grades of all students.
+      Available only to admin users and teachers & assistants of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+    responses:
+      200:
+        description: Returns all grades of the course.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/StudentRow'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+    security:
+      - cookieAuth: []
+  post:
+    tags: [Task Grade]
+    description: >
+      Add new grades to the course.
+      Available only to admin users and teachers & assistants of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/NewGrade'
+    responses:
+      201:
+        description: Grades added.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+
+/v1/courses/{courseId}/grades/{gradeId}:
+  put:
+    tags: [Task Grade]
+    description: >
+      Edit grade.
+      Available only to admin users and teachers & assistants of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/components/parameters/gradeId'
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/EditGrade'
+    responses:
+      200:
+        description: Grade edited.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+  delete:
+    tags: [Task Grade]
+    description: >
+      Delete grade.
+      Available only to admin users and teachers & assistants of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/components/parameters/gradeId'
+    responses:
+      200:
+        description: Grade deleted.
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+      409:
+        $ref: '#/components/responses/Conflict'
+    security:
+      - cookieAuth: []
+
+/v1/latest-grades:
+  get:
+    tags: [Task Grade]
+    description: Get latest grade date for each student
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: array
+            description: User IDs to query
+            items:
+              $ref: '#/definitions/UserId'
+    responses:
+      200:
+        description: The dates of the latest grades for each student.
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/LatestGrades'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+    security:
+      - cookieAuth: []
+
+/v1/courses/{courseId}/grading-models/{gradingModelId}/grades/csv/sisu:
+  get:
+    tags: [Task Grade]
+    description: >
+      Get the final grades of all students in a Sisu compatible CSV format.
+      Results can be filtered by student numbers or particular instance ID.
+      Available only to admin users and teachers in charge of the course.
+    parameters:
+      - $ref: '#/components/parameters/courseId'
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/definitions/SisuUploadData'
+    responses:
+      200:
+        description: Sisu formatted CSV.
+        content:
+          text/csv:
+            description: CSV file with course results.
+            schema:
+              type: string
+            example: |
+              studentNumber,grade,credits,assessmentDate,completionLanguage
+              352772,5,5,26.5.2023,fi
+              812472,4,5,26.5.2023,fi
+              545761,5,5,26.5.2023,fi
+              662292,2,5,26.5.2023,fi
+      400:
+        $ref: '#/components/responses/BadRequest'
+      401:
+        $ref: '#/components/responses/Unauthorized'
+      403:
+        $ref: '#/components/responses/Forbidden'
+      404:
+        $ref: '#/components/responses/NotFound'
+    security:
+      - cookieAuth: []

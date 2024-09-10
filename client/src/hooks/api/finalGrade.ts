@@ -1,24 +1,24 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult,
+  type UseMutationOptions,
+  type UseMutationResult,
+  type UseQueryOptions,
+  type UseQueryResult,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
 
 import {
-  EditFinalGrade,
-  FinalGradeData,
+  type EditFinalGrade,
+  type FinalGradeData,
   FinalGradeDataArraySchema,
-  NewFinalGrade,
+  type NewFinalGrade,
 } from '@/common/types';
-import {Numeric} from '@/types';
+import type {Numeric} from '@/types';
 import axios from './axios';
 
 export const useGetFinalGrades = (
@@ -41,7 +41,7 @@ export const useAddFinalGrades = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: newFinalGrades =>
+    mutationFn: async newFinalGrades =>
       axios.post(`/api/v1/courses/${courseId}/final-grades`, newFinalGrades),
 
     onSuccess: () => {
@@ -62,7 +62,7 @@ export const useEditFinalGrade = (
   options?: UseMutationOptions<void, unknown, EditFinalGradeVars>
 ): UseMutationResult<void, unknown, EditFinalGradeVars> =>
   useMutation({
-    mutationFn: vars =>
+    mutationFn: async vars =>
       axios.put(
         `/api/v1/courses/${courseId}/final-grades/${vars.finalGradeId}`,
         vars.data
@@ -77,7 +77,7 @@ export const useDeleteFinalGrade = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: finalGradeId =>
+    mutationFn: async finalGradeId =>
       axios.delete(`/api/v1/courses/${courseId}/final-grades/${finalGradeId}`),
 
     onSuccess: () => {

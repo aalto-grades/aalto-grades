@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  FilledInputProps,
-  InputProps as InputPropsType,
-  OutlinedInputProps,
+  type FilledInputProps,
+  type InputProps as InputPropsType,
+  type OutlinedInputProps,
   TextField,
 } from '@mui/material';
-import {FormikProps} from 'formik';
-import {HTMLInputTypeAttribute, JSX, PropsWithChildren} from 'react';
+import type {FormikProps} from 'formik';
+import type {HTMLInputTypeAttribute, JSX, PropsWithChildren} from 'react';
 
 type PropsType = {
   form: FormikProps<{[key: string]: unknown}>;
@@ -41,7 +41,7 @@ const FormField = ({
     name={value}
     type={type ?? 'text'}
     fullWidth
-    value={form.values[value]}
+    value={form.values[value] ?? ''} // Convert nulls in to empty values to prevent warnings
     disabled={disabled || form.isSubmitting}
     label={label}
     InputLabelProps={{shrink: true}}

@@ -1,8 +1,8 @@
-# SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+# SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 #
 # SPDX-License-Identifier: MIT
 
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 RUN mkdir common server && chown node:node server
@@ -31,8 +31,10 @@ COPY server/src ./src
 USER node
 RUN npm run build
 
+# Sleep 10s to wait for the database to come up. Not optimal but works
 EXPOSE 3000
 CMD ["/bin/sh", "-c", "\
+    sleep 10 && \
     npm run migration:up && \
     npm run seed:up && \
     npm run citest"]

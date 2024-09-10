@@ -1,29 +1,31 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {AccountTreeRounded, Error} from '@mui/icons-material';
 import {Box, IconButton, Tooltip} from '@mui/material';
-import {JSX, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {GradingScale} from '@/common/types';
-import {GroupedStudentRow} from '@/context/GradesTableProvider';
+import type {GradingScale} from '@/common/types';
+import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useGetAllGradingModels} from '@/hooks/useApi';
-import {getGradeString} from '@/utils/textFormat';
+import {getGradeString} from '@/utils';
 
 type PropsType = {
   row: GroupedStudentRow;
   gradingModelIds: number[] | undefined;
   onClick: () => void;
-  gradingScale: GradingScale;
+  gradingScale?: GradingScale | null;
+  value?: number | null;
 };
 const PredictedGradeCell = ({
   row,
   gradingModelIds,
   onClick,
-  gradingScale,
+  gradingScale = null,
+  value = null,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const [hover, setHover] = useState<boolean>(false);
@@ -78,15 +80,17 @@ const PredictedGradeCell = ({
         disableInteractive
       >
         <p style={{margin: 0, display: 'inline'}}>
-          {gradingModelIds
-            ?.map(modelId =>
-              getGradeString(
-                t,
-                gradingScale,
-                row.predictedFinalGrades?.[modelId]?.finalGrade
-              )
-            )
-            .join(' / ') || 'N/A'}
+          {gradingScale !== null
+            ? gradingModelIds
+                ?.map(modelId =>
+                  getGradeString(
+                    t,
+                    gradingScale,
+                    row.predictedGraphValues?.[modelId]?.finalGrade
+                  )
+                )
+                .join(' / ') || 'N/A'
+            : value!}
         </p>
       </Tooltip>
       {gradingModelIds !== undefined && gradingModelIds.length > 0 && hover && (

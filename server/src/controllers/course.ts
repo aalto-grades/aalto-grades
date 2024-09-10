@@ -2,17 +2,29 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Transaction, UniqueConstraintError} from 'sequelize';
+import {type Transaction, UniqueConstraintError} from 'sequelize';
 
 import {
-  CourseData,
+  type CourseData,
   CourseRoleType,
-  EditCourseData,
+  type EditCourseData,
   HttpCode,
   Language,
-  NewCourseData,
+  type NewCourseData,
   SystemRole,
 } from '@/common/types';
+import {sequelize} from '../database';
+import Course from '../database/models/course';
+import CourseRole from '../database/models/courseRole';
+import CourseTranslation from '../database/models/courseTranslation';
+import FinalGrade from '../database/models/finalGrade';
+import User from '../database/models/user';
+import {
+  ApiError,
+  type CourseFull,
+  type Endpoint,
+  type JwtClaims,
+} from '../types';
 import {
   findAndValidateCourseId,
   findCourseFullById,
@@ -21,13 +33,6 @@ import {
   validateEmailList,
   validateRoleUniqueness,
 } from './utils/course';
-import {sequelize} from '../database';
-import Course from '../database/models/course';
-import CourseRole from '../database/models/courseRole';
-import CourseTranslation from '../database/models/courseTranslation';
-import FinalGrade from '../database/models/finalGrade';
-import User from '../database/models/user';
-import {ApiError, CourseFull, Endpoint, JwtClaims} from '../types';
 
 /**
  * () => CourseData

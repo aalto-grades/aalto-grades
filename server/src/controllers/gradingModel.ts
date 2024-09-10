@@ -1,23 +1,24 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
 
 import {
-  EditGradingModelData,
-  GradingModelData,
+  type EditGradingModelData,
+  type GradingModelData,
   HttpCode,
-  NewGradingModelData,
+  type NewGradingModelData,
 } from '@/common/types';
+import GradingModel from '../database/models/gradingModel';
+import {ApiError, type Endpoint} from '../types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {findCoursePartByCourseId} from './utils/coursePart';
+import {findCourseTaskByCourseId} from './utils/courseTask';
 import {
-  checkGradingModelCourseParts,
+  checkGradingModelSources,
   validateGradingModelPath,
 } from './utils/gradingModel';
-import GradingModel from '../database/models/gradingModel';
-import {ApiError, Endpoint} from '../types';
 
 /**
  * () => GradingModelData
@@ -33,14 +34,23 @@ export const getGradingModel: Endpoint<void, GradingModelData> = async (
     req.params.gradingModelId
   );
   const coursePartData = await findCoursePartByCourseId(course.id);
+  const courseTaskData = await findCourseTaskByCourseId(course.id);
 
   res.json({
     id: gradingModel.id,
     courseId: gradingModel.courseId,
+    coursePartId: gradingModel.coursePartId,
     name: gradingModel.name,
     graphStructure: gradingModel.graphStructure,
     archived: gradingModel.archived,
-    ...checkGradingModelCourseParts(gradingModel, coursePartData),
+    ...checkGradingModelSources(
+      gradingModel,
+      gradingModel.coursePartId !== null
+        ? courseTaskData.filter(
+            task => task.coursePartId === gradingModel.coursePartId
+          )
+        : coursePartData
+    ),
   });
 };
 
@@ -55,6 +65,7 @@ export const getAllGradingModels: Endpoint<void, GradingModelData[]> = async (
 ) => {
   const course = await findAndValidateCourseId(req.params.courseId);
   const coursePartData = await findCoursePartByCourseId(course.id);
+  const courseTaskData = await findCourseTaskByCourseId(course.id);
 
   const gradingModels = await GradingModel.findAll({
     where: {courseId: course.id},
@@ -65,10 +76,18 @@ export const getAllGradingModels: Endpoint<void, GradingModelData[]> = async (
     gradingModelsData.push({
       id: gradingModel.id,
       courseId: gradingModel.courseId,
+      coursePartId: gradingModel.coursePartId,
       name: gradingModel.name,
       graphStructure: gradingModel.graphStructure,
       archived: gradingModel.archived,
-      ...checkGradingModelCourseParts(gradingModel, coursePartData),
+      ...checkGradingModelSources(
+        gradingModel,
+        gradingModel.coursePartId !== null
+          ? courseTaskData.filter(
+              task => task.coursePartId === gradingModel.coursePartId
+            )
+          : coursePartData
+      ),
     });
   }
 
@@ -86,26 +105,42 @@ export const addGradingModel: Endpoint<NewGradingModelData, number> = async (
 ) => {
   const courseId = await validateCourseId(req.params.courseId);
 
-  // Find or create new grading model based on name and course ID.
-  const [gradingModel, created] = await GradingModel.findOrCreate({
-    where: {
-      name: req.body.name,
-      courseId: courseId,
-    },
-    defaults: {
-      name: req.body.name,
-      graphStructure: req.body.graphStructure,
-    },
-  });
+  let modelId;
+  try {
+    const [gradingModel, created] = await GradingModel.findOrCreate({
+      where: {
+        name: req.body.name,
+        courseId: courseId,
+      },
+      defaults: {
+        name: req.body.name,
+        courseId: courseId,
+        coursePartId: req.body.coursePartId,
+        graphStructure: req.body.graphStructure,
+      },
+    });
 
-  if (!created) {
-    throw new ApiError(
-      `Grading model with name '${req.body.name}' already exists in course ID ${courseId}`,
-      HttpCode.Conflict
-    );
+    if (!created) {
+      throw new ApiError(
+        `Grading model with name '${req.body.name}' already exists in course ID ${courseId}`,
+        HttpCode.Conflict
+      );
+    }
+    modelId = gradingModel.id;
+  } catch (error) {
+    // Duplicate course part id error
+    if (error instanceof UniqueConstraintError) {
+      throw new ApiError(
+        'There cannot be two grading models for the same course part',
+        HttpCode.Conflict
+      );
+    }
+
+    // Other error
+    throw error;
   }
 
-  res.status(HttpCode.Created).json(gradingModel.id);
+  res.status(HttpCode.Created).json(modelId);
 };
 
 /**

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -12,30 +12,34 @@ import {
 } from '@mui/material';
 import {
   GridActionsCellItem,
-  GridCellParams,
-  GridColDef,
-  GridRowClassNameParams,
-  GridRowModel,
-  GridRowsProp,
+  type GridCellParams,
+  type GridColDef,
+  type GridRowClassNameParams,
+  type GridRowModel,
+  type GridRowsProp,
   GridToolbarContainer,
-  GridValidRowModel,
+  type GridValidRowModel,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useEffect, useMemo, useState} from 'react';
+import {type JSX, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker, useParams} from 'react-router-dom';
 
-import {EditGradeData, GradeData, NewGrade} from '@/common/types';
+import type {
+  EditTaskGradeData,
+  NewTaskGrade,
+  TaskGradeData,
+} from '@/common/types';
 import StyledDataGrid, {
-  GetRowClassName,
-  ProcessRowUpdate,
+  type GetRowClassName,
+  type ProcessRowUpdate,
 } from '@/components/shared/StyledDataGrid';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {useTableContext} from '@/context/useTableContext';
 import {useAddGrades, useDeleteGrade, useEditGrade} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
-import {findBestGrade} from '@/utils/bestGrade';
+import {findBestGrade} from '@/utils';
 
 type ColTypes = {
   id: number;
@@ -43,7 +47,7 @@ type ColTypes = {
   grader: string;
   grade: number;
   date: Date;
-  expiryDate: Date;
+  expiryDate: Date | null;
   exported: boolean;
   comment: string;
   selected: string;
@@ -54,16 +58,16 @@ type PropsType = {
   open: boolean;
   onClose: () => void;
   studentNumber: string;
-  coursePartId: number;
+  courseTaskId: number;
   maxGrade: number | null;
   title: string;
-  grades: GradeData[];
+  grades: TaskGradeData[];
 };
 const EditGradesDialog = ({
   open,
   onClose,
   studentNumber,
-  coursePartId,
+  courseTaskId,
   maxGrade,
   title,
   grades,
@@ -186,6 +190,7 @@ const EditGradesDialog = ({
       type: 'actions',
       getActions: params => [
         <GridActionsCellItem
+          key={params.id}
           icon={<Delete />}
           label={t('general.delete')}
           onClick={() =>
@@ -205,7 +210,7 @@ const EditGradesDialog = ({
   const dataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
       setRows(oldRows => {
-        const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
+        const freeId = Math.max(0, ...oldRows.map(row => row.id)) + 1;
         const newRow: ColTypes = {
           id: freeId,
           gradeId: -1,
@@ -231,15 +236,15 @@ const EditGradesDialog = ({
   };
 
   const handleSubmit = async (): Promise<void> => {
-    const newGrades: NewGrade[] = [];
+    const newGrades: NewTaskGrade[] = [];
     const deletedGrades: number[] = [];
-    const editedGrades: {gradeId: number; data: EditGradeData}[] = [];
+    const editedGrades: {gradeId: number; data: EditTaskGradeData}[] = [];
 
     for (const row of rows) {
       if (row.gradeId === -1) {
         newGrades.push({
           studentNumber,
-          coursePartId,
+          courseTaskId,
           grade: row.grade,
           date: row.date,
           expiryDate: row.expiryDate,
@@ -265,8 +270,8 @@ const EditGradesDialog = ({
 
     await Promise.all([
       addGrades.mutateAsync(newGrades),
-      ...deletedGrades.map(gradeId => deleteGrade.mutateAsync(gradeId)),
-      ...editedGrades.map(editData => editGrade.mutateAsync(editData)),
+      ...deletedGrades.map(async gradeId => deleteGrade.mutateAsync(gradeId)),
+      ...editedGrades.map(async editData => editGrade.mutateAsync(editData)),
     ]);
 
     onClose();
@@ -276,6 +281,11 @@ const EditGradesDialog = ({
 
   type RowType = GridRowModel<ColTypes>;
   const processRowUpdate = (newRow: RowType, oldRow: RowType): RowType => {
+    if (!newRow.expiryDate || !oldRow.expiryDate) {
+      setError(false);
+      return newRow;
+    }
+
     const diff = newRow.date.getTime() - oldRow.date.getTime(); // Diff to update expiration date with
 
     if (

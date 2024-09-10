@@ -1,23 +1,24 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
-import {TFunction} from 'i18next';
+import type {TFunction} from 'i18next';
 
 import {
-  CoursePartData,
-  GradingModelData,
+  type CourseTaskData,
+  type GradingModelData,
   GradingScale,
-  StudentRow,
+  type StudentRow,
 } from '@/common/types';
-import {batchCalculateGraph} from '@/common/util/calculateGraph';
-import {
+import {batchCalculateFinalGrades} from '@/common/util';
+import type {
   ExtendedStudentRow,
   GroupedStudentRow,
+  PredictedGraphValues,
   RowError,
   RowErrorType,
 } from '@/context/GradesTableProvider';
-import {GradeSelectOption, findBestGrade} from './bestGrade';
+import {type GradeSelectOption, findBestGrade} from './bestGrade';
 
 /**
  * Groups the student rows by their latest best grade date.
@@ -31,15 +32,15 @@ export const groupByLatestBestGrade = (
   gradeSelectOption: GradeSelectOption
 ): GroupedStudentRow[] => {
   const findLatestBestGradeDate = (row: StudentRow): string => {
-    let newestDate = new Date('1970-01-01');
+    let newestDate = new Date(0);
 
-    for (const coursePart of row.courseParts) {
-      const bestGrade = findBestGrade(coursePart.grades, {
+    for (const courseTask of row.courseTasks) {
+      const bestGrade = findBestGrade(courseTask.grades, {
         expiredOption: 'prefer_non_expired',
         gradeSelectOption,
       });
       const bestGradeDate =
-        bestGrade === null ? new Date('1970-01-01') : new Date(bestGrade.date);
+        bestGrade === null ? new Date(0) : new Date(bestGrade.date);
 
       // Get best grade date for each course part and get the newest
       if (bestGradeDate > newestDate) newestDate = bestGradeDate;
@@ -56,10 +57,10 @@ export const groupByLatestBestGrade = (
 };
 
 export const findLatestGrade = (row: StudentRow): Date => {
-  let latestDate = new Date(1970, 0, 1);
-  for (const coursePart of row.courseParts) {
-    for (const grade of coursePart.grades) {
-      if (grade.date.getTime() > latestDate.getTime()) latestDate = grade.date;
+  let latestDate = new Date(0);
+  for (const courseTask of row.courseTasks) {
+    for (const grade of courseTask.grades) {
+      if (grade.date > latestDate) latestDate = grade.date;
     }
   }
   return latestDate;
@@ -78,20 +79,22 @@ export const predictGrades = (
   gradingModels: GradingModelData[],
   gradeSelectOption: GradeSelectOption
 ): {
-  [key: GradingModelData['id']]: ReturnType<typeof batchCalculateGraph>;
+  [key: GradingModelData['id']]: ReturnType<typeof batchCalculateFinalGrades>;
 } => {
   const result: {
-    [key: GradingModelData['id']]: ReturnType<typeof batchCalculateGraph>;
+    [key: GradingModelData['id']]: ReturnType<typeof batchCalculateFinalGrades>;
   } = {};
   for (const gradingModel of gradingModels) {
-    result[gradingModel.id] = batchCalculateGraph(
-      gradingModel.graphStructure,
+    if (gradingModel.coursePartId !== null) continue;
+    result[gradingModel.id] = batchCalculateFinalGrades(
+      gradingModel,
+      gradingModels,
       rows.map(row => ({
         userId: row.user.id,
-        courseParts: row.courseParts.map(coursePart => ({
-          coursePartId: coursePart.coursePartId,
-          grade:
-            findBestGrade(coursePart.grades, {gradeSelectOption})?.grade ?? 0, // TODO: Handle grade expiration
+        courseTasks: row.courseTasks.map(task => ({
+          id: task.courseTaskId,
+          // TODO: Manage expired course tasks?
+          grade: findBestGrade(task.grades, {gradeSelectOption})?.grade ?? 0,
         })),
       }))
     );
@@ -100,27 +103,27 @@ export const predictGrades = (
 };
 
 export const invalidGradesCheck = (
-  t: TFunction<'translation', undefined>,
+  t: TFunction,
   row: StudentRow,
-  courseParts: CoursePartData[]
+  courseTasks: CourseTaskData[]
 ): RowError[] => {
   const errors: RowError[] = [];
   const maxGrades = Object.fromEntries(
-    courseParts.map(coursePart => [coursePart.id, coursePart.maxGrade])
+    courseTasks.map(courseTask => [courseTask.id, courseTask.maxGrade])
   );
 
-  for (const coursePart of row.courseParts) {
-    const maxGrade = maxGrades[coursePart.coursePartId];
+  for (const courseTask of row.courseTasks) {
+    const maxGrade = maxGrades[courseTask.courseTaskId];
     if (
-      coursePart.coursePartId in maxGrades &&
+      courseTask.courseTaskId in maxGrades &&
       maxGrade !== null &&
-      coursePart.grades.some(grade => grade.grade > maxGrade)
+      courseTask.grades.some(grade => grade.grade > maxGrade)
     )
       errors.push({
         message: t('utils.grade-higher-than-max'),
         type: 'InvalidGrade',
         info: {
-          columnId: coursePart.coursePartName,
+          columnId: courseTask.courseTaskName,
         },
       });
   }
@@ -129,20 +132,20 @@ export const invalidGradesCheck = (
 };
 
 export const predictedGradesErrorCheck = (
-  t: TFunction<'translation', undefined>,
-  studentPredictedGrades: {[k: string]: {finalGrade: number}},
+  t: TFunction,
+  studentPredictedGrades: PredictedGraphValues,
   courseScale: GradingScale
 ): RowError[] => {
   const errors: RowError[] = [];
   for (const [modelId, grade] of Object.entries(studentPredictedGrades)) {
+    // Check if model is a course part model.
+    if (Object.keys(grade.courseParts).length === 0) continue;
+
     if (grade.finalGrade % 1 !== 0) {
       errors.push({
         message: t('utils.grade-not-an-int'),
         type: 'InvalidPredictedGrade',
-        info: {
-          columnId: 'predictedFinalGrades',
-          modelId: modelId,
-        },
+        info: {modelId: parseInt(modelId)},
       });
     }
     // if grade is out of range
@@ -157,10 +160,7 @@ export const predictedGradesErrorCheck = (
       errors.push({
         message: t('utils.grade-out-of-range'),
         type: 'OutOfRangePredictedGrade',
-        info: {
-          columnId: 'predictedFinalGrades',
-          modelId: modelId,
-        },
+        info: {modelId: parseInt(modelId)},
       });
     }
   }
@@ -168,10 +168,10 @@ export const predictedGradesErrorCheck = (
 };
 
 export const getRowErrors = (
-  t: TFunction<'translation', undefined>,
+  t: TFunction,
   row: StudentRow,
-  courseParts: CoursePartData[],
-  studentPredictedGrades: {[k: string]: {finalGrade: number}},
+  courseTasks: CourseTaskData[],
+  studentPredictedGrades: PredictedGraphValues,
   courseScale: GradingScale
 ): RowError[] => {
   const predictedGradeErrors = predictedGradesErrorCheck(
@@ -179,7 +179,7 @@ export const getRowErrors = (
     studentPredictedGrades,
     courseScale
   );
-  const invalidGradeErrors = invalidGradesCheck(t, row, courseParts);
+  const invalidGradeErrors = invalidGradesCheck(t, row, courseTasks);
   return [...predictedGradeErrors, ...invalidGradeErrors];
 };
 
@@ -237,7 +237,7 @@ export const getErrorTypes = (
  */
 export const getErrorCount = (
   rowModel: GroupedStudentRow[],
-  selectedGradingModel: 'any' | number
+  selectedGradingModel: GradingModelData | 'any'
 ): number => {
   let totalErrors = 0;
 
@@ -249,7 +249,7 @@ export const getErrorCount = (
           case 'InvalidPredictedGrade':
             if (
               selectedGradingModel === 'any' ||
-              selectedGradingModel === Number(error.info.modelId)
+              error.info.modelId === selectedGradingModel.id
             ) {
               totalErrors += 1;
             }

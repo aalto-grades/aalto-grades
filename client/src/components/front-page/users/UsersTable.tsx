@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -17,13 +17,13 @@ import {
   Typography,
 } from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useMemo, useState} from 'react';
+import {type JSX, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 
-import {SystemRole, UserData} from '@/common/types';
+import {SystemRole, type UserData} from '@/common/types';
 import {useDeleteUser, useGetUsers} from '@/hooks/useApi';
-import {HeadCellData} from '@/types';
+import type {HeadCellData} from '@/types';
 import ResetAuthDialog from './ResetAuthDialog';
 
 const UsersTable = (): JSX.Element => {
@@ -91,7 +91,7 @@ const UsersTable = (): JSX.Element => {
           </TableHead>
           <TableBody>
             {shownUsers.map(user => (
-              <TableRow key={user.email} hover={true}>
+              <TableRow key={user.email} hover>
                 <TableCell sx={{width: '75%'}}>{user.email}</TableCell>
                 <TableCell>
                   <Tooltip
@@ -112,7 +112,7 @@ const UsersTable = (): JSX.Element => {
                     <span>
                       <IconButton
                         aria-label="delete"
-                        onClick={() => handleDeleteUser(user)}
+                        onClick={async () => handleDeleteUser(user)}
                       >
                         <Delete />
                       </IconButton>

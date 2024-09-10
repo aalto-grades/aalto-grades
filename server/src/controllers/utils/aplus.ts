@@ -2,17 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-import axios, {AxiosResponse} from 'axios';
-import {Request} from 'express';
-import {z} from 'zod';
+import axios from 'axios';
+import type {Request} from 'express';
+import {type ZodSchema, z} from 'zod';
 
-import {AplusGradeSourceData, HttpCode} from '@/common/types';
+import {type AplusGradeSourceData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
-import {findCoursePartById} from './coursePart';
+import {validateCourseTaskBelongsToCourse} from './courseTask';
 import {AXIOS_TIMEOUT} from '../../configs/constants';
 import httpLogger from '../../configs/winston';
 import AplusGradeSource from '../../database/models/aplusGradeSource';
-import Course from '../../database/models/course';
+import type Course from '../../database/models/course';
 import {ApiError, stringToIdSchema} from '../../types';
 
 /**
@@ -64,7 +64,7 @@ const findAndValidateAplusGradeSourceId = async (
       HttpCode.BadRequest
     );
   }
-  return await findAplusGradeSourceById(result.data);
+  return findAplusGradeSourceById(result.data);
 };
 
 /**
@@ -80,34 +80,30 @@ export const validateAplusGradeSourcePath = async (
   const course = await findAndValidateCourseId(courseId);
   const aplusGradeSource =
     await findAndValidateAplusGradeSourceId(aplusGradeSourceId);
-  const coursePart = await findCoursePartById(aplusGradeSource.coursePartId);
 
-  if (coursePart.courseId !== course.id) {
-    throw new ApiError(
-      `A+ grade source with ID ${aplusGradeSource.id} ` +
-        `does not belong to the course with ID ${course.id}`,
-      HttpCode.Conflict
-    );
-  }
+  await validateCourseTaskBelongsToCourse(
+    course.id,
+    aplusGradeSource.courseTaskId
+  );
 
   return [course, aplusGradeSource];
 };
 
 /**
- * Validates that an A+ grade source exists and belongs to a course part.
+ * Validates that an A+ grade source exists and belongs to a course task.
  *
  * @throws ApiError(404|409) if A+ grade source is not found or doesn't belong
- *   to the course part.
+ *   to the course task.
  */
-export const validateAplusGradeSourceBelongsToCoursePart = async (
-  coursePartId: number,
+export const validateAplusGradeSourceBelongsToCourseTask = async (
+  courseTaskId: number,
   aplusGradeSourceId: number
 ): Promise<void> => {
   const aplusGradeSource = await findAplusGradeSourceById(aplusGradeSourceId);
-  if (aplusGradeSource.coursePartId !== coursePartId) {
+  if (aplusGradeSource.courseTaskId !== courseTaskId) {
     throw new ApiError(
       `A+ grade source with ID ${aplusGradeSource.id} ` +
-        `does not  belong to the course part with ID ${coursePartId}`,
+        `does not belong to the course task with ID ${courseTaskId}`,
       HttpCode.Conflict
     );
   }
@@ -158,12 +154,28 @@ export const parseAplusToken = (req: Request): string => {
  */
 export const fetchFromAplus = async <T>(
   url: string,
-  aplusToken: string
-): Promise<AxiosResponse<T>> => {
+  aplusToken: string,
+  schema: ZodSchema<T>
+): Promise<T> => {
   httpLogger.http(`Calling A+ With "GET ${url}"`);
-  return await axios.get<T>(url, {
-    timeout: AXIOS_TIMEOUT,
-    validateStatus: (status: number) => status === 200,
-    headers: {Authorization: `Token ${aplusToken}`},
-  });
+
+  const result = schema.safeParse(
+    (
+      await axios.get<T>(url, {
+        timeout: AXIOS_TIMEOUT,
+        validateStatus: (status: number) => status === 200,
+        headers: {Authorization: `Token ${aplusToken}`},
+      })
+    ).data
+  );
+
+  if (!result.success) {
+    throw new ApiError(
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      `Validating data from A+ failed: ${result.error}`,
+      HttpCode.BadGateway
+    );
+  }
+
+  return result.data;
 };

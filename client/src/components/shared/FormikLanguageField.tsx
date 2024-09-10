@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {FormikProps} from 'formik';
-import {JSX} from 'react';
+import type {FormikProps} from 'formik';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import FormField from './FormikField';
@@ -21,7 +21,7 @@ const FormLanguagesField = ({
   valueFormat,
   labelFormat,
   helperTextFormat,
-  disabled,
+  disabled = false,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
 

@@ -5,12 +5,12 @@
 import {Button, Typography} from '@mui/material';
 import {
   DataGrid,
-  GridColDef,
-  GridRowSelectionModel,
-  GridRowsProp,
+  type GridColDef,
+  type GridRowSelectionModel,
+  type GridRowsProp,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useEffect, useMemo, useState} from 'react';
+import {type JSX, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker} from 'react-router-dom';

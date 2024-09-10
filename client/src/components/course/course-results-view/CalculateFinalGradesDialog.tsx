@@ -20,17 +20,16 @@ import {
 } from '@mui/material';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs, {Dayjs} from 'dayjs';
+import dayjs, {type Dayjs} from 'dayjs';
 import 'dayjs/locale/en-gb';
 import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {GradingModelData, StudentRow} from '@/common/types';
-import {GroupedStudentRow} from '@/context/GradesTableProvider';
+import type {GradingModelData, StudentRow} from '@/common/types';
+import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useGetAllGradingModels} from '@/hooks/useApi';
-import {GradeSelectOption} from '@/utils/bestGrade';
-import {getErrorTypes} from '@/utils/table';
+import {type GradeSelectOption, getErrorTypes} from '@/utils';
 
 type PropsType = {
   open: boolean;
@@ -55,7 +54,7 @@ const CalculateFinalGradesDialog = ({
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const allGradingModels = useGetAllGradingModels(courseId);
-  // TODO: Auto select the model used in the table view
+  // TODO: Auto select the model used in the table view?
 
   const [dateOverride, setDateOverride] = useState<boolean>(false);
   const [gradingDate, setGradingDate] = useState<Dayjs>(dayjs());
@@ -67,7 +66,9 @@ const CalculateFinalGradesDialog = ({
   const modelList = useMemo(
     () =>
       allGradingModels.data !== undefined
-        ? allGradingModels.data.filter(model => !model.archived)
+        ? allGradingModels.data.filter(
+            model => model.coursePartId === null && !model.archived
+          )
         : [],
     [allGradingModels.data]
   );
@@ -80,10 +81,10 @@ const CalculateFinalGradesDialog = ({
   useEffect(() => {
     if (!open) return;
 
-    let latestDate = new Date(1970, 0, 1);
+    let latestDate = new Date(0);
     for (const row of selectedRows) {
-      for (const coursePart of row.courseParts) {
-        for (const grade of coursePart.grades) {
+      for (const courseTask of row.courseTasks) {
+        for (const grade of courseTask.grades) {
           if (grade.date.getTime() > latestDate.getTime())
             latestDate = grade.date;
         }
@@ -110,12 +111,10 @@ const CalculateFinalGradesDialog = ({
 
   const getWarning = (model: GradingModelData | null): string => {
     if (model === null) return '';
-    if (model.hasArchivedCourseParts && model.hasDeletedCourseParts)
+    if (model.hasArchivedSources && model.hasDeletedSources)
       return t('course.results.model-has-deleted-and-archived');
-    if (model.hasArchivedCourseParts)
-      return t('course.results.model-has-archived');
-    if (model.hasDeletedCourseParts)
-      return t('course.results.model-has-deleted');
+    if (model.hasArchivedSources) return t('course.results.model-has-archived');
+    if (model.hasDeletedSources) return t('course.results.model-has-deleted');
     return '';
   };
 
@@ -140,8 +139,8 @@ const CalculateFinalGradesDialog = ({
         </Collapse>
         <Collapse
           in={
-            selectedModel?.hasDeletedCourseParts ||
-            selectedModel?.hasArchivedCourseParts
+            selectedModel?.hasDeletedSources ||
+            selectedModel?.hasArchivedSources
           }
         >
           <Alert sx={{mb: 2, mt: -1}} severity="warning">

@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-/* eslint camelcase: off */
+/* eslint-disable camelcase */
 
-import {Op, QueryInterface} from 'sequelize';
+import {Op, type QueryInterface} from 'sequelize';
 
 import {sequelize} from '..';
 import {dbLogger} from '../../configs/winston';
@@ -25,17 +25,38 @@ export default {
         transaction,
       });
 
-      await queryInterface.addConstraint('assessment_model', {
-        fields: ['course_id', 'name'],
+      await queryInterface.addConstraint('course', {
+        fields: ['course_code'],
         type: 'unique',
-        name: 'course_assessment_model_name_un',
+        name: 'course_course_code_un',
         transaction,
       });
 
-      await queryInterface.addConstraint('attainment_grade', {
+      await queryInterface.addConstraint('grading_model', {
+        fields: ['course_id', 'name'],
+        type: 'unique',
+        name: 'course_grading_model_name_un',
+        transaction,
+      });
+
+      await queryInterface.addConstraint('course_part', {
+        fields: ['course_id', 'name'],
+        type: 'unique',
+        name: 'course_course_part_name_un',
+        transaction,
+      });
+
+      await queryInterface.addConstraint('course_task', {
+        fields: ['course_part_id', 'name'],
+        type: 'unique',
+        name: 'course_part_course_task_name_un',
+        transaction,
+      });
+
+      await queryInterface.addConstraint('task_grade', {
         fields: ['date'],
         type: 'check',
-        name: 'attainment_grade_date_ck',
+        name: 'task_grade_date_ck',
         where: {
           date: {
             [Op.lte]: sequelize.col('expiry_date'),
@@ -57,15 +78,31 @@ export default {
         transaction,
       });
 
+      await queryInterface.removeConstraint('course', 'course_course_code_un', {
+        transaction,
+      });
+
       await queryInterface.removeConstraint(
-        'assessment_model',
-        'course_assessment_model_name_un',
+        'grading_model',
+        'course_grading_model_name_un',
         {transaction}
       );
 
       await queryInterface.removeConstraint(
-        'attainment_grade',
-        'attainment_grade_date_ck',
+        'course_part',
+        'course_course_part_name_un',
+        {transaction}
+      );
+
+      await queryInterface.removeConstraint(
+        'course_task',
+        'course_part_course_task_name_un',
+        {transaction}
+      );
+
+      await queryInterface.removeConstraint(
+        'task_grade',
+        'task_grade_date_ck',
         {transaction}
       );
 

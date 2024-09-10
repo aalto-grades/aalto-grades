@@ -3,12 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 import {Alert, Button, Divider, Tooltip, Typography} from '@mui/material';
-import {TFunction} from 'i18next';
+import type {TFunction} from 'i18next';
 import {enqueueSnackbar} from 'notistack';
 import {
-  DragEvent,
-  DragEventHandler,
-  JSX,
+  type Dispatch,
+  type DragEvent,
+  type DragEventHandler,
+  type JSX,
+  type SetStateAction,
   useCallback,
   useEffect,
   useMemo,
@@ -20,41 +22,42 @@ import {useBlocker} from 'react-router-dom';
 import {
   Background,
   BackgroundVariant,
-  Connection,
+  type Connection,
   Controls,
-  Edge,
+  type Edge,
   MiniMap,
-  Node,
+  type NodeChange,
+  type NodeProps,
   ReactFlow,
-  ReactFlowInstance,
+  type ReactFlowInstance,
   addEdge,
   useEdgesState,
   useNodesState,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import './flow.scss'; // Import styles
-import {CoursePartData, CoursePartGradesData} from '@/common/types';
-import {
-  CoursePartNodeValue,
+import type {
   CustomNodeTypes,
   DropInNodes,
   FullNodeData,
+  GraphSource,
+  GraphSourceValue,
   GraphStructure,
   NodeSettings,
   NodeValues,
-} from '@/common/types/graph';
-import {calculateNewNodeValues, initNode} from '@/common/util/calculateGraph';
+  SourceNodeValue,
+  TypedNode,
+} from '@/common/types';
+import {calculateNodeValues, initNode} from '@/common/util';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
-  ExtraNodeData,
+  type ExtraNodeData,
   ExtraNodeDataContext,
   NodeDataContext,
   NodeValuesContext,
 } from '@/context/GraphProvider';
-import {GradeSelectOption, findBestGrade} from '@/utils/bestGrade';
-import CoursePartValuesDialog from './CoursePartValuesDialog';
-import SelectCoursePartsDialog from './SelectCoursePartsDialog';
+import SelectSourcesDialog from './SelectSourcesDialog';
+import SourceValuesDialog from './SourceValuesDialog';
 import {
   findDisconnectedEdges,
   formatGraph,
@@ -64,24 +67,37 @@ import {
 } from './graphUtil';
 import AdditionNode from './nodes/AdditionNode';
 import AverageNode from './nodes/AverageNode';
-import CoursePartNode from './nodes/CoursePartNode';
-import GradeNode from './nodes/GradeNode';
 import MaxNode from './nodes/MaxNode';
 import MinPointsNode from './nodes/MinPointsNode';
 import RequireNode from './nodes/RequireNode';
 import RoundNode from './nodes/RoundNode';
+import SinkNode from './nodes/SinkNode';
+import SourceNode from './nodes/SourceNode';
 import StepperNode from './nodes/StepperNode';
 import SubstituteNode from './nodes/SubstituteNode';
+import './flow.scss'; // Import styles. At the bottom of the imports to fix import/order
 
-const nodeTypesMap = {
+// TODO: Don't show word 'source' to user?
+// Instead we could check if is course part model or not
+// And show course task / course part
+
+type NodeState = [
+  TypedNode[],
+  Dispatch<SetStateAction<TypedNode[]>>,
+  (changes: NodeChange[]) => void,
+];
+
+const nodeTypesMap: {
+  [key in CustomNodeTypes]: (props: NodeProps) => JSX.Element;
+} = {
   addition: AdditionNode,
-  coursepart: CoursePartNode,
   average: AverageNode,
-  grade: GradeNode,
   max: MaxNode,
   minpoints: MinPointsNode,
   require: RequireNode,
   round: RoundNode,
+  sink: SinkNode,
+  source: SourceNode,
   stepper: StepperNode,
   substitute: SubstituteNode,
 };
@@ -89,22 +105,21 @@ const nodeTypesMap = {
 // Load graph for the first time
 const initGraphFn = (
   initGraph: GraphStructure,
-  courseParts: {id: number; name: string; archived: boolean}[],
-  t: TFunction<'translation', undefined>
+  sources: GraphSource[],
+  sourceValues: GraphSourceValue[] | null,
+  t: TFunction
 ): {initNodeValues: NodeValues; extraNodeData: ExtraNodeData} => {
-  // Check for deleted & archived course parts (edit extra data)
+  // Check for deleted & archived sources (edit extra data)
   const extraNodeData: ExtraNodeData = {};
   for (const node of initGraph.nodes) {
-    if (node.type !== 'coursepart') continue;
-    const coursePartId = parseInt(node.id.split('-')[1]);
+    if (node.type !== 'source') continue;
+    const sourceId = parseInt(node.id.split('-')[1]);
 
-    const nodeCoursePart = courseParts.find(
-      coursePart => coursePart.id === coursePartId
-    );
-    if (nodeCoursePart === undefined) {
-      extraNodeData[node.id] = {warning: t('shared.graph.part-deleted')};
-    } else if (nodeCoursePart.archived) {
-      extraNodeData[node.id] = {warning: t('shared.graph.part-archived')};
+    const nodeSource = sources.find(source => source.id === sourceId);
+    if (nodeSource === undefined) {
+      extraNodeData[node.id] = {warning: t('shared.graph.source-deleted')};
+    } else if (nodeSource.archived) {
+      extraNodeData[node.id] = {warning: t('shared.graph.source-archived')};
     }
   }
 
@@ -112,27 +127,34 @@ const initGraphFn = (
   const initNodeValues = Object.fromEntries(
     initGraph.nodes.map(node => [
       node.id,
-      initNode(node.type as CustomNodeTypes, node.id, initGraph.edges).value,
+      initNode(node.type!, node.id, initGraph.edges).value,
     ])
   );
+
+  if (sourceValues !== null) {
+    for (const sourceValue of sourceValues) {
+      const sourceId = `source-${sourceValue.id}`;
+      if (!(sourceId in initNodeValues)) continue;
+
+      (initNodeValues[sourceId] as SourceNodeValue).source = sourceValue.value;
+    }
+  }
 
   return {initNodeValues, extraNodeData};
 };
 
 type GraphProps = {
   initGraph: GraphStructure;
-  courseParts: {id: number; name: string; archived: boolean}[];
-  userGrades: CoursePartGradesData[] | null;
-  gradeSelectOption?: GradeSelectOption;
+  sources: GraphSource[];
+  sourceValues: GraphSourceValue[] | null;
   onSave?: (graphStructure: GraphStructure) => Promise<void>;
   readOnly?: boolean;
   modelHasFinalGrades?: boolean;
 };
 const Graph = ({
   initGraph,
-  courseParts,
-  userGrades,
-  gradeSelectOption,
+  sources,
+  sourceValues,
   onSave: onParentSave,
   readOnly = false,
   modelHasFinalGrades = false,
@@ -140,11 +162,12 @@ const Graph = ({
   const {t} = useTranslation();
 
   const {initNodeValues, extraNodeData} = useMemo(
-    () => initGraphFn(initGraph, courseParts, t),
-    [courseParts, initGraph, t]
+    () => initGraphFn(initGraph, sources, sourceValues, t),
+    [initGraph, sources, sourceValues, t]
   );
-
-  const [nodes, setNodes, onNodesChange] = useNodesState(initGraph.nodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState(
+    initGraph.nodes
+  ) as NodeState;
   const [edges, setEdges, onEdgesChange] = useEdgesState(initGraph.edges);
   const [nodeData, setNodeData] = useState<FullNodeData>(initGraph.nodeData);
   const [nodeValues, setNodeValues] = useState<NodeValues>(initNodeValues);
@@ -153,17 +176,15 @@ const Graph = ({
 
   // Used to check for changes
   const [lastState, setLastState] = useState<{
-    nodes: Node[];
+    nodes: TypedNode[];
     edges: Edge[];
     nodeSettings: {[key: string]: NodeSettings | undefined};
     nodeValues: NodeValues;
   } | null>(null);
 
-  const [selected, setSelected] = useState<Node[]>([]);
-  const [coursePartsSelectOpen, setCoursePartsSelectOpen] =
-    useState<boolean>(false);
-  const [coursePartValuesOpen, setCoursePartValuesOpen] =
-    useState<boolean>(false);
+  const [selected, setSelected] = useState<TypedNode[]>([]);
+  const [sourcesSelectOpen, setSourcesSelectOpen] = useState<boolean>(false);
+  const [sourceValuesOpen, setSourceValuesOpen] = useState<boolean>(false);
   const [originalGraphStructure, setOriginalGraphStructure] =
     useState<GraphStructure>(initGraph);
 
@@ -174,21 +195,19 @@ const Graph = ({
     JSON.stringify(originalGraphStructure.nodeData) !==
       JSON.stringify(nodeData);
 
-  // Course part nodes that the user is allowed to delete
-  const delCourseParts = useMemo(
+  // Source nodes that the user is allowed to delete
+  const delSources = useMemo(
     () =>
       initGraph.nodes
         .filter(node => {
-          if (node.type !== 'coursepart') return false;
-          const coursePartId = parseInt(node.id.split('-')[1]);
+          if (node.type !== 'source') return false;
+          const sourceId = parseInt(node.id.split('-')[1]);
 
-          const nodeCoursePart = courseParts.find(
-            coursePart => coursePart.id === coursePartId
-          );
-          return nodeCoursePart === undefined || nodeCoursePart.archived;
+          const nodeSource = sources.find(source => source.id === sourceId);
+          return nodeSource === undefined || nodeSource.archived;
         })
         .map(node => node.id),
-    [courseParts, initGraph.nodes]
+    [sources, initGraph.nodes]
   );
 
   const blocker = useBlocker(
@@ -227,7 +246,7 @@ const Graph = ({
         edge => !disconnectedEdges.includes(edge)
       );
 
-      const newNodeValues: NodeValues = calculateNewNodeValues(
+      const newNodeValues: NodeValues = calculateNodeValues(
         nodeValues,
         nodeData,
         nodes,
@@ -273,28 +292,6 @@ const Graph = ({
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [unsaved]);
 
-  useEffect(() => {
-    if (userGrades === null) return;
-    const newNodeValues = {...nodeValues};
-    let change = false;
-
-    for (const coursePart of userGrades) {
-      const coursePartId = `coursepart-${coursePart.coursePartId}`;
-      if (!(coursePartId in newNodeValues)) continue;
-
-      const newValue = newNodeValues[coursePartId] as CoursePartNodeValue;
-      const bestGrade =
-        coursePart.grades.length === 0
-          ? 0
-          : findBestGrade(coursePart.grades, {gradeSelectOption})!.grade;
-      if (newValue.value !== bestGrade) {
-        newValue.source = bestGrade;
-        change = true;
-      }
-    }
-    if (change) setNodeValues(newNodeValues);
-  }, [gradeSelectOption, nodeValues, userGrades]);
-
   const onSave = async (): Promise<void> => {
     if (onParentSave === undefined) return;
 
@@ -325,34 +322,33 @@ const Graph = ({
     setNodes(await formatGraph(nodes, edges, nodeValues));
   };
 
-  const handleCoursePartSelect = (
-    newCourseParts: CoursePartData[],
-    removedCourseParts: CoursePartData[]
+  const handleSourceSelect = (
+    newSources: GraphSource[],
+    removedSources: GraphSource[]
   ): void => {
-    setCoursePartsSelectOpen(false);
+    setSourcesSelectOpen(false);
 
     let newNodes = [...nodes];
     let newEdges = [...edges];
     const newNodeValues = {...nodeValues};
     const newNodeData = {...nodeData};
 
-    for (const coursePart of newCourseParts) {
+    for (const source of newSources) {
       newNodes.push({
-        id: `coursepart-${coursePart.id}`,
-        type: 'coursepart',
+        id: `source-${source.id}`,
+        type: 'source',
         position: {x: 0, y: 100 * newNodes.length},
         data: {},
       });
-      newNodeData[`coursepart-${coursePart.id}`] = {
-        title: coursePart.name,
-        settings: {minPoints: null, onFailSetting: 'coursefail'},
+      newNodeData[`source-${source.id}`] = {
+        title: source.name,
+        settings: {minPoints: null, onFailSetting: 'fullfail'},
       };
-      newNodeValues[`coursepart-${coursePart.id}`] =
-        initNode('coursepart').value;
+      newNodeValues[`source-${source.id}`] = initNode('source').value;
     }
 
-    for (const coursePart of removedCourseParts) {
-      const nodeId = `coursepart-${coursePart.id}`;
+    for (const source of removedSources) {
+      const nodeId = `source-${source.id}`;
       newNodes = newNodes.filter(newNode => newNode.id !== nodeId);
       newEdges = newEdges.filter(newEdge => newEdge.source !== nodeId);
     }
@@ -361,20 +357,20 @@ const Graph = ({
     setEdges(newEdges);
     setNodeData(newNodeData);
     setNodeValues(newNodeValues);
-    if (newCourseParts.length > 0) {
+    if (newSources.length > 0) {
       setTimeout(() => {
         reactFlowInstance?.fitView();
       }, 0);
     }
   };
 
-  const handleSetCoursePartValues = (coursePartValues: {
+  const handleSetSourceValues = (newSourceValues: {
     [key: number]: number;
   }): void => {
     const newNodeValues = structuredClone(nodeValues);
-    for (const [coursePartId, value] of Object.entries(coursePartValues)) {
-      const nodeValue = newNodeValues[`coursepart-${coursePartId}`];
-      if (nodeValue.type === 'coursepart') nodeValue.source = value;
+    for (const [sourceId, value] of Object.entries(newSourceValues)) {
+      const nodeValue = newNodeValues[`source-${sourceId}`];
+      if (nodeValue.type === 'source') nodeValue.source = value;
     }
     setNodeValues(newNodeValues);
   };
@@ -415,7 +411,12 @@ const Graph = ({
       while (nodeId in nodeTypeMap) nodeId = `dnd-${type}-${getId()}`; // To prevent duplicates from loading existing graph
 
       const initState = initNode(type);
-      const newNode: Node = {id: nodeId, type, position, data: {}};
+      const newNode: TypedNode = {
+        id: nodeId,
+        type,
+        position,
+        data: {},
+      };
 
       setNodes(oldNodes => oldNodes.concat(newNode));
       setNodeValues(oldNodeValues => ({
@@ -430,26 +431,26 @@ const Graph = ({
   );
 
   const dragAndDropNodes = getDragAndDropNodes(t);
-  const courseFail = Object.values(nodeValues).find(
-    nodeVal => 'courseFail' in nodeVal && nodeVal.courseFail
+  const fullFail = Object.values(nodeValues).find(
+    nodeVal => 'fullFail' in nodeVal && nodeVal.fullFail
   );
   return (
     <>
       <UnsavedChangesDialog blocker={blocker} />
-      <SelectCoursePartsDialog
+      <SelectSourcesDialog
         nodes={nodes}
-        courseParts={courseParts}
-        open={coursePartsSelectOpen}
-        handleCoursePartSelect={handleCoursePartSelect}
-        onClose={() => setCoursePartsSelectOpen(false)}
+        sources={sources}
+        open={sourcesSelectOpen}
+        handleSourceSelect={handleSourceSelect}
+        onClose={() => setSourcesSelectOpen(false)}
       />
-      <CoursePartValuesDialog
+      <SourceValuesDialog
         nodes={nodes}
         nodeValues={nodeValues}
-        courseParts={courseParts}
-        open={coursePartValuesOpen}
-        onClose={() => setCoursePartValuesOpen(false)}
-        handleSetCoursePartValues={handleSetCoursePartValues}
+        sources={sources}
+        open={sourceValuesOpen}
+        onClose={() => setSourceValuesOpen(false)}
+        handleSetSourceValues={handleSetSourceValues}
       />
       <div style={{position: 'relative'}}>
         {unsaved && (
@@ -481,7 +482,7 @@ const Graph = ({
             </Alert>
           </Tooltip>
         )}
-        {courseFail && (
+        {fullFail && (
           <Alert
             sx={{
               position: 'absolute',
@@ -504,7 +505,13 @@ const Graph = ({
           <Button
             onClick={() => {
               onNodesChange(
-                selected.map(node => ({type: 'remove', id: node.id}))
+                selected
+                  .filter(
+                    node =>
+                      delSources.includes(node.id) ||
+                      (node.type !== 'source' && node.type !== 'sink')
+                  )
+                  .map(node => ({type: 'remove', id: node.id}))
               );
             }}
             variant="contained"
@@ -520,10 +527,13 @@ const Graph = ({
           </Button>
         )}
       </div>
-      <NodeValuesContext.Provider value={{nodeValues}}>
-        <ExtraNodeDataContext.Provider value={{extraNodeData}}>
+      <NodeValuesContext.Provider value={nodeValues}>
+        <ExtraNodeDataContext.Provider value={extraNodeData}>
           <NodeDataContext.Provider
-            value={{nodeData, setNodeTitle, setNodeSettings}}
+            value={useMemo(
+              () => ({nodeData, setNodeTitle, setNodeSettings}),
+              [nodeData]
+            )}
           >
             <div style={{width: '100%', height: '60vh'}}>
               <ReactFlow
@@ -534,13 +544,15 @@ const Graph = ({
                     changes.filter(
                       change =>
                         change.type !== 'remove' ||
-                        delCourseParts.includes(change.id) ||
-                        (nodeTypeMap[change.id] !== 'coursepart' &&
-                          nodeTypeMap[change.id] !== 'grade')
+                        delSources.includes(change.id) ||
+                        (nodeTypeMap[change.id] !== 'source' &&
+                          nodeTypeMap[change.id] !== 'sink')
                     )
                   )
                 }
-                onSelectionChange={changes => setSelected(changes.nodes)}
+                onSelectionChange={changes =>
+                  setSelected(changes.nodes as TypedNode[])
+                }
                 minZoom={0.25}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
@@ -594,13 +606,13 @@ const Graph = ({
                 <Divider sx={{my: 1}} />
                 <div style={{float: 'left'}}>
                   <Button
-                    onClick={() => setCoursePartsSelectOpen(true)}
+                    onClick={() => setSourcesSelectOpen(true)}
                     variant="outlined"
                   >
-                    {t('general.select-course-parts')}
+                    {t('shared.graph.select-sources')}
                   </Button>
                   <Button
-                    onClick={() => setCoursePartValuesOpen(true)}
+                    onClick={() => setSourceValuesOpen(true)}
                     variant="outlined"
                     sx={{ml: 1}}
                   >

@@ -1,25 +1,25 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult,
+  type UseMutationOptions,
+  type UseMutationResult,
+  type UseQueryOptions,
+  type UseQueryResult,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
 
-import {IdSchema} from '@/common/types';
 import {
-  CoursePartData,
+  type CoursePartData,
   CoursePartDataArraySchema,
-  EditCoursePartData,
-  NewCoursePartData,
-} from '@/common/types/coursePart';
-import {Numeric} from '@/types';
+  type EditCoursePartData,
+  IdSchema,
+  type NewCoursePartData,
+} from '@/common/types';
+import type {Numeric} from '@/types';
 import axios from './axios';
 
 export const useGetCourseParts = (
@@ -67,7 +67,7 @@ export const useEditCoursePart = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: vars =>
+    mutationFn: async vars =>
       axios.put(
         `/api/v1/courses/${courseId}/parts/${vars.coursePartId}`,
         vars.coursePart
@@ -93,7 +93,7 @@ export const useDeleteCoursePart = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: coursePartId =>
+    mutationFn: async coursePartId =>
       axios.delete(`/api/v1/courses/${courseId}/parts/${coursePartId}`),
 
     onSuccess: () => {

@@ -20,11 +20,11 @@ import {
   TableRow,
   Tooltip,
 } from '@mui/material';
-import {JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {AplusGradeSourceData, AplusGradeSourceType} from '@/common/types';
+import {type AplusGradeSourceData, AplusGradeSourceType} from '@/common/types';
 import {useDeleteAplusGradeSource} from '@/hooks/useApi';
 
 type PropsType = {
@@ -78,7 +78,7 @@ const ViewAplusGradeSourcesDialog = ({
             </TableHead>
             <TableBody>
               {aplusGradeSources.map(source => (
-                <TableRow>
+                <TableRow key={source.id}>
                   <TableCell>{source.aplusCourse.courseCode}</TableCell>
                   <TableCell>{source.aplusCourse.name}</TableCell>
                   <TableCell>{source.aplusCourse.instance}</TableCell>

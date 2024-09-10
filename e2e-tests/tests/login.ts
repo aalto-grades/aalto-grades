@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {HashAlgorithms} from '@otplib/core/';
-import {Page} from '@playwright/test';
+import type {Page} from '@playwright/test';
 import {authenticator} from 'otplib';
 
 // Set TOTP codes to use sha512 instead of sha1
@@ -49,7 +49,7 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
       }
 
       // Wait for the login to go through
-      await page.waitForTimeout(100);
+      await page.waitForTimeout(200);
 
       const success = await page
         .getByRole('heading', {name: 'Courses'})

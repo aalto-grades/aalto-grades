@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 import path from 'node:path';
-import readlineSync from 'readline-sync';
+import * as readlineSync from 'readline-sync';
 
 type TranslationJson = {[key: string]: TranslationJson | string | undefined};
 
@@ -156,7 +156,7 @@ const updateTranslation = (file: File, changes: Change[]): void => {
   }
   fs.copyFileSync(file, backup);
 
-  const entries = parseFileEntries(file).entries;
+  const {entries} = parseFileEntries(file);
   const updated = structuredClone(entries);
 
   for (const change of changes) {

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -14,14 +14,14 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {JSX, useCallback, useMemo, useState} from 'react';
+import {type JSX, useCallback, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
-import {CourseData, CourseRoleType, SystemRole} from '@/common/types';
+import {type CourseData, CourseRoleType, SystemRole} from '@/common/types';
 import useAuth from '@/hooks/useAuth';
-import {HeadCellData} from '@/types';
-import {getCourseRole} from '@/utils/utils';
+import type {HeadCellData} from '@/types';
+import {getCourseRole} from '@/utils';
 
 const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
   const {t} = useTranslation();
@@ -119,20 +119,20 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
             <TableRow
               key={course.id}
               id={`ag-see-instances-tr-${course.id}`}
-              hover={true}
+              hover
               sx={{
                 cursor: 'pointer',
                 '&:focus': {backgroundColor: 'rgba(0, 0, 0, 0.04)'},
               }}
               role="button"
               onClick={() =>
-                navigate(`/${course.id}/course-results`, {
+                navigate(`/${course.id}`, {
                   unstable_viewTransition: true,
                 })
               }
               onKeyDown={e => {
                 if (e.key === 'Enter') {
-                  navigate(`/${course.id}/course-results`, {
+                  navigate(`/${course.id}`, {
                     unstable_viewTransition: true,
                   });
                 }

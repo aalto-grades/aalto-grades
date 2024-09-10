@@ -10,8 +10,8 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@mui/material';
-import {JSX} from 'react';
-import {IModalProps} from 'react-global-modal';
+import type {JSX} from 'react';
+import type {IModalProps} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 
 type PropsType = IModalProps & {
@@ -24,6 +24,7 @@ const ConfirmDialog = ({
   children,
   actions,
   confirmNavigate,
+  confirmDiscard,
   confirmDelete,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
@@ -41,9 +42,9 @@ const ConfirmDialog = ({
 
   const defaultTitle = 'AsyncConfirmation Modal Title';
   const defaultBody = 'AsynConfirmation Modal message'; // Default body has typo lol
-  if (confirmNavigate && title === defaultTitle)
+  if ((confirmNavigate || confirmDiscard) && title === defaultTitle)
     title = t('general.unsaved-changes');
-  if (confirmNavigate && body === defaultBody)
+  if ((confirmNavigate || confirmDiscard) && body === defaultBody)
     body = t('shared.unsaved-changes.body');
 
   return (
@@ -63,7 +64,7 @@ const ConfirmDialog = ({
           variant="contained"
           color={confirmNavigate || confirmDelete ? 'error' : 'primary'}
         >
-          {confirmNavigate
+          {confirmNavigate || confirmDiscard
             ? t('shared.unsaved-changes.discard')
             : confirmDelete
               ? t('general.delete')

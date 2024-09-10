@@ -1,20 +1,16 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
 import {
-  AplusCourseData,
-  AplusExerciseData,
-  AplusGradeSourceType,
-  AuthData,
-  CourseData,
+  type AuthData,
+  type CourseData,
   CourseRoleType,
   GradingScale,
   Language,
-  LocalizedString,
-  NewAplusGradeSourceData,
+  type LocalizedString,
 } from '@/common/types';
-import {LanguageOption} from '@/types';
+import type {LanguageOption} from '@/types';
 
 export const getMaxFinalGrade = (gradingScale: GradingScale): number => {
   switch (gradingScale) {
@@ -218,71 +214,3 @@ export const sisuLanguageOptions: LanguageOption[] = [
     language: {fi: 'Venäjä', en: 'Russian', sv: 'Ryska'},
   },
 ];
-
-export const setAplusToken = (token: string): void =>
-  localStorage.setItem('Aplus-Token', token);
-
-export const getAplusToken = (): string | null =>
-  localStorage.getItem('Aplus-Token');
-
-export const getLatestAplusModuleDate = (
-  aplusExerciseData: AplusExerciseData
-): Date =>
-  aplusExerciseData.modules.sort(
-    (a, b) => b.closingDate.getTime() - a.closingDate.getTime()
-  )[0].closingDate;
-
-export const newAplusGradeSource = (
-  aplusCourse: AplusCourseData,
-  date: Date,
-  {
-    module,
-    exercise,
-    difficulty,
-  }: {
-    module?: {
-      id: number;
-      name: string;
-    };
-    exercise?: {
-      id: number;
-      name: string;
-    };
-    difficulty?: {
-      difficulty: string;
-    };
-  }
-): NewAplusGradeSourceData => {
-  const base = {coursePartId: -1, aplusCourse: aplusCourse, date: date};
-
-  if (module !== undefined) {
-    return {
-      ...base,
-      sourceType: AplusGradeSourceType.Module,
-      moduleId: module.id,
-      moduleName: module.name,
-    };
-  }
-
-  if (exercise !== undefined) {
-    return {
-      ...base,
-      sourceType: AplusGradeSourceType.Exercise,
-      exerciseId: exercise.id,
-      exerciseName: exercise.name,
-    };
-  }
-
-  if (difficulty !== undefined) {
-    return {
-      ...base,
-      sourceType: AplusGradeSourceType.Difficulty,
-      difficulty: difficulty.difficulty,
-    };
-  }
-
-  return {
-    ...base,
-    sourceType: AplusGradeSourceType.FullPoints,
-  };
-};
