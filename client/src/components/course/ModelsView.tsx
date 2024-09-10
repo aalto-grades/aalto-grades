@@ -228,7 +228,6 @@ const ModelsView = (): JSX.Element => {
       ...graphStructure,
       nodes: graphStructure.nodes.map(simplifyNode),
     };
-    console.log(JSON.stringify(simplifiedGraphStructure));
     await editModel.mutateAsync({
       courseId,
       gradingModelId: currentModel.id,
