@@ -190,9 +190,9 @@ export const batchCalculateCourseParts = (
         nodes,
         edges
       );
-      const finalValue = (graphValues.sink as SinkNodeValue).value;
-      coursePartValues[model.coursePartId!] = finalValue;
-      result[student.userId][model.coursePartId!] = finalValue;
+      const partValue = (graphValues.sink as SinkNodeValue).value;
+      coursePartValues[model.coursePartId!] = partValue;
+      result[student.userId][model.coursePartId!] = partValue;
     }
     sourceValues = Object.entries(coursePartValues).map(([id, value]) => ({
       id: parseInt(id),
@@ -214,7 +214,7 @@ export const batchCalculateFinalGrades = (
     courseTasks: {id: number; grade: number}[];
   }[]
 ): {
-  [key: number]: {courseParts: {[key: string]: number}; finalValue: number};
+  [key: number]: {courseParts: {[key: string]: number}; finalGrade: number};
 } => {
   if (finalModel.coursePartId !== null)
     throw new Error(
@@ -235,11 +235,11 @@ export const batchCalculateFinalGrades = (
   );
 
   const result: {
-    [key: number]: {courseParts: {[key: string]: number}; finalValue: number};
+    [key: number]: {courseParts: {[key: string]: number}; finalGrade: number};
   } = {};
 
   for (const student of studentData) {
-    result[student.userId] = {courseParts: {}, finalValue: 0};
+    result[student.userId] = {courseParts: {}, finalGrade: 0};
     let sourceValues = student.courseTasks.map(task => ({
       id: task.id,
       value: task.grade,
@@ -260,9 +260,9 @@ export const batchCalculateFinalGrades = (
         nodes,
         edges
       );
-      const finalValue = (graphValues.sink as SinkNodeValue).value;
-      coursePartValues[model.coursePartId!] = finalValue;
-      result[student.userId].courseParts[model.coursePartId!] = finalValue;
+      const partValue = (graphValues.sink as SinkNodeValue).value;
+      coursePartValues[model.coursePartId!] = partValue;
+      result[student.userId].courseParts[model.coursePartId!] = partValue;
     }
     sourceValues = Object.entries(coursePartValues).map(([id, value]) => ({
       id: parseInt(id),
@@ -273,8 +273,8 @@ export const batchCalculateFinalGrades = (
     const {nodes, edges, nodeData} = finalModel.graphStructure;
     const [_, nodeValues] = initNodeValues(nodes, sourceValues);
     const graphValues = calculateNodeValues(nodeValues, nodeData, nodes, edges);
-    const finalValue = (graphValues.sink as SinkNodeValue).value;
-    result[student.userId].finalValue = finalValue;
+    const finalGrade = (graphValues.sink as SinkNodeValue).value;
+    result[student.userId].finalGrade = finalGrade;
   }
 
   return result;

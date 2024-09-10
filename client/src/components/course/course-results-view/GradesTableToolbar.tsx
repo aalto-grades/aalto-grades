@@ -450,10 +450,10 @@ const GradesTableToolbar = (): JSX.Element => {
     for (const grade of Object.values(finalGrades)) {
       const maxFinalGrade = getMaxFinalGrade(course.data.gradingScale);
       const Schema = z.number().int().min(0).max(maxFinalGrade);
-      const result = Schema.safeParse(grade.finalValue);
+      const result = Schema.safeParse(grade.finalGrade);
       if (!result.success) {
         enqueueSnackbar(
-          t('course.results.invalid-final', {grade: grade.finalValue}),
+          t('course.results.invalid-final', {grade: grade.finalGrade}),
           {variant: 'error'}
         );
         return false;
@@ -463,7 +463,7 @@ const GradesTableToolbar = (): JSX.Element => {
       selectedRows.map(selectedRow => ({
         userId: selectedRow.user.id,
         gradingModelId,
-        grade: finalGrades[selectedRow.user.id].finalValue,
+        grade: finalGrades[selectedRow.user.id].finalGrade,
         date: dateOverride ? gradingDate : findLatestGrade(selectedRow),
         comment: null,
       }))

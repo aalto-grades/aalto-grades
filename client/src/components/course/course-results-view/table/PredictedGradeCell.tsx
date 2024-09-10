@@ -86,7 +86,7 @@ const PredictedGradeCell = ({
                   getGradeString(
                     t,
                     gradingScale,
-                    row.predictedGraphValues?.[modelId]?.finalValue
+                    row.predictedGraphValues?.[modelId]?.finalGrade
                   )
                 )
                 .join(' / ') || 'N/A'

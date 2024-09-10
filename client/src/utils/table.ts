@@ -141,7 +141,7 @@ export const predictedGradesErrorCheck = (
     // Check if model is a course part model.
     if (Object.keys(grade.courseParts).length === 0) continue;
 
-    if (grade.finalValue % 1 !== 0) {
+    if (grade.finalGrade % 1 !== 0) {
       errors.push({
         message: t('utils.grade-not-an-int'),
         type: 'InvalidPredictedGrade',
@@ -151,11 +151,11 @@ export const predictedGradesErrorCheck = (
     // if grade is out of range
     if (
       (courseScale === GradingScale.Numerical &&
-        !(grade.finalValue >= 0 && grade.finalValue <= 5)) ||
+        !(grade.finalGrade >= 0 && grade.finalGrade <= 5)) ||
       (courseScale === GradingScale.PassFail &&
-        !(grade.finalValue >= 0 && grade.finalValue <= 1)) ||
+        !(grade.finalGrade >= 0 && grade.finalGrade <= 1)) ||
       (courseScale === GradingScale.SecondNationalLanguage &&
-        !(grade.finalValue >= 0 && grade.finalValue <= 2))
+        !(grade.finalGrade >= 0 && grade.finalGrade <= 2))
     ) {
       errors.push({
         message: t('utils.grade-out-of-range'),

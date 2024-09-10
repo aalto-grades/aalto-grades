@@ -103,7 +103,7 @@ export type RowError =
 export type RowErrorType = RowError['type'];
 
 export type PredictedGraphValues = {
-  [key: number]: {courseParts: {[key: string]: number}; finalValue: number};
+  [key: number]: {courseParts: {[key: string]: number}; finalGrade: number};
 };
 export type ExtendedStudentRow = StudentRow & {
   predictedGraphValues?: PredictedGraphValues;
@@ -335,10 +335,10 @@ export const GradesTableProvider = ({
 
     const valA =
       a.getValue<GroupedStudentRow>(columnId).predictedGraphValues?.[modelId]
-        .finalValue;
+        .finalGrade;
     const valB =
       b.getValue<GroupedStudentRow>(columnId).predictedGraphValues?.[modelId]
-        .finalValue;
+        .finalGrade;
 
     if (valB === undefined) return 1;
     if (valA === undefined) return -1;
