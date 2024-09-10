@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+
 diff --git a/node_modules/react-global-modal/package.json b/node_modules/react-global-modal/package.json
 index 7269bd4..dfc4e83 100644
 --- a/node_modules/react-global-modal/package.json

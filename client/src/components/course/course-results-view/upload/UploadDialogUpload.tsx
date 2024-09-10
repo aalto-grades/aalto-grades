@@ -69,7 +69,7 @@ const UploadDialogUpload = ({
   const DataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
       setRows(oldRows => {
-        const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
+        const freeId = Math.max(1, ...oldRows.map(row => row.id)) + 1;
         const newRow: GradeUploadColTypes = {
           id: freeId,
         } as GradeUploadColTypes;

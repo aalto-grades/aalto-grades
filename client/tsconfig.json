@@ -1,7 +1,11 @@
+// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 {
   "files": [],
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
+    {"path": "./tsconfig.app.json"},
+    {"path": "./tsconfig.node.json"}
   ]
 }

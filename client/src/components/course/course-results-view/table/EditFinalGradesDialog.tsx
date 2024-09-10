@@ -216,7 +216,7 @@ const EditFinalGradesDialog = ({
   const dataGridToolbar = (): JSX.Element => {
     const addFinalGrade = (): void => {
       setRows(oldRows => {
-        const freeId = Math.max(...oldRows.map(row => row.id)) + 1;
+        const freeId = Math.max(1, ...oldRows.map(row => row.id)) + 1;
         const newRow: ColTypes = {
           id: freeId,
           finalGradeId: -1,
