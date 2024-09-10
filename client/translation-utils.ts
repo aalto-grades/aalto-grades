@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 import path from 'node:path';
-import readlineSync from 'readline-sync';
+import * as readlineSync from 'readline-sync';
 
 type TranslationJson = {[key: string]: TranslationJson | string | undefined};
 

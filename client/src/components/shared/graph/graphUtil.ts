@@ -260,7 +260,7 @@ export const formatGraph = async (
             parseInt(key2.split('-').at(-1)!)
         );
       }
-      const sourcePorts = sortedKeys.toReversed().map(key => ({
+      const sourcePorts = [...sortedKeys].reverse().map(key => ({
         id: key,
         properties: {side: 'WEST'},
       }));

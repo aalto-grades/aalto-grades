@@ -19,7 +19,12 @@ module.exports = {
   plugins: ['@typescript-eslint', 'react-refresh', 'no-relative-import-paths'],
   settings: {
     'import/resolver': {
-      typescript: {project: `${__dirname}/`}, // this loads <rootdir>/tsconfig.json to eslint
+      typescript: {
+        project: [
+          `${__dirname}/tsconfig.node.json`,
+          `${__dirname}/tsconfig.app.json`,
+        ],
+      },
     },
     react: {version: 'detect'},
   },
@@ -76,7 +81,7 @@ module.exports = {
     ],
   },
   parserOptions: {
-    project: './tsconfig.json',
+    project: ['./tsconfig.node.json', './tsconfig.app.json'],
     tsconfigRootDir: __dirname,
   },
 };

@@ -628,14 +628,20 @@ export const GradesTableProvider = ({
       <UserGraphDialog
         open={userGraphOpen}
         onClose={() => setUserGraphOpen(false)}
-        gradingModels={gradingModels?.toSorted((a, b) => {
-          if (a.coursePartId === null && b.coursePartId !== null) return -1;
-          if (a.coursePartId !== null && b.coursePartId === null) return 1;
-          if (selectedGradingModel === 'any') return a.id - b.id;
-          if (a.id === selectedGradingModel.id) return -1;
-          if (b.id === selectedGradingModel.id) return 1;
-          return a.id - b.id;
-        })}
+        gradingModels={
+          gradingModels === undefined
+            ? null
+            : [...gradingModels].sort((a, b) => {
+                if (a.coursePartId === null && b.coursePartId !== null)
+                  return -1;
+                if (a.coursePartId !== null && b.coursePartId === null)
+                  return 1;
+                if (selectedGradingModel === 'any') return a.id - b.id;
+                if (a.id === selectedGradingModel.id) return -1;
+                if (b.id === selectedGradingModel.id) return 1;
+                return a.id - b.id;
+              })
+        }
         coursePartValues={coursePartValues}
         data={userGraphData}
       />

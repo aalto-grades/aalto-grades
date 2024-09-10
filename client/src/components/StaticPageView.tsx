@@ -4,15 +4,10 @@
 
 import {Box, Typography} from '@mui/material';
 import DOMPurify from 'dompurify';
-import type React from 'react';
-import {useEffect, useState} from 'react';
+import {type JSX, useEffect, useState} from 'react';
 
-interface StaticPageProps {
-  url: string;
-  title?: string;
-}
-
-const StaticPageView: React.FC<StaticPageProps> = ({url, title}) => {
+type PropsType = {url: string; title?: string};
+const StaticPageView = ({url, title}: PropsType): JSX.Element => {
   const [htmlContent, setHtmlContent] = useState<string>('');
 
   useEffect(() => {

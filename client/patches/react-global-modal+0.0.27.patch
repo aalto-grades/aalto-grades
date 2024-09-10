@@ -1,0 +1,16 @@
+diff --git a/node_modules/react-global-modal/package.json b/node_modules/react-global-modal/package.json
+index 7269bd4..dfc4e83 100644
+--- a/node_modules/react-global-modal/package.json
++++ b/node_modules/react-global-modal/package.json
+@@ -7,7 +7,10 @@
+   ],
+   "exports": {
+     ".": {
+-      "import": "./dist/react-global-modal.es.js",
++      "import": {
++       "types": "./dist/index.d.ts",
++       "default":  "./dist/react-global-modal.es.js"
++      },
+       "require": "./dist/react-global-modal.umd.js"
+     },
+     "./dist/style.css": "./dist/style.css"

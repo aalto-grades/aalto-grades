@@ -177,9 +177,8 @@ const RequireNode = (props: NodeProps): JSX.Element => {
                     : Math.round(source.value * 100) / 100}
                 </td>
                 <td>
-                  {/* Happens when loading. TODO: Fix? */}
-                  {!Object.hasOwn(nodeValue.values, key)
-                    ? ''
+                  {!(key in nodeValue.values)
+                    ? '' // Happens when loading. TODO: Fix?
                     : numFail > settings.numFail ||
                         nodeValue.values[key] === 'fail'
                       ? nodeValue.values[key]

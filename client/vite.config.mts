@@ -11,10 +11,7 @@ import viteTsconfigPaths from 'vite-tsconfig-paths';
 
 import libreJs from './libre-js-plugin';
 
-// export default defineConfig(({mode}) => {
 export default defineConfig({
-  // depending on your application, base can also be "/"
-  base: '/',
   plugins: [
     react(),
     viteTsconfigPaths(),
@@ -37,9 +34,6 @@ export default defineConfig({
       licenseExceptions: ['0BSD'],
     }),
   ],
-  //   resolve: {
-  //     alias: [{find: '@', replacement: path.resolve(__dirname, './src')}],
-  //   },
   define: {
     // The build will contain a syntax error if we don't manually insert quotes
     AALTO_GRADES_VERSION:
@@ -68,11 +62,10 @@ export default defineConfig({
     },
   },
   server: {
-    // this ensures that the browser opens upon server start
     open: true,
-    // this sets a default port to 3005
     port: 3005,
-    // Forward /api/v1/... to localhost:3000/v1/...
+
+    // Forward `/api/v1/*` to `localhost:3000/v1/*`
     proxy: {
       '/api': {
         target: 'http://localhost:3000',

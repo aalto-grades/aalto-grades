@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {StrictMode} from 'react';
-import ReactDOM from 'react-dom/client';
+import {createRoot} from 'react-dom/client';
 import {createGlobalStyle} from 'styled-components';
 
 import App from './App';
@@ -34,7 +34,7 @@ if (rootElement) {
   }
 `;
 
-  const root = ReactDOM.createRoot(rootElement);
+  const root = createRoot(rootElement);
   root.render(
     <StrictMode>
       <GlobalStyles />

@@ -30,7 +30,7 @@ import {findBestGrade} from '@/utils';
 type PropsType = {
   open: boolean;
   onClose: () => void;
-  gradingModels: GradingModelData[] | undefined;
+  gradingModels: GradingModelData[] | null;
   coursePartValues: {[key: number]: {[key: string]: number | null}};
 
   data: {
@@ -55,7 +55,7 @@ const UserGraphDialog = ({
     null
   );
 
-  const [oldModels, setOldModels] = useState<typeof gradingModels>(undefined);
+  const [oldModels, setOldModels] = useState<typeof gradingModels>(null);
   const [oldData, setOldData] = useState<typeof data>(null);
   if (gradingModels !== oldModels || data !== oldData) {
     setOldModels(gradingModels);
@@ -63,7 +63,7 @@ const UserGraphDialog = ({
 
     if (data?.gradingModel) {
       setSelectedModel(data.gradingModel);
-    } else if (gradingModels !== undefined && gradingModels.length > 0)
+    } else if (gradingModels !== null && gradingModels.length > 0)
       setSelectedModel(gradingModels[0]);
   }
 
@@ -120,7 +120,7 @@ const UserGraphDialog = ({
         )}
       </DialogContent>
       <DialogActions>
-        {gradingModels !== undefined &&
+        {gradingModels !== null &&
           gradingModels.length > 0 &&
           !data?.gradingModel && (
             <FormControl size="small">

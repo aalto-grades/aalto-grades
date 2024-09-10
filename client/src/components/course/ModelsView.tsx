@@ -76,9 +76,11 @@ const ModelsView = (): JSX.Element => {
   // Sort models by archived status
   const models = useMemo(
     () =>
-      allGradingModels.data?.toSorted(
-        (m1, m2) => Number(m1.archived) - Number(m2.archived)
-      ) ?? null,
+      allGradingModels.data === undefined
+        ? null
+        : [...allGradingModels.data].sort(
+            (m1, m2) => Number(m1.archived) - Number(m2.archived)
+          ),
     [allGradingModels.data]
   );
 

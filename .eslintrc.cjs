@@ -8,6 +8,7 @@ module.exports = {
   rules: {
     // Disable some rules from gts
     'n/no-unpublished-import': 'off',
+    'n/no-missing-import': 'off',
 
     // Extra rules on top of gts
     camelcase: 'warn',
