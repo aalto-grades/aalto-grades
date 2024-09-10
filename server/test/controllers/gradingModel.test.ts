@@ -30,7 +30,7 @@ const responseTests = new ResponseTests(request);
 let cookies: Cookies = {} as Cookies;
 let courseId = -1;
 let courseParts: CoursePartData[] = [];
-let courseTasks: CourseTaskData[] = []; // TODO: Use
+let courseTasks: CourseTaskData[] = [];
 let gradingModId = -1;
 let finalGradeStructure: GraphStructure = {} as GraphStructure;
 

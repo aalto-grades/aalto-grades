@@ -17,6 +17,7 @@ import {
   type StudentRow,
   SystemRole,
 } from '@/common/types';
+import {batchCalculateCourseParts} from '@/common/util';
 import Graph from '@/components/shared/graph/Graph';
 import {simplifyNode} from '@/components/shared/graph/graphUtil';
 import {
@@ -62,6 +63,9 @@ const ModelsView = (): JSX.Element => {
     null
   );
   const [currentUserRow, setCurrentUserRow] = useState<StudentRow | null>(null);
+  const [coursePartValues, setCoursePartValues] = useState<{
+    [key: string]: number | null;
+  } | null>(null);
   const [loadGraphId, setLoadGraphId] = useState<number>(-1);
 
   const [createDialogOpen, setCreateDialogOpen] = useState<{
@@ -184,21 +188,44 @@ const ModelsView = (): JSX.Element => {
 
   // Load userId url param
   useEffect(() => {
-    if (userId === undefined || grades.data === undefined) return;
+    if (userId === undefined || grades.data === undefined || models === null)
+      return;
     if (currentUserRow !== null && currentUserRow.user.id === parseInt(userId))
       return;
 
-    for (const row of grades.data) {
-      if (row.user.id === parseInt(userId)) {
-        setCurrentUserRow(row);
-        return;
-      }
+    const userRow = grades.data.find(row => row.user.id === parseInt(userId));
+    if (userRow === undefined) {
+      enqueueSnackbar(t('course.models.grade-not-found', {user: userId}), {
+        variant: 'error',
+      });
+      navigate(`/${courseId}/models/${modelId}`);
+      return;
     }
-    enqueueSnackbar(t('course.models.grade-not-found', {user: userId}), {
-      variant: 'error',
-    });
-    navigate(`/${courseId}/models/${modelId}`);
-  }, [courseId, currentUserRow, grades.data, modelId, navigate, t, userId]);
+
+    setCurrentUserRow(userRow);
+    setCoursePartValues(
+      batchCalculateCourseParts(models, [
+        {
+          userId: userRow.user.id,
+          courseTasks: userRow.courseTasks
+            .filter(task => task.grades.length > 0)
+            .map(task => ({
+              id: task.courseTaskId,
+              grade: findBestGrade(task.grades)!.grade,
+            })),
+        },
+      ])[userRow.user.id]
+    );
+  }, [
+    courseId,
+    currentUserRow,
+    grades.data,
+    modelId,
+    models,
+    navigate,
+    t,
+    userId,
+  ]);
 
   const handleArchiveModel = (
     gradingModelId: number,
@@ -347,7 +374,12 @@ const ModelsView = (): JSX.Element => {
                   id: task.courseTaskId,
                   value: findBestGrade(task.grades)?.grade ?? 0,
                 })) ?? null)
-              : null // TODO
+              : coursePartValues === null
+                ? null
+                : Object.entries(coursePartValues).map(([id, value]) => ({
+                    id: parseInt(id),
+                    value: value ?? 0,
+                  }))
           }
           readOnly={!editRights}
           onSave={onSave}

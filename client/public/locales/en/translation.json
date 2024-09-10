@@ -357,9 +357,9 @@
         "none": "None"
       },
       "missing-part-model-create": "This course part does not have a model yet. Click to create one",
-      "has-deleted-and-archived": "Contains deleted & archived course parts",
-      "has-archived": "Contains archived course parts",
-      "has-deleted": "Contains deleted course parts",
+      "has-deleted-and-archived": "Contains deleted & archived sources",
+      "has-archived": "Contains archived sources",
+      "has-deleted": "Contains deleted sources",
       "rename": {
         "title": "Rename grading model",
         "saved": "Grading model saved"

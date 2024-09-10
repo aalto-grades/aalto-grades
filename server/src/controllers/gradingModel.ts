@@ -20,8 +20,6 @@ import {
   validateGradingModelPath,
 } from './utils/gradingModel';
 
-// TODO: Add support for course part models
-
 /**
  * () => GradingModelData
  *

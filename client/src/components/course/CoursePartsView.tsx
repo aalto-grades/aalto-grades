@@ -180,7 +180,6 @@ const CoursePartsView = (): JSX.Element => {
   };
 
   // Update rows when course tasks change
-  // TODO: Fix this such that it wont overwrite changes
   const [oldCourseTaskData, setOldCourseTaskData] =
     useState<typeof courseTasks.data>(undefined);
   if (courseTasks.data !== oldCourseTaskData) {
