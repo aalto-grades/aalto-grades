@@ -9,15 +9,15 @@ import {
   HttpCode,
   type ModifyCourseTasks,
 } from '@/common/types';
+import {sequelize} from '../database';
+import CourseTask from '../database/models/courseTask';
+import {ApiError, type Endpoint} from '../types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {validateCoursePartBelongsToCourse} from './utils/coursePart';
 import {
   findCourseTaskByCourseId,
   validateCourseTaskPath,
 } from './utils/courseTask';
-import {sequelize} from '../database';
-import CourseTask from '../database/models/courseTask';
-import {ApiError, type Endpoint} from '../types';
 
 /**
  * () => CourseTaskData[]

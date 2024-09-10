@@ -11,10 +11,10 @@ import {
   Model,
 } from 'sequelize';
 
+import {sequelize} from '..';
 import AplusGradeSource from './aplusGradeSource';
 import CourseTask from './courseTask';
 import User from './user';
-import {sequelize} from '..';
 
 export default class TaskGrade extends Model<
   InferAttributes<TaskGrade>,

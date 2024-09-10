@@ -13,14 +13,6 @@ import {
   type NewCourseData,
   SystemRole,
 } from '@/common/types';
-import {
-  findAndValidateCourseId,
-  findCourseFullById,
-  parseCourseFull,
-  validateCourseId,
-  validateEmailList,
-  validateRoleUniqueness,
-} from './utils/course';
 import {sequelize} from '../database';
 import Course from '../database/models/course';
 import CourseRole from '../database/models/courseRole';
@@ -33,6 +25,14 @@ import {
   type Endpoint,
   type JwtClaims,
 } from '../types';
+import {
+  findAndValidateCourseId,
+  findCourseFullById,
+  parseCourseFull,
+  validateCourseId,
+  validateEmailList,
+  validateRoleUniqueness,
+} from './utils/course';
 
 /**
  * () => CourseData

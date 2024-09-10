@@ -12,9 +12,9 @@ import {
 } from 'sequelize';
 
 import type {GraphStructure} from '@/common/types';
+import {sequelize} from '..';
 import Course from './course';
 import CoursePart from './coursePart';
-import {sequelize} from '..';
 
 export default class GradingModel extends Model<
   InferAttributes<GradingModel>,

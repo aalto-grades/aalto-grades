@@ -18,18 +18,6 @@ import {
   type UserData,
   type UserIdArray,
 } from '@/common/types';
-import {validateAplusGradeSourceBelongsToCourseTask} from './utils/aplus';
-import {findAndValidateCourseId, validateCourseId} from './utils/course';
-import {validateCourseTaskBelongsToCourse} from './utils/courseTask';
-import {parseFinalGrade} from './utils/finalGrade';
-import {
-  findAndValidateGradePath,
-  getDateOfLatestGrade,
-  getFinalGradesFor,
-  parseTaskGrade,
-  studentNumbersExist,
-  validateUserAndGrader,
-} from './utils/taskGrade';
 import httpLogger from '../configs/winston';
 import {sequelize} from '../database';
 import AplusGradeSource from '../database/models/aplusGradeSource';
@@ -45,6 +33,18 @@ import {
   type JwtClaims,
   type NewDbGradeData,
 } from '../types';
+import {validateAplusGradeSourceBelongsToCourseTask} from './utils/aplus';
+import {findAndValidateCourseId, validateCourseId} from './utils/course';
+import {validateCourseTaskBelongsToCourse} from './utils/courseTask';
+import {parseFinalGrade} from './utils/finalGrade';
+import {
+  findAndValidateGradePath,
+  getDateOfLatestGrade,
+  getFinalGradesFor,
+  parseTaskGrade,
+  studentNumbersExist,
+  validateUserAndGrader,
+} from './utils/taskGrade';
 
 /**
  * () => StudentRow[]

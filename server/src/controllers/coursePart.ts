@@ -10,13 +10,13 @@ import {
   HttpCode,
   type NewCoursePartData,
 } from '@/common/types';
+import CoursePart from '../database/models/coursePart';
+import {ApiError, type Endpoint} from '../types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
   findCoursePartByCourseId,
   validateCoursePartPath,
 } from './utils/coursePart';
-import CoursePart from '../database/models/coursePart';
-import {ApiError, type Endpoint} from '../types';
 
 /**
  * () => CoursePartData[]

@@ -11,8 +11,8 @@ import {
   Model,
 } from 'sequelize';
 
-import Course from './course';
 import {sequelize} from '..';
+import Course from './course';
 
 export default class CoursePart extends Model<
   InferAttributes<CoursePart>,

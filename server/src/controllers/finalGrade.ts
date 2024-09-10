@@ -9,10 +9,6 @@ import {
   HttpCode,
   type NewFinalGrade,
 } from '@/common/types';
-import {findAndValidateCourseId, validateCourseId} from './utils/course';
-import {findAndValidateFinalGradePath} from './utils/finalGrade';
-import {validateGradingModelBelongsToCourse} from './utils/gradingModel';
-import {validateUserAndGrader} from './utils/taskGrade';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
 import {
@@ -21,6 +17,10 @@ import {
   type JwtClaims,
   type NewDbFinalGradeData,
 } from '../types';
+import {findAndValidateCourseId, validateCourseId} from './utils/course';
+import {findAndValidateFinalGradePath} from './utils/finalGrade';
+import {validateGradingModelBelongsToCourse} from './utils/gradingModel';
+import {validateUserAndGrader} from './utils/taskGrade';
 
 /**
  * () => FinalGradeData[]

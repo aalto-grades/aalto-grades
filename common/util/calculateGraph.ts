@@ -4,8 +4,8 @@
 
 import type {Edge} from 'reactflow';
 
-import {initNodeValues, updateNodeValue} from './graphCalculationUtil';
 import type {GradingModelData} from '../types';
+import {initNodeValues, updateNodeValue} from './graphCalculationUtil';
 import type {
   FullNodeData,
   NodeValues,

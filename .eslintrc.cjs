@@ -36,9 +36,7 @@ module.exports = {
           ['internal', 'parent', 'sibling', 'index'],
         ],
         'newlines-between': 'always',
-        alphabetize: {
-          order: 'asc',
-        },
+        alphabetize: {order: 'asc'},
         // https://github.com/import-js/eslint-plugin-import/issues/2008#issuecomment-801263294
         pathGroups: [
           {

@@ -12,8 +12,8 @@ import {
 } from 'sequelize';
 
 import type {AplusCourseData, AplusGradeSourceType} from '@/common/types';
-import CourseTask from './courseTask';
 import {sequelize} from '..';
+import CourseTask from './courseTask';
 
 export default class AplusGradeSource extends Model<
   InferAttributes<AplusGradeSource>,

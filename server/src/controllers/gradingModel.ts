@@ -10,6 +10,8 @@ import {
   HttpCode,
   type NewGradingModelData,
 } from '@/common/types';
+import GradingModel from '../database/models/gradingModel';
+import {ApiError, type Endpoint} from '../types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {findCoursePartByCourseId} from './utils/coursePart';
 import {findCourseTaskByCourseId} from './utils/courseTask';
@@ -17,8 +19,6 @@ import {
   checkGradingModelSources,
   validateGradingModelPath,
 } from './utils/gradingModel';
-import GradingModel from '../database/models/gradingModel';
-import {ApiError, type Endpoint} from '../types';
 
 // TODO: Add support for course part models
 

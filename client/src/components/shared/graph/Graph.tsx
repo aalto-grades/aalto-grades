@@ -58,7 +58,6 @@ import {
 } from '@/context/GraphProvider';
 import SelectSourcesDialog from './SelectSourcesDialog';
 import SourceValuesDialog from './SourceValuesDialog';
-import './flow.scss'; // Import styles
 import {
   findDisconnectedEdges,
   formatGraph,
@@ -76,6 +75,7 @@ import SinkNode from './nodes/SinkNode';
 import SourceNode from './nodes/SourceNode';
 import StepperNode from './nodes/StepperNode';
 import SubstituteNode from './nodes/SubstituteNode';
+import './flow.scss'; // Import styles. At the bottom of the imports to fix import/order
 
 // TODO: Don't show word 'source' to user?
 // Instead we could check if is course part model or not

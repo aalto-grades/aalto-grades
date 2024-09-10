@@ -11,8 +11,8 @@ import {
   Model,
 } from 'sequelize';
 
-import CoursePart from './coursePart';
 import {sequelize} from '..';
+import CoursePart from './coursePart';
 
 export default class CourseTask extends Model<
   InferAttributes<CourseTask>,

@@ -16,14 +16,6 @@ import {
   type NewTaskGrade,
 } from '@/common/types';
 import {aplusGradeSourcesEqual} from '@/common/util';
-import {
-  fetchFromAplus,
-  parseAplusGradeSource,
-  parseAplusToken,
-  validateAplusCourseId,
-  validateAplusGradeSourcePath,
-} from './utils/aplus';
-import {validateCourseTaskPath} from './utils/courseTask';
 import {APLUS_API_URL} from '../configs/environment';
 import AplusGradeSource from '../database/models/aplusGradeSource';
 import {
@@ -34,6 +26,14 @@ import {
   type AplusStudentPoints,
   type Endpoint,
 } from '../types';
+import {
+  fetchFromAplus,
+  parseAplusGradeSource,
+  parseAplusToken,
+  validateAplusCourseId,
+  validateAplusGradeSourcePath,
+} from './utils/aplus';
+import {validateCourseTaskPath} from './utils/courseTask';
 
 /**
  * () => AplusCourseData[]
