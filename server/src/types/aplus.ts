@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
+/* eslint-disable camelcase */
+
 import {z} from 'zod';
 
 import {DateSchema} from '@/common/types';
 
 // This file contains validation schemas and types for data returned by the A+
 // API.
-
-/* eslint camelcase: off */
 
 // GET /users/me
 export const AplusCoursesResSchema = z.object({
