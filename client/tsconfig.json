@@ -25,5 +25,5 @@
     "jsx": "react-jsx",
     "types": ["vite/client"]
   },
-  "include": ["src", "translation-utils.ts", "vite-env.d.ts", "vite.config.ts"]
+  "include": ["src", "translation-utils.ts", "vite-env.d.ts", "vite.config.mts"]
 }
