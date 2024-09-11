@@ -110,7 +110,7 @@ export const initNode = (
   }
 };
 
-export type GraphTemplate = 'none' | 'addition' | 'average';
+export type GraphTemplate = 'none' | 'addition' | 'average' | 'max';
 
 const createEdge = (
   source: string,
@@ -134,22 +134,19 @@ export const initGraph = (
   sources: CoursePartData[] | CourseTaskData[],
   coursePart: CoursePartData | null = null
 ): GraphStructure => {
+  let x = 0;
   const nodes: TypedNode[] = [
-    {
-      id: 'sink',
-      type: 'sink',
-      position: {x: 1116, y: 0},
-      data: {},
-    },
     ...sources.map(
       (source, index): TypedNode => ({
         id: `source-${source.id}`,
         type: 'source',
-        position: {x: 12, y: 173 * index},
+        position: {x, y: (97 + 50) * index},
         data: {},
       })
     ),
   ];
+  x += 225 + 150;
+
   const edges: Edge[] = [];
   const nodeData: FullNodeData = {
     sink: {
@@ -166,63 +163,99 @@ export const initGraph = (
     ),
   };
 
-  if (template === 'addition' || template === 'average') {
-    const middleNodeId = template === 'addition' ? 'addition' : 'average';
-    const middleNodeType = template === 'addition' ? 'addition' : 'average';
-
-    // Add addition/average node
+  const middleNode: {
+    [key: string]: {
+      id: string;
+      type: CustomNodeTypes;
+      size: number;
+      data: NodeData;
+    };
+  } = {
+    max: {
+      id: 'max',
+      type: 'max',
+      size: 92,
+      data: {title: 'Max', settings: {minValue: 0}},
+    },
+    addition: {
+      id: 'addition',
+      type: 'addition',
+      size: 88,
+      data: {title: 'Addition'},
+    },
+    average: {
+      id: 'average',
+      type: 'average',
+      size: 171,
+      data: {
+        title: 'Average',
+        settings: {
+          weights: Object.fromEntries(
+            sources.map((_, i) => [
+              `average-${i}`,
+              Math.round((100 / sources.length) * 10) / 10,
+            ])
+          ),
+          percentageMode: true,
+        },
+      },
+    },
+  };
+  if (template === 'max' || template === 'addition' || template === 'average') {
+    // Add middleNode
     nodes.push({
-      id: middleNodeId,
-      type: middleNodeType,
-      position: {x: 437, y: 0},
+      id: middleNode[template].id,
+      type: middleNode[template].type,
+      position: {x, y: 0},
       data: {},
     });
+    x += middleNode[template].size + 150;
+
     for (let i = 0; i < sources.length; i++) {
       const sourceNodeId = `source-${sources[i].id}`;
-      edges.push(createEdge(sourceNodeId, middleNodeId, undefined, i));
+      edges.push(
+        createEdge(sourceNodeId, middleNode[template].id, undefined, i)
+      );
     }
-    nodeData[middleNodeId] =
-      template === 'addition'
-        ? {title: 'Addition'}
-        : {
-            title: 'Average',
-            settings: {
-              weights: Object.fromEntries(
-                sources.map((_, i) => [
-                  `average-${i}`,
-                  Math.round((100 / sources.length) * 10) / 10,
-                ])
-              ),
-              percentageMode: true,
-            },
-          };
+    nodeData[middleNode[template].id] = middleNode[template].data;
 
-    // Add stepper node
-    nodes.push({
-      id: 'stepper',
-      type: 'stepper',
-      position: {x: 725, y: 0},
-      data: {},
-    });
-    edges.push(createEdge(middleNodeId, 'stepper'));
-    nodeData.stepper = {
-      title: 'Convert to grade',
-      settings: {
-        numSteps: 6,
-        outputValues: [0, 1, 2, 3, 4, 5],
-        middlePoints:
-          template === 'average'
-            ? [1.7, 3.3, 5, 6.7, 8.3]
-            : Array.from(
-                {length: 5},
-                (_, i) =>
-                  Math.round((((i + 1) * 10 * sources.length) / 6) * 10) / 10
-              ),
-      },
-    };
-
-    edges.push(createEdge('stepper', 'sink'));
+    if (template === 'max' || coursePart) {
+      edges.push(createEdge(middleNode[template].id, 'sink'));
+    } else {
+      // Add stepper node
+      nodes.push({
+        id: 'stepper',
+        type: 'stepper',
+        position: {x, y: 0},
+        data: {},
+      });
+      x += 191 + 150;
+      edges.push(createEdge(middleNode[template].id, 'stepper'));
+      nodeData.stepper = {
+        title: 'Convert to grade',
+        settings: {
+          numSteps: 6,
+          outputValues: [0, 1, 2, 3, 4, 5],
+          middlePoints:
+            template === 'average'
+              ? [1.7, 3.3, 5, 6.7, 8.3]
+              : Array.from(
+                  {length: 5},
+                  (_, i) =>
+                    Math.round((((i + 1) * 10 * sources.length) / 6) * 10) / 10
+                ),
+        },
+      };
+      edges.push(createEdge('stepper', 'sink'));
+    }
   }
+
+  nodes.push({
+    id: 'sink',
+    type: 'sink',
+    position: {x, y: 0},
+    data: {},
+  });
 
   return {nodes, edges, nodeData};
 };

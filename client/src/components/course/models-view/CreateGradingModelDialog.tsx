@@ -122,6 +122,7 @@ const CreateGradingModelDialog = ({
             <MenuItem value="average">
               {t('shared.graph.node.average')}
             </MenuItem>
+            <MenuItem value="max">{t('shared.graph.node.max')}</MenuItem>
           </Select>
         </FormControl>
       </DialogContent>
