@@ -210,7 +210,7 @@ const AverageNode = (props: NodeProps): JSX.Element => {
                   value={weight}
                   onChange={event => handleChange(key, event)}
                 />
-                {localSettings.percentageMode && <label> %</label>}
+                {localSettings.percentageMode && ' %'}
               </td>
               <td>
                 {!(key in sources) ||
@@ -228,7 +228,7 @@ const AverageNode = (props: NodeProps): JSX.Element => {
           <tr>
             <td>
               <input style={{width: '40px'}} type="number" disabled />
-              {localSettings.percentageMode && <label> %</label>}
+              {localSettings.percentageMode && ' %'}
             </td>
             <td>-</td>
           </tr>

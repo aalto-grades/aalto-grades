@@ -84,7 +84,7 @@ const SourceNode = (props: NodeProps): JSX.Element => {
       </div>
       {settings.minPoints !== null && (
         <div style={{textAlign: 'left'}}>
-          <label>On fail: </label>
+          <label>{t('shared.graph.on-fail')}: </label>
           <select
             onChange={handleSelectChange}
             value={localSettings.onFailSetting}
