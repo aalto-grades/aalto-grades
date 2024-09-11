@@ -251,9 +251,17 @@ const ModelsView = (): JSX.Element => {
   const onSave = async (graphStructure: GraphStructure): Promise<void> => {
     if (currentModel === null) throw new Error(t('course.models.save-null'));
 
+    const nodeIds = new Set(graphStructure.nodes.map(node => node.id));
     const simplifiedGraphStructure = {
-      ...graphStructure,
+      // Simplify nodes
       nodes: graphStructure.nodes.map(simplifyNode),
+      edges: graphStructure.edges,
+      // Remove nodeData for nodes that no longer exist
+      nodeData: Object.fromEntries(
+        Object.entries(graphStructure.nodeData).filter(([key]) =>
+          nodeIds.has(key)
+        )
+      ),
     };
     await editModel.mutateAsync({
       courseId,
