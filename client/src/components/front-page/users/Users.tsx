@@ -34,16 +34,14 @@ const Users = (): JSX.Element => {
         </Typography>
         <Box sx={{mb: -10 /* Align with tabs */}}>
           <Button
-            id="ag-manage-users-btn"
             sx={{mr: 1.5}}
             size="large"
             variant="contained"
             onClick={() => navigate('/manage-students')}
           >
-            {t('front-page.manage-users')}
+            {t('front-page.manage-students')}
           </Button>
           <Button
-            id="ag-new-user-btn"
             size="large"
             variant="contained"
             onClick={() => setAddOpen(true)}
