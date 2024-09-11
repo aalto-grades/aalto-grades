@@ -18,16 +18,16 @@ import {useTranslation} from 'react-i18next';
 import {getAplusToken, setAplusToken} from '@/utils';
 
 type PropsType = {
-  handleClose: () => void;
-  handleSubmit: () => void;
   open: boolean;
+  onClose: () => void;
+  onSubmit: () => void;
   error?: boolean;
 };
 
 const AplusTokenDialog = ({
-  handleClose,
-  handleSubmit,
   open,
+  onClose,
+  onSubmit,
   error = false,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
@@ -35,7 +35,7 @@ const AplusTokenDialog = ({
   const [token, setToken] = useState<string>('');
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>{t('general.a+-api-token')}</DialogTitle>
       <DialogContent>
         <Typography>
@@ -72,13 +72,13 @@ const AplusTokenDialog = ({
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
+        <Button onClick={onClose}>Cancel</Button>
         <Button
           disabled={!token || token.length !== 40}
           variant="contained"
           onClick={() => {
             if (token) setAplusToken(token);
-            handleSubmit();
+            onSubmit();
           }}
         >
           {t('general.submit')}

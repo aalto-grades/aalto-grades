@@ -37,17 +37,18 @@ import {sisuLanguageOptions} from '@/utils';
 
 type DownloadOption = 'all' | 'exported' | 'unexported';
 
+type PropsType = {
+  open: boolean;
+  onClose: () => void;
+  onExited: () => void;
+  selectedRows: StudentRow[];
+};
 const SisuDownloadDialog = ({
   open,
-  handleClose,
-  handleExited,
+  onClose,
+  onExited,
   selectedRows,
-}: {
-  open: boolean;
-  handleClose: () => void;
-  handleExited: () => void;
-  selectedRows: StudentRow[];
-}): JSX.Element => {
+}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const localize = useLocalize();
   const {courseId} = useParams() as {courseId: string};
@@ -134,15 +135,15 @@ const SisuDownloadDialog = ({
         studentNumbers: studentNumbers as [string, ...string[]], // Non-empty array
       },
     });
-    if (!exportedValuesInList) handleClose();
+    if (!exportedValuesInList) onClose();
   };
 
   return (
     <Dialog
       open={open}
-      onClose={handleClose}
+      onClose={onClose}
       transitionDuration={{exit: 800}}
-      TransitionProps={{onExited: handleExited}}
+      TransitionProps={{onExited: onExited}}
       fullWidth
     >
       <DialogTitle>
@@ -249,7 +250,7 @@ const SisuDownloadDialog = ({
         </Paper>
       </DialogContent>
       <DialogActions>
-        <Button variant="outlined" onClick={handleClose}>
+        <Button variant="outlined" onClick={onClose}>
           {t('general.cancel')}
         </Button>
         <Button

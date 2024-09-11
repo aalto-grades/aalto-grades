@@ -438,7 +438,7 @@ const CoursePartsView = (): JSX.Element => {
         coursePartId={selectedPart}
       />
       <AddAplusGradeSourceDialog
-        handleClose={() =>
+        onClose={() =>
           setAddAplusSourcesTo({
             courseTaskId: null,
             aplusGradeSources: [],
@@ -448,8 +448,8 @@ const CoursePartsView = (): JSX.Element => {
         aplusGradeSources={addAplusSourcesTo.aplusGradeSources}
       />
       <ViewAplusGradeSourcesDialog
-        handleClose={() => setViewAplusSourcesOpen(false)}
         open={viewAplusSourcesOpen}
+        onClose={() => setViewAplusSourcesOpen(false)}
         aplusGradeSources={aplusGradeSources}
       />
       <UnsavedChangesDialog

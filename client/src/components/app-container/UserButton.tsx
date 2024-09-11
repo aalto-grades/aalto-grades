@@ -76,15 +76,15 @@ const UserButton = (): JSX.Element => {
   return (
     <>
       <AplusTokenDialog
-        handleClose={() => setAplusTokenDialogOpen(false)}
-        handleSubmit={() => setAplusTokenDialogOpen(false)}
         open={aplusTokenDialogOpen}
+        onClose={() => setAplusTokenDialogOpen(false)}
+        onSubmit={() => setAplusTokenDialogOpen(false)}
       />
       {auth.role === SystemRole.Admin && (
         <>
           <ChangePasswordDialog
-            onClose={() => setChangePasswordDialogOpen(false)}
             open={changePasswordDialogOpen}
+            onClose={() => setChangePasswordDialogOpen(false)}
           />
           <OtpAuthDialog
             open={showMfaDialog}

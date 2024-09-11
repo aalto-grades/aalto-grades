@@ -143,12 +143,12 @@ const NewAplusCourseTasksDialog = ({
   return (
     <>
       <AplusTokenDialog
-        handleClose={onClose}
-        handleSubmit={() => {
+        open={open && aplusTokenDialogOpen}
+        onClose={onClose}
+        onSubmit={() => {
           setAplusTokenDialogOpen(false);
           aplusCourses.refetch();
         }}
-        open={open && aplusTokenDialogOpen}
         error={aplusCourses.isError}
       />
       <Dialog

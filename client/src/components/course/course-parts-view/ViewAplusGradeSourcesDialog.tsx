@@ -28,13 +28,13 @@ import {type AplusGradeSourceData, AplusGradeSourceType} from '@/common/types';
 import {useDeleteAplusGradeSource} from '@/hooks/useApi';
 
 type PropsType = {
-  handleClose: () => void;
+  onClose: () => void;
   open: boolean;
   aplusGradeSources: AplusGradeSourceData[];
 };
 
 const ViewAplusGradeSourcesDialog = ({
-  handleClose,
+  onClose,
   open,
   aplusGradeSources,
 }: PropsType): JSX.Element => {
@@ -57,11 +57,11 @@ const ViewAplusGradeSourcesDialog = ({
 
   const handleDelete = (aplusGradeSourceId: number): void => {
     deleteAplusGradeSource.mutate(aplusGradeSourceId);
-    handleClose();
+    onClose();
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="lg">
+    <Dialog open={open} onClose={onClose} maxWidth="lg">
       <DialogTitle>{t('general.a+-grade-sources')}</DialogTitle>
       <DialogContent>
         <TableContainer component={Paper}>
@@ -106,7 +106,7 @@ const ViewAplusGradeSourcesDialog = ({
         </TableContainer>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Close</Button>
+        <Button onClick={onClose}>Close</Button>
       </DialogActions>
     </Dialog>
   );

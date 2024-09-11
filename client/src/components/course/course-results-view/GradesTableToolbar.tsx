@@ -479,8 +479,8 @@ const GradesTableToolbar = (): JSX.Element => {
     <>
       <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} />
       <AplusImportDialog
-        onClose={() => setAplusImportDialogOpen(false)}
         open={aplusImportDialogOpen}
+        onClose={() => setAplusImportDialogOpen(false)}
       />
       <CalculateFinalGradesDialog
         open={showCalculateDialog}
@@ -491,8 +491,8 @@ const GradesTableToolbar = (): JSX.Element => {
       />
       <SisuDownloadDialog
         open={showSisuDialog}
-        handleClose={() => setShowSisuDialog(false)}
-        handleExited={handleExitedSisuDialog}
+        onClose={() => setShowSisuDialog(false)}
+        onExited={handleExitedSisuDialog}
         selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
       />
 
