@@ -277,11 +277,11 @@ const ModelsView = (): JSX.Element => {
       <CreateGradingModelDialog
         open={createDialogOpen.open}
         onClose={() => setCreateDialogOpen({open: false})}
-        coursePart={createDialogOpen.coursePart}
         onSubmit={id => {
           allGradingModels.refetch();
           setLoadGraphId(id);
         }}
+        coursePart={createDialogOpen.coursePart}
       />
       <RenameGradingModelDialog
         open={editDialogOpen}
