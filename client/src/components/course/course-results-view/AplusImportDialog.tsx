@@ -29,17 +29,16 @@ import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
 import {
   useAddGrades,
   useFetchAplusGrades,
+  useGetCourseParts,
   useGetCourseTasks,
 } from '@/hooks/useApi';
 import {getAplusToken} from '@/utils';
 
-type PropsType = {
-  open: boolean;
-  onClose: () => void;
-};
+type PropsType = {open: boolean; onClose: () => void};
 const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
+  const courseParts = useGetCourseParts(courseId);
   const courseTasks = useGetCourseTasks(courseId);
 
   const [step, setStep] = useState<number>(0);
@@ -88,6 +87,10 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
     row => row.expiryDate !== null
   );
 
+  const coursePartNames = Object.fromEntries(
+    courseParts.data?.map(part => [part.id, part.name]) ?? []
+  );
+
   return (
     <Dialog open={open} onClose={handleResetAndClose} maxWidth="md" fullWidth>
       {step === 0 && (
@@ -98,15 +101,19 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
             <FormGroup>
               {courseTasks.data
                 ?.filter(task => task.aplusGradeSources.length > 0)
-                .map(task => (
-                  <FormControlLabel
-                    key={task.id}
-                    control={
-                      <Checkbox onChange={e => handleSelect(e, task.id)} />
-                    }
-                    label={task.name}
-                  />
-                ))}
+                .map(task => {
+                  const partName = coursePartNames[task.coursePartId];
+                  const coursePartString = partName ? `${partName} -> ` : '';
+                  return (
+                    <FormControlLabel
+                      key={task.id}
+                      control={
+                        <Checkbox onChange={e => handleSelect(e, task.id)} />
+                      }
+                      label={`${coursePartString}${task.name}`}
+                    />
+                  );
+                })}
             </FormGroup>
           </DialogContent>
         </>

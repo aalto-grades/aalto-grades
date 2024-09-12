@@ -66,7 +66,7 @@ const SelectAplusGradeSources = ({
                 onChange={e =>
                   handleChange(
                     e.target.checked,
-                    `A+ ${t('general.course')}: ${aplusCourse.name}`,
+                    `[${aplusCourse.name}] ${t('general.full-points')}`,
                     aplusExerciseData.data.maxGrade,
                     newAplusGradeSource(
                       aplusCourse,
@@ -100,7 +100,7 @@ const SelectAplusGradeSources = ({
                     onChange={e =>
                       handleChange(
                         e.target.checked,
-                        `A+ ${t('general.module')}: ${module.name}`,
+                        `[${aplusCourse.name}] ${t('general.module')}: ${module.name}`,
                         module.maxGrade,
                         newAplusGradeSource(aplusCourse, module.closingDate, {
                           module,
@@ -135,7 +135,7 @@ const SelectAplusGradeSources = ({
                       onChange={e =>
                         handleChange(
                           e.target.checked,
-                          `A+ ${t('general.exercise')}: ${exercise.name}`,
+                          `[${aplusCourse.name}] ${t('general.exercise')}: ${exercise.name}`,
                           exercise.maxGrade,
                           newAplusGradeSource(aplusCourse, module.closingDate, {
                             exercise,
@@ -173,7 +173,7 @@ const SelectAplusGradeSources = ({
                       onChange={e =>
                         handleChange(
                           e.target.checked,
-                          `A+ ${t('general.difficulty')}: ${difficulty.difficulty}`,
+                          `[${aplusCourse.name}] ${t('general.difficulty')}: ${difficulty.difficulty}`,
                           difficulty.maxGrade,
                           newAplusGradeSource(
                             aplusCourse,
