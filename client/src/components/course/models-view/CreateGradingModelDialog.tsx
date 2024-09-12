@@ -27,17 +27,18 @@ import {
   useGetCourseTasks,
 } from '@/hooks/useApi';
 
+type PropsType = {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (id: number) => void;
+  coursePart?: CoursePartData;
+};
 const CreateGradingModelDialog = ({
   open,
   onClose,
-  coursePart,
   onSubmit,
-}: {
-  open: boolean;
-  onClose: () => void;
-  coursePart?: CoursePartData;
-  onSubmit: (id: number) => void;
-}): JSX.Element => {
+  coursePart,
+}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const courseParts = useGetCourseParts(courseId);
@@ -85,7 +86,15 @@ const CreateGradingModelDialog = ({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
+    <Dialog
+      open={open}
+      onClose={() => {
+        onClose();
+        if (coursePart) setName('');
+      }}
+      fullWidth
+      maxWidth="xs"
+    >
       <DialogTitle>
         {coursePart !== undefined
           ? t('course.models.create-model.part-title', {part: coursePart.name})
@@ -122,6 +131,7 @@ const CreateGradingModelDialog = ({
             <MenuItem value="average">
               {t('shared.graph.node.average')}
             </MenuItem>
+            <MenuItem value="max">{t('shared.graph.node.max')}</MenuItem>
           </Select>
         </FormControl>
       </DialogContent>

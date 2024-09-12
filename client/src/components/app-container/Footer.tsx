@@ -5,6 +5,7 @@
 import {Box, Link, Tooltip, Typography} from '@mui/material';
 import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
+import {Link as RouterLink} from 'react-router-dom';
 
 const Footer = (): JSX.Element => {
   const {t} = useTranslation();
@@ -21,25 +22,35 @@ const Footer = (): JSX.Element => {
         marginTop: 'auto',
       }}
     >
-      <Link href="/privacy-notice" underline="none" sx={{mx: 3}}>
+      <Link
+        component={RouterLink}
+        to="/privacy-notice"
+        underline="none"
+        sx={{mx: 3}}
+      >
         {t('app.footer.privacy')}
       </Link>
-      <Link href="/accessibility-statement" underline="none" sx={{mr: 3}}>
+      <Link
+        component={RouterLink}
+        to="/accessibility-statement"
+        underline="none"
+        sx={{mr: 3}}
+      >
         {t('app.footer.accessibility')}
       </Link>
-      <Link href="/support" underline="none" sx={{mr: 3}}>
+      <Link component={RouterLink} to="/support" underline="none" sx={{mr: 3}}>
         {t('app.footer.support')}
       </Link>
-      <Link href="/licenses" underline="none" sx={{mr: 3}}>
+      <Link component={RouterLink} to="/licenses" underline="none" sx={{mr: 3}}>
         {t('app.footer.licenses')}
       </Link>
       <Tooltip title={t('app.footer.source.tooltip')}>
         <Link
           // TODO: Once we have releases and employ a versioning scheme, link the version tag
-          // href={`https://github.com/aalto-grades/aalto-grades/tree/${AALTO_GRADES_VERSION}`}
+          // to={`https://github.com/aalto-grades/aalto-grades/tree/${AALTO_GRADES_VERSION}`}
           href="https://github.com/aalto-grades/aalto-grades"
-          rel="noreferrer"
           target="_blank"
+          rel="noreferrer"
           underline="none"
           sx={{mr: 3}}
         >
@@ -49,8 +60,8 @@ const Footer = (): JSX.Element => {
       <Tooltip title={t('app.footer.feedback.tooltip')}>
         <Link
           href="https://link.webropolsurveys.com/S/E358C6E5E7690C72"
-          rel="noreferrer"
           target="_blank"
+          rel="noreferrer"
           underline="none"
           sx={{mr: 3}}
         >

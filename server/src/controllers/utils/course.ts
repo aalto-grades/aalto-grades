@@ -90,12 +90,10 @@ export const parseCourseFull = (course: CourseFull): CourseData => {
     const role = user.CourseRole.role;
     if (role === CourseRoleType.Student) continue;
 
-    if (user.name === null || user.email === null) {
-      httpLogger.error(
-        `Teacher or assistant user ${user.id} is missing a name or an email`
-      );
+    if (user.email === null) {
+      httpLogger.error(`Teacher or assistant user ${user.id} an email`);
       throw new ApiError(
-        'Teacher or assistant user is missing a name or an email',
+        'Teacher or assistant user is missing an email',
         HttpCode.InternalServerError
       );
     }

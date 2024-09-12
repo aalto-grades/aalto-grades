@@ -208,8 +208,8 @@ const UploadDialogUpload = ({
       </DialogTitle>
       <Dialog
         open={textFieldOpen}
-        fullWidth
         onClose={() => setTextFieldOpen(false)}
+        fullWidth
       >
         <DialogTitle>{t('course.results.upload.paste-text')}</DialogTitle>
         <DialogContent>

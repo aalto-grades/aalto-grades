@@ -438,18 +438,18 @@ const Graph = ({
     <>
       <UnsavedChangesDialog blocker={blocker} />
       <SelectSourcesDialog
+        open={sourcesSelectOpen}
+        onClose={() => setSourcesSelectOpen(false)}
         nodes={nodes}
         sources={sources}
-        open={sourcesSelectOpen}
         handleSourceSelect={handleSourceSelect}
-        onClose={() => setSourcesSelectOpen(false)}
       />
       <SourceValuesDialog
+        open={sourceValuesOpen}
+        onClose={() => setSourceValuesOpen(false)}
         nodes={nodes}
         nodeValues={nodeValues}
         sources={sources}
-        open={sourceValuesOpen}
-        onClose={() => setSourceValuesOpen(false)}
         handleSetSourceValues={handleSetSourceValues}
       />
       <div style={{position: 'relative'}}>

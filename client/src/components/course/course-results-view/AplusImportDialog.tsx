@@ -116,12 +116,12 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
           <DialogTitle>{t('course.parts.fetching-grades')}</DialogTitle>
           <DialogContent>
             <AplusTokenDialog
-              handleClose={handleResetAndClose}
-              handleSubmit={() => {
+              open={aplusTokenDialogOpen}
+              onClose={handleResetAndClose}
+              onSubmit={() => {
                 setAplusTokenDialogOpen(false);
                 aplusGrades.refetch();
               }}
-              open={aplusTokenDialogOpen}
               error={aplusGrades.isError}
             />
             <Typography>{t('course.parts.fetching-grades-wait')}</Typography>

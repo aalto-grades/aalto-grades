@@ -36,7 +36,7 @@ const CreateAplusCourseTasks = ({
   return (
     <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
       {courseTasksWithSource.map(([courseTask, _], index) => (
-        <Card sx={{m: 1}} key={index}>
+        <Card key={index} sx={{m: 1}}>
           <CardContent
             sx={{display: 'flex', flexDirection: 'column', width: 370}}
           >

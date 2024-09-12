@@ -9,7 +9,6 @@ import {
 } from '@node-saml/passport-saml';
 import {DOMParser} from '@xmldom/xmldom';
 import axios from 'axios';
-import type {Request} from 'express';
 import {type SelectReturnType, isArrayOfNodes, useNamespaces} from 'xpath';
 
 import {HttpCode, type SystemRole} from '@/common/types';
@@ -72,22 +71,18 @@ export const getIdpSignCert = async (
 export const getSamlStrategy = async (): Promise<SamlStrategy> =>
   new SamlStrategy(
     {
+      // Some documentation https://github.com/node-saml/node-saml
       callbackUrl: SAML_CALLBACK,
       entryPoint: SAML_ENTRYPOINT,
       issuer: SAML_ISSUER,
-      cert: (await getIdpSignCert(SAML_METADATA_URL)) ?? DEV_SAML_IDP_CERT, // IdP public key in .pem format
+      idpCert: (await getIdpSignCert(SAML_METADATA_URL)) ?? DEV_SAML_IDP_CERT, // IdP public key in .pem format
       decryptionPvk: SAML_DECRYPTION_PVK,
       privateKey: SAML_PRIVATE_KEY, // SP private key in .pem format
       signatureAlgorithm: 'sha256',
       identifierFormat: null,
-      passReqToCallback: true, // This is required when using typescript apparently...
     },
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    async (
-      _req: Request,
-      profile: Profile | null,
-      done: SamlVerifiedCallback
-    ) => {
+    async (profile: Profile | null, done: SamlVerifiedCallback) => {
       try {
         const eduUser = profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
         const email = profile?.['urn:oid:0.9.2342.19200300.100.1.3'] as string;
@@ -116,7 +111,7 @@ export const getSamlStrategy = async (): Promise<SamlStrategy> =>
         return done(error as Error);
       }
     },
-    (_req: Request, profile: Profile | null, done: SamlVerifiedCallback) => {
+    (profile: Profile | null, done: SamlVerifiedCallback) => {
       // for logout
       try {
         return done(null, {profile});

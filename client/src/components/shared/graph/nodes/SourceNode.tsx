@@ -84,7 +84,7 @@ const SourceNode = (props: NodeProps): JSX.Element => {
       </div>
       {settings.minPoints !== null && (
         <div style={{textAlign: 'left'}}>
-          <label>On fail: </label>
+          <label>{t('shared.graph.on-fail')}: </label>
           <select
             onChange={handleSelectChange}
             value={localSettings.onFailSetting}
@@ -94,12 +94,18 @@ const SourceNode = (props: NodeProps): JSX.Element => {
           </select>
         </div>
       )}
-      <p className="output-value">
-        {t('shared.graph.output')}:{' '}
-        {nodeValue.value === 'fail'
-          ? 'fail'
-          : Math.round(nodeValue.value * 100) / 100}
-      </p>
+
+      <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
+        <p className="output-value" style={{margin: '5px 0px 0px 0px'}}>
+          {t('shared.graph.value')}: {Math.round(nodeValue.source * 100) / 100}
+        </p>
+        <p className="output-value" style={{margin: '5px 0px 0px 0px'}}>
+          {t('shared.graph.output')}:{' '}
+          {nodeValue.value === 'fail'
+            ? 'fail'
+            : Math.round(nodeValue.value * 100) / 100}
+        </p>
+      </div>
 
       <Handle
         type="source"

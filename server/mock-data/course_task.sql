@@ -19,9 +19,12 @@ insert into public.course_task (course_part_id, name, days_valid, max_grade, cre
 (2, 'Substitute 2', NULL, NULL, NOW(), NOW()),
 (2, 'Substitute 3', NULL, NULL, NOW(), NOW()),
 (2, 'Substitute 4', NULL, NULL, NOW(), NOW()),
-(3, 'Exercise 1', NULL, 10, NOW(), NOW()),
+(3, 'Exercise 1', NULL, 10, NOW(), NOW()), -- 17
 (3, 'Exercise 2', NULL, 10, NOW(), NOW()),
-(4, 'Exam points', NULL, 20, NOW(), NOW());
+(4, 'Exam points', NULL, 20, NOW(), NOW()),
+(5, 'Exercise 1', NULL, 10, NOW(), NOW()),
+(5, 'Exercise 2', NULL, 10, NOW(), NOW()),
+(6, 'Exam points', NULL, 20, NOW(), NOW());
 
 
 SELECT setval('course_part_id_seq', COALESCE((SELECT MAX(id)+1 FROM course_part), 1), false);

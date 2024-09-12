@@ -19,7 +19,7 @@
     "test": "jest --verbose --detectOpenHandles --coverage"
   },
   "dependencies": {
-    "@node-saml/passport-saml": "^4.0.4",
+    "@node-saml/passport-saml": "^5.0.0",
     "@xmldom/xmldom": "^0.8.10",
     "argon2": "^0.41.0",
     "axios": "^1.2.3",

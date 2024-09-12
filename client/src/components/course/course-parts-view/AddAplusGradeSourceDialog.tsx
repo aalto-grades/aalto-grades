@@ -25,13 +25,13 @@ import SelectAplusCourse from './SelectAplusCourse';
 import SelectAplusGradeSource from './SelectAplusGradeSource';
 
 type PropsType = {
-  handleClose: () => void;
+  onClose: () => void;
   courseTaskId: number | null;
   aplusGradeSources: AplusGradeSourceData[];
 };
 
 const AddAplusGradeSourceDialog = ({
-  handleClose,
+  onClose,
   courseTaskId,
   aplusGradeSources,
 }: PropsType): JSX.Element => {
@@ -52,7 +52,7 @@ const AddAplusGradeSourceDialog = ({
   const handleResetAndClose = (): void => {
     setStep(0);
     setAplusCourse(null);
-    handleClose();
+    onClose();
   };
 
   return (
@@ -102,12 +102,12 @@ const AddAplusGradeSourceDialog = ({
         </DialogActions>
       </Dialog>
       <AplusTokenDialog
-        handleClose={handleClose}
-        handleSubmit={() => {
+        open={aplusTokenDialogOpen && open}
+        onClose={onClose}
+        onSubmit={() => {
           setAplusTokenDialogOpen(false);
           aplusCourses.refetch();
         }}
-        open={aplusTokenDialogOpen && open}
         error={aplusCourses.isError}
       />
     </>
