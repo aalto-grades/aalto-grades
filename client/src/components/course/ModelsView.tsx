@@ -304,13 +304,16 @@ const ModelsView = (): JSX.Element => {
       <Box sx={{display: 'flex', mb: 1}}>
         {(auth?.role === SystemRole.Admin || isTeacherInCharge) &&
           !graphOpen && (
-            <Tooltip title={t('course.models.new-model')} placement="top">
+            <Tooltip
+              title={t('course.models.create-final-grade-model')}
+              placement="top"
+            >
               <Button
                 sx={{mt: 1}}
                 variant="outlined"
                 onClick={() => setCreateDialogOpen({open: true})}
               >
-                {t('course.models.create-new')}
+                {t('course.models.create-final-grade-model')}
               </Button>
             </Tooltip>
           )}
