@@ -74,18 +74,20 @@ const SelectSourcesDialog = ({
 
       <DialogContent>
         <FormGroup>
-          {sources.map(source => (
-            <FormControlLabel
-              key={source.id}
-              control={
-                <Checkbox
-                  checked={selected[source.id]}
-                  onChange={() => onSelect(source.id)}
-                />
-              }
-              label={source.name}
-            />
-          ))}
+          {sources
+            .filter(source => !source.archived)
+            .map(source => (
+              <FormControlLabel
+                key={source.id}
+                control={
+                  <Checkbox
+                    checked={selected[source.id]}
+                    onChange={() => onSelect(source.id)}
+                  />
+                }
+                label={source.name}
+              />
+            ))}
         </FormGroup>
       </DialogContent>
       <DialogActions>
