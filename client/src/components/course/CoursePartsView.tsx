@@ -341,12 +341,6 @@ const CoursePartsView = (): JSX.Element => {
       editable: true,
     },
     {
-      field: 'validUntil',
-      headerName: t('course.parts.valid-until'),
-      type: 'date',
-      editable: true,
-    },
-    {
       field: 'aplusGradeSources',
       headerName: t('general.a+-grade-sources'),
       type: 'actions',
