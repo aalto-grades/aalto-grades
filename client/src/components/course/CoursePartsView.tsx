@@ -8,7 +8,7 @@ import {
   Archive,
   Delete,
   Edit,
-  More,
+  FontDownload,
   Unarchive,
 } from '@mui/icons-material';
 import {
@@ -259,7 +259,8 @@ const CoursePartsView = (): JSX.Element => {
     if (params.row.aplusGradeSources.length > 0) {
       elements.push(
         <GridActionsCellItem
-          icon={<More />}
+          // Big A icon :p
+          icon={<FontDownload />}
           label={t('course.parts.view-a+-sources')}
           onClick={() => {
             setAplusGradeSources(params.row.aplusGradeSources);
