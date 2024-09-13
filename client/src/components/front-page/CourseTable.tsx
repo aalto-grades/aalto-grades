@@ -20,12 +20,14 @@ import {useNavigate} from 'react-router-dom';
 
 import {type CourseData, CourseRoleType, SystemRole} from '@/common/types';
 import useAuth from '@/hooks/useAuth';
+import {useLocalize} from '@/hooks/useLocalize';
 import type {HeadCellData} from '@/types';
-import {getCourseRole} from '@/utils';
+import {departments, getCourseRole} from '@/utils';
 
 const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
   const {t} = useTranslation();
   const navigate = useNavigate();
+  const localize = useLocalize();
   const {auth} = useAuth();
   const [page, setPage] = useState<number>(1);
   const [searchText, setSearchText] = useState<string>('');
@@ -56,14 +58,22 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
     [auth, t]
   );
 
+  const getCourseDepartment = useCallback(
+    (course: CourseData): string =>
+      localize(
+        departments.find(dep => dep.id === course.department)!.department
+      ),
+    [localize]
+  );
+
   const filteredCourses = useMemo(
     () =>
       courses.filter(course => {
         let courseString = `${course.courseCode} ${course.name.en}`;
-        courseString += ` ${course.department.en} ${getCourseRoleString(course)}`;
+        courseString += ` ${getCourseDepartment(course)} ${getCourseRoleString(course)}`;
         return courseString.toLowerCase().includes(searchText.toLowerCase());
       }),
-    [courses, getCourseRoleString, searchText]
+    [courses, getCourseDepartment, getCourseRoleString, searchText]
   );
   const sortedCourses = useMemo(
     () =>
@@ -140,8 +150,8 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
               tabIndex={0}
             >
               <TableCell>{course.courseCode}</TableCell>
-              <TableCell>{course.name.en}</TableCell>
-              <TableCell>{course.department.en}</TableCell>
+              <TableCell>{localize(course.name)}</TableCell>
+              <TableCell>{getCourseDepartment(course)}</TableCell>
               <TableCell>{getCourseRoleString(course)}</TableCell>
             </TableRow>
           ))}

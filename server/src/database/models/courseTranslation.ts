@@ -21,7 +21,6 @@ export default class CourseTranslation extends Model<
   declare id: CreationOptional<number>;
   declare courseId: ForeignKey<Course['id']>;
   declare language: 'EN' | 'FI' | 'SV';
-  declare department: string;
   declare courseName: string;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -44,10 +43,6 @@ CourseTranslation.init(
     },
     language: {
       type: new DataTypes.ENUM('EN', 'FI', 'SV'),
-      allowNull: false,
-    },
-    department: {
-      type: new DataTypes.STRING(),
       allowNull: false,
     },
     courseName: {

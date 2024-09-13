@@ -10,7 +10,7 @@ import {
   Model,
 } from 'sequelize';
 
-import type {GradingScale, Language} from '@/common/types';
+import type {Department, GradingScale, Language} from '@/common/types';
 import {sequelize} from '..';
 
 export default class Course extends Model<
@@ -19,6 +19,7 @@ export default class Course extends Model<
 > {
   declare id: CreationOptional<number>;
   declare courseCode: string;
+  declare department: Department;
   declare languageOfInstruction: Language;
   declare minCredits: number;
   declare maxCredits: number;
@@ -38,18 +39,32 @@ Course.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    languageOfInstruction: {
+    department: {
       type: DataTypes.ENUM(
-        'FI',
-        'SV',
-        'EN',
-        'ES',
-        'JA',
-        'ZH',
-        'PT',
-        'FR',
-        'DE',
-        'RU'
+        'ARCHITECTURE',
+        'ART_AND_MEDIA',
+        'DESIGN',
+        'FILM',
+        'ACCOUNTING_AND_BUSINESS_LAW',
+        'ECONOMICS',
+        'FINANCE',
+        'MANAGEMENT_STUDIES',
+        'MARKETING',
+        'INFORMATION_AND_SERVICE_MANAGEMENT',
+        'BIOPRODUCTS_AND_BIOSYSTEMS',
+        'CHEMICAL_AND_METALLURGICAL_ENGINEERING',
+        'CHEMISTRY_AND_MATERIALS_SCIENCE',
+        'INFORMATION_AND_COMMUNICATIONS_ENGINEERING',
+        'ELECTRONICS_AND_NANO_ENGINEERING',
+        'ELECTRICAL_ENGINEERING_AND_AUTOMATION',
+        'BUILT_ENVIRONMENT',
+        'CIVIL_ENGINEERING',
+        'MECHANICAL_ENGINEERING',
+        'APPLIED_PHYSICS',
+        'COMPUTER_SCIENCE',
+        'INDUSTRIAL_ENGINEERING_AND_MANAGEMENT',
+        'MATHEMATICS_AND_SYSTEMS_ANALYSIS',
+        'NEUROSCIENCE_AND_BIOMEDICAL_ENGINEERING'
       ),
       allowNull: false,
     },
@@ -66,6 +81,21 @@ Course.init(
         'PASS_FAIL',
         'NUMERICAL',
         'SECOND_NATIONAL_LANGUAGE'
+      ),
+      allowNull: false,
+    },
+    languageOfInstruction: {
+      type: DataTypes.ENUM(
+        'FI',
+        'SV',
+        'EN',
+        'ES',
+        'JA',
+        'ZH',
+        'PT',
+        'FR',
+        'DE',
+        'RU'
       ),
       allowNull: false,
     },

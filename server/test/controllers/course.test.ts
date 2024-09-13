@@ -8,6 +8,7 @@ import {
   type CourseData,
   CourseDataArraySchema,
   CourseDataSchema,
+  Department,
   type EditCourseData,
   GradingScale,
   HttpCode,
@@ -149,17 +150,13 @@ describe('Test POST /v1/courses - create new course', () => {
   let newCourseI = 0;
   const createCourseData = (): NewCourseData => ({
     courseCode: `ELEC-A720${newCourseI++}`,
+    department: Department.ComputerScience,
     minCredits: 5,
     maxCredits: 5,
     gradingScale: GradingScale.Numerical,
     languageOfInstruction: Language.English,
     teachersInCharge: ['teacher@aalto.fi'],
     assistants: ['assistant@aalto.fi'],
-    department: {
-      fi: 'Sähkötekniikan korkeakoulu',
-      en: 'School of Electrical Engineering',
-      sv: 'Högskolan för elektroteknik',
-    },
     name: {
       fi: 'Signaalit ja järjestelmät',
       en: 'Signals and Systems',
@@ -284,41 +281,34 @@ describe('Test POST /v1/courses - create new course', () => {
 describe('Test PUT /v1/courses/:courseId - edit course', () => {
   const uneditedCourseDataBase: EditCourseData = {
     courseCode: 'CS-A????',
-    teachersInCharge: [],
+    department: Department.ComputerScience,
     minCredits: 5,
     maxCredits: 5,
-    assistants: [],
     gradingScale: GradingScale.Numerical,
     languageOfInstruction: Language.English,
-    department: {
-      fi: 'Tietotekniikan laitos',
-      en: 'Department of Computer Science',
-      sv: 'Institutionen för datateknik',
-    },
     name: {
       fi: '[Test] Edit course',
       en: '[Test] Edit course',
       sv: '[Test] Edit course',
     },
+    teachersInCharge: [],
+    assistants: [],
   };
 
   const courseDataEdits: EditCourseData = {
-    courseCode: 'edited',
-    teachersInCharge: [],
+    courseCode: 'CS-EDIT',
+    department: Department.Architecture,
     minCredits: 3,
     maxCredits: 7,
     gradingScale: GradingScale.SecondNationalLanguage,
-    languageOfInstruction: Language.English,
-    department: {
-      fi: 'muokattu laitos',
-      en: 'edited department',
-      sv: 'redigerad institutionen',
-    },
+    languageOfInstruction: Language.Japanese,
     name: {
       fi: 'muokattu nimi',
       en: 'edited name',
       sv: 'redigerad namn',
     },
+    teachersInCharge: [],
+    assistants: [],
   };
 
   const findUsers = (

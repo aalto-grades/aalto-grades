@@ -9,6 +9,7 @@ import {
   type CoursePartData,
   CourseRoleType,
   type CourseTaskData,
+  Department,
   GradingScale,
   Language,
   type NewCourseData,
@@ -328,6 +329,7 @@ class CreateData {
       const newCourse = await Course.create(
         {
           courseCode: courseData?.courseCode ?? `CS-${this.freeId}`,
+          department: courseData?.department ?? Department.ComputerScience,
           minCredits: courseData?.minCredits ?? 0,
           maxCredits: courseData?.maxCredits ?? this.randInt(5, 15),
           gradingScale: courseData?.gradingScale ?? GradingScale.Numerical,
@@ -342,57 +344,46 @@ class CreateData {
           {
             courseId: newCourse.id,
             language: Language.Finnish,
-            department: courseData?.department?.fi ?? 'Tietotekniikan laitos',
             courseName: courseData?.name?.fi ?? `Testi kurssi ${this.freeId}`,
           },
           {
             courseId: newCourse.id,
             language: Language.English,
-            department:
-              courseData?.department?.en ?? 'Department of Computer Science',
             courseName: courseData?.name?.en ?? `Test course ${this.freeId}`,
           },
           {
             courseId: newCourse.id,
             language: Language.Swedish,
-            department:
-              courseData?.department?.sv ?? 'Institutionen för datateknik',
             courseName: courseData?.name?.sv ?? `testkurs ${this.freeId}`,
           },
         ],
         {transaction: t}
       );
 
-      // Add teacher and assistant roles
-      const teacherRoles = hasTeacher
-        ? [
-            {
-              courseId: newCourse.id,
-              userId: TEACHER_ID,
-              role: CourseRoleType.Teacher,
-            },
-          ]
-        : [];
-      const assistantRoles = hasAssistant
-        ? [
-            {
-              courseId: newCourse.id,
-              userId: ASSISTANT_ID,
-              role: CourseRoleType.Assistant,
-            },
-          ]
-        : [];
-      const studentRoles = hasStudent
-        ? [
-            {
-              courseId: newCourse.id,
-              userId: STUDENT_ID,
-              role: CourseRoleType.Student,
-            },
-          ]
-        : [];
+      // Add roles
+      const newRoles = [];
+      if (hasTeacher) {
+        newRoles.push({
+          courseId: newCourse.id,
+          userId: TEACHER_ID,
+          role: CourseRoleType.Teacher,
+        });
+      }
+      if (hasAssistant) {
+        newRoles.push({
+          courseId: newCourse.id,
+          userId: ASSISTANT_ID,
+          role: CourseRoleType.Assistant,
+        });
+      }
+      if (hasStudent) {
+        newRoles.push({
+          courseId: newCourse.id,
+          userId: STUDENT_ID,
+          role: CourseRoleType.Student,
+        });
+      }
 
-      const newRoles = [...teacherRoles, ...assistantRoles, ...studentRoles];
       if (newRoles.length > 0) {
         await CourseRole.bulkCreate(newRoles, {transaction: t});
       }
