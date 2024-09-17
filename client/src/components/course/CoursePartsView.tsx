@@ -15,7 +15,7 @@ import {
   Box,
   Button,
   CircularProgress,
-  Grid,
+  Grid2 as Grid,
   IconButton,
   List,
   ListItem,
@@ -474,7 +474,7 @@ const CoursePartsView = (): JSX.Element => {
       </Box>
 
       <Grid container spacing={2}>
-        <Grid item xs={4}>
+        <Grid size={4}>
           {courseParts.data === undefined ? (
             <CircularProgress />
           ) : (
@@ -548,7 +548,7 @@ const CoursePartsView = (): JSX.Element => {
             ))}
           </List>
         </Grid>
-        <Grid item xs={8}>
+        <Grid size={8}>
           <div style={{height: '100%', maxHeight: '70vh'}}>
             <DataGrid
               rows={rows}

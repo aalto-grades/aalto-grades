@@ -6,7 +6,7 @@ import {
   Box,
   Button,
   Collapse,
-  Grid,
+  Grid2 as Grid,
   TextField,
   Typography,
 } from '@mui/material';

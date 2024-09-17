@@ -11,6 +11,7 @@ import {
   Avatar,
   Box,
   Button,
+  Grid2 as Grid,
   IconButton,
   List,
   ListItem,
@@ -20,7 +21,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
 import {Form, Formik, type FormikHelpers, type FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useEffect, useRef, useState} from 'react';
@@ -300,7 +300,7 @@ const EditCourseView = (): JSX.Element => {
             gap={5}
             sx={{overflow: 'auto', height: '100%'}}
           >
-            <Grid md={5}>
+            <Grid size={{xs: 12, md: 5.5}}>
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="courseCode"
@@ -376,7 +376,7 @@ const EditCourseView = (): JSX.Element => {
                 ))}
               </FormField>
             </Grid>
-            <Grid md={5}>
+            <Grid size={{xs: 12, md: 5.5}}>
               <TextField
                 id="teacherEmail" // Must be in camelCase to match data
                 type="text"

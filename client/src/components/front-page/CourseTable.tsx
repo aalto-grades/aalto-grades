@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  Grid,
+  Grid2 as Grid,
   Pagination,
   Table,
   TableBody,
