@@ -33,8 +33,11 @@ import {z} from 'zod';
 
 import {
   AaltoEmailSchema,
+  Department,
   GradingScale,
+  GradingScaleSchema,
   Language,
+  LanguageSchema,
   type NewCourseData,
 } from '@/common/types';
 import FormField from '@/components/shared/FormikField';
@@ -49,12 +52,12 @@ import {
 
 type FormData = {
   courseCode: string;
+  department: Department;
   minCredits: number;
   maxCredits: number;
   gradingScale: GradingScale;
   teacherEmail: string;
   assistantEmail: string;
-  department: number;
   languageOfInstruction: Language;
   nameEn: string;
   nameFi: string;
@@ -63,13 +66,13 @@ type FormData = {
 
 const initialValues = {
   courseCode: '',
+  department: Department.ComputerScience,
   minCredits: 0,
   maxCredits: 0,
   gradingScale: GradingScale.Numerical,
   languageOfInstruction: Language.English,
   teacherEmail: '',
   assistantEmail: '',
-  department: -1,
   nameEn: '',
   nameFi: '',
   nameSv: '',
@@ -100,14 +103,11 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
       maxCredits: z.number({
         required_error: t('course.edit.max-credits-required'),
       }),
-      gradingScale: z.nativeEnum(GradingScale),
-      languageOfInstruction: z.nativeEnum(Language),
+      gradingScale: GradingScaleSchema,
+      languageOfInstruction: LanguageSchema,
       teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
       assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
-      department: z
-        .number()
-        .min(0, t('course.edit.department-select'))
-        .max(departments.length - 1, t('course.edit.department-select')),
+      department: z.nativeEnum(Department),
       nameEn: z
         .string({required_error: t('course.edit.name-english')})
         .min(1, t('course.edit.name-english')),
@@ -141,11 +141,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
       maxCredits: values.maxCredits,
       gradingScale: values.gradingScale,
       languageOfInstruction: values.languageOfInstruction,
-      department: {
-        fi: departments[values.department].fi,
-        sv: departments[values.department].sv,
-        en: departments[values.department].en,
-      },
+      department: values.department,
       name: {
         fi: values.nameFi,
         sv: values.nameSv,
@@ -185,6 +181,10 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
     }
   };
 
+  const sortedDepartments = [...departments].sort((a, b) =>
+    localize(a.department).localeCompare(localize(b.department))
+  );
+
   return (
     <Formik
       initialValues={initialValues}
@@ -214,9 +214,9 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               helperText={t('course.edit.organizing-department-help')}
               select
             >
-              {departments.map((department, i) => (
-                <MenuItem key={department.en} value={i}>
-                  {localize(department)}
+              {sortedDepartments.map(department => (
+                <MenuItem key={department.id} value={department.id}>
+                  {localize(department.department)}
                 </MenuItem>
               ))}
             </FormField>

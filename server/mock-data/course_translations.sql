@@ -2,16 +2,16 @@
 --
 -- SPDX-License-Identifier: MIT
 
-INSERT INTO public.course_translation (course_id, language, department, course_name, created_at, updated_at) VALUES
-(1, 'EN', 'Department of Computer Science', 'O1', NOW(), NOW()),
-(1, 'FI', 'Tietotekniikan laitos', 'O1', NOW(), NOW()),
-(1, 'SV', 'Institutionen för datateknik', 'O1', NOW(), NOW()),
-(2, 'EN', 'Department of Computer Science', 'Y1', NOW(), NOW()),
-(2, 'FI', 'Tietotekniikan laitos', 'Y1', NOW(), NOW()),
-(2, 'SV', 'Institutionen för datateknik', 'Y1', NOW(), NOW()),
-(3, 'EN', 'Department of Computer Science', 'Example & grades', NOW(), NOW()),
-(3, 'FI', 'Tietotekniikan laitos', 'Example & grades', NOW(), NOW()),
-(3, 'SV', 'Institutionen för datateknik', 'Example & grades', NOW(), NOW()),
-(4, 'EN', 'Department of Computer Science', 'Example', NOW(), NOW()),
-(4, 'FI', 'Tietotekniikan laitos', 'Example', NOW(), NOW()),
-(4, 'SV', 'Institutionen för datateknik', 'Example', NOW(), NOW());
+INSERT INTO public.course_translation (course_id, language, course_name, created_at, updated_at) VALUES
+(1, 'EN', 'O1', NOW(), NOW()),
+(1, 'FI', 'O1', NOW(), NOW()),
+(1, 'SV', 'O1', NOW(), NOW()),
+(2, 'EN', 'Y1', NOW(), NOW()),
+(2, 'FI', 'Y1', NOW(), NOW()),
+(2, 'SV', 'Y1', NOW(), NOW()),
+(3, 'EN', 'Example & grades', NOW(), NOW()),
+(3, 'FI', 'Esimerkki & arvosanat', NOW(), NOW()),
+(3, 'SV', 'Example & grades', NOW(), NOW()),
+(4, 'EN', 'Example', NOW(), NOW()),
+(4, 'FI', 'Esimerkki', NOW(), NOW()),
+(4, 'SV', 'Example', NOW(), NOW());

@@ -37,7 +37,12 @@ import StyledDataGrid, {
 } from '@/components/shared/StyledDataGrid';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {useTableContext} from '@/context/useTableContext';
-import {useAddGrades, useDeleteGrade, useEditGrade} from '@/hooks/useApi';
+import {
+  useAddGrades,
+  useDeleteGrade,
+  useEditGrade,
+  useGetCourseTasks,
+} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import {findBestGrade} from '@/utils';
 
@@ -77,6 +82,7 @@ const EditGradesDialog = ({
   const {courseId} = useParams() as {courseId: string};
   const {gradeSelectOption} = useTableContext();
 
+  const courseTasks = useGetCourseTasks(courseId);
   const addGrades = useAddGrades(courseId);
   const deleteGrade = useDeleteGrade(courseId);
   const editGrade = useEditGrade(courseId);
@@ -144,7 +150,8 @@ const EditGradesDialog = ({
     setInitRows(structuredClone(newRows));
   }, [grades]);
 
-  if (!auth) return <>Not permitted</>; // Not needed?
+  const courseTask =
+    courseTasks.data?.find(task => task.id === courseTaskId) ?? null;
 
   const columns: GridColDef<ColTypes>[] = [
     {
@@ -214,10 +221,12 @@ const EditGradesDialog = ({
         const newRow: ColTypes = {
           id: freeId,
           gradeId: -1,
-          grader: auth.name,
+          grader: auth!.name,
           grade: 0,
           date: new Date(),
-          expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          expiryDate: courseTask?.daysValid
+            ? new Date(Date.now() + courseTask.daysValid * 24 * 60 * 60 * 1000)
+            : null,
           exported: false,
           comment: '',
           selected: '',
@@ -244,7 +253,7 @@ const EditGradesDialog = ({
       if (row.gradeId === -1) {
         newGrades.push({
           studentNumber,
-          courseTaskId,
+          courseTaskId: courseTaskId,
           grade: row.grade,
           date: row.date,
           expiryDate: row.expiryDate,

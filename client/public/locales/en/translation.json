@@ -198,6 +198,7 @@
       "select-grade-sources": "Select grade sources",
       "create-tasks": "Create course tasks",
       "delete-a+": "Delete A+ grade source",
+      "no-aplus-grades": "No aplus grades found for selected course tasks",
       "select-course-tasks": "Select course tasks",
       "select-for-fetching": "Select the course parts you want to fetch grades for from A+.",
       "fetching-grades": "Fetching grades",
@@ -373,8 +374,7 @@
       "delete-model": "Delete model",
       "delete-model-message": "Are you sure that you want to delete this model",
       "save-null": "Tried to save null model",
-      "new-model": "New grading model",
-      "create-new": "Create new",
+      "create-final-grade-model": "Create new final grade model",
       "back": "Back to models",
       "no-models": "No grading models. Please add grading models in order to calculate the grades of students."
     },

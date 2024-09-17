@@ -12,7 +12,7 @@ import {
   DialogTitle,
   FormControlLabel,
   FormGroup,
-  Grid,
+  Grid2 as Grid,
   IconButton,
   Switch,
   Tooltip,
@@ -102,24 +102,24 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
           </>
         ) : (
           <Grid container spacing={2}>
-            <Grid item xs={6}>
+            <Grid size={6}>
               <Typography>{t('general.email')}</Typography>
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={6}>
               <Typography>{user?.email}</Typography>
             </Grid>
 
-            <Grid item xs={6}>
+            <Grid size={6}>
               <Typography>{t('general.name')}</Typography>
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={6}>
               <Typography>{user?.name}</Typography>
             </Grid>
 
-            <Grid item xs={6}>
+            <Grid size={6}>
               <Typography>{t('front-page.temporary-password')}</Typography>
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={6}>
               <Typography sx={{display: 'inline'}}>
                 {temporaryPassword}
               </Typography>

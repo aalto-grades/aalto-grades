@@ -6,11 +6,11 @@ import {
   type AuthData,
   type CourseData,
   CourseRoleType,
+  Department,
   GradingScale,
   Language,
-  type LocalizedString,
 } from '@/common/types';
-import type {LanguageOption} from '@/types';
+import type {DepartmentOption, LanguageOption} from '@/types';
 
 export const getMaxFinalGrade = (gradingScale: GradingScale): number => {
   switch (gradingScale) {
@@ -37,137 +37,209 @@ export const getCourseRole = (
 };
 
 // https://www.aalto.fi/en/aalto-university/schools-departments-and-units
-export const departments: LocalizedString[] = [
+export const departments: DepartmentOption[] = [
   // School of Arts, Design and Architecture
   {
-    fi: 'Arkkitehtuurin laitos',
-    en: 'Department of Architecture',
-    sv: 'Institutionen för arkitektur',
+    id: Department.Architecture,
+    department: {
+      fi: 'Arkkitehtuurin laitos',
+      en: 'Department of Architecture',
+      sv: 'Institutionen för arkitektur',
+    },
   },
   {
-    fi: 'Taiteen ja median laitos',
-    en: 'Department of Art and Media',
-    sv: 'Institutionen för konst och media',
+    id: Department.ArtAndMedia,
+    department: {
+      fi: 'Taiteen ja median laitos',
+      en: 'Department of Art and Media',
+      sv: 'Institutionen för konst och media',
+    },
   },
   {
-    fi: 'Muotoilun laitos',
-    en: 'Department of Design',
-    sv: 'Institutionen för design',
+    id: Department.Design,
+    department: {
+      fi: 'Muotoilun laitos',
+      en: 'Department of Design',
+      sv: 'Institutionen för design',
+    },
   },
   {
-    fi: 'Elokuvataiteen laitos',
-    en: 'Department of Film',
-    sv: 'Institutionen för filmkonst',
+    id: Department.Film,
+    department: {
+      fi: 'Elokuvataiteen laitos',
+      en: 'Department of Film',
+      sv: 'Institutionen för filmkonst',
+    },
   },
 
   // School of Business
   {
-    fi: 'Laskentatoimen laitos',
-    en: 'Department of Accounting and Business Law',
-    sv: 'Institutionen för redovisning',
+    id: Department.AccountingAndBusinessLaw,
+    department: {
+      fi: 'Laskentatoimen laitos',
+      en: 'Department of Accounting and Business Law',
+      sv: 'Institutionen för redovisning',
+    },
   },
   {
-    fi: 'Taloustieteen laitos',
-    en: 'Department of Economics',
-    sv: 'Institutionen för ekonomi',
+    id: Department.Economics,
+    department: {
+      fi: 'Taloustieteen laitos',
+      en: 'Department of Economics',
+      sv: 'Institutionen för ekonomi',
+    },
   },
   {
-    fi: 'Rahoituksen laitos',
-    en: 'Department of Finance',
-    sv: 'Institutionen för finansiering',
+    id: Department.Finance,
+    department: {
+      fi: 'Rahoituksen laitos',
+      en: 'Department of Finance',
+      sv: 'Institutionen för finansiering',
+    },
   },
   {
-    fi: 'Johtamisen laitos',
-    en: 'Department of Management Studies',
-    sv: 'Institutionen för ledarskapsstudier',
+    id: Department.ManagementStudies,
+    department: {
+      fi: 'Johtamisen laitos',
+      en: 'Department of Management Studies',
+      sv: 'Institutionen för ledarskapsstudier',
+    },
   },
   {
-    fi: 'Markkinoinnin laitos',
-    en: 'Department of Marketing',
-    sv: 'Institutionen för marknadsföring',
+    id: Department.Marketing,
+    department: {
+      fi: 'Markkinoinnin laitos',
+      en: 'Department of Marketing',
+      sv: 'Institutionen för marknadsföring',
+    },
   },
   {
-    fi: 'Tieto- ja palvelujohtamisen laitos',
-    en: 'Department of Information and Service Management',
-    sv: 'Institutionen för informations- och serviceekonomi',
+    id: Department.InformationAndServiceManagement,
+    department: {
+      fi: 'Tieto- ja palvelujohtamisen laitos',
+      en: 'Department of Information and Service Management',
+      sv: 'Institutionen för informations- och serviceekonomi',
+    },
   },
 
   // School of Chemical Engineering
   {
-    fi: 'Biotuotteiden ja biotekniikan laitos',
-    en: 'Department of Bioproducts and Biosystems',
-    sv: 'Institutionen för bioprodukter och bioteknik',
+    id: Department.BioproductsAndBiosystems,
+    department: {
+      fi: 'Biotuotteiden ja biotekniikan laitos',
+      en: 'Department of Bioproducts and Biosystems',
+      sv: 'Institutionen för bioprodukter och bioteknik',
+    },
   },
   {
-    fi: 'Kemian tekniikan ja metallurgian laitos',
-    en: 'Department of Chemical and Metallurgical Engineering',
-    sv: 'Institutionen för kemiteknik och metallurgi',
+    id: Department.ChemicalAndMetallurgicalEngineering,
+    department: {
+      fi: 'Kemian tekniikan ja metallurgian laitos',
+      en: 'Department of Chemical and Metallurgical Engineering',
+      sv: 'Institutionen för kemiteknik och metallurgi',
+    },
   },
   {
-    fi: 'Kemian ja materiaalitieteen laitos',
-    en: 'Department of Chemistry and Materials Science',
-    sv: 'Institutionen för kemi och materialvetenskap',
+    id: Department.ChemistryAndMaterialsScience,
+    department: {
+      fi: 'Kemian ja materiaalitieteen laitos',
+      en: 'Department of Chemistry and Materials Science',
+      sv: 'Institutionen för kemi och materialvetenskap',
+    },
   },
 
   // School of Electrical Engineering
   {
-    fi: 'Informaatio- ja tietoliikennetekniikan laitos',
-    en: 'Department of Information and Communications Engineering',
-    sv: 'Institutionen för informations- och kommunikationsteknik',
+    id: Department.InformationAndCommunicationsEngineering,
+    department: {
+      fi: 'Informaatio- ja tietoliikennetekniikan laitos',
+      en: 'Department of Information and Communications Engineering',
+      sv: 'Institutionen för informations- och kommunikationsteknik',
+    },
   },
   {
-    fi: 'Elektroniikan ja nanotekniikan laitos',
-    en: 'Department of Electronics and Nanoengineering',
-    sv: 'Institutionen för elektronik och nanoteknik',
+    id: Department.ElectronicsAndNanoengineering,
+    department: {
+      fi: 'Elektroniikan ja nanotekniikan laitos',
+      en: 'Department of Electronics and Nanoengineering',
+      sv: 'Institutionen för elektronik och nanoteknik',
+    },
   },
   {
-    fi: 'Sähkötekniikan ja automaation laitos',
-    en: 'Department of Electrical Engineering and Automation',
-    sv: 'Institutionen för elektroteknik och automation',
+    id: Department.ElectricalEngineeringAndAutomation,
+    department: {
+      fi: 'Sähkötekniikan ja automaation laitos',
+      en: 'Department of Electrical Engineering and Automation',
+      sv: 'Institutionen för elektroteknik och automation',
+    },
   },
 
   // School of Engineering
   {
-    fi: 'Rakennetun ympäristön laitos',
-    en: 'Department of Built Environment',
-    sv: 'Institutionen för byggd miljö',
+    id: Department.BuiltEnvironment,
+    department: {
+      fi: 'Rakennetun ympäristön laitos',
+      en: 'Department of Built Environment',
+      sv: 'Institutionen för byggd miljö',
+    },
   },
   {
-    fi: 'Rakennustekniikan laitos',
-    en: 'Department of Civil Engineering',
-    sv: 'Institutionen för byggnadsteknik',
+    id: Department.CivilEngineering,
+    department: {
+      fi: 'Rakennustekniikan laitos',
+      en: 'Department of Civil Engineering',
+      sv: 'Institutionen för byggnadsteknik',
+    },
   },
   {
-    fi: 'Konetekniikan laitos',
-    en: 'Department of Mechanical Engineering',
-    sv: 'Institutionen för maskinteknik',
+    id: Department.MechanicalEngineering,
+    department: {
+      fi: 'Konetekniikan laitos',
+      en: 'Department of Mechanical Engineering',
+      sv: 'Institutionen för maskinteknik',
+    },
   },
 
   // School of Science
   {
-    fi: 'Teknillisen fysiikan laitos',
-    en: 'Department of Applied Physics',
-    sv: 'Institutionen för teknisk fysik',
+    id: Department.AppliedPhysics,
+    department: {
+      fi: 'Teknillisen fysiikan laitos',
+      en: 'Department of Applied Physics',
+      sv: 'Institutionen för teknisk fysik',
+    },
   },
   {
-    fi: 'Tietotekniikan laitos',
-    en: 'Department of Computer Science',
-    sv: 'Institutionen för datateknik',
+    id: Department.ComputerScience,
+    department: {
+      fi: 'Tietotekniikan laitos',
+      en: 'Department of Computer Science',
+      sv: 'Institutionen för datateknik',
+    },
   },
   {
-    fi: 'Tuotantotalouden laitos',
-    en: 'Department of Industrial Engineering and Management',
-    sv: 'Institutionen för produktionsekonomi',
+    id: Department.IndustrialEngineeringAndManagement,
+    department: {
+      fi: 'Tuotantotalouden laitos',
+      en: 'Department of Industrial Engineering and Management',
+      sv: 'Institutionen för produktionsekonomi',
+    },
   },
   {
-    fi: 'Matematiikan ja systeemianalyysin laitos',
-    en: 'Department of Mathematics and Systems Analysis',
-    sv: 'Institutionen för matematik och systemanalys',
+    id: Department.MathematicsAndSystemsAnalysis,
+    department: {
+      fi: 'Matematiikan ja systeemianalyysin laitos',
+      en: 'Department of Mathematics and Systems Analysis',
+      sv: 'Institutionen för matematik och systemanalys',
+    },
   },
   {
-    fi: 'Neurotieteen ja lääketieteellisen tekniikan laitos',
-    en: 'Department of Neuroscience and Biomedical Engineering',
-    sv: 'Institutionen för neurovetenskap och biomedicinsk teknik',
+    id: Department.NeuroscienceAndBiomedicalEngineering,
+    department: {
+      fi: 'Neurotieteen ja lääketieteellisen tekniikan laitos',
+      en: 'Department of Neuroscience and Biomedical Engineering',
+      sv: 'Institutionen för neurovetenskap och biomedicinsk teknik',
+    },
   },
 ];
 

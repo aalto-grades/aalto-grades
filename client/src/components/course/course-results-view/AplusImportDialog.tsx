@@ -21,7 +21,14 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import {type ChangeEvent, type JSX, useState} from 'react';
+import {enqueueSnackbar} from 'notistack';
+import {
+  type ChangeEvent,
+  type JSX,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
@@ -29,17 +36,16 @@ import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
 import {
   useAddGrades,
   useFetchAplusGrades,
+  useGetCourseParts,
   useGetCourseTasks,
 } from '@/hooks/useApi';
 import {getAplusToken} from '@/utils';
 
-type PropsType = {
-  open: boolean;
-  onClose: () => void;
-};
+type PropsType = {open: boolean; onClose: () => void};
 const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
+  const courseParts = useGetCourseParts(courseId);
   const courseTasks = useGetCourseTasks(courseId);
 
   const [step, setStep] = useState<number>(0);
@@ -52,20 +58,28 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
     enabled: false,
   });
 
-  const [oldAplusGrades, setOldAplusGrades] = useState<
-    typeof aplusGrades | null
-  >(null);
-  if (JSON.stringify(aplusGrades) !== JSON.stringify(oldAplusGrades)) {
-    setOldAplusGrades(aplusGrades);
+  const handleResetAndClose = useCallback(() => {
+    setStep(0);
+    setCourseTaskIds([]);
+    setAplusTokenDialogOpen(false);
+    onClose();
+  }, [onClose]);
 
-    if (step === 1) {
-      if (!aplusGrades.isFetching && aplusGrades.data) {
-        setStep(2);
-      } else {
-        setAplusTokenDialogOpen(!getAplusToken() || aplusGrades.isError);
-      }
+  // Must be a useEffect to be able to call enqueueSnackbar & onClose :/
+  useEffect(() => {
+    if (step !== 1) return;
+
+    if (!aplusGrades.data) {
+      setAplusTokenDialogOpen(!getAplusToken() || aplusGrades.isError);
+    } else if (aplusGrades.data.length === 0) {
+      enqueueSnackbar(t('course.parts.no-aplus-grades'), {
+        variant: 'warning',
+      });
+      handleResetAndClose();
+    } else {
+      setStep(2);
     }
-  }
+  }, [aplusGrades.data, aplusGrades.isError, handleResetAndClose, step, t]);
 
   const handleSelect = (
     event: ChangeEvent<HTMLInputElement>,
@@ -77,129 +91,134 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
         : courseTaskIds.filter(id => id !== courseTaskId)
     );
 
-  const handleResetAndClose = (): void => {
-    setStep(0);
-    setCourseTaskIds([]);
-    setAplusTokenDialogOpen(false);
-    onClose();
-  };
-
   const gradesHaveExpiryDates = aplusGrades.data?.some(
     row => row.expiryDate !== null
   );
 
+  const coursePartNames = Object.fromEntries(
+    courseParts.data?.map(part => [part.id, part.name]) ?? []
+  );
+
   return (
-    <Dialog open={open} onClose={handleResetAndClose} maxWidth="md" fullWidth>
-      {step === 0 && (
-        <>
-          <DialogTitle>{t('course.parts.select-course-tasks')}</DialogTitle>
-          <DialogContent>
-            <Typography>{t('course.parts.select-for-fetching')}</Typography>
-            <FormGroup>
-              {courseTasks.data
-                ?.filter(task => task.aplusGradeSources.length > 0)
-                .map(task => (
-                  <FormControlLabel
-                    key={task.id}
-                    control={
-                      <Checkbox onChange={e => handleSelect(e, task.id)} />
-                    }
-                    label={task.name}
-                  />
-                ))}
-            </FormGroup>
-          </DialogContent>
-        </>
-      )}
-      {step === 1 && (
-        <>
-          <DialogTitle>{t('course.parts.fetching-grades')}</DialogTitle>
-          <DialogContent>
-            <AplusTokenDialog
-              open={aplusTokenDialogOpen}
-              onClose={handleResetAndClose}
-              onSubmit={() => {
-                setAplusTokenDialogOpen(false);
-                aplusGrades.refetch();
-              }}
-              error={aplusGrades.isError}
-            />
-            <Typography>{t('course.parts.fetching-grades-wait')}</Typography>
-            <LinearProgress sx={{mt: 2}} />
-          </DialogContent>
-        </>
-      )}
-      {step === 2 && (
-        <>
-          <DialogTitle>{t('general.confirm')}</DialogTitle>
-          <DialogContent>
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>{t('general.student-number')}</TableCell>
-                    <TableCell>{t('general.course-task')}</TableCell>
-                    <TableCell>{t('general.grade')}</TableCell>
-                    <TableCell>{t('general.date')}</TableCell>
-                    {gradesHaveExpiryDates && (
-                      <TableCell>{t('general.expiry-date')}</TableCell>
-                    )}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {aplusGrades.data?.map(row => (
-                    <TableRow key={row.studentNumber}>
-                      <TableCell>{row.studentNumber}</TableCell>
-                      <TableCell>
-                        {
-                          courseTasks.data!.find(
-                            task => task.id === row.courseTaskId
-                          )!.name
+    <>
+      <AplusTokenDialog
+        open={aplusTokenDialogOpen}
+        onClose={handleResetAndClose}
+        onSubmit={() => {
+          setAplusTokenDialogOpen(false);
+          aplusGrades.refetch();
+        }}
+        error={aplusGrades.isError}
+      />
+      <Dialog open={open} onClose={handleResetAndClose} maxWidth="md" fullWidth>
+        {step === 0 && (
+          <>
+            <DialogTitle>{t('course.parts.select-course-tasks')}</DialogTitle>
+            <DialogContent>
+              <Typography>{t('course.parts.select-for-fetching')}</Typography>
+              <FormGroup>
+                {courseTasks.data
+                  ?.filter(task => task.aplusGradeSources.length > 0)
+                  .map(task => {
+                    const partName = coursePartNames[task.coursePartId];
+                    const coursePartString = partName ? `${partName} -> ` : '';
+                    return (
+                      <FormControlLabel
+                        key={task.id}
+                        control={
+                          <Checkbox onChange={e => handleSelect(e, task.id)} />
                         }
-                      </TableCell>
-                      <TableCell>{row.grade}</TableCell>
-                      <TableCell>{row.date.toDateString()}</TableCell>
+                        label={`${coursePartString}${task.name}`}
+                      />
+                    );
+                  })}
+              </FormGroup>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => {
+                  setStep(1);
+                  if (getAplusToken()) {
+                    aplusGrades.refetch();
+                  } else {
+                    setAplusTokenDialogOpen(true);
+                  }
+                }}
+                disabled={courseTaskIds.length === 0}
+              >
+                {t('general.next')}
+              </Button>
+            </DialogActions>
+          </>
+        )}
+
+        {step === 1 && (
+          <>
+            <DialogTitle>{t('course.parts.fetching-grades')}</DialogTitle>
+            <DialogContent>
+              <Typography>{t('course.parts.fetching-grades-wait')}</Typography>
+              <LinearProgress sx={{mt: 2}} />
+            </DialogContent>
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            <DialogTitle>{t('general.confirm')}</DialogTitle>
+            <DialogContent>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>{t('general.student-number')}</TableCell>
+                      <TableCell>{t('general.course-task')}</TableCell>
+                      <TableCell>{t('general.grade')}</TableCell>
+                      <TableCell>{t('general.date')}</TableCell>
                       {gradesHaveExpiryDates && (
-                        <TableCell>
-                          {row.expiryDate === null
-                            ? ''
-                            : row.expiryDate.toDateString()}
-                        </TableCell>
+                        <TableCell>{t('general.expiry-date')}</TableCell>
                       )}
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </DialogContent>
-        </>
-      )}
-      <DialogActions>
-        {step === 0 && (
-          <Button
-            onClick={() => {
-              setStep(1);
-              if (getAplusToken()) {
-                aplusGrades.refetch();
-              }
-            }}
-            disabled={courseTaskIds.length === 0}
-          >
-            {t('general.next')}
-          </Button>
+                  </TableHead>
+                  <TableBody>
+                    {aplusGrades.data?.map(row => (
+                      <TableRow key={row.studentNumber}>
+                        <TableCell>{row.studentNumber}</TableCell>
+                        <TableCell>
+                          {
+                            courseTasks.data!.find(
+                              task => task.id === row.courseTaskId
+                            )!.name
+                          }
+                        </TableCell>
+                        <TableCell>{row.grade}</TableCell>
+                        <TableCell>{row.date.toDateString()}</TableCell>
+                        {gradesHaveExpiryDates && (
+                          <TableCell>
+                            {row.expiryDate === null
+                              ? ''
+                              : row.expiryDate.toDateString()}
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => {
+                  addGrades.mutate(aplusGrades.data!);
+                  handleResetAndClose();
+                }}
+              >
+                {t('general.submit')}
+              </Button>
+            </DialogActions>
+          </>
         )}
-        {step === 2 && (
-          <Button
-            onClick={() => {
-              addGrades.mutate(aplusGrades.data!);
-              handleResetAndClose();
-            }}
-          >
-            {t('general.submit')}
-          </Button>
-        )}
-      </DialogActions>
-    </Dialog>
+      </Dialog>
+    </>
   );
 };
 
