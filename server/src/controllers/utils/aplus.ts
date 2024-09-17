@@ -114,6 +114,7 @@ export const parseAplusGradeSource = (
 ): AplusGradeSourceData =>
   ({
     id: aplusGradeSource.id,
+    courseTaskId: aplusGradeSource.courseTaskId,
     aplusCourse: aplusGradeSource.aplusCourse,
     sourceType: aplusGradeSource.sourceType,
     moduleId: aplusGradeSource.moduleId ?? undefined,

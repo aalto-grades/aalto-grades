@@ -236,6 +236,7 @@ const EditGradesDialog = ({
         newGrades.push({
           studentNumber,
           courseTaskId,
+          aplusGradeSourceId: null,
           grade: row.grade,
           date: row.date,
           expiryDate: row.expiryDate,

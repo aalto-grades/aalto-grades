@@ -42,6 +42,17 @@ const students: {id: number; studentNumber: string; finalGrade: number}[] = [];
 beforeAll(async () => {
   cookies = await getCookies();
 
+  // Create students
+  for (let i = 0; i < 10; i++) {
+    const newUser = await createData.createUser();
+    assert(newUser.studentNumber); // Fix typescript warning
+    students.push({
+      id: newUser.id,
+      studentNumber: newUser.studentNumber,
+      finalGrade: Math.floor(Math.random() * 6),
+    });
+  }
+
   [courseId, , courseTasks] = await createData.createCourse({});
   editGradeId = await createData.createGrade(
     students[0].id,
@@ -131,6 +142,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       {
         studentNumber: studentNumber,
         courseTaskId: courseTasks[0].id,
+        aplusGradeSourceId: null,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: NEXT_YEAR,
@@ -139,6 +151,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       {
         studentNumber: studentNumber,
         courseTaskId: courseTasks[1].id,
+        aplusGradeSourceId: null,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: NEXT_YEAR,
@@ -147,6 +160,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       {
         studentNumber: studentNumber,
         courseTaskId: courseTasks[2].id,
+        aplusGradeSourceId: null,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: NEXT_YEAR,
@@ -283,7 +297,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
 
     const upload = async (): Promise<NewTaskGrade[]> => {
       const data = (await genGrades(student.studentNumber)).filter(
-        grade => grade.aplusGradeSourceId !== undefined
+        grade => grade.aplusGradeSourceId !== null
       );
 
       const res = await request
@@ -380,6 +394,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       {
         studentNumber: student.studentNumber,
         courseTaskId: noRoleCourseTasks[0].id,
+        aplusGradeSourceId: null,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: NEXT_YEAR,

@@ -149,7 +149,7 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
 
     // Validate A+ course task id
     if (
-      grade.aplusGradeSourceId !== undefined &&
+      grade.aplusGradeSourceId !== null &&
       !validAPlusCourseTaskIds.has(grade.aplusGradeSourceId)
     ) {
       await validateAplusGradeSourceBelongsToCourseTask(
@@ -209,7 +209,7 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
 
       // If a student already has a grade for a particular A+ grade source,
       // don't create a new grade row. Instead, update the existing one.
-      if (gradeEntry.aplusGradeSourceId !== undefined) {
+      if (gradeEntry.aplusGradeSourceId !== null) {
         const grade = await TaskGrade.findOne({
           where: {
             userId: userId,
@@ -235,7 +235,7 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
         userId: userId,
         courseTaskId: gradeEntry.courseTaskId,
         graderId: grader.id,
-        aplusGradeSourceId: gradeEntry.aplusGradeSourceId,
+        aplusGradeSourceId: gradeEntry.aplusGradeSourceId ?? undefined,
         date: gradeEntry.date,
         expiryDate: gradeEntry.expiryDate,
         grade: gradeEntry.grade,

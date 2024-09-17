@@ -3,10 +3,11 @@
 # SPDX-License-Identifier: MIT
 ---
 definitions:
+  # Smaller units
   CourseId:
     type: integer
-    description: Internal course database ID.
     format: int32
+    description: Internal course database ID.
     minimum: 1
     example: 1
   CourseCode:
@@ -54,6 +55,7 @@ definitions:
     description: Course language.
     example: EN
 
+  # Bigger schemas
   CourseData:
     type: object
     description: Course general information with translations.
@@ -77,11 +79,11 @@ definitions:
       teachersInCharge:
         type: array
         items:
-          $ref: '#/definitions/UserWithEmail'
+          $ref: '#/definitions/TeacherData'
       assistants:
         type: array
         items:
-          $ref: '#/definitions/UserWithEmail'
+          $ref: '#/definitions/TeacherData'
     required:
       - id
       - courseCode
@@ -181,11 +183,11 @@ definitions:
       teachersInCharge:
         type: array
         items:
-          $ref: '#/definitions/UserWithEmail'
+          $ref: '#/definitions/TeacherData'
       assistants:
         type: array
         items:
-          $ref: '#/definitions/UserWithEmail'
+          $ref: '#/definitions/TeacherData'
       finalGrades:
         type: array
         items:
@@ -219,9 +221,9 @@ definitions:
               items:
                 $ref: '#/definitions/CourseData'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
     security:
       - cookieAuth: []
   post:
@@ -242,15 +244,15 @@ definitions:
             schema:
               $ref: '#/definitions/CourseId'
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
       409:
-        $ref: '#/components/responses/Conflict'
+        $ref: '#/responses/Conflict'
       422:
         description: Duplicate emails found.
         content:
@@ -265,7 +267,7 @@ definitions:
     tags: [Course]
     description: Get course information.
     parameters:
-      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/parameters/courseId'
     responses:
       200:
         description: >
@@ -274,18 +276,15 @@ definitions:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                data:
-                  $ref: '#/definitions/CourseData'
+              $ref: '#/definitions/CourseData'
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/AuthenticationError'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
     security:
       - cookieAuth: []
   put:
@@ -294,7 +293,7 @@ definitions:
       Edit an existing course.
       Available only to admin users.
     parameters:
-      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/parameters/courseId'
     requestBody:
       content:
         application/json:
@@ -304,19 +303,15 @@ definitions:
       200:
         description: Course Edited.
       400:
-        description: A validation error has occurred in the request body.
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/Failure'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/AuthenticationError'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/AuthorizationError'
+        $ref: '#/responses/Forbidden'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
       409:
-        $ref: '#/components/responses/Conflict'
+        $ref: '#/responses/Conflict'
       422:
         description: Duplicate emails found.
         content:

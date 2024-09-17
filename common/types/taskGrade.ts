@@ -26,7 +26,7 @@ export const NewTaskGradeSchema = z
   .strictObject({
     studentNumber: z.string(),
     courseTaskId: z.number().int(),
-    aplusGradeSourceId: z.number().int().optional(),
+    aplusGradeSourceId: z.number().int().nullable(),
     grade: z.number(),
     date: DateSchema,
     expiryDate: DateSchema.nullable(),
