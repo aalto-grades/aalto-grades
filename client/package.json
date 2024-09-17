@@ -19,8 +19,8 @@
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.11.16",
-    "@mui/material": "^5.13.3",
+    "@mui/icons-material": "^6.1.0",
+    "@mui/material": "^6.1.0",
     "@mui/types": "^7.2.4",
     "@mui/x-data-grid": "^7.3.0",
     "@mui/x-date-pickers": "^7.2.0",

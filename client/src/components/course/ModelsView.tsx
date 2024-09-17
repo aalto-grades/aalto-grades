@@ -82,16 +82,25 @@ const ModelsView = (): JSX.Element => {
     () =>
       allGradingModels.data === undefined
         ? null
-        : [...allGradingModels.data].sort(
-            (m1, m2) => Number(m1.archived) - Number(m2.archived)
-          ),
-    [allGradingModels.data]
+        : [...allGradingModels.data]
+            .sort((m1, m2) => Number(m1.archived) - Number(m2.archived))
+            .filter(
+              // Filter out models from archived course parts
+              model =>
+                !(model.coursePartId && courseParts.data) ||
+                !courseParts.data.some(
+                  part => part.id === model.coursePartId && part.archived
+                )
+            ),
+    [allGradingModels.data, courseParts.data]
   );
 
   const coursePartsWithoutModels = useMemo(
     () =>
       courseParts.data?.filter(
-        part => !models?.some(model => model.coursePartId === part.id)
+        part =>
+          !part.archived &&
+          !models?.some(model => model.coursePartId === part.id)
       ) ?? [],
     [courseParts.data, models]
   );
@@ -304,13 +313,16 @@ const ModelsView = (): JSX.Element => {
       <Box sx={{display: 'flex', mb: 1}}>
         {(auth?.role === SystemRole.Admin || isTeacherInCharge) &&
           !graphOpen && (
-            <Tooltip title={t('course.models.new-model')} placement="top">
+            <Tooltip
+              title={t('course.models.create-final-grade-model')}
+              placement="top"
+            >
               <Button
                 sx={{mt: 1}}
                 variant="outlined"
                 onClick={() => setCreateDialogOpen({open: true})}
               >
-                {t('course.models.create-new')}
+                {t('course.models.create-final-grade-model')}
               </Button>
             </Tooltip>
           )}

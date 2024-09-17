@@ -8,14 +8,14 @@ import {
   Archive,
   Delete,
   Edit,
-  More,
+  FontDownload,
   Unarchive,
 } from '@mui/icons-material';
 import {
   Box,
   Button,
   CircularProgress,
-  Grid,
+  Grid2 as Grid,
   IconButton,
   List,
   ListItem,
@@ -259,7 +259,8 @@ const CoursePartsView = (): JSX.Element => {
     if (params.row.aplusGradeSources.length > 0) {
       elements.push(
         <GridActionsCellItem
-          icon={<More />}
+          // Big A icon :p
+          icon={<FontDownload />}
           label={t('course.parts.view-a+-sources')}
           onClick={() => {
             setAplusGradeSources(params.row.aplusGradeSources);
@@ -337,12 +338,6 @@ const CoursePartsView = (): JSX.Element => {
       field: 'maxGrade',
       headerName: t('general.max-grade'),
       type: 'number',
-      editable: true,
-    },
-    {
-      field: 'validUntil',
-      headerName: t('course.parts.valid-until'),
-      type: 'date',
       editable: true,
     },
     {
@@ -479,7 +474,7 @@ const CoursePartsView = (): JSX.Element => {
       </Box>
 
       <Grid container spacing={2}>
-        <Grid item xs={4}>
+        <Grid size={4}>
           {courseParts.data === undefined ? (
             <CircularProgress />
           ) : (
@@ -553,7 +548,7 @@ const CoursePartsView = (): JSX.Element => {
             ))}
           </List>
         </Grid>
-        <Grid item xs={8}>
+        <Grid size={8}>
           <div style={{height: '100%', maxHeight: '70vh'}}>
             <DataGrid
               rows={rows}

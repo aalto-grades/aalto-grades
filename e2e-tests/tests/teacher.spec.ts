@@ -39,7 +39,7 @@ test.describe('Test courses as teacher', () => {
   test('Create grading model', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
     await page.getByRole('button', {name: 'Grading models'}).click();
-    await page.getByLabel('New grading model').click();
+    await page.getByLabel('Create new final grade model').click();
     await page.getByLabel('Name *').click();
     await page.getByLabel('Name *').fill('Test model');
     await page.getByLabel('Select template').click();

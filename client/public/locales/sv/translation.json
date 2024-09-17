@@ -197,6 +197,7 @@
       "select-grade-sources": "UNTRANSLATED",
       "create-tasks": "UNTRANSLATED",
       "delete-a+": "UNTRANSLATED",
+      "no-aplus-grades": "UNTRANSLATED",
       "select-course-tasks": "UNTRANSLATED",
       "select-for-fetching": "UNTRANSLATED",
       "fetching-grades": "UNTRANSLATED",
@@ -372,8 +373,7 @@
       "delete-model": "UNTRANSLATED",
       "delete-model-message": "UNTRANSLATED",
       "save-null": "UNTRANSLATED",
-      "new-model": "UNTRANSLATED",
-      "create-new": "UNTRANSLATED",
+      "create-final-grade-model": "UNTRANSLATED",
       "back": "UNTRANSLATED",
       "no-models": "UNTRANSLATED"
     },

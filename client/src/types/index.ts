@@ -5,7 +5,7 @@
 import type {TFunction} from 'i18next';
 import {z} from 'zod';
 
-import type {Language, LocalizedString} from '@/common/types';
+import type {Department, Language, LocalizedString} from '@/common/types';
 
 export type HeadCellData = {
   id: string;
@@ -13,6 +13,11 @@ export type HeadCellData = {
 };
 
 export type Numeric = number | string;
+
+export type DepartmentOption = {
+  id: Department;
+  department: LocalizedString;
+};
 
 export type LanguageOption = {
   id: Language;

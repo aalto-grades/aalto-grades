@@ -7,7 +7,7 @@ import 'react-global-modal/dist/style.css';
 import {
   Experimental_CssVarsProvider as CssVarsProvider,
   type CssVarsTheme,
-  experimental_extendTheme as extendTheme,
+  extendTheme,
 } from '@mui/material/styles';
 import {
   MutationCache,

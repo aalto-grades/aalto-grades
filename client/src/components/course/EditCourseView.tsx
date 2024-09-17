@@ -11,6 +11,7 @@ import {
   Avatar,
   Box,
   Button,
+  Grid2 as Grid,
   IconButton,
   List,
   ListItem,
@@ -20,7 +21,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
 import {Form, Formik, type FormikHelpers, type FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useEffect, useRef, useState} from 'react';
@@ -31,9 +31,13 @@ import {z} from 'zod';
 
 import {
   AaltoEmailSchema,
+  type Department,
+  DepartmentSchema,
   type EditCourseData,
   GradingScale,
-  Language,
+  GradingScaleSchema,
+  type Language,
+  LanguageSchema,
   SystemRole,
 } from '@/common/types';
 import FormField from '@/components/shared/FormikField';
@@ -51,12 +55,12 @@ import {
 
 type FormData = {
   courseCode: string;
+  department: Department;
   minCredits: number;
   maxCredits: number;
   gradingScale: GradingScale;
   teacherEmail: string;
   assistantEmail: string;
-  department: number;
   languageOfInstruction: Language;
   nameEn: string;
   nameFi: string;
@@ -120,12 +124,7 @@ const EditCourseView = (): JSX.Element => {
         languageOfInstruction: course.data.languageOfInstruction,
         teacherEmail: '',
         assistantEmail: '',
-        department: departments.findIndex(
-          department =>
-            department.en === course.data.department.en ||
-            department.fi === course.data.department.fi ||
-            department.sv === course.data.department.sv
-        ),
+        department: course.data.department,
         nameEn: course.data.name.en,
         nameFi: course.data.name.fi,
         nameSv: course.data.name.sv,
@@ -175,11 +174,7 @@ const EditCourseView = (): JSX.Element => {
       maxCredits: values.maxCredits,
       gradingScale: values.gradingScale,
       languageOfInstruction: values.languageOfInstruction,
-      department: {
-        fi: departments[values.department].fi,
-        sv: departments[values.department].sv,
-        en: departments[values.department].en,
-      },
+      department: values.department,
       name: {
         fi: values.nameFi,
         sv: values.nameSv,
@@ -220,14 +215,11 @@ const EditCourseView = (): JSX.Element => {
       maxCredits: z.number({
         required_error: t('course.edit.max-credits-required'),
       }),
-      gradingScale: z.nativeEnum(GradingScale),
-      languageOfInstruction: z.nativeEnum(Language),
+      gradingScale: GradingScaleSchema,
+      languageOfInstruction: LanguageSchema,
       teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
       assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
-      department: z
-        .number()
-        .min(0, t('course.edit.department-select'))
-        .max(departments.length - 1, t('course.edit.department-select')),
+      department: DepartmentSchema,
       nameEn: z
         .string({required_error: t('course.edit.name-english')})
         .min(1, t('course.edit.name-english')),
@@ -242,6 +234,10 @@ const EditCourseView = (): JSX.Element => {
       path: ['maxCredits'],
       message: t('course.edit.max-below-min'),
     });
+
+  const sortedDepartments = [...departments].sort((a, b) =>
+    localize(a.department).localeCompare(localize(b.department))
+  );
 
   const validateForm = (
     values: FormData
@@ -304,7 +300,7 @@ const EditCourseView = (): JSX.Element => {
             gap={5}
             sx={{overflow: 'auto', height: '100%'}}
           >
-            <Grid md={5}>
+            <Grid size={{xs: 12, md: 5.5}}>
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="courseCode"
@@ -327,9 +323,9 @@ const EditCourseView = (): JSX.Element => {
                 helperText={t('course.edit.organizing-department-help')}
                 select
               >
-                {departments.map((department, i) => (
-                  <MenuItem key={department.en} value={i}>
-                    {localize(department)}
+                {sortedDepartments.map(department => (
+                  <MenuItem key={department.id} value={department.id}>
+                    {localize(department.department)}
                   </MenuItem>
                 ))}
               </FormField>
@@ -380,7 +376,7 @@ const EditCourseView = (): JSX.Element => {
                 ))}
               </FormField>
             </Grid>
-            <Grid md={5}>
+            <Grid size={{xs: 12, md: 5.5}}>
               <TextField
                 id="teacherEmail" // Must be in camelCase to match data
                 type="text"

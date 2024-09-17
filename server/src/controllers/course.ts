@@ -81,6 +81,7 @@ export const addCourse: Endpoint<NewCourseData, number> = async (req, res) => {
       },
       defaults: {
         courseCode: req.body.courseCode,
+        department: req.body.department,
         minCredits: req.body.minCredits,
         maxCredits: req.body.maxCredits,
         gradingScale: req.body.gradingScale,
@@ -102,19 +103,16 @@ export const addCourse: Endpoint<NewCourseData, number> = async (req, res) => {
         {
           courseId: newCourse.id,
           language: Language.Finnish,
-          department: req.body.department.fi,
           courseName: req.body.name.fi,
         },
         {
           courseId: newCourse.id,
           language: Language.English,
-          department: req.body.department.en,
           courseName: req.body.name.en,
         },
         {
           courseId: newCourse.id,
           language: Language.Swedish,
-          department: req.body.department.sv,
           courseName: req.body.name.sv,
         },
       ],
@@ -160,13 +158,13 @@ export const editCourse: Endpoint<EditCourseData, void> = async (req, res) => {
 
   const {
     courseCode,
+    department,
     minCredits,
     maxCredits,
     gradingScale,
     languageOfInstruction,
-    teachersInCharge,
-    department,
     name,
+    teachersInCharge,
     assistants,
   } = req.body;
 
@@ -224,6 +222,7 @@ export const editCourse: Endpoint<EditCourseData, void> = async (req, res) => {
       await Course.update(
         {
           courseCode: courseCode ?? course.courseCode,
+          department: department ?? course.department,
           minCredits: minCredits ?? course.minCredits,
           maxCredits: maxCredits ?? course.maxCredits,
           gradingScale: gradingScale ?? course.gradingScale,
@@ -253,10 +252,7 @@ export const editCourse: Endpoint<EditCourseData, void> = async (req, res) => {
       key: 'en' | 'fi' | 'sv'
     ): Promise<void> => {
       await CourseTranslation.update(
-        {
-          department: department ? department[key] : undefined,
-          courseName: name ? name[key] : undefined,
-        },
+        {courseName: name ? name[key] : undefined},
         {
           where: {courseId: course.id, language: language},
           transaction: t,
