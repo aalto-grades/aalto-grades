@@ -17,6 +17,7 @@ import {
   type FinalGradeData,
   FinalGradeDataArraySchema,
   type NewFinalGrade,
+  type SisuCsvUpload,
 } from '@/common/types';
 import type {Numeric} from '@/types';
 import axios from './axios';
@@ -88,3 +89,18 @@ export const useDeleteFinalGrade = (
     ...options,
   });
 };
+
+type DownloadSisuGradeCsvVars = {courseId: Numeric; data: SisuCsvUpload};
+export const useDownloadSisuGradeCsv = (
+  options?: UseMutationOptions<BlobPart, unknown, DownloadSisuGradeCsvVars>
+): UseMutationResult<BlobPart, unknown, DownloadSisuGradeCsvVars> =>
+  useMutation({
+    mutationFn: async vars =>
+      (
+        await axios.post<BlobPart>(
+          `/api/v1/courses/${vars.courseId}/final-grades/csv/sisu`,
+          vars.data
+        )
+      ).data,
+    ...options,
+  });

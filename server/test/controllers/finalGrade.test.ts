@@ -565,7 +565,7 @@ describe('Test Delete/v1/courses/:courseId/final-grades/:finalGradeId - delete a
   });
 });
 
-describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatible grading in CSV', () => {
+describe('Test POST /v1/courses/:courseId/final-grades/csv/sisu - export Sisu compatible grading in CSV', () => {
   const today = new Date().toLocaleDateString('FI-fi');
   const createCSVString = (
     studentData: {studentNumber: string; finalGrade: number}[],
@@ -584,7 +584,7 @@ describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatib
     const testCookies = [cookies.adminCookie, cookies.teacherCookie];
     for (const cookie of testCookies) {
       const res = await request
-        .post(`/v1/courses/${courseId}/grades/csv/sisu`)
+        .post(`/v1/courses/${courseId}/final-grades/csv/sisu`)
         .send({studentNumbers, assessmentDate: null, completionLanguage: null})
         .set('Cookie', cookie)
         .set('Accept', 'text/csv')
@@ -603,7 +603,7 @@ ${createCSVString(students, today, 'en').join(',\n')},\n`);
   it('should export only selected grades', async () => {
     const selectedStudents = [students[0], students[3], students[6]];
     const res = await request
-      .post(`/v1/courses/${courseId}/grades/csv/sisu`)
+      .post(`/v1/courses/${courseId}/final-grades/csv/sisu`)
       .send({
         studentNumbers: selectedStudents.map(student => student.studentNumber),
         assessmentDate: null,
@@ -624,7 +624,7 @@ ${createCSVString(selectedStudents, today, 'en').join(',\n')},\n`);
 
   it('should export CSV successfully with custom assessmentDate and completionLanguage', async () => {
     const res = await request
-      .post(`/v1/courses/${courseId}/grades/csv/sisu`)
+      .post(`/v1/courses/${courseId}/final-grades/csv/sisu`)
       .send({
         studentNumbers,
         assessmentDate: new Date(2023, 4, 12),
@@ -656,7 +656,7 @@ ${createCSVString(students, '12.5.2023', 'ja').join(',\n')},\n`);
       );
     }
     const res = await request
-      .post(`/v1/courses/${passFailCourseId}/grades/csv/sisu`)
+      .post(`/v1/courses/${passFailCourseId}/final-grades/csv/sisu`)
       .send({
         studentNumbers: studentNums,
         assessmentDate: null,
@@ -689,7 +689,7 @@ ${students[1].studentNumber},pass,5,${today},en,\n`);
       );
     }
     const res = await request
-      .post(`/v1/courses/${secondaryLangCourseId}/grades/csv/sisu`)
+      .post(`/v1/courses/${secondaryLangCourseId}/final-grades/csv/sisu`)
       .send({
         studentNumbers: studentNums,
         assessmentDate: null,
@@ -711,7 +711,7 @@ ${students[2].studentNumber},G,5,${today},en,\n`);
   });
 
   it('should respond with 400 if validation fails', async () => {
-    const url = `/v1/courses/${courseId}/grades/csv/sisu`;
+    const url = `/v1/courses/${courseId}/final-grades/csv/sisu`;
     const badRequest = responseTests.testBadRequest(url, cookies.adminCookie);
 
     await badRequest.post({
@@ -726,7 +726,7 @@ ${students[2].studentNumber},G,5,${today},en,\n`);
   });
 
   it('should respond with 400 if id is invalid', async () => {
-    const url = '/v1/courses/bad/grades/csv/sisu';
+    const url = '/v1/courses/bad/final-grades/csv/sisu';
     const data = {
       studentNumbers,
       assessmentDate: null,
@@ -736,7 +736,7 @@ ${students[2].studentNumber},G,5,${today},en,\n`);
   });
 
   it('should respond with 401 or 403 if not authorized', async () => {
-    let url = `/v1/courses/${courseId}/grades/csv/sisu`;
+    let url = `/v1/courses/${courseId}/final-grades/csv/sisu`;
     const data = {
       studentNumbers,
       assessmentDate: null,
@@ -759,7 +759,7 @@ ${students[2].studentNumber},G,5,${today},en,\n`);
   });
 
   it('should respond with 404 if grades have not been calculated yet', async () => {
-    const url = `/v1/courses/${noRoleCourseId}/grades/csv/sisu`;
+    const url = `/v1/courses/${noRoleCourseId}/final-grades/csv/sisu`;
     const data = {
       studentNumbers: [studentNumbers[0]],
       assessmentDate: null,
@@ -770,7 +770,7 @@ ${students[2].studentNumber},G,5,${today},en,\n`);
   });
 
   it('should respond with 404 if student number not found', async () => {
-    const url = `/v1/courses/${noRoleCourseId}/grades/csv/sisu`;
+    const url = `/v1/courses/${noRoleCourseId}/final-grades/csv/sisu`;
     const data = {
       studentNumbers: [nonExistentStudentNumber],
       assessmentDate: null,
@@ -781,7 +781,7 @@ ${students[2].studentNumber},G,5,${today},en,\n`);
   });
 
   it('should respond with 404 if not found', async () => {
-    const url = `/v1/courses/${nonExistentId}/grades/csv/sisu`;
+    const url = `/v1/courses/${nonExistentId}/final-grades/csv/sisu`;
     const data = {
       studentNumbers,
       assessmentDate: null,

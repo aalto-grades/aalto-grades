@@ -17,7 +17,6 @@ import {
   type LatestGrades,
   LatestGradesSchema,
   type NewTaskGrade,
-  type SisuCsvUpload,
   type StudentRow,
   StudentRowArraySchema,
   type UserIdArray,
@@ -98,20 +97,5 @@ export const useGetLatestGrades = (
       LatestGradesSchema.parse(
         (await axios.post('/api/v1/latest-grades', userIds)).data
       ),
-    ...options,
-  });
-
-type DownloadSisuGradeCsvVars = {courseId: Numeric; data: SisuCsvUpload};
-export const useDownloadSisuGradeCsv = (
-  options?: UseMutationOptions<BlobPart, unknown, DownloadSisuGradeCsvVars>
-): UseMutationResult<BlobPart, unknown, DownloadSisuGradeCsvVars> =>
-  useMutation({
-    mutationFn: async vars =>
-      (
-        await axios.post<BlobPart>(
-          `/api/v1/courses/${vars.courseId}/grades/csv/sisu`,
-          vars.data
-        )
-      ).data,
     ...options,
   });

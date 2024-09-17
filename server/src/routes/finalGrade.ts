@@ -61,7 +61,7 @@ router.delete(
 
 // Actually gets the csv but the request type must be post to be able to use request.body
 router.post(
-  '/v1/courses/:courseId/grades/csv/sisu',
+  '/v1/courses/:courseId/final-grades/csv/sisu',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json({limit: '10mb'}),
