@@ -2,9 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {type Includeable, Op} from 'sequelize';
-
-import {HttpCode, type TaskGradeData, type UserData} from '@/common/types';
+import {
+  HttpCode,
+  type StudentData,
+  type TaskGradeData,
+  type TeacherData,
+} from '@/common/types';
 import {parseAplusGradeSource} from './aplus';
 import {findAndValidateCourseId} from './course';
 import {findCoursePartById} from './coursePart';
@@ -13,9 +16,8 @@ import httpLogger from '../../configs/winston';
 import type Course from '../../database/models/course';
 import CoursePart from '../../database/models/coursePart';
 import CourseTask from '../../database/models/courseTask';
-import FinalGrade from '../../database/models/finalGrade';
+import type FinalGrade from '../../database/models/finalGrade';
 import TaskGrade from '../../database/models/taskGrade';
-import User from '../../database/models/user';
 import {ApiError, stringToIdSchema} from '../../types';
 
 /**
@@ -60,7 +62,7 @@ export const getDateOfLatestGrade = async (
  */
 export const validateUserAndGrader = (
   grade: TaskGrade | FinalGrade
-): [UserData & {studentNumber: string}, UserData & {name: string}] => {
+): [StudentData, TeacherData] => {
   const gradeType = grade instanceof TaskGrade ? 'grade' : 'final grade';
 
   if (grade.User === undefined) {
@@ -89,12 +91,12 @@ export const validateUserAndGrader = (
     );
   }
 
-  if (grade.grader.name === null) {
+  if (grade.grader.email === null) {
     httpLogger.error(
-      `Found a ${gradeType} ${grade.id} where grader ${grade.grader.id} name is null`
+      `Found a ${gradeType} ${grade.id} where grader ${grade.grader.id} email is null`
     );
     throw new ApiError(
-      `Found a ${gradeType} where grader name is null`,
+      `Found a ${gradeType} where grader email is null`,
       HttpCode.InternalServerError
     );
   }
@@ -125,93 +127,11 @@ export const parseTaskGrade = (taskGrade: TaskGrade): TaskGradeData => {
       ? parseAplusGradeSource(taskGrade.AplusGradeSource)
       : null,
     grade: taskGrade.grade,
-    exportedToSisu: taskGrade.sisuExportDate,
     date: new Date(taskGrade.date),
     expiryDate:
       taskGrade.expiryDate === null ? null : new Date(taskGrade.expiryDate),
     comment: taskGrade.comment,
   };
-};
-
-/**
- * Validates that all student numbers in the array exist
- *
- * @throws ApiError(404) If a student number is not found in the database
- */
-export const studentNumbersExist = async (
-  studentNumbers: string[]
-): Promise<void> => {
-  const foundStudentNumbers = (
-    await User.findAll({
-      attributes: ['studentNumber'],
-      where: {
-        studentNumber: {[Op.in]: studentNumbers},
-      },
-    })
-  ).map(student => student.studentNumber);
-
-  if (foundStudentNumbers.length !== studentNumbers.length) {
-    const errors: string[] = [];
-
-    for (const studentNumber of studentNumbers) {
-      if (!foundStudentNumbers.includes(studentNumber)) {
-        errors.push(`user with student number ${studentNumber} not found`);
-      }
-    }
-
-    throw new ApiError(errors, HttpCode.NotFound);
-  }
-};
-
-/**
- * Find all final grades for given course and student numbers
- *
- * @throws ApiError(404)
- */
-export const getFinalGradesFor = async (
-  courseId: number,
-  studentNumbers: string[],
-  skipErrorOnEmpty: boolean = false
-): Promise<FinalGrade[]> => {
-  // Prepare base query options for User.
-  const userQueryOptions: Includeable = {
-    model: User,
-    attributes: ['id', 'studentNumber'],
-  };
-
-  // Conditionally add a where clause if student numbers are included in the
-  // function call
-  if (studentNumbers.length > 0) {
-    userQueryOptions.where = {
-      studentNumber: {
-        [Op.in]: studentNumbers,
-      },
-    };
-  }
-
-  const finalGrades = await FinalGrade.findAll({
-    where: {courseId: courseId},
-    include: [
-      {
-        model: User,
-        required: true,
-        as: 'grader',
-        attributes: ['id', 'name'],
-      },
-      userQueryOptions,
-    ],
-    order: [['id', 'ASC']],
-  });
-
-  if (finalGrades.length === 0 && !skipErrorOnEmpty) {
-    throw new ApiError(
-      'no grades found, make sure grades have been ' +
-        'uploaded/calculated before requesting course results',
-      HttpCode.NotFound
-    );
-  }
-
-  return finalGrades;
 };
 
 /**

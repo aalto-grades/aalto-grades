@@ -1,24 +1,20 @@
 // SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
-import {stringify} from 'csv-stringify';
 import {Op} from 'sequelize';
 
 import {
   CourseRoleType,
   type EditTaskGradeData,
   type FinalGradeData,
-  GradingScale,
   HttpCode,
   type LatestGrades,
   type NewTaskGrade,
-  type SisuCsvUpload,
   type StudentRow,
   type TaskGradeData,
   type UserData,
   type UserIdArray,
 } from '@/common/types';
-import httpLogger from '../configs/winston';
 import {sequelize} from '../database';
 import AplusGradeSource from '../database/models/aplusGradeSource';
 import CoursePart from '../database/models/coursePart';
@@ -34,15 +30,12 @@ import {
   type NewDbGradeData,
 } from '../types';
 import {validateAplusGradeSourceBelongsToCourseTask} from './utils/aplus';
-import {findAndValidateCourseId, validateCourseId} from './utils/course';
+import {validateCourseId} from './utils/course';
 import {validateCourseTaskBelongsToCourse} from './utils/courseTask';
 import {parseFinalGrade} from './utils/finalGrade';
 import {
   findAndValidateGradePath,
-  getDateOfLatestGrade,
-  getFinalGradesFor,
   parseTaskGrade,
-  studentNumbersExist,
   validateUserAndGrader,
 } from './utils/taskGrade';
 
@@ -387,180 +380,4 @@ export const getLatestGrades: Endpoint<UserIdArray, LatestGrades> = async (
   }
 
   res.json(latestGrades);
-};
-
-/**
- * Get grading data formatted to Sisu compatible format for exporting grades to
- * Sisu. Documentation and requirements for Sisu CSV file structure available at
- * https://wiki.aalto.fi/display/SISEN/Assessment+of+implementations
- *
- * (SisuCsvUpload) => string (text/csv)
- *
- * @throws ApiError(400|404)
- */
-export const getSisuFormattedGradingCSV: Endpoint<
-  SisuCsvUpload,
-  string
-> = async (req, res) => {
-  const course = await findAndValidateCourseId(req.params.courseId);
-  await studentNumbersExist(req.body.studentNumbers);
-
-  // TODO: Only one grade per user per instance is allowed
-  const finalGrades = await getFinalGradesFor(
-    course.id,
-    req.body.studentNumbers
-  );
-
-  type SisuCsvFormat = {
-    studentNumber: string;
-    grade: string;
-    credits: number;
-    assessmentDate: string;
-    completionLanguage: string;
-    comment: string;
-  };
-
-  type MarkSisuExport = {gradeId: number; userId: number};
-
-  const courseResults: SisuCsvFormat[] = [];
-  const existingResults: FinalGrade[] = [];
-  const exportedToSisu: MarkSisuExport[] = [];
-
-  for (const finalGrade of finalGrades) {
-    if (finalGrade.User === undefined) {
-      httpLogger.error(
-        `Final grade ${finalGrade.id} user was undefined even though student numbers were validated`
-      );
-      throw new ApiError(
-        'Final grade user was undefined',
-        HttpCode.InternalServerError
-      );
-    }
-    if (finalGrade.User.studentNumber === null) {
-      httpLogger.error(
-        `Final grade ${finalGrade.id} user student number was null even though student numbers were validated`
-      );
-      throw new ApiError(
-        'Final grade user student number was null',
-        HttpCode.InternalServerError
-      );
-    }
-
-    const existingResult = existingResults.find(
-      value => value.User?.studentNumber === finalGrade.User?.studentNumber
-    );
-
-    const gradeIsBetter = (
-      newGrade: FinalGrade,
-      oldGrade: FinalGrade
-    ): boolean => {
-      // Prefer manual final grades
-      const newIsManual = newGrade.gradingModelId === null;
-      const oldIsManual = oldGrade.gradingModelId === null;
-      if (newIsManual && !oldIsManual) return true;
-      if (oldIsManual && !newIsManual) return false;
-
-      if (newGrade.grade > oldGrade.grade) return true;
-      return (
-        newGrade.grade === oldGrade.grade &&
-        new Date(newGrade.date).getTime() >= new Date(oldGrade.date).getTime()
-      );
-    };
-
-    if (existingResult) {
-      // TODO: Maybe more options than just latest grade
-      if (!gradeIsBetter(finalGrade, existingResult)) continue;
-
-      existingResult.date = finalGrade.date;
-      existingResult.grade = finalGrade.grade;
-      existingResult.gradingModelId = finalGrade.gradingModelId;
-
-      // Set existing course result grade
-      const existingCourseResult = courseResults.find(
-        value => value.studentNumber === finalGrade.User?.studentNumber
-      );
-      if (existingCourseResult === undefined) {
-        // Should pretty much never happen
-        httpLogger.error("Couldn't find duplicate final grade again");
-        throw new ApiError(
-          "Couldn't find duplicate final grade again",
-          HttpCode.InternalServerError
-        );
-      }
-      existingCourseResult.grade = finalGrade.grade.toString();
-
-      // There can be multiple grades, make sure only the exported grade is marked with timestamp.
-      const userData = exportedToSisu.find(
-        value => value.userId === finalGrade.User?.id
-      );
-      if (userData) userData.gradeId = finalGrade.id;
-    } else {
-      exportedToSisu.push({gradeId: finalGrade.id, userId: finalGrade.userId});
-
-      // Assessment date must be in form dd.mm.yyyy.
-      // HERE we want to find the latest completed grade for student
-      const assessmentDate = (
-        req.body.assessmentDate ??
-        (await getDateOfLatestGrade(finalGrade.userId, course.id))
-      ).toLocaleDateString('fi-FI');
-
-      const completionLanguage = req.body.completionLanguage
-        ? req.body.completionLanguage.toLowerCase()
-        : course.languageOfInstruction.toLowerCase();
-
-      let csvGrade;
-      switch (course.gradingScale) {
-        case GradingScale.Numerical:
-          csvGrade = finalGrade.grade.toString();
-          break;
-        case GradingScale.PassFail:
-          csvGrade = finalGrade.grade === 0 ? 'fail' : 'pass';
-          break;
-        case GradingScale.SecondNationalLanguage:
-          if (finalGrade.grade === 0) csvGrade = 'Fail';
-          else if (finalGrade.grade === 1) csvGrade = 'SAT';
-          else csvGrade = 'G';
-          break;
-      }
-
-      existingResults.push(finalGrade);
-      courseResults.push({
-        studentNumber: finalGrade.User.studentNumber,
-        grade: csvGrade,
-        credits: course.maxCredits,
-        assessmentDate: assessmentDate,
-        completionLanguage: completionLanguage,
-        comment: finalGrade.comment ?? '', // Comment column is required, but can be empty.
-      });
-    }
-  }
-
-  await FinalGrade.update(
-    {sisuExportDate: new Date()},
-    {
-      where: {
-        id: {
-          [Op.or]: exportedToSisu.map(value => value.gradeId),
-        },
-      },
-    }
-  );
-
-  stringify(
-    courseResults,
-    {
-      header: true,
-      delimiter: ',', // NOTE, accepted delimiters in Sisu are semicolon ; and comma ,
-    },
-    (_err, data) => {
-      res
-        .setHeader('Content-Type', 'text/csv')
-        .attachment(
-          `final_grades_course_${
-            course.courseCode
-          }_${new Date().toLocaleDateString('fi-FI')}.csv`
-        )
-        .send(data);
-    }
-  );
 };

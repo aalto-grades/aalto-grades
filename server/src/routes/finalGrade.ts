@@ -10,12 +10,14 @@ import {
   CourseRoleType,
   EditFinalGradeSchema,
   NewFinalGradeArraySchema,
+  SisuCsvUploadSchema,
 } from '@/common/types';
 import {
   addFinalGrades,
   deleteFinalGrade,
   editFinalGrade,
   getFinalGrades,
+  getSisuFormattedGradingCSV,
 } from '../controllers/finalGrade';
 import {handleInvalidRequestJson} from '../middleware';
 import {courseAuthorization} from '../middleware/authorization';
@@ -55,4 +57,15 @@ router.delete(
   passport.authenticate('jwt', {session: false}) as RequestHandler,
   courseAuthorization([CourseRoleType.Teacher]),
   controllerDispatcher(deleteFinalGrade)
+);
+
+// Actually gets the csv but the request type must be post to be able to use request.body
+router.post(
+  '/v1/courses/:courseId/grades/csv/sisu',
+  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  courseAuthorization([CourseRoleType.Teacher]),
+  express.json({limit: '10mb'}),
+  handleInvalidRequestJson,
+  processRequestBody(SisuCsvUploadSchema),
+  controllerDispatcher(getSisuFormattedGradingCSV)
 );

@@ -24,3 +24,12 @@ export type NewDbGradeData = {
   expiryDate: Date | null;
   comment?: string | null;
 };
+
+export type SisuCsvFormat = {
+  studentNumber: string;
+  grade: string;
+  credits: number;
+  assessmentDate: string;
+  completionLanguage: string;
+  comment: string;
+};

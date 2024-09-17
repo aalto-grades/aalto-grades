@@ -48,7 +48,6 @@ type ColTypes = {
   grade: number;
   date: Date;
   expiryDate: Date | null;
-  exported: boolean;
   comment: string;
   selected: string;
   aplusGrade: boolean;
@@ -135,7 +134,6 @@ const EditGradesDialog = ({
       grade: grade.grade,
       date: grade.date,
       expiryDate: grade.expiryDate,
-      exported: grade.exportedToSisu !== null,
       comment: grade.comment ?? '',
       selected: '',
       aplusGrade: grade.aplusGradeSource !== null,
@@ -172,12 +170,6 @@ const EditGradesDialog = ({
       type: 'date',
       editable: true,
       width: 120,
-    },
-    {
-      field: 'exported',
-      headerName: t('general.exported'),
-      type: 'boolean',
-      editable: false,
     },
     {
       field: 'comment',
@@ -218,7 +210,6 @@ const EditGradesDialog = ({
           grade: 0,
           date: new Date(),
           expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-          exported: false,
           comment: '',
           selected: '',
           aplusGrade: false,
