@@ -8,19 +8,19 @@ export type NewDbFinalGradeData = {
   gradingModelId?: number | null;
   graderId: number;
   grade: number;
-  sisuExportDate?: Date | null;
   date: Date;
+  sisuExportDate?: Date | null;
   comment?: string | null;
 };
 
-export type NewDbGradeData = {
+export type NewDbTaskGradeData = {
   userId: number;
   courseTaskId: number;
   graderId: number;
   aplusGradeSourceId?: number;
   grade: number;
-  sisuExportDate?: Date | null;
   date: Date;
+  sisuExportDate?: Date | null;
   expiryDate: Date | null;
   comment?: string | null;
 };

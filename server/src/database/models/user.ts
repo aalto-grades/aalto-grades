@@ -19,11 +19,11 @@ export default class User extends Model<
   InferCreationAttributes<User>
 > {
   declare id: CreationOptional<number>;
-  declare eduUser: CreationOptional<string | null>;
-  declare studentNumber: CreationOptional<string | null>;
   declare name: CreationOptional<string | null>;
-  declare role: CreationOptional<SystemRole>;
   declare email: CreationOptional<string | null>;
+  declare studentNumber: CreationOptional<string | null>;
+  declare eduUser: CreationOptional<string | null>;
+  declare role: CreationOptional<SystemRole>;
   declare password: CreationOptional<string | null>;
   declare forcePasswordReset: CreationOptional<boolean | null>;
   declare mfaSecret: CreationOptional<string | null>;
@@ -43,24 +43,9 @@ User.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    eduUser: {
-      type: new DataTypes.STRING(),
-      unique: true,
-      allowNull: true,
-    },
-    studentNumber: {
-      type: new DataTypes.STRING(),
-      unique: true,
-      allowNull: true,
-    },
     name: {
       type: new DataTypes.STRING(),
       allowNull: true,
-    },
-    role: {
-      type: DataTypes.ENUM('USER', 'ADMIN'),
-      allowNull: false,
-      defaultValue: 'USER',
     },
     email: {
       type: new DataTypes.STRING(255),
@@ -69,6 +54,21 @@ User.init(
       validate: {
         isEmail: true,
       },
+    },
+    studentNumber: {
+      type: new DataTypes.STRING(),
+      unique: true,
+      allowNull: true,
+    },
+    eduUser: {
+      type: new DataTypes.STRING(),
+      unique: true,
+      allowNull: true,
+    },
+    role: {
+      type: DataTypes.ENUM('USER', 'ADMIN'),
+      allowNull: false,
+      defaultValue: 'USER',
     },
     password: {
       type: new DataTypes.CHAR(255),

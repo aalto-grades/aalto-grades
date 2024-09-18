@@ -22,13 +22,13 @@ export default class AplusGradeSource extends Model<
   declare id: CreationOptional<number>;
   declare courseTaskId: ForeignKey<CourseTask['id']>;
   declare aplusCourse: AplusCourseData; // TODO: Store as a table? Or individual fields?
+  declare date: Date | string;
   declare sourceType: AplusGradeSourceType;
   declare moduleId: CreationOptional<number | null>;
   declare moduleName: CreationOptional<string | null>;
   declare exerciseId: CreationOptional<number | null>;
   declare exerciseName: CreationOptional<string | null>;
   declare difficulty: CreationOptional<string | null>;
-  declare date: Date | string;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -50,6 +50,10 @@ AplusGradeSource.init(
     },
     aplusCourse: {
       type: DataTypes.JSONB,
+      allowNull: false,
+    },
+    date: {
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     sourceType: {
@@ -75,10 +79,6 @@ AplusGradeSource.init(
     difficulty: {
       type: DataTypes.STRING,
       allowNull: true,
-    },
-    date: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

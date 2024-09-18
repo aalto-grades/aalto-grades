@@ -126,7 +126,7 @@ const findPreviouslyExportedToSisu = (
   row: StudentRow
 ): FinalGradeData | null => {
   for (const fg of row.finalGrades) {
-    if (bestGrade.finalGradeId === fg.finalGradeId) continue; // Skip the best grade
+    if (bestGrade.id === fg.id) continue; // Skip the best grade
     if (fg.sisuExportDate === null) continue; // and those not exported to sisu
 
     if (bestGrade.sisuExportDate !== null) {

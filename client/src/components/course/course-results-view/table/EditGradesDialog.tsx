@@ -133,9 +133,9 @@ const EditGradesDialog = ({
   }, [bestGrade, rows]);
 
   useEffect(() => {
-    const newRows = grades.map((grade, gradeId) => ({
-      id: gradeId,
-      gradeId: grade.gradeId,
+    const newRows = grades.map((grade, i) => ({
+      id: i,
+      gradeId: grade.id,
       grader: grade.grader.name!,
       grade: grade.grade,
       date: grade.date,

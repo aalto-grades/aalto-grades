@@ -58,7 +58,7 @@ export const getFinalGrades: Endpoint<void, FinalGradeData[]> = async (
   for (const finalGrade of dbFinalGrades) {
     const [user, grader] = validateUserAndGrader(finalGrade);
     finalGrades.push({
-      finalGradeId: finalGrade.id,
+      id: finalGrade.id,
       user: user,
       courseId: finalGrade.courseId,
       gradingModelId: finalGrade.gradingModelId,
@@ -261,7 +261,7 @@ export const getSisuFormattedGradingCSV: Endpoint<
         break;
     }
 
-    exportedToSisu.push(bestFinalGrade.finalGradeId);
+    exportedToSisu.push(bestFinalGrade.id);
     sisuData.push({
       studentNumber: studentNumber,
       grade: csvGrade,

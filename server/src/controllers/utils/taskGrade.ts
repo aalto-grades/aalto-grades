@@ -126,9 +126,11 @@ export const validateUserAndGrader = (
 
 /** Converts taskGrade database object into the TaskGradeData type */
 export const parseTaskGrade = (taskGrade: TaskGrade): TaskGradeData => {
-  const [, grader] = validateUserAndGrader(taskGrade);
+  const [user, grader] = validateUserAndGrader(taskGrade);
   return {
-    gradeId: taskGrade.id,
+    id: taskGrade.id,
+    courseTaskId: taskGrade.courseTaskId,
+    user: user,
     grader: grader,
     aplusGradeSource: taskGrade.AplusGradeSource
       ? parseAplusGradeSource(taskGrade.AplusGradeSource)

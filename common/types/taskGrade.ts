@@ -10,7 +10,9 @@ import {DateSchema, IdSchema} from './general';
 import {StudentDataSchema, TeacherDataSchema} from './user';
 
 const BaseGradeDataSchema = z.strictObject({
-  gradeId: IdSchema,
+  id: IdSchema,
+  user: StudentDataSchema,
+  courseTaskId: IdSchema,
   grader: TeacherDataSchema,
   aplusGradeSource: AplusGradeSourceDataSchema.nullable(),
   grade: z.number(),
@@ -25,8 +27,8 @@ export const TaskGradeDataSchema = BaseGradeDataSchema.refine(
 export const NewTaskGradeSchema = z
   .strictObject({
     studentNumber: z.string(),
-    courseTaskId: z.number().int(),
-    aplusGradeSourceId: z.number().int().nullable(),
+    courseTaskId: IdSchema,
+    aplusGradeSourceId: IdSchema.nullable(),
     grade: z.number(),
     date: DateSchema,
     expiryDate: DateSchema.nullable(),
@@ -36,7 +38,7 @@ export const NewTaskGradeSchema = z
     path: ['date'],
   });
 export const EditTaskGradeDataSchema = BaseGradeDataSchema.omit({
-  gradeId: true,
+  id: true,
   aplusGradeSource: true,
   grader: true,
 })

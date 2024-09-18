@@ -27,7 +27,7 @@ import {
   ApiError,
   type Endpoint,
   type JwtClaims,
-  type NewDbGradeData,
+  type NewDbTaskGradeData,
 } from '../types';
 import {validateAplusGradeSourceBelongsToCourseTask} from './utils/aplus';
 import {validateCourseId} from './utils/course';
@@ -202,7 +202,7 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
   );
 
   await sequelize.transaction(async t => {
-    const preparedBulkCreate: NewDbGradeData[] = [];
+    const preparedBulkCreate: NewDbTaskGradeData[] = [];
 
     for (const gradeEntry of req.body) {
       const userId = studentNumberToId[gradeEntry.studentNumber];

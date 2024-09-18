@@ -18,8 +18,8 @@ export const FullUserDataSchema = z.strictObject({
   name: z.string().nullable(),
   email: z.string().email().nullable(),
   studentNumber: z.string().nullable(),
-  role: SystemRoleSchema,
   idpUser: z.boolean(),
+  role: SystemRoleSchema,
 });
 export const StudentDataSchema = z.strictObject({
   id: IdSchema,

@@ -64,7 +64,7 @@ export const findAndValidateFinalGradePath = async (
 export const parseFinalGrade = (finalGrade: FinalGrade): FinalGradeData => {
   const [user, grader] = validateUserAndGrader(finalGrade);
   return {
-    finalGradeId: finalGrade.id,
+    id: finalGrade.id,
     user: user,
     courseId: finalGrade.courseId,
     gradingModelId: finalGrade.gradingModelId,

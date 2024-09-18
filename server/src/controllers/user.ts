@@ -136,7 +136,7 @@ export const getCoursesOfUser: Endpoint<void, CourseWithFinalGrades[]> = async (
       finalGrades: course.FinalGrades.map(finalGrade => {
         const [finalGradeUser, grader] = validateUserAndGrader(finalGrade);
         return {
-          finalGradeId: finalGrade.id,
+          id: finalGrade.id,
           user: finalGradeUser,
           courseId: finalGrade.courseId,
           gradingModelId: finalGrade.gradingModelId,

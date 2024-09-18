@@ -8,7 +8,7 @@ import {DateSchema, IdSchema, LanguageSchema} from './general';
 import {StudentDataSchema, TeacherDataSchema} from './user';
 
 export const FinalGradeDataSchema = z.strictObject({
-  finalGradeId: IdSchema,
+  id: IdSchema,
   user: StudentDataSchema,
   courseId: IdSchema,
   gradingModelId: IdSchema.nullable(),
