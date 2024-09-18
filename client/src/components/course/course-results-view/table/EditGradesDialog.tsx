@@ -92,6 +92,10 @@ const EditGradesDialog = ({
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
 
+  console.log(
+    JSON.stringify(rows.map(row => ({...row, selected: ''}))),
+    JSON.stringify(initRows)
+  );
   const changes = useMemo(
     () =>
       JSON.stringify(rows.map(row => ({...row, selected: ''}))) !==
@@ -271,6 +275,7 @@ const EditGradesDialog = ({
         });
       }
     }
+    console.log(editedGrades);
 
     const rowIds = new Set(rows.map(row => row.gradeId));
     for (const initRow of initRows) {
@@ -292,6 +297,9 @@ const EditGradesDialog = ({
   const processRowUpdate = (newRow: RowType, oldRow: RowType): RowType => {
     if (!newRow.expiryDate || !oldRow.expiryDate) {
       setError(false);
+      setRows((oldRows: GridRowsProp<ColTypes>) =>
+        oldRows.map(row => (row.id === newRow.id ? newRow : row))
+      );
       return newRow;
     }
 
@@ -387,6 +395,7 @@ const EditGradesDialog = ({
           </Button>
           <Button
             onClick={() => {
+              console.log(JSON.stringify({changes}));
               if (changes) handleSubmit();
               else onClose();
             }}
