@@ -14,7 +14,7 @@ import CoursePart from '../database/models/coursePart';
 import {ApiError, type Endpoint} from '../types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
-  findCoursePartByCourseId,
+  getAllCourseCourseParts,
   validateCoursePartPath,
 } from './utils/coursePart';
 
@@ -28,7 +28,7 @@ export const getCourseParts: Endpoint<void, CoursePartData[]> = async (
   res
 ) => {
   const course = await findAndValidateCourseId(req.params.courseId);
-  const coursePartData = await findCoursePartByCourseId(course.id);
+  const coursePartData = await getAllCourseCourseParts(course.id);
 
   res.json(coursePartData);
 };

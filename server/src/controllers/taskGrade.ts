@@ -34,7 +34,7 @@ import {validateCourseId} from './utils/course';
 import {validateCourseTaskBelongsToCourse} from './utils/courseTask';
 import {parseFinalGrade} from './utils/finalGrade';
 import {
-  findAndValidateGradePath,
+  findAndValidateTaskGradePath,
   parseTaskGrade,
   validateUserAndGrader,
 } from './utils/taskGrade';
@@ -281,7 +281,7 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
   res
 ) => {
   const grader = req.user as JwtClaims;
-  const [, gradeData] = await findAndValidateGradePath(
+  const [, gradeData] = await findAndValidateTaskGradePath(
     req.params.courseId,
     req.params.gradeId
   );
@@ -337,7 +337,7 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
  * @throws ApiError(400|404|409)
  */
 export const deleteGrade: Endpoint<void, void> = async (req, res) => {
-  const [, grade] = await findAndValidateGradePath(
+  const [, grade] = await findAndValidateTaskGradePath(
     req.params.courseId,
     req.params.gradeId
   );

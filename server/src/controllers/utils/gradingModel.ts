@@ -31,47 +31,18 @@ export const findGradingModelById = async (
   return gradingModel;
 };
 
-/** Checks if grading model has deleted or archived course sources. */
-export const checkGradingModelSources = (
-  gradingModel: GradingModel,
-  sources: CourseTaskData[] | CoursePartData[]
-): {hasDeletedSources: boolean; hasArchivedSources: boolean} => {
-  let hasDeleted = false;
-  let hasArchived = false;
-
-  const modelSourceIds = [];
-  for (const node of gradingModel.graphStructure.nodes) {
-    if (node.type !== 'source') continue;
-    modelSourceIds.push(parseInt(node.id.split('-')[1]));
-  }
-
-  const sourceIds = new Set(sources.map(source => source.id));
-  for (const sourceId of modelSourceIds) {
-    if (!sourceIds.has(sourceId)) hasDeleted = true;
-  }
-  for (const source of sources) {
-    if (modelSourceIds.includes(source.id) && source.archived)
-      hasArchived = true;
-  }
-
-  return {
-    hasDeletedSources: hasDeleted,
-    hasArchivedSources: hasArchived,
-  };
-};
-
 /**
  * Finds a grading model by url param id and also validates the url param.
  *
  * @throws ApiError(400|404) if invalid or not found.
  */
 const findAndValidateGradingModelId = async (
-  courseId: string
+  modelId: string
 ): Promise<GradingModel> => {
-  const result = stringToIdSchema.safeParse(courseId);
+  const result = stringToIdSchema.safeParse(modelId);
   if (!result.success) {
     throw new ApiError(
-      `Invalid grading model id ${courseId}`,
+      `Invalid grading model id ${modelId}`,
       HttpCode.BadRequest
     );
   }
@@ -87,10 +58,10 @@ const findAndValidateGradingModelId = async (
  */
 export const validateGradingModelBelongsToCourse = async (
   courseId: number,
-  gradingModelId: number
+  modelId: number
 ): Promise<[Course, GradingModel]> => {
   const course = await findCourseById(courseId);
-  const gradingModel = await findGradingModelById(gradingModelId);
+  const gradingModel = await findGradingModelById(modelId);
 
   // Check that grading model belongs to the course.
   if (gradingModel.courseId !== course.id) {
@@ -128,4 +99,33 @@ export const validateGradingModelPath = async (
   }
 
   return [course, gradingModel];
+};
+
+/** Checks if grading model has deleted or archived course sources. */
+export const checkGradingModelSources = (
+  gradingModel: GradingModel,
+  sources: CourseTaskData[] | CoursePartData[]
+): {hasDeletedSources: boolean; hasArchivedSources: boolean} => {
+  let hasDeleted = false;
+  let hasArchived = false;
+
+  const modelSourceIds = [];
+  for (const node of gradingModel.graphStructure.nodes) {
+    if (node.type !== 'source') continue;
+    modelSourceIds.push(parseInt(node.id.split('-')[1]));
+  }
+
+  const sourceIds = new Set(sources.map(source => source.id));
+  for (const sourceId of modelSourceIds) {
+    if (!sourceIds.has(sourceId)) hasDeleted = true;
+  }
+  for (const source of sources) {
+    if (modelSourceIds.includes(source.id) && source.archived)
+      hasArchived = true;
+  }
+
+  return {
+    hasDeletedSources: hasDeleted,
+    hasArchivedSources: hasArchived,
+  };
 };

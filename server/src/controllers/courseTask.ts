@@ -15,7 +15,7 @@ import {ApiError, type Endpoint} from '../types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {validateCoursePartBelongsToCourse} from './utils/coursePart';
 import {
-  findCourseTaskByCourseId,
+  getAllCourseCourseTasks,
   validateCourseTaskPath,
 } from './utils/courseTask';
 
@@ -29,7 +29,7 @@ export const getCourseTasks: Endpoint<void, CourseTaskData[]> = async (
   res
 ) => {
   const course = await findAndValidateCourseId(req.params.courseId);
-  const courseTaskData = await findCourseTaskByCourseId(course.id);
+  const courseTaskData = await getAllCourseCourseTasks(course.id);
 
   res.json(courseTaskData);
 };

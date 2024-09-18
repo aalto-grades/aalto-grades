@@ -14,49 +14,56 @@ import {findCoursePartById} from './coursePart';
 import {findCourseTaskById} from './courseTask';
 import httpLogger from '../../configs/winston';
 import type Course from '../../database/models/course';
-import CoursePart from '../../database/models/coursePart';
-import CourseTask from '../../database/models/courseTask';
 import type FinalGrade from '../../database/models/finalGrade';
 import TaskGrade from '../../database/models/taskGrade';
 import {ApiError, stringToIdSchema} from '../../types';
 
 /**
- * Retrieves the date of the latest grade for a user based on a course ID.
+ * Finds a grade by its ID.
  *
- * @throws ApiError(400) if there are no grades for the user.
+ * @throws ApiError(404) if not found.
  */
-export const getDateOfLatestGrade = async (
-  userId: number,
-  courseId: number
-): Promise<Date> => {
-  const grades = await TaskGrade.findAll({
-    where: {userId},
-    include: [
-      {
-        model: CourseTask,
-        include: [{model: CoursePart, where: {courseId}}],
-      },
-    ],
-  });
+export const findTaskGradeById = async (id: number): Promise<TaskGrade> => {
+  const grade = await TaskGrade.findByPk(id);
+  if (grade === null) {
+    throw new ApiError(`Grade with ID ${id} not found`, HttpCode.NotFound);
+  }
+  return grade;
+};
 
-  if (grades.length === 0) {
+/**
+ * Finds a grade by id and also validates that it belongs to the correct course.
+ *
+ * @throws ApiError(400|404|409) if invalid ids, not found, or didn't match.
+ */
+export const findAndValidateTaskGradePath = async (
+  courseId: string,
+  gradeId: string
+): Promise<[Course, TaskGrade]> => {
+  const result = stringToIdSchema.safeParse(gradeId);
+  if (!result.success) {
+    throw new ApiError(`Invalid grade ID ${gradeId}`, HttpCode.BadRequest);
+  }
+
+  const course = await findAndValidateCourseId(courseId);
+  const grade = await findTaskGradeById(result.data);
+  const courseTask = await findCourseTaskById(grade.courseTaskId);
+  const coursePart = await findCoursePartById(courseTask.coursePartId);
+
+  if (coursePart.courseId !== course.id) {
     throw new ApiError(
-      `Failed to find the date of the latest grade, user ${userId} has` +
-        ` no grades for course ${courseId}.`,
-      HttpCode.BadRequest
+      `Grade with ID ${gradeId} ` +
+        `does not belong to the course with ID ${courseId}`,
+      HttpCode.Conflict
     );
   }
 
-  let maxSoFar = new Date(0);
-  for (const grade of grades) {
-    if (new Date(grade.date) > maxSoFar) maxSoFar = new Date(grade.date);
-  }
-  return maxSoFar;
+  return [course, grade];
 };
 
 /**
  * Validates that the user and grader of an AttainmentGrade or FinalGrade are
- * defined and that the user has a studentNumber and the grader a name.
+ * defined and that the user has a studentNumber and the grader an email.
  *
  * @throws ApiError(500) if any values are undefined or null.
  */
@@ -132,47 +139,4 @@ export const parseTaskGrade = (taskGrade: TaskGrade): TaskGradeData => {
       taskGrade.expiryDate === null ? null : new Date(taskGrade.expiryDate),
     comment: taskGrade.comment,
   };
-};
-
-/**
- * Finds a grade by its ID.
- *
- * @throws ApiError(404) if not found.
- */
-export const findGradeById = async (id: number): Promise<TaskGrade> => {
-  const grade = await TaskGrade.findByPk(id);
-  if (grade === null) {
-    throw new ApiError(`Grade with ID ${id} not found`, HttpCode.NotFound);
-  }
-  return grade;
-};
-
-/**
- * Finds a grade by id and also validates that it belongs to the correct course.
- *
- * @throws ApiError(400|404|409) if invalid ids, not found, or didn't match.
- */
-export const findAndValidateGradePath = async (
-  courseId: string,
-  gradeId: string
-): Promise<[Course, TaskGrade]> => {
-  const result = stringToIdSchema.safeParse(gradeId);
-  if (!result.success) {
-    throw new ApiError(`Invalid grade ID ${gradeId}`, HttpCode.BadRequest);
-  }
-
-  const course = await findAndValidateCourseId(courseId);
-  const grade = await findGradeById(result.data);
-  const courseTask = await findCourseTaskById(grade.courseTaskId);
-  const coursePart = await findCoursePartById(courseTask.coursePartId);
-
-  if (coursePart.courseId !== course.id) {
-    throw new ApiError(
-      `Grade with ID ${gradeId} ` +
-        `does not belong to the course with ID ${courseId}`,
-      HttpCode.Conflict
-    );
-  }
-
-  return [course, grade];
 };

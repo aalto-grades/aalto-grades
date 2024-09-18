@@ -28,6 +28,38 @@ export const findFinalGradeById = async (id: number): Promise<FinalGrade> => {
   return finalGrade;
 };
 
+/**
+ * Finds a final grade by id and also validates that it belongs to the correct
+ * course.
+ *
+ * @throws ApiError(400|404|409) if invalid ids, not found, or didn't match.
+ */
+export const findAndValidateFinalGradePath = async (
+  courseId: string,
+  finalGradeId: string
+): Promise<[Course, FinalGrade]> => {
+  const result = stringToIdSchema.safeParse(finalGradeId);
+  if (!result.success) {
+    throw new ApiError(
+      `Invalid final grade ID ${finalGradeId}`,
+      HttpCode.BadRequest
+    );
+  }
+  const course = await findAndValidateCourseId(courseId);
+  const finalGrade = await findFinalGradeById(result.data);
+
+  // Check that final grade belongs to the course.
+  if (finalGrade.courseId !== course.id) {
+    throw new ApiError(
+      `Final grade ID ${finalGradeId} ` +
+        `does not belong to the course with ID ${courseId}`,
+      HttpCode.Conflict
+    );
+  }
+
+  return [course, finalGrade];
+};
+
 /** Converts finalGrade database object into the FinalGradeData type */
 export const parseFinalGrade = (finalGrade: FinalGrade): FinalGradeData => {
   const [user, grader] = validateUserAndGrader(finalGrade);
@@ -132,36 +164,4 @@ export const sisuPreferFinalGrade = (
     newGrade.grade === oldGrade.grade &&
     new Date(newGrade.date) >= new Date(oldGrade.date)
   );
-};
-
-/**
- * Finds a final grade by id and also validates that it belongs to the correct
- * course.
- *
- * @throws ApiError(400|404|409) if invalid ids, not found, or didn't match.
- */
-export const findAndValidateFinalGradePath = async (
-  courseId: string,
-  finalGradeId: string
-): Promise<[Course, FinalGrade]> => {
-  const result = stringToIdSchema.safeParse(finalGradeId);
-  if (!result.success) {
-    throw new ApiError(
-      `Invalid final grade ID ${finalGradeId}`,
-      HttpCode.BadRequest
-    );
-  }
-  const course = await findAndValidateCourseId(courseId);
-  const finalGrade = await findFinalGradeById(result.data);
-
-  // Check that final grade belongs to the course.
-  if (finalGrade.courseId !== course.id) {
-    throw new ApiError(
-      `Final grade ID ${finalGradeId} ` +
-        `does not belong to the course with ID ${courseId}`,
-      HttpCode.Conflict
-    );
-  }
-
-  return [course, finalGrade];
 };
