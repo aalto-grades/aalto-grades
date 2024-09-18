@@ -2,12 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HashAlgorithms} from '@otplib/core/';
 import type {Page} from '@playwright/test';
 import {authenticator} from 'otplib';
-
-// Set TOTP codes to use sha512 instead of sha1
-authenticator.options = {algorithm: HashAlgorithms.SHA512, digits: 6};
 
 type UserType = 'admin' | 'teacher' | 'assistant' | 'student';
 const mfaSecrets = {

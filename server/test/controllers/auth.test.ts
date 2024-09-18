@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {HashAlgorithms} from '@otplib/core/';
 import {CookieAccessInfo} from 'cookiejar';
 import * as fs from 'fs';
 import mockdate from 'mockdate';
@@ -28,8 +27,6 @@ import {createData} from '../util/createData';
 import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
-
-authenticator.options = {algorithm: HashAlgorithms.SHA512, digits: 6};
 
 const request = supertest(app);
 const responseTests = new ResponseTests(request);
