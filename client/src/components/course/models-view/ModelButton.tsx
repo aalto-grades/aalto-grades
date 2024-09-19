@@ -38,8 +38,12 @@ const ModelButton = ({
   const {t} = useTranslation();
 
   let warning = '';
-  if (model.hasArchivedSources && model.hasDeletedSources)
-    warning = t('course.models.has-deleted-and-archived');
+  const numErrors =
+    Number(model.hasExpiredSources) +
+    Number(model.hasArchivedSources) +
+    Number(model.hasDeletedSources);
+  if (numErrors > 1) warning = t('course.models.has-multiple-warnings');
+  else if (model.hasExpiredSources) warning = t('course.models.has-expired');
   else if (model.hasArchivedSources) warning = t('course.models.has-archived');
   else if (model.hasDeletedSources) warning = t('course.models.has-deleted');
 
@@ -92,7 +96,7 @@ const ModelButton = ({
     >
       <ListItemButton onClick={onClick}>
         <ListItemText primary={model.name} />
-        {(model.hasArchivedSources || model.hasDeletedSources) && (
+        {numErrors > 0 && (
           <ListItemIcon sx={{mr: 6.6}}>
             <Tooltip title={warning} placement="top">
               <Warning color="warning" />

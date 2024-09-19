@@ -56,6 +56,7 @@
       },
       "source-deleted": "UNTRANSLATED",
       "source-archived": "UNTRANSLATED",
+      "source-expired": "UNTRANSLATED",
       "saving": "UNTRANSLATED",
       "has-final-grades-message": "UNTRANSLATED",
       "saved": "UNTRANSLATED",
@@ -211,7 +212,6 @@
       "archive": "UNTRANSLATED",
       "delete": "UNTRANSLATED",
       "delete-message": "UNTRANSLATED",
-      "valid-until": "UNTRANSLATED",
       "archived": "UNTRANSLATED",
       "add-new-task": "UNTRANSLATED",
       "add-from-a+": "UNTRANSLATED",
@@ -220,10 +220,36 @@
       "edit-part": "UNTRANSLATED",
       "no-expiry-date": "UNTRANSLATED"
     },
+    "models": {
+      "has-multiple-warnings": "UNTRANSLATED",
+      "has-expired": "UNTRANSLATED",
+      "has-archived": "UNTRANSLATED",
+      "has-deleted": "UNTRANSLATED",
+      "create-model": {
+        "part-title": "UNTRANSLATED",
+        "final-grade-title": "UNTRANSLATED",
+        "select-template": "UNTRANSLATED",
+        "none": "UNTRANSLATED"
+      },
+      "missing-part-model-create": "UNTRANSLATED",
+      "rename": {
+        "title": "UNTRANSLATED",
+        "saved": "UNTRANSLATED"
+      },
+      "unarchive": "UNTRANSLATED",
+      "archive": "UNTRANSLATED",
+      "cannot-delete-with-final": "UNTRANSLATED",
+      "delete-grading-model": "UNTRANSLATED",
+      "model-not-found": "UNTRANSLATED",
+      "grade-not-found": "UNTRANSLATED",
+      "delete-model": "UNTRANSLATED",
+      "delete-model-message": "UNTRANSLATED",
+      "save-null": "UNTRANSLATED",
+      "create-final-grade-model": "UNTRANSLATED",
+      "back": "UNTRANSLATED",
+      "no-models": "UNTRANSLATED"
+    },
     "results": {
-      "model-has-deleted-and-archived": "UNTRANSLATED",
-      "model-has-archived": "UNTRANSLATED",
-      "model-has-deleted": "UNTRANSLATED",
       "calculate-final": "UNTRANSLATED",
       "calculating-for_one": "UNTRANSLATED",
       "calculating-for_other": "UNTRANSLATED",
@@ -281,6 +307,7 @@
       "multiple-final": "UNTRANSLATED",
       "final-of": "UNTRANSLATED",
       "final-on-date": "UNTRANSLATED",
+      "not-participated": "UNTRANSLATED",
       "edit-grade": "UNTRANSLATED",
       "multiple-grade": "UNTRANSLATED",
       "grade-of-for": "UNTRANSLATED",
@@ -323,7 +350,6 @@
       "min-credits-required": "UNTRANSLATED",
       "min-credits-negative": "UNTRANSLATED",
       "max-credits-required": "UNTRANSLATED",
-      "department-select": "UNTRANSLATED",
       "name-english": "UNTRANSLATED",
       "name-finnish": "UNTRANSLATED",
       "name-swedish": "UNTRANSLATED",
@@ -350,37 +376,8 @@
       "no-assistants": "UNTRANSLATED",
       "input-at-least-one-assistant": "UNTRANSLATED"
     },
-    "models": {
-      "create-model": {
-        "part-title": "UNTRANSLATED",
-        "final-grade-title": "UNTRANSLATED",
-        "select-template": "UNTRANSLATED",
-        "none": "UNTRANSLATED"
-      },
-      "missing-part-model-create": "UNTRANSLATED",
-      "has-deleted-and-archived": "UNTRANSLATED",
-      "has-archived": "UNTRANSLATED",
-      "has-deleted": "UNTRANSLATED",
-      "rename": {
-        "title": "UNTRANSLATED",
-        "saved": "UNTRANSLATED"
-      },
-      "unarchive": "UNTRANSLATED",
-      "archive": "UNTRANSLATED",
-      "cannot-delete-with-final": "UNTRANSLATED",
-      "delete-grading-model": "UNTRANSLATED",
-      "model-not-found": "UNTRANSLATED",
-      "grade-not-found": "UNTRANSLATED",
-      "delete-model": "UNTRANSLATED",
-      "delete-model-message": "UNTRANSLATED",
-      "save-null": "UNTRANSLATED",
-      "create-final-grade-model": "UNTRANSLATED",
-      "back": "UNTRANSLATED",
-      "no-models": "UNTRANSLATED"
-    },
     "list": "UNTRANSLATED"
   },
-  "not-participated": "UNTRANSLATED",
   "front-page": {
     "not-logged-in": "UNTRANSLATED",
     "search": "UNTRANSLATED",

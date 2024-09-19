@@ -109,14 +109,20 @@ const CalculateFinalGradesDialog = ({
     if (success) onClose();
   };
 
-  const getWarning = (model: GradingModelData | null): string => {
-    if (model === null) return '';
-    if (model.hasArchivedSources && model.hasDeletedSources)
-      return t('course.results.model-has-deleted-and-archived');
-    if (model.hasArchivedSources) return t('course.results.model-has-archived');
-    if (model.hasDeletedSources) return t('course.results.model-has-deleted');
-    return '';
-  };
+  let warning = '';
+  if (selectedModel !== null) {
+    const numErrors =
+      Number(selectedModel.hasExpiredSources) +
+      Number(selectedModel.hasArchivedSources) +
+      Number(selectedModel.hasDeletedSources);
+    if (numErrors > 1) warning = t('course.models.has-multiple-warnings');
+    else if (selectedModel.hasExpiredSources)
+      warning = t('course.models.has-expired');
+    else if (selectedModel.hasArchivedSources)
+      warning = t('course.models.has-archived');
+    else if (selectedModel.hasDeletedSources)
+      warning = t('course.models.has-deleted');
+  }
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
@@ -137,14 +143,9 @@ const CalculateFinalGradesDialog = ({
             {t('course.results.some-grade-invalid')}
           </Alert>
         </Collapse>
-        <Collapse
-          in={
-            selectedModel?.hasDeletedSources ||
-            selectedModel?.hasArchivedSources
-          }
-        >
+        <Collapse in={warning !== ''}>
           <Alert sx={{mb: 2, mt: -1}} severity="warning">
-            {getWarning(selectedModel)}
+            {warning}
           </Alert>
         </Collapse>
         <Collapse
