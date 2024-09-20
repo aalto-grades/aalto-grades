@@ -135,9 +135,9 @@ const EditFinalGradesDialog = ({
       return model?.name ?? t('course.results.not-found');
     };
 
-    const newRows = finalGrades.map((finalGrade, finalGradeId) => ({
-      id: finalGradeId,
-      finalGradeId: finalGrade.finalGradeId,
+    const newRows = finalGrades.map((finalGrade, i) => ({
+      id: i,
+      finalGradeId: finalGrade.id,
       grader: finalGrade.grader.name!,
       grade: finalGrade.grade,
       date: finalGrade.date,

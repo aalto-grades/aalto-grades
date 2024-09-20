@@ -165,6 +165,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
         gradeData.push({
           studentNumber: row.studentNo,
           courseTaskId: courseTask.id,
+          aplusGradeSourceId: null,
           grade: grade,
           date: dateData.completionDate.toDate(),
           expiryDate: dateData.expirationDate?.toDate() ?? null,

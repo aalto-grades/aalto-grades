@@ -8,14 +8,12 @@ import supertest from 'supertest';
 import {
   type CourseTaskData,
   type EditTaskGradeData,
-  GradingScale,
   HttpCode,
   LatestGradesSchema,
   type NewTaskGrade,
   StudentRowArraySchema,
 } from '@/common/types';
 import {app} from '../../src/app';
-import * as gradesUtil from '../../src/controllers/utils/taskGrade';
 import TaskGrade from '../../src/database/models/taskGrade';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
@@ -38,14 +36,13 @@ let noRoleCourseTasks: CourseTaskData[] = [];
 let noRoleGradeId = -1;
 const nonExistentId = 1000000;
 const newStudentNumber = '867493';
-const nonExistentStudentNumber = '945942';
 
 const students: {id: number; studentNumber: string; finalGrade: number}[] = [];
-let studentNumbers: string[] = [];
 
 beforeAll(async () => {
   cookies = await getCookies();
 
+  // Create students
   for (let i = 0; i < 10; i++) {
     const newUser = await createData.createUser();
     assert(newUser.studentNumber); // Fix typescript warning
@@ -55,45 +52,8 @@ beforeAll(async () => {
       finalGrade: Math.floor(Math.random() * 6),
     });
   }
-  studentNumbers = students.map(student => student.studentNumber);
 
-  let gradingModelId: number;
-  [courseId, , courseTasks, gradingModelId] = await createData.createCourse({
-    courseData: {maxCredits: 5, courseCode: 'CS-A????'},
-  });
-  for (const student of students) {
-    // Create a worse final grade before the actual one
-    if (student.finalGrade > 0) {
-      await createData.createFinalGrade(
-        courseId,
-        student.id,
-        gradingModelId,
-        TEACHER_ID,
-        student.finalGrade -
-          Math.floor(Math.random() * (student.finalGrade + 1))
-      );
-    }
-
-    await createData.createFinalGrade(
-      courseId,
-      student.id,
-      gradingModelId,
-      TEACHER_ID,
-      student.finalGrade
-    );
-
-    // Create a worse final grade after the actual one
-    if (student.finalGrade > 0) {
-      await createData.createFinalGrade(
-        courseId,
-        student.id,
-        gradingModelId,
-        TEACHER_ID,
-        student.finalGrade -
-          Math.floor(Math.random() * (student.finalGrade + 1))
-      );
-    }
-  }
+  [courseId, , courseTasks] = await createData.createCourse({});
   editGradeId = await createData.createGrade(
     students[0].id,
     courseTasks[0].id,
@@ -182,6 +142,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       {
         studentNumber: studentNumber,
         courseTaskId: courseTasks[0].id,
+        aplusGradeSourceId: null,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: NEXT_YEAR,
@@ -190,6 +151,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       {
         studentNumber: studentNumber,
         courseTaskId: courseTasks[1].id,
+        aplusGradeSourceId: null,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: NEXT_YEAR,
@@ -198,6 +160,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       {
         studentNumber: studentNumber,
         courseTaskId: courseTasks[2].id,
+        aplusGradeSourceId: null,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: NEXT_YEAR,
@@ -334,7 +297,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
 
     const upload = async (): Promise<NewTaskGrade[]> => {
       const data = (await genGrades(student.studentNumber)).filter(
-        grade => grade.aplusGradeSourceId !== undefined
+        grade => grade.aplusGradeSourceId !== null
       );
 
       const res = await request
@@ -431,6 +394,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
       {
         studentNumber: student.studentNumber,
         courseTaskId: noRoleCourseTasks[0].id,
+        aplusGradeSourceId: null,
         grade: Math.floor(Math.random() * 11),
         date: new Date(),
         expiryDate: NEXT_YEAR,
@@ -728,259 +692,5 @@ describe('Test POST /v1/latest-grades - fetch latest grades for multiple student
 
     const url = '/v1/latest-grades';
     await responseTests.testNotFound(url, cookies.adminCookie).post(userIds);
-  });
-});
-
-describe('Test POST /v1/courses/:courseId/grades/csv/sisu - export Sisu compatible grading in CSV', () => {
-  const createCSVString = (
-    studentData: {studentNumber: string; finalGrade: number}[],
-    dateStr: string,
-    language: string
-  ): string[] => {
-    const data = [];
-    for (const student of studentData) {
-      const csvStudent = `${student.studentNumber},${student.finalGrade}`;
-      data.push(`${csvStudent},5,${dateStr},${language}`);
-    }
-    return data;
-  };
-
-  beforeEach(() => {
-    jest
-      .spyOn(global.Date, 'now')
-      .mockImplementation(() => new Date('2023-06-21').getTime());
-    jest
-      .spyOn(gradesUtil, 'getDateOfLatestGrade')
-      .mockImplementation(async () => Promise.resolve(new Date('2023-06-21')));
-  });
-
-  afterEach(() => {
-    jest.spyOn(global.Date, 'now').mockRestore();
-    jest.spyOn(gradesUtil, 'getDateOfLatestGrade').mockRestore();
-  });
-
-  it('should export CSV', async () => {
-    const testCookies = [cookies.adminCookie, cookies.teacherCookie];
-    for (const cookie of testCookies) {
-      const res = await request
-        .post(`/v1/courses/${courseId}/grades/csv/sisu`)
-        .send({studentNumbers, assessmentDate: null, completionLanguage: null})
-        .set('Cookie', cookie)
-        .set('Accept', 'text/csv')
-        .expect(HttpCode.Ok);
-
-      expect(res.text)
-        .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-${createCSVString(students, '21.6.2023', 'en').join(',\n')},\n`);
-      expect(res.headers['content-disposition']).toBe(
-        'attachment; filename="final_grades_course_CS-A????_' +
-          `${new Date().toLocaleDateString('fi-FI')}.csv"`
-      );
-    }
-  });
-
-  it('should export only selected grades', async () => {
-    const selectedStudents = [students[0], students[3], students[6]];
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades/csv/sisu`)
-      .send({
-        studentNumbers: selectedStudents.map(student => student.studentNumber),
-        assessmentDate: null,
-        completionLanguage: null,
-      })
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'text/csv')
-      .expect(HttpCode.Ok);
-
-    expect(res.text)
-      .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-${createCSVString(selectedStudents, '21.6.2023', 'en').join(',\n')},\n`);
-    expect(res.headers['content-disposition']).toBe(
-      'attachment; filename="final_grades_course_CS-A????_' +
-        `${new Date().toLocaleDateString('fi-FI')}.csv"`
-    );
-  });
-
-  it('should export CSV successfully with custom assessmentDate and completionLanguage', async () => {
-    const res = await request
-      .post(`/v1/courses/${courseId}/grades/csv/sisu`)
-      .send({
-        studentNumbers,
-        assessmentDate: new Date(2023, 4, 12),
-        completionLanguage: 'JA',
-      })
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'text/csv')
-      .expect(HttpCode.Ok);
-
-    expect(res.text)
-      .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-${createCSVString(students, '12.5.2023', 'ja').join(',\n')},\n`);
-    expect(res.headers['content-disposition']).toBe(
-      'attachment; filename="final_grades_course_CS-A????_' +
-        `${new Date().toLocaleDateString('fi-FI')}.csv"`
-    );
-  });
-
-  it('should export CSV when gradingScale is pass/fail', async () => {
-    const [passFailCourseId, , , modelId] = await createData.createCourse({
-      courseData: {
-        gradingScale: GradingScale.PassFail,
-        maxCredits: 5,
-        courseCode: 'CS-A9542',
-      },
-    });
-    const studentNums = [];
-    for (let i = 0; i <= 1; i++) {
-      studentNums.push(students[i].studentNumber);
-      await createData.createFinalGrade(
-        passFailCourseId,
-        students[i].id,
-        modelId,
-        TEACHER_ID,
-        i
-      );
-    }
-    const res = await request
-      .post(`/v1/courses/${passFailCourseId}/grades/csv/sisu`)
-      .send({
-        studentNumbers: studentNums,
-        assessmentDate: null,
-        completionLanguage: null,
-      })
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'text/csv')
-      .expect(HttpCode.Ok);
-
-    expect(res.text)
-      .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-${students[0].studentNumber},fail,5,21.6.2023,en,
-${students[1].studentNumber},pass,5,21.6.2023,en,\n`);
-    expect(res.headers['content-disposition']).toBe(
-      'attachment; filename="final_grades_course_CS-A9542_' +
-        `${new Date().toLocaleDateString('fi-FI')}.csv"`
-    );
-  });
-
-  it('should export CSV when gradingScale is secondary language', async () => {
-    const [passFailCourseId, , , modelId] = await createData.createCourse({
-      courseData: {
-        gradingScale: GradingScale.SecondNationalLanguage,
-        maxCredits: 5,
-        courseCode: 'CS-A8341',
-      },
-    });
-    const studentNums = [];
-    for (let i = 0; i <= 2; i++) {
-      studentNums.push(students[i].studentNumber);
-      await createData.createFinalGrade(
-        passFailCourseId,
-        students[i].id,
-        modelId,
-        TEACHER_ID,
-        i
-      );
-    }
-    const res = await request
-      .post(`/v1/courses/${passFailCourseId}/grades/csv/sisu`)
-      .send({
-        studentNumbers: studentNums,
-        assessmentDate: null,
-        completionLanguage: null,
-      })
-      .set('Cookie', cookies.teacherCookie)
-      .set('Accept', 'text/csv')
-      .expect(HttpCode.Ok);
-
-    expect(res.text)
-      .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
-${students[0].studentNumber},Fail,5,21.6.2023,en,
-${students[1].studentNumber},SAT,5,21.6.2023,en,
-${students[2].studentNumber},G,5,21.6.2023,en,\n`);
-    expect(res.headers['content-disposition']).toBe(
-      'attachment; filename="final_grades_course_CS-A8341_' +
-        `${new Date().toLocaleDateString('fi-FI')}.csv"`
-    );
-  });
-
-  it('should respond with 400 if validation fails', async () => {
-    const url = `/v1/courses/${courseId}/grades/csv/sisu`;
-    const badRequest = responseTests.testBadRequest(url, cookies.adminCookie);
-
-    await badRequest.post({
-      studentNumbers,
-      assessmentDate: null,
-      completionLanguage: 'ja',
-    });
-    await badRequest.post({
-      studentNumbers,
-      assessmentDate: '2024-12-00T00:00:00.000Z',
-    });
-  });
-
-  it('should respond with 400 if id is invalid', async () => {
-    const url = '/v1/courses/bad/grades/csv/sisu';
-    const data = {
-      studentNumbers,
-      assessmentDate: null,
-      completionLanguage: null,
-    };
-    await responseTests.testBadRequest(url, cookies.adminCookie).post(data);
-  });
-
-  it('should respond with 401 or 403 if not authorized', async () => {
-    let url = `/v1/courses/${courseId}/grades/csv/sisu`;
-    const data = {
-      studentNumbers,
-      assessmentDate: null,
-      completionLanguage: null,
-    };
-    await responseTests.testUnauthorized(url).post(data);
-
-    await responseTests
-      .testForbidden(url, [cookies.assistantCookie, cookies.studentCookie])
-      .post(data);
-
-    url = `/v1/courses/${noRoleCourseId}/grading-models`;
-    await responseTests
-      .testForbidden(url, [
-        cookies.teacherCookie,
-        cookies.assistantCookie,
-        cookies.studentCookie,
-      ])
-      .post(data);
-  });
-
-  it('should respond with 404 if grades have not been calculated yet', async () => {
-    const url = `/v1/courses/${noRoleCourseId}/grades/csv/sisu`;
-    const data = {
-      studentNumbers: [studentNumbers[0]],
-      assessmentDate: null,
-      completionLanguage: null,
-    };
-
-    await responseTests.testNotFound(url, cookies.adminCookie).post(data);
-  });
-
-  it('should respond with 404 if student number not found', async () => {
-    const url = `/v1/courses/${noRoleCourseId}/grades/csv/sisu`;
-    const data = {
-      studentNumbers: [nonExistentStudentNumber],
-      assessmentDate: null,
-      completionLanguage: null,
-    };
-
-    await responseTests.testNotFound(url, cookies.adminCookie).post(data);
-  });
-
-  it('should respond with 404 if not found', async () => {
-    const url = `/v1/courses/${nonExistentId}/grades/csv/sisu`;
-    const data = {
-      studentNumbers,
-      assessmentDate: null,
-      completionLanguage: null,
-    };
-
-    await responseTests.testNotFound(url, cookies.adminCookie).post(data);
   });
 });

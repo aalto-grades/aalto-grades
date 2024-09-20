@@ -28,35 +28,6 @@ export const findCourseTaskById = async (id: number): Promise<CourseTask> => {
   return courseTask;
 };
 
-/** Finds all course tasks of a specific course. */
-export const findCourseTaskByCourseId = async (
-  courseId: number
-): Promise<CourseTaskData[]> => {
-  const courseParts = await CoursePart.findAll({where: {courseId}});
-
-  const courseTasks = (await CourseTask.findAll({
-    where: {coursePartId: courseParts.map(part => part.id)},
-    include: AplusGradeSource,
-    order: [['id', 'ASC']],
-  })) as (CourseTask & {
-    AplusGradeSources: AplusGradeSource[];
-  })[];
-
-  return courseTasks.map(
-    (courseTask): CourseTaskData => ({
-      id: courseTask.id,
-      coursePartId: courseTask.coursePartId,
-      name: courseTask.name,
-      daysValid: courseTask.daysValid,
-      maxGrade: courseTask.maxGrade,
-      archived: courseTask.archived,
-      aplusGradeSources: courseTask.AplusGradeSources.map(gradeSource =>
-        parseAplusGradeSource(gradeSource)
-      ),
-    })
-  );
-};
-
 /**
  * Finds a course task by url param ID and also validates the URL param.
  *
@@ -123,4 +94,33 @@ export const validateCourseTaskPath = async (
   }
 
   return [course, coursePart, courseTask];
+};
+
+/** Finds all course tasks of a specific course. */
+export const getAllCourseCourseTasks = async (
+  courseId: number
+): Promise<CourseTaskData[]> => {
+  const courseParts = await CoursePart.findAll({where: {courseId}});
+
+  const courseTasks = (await CourseTask.findAll({
+    where: {coursePartId: courseParts.map(part => part.id)},
+    include: AplusGradeSource,
+    order: [['id', 'ASC']],
+  })) as (CourseTask & {
+    AplusGradeSources: AplusGradeSource[];
+  })[];
+
+  return courseTasks.map(
+    (courseTask): CourseTaskData => ({
+      id: courseTask.id,
+      coursePartId: courseTask.coursePartId,
+      name: courseTask.name,
+      daysValid: courseTask.daysValid,
+      maxGrade: courseTask.maxGrade,
+      archived: courseTask.archived,
+      aplusGradeSources: courseTask.AplusGradeSources.map(gradeSource =>
+        parseAplusGradeSource(gradeSource)
+      ),
+    })
+  );
 };

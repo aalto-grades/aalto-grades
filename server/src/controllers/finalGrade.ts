@@ -2,12 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {stringify} from 'csv-stringify';
+
 import {
   type EditFinalGrade,
   type FinalGradeData,
   GradingScale,
   HttpCode,
   type NewFinalGrade,
+  type SisuCsvUpload,
 } from '@/common/types';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
@@ -16,9 +19,15 @@ import {
   type Endpoint,
   type JwtClaims,
   type NewDbFinalGradeData,
+  type SisuCsvFormat,
 } from '../types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
-import {findAndValidateFinalGradePath} from './utils/finalGrade';
+import {
+  findAndValidateFinalGradePath,
+  getFinalGradesFor,
+  sisuPreferFinalGrade,
+  studentNumbersExist,
+} from './utils/finalGrade';
 import {validateGradingModelBelongsToCourse} from './utils/gradingModel';
 import {validateUserAndGrader} from './utils/taskGrade';
 
@@ -49,7 +58,7 @@ export const getFinalGrades: Endpoint<void, FinalGradeData[]> = async (
   for (const finalGrade of dbFinalGrades) {
     const [user, grader] = validateUserAndGrader(finalGrade);
     finalGrades.push({
-      finalGradeId: finalGrade.id,
+      id: finalGrade.id,
       user: user,
       courseId: finalGrade.courseId,
       gradingModelId: finalGrade.gradingModelId,
@@ -183,4 +192,108 @@ export const deleteFinalGrade: Endpoint<void, void> = async (req, res) => {
   await finalGrade.destroy();
 
   res.sendStatus(HttpCode.Ok);
+};
+
+/**
+ * Get grading data formatted to Sisu compatible format for exporting grades to
+ * Sisu. Documentation and requirements for Sisu CSV file structure available at
+ * https://wiki.aalto.fi/display/SISEN/Assessment+of+implementations
+ *
+ * (SisuCsvUpload) => string (text/csv)
+ *
+ * @throws ApiError(400|404)
+ */
+export const getSisuFormattedGradingCSV: Endpoint<
+  SisuCsvUpload,
+  string
+> = async (req, res) => {
+  const course = await findAndValidateCourseId(req.params.courseId);
+  await studentNumbersExist(req.body.studentNumbers);
+
+  const allFinalGrades = await getFinalGradesFor(
+    course.id,
+    req.body.studentNumbers
+  );
+
+  // Group final grades by student number
+  const studentFinalGrades: {[key: string]: FinalGradeData[]} = {};
+  for (const finalGrade of allFinalGrades) {
+    const studentNumber = finalGrade.user.studentNumber;
+    if (!(studentNumber in studentFinalGrades))
+      studentFinalGrades[studentNumber] = [];
+    studentFinalGrades[studentNumber].push(finalGrade);
+  }
+
+  const sisuData: SisuCsvFormat[] = [];
+  const exportedToSisu: number[] = [];
+
+  for (const [studentNumber, finalGrades] of Object.entries(
+    studentFinalGrades
+  )) {
+    // Find best final grade
+    let bestFinalGrade = finalGrades[0];
+    for (const finalGrade of finalGrades) {
+      if (sisuPreferFinalGrade(finalGrade, bestFinalGrade))
+        bestFinalGrade = finalGrade;
+    }
+
+    // Assessment date must be in form dd.mm.yyyy.
+    const assessmentDate = (
+      req.body.assessmentDate ?? new Date(bestFinalGrade.date)
+    ).toLocaleDateString('fi-FI');
+
+    const completionLanguage = req.body.completionLanguage
+      ? req.body.completionLanguage.toLowerCase()
+      : course.languageOfInstruction.toLowerCase();
+
+    let csvGrade;
+    switch (course.gradingScale) {
+      case GradingScale.Numerical:
+        csvGrade = bestFinalGrade.grade.toString();
+        break;
+      case GradingScale.PassFail:
+        csvGrade = bestFinalGrade.grade === 0 ? 'fail' : 'pass';
+        break;
+      case GradingScale.SecondNationalLanguage:
+        if (bestFinalGrade.grade === 0) csvGrade = 'Fail';
+        else if (bestFinalGrade.grade === 1) csvGrade = 'SAT';
+        else csvGrade = 'G';
+        break;
+    }
+
+    exportedToSisu.push(bestFinalGrade.id);
+    sisuData.push({
+      studentNumber: studentNumber,
+      grade: csvGrade,
+      credits: course.maxCredits,
+      assessmentDate: assessmentDate,
+      completionLanguage: completionLanguage,
+      comment: bestFinalGrade.comment ?? '', // Comment column is required, but can be empty.
+    });
+  }
+
+  await FinalGrade.update(
+    {sisuExportDate: new Date()},
+    {
+      where: {id: exportedToSisu},
+    }
+  );
+
+  stringify(
+    sisuData,
+    {
+      header: true,
+      delimiter: ',', // Accepted delimiters in Sisu are semicolon ; and comma ,
+    },
+    (_err, data) => {
+      res
+        .setHeader('Content-Type', 'text/csv')
+        .attachment(
+          `final_grades_course_${
+            course.courseCode
+          }_${new Date().toLocaleDateString('fi-FI')}.csv`
+        )
+        .send(data);
+    }
+  );
 };

@@ -69,6 +69,7 @@ const DifficultyBase = z.strictObject({
 
 const GradeSourceBase = z.strictObject({
   id: IdSchema,
+  courseTaskId: IdSchema,
   aplusCourse: AplusCourseDataSchema,
   date: DateSchema,
 });
@@ -84,7 +85,7 @@ const NewGradeSourceBase = z.strictObject({
   aplusCourse: AplusCourseDataSchema,
   date: DateSchema,
 });
-const NewAplusGradeSourceSchema = z.discriminatedUnion('sourceType', [
+export const NewAplusGradeSourceSchema = z.discriminatedUnion('sourceType', [
   NewGradeSourceBase.merge(FullPointsBase).strict(),
   NewGradeSourceBase.merge(ModuleBase).strict(),
   NewGradeSourceBase.merge(ExerciseBase).strict(),

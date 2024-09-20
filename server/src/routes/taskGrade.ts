@@ -10,7 +10,6 @@ import {
   CourseRoleType,
   EditTaskGradeDataSchema,
   NewTaskGradeArraySchema,
-  SisuCsvUploadSchema,
   SystemRole,
   UserIdArraySchema,
 } from '@/common/types';
@@ -20,7 +19,6 @@ import {
   editGrade,
   getGrades,
   getLatestGrades,
-  getSisuFormattedGradingCSV,
 } from '../controllers/taskGrade';
 import {handleInvalidRequestJson} from '../middleware';
 import {authorization, courseAuthorization} from '../middleware/authorization';
@@ -71,15 +69,4 @@ router.post(
   handleInvalidRequestJson,
   processRequestBody(UserIdArraySchema),
   controllerDispatcher(getLatestGrades)
-);
-
-// Actually gets the csv but the request type must be post to be able to use request.body
-router.post(
-  '/v1/courses/:courseId/grades/csv/sisu',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
-  courseAuthorization([CourseRoleType.Teacher]),
-  express.json({limit: '10mb'}),
-  handleInvalidRequestJson,
-  processRequestBody(SisuCsvUploadSchema),
-  controllerDispatcher(getSisuFormattedGradingCSV)
 );

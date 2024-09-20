@@ -4,15 +4,15 @@
 
 import {z} from 'zod';
 
-import {DateSchema, IdSchema} from './general';
-import {UserDataSchema} from './user';
+import {DateSchema, IdSchema, LanguageSchema} from './general';
+import {StudentDataSchema, TeacherDataSchema} from './user';
 
 export const FinalGradeDataSchema = z.strictObject({
-  finalGradeId: IdSchema,
-  user: UserDataSchema,
+  id: IdSchema,
+  user: StudentDataSchema,
   courseId: IdSchema,
   gradingModelId: IdSchema.nullable(),
-  grader: UserDataSchema,
+  grader: TeacherDataSchema,
   grade: z.number().int().min(0).max(5),
   date: DateSchema,
   sisuExportDate: DateSchema.nullable(),
@@ -34,9 +34,16 @@ export const EditFinalGradeSchema = z
   })
   .partial();
 
+export const SisuCsvUploadSchema = z.strictObject({
+  assessmentDate: DateSchema.nullable(), // Assessment date override
+  completionLanguage: LanguageSchema.nullable(), // Defaults to course language
+  studentNumbers: z.array(z.string()).nonempty(),
+});
+
 export const NewFinalGradeArraySchema = z.array(NewFinalGradeSchema);
 export const FinalGradeDataArraySchema = z.array(FinalGradeDataSchema);
 
 export type FinalGradeData = z.infer<typeof FinalGradeDataSchema>;
 export type NewFinalGrade = z.infer<typeof NewFinalGradeSchema>;
 export type EditFinalGrade = z.infer<typeof EditFinalGradeSchema>;
+export type SisuCsvUpload = z.infer<typeof SisuCsvUploadSchema>;

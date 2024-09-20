@@ -28,9 +28,9 @@ export default class FinalGrade extends Model<
   > | null>;
   declare graderId: ForeignKey<User['id']>;
   declare grade: number;
-  declare sisuExportDate: CreationOptional<Date | null>;
   // Date when grade part is completed (e.g., deadline or exam date)
   declare date: Date | string; // Database outputs yyyy-mm-dd but inserting date is allowed
+  declare sisuExportDate: CreationOptional<Date | null>;
   declare comment: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -82,13 +82,13 @@ FinalGrade.init(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
-    sisuExportDate: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
     date: {
       type: DataTypes.DATEONLY,
       allowNull: false,
+    },
+    sisuExportDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
     comment: {
       type: DataTypes.STRING,

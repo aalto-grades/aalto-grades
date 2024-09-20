@@ -267,6 +267,10 @@ export default {
             type: DataTypes.JSONB,
             allowNull: false,
           },
+          date: {
+            type: DataTypes.DATEONLY,
+            allowNull: false,
+          },
           source_type: {
             type: DataTypes.ENUM(
               'FULL_POINTS',
@@ -295,10 +299,6 @@ export default {
           difficulty: {
             type: DataTypes.STRING,
             allowNull: true,
-          },
-          date: {
-            type: DataTypes.DATEONLY,
-            allowNull: false,
           },
           created_at: DataTypes.DATE,
           updated_at: DataTypes.DATE,

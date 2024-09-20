@@ -64,12 +64,12 @@ export const DepartmentSchema = z.nativeEnum(Department);
 export const BaseCourseDataSchema = z.strictObject({
   id: IdSchema,
   courseCode: z.string(),
+  department: DepartmentSchema,
   minCredits: z.number().int().min(0),
   maxCredits: z.number().int(),
-  department: DepartmentSchema,
-  name: LocalizedStringSchema,
   gradingScale: GradingScaleSchema,
   languageOfInstruction: LanguageSchema,
+  name: LocalizedStringSchema,
   teachersInCharge: z.array(TeacherDataSchema),
   assistants: z.array(TeacherDataSchema),
 });

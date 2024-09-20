@@ -309,7 +309,11 @@ export const changeOwnAuth: Endpoint<
   res.json({otpAuth: null});
 };
 
-/** (ConfirmMfaData) => void */
+/**
+ * (ConfirmMfaData) => void
+ *
+ * @throws ApiError(401)
+ */
 export const confirmMfa: Endpoint<ConfirmMfaData, void> = async (req, res) => {
   const user = req.user as JwtClaims;
 

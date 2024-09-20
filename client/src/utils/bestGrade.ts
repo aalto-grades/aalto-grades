@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 type BaseType = {
-  gradeId: number;
+  id: number;
   grade: number;
   date: Date;
   expiryDate: Date | null;
@@ -22,7 +22,7 @@ const gradeIsNewer = (
   const newDateTime = newGrade.date.getTime();
   const oldDateTime = oldGrade.date.getTime();
   if (newDateTime !== oldDateTime) return newDateTime > oldDateTime;
-  return newGrade.gradeId > oldGrade.gradeId;
+  return newGrade.id > oldGrade.id;
 };
 
 const gradeIsBetter = (

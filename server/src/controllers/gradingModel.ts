@@ -13,8 +13,8 @@ import {
 import GradingModel from '../database/models/gradingModel';
 import {ApiError, type Endpoint} from '../types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
-import {findCoursePartByCourseId} from './utils/coursePart';
-import {findCourseTaskByCourseId} from './utils/courseTask';
+import {getAllCourseCourseParts} from './utils/coursePart';
+import {getAllCourseCourseTasks} from './utils/courseTask';
 import {
   checkGradingModelSources,
   validateGradingModelPath,
@@ -33,8 +33,8 @@ export const getGradingModel: Endpoint<void, GradingModelData> = async (
     req.params.courseId,
     req.params.gradingModelId
   );
-  const coursePartData = await findCoursePartByCourseId(course.id);
-  const courseTaskData = await findCourseTaskByCourseId(course.id);
+  const coursePartData = await getAllCourseCourseParts(course.id);
+  const courseTaskData = await getAllCourseCourseTasks(course.id);
 
   res.json({
     id: gradingModel.id,
@@ -64,8 +64,8 @@ export const getAllGradingModels: Endpoint<void, GradingModelData[]> = async (
   res
 ) => {
   const course = await findAndValidateCourseId(req.params.courseId);
-  const coursePartData = await findCoursePartByCourseId(course.id);
-  const courseTaskData = await findCourseTaskByCourseId(course.id);
+  const coursePartData = await getAllCourseCourseParts(course.id);
+  const courseTaskData = await getAllCourseCourseTasks(course.id);
 
   const gradingModels = await GradingModel.findAll({
     where: {courseId: course.id},

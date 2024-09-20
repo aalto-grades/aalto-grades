@@ -85,8 +85,7 @@ const CalculateFinalGradesDialog = ({
     for (const row of selectedRows) {
       for (const courseTask of row.courseTasks) {
         for (const grade of courseTask.grades) {
-          if (grade.date.getTime() > latestDate.getTime())
-            latestDate = grade.date;
+          if (grade.date > latestDate) latestDate = grade.date;
         }
       }
     }
