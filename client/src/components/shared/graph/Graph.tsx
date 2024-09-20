@@ -120,6 +120,8 @@ const initGraphFn = (
       extraNodeData[node.id] = {warning: t('shared.graph.source-deleted')};
     } else if (nodeSource.archived) {
       extraNodeData[node.id] = {warning: t('shared.graph.source-archived')};
+    } else if (nodeSource.expiryDate && nodeSource.expiryDate < new Date()) {
+      extraNodeData[node.id] = {warning: t('shared.graph.source-expired')};
     }
   }
 

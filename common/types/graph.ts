@@ -191,5 +191,10 @@ export type GraphStructure = z.infer<typeof GraphStructureSchema>;
 
 // Types without schemas
 export type TypedNode = Node<object, CustomNodeTypes>;
-export type GraphSource = {id: number; name: string; archived: boolean};
+export type GraphSource = {
+  id: number;
+  name: string;
+  archived: boolean;
+  expiryDate?: Date | null;
+};
 export type GraphSourceValue = {id: number; value: number};

@@ -105,9 +105,16 @@ export const validateGradingModelPath = async (
 export const checkGradingModelSources = (
   gradingModel: GradingModel,
   sources: CourseTaskData[] | CoursePartData[]
-): {hasDeletedSources: boolean; hasArchivedSources: boolean} => {
-  let hasDeleted = false;
-  let hasArchived = false;
+): {
+  hasExpiredSources: boolean;
+  hasDeletedSources: boolean;
+  hasArchivedSources: boolean;
+} => {
+  const now = new Date();
+
+  let hasExpiredSources = false;
+  let hasDeletedSources = false;
+  let hasArchivedSources = false;
 
   const modelSourceIds = [];
   for (const node of gradingModel.graphStructure.nodes) {
@@ -117,15 +124,18 @@ export const checkGradingModelSources = (
 
   const sourceIds = new Set(sources.map(source => source.id));
   for (const sourceId of modelSourceIds) {
-    if (!sourceIds.has(sourceId)) hasDeleted = true;
+    if (!sourceIds.has(sourceId)) hasDeletedSources = true;
   }
   for (const source of sources) {
     if (modelSourceIds.includes(source.id) && source.archived)
-      hasArchived = true;
+      hasArchivedSources = true;
+    if ('expiryDate' in source && source.expiryDate && source.expiryDate < now)
+      hasExpiredSources = true;
   }
 
   return {
-    hasDeletedSources: hasDeleted,
-    hasArchivedSources: hasArchived,
+    hasExpiredSources,
+    hasDeletedSources,
+    hasArchivedSources,
   };
 };

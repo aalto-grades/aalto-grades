@@ -18,7 +18,7 @@ import FormField from '@/components/shared/FormikField';
 import {useAddCoursePart} from '@/hooks/useApi';
 import {nullableDateSchema} from '@/types';
 
-type FormData = {name: string; expiryDate: Date | '' | null};
+type FormData = {name: string; expiryDate: string | null};
 const initialValues: FormData = {name: '', expiryDate: null};
 
 type PropsType = {

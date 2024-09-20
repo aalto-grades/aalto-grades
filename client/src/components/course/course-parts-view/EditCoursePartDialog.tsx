@@ -19,7 +19,7 @@ import FormField from '@/components/shared/FormikField';
 import {useEditCoursePart} from '@/hooks/useApi';
 import {nullableDateSchema} from '@/types';
 
-type FormData = {name: string; expiryDate: Date | '' | null};
+type FormData = {name: string; expiryDate: string | null};
 
 type PropsType = {
   open: boolean;
@@ -37,7 +37,7 @@ const EditCoursePartDialog = ({
 
   const initialValues: FormData = {
     name: coursePart?.name ?? '',
-    expiryDate: coursePart?.expiryDate ?? '',
+    expiryDate: coursePart?.expiryDate?.toISOString().split('T')[0] ?? '',
   };
   const ValidationSchema = z.strictObject({
     name: z.string().min(1),

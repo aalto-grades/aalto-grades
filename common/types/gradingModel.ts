@@ -15,24 +15,21 @@ export const GradingModelDataSchema = z.strictObject({
   name: z.string(),
   graphStructure: GraphStructureSchema,
   archived: z.boolean(),
+  hasExpiredSources: z.boolean(),
   hasArchivedSources: z.boolean(),
   hasDeletedSources: z.boolean(),
 });
-export const NewGradingModelDataSchema = GradingModelDataSchema.omit({
-  id: true,
-  courseId: true,
-  archived: true,
-  hasArchivedSources: true,
-  hasDeletedSources: true,
-}).strict();
-export const EditGradingModelDataSchema = GradingModelDataSchema.omit({
-  id: true,
-  courseId: true,
-  coursePartId: true,
-  hasArchivedSources: true,
-  hasDeletedSources: true,
-})
-  .strict()
+export const NewGradingModelDataSchema = z.strictObject({
+  coursePartId: IdSchema.nullable(),
+  name: z.string(),
+  graphStructure: GraphStructureSchema,
+});
+export const EditGradingModelDataSchema = z
+  .strictObject({
+    name: z.string(),
+    graphStructure: GraphStructureSchema,
+    archived: z.boolean(),
+  })
   .partial();
 
 export const GradingModelDataArraySchema = z.array(GradingModelDataSchema);

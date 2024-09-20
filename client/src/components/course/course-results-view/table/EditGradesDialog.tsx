@@ -284,6 +284,9 @@ const EditGradesDialog = ({
   const processRowUpdate = (newRow: RowType, oldRow: RowType): RowType => {
     if (!newRow.expiryDate || !oldRow.expiryDate) {
       setError(false);
+      setRows((oldRows: GridRowsProp<ColTypes>) =>
+        oldRows.map(row => (row.id === newRow.id ? newRow : row))
+      );
       return newRow;
     }
 

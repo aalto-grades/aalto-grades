@@ -85,7 +85,7 @@ const GradeCell = ({
       <span>
         {sourceValue.type === 'courseTask'
           ? (bestGrade?.grade ?? '-')
-          : (sourceValue.grade ?? t('not-participated'))}
+          : (sourceValue.grade ?? t('course.results.not-participated'))}
       </span>
 
       {/* Course task specific elements */}
