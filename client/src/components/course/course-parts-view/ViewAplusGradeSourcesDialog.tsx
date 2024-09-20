@@ -28,14 +28,13 @@ import {type AplusGradeSourceData, AplusGradeSourceType} from '@/common/types';
 import {useDeleteAplusGradeSource} from '@/hooks/useApi';
 
 type PropsType = {
-  onClose: () => void;
   open: boolean;
+  onClose: () => void;
   aplusGradeSources: AplusGradeSourceData[];
 };
-
 const ViewAplusGradeSourcesDialog = ({
-  onClose,
   open,
+  onClose,
   aplusGradeSources,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();

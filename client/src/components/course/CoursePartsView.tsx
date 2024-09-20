@@ -434,10 +434,7 @@ const CoursePartsView = (): JSX.Element => {
       />
       <AddAplusGradeSourceDialog
         onClose={() =>
-          setAddAplusSourcesTo({
-            courseTaskId: null,
-            aplusGradeSources: [],
-          })
+          setAddAplusSourcesTo({courseTaskId: null, aplusGradeSources: []})
         }
         courseTaskId={addAplusSourcesTo.courseTaskId}
         aplusGradeSources={addAplusSourcesTo.aplusGradeSources}

@@ -25,10 +25,10 @@ import type {HeadCellData} from '@/types';
 import {departments, getCourseRole} from '@/utils';
 
 const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
-  const {t} = useTranslation();
-  const navigate = useNavigate();
-  const localize = useLocalize();
   const {auth} = useAuth();
+  const {t} = useTranslation();
+  const localize = useLocalize();
+  const navigate = useNavigate();
   const [page, setPage] = useState<number>(1);
   const [searchText, setSearchText] = useState<string>('');
 
@@ -128,7 +128,6 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
           {coursePage.map(course => (
             <TableRow
               key={course.id}
-              id={`ag-see-instances-tr-${course.id}`}
               hover
               sx={{
                 cursor: 'pointer',

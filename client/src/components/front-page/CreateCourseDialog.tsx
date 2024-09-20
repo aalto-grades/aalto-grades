@@ -164,6 +164,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
   ): {[key in keyof FormData]?: string[]} | undefined => {
     const result = ValidationSchema.safeParse(values);
     if (result.success) return;
+
     const fieldErrors = result.error.formErrors.fieldErrors;
     return Object.fromEntries(
       Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
