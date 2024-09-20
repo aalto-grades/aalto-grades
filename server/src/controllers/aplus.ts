@@ -285,7 +285,7 @@ export const fetchAplusGrades: Endpoint<void, NewTaskGrade[]> = async (
 
       const points = pointsResCache[aplusCourseId];
       for (const student of points) {
-        // TODO: https://github.com/aalto-grades/base-repository/issues/747
+        // TODO: Handle students without student number (#747)
         if (!student.student_id) {
           continue;
         }

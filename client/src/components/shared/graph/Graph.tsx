@@ -77,7 +77,7 @@ import StepperNode from './nodes/StepperNode';
 import SubstituteNode from './nodes/SubstituteNode';
 import './flow.scss'; // Import styles. At the bottom of the imports to fix import/order
 
-// TODO: Don't show word 'source' to user?
+// TODO: Don't show word 'source' to user? (#886)
 // Instead we could check if is course part model or not
 // And show course task / course part
 

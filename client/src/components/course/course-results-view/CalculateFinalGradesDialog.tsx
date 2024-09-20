@@ -54,7 +54,6 @@ const CalculateFinalGradesDialog = ({
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const allGradingModels = useGetAllGradingModels(courseId);
-  // TODO: Auto select the model used in the table view?
 
   const [dateOverride, setDateOverride] = useState<boolean>(false);
   const [gradingDate, setGradingDate] = useState<Dayjs>(dayjs());

@@ -442,7 +442,7 @@ const GradesTableToolbar = (): JSX.Element => {
         userId: selectedRow.user.id,
         courseTasks: selectedRow.courseTasks.map(task => ({
           id: task.courseTaskId,
-          // TODO: Manage expired course tasks?
+          // TODO: Manage expired task grades? (#696)
           grade: findBestGrade(task.grades, {gradeSelectOption})?.grade ?? 0,
         })),
       }))

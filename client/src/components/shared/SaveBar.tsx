@@ -39,12 +39,6 @@ const SaveBar = ({
           boxSizing: 'border-box',
         }}
       >
-        {/* // TODO: fix flickering when saving with loading text enabled */}
-        {/* {loading ? (
-            <Typography variant="body2">{t('general.saving')}...</Typography>
-          ) : (
-            <Typography variant="body2">{t('general.unsaved-changes')}</Typography>
-            )}{' '}   */}
         <Typography variant="body2">{t('general.unsaved-changes')}</Typography>
         <Button
           id="ag-save-course-btn"

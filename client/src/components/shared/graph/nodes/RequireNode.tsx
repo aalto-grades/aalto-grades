@@ -178,7 +178,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
                 </td>
                 <td>
                   {!(key in nodeValue.values)
-                    ? '' // Happens when loading. TODO: Fix?
+                    ? '' // Happens sometimes when loading graph for the first time
                     : numFail > settings.numFail ||
                         nodeValue.values[key] === 'fail'
                       ? nodeValue.values[key]

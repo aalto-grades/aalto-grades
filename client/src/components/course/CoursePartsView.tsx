@@ -461,7 +461,6 @@ const CoursePartsView = (): JSX.Element => {
           handleDiscard={confirmDiscard}
           handleSave={handleSubmit}
           disabled={editing}
-          // loading={form.isSubmitting}
         />
       </div>
 

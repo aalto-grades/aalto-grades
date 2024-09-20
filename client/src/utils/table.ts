@@ -93,7 +93,7 @@ export const predictGrades = (
         userId: row.user.id,
         courseTasks: row.courseTasks.map(task => ({
           id: task.courseTaskId,
-          // TODO: Manage expired course tasks?
+          // TODO: Manage expired task grades? (#696)
           grade: findBestGrade(task.grades, {gradeSelectOption})?.grade ?? 0,
         })),
       }))

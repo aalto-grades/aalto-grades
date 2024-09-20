@@ -293,7 +293,6 @@ class CreateData {
     return finalGrade.id;
   }
 
-  // TODO: Support and test with final grade models.
   /** Creates a grading model that uses the average model */
   async createGradingModel(
     courseId: number,

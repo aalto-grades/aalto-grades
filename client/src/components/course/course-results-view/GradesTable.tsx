@@ -95,8 +95,6 @@ const RenderCell = ({
   );
 };
 
-// TODO: Better column definitions
-// TODO: Better typing and freeze how to access data
 const GradesTable = (): JSX.Element => {
   const {table} = useTableContext();
   const {rows} = table.getRowModel();

@@ -189,7 +189,7 @@ const GradeCell = ({
               {/* </IconButton> */}
             </Tooltip>
           )}
-          {/* Multiple grades (more performance than showing button) TODO: Better solution */}
+          {/* Multiple grades (more performance than showing button) */}
           {!hasInvalidGrade &&
             !isGradeExpired &&
             sourceValue.task.grades.length > 1 && (

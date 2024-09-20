@@ -41,7 +41,7 @@ export default defineConfig({
       use: {...devices['Desktop Firefox']},
     },
 
-    // Broken, TODO: enable
+    // Broken, TODO: enable (#594)
     // {
     //   name: 'webkit',
     //   use: {...devices['Desktop Safari']},

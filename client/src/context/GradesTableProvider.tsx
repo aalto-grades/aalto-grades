@@ -196,7 +196,7 @@ export const GradesTableProvider = ({
             .filter(task => task.grades.length > 0)
             .map(task => ({
               id: task.courseTaskId,
-              // TODO: Handle expired grades?
+              // TODO: Handle expired task grades? (#696)
               grade: findBestGrade(task.grades)!.grade,
             })),
         }))
@@ -426,7 +426,7 @@ export const GradesTableProvider = ({
   // For example calculating the latest attainment date
   // For example grouping by Exported to sisu has no need to create a column
   const groupingColumns =
-    // TODO: Should use the visibility API
+    // TODO: Should use the visibility API (#888)
     [
       columnHelper.accessor(row => row.latestBestGrade, {
         id: 'latestBestGrade',
