@@ -3,15 +3,31 @@
 # SPDX-License-Identifier: MIT
 ---
 definitions:
+  # Smaller units
   UserId:
     type: integer
-    description: Internal user database ID.
     format: int32
+    description: Internal user database ID.
     minimum: 1
     example: 1
 
+  UserName:
+    type: string
+    description: User's name.
+    example: John Doe
+  NullableUserName:
+    type: string
+    nullable: true
+    description: User's name.
+    example: John Doe
+
   UserEmail:
     type: string
+    description: User's email address.
+    example: john.doe@aalto.fi
+  NullableUserEmail:
+    type: string
+    nullable: true
     description: User's email address.
     example: john.doe@aalto.fi
 
@@ -19,100 +35,113 @@ definitions:
     type: string
     description: User's student number.
     example: 2683926
+  NullableStudentNumber:
+    type: string
+    nullable: true
+    description: User's student number.
+    example: 2683926
 
+  # Bigger schemas
   UserData:
     type: object
-    description: User's personal information.
     properties:
       id:
         $ref: '#/definitions/UserId'
       name:
-        type: string
-        description: User's name.
-        example: Eddy Engineer
+        $ref: '#/definitions/NullableUserName'
       email:
-        $ref: '#/definitions/UserEmail'
+        $ref: '#/definitions/NullableUserEmail'
       studentNumber:
-        $ref: '#/definitions/StudentNumber'
+        $ref: '#/definitions/NullableStudentNumber'
     required:
       - id
-
-  UserWithEmail:
-    type: object
-    properties:
-      id:
-        $ref: '#/definitions/UserId'
-      name:
-        type: string
-        description: User's name.
-        example: John Doe
-      email:
-        $ref: '#/definitions/UserEmail'
-      studentNumber:
-        type: string
-        description: User's student number
-        example: 1234567
-    required:
-      - id
+      - name
       - email
+      - studentNumber
 
   FullUserData:
     type: object
-    description: User data with a couple of extra fields.
     properties:
       id:
         $ref: '#/definitions/UserId'
       name:
-        type: string
-        description: User's name.
-        example: Eddy Engineer
+        $ref: '#/definitions/NullableUserName'
       email:
-        $ref: '#/definitions/UserEmail'
+        $ref: '#/definitions/NullableUserEmail'
       studentNumber:
-        $ref: '#/definitions/StudentNumber'
+        $ref: '#/definitions/NullableStudentNumber'
       role:
         $ref: '#/definitions/SystemRole'
       idpUser:
         type: boolean
-        description: If the user is an IDP user
+        description: If the user is an IDP user.
         example: true
     required:
       - id
+      - name
+      - email
+      - studentNumber
       - role
       - idpUser
 
-  IdpUser:
+  StudentData:
     type: object
     properties:
-      admin:
-        type: boolean
-        enum: [false]
-        example: false
+      id:
+        $ref: '#/definitions/UserId'
+      name:
+        $ref: '#/definitions/NullableUserName'
+      email:
+        $ref: '#/definitions/NullableUserEmail'
+      studentNumber:
+        $ref: '#/definitions/StudentNumber'
+    required:
+      - id
+      - name
+      - email
+      - studentNumber
+
+  TeacherData:
+    type: object
+    properties:
+      id:
+        $ref: '#/definitions/UserId'
+      name:
+        $ref: '#/definitions/NullableUserName'
       email:
         $ref: '#/definitions/UserEmail'
+      studentNumber:
+        $ref: '#/definitions/NullableStudentNumber'
     required:
-      - admin
+      - id
+      - name
       - email
-  AdminUser:
+      - studentNumber
+
+  # Actually a union
+  NewUser:
     type: object
     properties:
       admin:
         type: boolean
-        enum: [true]
+        description: If the new user should be an admin.
+        example: true
       email:
         $ref: '#/definitions/UserEmail'
       name:
-        type: string
-        description: User's name.
-        example: Eddy Engineer
+        $ref: '#/definitions/UserName'
     required:
       - admin
       - email
-      - name
-  NewUser:
-    oneOf:
-      - $ref: '#/definitions/IdpUser'
-      - $ref: '#/definitions/AdminUser'
+      # - name
+
+  NewUserResponse:
+    type: object
+    properties:
+      temporaryPassword:
+        $ref: '#/definitions/NullableTemporaryPassword'
+    required:
+      - temporaryPassword
 
 /v1/users/own-courses:
   get:
@@ -121,7 +150,7 @@ definitions:
       Get all courses the requester has or is currently participating in.
     responses:
       200:
-        description: Courses the requester has participated in.
+        description: Courses the requester is currently participating in.
         content:
           application/json:
             schema:
@@ -129,7 +158,7 @@ definitions:
               items:
                 $ref: '#/definitions/CourseData'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
     security:
       - cookieAuth: []
 
@@ -149,11 +178,11 @@ definitions:
               items:
                 $ref: '#/definitions/CourseDataWithFinalGrades'
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
     security:
       - cookieAuth: []
 
@@ -174,11 +203,11 @@ definitions:
               items:
                 $ref: '#/definitions/UserData'
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
     security:
       - cookieAuth: []
 
@@ -196,9 +225,9 @@ definitions:
               items:
                 $ref: '#/definitions/FullUserData'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
     security:
       - cookieAuth: []
   post:
@@ -213,13 +242,17 @@ definitions:
             $ref: '#/definitions/NewUser'
     responses:
       201:
-        description: User created.
+        description: User Created.
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/NewUserResponse'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
       409:
-        $ref: '#/components/responses/Conflict'
+        $ref: '#/responses/Conflict'
     security:
       - cookieAuth: []
 
@@ -230,43 +263,43 @@ definitions:
       delete an idp user or an admin user.
       Available only to admin users.
     parameters:
-      - $ref: '#/components/parameters/userId'
+      - $ref: '#/parameters/userId'
     responses:
       200:
         description: User deleted.
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
     security:
       - cookieAuth: []
 
 /v1/users/delete:
   post:
     tags: [User]
-    description: Delete multiple users at once
+    description: Delete multiple users at once.
     requestBody:
       content:
         application/json:
           schema:
             type: array
-            description: List of user IDs to delete
+            description: List of user IDs to delete.
             items:
               $ref: '#/definitions/UserId'
     responses:
       200:
         description: Users deleted.
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
     security:
       - cookieAuth: []

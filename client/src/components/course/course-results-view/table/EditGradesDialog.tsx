@@ -53,7 +53,6 @@ type ColTypes = {
   grade: number;
   date: Date;
   expiryDate: Date | null;
-  exported: boolean;
   comment: string;
   selected: string;
   aplusGrade: boolean;
@@ -134,14 +133,13 @@ const EditGradesDialog = ({
   }, [bestGrade, rows]);
 
   useEffect(() => {
-    const newRows = grades.map((grade, gradeId) => ({
-      id: gradeId,
-      gradeId: grade.gradeId,
+    const newRows = grades.map((grade, i) => ({
+      id: i,
+      gradeId: grade.id,
       grader: grade.grader.name!,
       grade: grade.grade,
       date: grade.date,
       expiryDate: grade.expiryDate,
-      exported: grade.exportedToSisu !== null,
       comment: grade.comment ?? '',
       selected: '',
       aplusGrade: grade.aplusGradeSource !== null,
@@ -179,12 +177,6 @@ const EditGradesDialog = ({
       type: 'date',
       editable: true,
       width: 120,
-    },
-    {
-      field: 'exported',
-      headerName: t('general.exported'),
-      type: 'boolean',
-      editable: false,
     },
     {
       field: 'comment',
@@ -227,7 +219,6 @@ const EditGradesDialog = ({
           expiryDate: courseTask?.daysValid
             ? new Date(Date.now() + courseTask.daysValid * 24 * 60 * 60 * 1000)
             : null,
-          exported: false,
           comment: '',
           selected: '',
           aplusGrade: false,
@@ -254,6 +245,7 @@ const EditGradesDialog = ({
         newGrades.push({
           studentNumber,
           courseTaskId: courseTaskId,
+          aplusGradeSourceId: null,
           grade: row.grade,
           date: row.date,
           expiryDate: row.expiryDate,

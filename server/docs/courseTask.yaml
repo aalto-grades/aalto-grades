@@ -3,33 +3,35 @@
 # SPDX-License-Identifier: MIT
 ---
 definitions:
+  # Smaller units
   CourseTaskId:
     type: integer
-    description: Internal course task database ID.
     format: int32
+    description: Internal course task database ID.
     minimum: 1
     example: 1
   CourseTaskName:
     type: string
     description: Name of the course task.
     example: Exercise 1
-  CourseTaskDaysValid:
+  NullableCourseTaskDaysValid:
     type: number
+    nullable: true
     description: Number of days valid.
     minimum: 1
     example: 365
-  CourseTaskMaxGrade:
+  NullableCourseTaskMaxGrade:
     type: number
+    nullable: true
     description: Maximum grade.
     example: 25
-    nullable: true
   CourseTaskArchived:
     type: boolean
     description: If the course task has been archived.
     example: false
 
+  # Bigger schemas
   CourseTaskData:
-    description: Course task information.
     type: object
     properties:
       id:
@@ -39,9 +41,9 @@ definitions:
       name:
         $ref: '#/definitions/CourseTaskName'
       daysValid:
-        $ref: '#/definitions/CourseTaskDaysValid'
+        $ref: '#/definitions/NullableCourseTaskDaysValid'
       maxGrade:
-        $ref: '#/definitions/CourseTaskMaxGrade'
+        $ref: '#/definitions/NullableCourseTaskMaxGrade'
       archived:
         $ref: '#/definitions/CourseTaskArchived'
       aplusGradeSources:
@@ -59,7 +61,6 @@ definitions:
       - aplusGradeSources
 
   NewCourseTaskData:
-    description: Course task information.
     type: object
     properties:
       coursePartId:
@@ -67,11 +68,9 @@ definitions:
       name:
         $ref: '#/definitions/CourseTaskName'
       daysValid:
-        $ref: '#/definitions/CourseTaskDaysValid'
+        $ref: '#/definitions/NullableCourseTaskDaysValid'
       maxGrade:
-        $ref: '#/definitions/CourseTaskMaxGrade'
-      archived:
-        $ref: '#/definitions/CourseTaskArchived'
+        $ref: '#/definitions/NullableCourseTaskMaxGrade'
     required:
       - coursePartId
       - name
@@ -79,7 +78,6 @@ definitions:
       - maxGrade
 
   EditCourseTaskData:
-    description: Course task information.
     type: object
     properties:
       id:
@@ -87,9 +85,9 @@ definitions:
       name:
         $ref: '#/definitions/CourseTaskName'
       daysValid:
-        $ref: '#/definitions/CourseTaskDaysValid'
+        $ref: '#/definitions/NullableCourseTaskDaysValid'
       maxGrade:
-        $ref: '#/definitions/CourseTaskMaxGrade'
+        $ref: '#/definitions/NullableCourseTaskMaxGrade'
       archived:
         $ref: '#/definitions/CourseTaskArchived'
     required:
@@ -120,7 +118,7 @@ definitions:
     tags: [Course Task]
     description: Get all the course tasks of the course.
     parameters:
-      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/parameters/courseId'
     responses:
       200:
         description: Returns all course tasks of the course.
@@ -131,18 +129,18 @@ definitions:
               items:
                 $ref: '#/definitions/CourseTaskData'
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
   post:
     tags: [Course Task]
     description: Add, edit, and delete course tasks.
     parameters:
-      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/parameters/courseId'
     requestBody:
       content:
         application/json:
@@ -160,12 +158,12 @@ definitions:
               items:
                 $ref: '#/definitions/CoursePartId'
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
       409:
-        $ref: '#/components/responses/Conflict'
+        $ref: '#/responses/Conflict'

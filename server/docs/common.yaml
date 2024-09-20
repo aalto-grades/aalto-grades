@@ -9,138 +9,93 @@ components:
       in: cookie
       name: jwt
 
-  parameters:
-    courseId:
-      in: path
-      name: courseId
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-      required: true
-      example: 1
-      description: The ID of the course.
-    gradingModelId:
-      in: path
-      name: gradingModelId
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-      required: true
-      example: 1
-      description: The ID of the grading model.
-    coursePartId:
-      in: path
-      name: coursePartId
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-      required: true
-      example: 1
-      description: Internal course part database ID.
-    finalGradeId:
-      in: path
-      name: finalGradeId
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-      required: true
-      example: 1
-      description: The ID of the final grade.
-    gradeId:
-      in: path
-      name: gradeId
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-      required: true
-      example: 1
-      description: The ID of the user grade.
-    userId:
-      in: path
-      name: userId
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-      required: true
-      example: 1
-      description: The ID of the user.
-    aplusCourseId:
-      in: path
-      name: aplusCourseId
-      schema:
-        type: integer
-        format: int32
-      required: true
-      example: 1
-      description: The ID of a course in A+.
-    aplusGradeSourceId:
-      in: path
-      name: aplusGradeSourceId
-      schema:
-        type: integer
-        format: int32
-      required: true
-      example: 1
-      description: The ID of the A+ grade source.
-    aplusToken:
-      in: header
-      name: Authorization
-      schema:
-        type: string
-      required: true
-      example: Aplus-Token abcdefghijklmnopqrstuvwxyzabcdefghijklmn
-      description: An API token from A+.
-
-  responses:
-    BadRequest:
-      description: Request body or url parameters invalid.
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/definitions/Error'
-              - $ref: '#/definitions/ZodError'
-    Unauthorized:
-      description: Cookie missing.
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/definitions/Error'
-              - $ref: '#/definitions/UnauthorizedError'
-    Forbidden:
-      description: The requester is not authorized to execute actions.
-      content:
-        application/json:
-          schema:
-            $ref: '#/definitions/Error'
-    NotFound:
-      description: Item with id given in the url or request body not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/definitions/Error'
-    Conflict:
-      description: >
-        The ids given in the url params or request body do not belong to each other or
-        a similar item already exists in the database or
-        deletion of item failed due to some dependency.
-      content:
-        application/json:
-          schema:
-            $ref: '#/definitions/Error'
-    BadGateway:
-      description: An external server returned a response indicating failure.
-      content:
-        application/json:
-          schema:
-            $ref: '#/definitions/Error'
+parameters:
+  courseId:
+    in: path
+    name: courseId
+    schema:
+      type: integer
+      format: int32
+      minimum: 1
+    required: true
+    example: 1
+    description: The ID of the course.
+  gradingModelId:
+    in: path
+    name: gradingModelId
+    schema:
+      type: integer
+      format: int32
+      minimum: 1
+    required: true
+    example: 1
+    description: The ID of the grading model.
+  coursePartId:
+    in: path
+    name: coursePartId
+    schema:
+      type: integer
+      format: int32
+      minimum: 1
+    required: true
+    example: 1
+    description: Internal course part database ID.
+  finalGradeId:
+    in: path
+    name: finalGradeId
+    schema:
+      type: integer
+      format: int32
+      minimum: 1
+    required: true
+    example: 1
+    description: The ID of the final grade.
+  gradeId:
+    in: path
+    name: gradeId
+    schema:
+      type: integer
+      format: int32
+      minimum: 1
+    required: true
+    example: 1
+    description: The ID of the user grade.
+  userId:
+    in: path
+    name: userId
+    schema:
+      type: integer
+      format: int32
+      minimum: 1
+    required: true
+    example: 1
+    description: The ID of the user.
+  aplusCourseId:
+    in: path
+    name: aplusCourseId
+    schema:
+      type: integer
+      format: int32
+    required: true
+    example: 1
+    description: The ID of a course in A+.
+  aplusGradeSourceId:
+    in: path
+    name: aplusGradeSourceId
+    schema:
+      type: integer
+      format: int32
+    required: true
+    example: 1
+    description: The ID of the A+ grade source.
+  aplusToken:
+    in: header
+    name: Authorization
+    schema:
+      type: string
+    required: true
+    example: Aplus-Token abcdefghijklmnopqrstuvwxyzabcdefghijklmn
+    description: An API token from A+.
 
 definitions:
   Error:
@@ -160,12 +115,12 @@ definitions:
 
   UnauthorizedError:
     type: object
-    description: Empty object returned when authentication fails
+    description: Empty object returned when authentication fails.
     example: {}
 
   ZodError:
     type: array
-    description: Zod error from parsing body
+    description: Zod error from parsing body.
     items:
       type: object
       properties:
@@ -197,3 +152,48 @@ definitions:
             },
         },
       ]
+
+responses:
+  BadRequest:
+    description: Request body or url parameters invalid.
+    content:
+      application/json:
+        schema:
+          oneOf:
+            - $ref: '#/definitions/Error'
+            - $ref: '#/definitions/ZodError'
+  Unauthorized:
+    description: Cookie missing.
+    content:
+      application/json:
+        schema:
+          oneOf:
+            - $ref: '#/definitions/Error'
+            - $ref: '#/definitions/UnauthorizedError'
+  Forbidden:
+    description: The requester is not authorized to execute actions.
+    content:
+      application/json:
+        schema:
+          $ref: '#/definitions/Error'
+  NotFound:
+    description: Item with id given in the url or request body not found.
+    content:
+      application/json:
+        schema:
+          $ref: '#/definitions/Error'
+  Conflict:
+    description: >
+      The ids given in the url params or request body do not belong to each other or
+      a similar item already exists in the database or
+      deletion of item failed due to some dependency.
+    content:
+      application/json:
+        schema:
+          $ref: '#/definitions/Error'
+  BadGateway:
+    description: An external server returned a response indicating failure.
+    content:
+      application/json:
+        schema:
+          $ref: '#/definitions/Error'

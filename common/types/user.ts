@@ -18,8 +18,14 @@ export const FullUserDataSchema = z.strictObject({
   name: z.string().nullable(),
   email: z.string().email().nullable(),
   studentNumber: z.string().nullable(),
-  role: SystemRoleSchema,
   idpUser: z.boolean(),
+  role: SystemRoleSchema,
+});
+export const StudentDataSchema = z.strictObject({
+  id: IdSchema,
+  name: z.string().nullable(),
+  email: z.string().email().nullable(),
+  studentNumber: z.string(),
 });
 export const TeacherDataSchema = z.strictObject({
   id: IdSchema,
@@ -55,6 +61,7 @@ export const UserWithRoleArraySchema = z.array(FullUserDataSchema);
 
 export type UserData = z.infer<typeof UserDataSchema>;
 export type FullUserData = z.infer<typeof FullUserDataSchema>;
+export type StudentData = z.infer<typeof StudentDataSchema>;
 export type TeacherData = z.infer<typeof TeacherDataSchema>;
 export type NewUser = z.infer<typeof NewUserSchema>;
 export type NewUserResponse = z.infer<typeof NewUserResponseSchema>;

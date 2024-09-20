@@ -24,24 +24,6 @@ export const findCoursePartById = async (id: number): Promise<CoursePart> => {
   return coursePart;
 };
 
-/** Finds all course parts of a specific course id. */
-export const findCoursePartByCourseId = async (
-  courseId: number
-): Promise<CoursePartData[]> => {
-  const courseParts = await CoursePart.findAll({where: {courseId: courseId}});
-
-  return courseParts.map(
-    (coursePart): CoursePartData => ({
-      id: coursePart.id,
-      courseId: coursePart.courseId,
-      name: coursePart.name,
-      expiryDate:
-        coursePart.expiryDate !== null ? new Date(coursePart.expiryDate) : null,
-      archived: coursePart.archived,
-    })
-  );
-};
-
 /**
  * Finds a course part by url param id and also validates the url param.
  *
@@ -106,4 +88,22 @@ export const validateCoursePartPath = async (
   }
 
   return [course, coursePart];
+};
+
+/** Finds all course parts of a specific course id. */
+export const getAllCourseCourseParts = async (
+  courseId: number
+): Promise<CoursePartData[]> => {
+  const courseParts = await CoursePart.findAll({where: {courseId: courseId}});
+
+  return courseParts.map(
+    (coursePart): CoursePartData => ({
+      id: coursePart.id,
+      courseId: coursePart.courseId,
+      name: coursePart.name,
+      expiryDate:
+        coursePart.expiryDate !== null ? new Date(coursePart.expiryDate) : null,
+      archived: coursePart.archived,
+    })
+  );
 };

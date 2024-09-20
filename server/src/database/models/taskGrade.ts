@@ -28,7 +28,6 @@ export default class TaskGrade extends Model<
     AplusGradeSource['id']
   > | null>;
   declare grade: number;
-  declare sisuExportDate: CreationOptional<Date | null>;
   // Date when course part is completed (e.g., deadline or exam date)
   declare date: Date | string; // Database outputs 'yyyy-mm-dd' but inserting date is allowed
   declare expiryDate: Date | string | null; // Database outputs 'yyyy-mm-dd' but inserting date is allowed
@@ -83,10 +82,6 @@ TaskGrade.init(
     grade: {
       type: DataTypes.FLOAT,
       allowNull: false,
-    },
-    sisuExportDate: {
-      type: DataTypes.DATE,
-      allowNull: true,
     },
     date: {
       type: DataTypes.DATEONLY,

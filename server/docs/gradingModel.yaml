@@ -3,13 +3,35 @@
 # SPDX-License-Identifier: MIT
 ---
 definitions:
+  # Smaller units
   GradingModelId:
     type: integer
-    description: Internal grading model database ID.
     format: int32
+    description: Internal grading model database ID.
+    minimum: 1
+    example: 1
+  NullableGradingModelId:
+    type: integer
+    format: int32
+    nullable: true
+    description: Internal grading model database ID.
     minimum: 1
     example: 1
 
+  GradingModelName:
+    type: string
+    description: Name of the grading model.
+    example: Final grade
+  GraphStructure:
+    type: object
+    description: Graph structure.
+    example: {'nodes': [], 'edges': [], 'nodeData': {}}
+  GradingModelArchived:
+    type: boolean
+    description: If grading model has been archived.
+    example: false
+
+  # Bigger schemas
   GradingModelData:
     type: object
     description: Grading model information.
@@ -19,24 +41,18 @@ definitions:
       courseId:
         $ref: '#/definitions/CourseId'
       name:
-        type: string
-        description: Name of the grading model.
-        example: Main model
+        $ref: '#/definitions/GradingModelName'
       graphStructure:
-        type: object
-        description: Graph structure
-        example: {'nodes': [], 'edges': [], 'nodeData': {}}
+        $ref: '#/definitions/GraphStructure'
       archived:
+        $ref: '#/definitions/GradingModelArchived'
+      hasArchivedSources:
         type: boolean
-        description: If grading model has been archived
+        description: If grading model has archived course parts.
         example: false
-      hasArchivedCourseParts:
+      hasDeletedSources:
         type: boolean
-        description: If grading model has archived course parts
-        example: false
-      hasDeletedCourseParts:
-        type: boolean
-        description: If grading model has deleted course parts
+        description: If grading model has deleted course parts.
         example: false
     required:
       - id
@@ -44,21 +60,17 @@ definitions:
       - name
       - graphStructure
       - archived
-      - hasArchivedCourseParts
-      - hasDeletedCourseParts
+      - hasArchivedSources
+      - hasDeletedSources
 
   NewGradingModelData:
     type: object
     description: Grading model information.
     properties:
       name:
-        type: string
-        description: Name of the grading model.
-        example: Main model
+        $ref: '#/definitions/GradingModelName'
       graphStructure:
-        type: object
-        description: Graph structure
-        example: {'nodes': [], 'edges': [], 'nodeData': {}}
+        $ref: '#/definitions/GraphStructure'
     required:
       - name
       - graphStructure
@@ -68,25 +80,19 @@ definitions:
     description: Grading model information.
     properties:
       name:
-        type: string
-        description: Name of the grading model.
-        example: Main model
+        $ref: '#/definitions/GradingModelName'
       graphStructure:
-        type: object
-        description: Graph structure
-        example: {'nodes': [], 'edges': [], 'nodeData': {}}
+        $ref: '#/definitions/GraphStructure'
       archived:
-        type: boolean
-        description: If grading model has been archived
-        example: false
+        $ref: '#/definitions/GradingModelArchived'
 
 /v1/courses/{courseId}/grading-models/{gradingModelId}:
   get:
     tags: [Grading Model]
     description: Get information about a grading model.
     parameters:
-      - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/gradingModelId'
+      - $ref: '#/parameters/courseId'
+      - $ref: '#/parameters/gradingModelId'
     responses:
       200:
         description: Returns grading model with given ID.
@@ -95,15 +101,15 @@ definitions:
             schema:
               $ref: '#/definitions/GradingModelData'
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
       409:
-        $ref: '#/components/responses/Conflict'
+        $ref: '#/responses/Conflict'
     security:
       - cookieAuth: []
   put:
@@ -112,8 +118,8 @@ definitions:
       Edit specified grading model.
       Available only to admin users and teachers of the course.
     parameters:
-      - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/gradingModelId'
+      - $ref: '#/parameters/courseId'
+      - $ref: '#/parameters/gradingModelId'
     requestBody:
       content:
         application/json:
@@ -121,17 +127,17 @@ definitions:
             $ref: '#/definitions/EditGradingModelData'
     responses:
       200:
-        description: Grading model updated
+        description: Grading model updated.
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
       409:
-        $ref: '#/components/responses/Conflict'
+        $ref: '#/responses/Conflict'
     security:
       - cookieAuth: []
   delete:
@@ -140,21 +146,21 @@ definitions:
       Deletes specified grading model.
       Available only to admin users and teachers of the course.
     parameters:
-      - $ref: '#/components/parameters/courseId'
-      - $ref: '#/components/parameters/gradingModelId'
+      - $ref: '#/parameters/courseId'
+      - $ref: '#/parameters/gradingModelId'
     responses:
       200:
-        description: Grading model deleted
+        description: Grading model deleted.
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
       409:
-        $ref: '#/components/responses/Conflict'
+        $ref: '#/responses/Conflict'
     security:
       - cookieAuth: []
 
@@ -165,10 +171,10 @@ definitions:
       Get all the grading models of a course.
       Available only to admin users and teachers and assistants of the course.
     parameters:
-      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/parameters/courseId'
     responses:
       200:
-        description: Returns all grading models of the course
+        description: Returns all grading models of the course.
         content:
           application/json:
             schema:
@@ -176,13 +182,13 @@ definitions:
               items:
                 $ref: '#/definitions/GradingModelData'
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
     security:
       - cookieAuth: []
   post:
@@ -191,7 +197,7 @@ definitions:
       Add a grading model to a course.
       Available only to admin users and teachers of the course.
     parameters:
-      - $ref: '#/components/parameters/courseId'
+      - $ref: '#/parameters/courseId'
     requestBody:
       content:
         application/json:
@@ -199,20 +205,20 @@ definitions:
             $ref: '#/definitions/NewGradingModelData'
     responses:
       201:
-        description: Grading model created
+        description: Grading model created.
         content:
           application/json:
             schema:
               $ref: '#/definitions/GradingModelId'
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
       409:
-        $ref: '#/components/responses/Conflict'
+        $ref: '#/responses/Conflict'
     security:
       - cookieAuth: []

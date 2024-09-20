@@ -3,39 +3,69 @@
 # SPDX-License-Identifier: MIT
 ---
 definitions:
-  UserId:
-    type: integer
-    description: The database identifier of the user.
-    format: int32
-    minimum: 1
-    example: 1
+  # Smaller units
   SystemRole:
     type: string
     enum: [USER, ADMIN]
     description: The role of the user. Used for system level authorization.
     example: USER
-  Email:
-    type: string
-    format: email
-    description: Email address, to be used as a credential.
-    example: john.doe@aalto.fi
-  Name:
-    type: string
-    description: A personal name of the user (not a credential).'
-    example: John Doe
   Password:
     type: string
     format: password
     description: Plaintext password.
     example: MySuperSecretPassword123
 
+  OTP:
+    type: string
+    description: TOTP token.
+    example: '523801'
+  NullableOTP:
+    type: string
+    nullable: true
+    description: TOTP token.
+    example: '523801'
+
+  OTPAuth:
+    type: string
+    description: TOTP secret.
+    example: "otpauth://totp/Aalto%20Grades:admin%40aalto.fi?secret=SECRET\
+      &period=30&digits=6&algorithm=SHA512&issuer=Aalto%20Grades"
+  NullableOTPAuth:
+    type: string
+    nullable: true
+    description: TOTP secret.
+    example: "otpauth://totp/Aalto%20Grades:admin%40aalto.fi?secret=SECRET\
+      &period=30&digits=6&algorithm=SHA512&issuer=Aalto%20Grades"
+
+  TemporaryPassword:
+    type: string
+    format: password
+    description: Temporary password.
+    example: 6NsVuS34z2cNy1K3
+  NullableTemporaryPassword:
+    type: string
+    format: password
+    nullable: true
+    description: Temporary password.
+    example: 6NsVuS34z2cNy1K3
+
+  ResetPassword:
+    type: boolean
+    description: If user password should be reset.
+    example: true
+  ResetMfa:
+    type: boolean
+    description: If user MFA should be reset.
+    example: false
+
+  # Bigger schemas
   AuthData:
     type: object
     properties:
       id:
         $ref: '#/definitions/UserId'
       name:
-        $ref: '#/definitions/Name'
+        $ref: '#/definitions/UserName'
       role:
         $ref: '#/definitions/SystemRole'
     required:
@@ -47,76 +77,43 @@ definitions:
     type: object
     properties:
       email:
-        $ref: '#/definitions/Email'
+        $ref: '#/definitions/UserEmail'
       password:
         $ref: '#/definitions/Password'
+      otp:
+        $ref: '#/definitions/NullableOTP'
     required:
       - email
       - password
+      - otp
+
+  # Actually a union
   LoginResult:
-    oneOf:
-      - title: Reset Password
-        type: object
-        description: User should reset their password
-        properties:
-          status:
-            type: string
-            enum:
-              - resetPassword
-            example: resetPassword
-        required:
-          - status
-      - title: Show MFA
-        type: object
-        description: The MFA qr code should be shown to the user
-        properties:
-          status:
-            type: string
-            enum:
-              - showMfa
-            example: showMfa
-          otpAuth:
-            type: string
-            example: 'exampleOtpAuth'
-        required:
-          - status
-          - otpAuth
-      - title: Enter MFA
-        type: object
-        description: The user should enter their TOTP code
-        properties:
-          status:
-            type: string
-            enum:
-              - enterMfa
-            example: enterMfa
-        required:
-          - status
-      - title: Ok
-        type: object
-        description: Logged in successfully
-        properties:
-          status:
-            type: string
-            enum:
-              - ok
-            example: ok
-          id:
-            $ref: '#/definitions/UserId'
-          name:
-            $ref: '#/definitions/Name'
-          role:
-            $ref: '#/definitions/SystemRole'
-        required:
-          - status
-          - id
-          - name
-          - role
+    type: object
+    properties:
+      status:
+        type: string
+        enum: [resetPassword, showMfa, enterMfa, ok]
+        description: A+ grade source type.
+        example: ok
+      otpAuth:
+        $ref: '#/definitions/OTPAuth'
+      otp:
+        $ref: '#/definitions/NullableOTP'
+      id:
+        $ref: '#/definitions/UserId'
+      name:
+        $ref: '#/definitions/UserName'
+      role:
+        $ref: '#/definitions/SystemRole'
+    required:
+      - status
+
   ResetOwnPasswordData:
     type: object
     properties:
       email:
-        $ref: '#/definitions/Email'
+        $ref: '#/definitions/UserEmail'
       password:
         $ref: '#/definitions/Password'
       newPassword:
@@ -130,68 +127,40 @@ definitions:
     type: object
     properties:
       resetPassword:
-        type: boolean
-        description: If user password should be reset
-        example: true
+        $ref: '#/definitions/ResetPassword'
       resetMfa:
-        type: boolean
-        description: If user MFA should be reset
-        example: false
+        $ref: '#/definitions/ResetMfa'
     required:
       - resetPassword
       - resetMfa
+
   ResetAuthResult:
     type: object
     properties:
       temporaryPassword:
-        type: string
-        example: 'h0AHU7f8DzhPSpED'
+        $ref: '#/definitions/NullableTemporaryPassword'
     required:
       - temporaryPassword
 
+  # Actually a union
   ChangeOwnAuthData:
-    oneOf:
-      - title: Reset Password
-        type: object
-        properties:
-          resetPassword:
-            type: boolean
-            enum:
-              - true
-            example: true
-          resetMfa:
-            type: boolean
-            enum:
-              - false
-            example: false
-          newPassword:
-            $ref: '#/definitions/Password'
-        required:
-          - resetPassword
-          - resetMfa
-          - newPassword
-      - title: Reset MFA
-        type: object
-        properties:
-          resetPassword:
-            type: boolean
-            enum:
-              - false
-            example: false
-          resetMfa:
-            type: boolean
-            enum:
-              - true
-            example: true
-        required:
-          - resetPassword
-          - resetMfa
+    type: object
+    properties:
+      resetPassword:
+        $ref: '#/definitions/ResetPassword'
+      resetMfa:
+        $ref: '#/definitions/ResetMfa'
+      newPassword:
+        $ref: '#/definitions/Password'
+    required:
+      - resetPassword
+      - resetMfa
+
   ChangeOwnAuthResponse:
     type: object
     properties:
       otpAuth:
-        type: string
-        nullable: true
+        $ref: '#/definitions/NullableOTPAuth'
     required:
       - otpAuth
 
@@ -199,12 +168,10 @@ definitions:
     type: object
     properties:
       otp:
-        type: string
-        nullable: false
+        $ref: '#/definitions/OTP'
     required:
       - otp
 
-# Endpoints
 /v1/auth/self-info:
   get:
     tags: [Auth]
@@ -217,9 +184,9 @@ definitions:
             schema:
               $ref: '#/definitions/AuthData'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
     security:
       - cookieAuth: []
 
@@ -247,7 +214,7 @@ definitions:
               type: string
               example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
 
 /v1/auth/logout:
   post:
@@ -262,14 +229,14 @@ definitions:
       200:
         description: The user has successfully logged out.
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
     security:
       - cookieAuth: []
 
 /v1/auth/reset-own-password:
   post:
     tags: [Auth]
-    description: Reset own password
+    description: Reset own password.
     requestBody:
       description: The credentials for the user and the new password.
       content:
@@ -280,11 +247,11 @@ definitions:
       200:
         description: Password reset successfully.
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
 
 /v1/auth/reset-auth/{userId}:
   post:
@@ -306,20 +273,20 @@ definitions:
             schema:
               $ref: '#/definitions/ResetAuthResult'
       400:
-        $ref: '#/components/responses/BadRequest'
+        $ref: '#/responses/BadRequest'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
       404:
-        $ref: '#/components/responses/NotFound'
+        $ref: '#/responses/NotFound'
     security:
       - cookieAuth: []
 
 /v1/auth/change-own-auth:
   post:
     tags: [Auth]
-    description: Change own password / MFA when logging in
+    description: Change own password / MFA when logging in.
     requestBody:
       description: What data to reset.
       content:
@@ -328,15 +295,15 @@ definitions:
             $ref: '#/definitions/ChangeOwnAuthData'
     responses:
       200:
-        description: Password / MFA reset successfully
+        description: Password / MFA reset successfully.
         content:
           application/json:
             schema:
               $ref: '#/definitions/ChangeOwnAuthResponse'
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
     security:
       - cookieAuth: []
 
@@ -352,21 +319,21 @@ definitions:
             $ref: '#/definitions/ConfirmMfaData'
     responses:
       200:
-        description: Mfa confirmed
+        description: Mfa confirmed.
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
       403:
-        $ref: '#/components/responses/Forbidden'
+        $ref: '#/responses/Forbidden'
     security:
       - cookieAuth: []
 
 /v1/auth/login-idp:
   get:
     tags: [Auth]
-    description: redirect to idp login page
+    description: redirect to idp login page.
     responses:
       303:
-        description: User redirected to idp login page
+        description: User redirected to idp login page.
 
 /v1/auth/login-idp/callback:
   post:
@@ -387,7 +354,7 @@ definitions:
               type: string
               example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'
 
 /v1/auth/saml/metadata:
   get:
@@ -396,6 +363,6 @@ definitions:
       A xml metadata file describing Service Provider SAML attributes
     responses:
       200:
-        description: Xml read successfully
+        description: Xml read successfully.
       401:
-        $ref: '#/components/responses/Unauthorized'
+        $ref: '#/responses/Unauthorized'

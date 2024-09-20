@@ -55,6 +55,34 @@ export const findCourseFullById = async (
   return course;
 };
 
+/**
+ * Finds a course by url param id and also validates the url param.
+ *
+ * @throws ApiError(400|404) if invalid or course not found.
+ */
+export const findAndValidateCourseId = async (
+  courseId: string
+): Promise<Course> => {
+  const result = stringToIdSchema.safeParse(courseId);
+  if (!result.success)
+    throw new ApiError(`Invalid course id ${courseId}`, HttpCode.BadRequest);
+  return findCourseById(result.data);
+};
+
+/**
+ * Validates course id url param and returns it as a number.
+ *
+ * @throws ApiError(400|404) if invalid or course not found.
+ */
+export const validateCourseId = async (courseId: string): Promise<number> => {
+  const result = stringToIdSchema.safeParse(courseId);
+  if (!result.success)
+    throw new ApiError(`Invalid course id ${courseId}`, HttpCode.BadRequest);
+  await findCourseById(result.data);
+  return result.data;
+};
+
+/** Convert CourseFull into CourseData */
 export const parseCourseFull = (course: CourseFull): CourseData => {
   const courseData: CourseData = {
     id: course.id,
@@ -173,31 +201,4 @@ export const validateRoleUniqueness = (
       );
     }
   }
-};
-
-/**
- * Finds a course by url param id and also validates the url param.
- *
- * @throws ApiError(400|404) if invalid or course not found.
- */
-export const findAndValidateCourseId = async (
-  courseId: string
-): Promise<Course> => {
-  const result = stringToIdSchema.safeParse(courseId);
-  if (!result.success)
-    throw new ApiError(`Invalid course id ${courseId}`, HttpCode.BadRequest);
-  return findCourseById(result.data);
-};
-
-/**
- * Validates course id url param and returns it as a number.
- *
- * @throws ApiError(400|404) if invalid or course not found.
- */
-export const validateCourseId = async (courseId: string): Promise<number> => {
-  const result = stringToIdSchema.safeParse(courseId);
-  if (!result.success)
-    throw new ApiError(`Invalid course id ${courseId}`, HttpCode.BadRequest);
-  await findCourseById(result.data);
-  return result.data;
 };
