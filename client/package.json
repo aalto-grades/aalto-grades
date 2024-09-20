@@ -1,6 +1,5 @@
 {
   "name": "aalto-grades-client",
-  "private": true,
   "license": "Expat (MIT)",
   "author": "The Aalto Grades Developers",
   "scripts": {

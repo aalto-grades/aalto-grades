@@ -1,8 +1,6 @@
 {
-  "name": "playwright",
   "license": "Expat (MIT)",
   "author": "The Aalto Grades Developers",
-  "main": "index.js",
   "scripts": {
     "lint": "eslint . --ext ts --report-unused-disable-directives"
   },
