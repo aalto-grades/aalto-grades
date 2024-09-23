@@ -125,7 +125,8 @@ if (!['test', 'development', 'production'].includes(NODE_ENV)) {
   );
 }
 
-import httpLogger from './winston'; // The logger needs NODE_ENV to be defined
+// The logger needs NODE_ENV to be defined so it has to be imported after it has been defined
+import httpLogger from './winston';
 
 if (NODE_ENV === 'development')
   httpLogger.warn('NODE_ENV = development, TOTP codes will not be validated');

@@ -149,21 +149,23 @@ export const addAplusGradeSources: Endpoint<
   const taskGradeSourcesById: {[key: number]: AplusGradeSource[]} = {};
   const newGradeSources: NewAplusGradeSourceData[] = req.body;
 
+  // Validate new grade sources
   for (const newGradeSource of newGradeSources) {
     const [, , courseTask] = await validateCourseTaskPath(
       req.params.courseId,
       String(newGradeSource.courseTaskId)
     );
 
-    for (const other of newGradeSources.filter(
-      source => source !== newGradeSource
-    )) {
-      if (aplusGradeSourcesEqual(newGradeSource, other)) {
-        throw new ApiError(
-          `attempted to add the same A+ grade source ${JSON.stringify(newGradeSource)} twice`,
-          HttpCode.Conflict
-        );
-      }
+    const duplicate = newGradeSources.some(
+      source =>
+        source !== newGradeSource &&
+        aplusGradeSourcesEqual(newGradeSource, source)
+    );
+    if (duplicate) {
+      throw new ApiError(
+        `attempted to add the same A+ grade source ${JSON.stringify(newGradeSource)} twice`,
+        HttpCode.Conflict
+      );
     }
 
     if (!(courseTask.id in taskGradeSourcesById)) {
@@ -172,15 +174,18 @@ export const addAplusGradeSources: Endpoint<
       });
     }
 
-    for (const taskGradeSource of taskGradeSourcesById[courseTask.id]) {
-      const parsed = parseAplusGradeSource(taskGradeSource);
-      if (aplusGradeSourcesEqual(newGradeSource, parsed)) {
-        throw new ApiError(
-          `course task with ID ${taskGradeSource.courseTaskId} ` +
-            `already has the A+ grade source ${JSON.stringify(newGradeSource)}`,
-          HttpCode.Conflict
-        );
-      }
+    const existing = taskGradeSourcesById[courseTask.id].find(taskGradeSource =>
+      aplusGradeSourcesEqual(
+        newGradeSource,
+        parseAplusGradeSource(taskGradeSource)
+      )
+    );
+    if (existing !== undefined) {
+      throw new ApiError(
+        `course task with ID ${existing.courseTaskId} ` +
+          `already has the A+ grade source ${JSON.stringify(existing)}`,
+        HttpCode.Conflict
+      );
     }
   }
 
@@ -296,20 +301,19 @@ export const fetchAplusGrades: Endpoint<void, NewTaskGrade[]> = async (
             grade = student.points;
             break;
 
-          case AplusGradeSourceType.Module:
-            for (const module of student.modules) {
-              if (module.id === gradeSource.moduleId) {
-                grade = module.points;
-                break;
-              }
-            }
-            if (grade === null) {
+          case AplusGradeSourceType.Module: {
+            const module = student.modules.find(
+              mod => mod.id === gradeSource.moduleId
+            );
+            if (module === undefined) {
               throw new ApiError(
                 `A+ course with ID ${aplusCourseId} has no module with ID ${gradeSource.moduleId}`,
                 HttpCode.InternalServerError
               );
             }
+            grade = module.points;
             break;
+          }
 
           case AplusGradeSourceType.Exercise:
             for (const module of student.modules) {

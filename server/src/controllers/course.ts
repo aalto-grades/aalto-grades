@@ -24,6 +24,7 @@ import {
   type CourseFull,
   type Endpoint,
   type JwtClaims,
+  type NewDbCourseRole,
 } from '../types';
 import {
   findAndValidateCourseId,
@@ -120,22 +121,16 @@ export const addCourse: Endpoint<NewCourseData, number> = async (req, res) => {
     );
 
     // Add teacher and assistant roles
-    const teacherRoles: CourseRole[] = teachers.map(
-      teacher =>
-        ({
-          courseId: newCourse.id,
-          userId: teacher.id,
-          role: CourseRoleType.Teacher,
-        }) as CourseRole
-    );
-    const assistantRoles: CourseRole[] = assistants.map(
-      assistant =>
-        ({
-          courseId: newCourse.id,
-          userId: assistant.id,
-          role: CourseRoleType.Assistant,
-        }) as CourseRole
-    );
+    const teacherRoles: NewDbCourseRole[] = teachers.map(teacher => ({
+      courseId: newCourse.id,
+      userId: teacher.id,
+      role: CourseRoleType.Teacher,
+    }));
+    const assistantRoles: NewDbCourseRole[] = assistants.map(assistant => ({
+      courseId: newCourse.id,
+      userId: assistant.id,
+      role: CourseRoleType.Assistant,
+    }));
     await CourseRole.bulkCreate([...teacherRoles, ...assistantRoles], {
       transaction: t,
     });

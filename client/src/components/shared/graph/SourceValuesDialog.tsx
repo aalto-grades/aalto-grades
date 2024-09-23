@@ -49,6 +49,7 @@ const SourceValuesDialog = ({
     const newInitValues: {[key: number]: string} = {};
     for (const [nodeId, nodeValue] of Object.entries(nodeValues)) {
       if (nodeValue.type !== 'source') continue;
+
       const sourceId = parseInt(nodeId.split('-')[1]);
       if (sourceNodeIds.includes(sourceId))
         newInitValues[sourceId] = nodeValue.source.toString();
