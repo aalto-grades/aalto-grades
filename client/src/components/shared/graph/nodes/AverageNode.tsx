@@ -60,13 +60,13 @@ const checkError = (settings: LocalSettings): boolean => {
 
 const AverageNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
-  const {id, isConnectable} = props;
-
-  const updateNodeInternals = useUpdateNodeInternals();
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
+  const {id, isConnectable} = props;
+  const updateNodeInternals = useUpdateNodeInternals();
   const nodeValues = useContext(NodeValuesContext);
 
   const settings = nodeData[id].settings as AverageNodeSettings;
+
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     convertSettingsToStrings(settings)
   );
@@ -149,6 +149,7 @@ const AverageNode = (props: NodeProps): JSX.Element => {
 
   let percentageSum = 0;
   for (const key of Object.keys(localSettings.weights)) {
+    // Check if is valid float
     if (/^\d+(?:\.\d+?)?$/.test(localSettings.weights[key])) {
       percentageSum += parseFloat(localSettings.weights[key]);
     }

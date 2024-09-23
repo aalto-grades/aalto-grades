@@ -19,8 +19,8 @@ import useAuth from '@/hooks/useAuth';
 import ChangePasswordDialog from './ChangePasswordDialog';
 
 const UserButton = (): JSX.Element => {
-  const {auth, setAuth} = useAuth();
   const {t} = useTranslation();
+  const {auth, setAuth} = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const confirmMfa = useConfirmMfa();

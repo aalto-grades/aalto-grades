@@ -64,7 +64,6 @@ import {
 // Define the shape of the context
 export type TableContextProps = {
   table: ReturnType<typeof useReactTable<GroupedStudentRow>>;
-  //   setTable: Dispatch<SetStateAction<typeof table>;
   gradeSelectOption: 'best' | 'latest';
   setGradeSelectOption: Dispatch<SetStateAction<'best' | 'latest'>>;
   selectedGradingModel: GradingModelData | 'any';
@@ -127,7 +126,7 @@ const findPreviouslyExportedToSisu = (
 ): FinalGradeData | null => {
   for (const fg of row.finalGrades) {
     if (bestGrade.id === fg.id) continue; // Skip the best grade
-    if (fg.sisuExportDate === null) continue; // and those not exported to sisu
+    if (fg.sisuExportDate === null) continue; // And those not exported to sisu
 
     if (bestGrade.sisuExportDate !== null) {
       // If the best grade is also exported, we need to check which one is newer
@@ -150,9 +149,9 @@ export const GradesTableProvider = ({
   const {courseId} = useParams() as {courseId: string};
 
   const course = useGetCourse(courseId);
+  const allGradingModels = useGetAllGradingModels(courseId);
   const courseParts = useGetCourseParts(courseId);
   const courseTasks = useGetCourseTasks(courseId);
-  const allGradingModels = useGetAllGradingModels(courseId);
 
   const [rowSelection, setRowSelection] = useState({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
@@ -225,7 +224,7 @@ export const GradesTableProvider = ({
         );
         return {
           ...row,
-          // keep the same structure of predictedGrades but only show result for the student
+          // Keep the same structure of predictedGrades but only show result for the student
           predictedGraphValues: studentPredictedGrades,
           errors: getRowErrors(
             t,
@@ -246,20 +245,6 @@ export const GradesTableProvider = ({
     gradingModels,
     t,
   ]);
-
-  // const [globalFilter, setGlobalFilter] = useState('');
-
-  //   useEffect(() => {
-  //     props.setSelectedStudents(_ => {
-  //       return table?.getSelectedRowModel().rows.map(row => {
-  //         // Setting selectedStudents
-  //         return row.original;
-  //       });
-  //     });
-  //   }, [rowSelection]);
-
-  // console.log(expanded);
-  // console.log(rowSelection);
 
   // --- Source columns ---
   const selectedModelSources = useMemo(() => {
@@ -354,7 +339,7 @@ export const GradesTableProvider = ({
         row={getValue()}
         gradingModelIds={
           selectedGradingModel === 'any'
-            ? finalGradeModels?.map(model => model.id)
+            ? (finalGradeModels?.map(model => model.id) ?? [])
             : [selectedGradingModel.id]
         }
         onClick={() => {
@@ -449,7 +434,6 @@ export const GradesTableProvider = ({
       header: ({table}) => (
         <>
           <Checkbox
-            id="select-all"
             checked={table.getIsAllRowsSelected()}
             indeterminate={table.getIsSomeRowsSelected()}
             onChange={table.getToggleAllRowsSelectedHandler()}
@@ -457,7 +441,6 @@ export const GradesTableProvider = ({
           <span style={{marginLeft: '4px', marginRight: '15px'}}>
             <Badge
               badgeContent={table.getSelectedRowModel().rows.length || '0'}
-              // color="secondary"
               color="primary"
               max={999}
             />
@@ -468,10 +451,8 @@ export const GradesTableProvider = ({
         <PrettyChip position="last">
           <>
             <Checkbox
-              id="select-checkbox"
               checked={row.getIsAllSubRowsSelected()}
               indeterminate={row.getIsSomeSelected()}
-              // onChange={row.getToggleSelectedHandler()}
               onChange={() => {
                 if (row.getIsSomeSelected()) {
                   // If some rows are selected, select all
@@ -503,7 +484,6 @@ export const GradesTableProvider = ({
       ),
       cell: ({row}) => (
         <Checkbox
-          id={`select-checkbox-${row.id}`}
           checked={row.getIsSelected()}
           onChange={row.getToggleSelectedHandler()}
           style={{
@@ -514,11 +494,9 @@ export const GradesTableProvider = ({
               content: '""',
               width: '11px',
               height: '113%',
-              // border: '1px solid black',
               borderBlockEnd: '1px solid lightgray',
               borderLeft: '1px solid lightgray',
               borderEndStartRadius: '10px',
-              // backgroundColor: 'black',
               position: 'absolute',
               left: '0px',
               bottom: '50%',
@@ -535,7 +513,7 @@ export const GradesTableProvider = ({
       enableHiding: true,
       // The column only filter, for other type of filtering write another filterFn
       filterFn: row => {
-        // Not sure which solution is the best one, for now i keep both
+        // Not sure which solution is the best one, for now we keep both
         // return getErrorCount([row.original], selectedGradingModel) > 0;
         return (row.original.errors?.length ?? 0) > 0;
       },
@@ -563,11 +541,6 @@ export const GradesTableProvider = ({
         aggregatedCell: () => null,
       }
     ),
-    // columnHelper.group({
-    //   header: 'Course parts',
-    //   meta: {PrettyChipPosition: 'alone'},
-    //   columns: gradeColumns,
-    // }),
     ...sourceColumns,
   ];
 
@@ -581,14 +554,7 @@ export const GradesTableProvider = ({
       setRowSelection(selection);
       table.options.state.rowSelection = rowSelection;
     },
-    // enableRowSelection: row => {
-    //   if (row.subRows && row.subRows.length > 0) {
-    //     return false;
-    //   }
-    //   return true;
-    // },
     enableRowSelection: true,
-    // onRowSelectionChange: setRowSelection,
     // Grouping / Expanding
     onGroupingChange: setGrouping,
     onExpandedChange: setExpanded,
@@ -608,9 +574,7 @@ export const GradesTableProvider = ({
     getExpandedRowModel: getExpandedRowModel(),
     getGroupedRowModel: getGroupedRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    // getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    // debugAll: true,
   });
 
   return (

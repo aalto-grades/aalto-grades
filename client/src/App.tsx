@@ -85,18 +85,6 @@ const muiTheme: CssVarsTheme = extendTheme({
           dark: '#519657',
           contrastText: '#000',
         },
-        // error: {
-        //   light: '#FFEBEE',
-        //   main: '#F44336',
-        //   dark: '#D32F2F',
-        //   contrastText: '#FFF',
-        // },
-        // info: {
-        //   light: '#FFC046',
-        //   main: '#FF8F00',
-        //   dark: '#C56000',
-        //   contrastText: '#000',
-        // },
         hoverGrey1: '#EAEAEA',
         hoverGrey2: '#F4F4F4',
         hoverGrey3: '#6E6E6E',
@@ -143,7 +131,6 @@ const muiTheme: CssVarsTheme = extendTheme({
           borderColor: 'black',
           height: '32px',
           fontSize: '14px',
-          // boxSizing: 'border-box',
         },
       },
     },
@@ -172,7 +159,6 @@ const muiTheme: CssVarsTheme = extendTheme({
       fontSize: '28px',
       fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       fontWeight: '400',
-      // lineHeight: '1.2',
     },
     h3: {
       fontSize: '24px',
@@ -210,7 +196,6 @@ const muiTheme: CssVarsTheme = extendTheme({
 let globalModalRef: GlobalModalWrapper | null = null;
 
 const Root = (): JSX.Element => {
-  // const {enqueueSnackbar} = useSnackbar();
   useEffect(() => {
     GlobalModal.setUpModal(globalModalRef as Ref<GlobalModalWrapper | null>);
   }, []);

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {type JSX, useContext, useState} from 'react';
+import {type ChangeEvent, type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
   Handle,
@@ -21,14 +21,14 @@ const rowHeight = 33.9;
 
 const RequireNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {id, isConnectable} = props;
-
   const updateNodeInternals = useUpdateNodeInternals();
   const nodeValues = useContext(NodeValuesContext);
-  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const settings = nodeData[id].settings as RequireNodeSettings;
   const initSettings = {...settings, numFail: settings.numFail.toString()};
+
   const [localSettings, setLocalSettings] =
     useState<LocalSettings>(initSettings);
   const [nextFree, setNextFree] = useState<number>(0);
@@ -62,7 +62,7 @@ const RequireNode = (props: NodeProps): JSX.Element => {
     }
   }
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const newLocalSettings = {...localSettings};
     newLocalSettings.numFail = event.target.value;
     setLocalSettings(newLocalSettings);
@@ -82,15 +82,15 @@ const RequireNode = (props: NodeProps): JSX.Element => {
     });
   };
 
-  const handleSelectChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ): void => {
+  const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>): void => {
     if (localSettings.onFailSetting === event.target.value) return;
     const newLocalSettings = {
       ...localSettings,
       onFailSetting: event.target.value as 'fullfail' | 'fail',
     };
     setLocalSettings(newLocalSettings);
+
+    // Update global settings if local setting are valid
     if (
       /^\d+$/.test(newLocalSettings.numFail) &&
       parseInt(newLocalSettings.numFail) <= handles.length

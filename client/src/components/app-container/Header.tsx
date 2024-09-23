@@ -50,7 +50,7 @@ const Header = (): JSX.Element => {
           fontWeight: 'bold',
           color: 'primary.main',
         }}
-        data-testid="a-grades-header-link"
+        data-testid="a-grades-header-link" // For e2e tests
         unstable_viewTransition
       >
         A{logoVariant} Grades

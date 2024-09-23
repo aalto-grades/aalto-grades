@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+import 'reactflow/dist/style.css';
+import './flow.scss';
+
 import {Alert, Button, Divider, Tooltip, Typography} from '@mui/material';
 import type {TFunction} from 'i18next';
 import {enqueueSnackbar} from 'notistack';
@@ -34,7 +37,6 @@ import {
   useEdgesState,
   useNodesState,
 } from 'reactflow';
-import 'reactflow/dist/style.css';
 
 import type {
   CustomNodeTypes,
@@ -75,7 +77,6 @@ import SinkNode from './nodes/SinkNode';
 import SourceNode from './nodes/SourceNode';
 import StepperNode from './nodes/StepperNode';
 import SubstituteNode from './nodes/SubstituteNode';
-import './flow.scss'; // Import styles. At the bottom of the imports to fix import/order
 
 // TODO: Don't show word 'source' to user? (#886)
 // Instead we could check if is course part model or not
@@ -125,7 +126,6 @@ const initGraphFn = (
     }
   }
 
-  // Load initGraph
   const initNodeValues = Object.fromEntries(
     initGraph.nodes.map(node => [
       node.id,
@@ -133,6 +133,7 @@ const initGraphFn = (
     ])
   );
 
+  // Set source values
   if (sourceValues !== null) {
     for (const sourceValue of sourceValues) {
       const sourceId = `source-${sourceValue.id}`;
@@ -238,7 +239,6 @@ const Graph = ({
 
   const updateValues = useCallback(
     (newEdges: Edge[] | null = null) => {
-      console.debug('Updating');
       const disconnectedEdges = findDisconnectedEdges(
         nodeValues,
         nodes,
@@ -285,10 +285,7 @@ const Graph = ({
   // Warning if leaving with unsaved
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent): void => {
-      if (unsaved) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
+      if (unsaved) e.preventDefault();
     };
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
@@ -464,7 +461,6 @@ const Graph = ({
               zIndex: 1,
             }}
             severity="info"
-            // variant="outlined"
           >
             {t('general.unsaved-changes')}
           </Alert>
@@ -496,7 +492,6 @@ const Graph = ({
               zIndex: 1,
             }}
             severity="warning"
-            // variant="outlined"
           >
             {t('shared.graph.course-failed')}
           </Alert>

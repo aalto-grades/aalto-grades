@@ -2,7 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {type JSX, useContext, useEffect, useState} from 'react';
+import {
+  type ChangeEvent,
+  type JSX,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
   Handle,
@@ -47,14 +53,13 @@ const convertFromLocalSettings = (
 
 const SubstituteNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {id, isConnectable} = props;
-
   const updateNodeInternals = useUpdateNodeInternals();
   const nodeValues = useContext(NodeValuesContext);
 
-  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
-
   const settings = nodeData[id].settings as SubstituteNodeSettings;
+
   const [localSettings, setLocalSettings] = useState<LocalSettings>(
     convertToLocalSettings(settings)
   );
@@ -76,6 +81,8 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
     let exerciseIndex = -1;
     for (const [key, source] of Object.entries(nodeValue.sources)) {
       maxId = Math.max(maxId, parseInt(key.split('-').at(-1)!));
+
+      // Check if source is pointint to substitutes or exercises
       if (key.split('-').at(-2) === 'substitute') {
         if (source.isConnected && !newSubstituteHandles.includes(key)) {
           newSubstituteHandles.push(key);
@@ -102,6 +109,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
         }
       }
     }
+
     if (change) {
       setTimeout(() => updateNodeInternals(id), 0);
       setSubstituteHandles(newSubstituteHandles);
@@ -119,9 +127,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
     // The JSON.stringify() is a hacky solution to get React to realize that the sources updated
   }, [JSON.stringify(nodeValue.sources)]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleNumChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ): void => {
+  const handleNumChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const newLocalSettings = {...localSettings};
     newLocalSettings.maxSubstitutions = event.target.value;
     setLocalSettings(newLocalSettings);
@@ -135,7 +141,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
 
   const handleValueChange = (
     index: number,
-    event: React.ChangeEvent<HTMLInputElement>
+    event: ChangeEvent<HTMLInputElement>
   ): void => {
     const newLocalSettings = {...localSettings};
     newLocalSettings.substituteValues[index] = event.target.value;

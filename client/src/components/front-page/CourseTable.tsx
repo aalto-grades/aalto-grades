@@ -25,8 +25,8 @@ import type {HeadCellData} from '@/types';
 import {departments, getCourseRole} from '@/utils';
 
 const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
-  const {auth} = useAuth();
   const {t} = useTranslation();
+  const {auth} = useAuth();
   const localize = useLocalize();
   const navigate = useNavigate();
   const [page, setPage] = useState<number>(1);
@@ -45,7 +45,6 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
       if (auth.role === SystemRole.Admin) return t('general.admin');
 
       const courseRole = getCourseRole(course, auth);
-
       switch (courseRole) {
         case CourseRoleType.Teacher:
           return t('general.teacher');

@@ -15,12 +15,12 @@ type LocalSettings = {roundingSetting: RoundSetting};
 
 const RoundNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
-  const {id, isConnectable} = props;
-
-  const nodeValues = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
+  const {id, isConnectable} = props;
+  const nodeValues = useContext(NodeValuesContext);
 
   const settings = nodeData[id].settings as RoundNodeSettings;
+
   const [localSettings, setLocalSettings] = useState<LocalSettings>({
     ...settings,
   });

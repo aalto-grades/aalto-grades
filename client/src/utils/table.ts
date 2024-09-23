@@ -148,7 +148,7 @@ export const predictedGradesErrorCheck = (
         info: {modelId: parseInt(modelId)},
       });
     }
-    // if grade is out of range
+    // If grade is out of range
     if (
       (courseScale === GradingScale.Numerical &&
         !(grade.finalGrade >= 0 && grade.finalGrade <= 5)) ||
