@@ -18,7 +18,7 @@ export const definition: OAS3Definition = {
     termsOfService: '',
     license: {
       name: 'Expat (MIT)',
-      url: 'https://github.com/aalto-grades/base-repository/blob/main/LICENSE',
+      url: 'https://github.com/aalto-grades/aalto-grades/blob/main/LICENSE',
     },
   },
 };
