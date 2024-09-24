@@ -12,7 +12,7 @@ on: # yamllint disable-line rule:truthy
 
 jobs:
   build_and_publish:
-    uses: aalto-grades/aalto-grades/.github/workflows/shared/build-and-publish.yaml@improve-workflows
+    uses: aalto-grades/aalto-grades/.github/workflows/build-and-publish.yaml@improve-workflows
     with:
       registry: ghcr.io
       client_image_name: aalto-grades/aalto-grades-frontend-dev
