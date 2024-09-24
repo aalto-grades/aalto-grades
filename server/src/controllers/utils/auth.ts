@@ -39,12 +39,12 @@ export const validateLogin = async (
     );
   }
 
-  if (NODE_ENV !== 'development' && !user.admin) {
+  if (NODE_ENV === 'production' && !user.admin) {
     throw new ApiError(
       'User that is not an admin has local login',
       HttpCode.InternalServerError
     );
-  } else if (NODE_ENV === 'development' && !user.admin) {
+  } else if (NODE_ENV !== 'production' && !user.admin) {
     return {
       id: user.id,
       role: SystemRole.User,
