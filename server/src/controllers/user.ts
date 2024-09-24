@@ -295,12 +295,7 @@ export const addUser: Endpoint<NewUser, NewUserResponse> = async (req, res) => {
     await User.create({
       name: req.body.name,
       email: req.body.email,
-      password: await argon.hash(temporaryPassword, {
-        type: argon.argon2id,
-        memoryCost: 19456,
-        parallelism: 1,
-        timeCost: 2,
-      }),
+      password,
       admin: true,
       forcePasswordReset: true,
     });
