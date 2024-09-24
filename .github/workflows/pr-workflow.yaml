@@ -46,7 +46,6 @@ jobs:
   #   name: Test and lint server
   #   runs-on: self-hosted
   #   env:
-  #     POSTGRES_PASSWORD: postgres
   #     NODE_ENV: test
   #   defaults:
   #     run:

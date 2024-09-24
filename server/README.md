@@ -32,12 +32,6 @@ docker compose down --remove-orphans
 
 #### Running the migrations and seeder
 
-Copy `.env.example` to `.env`:
-
-```
-cp .env.example .env
-```
-
 Install the packages:
 
 ```

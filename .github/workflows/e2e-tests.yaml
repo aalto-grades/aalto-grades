@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       LOCALHOST_URL: http://localhost:8080
-      POSTGRES_PASSWORD: postgres
     defaults:
       run:
         working-directory: ./e2e-tests
