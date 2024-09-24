@@ -29,5 +29,9 @@ jobs:
         run: npm ci
       - name: Install common dependencies
         run: npm --prefix ../common ci
+      - name: Build server
+        run: npm run build
+      - name: Migrate and seed database
+        run: npm run migration:up && npm run seed:up
       - name: Run tests
         run: npm run citest
