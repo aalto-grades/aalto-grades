@@ -22,9 +22,9 @@ jobs:
         with:
           node-version: 20
       - name: Docker compose down
-        run: docker compose down --volumes --remove-orphans
+        run: docker-compose down --volumes --remove-orphans
       - name: Run database
-        run: docker compose up database -d
+        run: docker-compose up database -d
       - name: Install dependencies
         run: npm ci
       - name: Install common dependencies

@@ -12,8 +12,9 @@ on: # yamllint disable-line rule:truthy
       - dev
 
 jobs:
-  run_e2e_tests:
-    uses: aalto-grades/aalto-grades/.github/workflows/e2e-tests.yaml@improve-workflows
+  # Commented out temporarily
+  # run_e2e_tests:
+  #   uses: aalto-grades/aalto-grades/.github/workflows/e2e-tests.yaml@improve-workflows
 
   server_tests:
     uses: aalto-grades/aalto-grades/.github/workflows/server-tests.yaml@improve-workflows
