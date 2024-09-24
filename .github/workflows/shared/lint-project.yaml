@@ -2,12 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-name: Lint project
+name: Lint Project
 on: # yamllint disable-line rule:truthy
   workflow_call:
 
 jobs:
-  lint_project:
+  lint_code:
     name: Lint project code
     runs-on: ubuntu-latest
     steps:

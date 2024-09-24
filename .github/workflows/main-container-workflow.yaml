@@ -3,60 +3,17 @@
 # SPDX-License-Identifier: MIT
 ---
 name: Main Image Creation Workflow
-run-name: ${{ github.actor }} main container creation
+run-name: Main image creation (${{ github.actor }})
+
 on: # yamllint disable-line rule:truthy
   push:
     branches:
       - main
-env:
-  REGISTRY: ghcr.io
-  FRONTEND_IMAGE_NAME: aalto-grades/aalto-grades-frontend
-  BACKEND_IMAGE_NAME: aalto-grades/aalto-grades-backend
 
 jobs:
-  build_and_push_frontend_and_backend:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata for Frontend
-        id: meta_front
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
-
-      - name: Extract metadata for Backend
-        id: meta_back
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: client/Dockerfile.prod
-          push: true
-          tags: ${{ steps.meta_front.outputs.tags }}
-          labels: ${{ steps.meta_front.outputs.labels }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: server/Dockerfile.prod
-          push: true
-          tags: ${{ steps.meta_back.outputs.tags }}
-          labels: ${{ steps.meta_back.outputs.labels }}
+  build_and_publish:
+    uses: aalto-grades/aalto-grades/.github/workflows/shared/build-and-publish.yaml@improve-workflows
+    with:
+      registry: ghcr.io
+      client_image_name: aalto-grades/aalto-grades-frontend
+      server_image_name: aalto-grades/aalto-grades-backend
