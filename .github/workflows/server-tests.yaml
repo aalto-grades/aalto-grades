@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+#
+# SPDX-License-Identifier: MIT
+---
+name: Server tests
+on: # yamllint disable-line rule:truthy
+  workflow_call:
+
+jobs:
+  server_tests:
+    name: Server tests
+    runs-on: self-hosted
+    env:
+      POSTGRES_PASSWORD: postgres
+      NODE_ENV: test
+    defaults:
+      run:
+        working-directory: ./server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Docker compose down
+        run: docker compose down --volumes --remove-orphans
+      - name: Run database
+        run: docker compose up database -d
+      - name: Install dependencies
+        run: npm ci
+      - name: Install common dependencies
+        run: npm --prefix ../common ci
+      - name: Run tests
+        run: npm run citest

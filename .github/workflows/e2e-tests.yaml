@@ -4,16 +4,11 @@
 ---
 name: End-to-end tests
 on: # yamllint disable-line rule:truthy
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-      # - dev
+  workflow_call:
+
 jobs:
-  test-e2e:
-    name: e2e test
+  e2e-tests:
+    name: Run e2e tests
     runs-on: ubuntu-latest
     env:
       LOCALHOST_URL: http://localhost:8080

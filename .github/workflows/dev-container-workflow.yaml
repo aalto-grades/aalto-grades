@@ -69,7 +69,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: server/dockerfiles/Dockerfile.prod
+          file: server/Dockerfile.prod
           push: true
           tags: ${{ steps.meta_back.outputs.tags }}
           labels: ${{ steps.meta_back.outputs.labels }}
