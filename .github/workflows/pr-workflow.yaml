@@ -13,10 +13,10 @@ on: # yamllint disable-line rule:truthy
 
 jobs:
   run_e2e_tests:
-    uses: aalto-grades/aalto-grades/.github/workflows/e2e-tests.yaml@improve-workflows
+    uses: ./.github/workflows/e2e-tests.yaml
 
   server_tests:
-    uses: aalto-grades/aalto-grades/.github/workflows/server-tests.yaml@improve-workflows
+    uses: ./.github/workflows/server-tests.yaml
 
   lint_project:
-    uses: aalto-grades/aalto-grades/.github/workflows/lint-project.yaml@improve-workflows
+    uses: ./.github/workflows/lint-project.yaml
