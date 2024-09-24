@@ -13,7 +13,6 @@ import {
   GradingScale,
   Language,
   type NewCourseData,
-  SystemRole,
   type UserData,
 } from '@/common/types';
 import {initGraph} from '@/common/util';
@@ -57,7 +56,7 @@ class CreateData {
       email: user?.email ?? `testUser${this.freeUserId}@aalto.fi`,
       name: user?.name ?? `test user${this.freeUserId}`,
       studentNumber: user?.studentNumber ?? `12345${this.freeUserId}`,
-      role: SystemRole.User,
+      idpUser: true,
     });
     this.freeUserId += 1;
     return {
@@ -89,7 +88,7 @@ class CreateData {
       email: user?.email ?? `testUser${this.freeUserId}@aalto.fi`,
       name: user?.name ?? `test user${this.freeUserId}`,
       studentNumber: user?.studentNumber ?? `12345${this.freeUserId}`,
-      role: SystemRole.Admin,
+      admin: true,
       password: password,
       forcePasswordReset: user?.forcePasswordReset ?? false,
       mfaSecret: user?.mfaSecret ?? null,

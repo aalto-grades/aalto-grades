@@ -4,7 +4,8 @@
 
 import argon from 'argon2';
 
-import {type AuthData, HttpCode, type SystemRole} from '@/common/types';
+import {type AuthData, HttpCode, SystemRole} from '@/common/types';
+import {NODE_ENV} from '../../configs/environment';
 import httpLogger from '../../configs/winston';
 import User from '../../database/models/user';
 import {ApiError} from '../../types';
@@ -38,9 +39,22 @@ export const validateLogin = async (
     );
   }
 
+  if (NODE_ENV !== 'development' && !user.admin) {
+    throw new ApiError(
+      'User that is not an admin has local login',
+      HttpCode.InternalServerError
+    );
+  } else if (NODE_ENV === 'development' && !user.admin) {
+    return {
+      id: user.id,
+      role: SystemRole.User,
+      name: user.name,
+    };
+  }
+
   return {
     id: user.id,
-    role: user.role as SystemRole,
+    role: SystemRole.Admin,
     name: user.name,
   };
 };

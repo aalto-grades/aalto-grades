@@ -11,7 +11,6 @@ import {
   Op,
 } from 'sequelize';
 
-import type {SystemRole} from '@/common/types';
 import {sequelize} from '..';
 
 export default class User extends Model<
@@ -23,7 +22,8 @@ export default class User extends Model<
   declare email: CreationOptional<string | null>;
   declare studentNumber: CreationOptional<string | null>;
   declare eduUser: CreationOptional<string | null>;
-  declare role: CreationOptional<SystemRole>;
+  declare idpUser: CreationOptional<boolean>;
+  declare admin: CreationOptional<boolean>;
   declare password: CreationOptional<string | null>;
   declare forcePasswordReset: CreationOptional<boolean | null>;
   declare mfaSecret: CreationOptional<string | null>;
@@ -65,10 +65,15 @@ User.init(
       unique: true,
       allowNull: true,
     },
-    role: {
-      type: DataTypes.ENUM('USER', 'ADMIN'),
+    idpUser: {
+      type: DataTypes.BOOLEAN(),
       allowNull: false,
-      defaultValue: 'USER',
+      defaultValue: false,
+    },
+    admin: {
+      type: DataTypes.BOOLEAN(),
+      allowNull: false,
+      defaultValue: false,
     },
     password: {
       type: new DataTypes.CHAR(255),

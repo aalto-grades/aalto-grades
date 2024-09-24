@@ -11,7 +11,7 @@ import {DOMParser} from '@xmldom/xmldom';
 import axios from 'axios';
 import {type SelectReturnType, isArrayOfNodes, useNamespaces} from 'xpath';
 
-import {HttpCode, type SystemRole} from '@/common/types';
+import {HttpCode, SystemRole} from '@/common/types';
 import {
   DEV_SAML_IDP_CERT,
   NODE_ENV,
@@ -104,7 +104,7 @@ export const getSamlStrategy = async (): Promise<SamlStrategy> =>
         // for now if teacher email is added by admin we allow the teacher to sign in
         return done(null, {
           id: user.id,
-          role: user.role as SystemRole,
+          role: SystemRole.User,
           name: user.name,
         });
       } catch (error) {
