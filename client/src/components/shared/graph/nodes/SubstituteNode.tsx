@@ -82,7 +82,7 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
     for (const [key, source] of Object.entries(nodeValue.sources)) {
       maxId = Math.max(maxId, parseInt(key.split('-').at(-1)!));
 
-      // Check if source is pointint to substitutes or exercises
+      // Check if source is pointing to substitutes or exercises
       if (key.split('-').at(-2) === 'substitute') {
         if (source.isConnected && !newSubstituteHandles.includes(key)) {
           newSubstituteHandles.push(key);

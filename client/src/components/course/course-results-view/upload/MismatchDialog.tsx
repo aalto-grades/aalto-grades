@@ -75,7 +75,7 @@ const MismatchDialog = ({
       return;
     }
 
-    // Duplicate field
+    // Duplicate target
     const usedSelections: string[] = [];
     for (const target of Object.values(selections)) {
       if (usedSelections.includes(target!) && target !== 'ignoreColumn') {
@@ -86,7 +86,7 @@ const MismatchDialog = ({
       usedSelections.push(target!);
     }
 
-    // Student number field not found
+    // Student number target not found
     const studentNumberTarget = Object.values(selections).some(
       target => target === 'studentNo'
     );

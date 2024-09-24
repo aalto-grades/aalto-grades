@@ -95,7 +95,7 @@ const GradesTable = (): JSX.Element => {
       className="container"
       ref={parentRef}
       style={{
-        overflowY: 'auto', // Our scrollable table container
+        overflowY: 'auto', // Scrollable table container
         position: 'relative', // Needed for sticky header
         height: 'calc(100vh - 255px)', // Should be a fixed height
         width: 'fit-content',
