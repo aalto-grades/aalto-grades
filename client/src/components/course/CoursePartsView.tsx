@@ -237,24 +237,25 @@ const CoursePartsView = (): JSX.Element => {
   const getAplusActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
     const elements: JSX.Element[] = [];
 
-    // span is necessary to show the tooltip while the button is disabled
-    elements.push(
-      <Tooltip title={unsavedChanges ? t('course.parts.a+-disabled') : ''}>
-        <span>
-          <GridActionsCellItem
-            disabled={unsavedChanges}
-            icon={<AddCircle />}
-            label={t('course.parts.add-a+-source')}
-            onClick={() =>
-              setAddAplusSourcesTo({
-                courseTaskId: params.row.id,
-                aplusGradeSources: params.row.aplusGradeSources,
-              })
-            }
-          />
-        </span>
-      </Tooltip>
-    );
+    if (editRights) {
+      elements.push(
+        <Tooltip title={unsavedChanges ? t('course.parts.a+-disabled') : ''}>
+          <span>
+            <GridActionsCellItem
+              label={t('course.parts.add-a+-source')}
+              icon={<AddCircle />}
+              disabled={unsavedChanges}
+              onClick={() =>
+                setAddAplusSourcesTo({
+                  courseTaskId: params.row.id,
+                  aplusGradeSources: params.row.aplusGradeSources,
+                })
+              }
+            />
+          </span>
+        </Tooltip>
+      );
+    }
 
     if (params.row.aplusGradeSources.length > 0) {
       elements.push(
@@ -326,19 +327,19 @@ const CoursePartsView = (): JSX.Element => {
       field: 'name',
       headerName: t('general.name'),
       type: 'string',
-      editable: true,
+      editable: editRights,
     },
     {
       field: 'daysValid',
       headerName: t('general.days-valid'),
       type: 'number',
-      editable: true,
+      editable: editRights,
     },
     {
       field: 'maxGrade',
       headerName: t('general.max-grade'),
       type: 'number',
-      editable: true,
+      editable: editRights,
     },
     {
       field: 'aplusGradeSources',
@@ -385,7 +386,7 @@ const CoursePartsView = (): JSX.Element => {
         <Button
           startIcon={<Add />}
           onClick={handleClick}
-          disabled={selectedPart === null}
+          disabled={selectedPart === null || !editRights}
         >
           {t('course.parts.add-new-task')}
         </Button>
@@ -394,7 +395,7 @@ const CoursePartsView = (): JSX.Element => {
             <Button
               startIcon={<Add />}
               onClick={() => setAplusDialogOpen(true)}
-              disabled={selectedPart === null || unsavedChanges}
+              disabled={selectedPart === null || unsavedChanges || !editRights}
             >
               {t('course.parts.add-from-a+')}
             </Button>
@@ -557,7 +558,7 @@ const CoursePartsView = (): JSX.Element => {
               editMode="row"
               rowSelection={false}
               disableColumnSelector
-              slots={{toolbar: DataGridToolbar}}
+              slots={editRights ? {toolbar: DataGridToolbar} : {}}
               onRowEditStart={() => setEditing(true)}
               onRowEditStop={() => setEditing(false)}
               processRowUpdate={updatedRow => {

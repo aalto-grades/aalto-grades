@@ -31,6 +31,7 @@ import {
   type FinalGradeData,
   GradingScale,
   type NewFinalGrade,
+  SystemRole,
 } from '@/common/types';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
@@ -70,7 +71,7 @@ const EditFinalGradesDialog = ({
   finalGrades,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
-  const {auth} = useAuth();
+  const {auth, isTeacherInCharge} = useAuth();
   const {courseId} = useParams() as {courseId: string};
 
   const course = useGetCourse(courseId);
@@ -83,6 +84,11 @@ const EditFinalGradesDialog = ({
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
+
+  const editRights = useMemo(
+    () => auth?.role === SystemRole.Admin || isTeacherInCharge,
+    [auth?.role, isTeacherInCharge]
+  );
 
   const changes = useMemo(
     () =>
@@ -163,13 +169,13 @@ const EditFinalGradesDialog = ({
       field: 'grade',
       headerName: t('general.grade'),
       type: 'number',
-      editable: true,
+      editable: editRights,
     },
     {
       field: 'date',
       headerName: t('general.date'),
       type: 'date',
-      editable: true,
+      editable: editRights,
       width: 110, // Enough width to fit the calendar icon
     },
     {
@@ -182,29 +188,35 @@ const EditFinalGradesDialog = ({
       field: 'exportDate',
       headerName: t('general.export-date'),
       type: 'date',
-      editable: true,
+      editable: editRights,
       width: 110, // Enough width to fit the calendar icon
     },
     {
       field: 'comment',
       headerName: t('general.comment'),
       type: 'string',
-      editable: true,
+      editable: editRights,
     },
-    {
-      field: 'actions',
-      type: 'actions',
-      getActions: params => [
-        <GridActionsCellItem
-          key={params.id}
-          icon={<Delete />}
-          label={t('general.delete')}
-          onClick={() =>
-            setRows(oldRows => oldRows.filter(row => row.id !== params.id))
-          }
-        />,
-      ],
-    },
+    ...(editRights
+      ? [
+          {
+            field: 'actions',
+            type: 'actions',
+            getActions: params => [
+              <GridActionsCellItem
+                key={params.id}
+                icon={<Delete />}
+                label={t('general.delete')}
+                onClick={() =>
+                  setRows(oldRows =>
+                    oldRows.filter(row => row.id !== params.id)
+                  )
+                }
+              />,
+            ],
+          } as GridColDef<ColTypes>,
+        ]
+      : []),
     {
       field: 'selected',
       type: 'string',
@@ -324,7 +336,7 @@ const EditFinalGradesDialog = ({
               editMode="row"
               rowSelection={false}
               disableColumnSelector
-              slots={{toolbar: dataGridToolbar}}
+              slots={editRights ? {toolbar: dataGridToolbar} : {}}
               initialState={{
                 sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
               }}
@@ -370,16 +382,18 @@ const EditFinalGradesDialog = ({
           >
             {changes ? t('general.discard') : t('general.close')}
           </Button>
-          <Button
-            onClick={() => {
-              if (changes) handleSubmit();
-              else onClose();
-            }}
-            variant={changes ? 'contained' : 'text'}
-            disabled={error || editing}
-          >
-            {t('general.save')}
-          </Button>
+          {editRights && (
+            <Button
+              onClick={() => {
+                if (changes) handleSubmit();
+                else onClose();
+              }}
+              variant={changes ? 'contained' : 'text'}
+              disabled={error || editing}
+            >
+              {t('general.save')}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </>
