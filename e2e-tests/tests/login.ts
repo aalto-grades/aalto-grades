@@ -27,8 +27,17 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
     name: 'Or manually enter the secret',
   });
 
+  // Check for new MFA secret
+  let newMfaSecret;
+  try {
+    await showSecretButton.waitFor({state: 'visible', timeout: 500});
+    newMfaSecret = true;
+  } catch {
+    newMfaSecret = false;
+  }
+
   // Login when MFA qr code is shown
-  if (await showSecretButton.isVisible()) {
+  if (newMfaSecret) {
     await showSecretButton.click();
 
     const secretText = await page.getByTestId('mfa-secret').textContent();
@@ -54,7 +63,11 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
         }
       }
     }
-    throw new Error('Failed to log in');
+    throw new Error('Failed to log in with new MFA secret');
+  }
+
+  if (mfaSecrets[user] === '') {
+    throw new Error(`Old MFA secret is empty for user ${user}`);
   }
 
   // Login when MFA qr code is not shown
@@ -79,5 +92,5 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
       await inputFields[i].fill('');
     }
   }
-  throw new Error('Failed to log in');
+  throw new Error('Failed to log in with old MFA secret');
 };
