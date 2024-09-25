@@ -83,11 +83,22 @@ const EditGradesDialog = ({
 
   const courseTasks = useGetCourseTasks(courseId);
   const addGrades = useAddGrades(courseId);
-  const deleteGrade = useDeleteGrade(courseId);
   const editGrade = useEditGrade(courseId);
+  const deleteGrade = useDeleteGrade(courseId);
 
-  const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
-  const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
+  const initRows = grades.map((grade, i) => ({
+    id: i,
+    gradeId: grade.id,
+    grader: grade.grader.name!,
+    grade: grade.grade,
+    date: grade.date,
+    expiryDate: grade.expiryDate,
+    comment: grade.comment ?? '',
+    selected: '',
+    aplusGrade: grade.aplusGradeSource !== null,
+  }));
+
+  const [rows, setRows] = useState<GridRowsProp<ColTypes>>(initRows);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
 
@@ -115,15 +126,13 @@ const EditGradesDialog = ({
   // Warning if leaving with unsaved
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent): void => {
-      if (changes) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
+      if (changes) e.preventDefault();
     };
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [changes]);
 
+  // Update selected column
   useEffect(() => {
     const newRows = rows.map(row => ({
       ...row,
@@ -131,22 +140,6 @@ const EditGradesDialog = ({
     }));
     if (JSON.stringify(rows) !== JSON.stringify(newRows)) setRows(newRows);
   }, [bestGrade, rows]);
-
-  useEffect(() => {
-    const newRows = grades.map((grade, i) => ({
-      id: i,
-      gradeId: grade.id,
-      grader: grade.grader.name!,
-      grade: grade.grade,
-      date: grade.date,
-      expiryDate: grade.expiryDate,
-      comment: grade.comment ?? '',
-      selected: '',
-      aplusGrade: grade.aplusGradeSource !== null,
-    }));
-    setRows(newRows);
-    setInitRows(structuredClone(newRows));
-  }, [grades]);
 
   const courseTask =
     courseTasks.data?.find(task => task.id === courseTaskId) ?? null;
@@ -277,7 +270,6 @@ const EditGradesDialog = ({
 
     onClose();
     enqueueSnackbar(t('general.grades-saved'), {variant: 'success'});
-    setInitRows(structuredClone(rows));
   };
 
   type RowType = GridRowModel<ColTypes>;

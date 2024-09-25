@@ -44,14 +44,15 @@ const FormField = ({
     value={form.values[value] ?? ''} // Convert nulls in to empty values to prevent warnings
     disabled={disabled || form.isSubmitting}
     label={label}
-    InputLabelProps={{shrink: true}}
-    InputProps={InputProps}
+    slotProps={{
+      input: InputProps,
+      inputLabel: {shrink: true},
+    }}
     margin="normal"
     helperText={form.errors[value] ?? helperText}
     error={form.touched[value] && form.errors[value] !== undefined}
     onChange={form.handleChange}
     select={select}
-    // SelectProps={{native: true}}
     sx={{textAlign: 'left'}}
   >
     {children}

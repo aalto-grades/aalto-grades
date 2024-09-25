@@ -47,13 +47,13 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
   const {courseId} = useParams() as {courseId: string};
   const courseParts = useGetCourseParts(courseId);
   const courseTasks = useGetCourseTasks(courseId);
+  const addGrades = useAddGrades(courseId);
 
   const [step, setStep] = useState<number>(0);
   const [courseTaskIds, setCourseTaskIds] = useState<number[]>([]);
   const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
     useState<boolean>(false);
 
-  const addGrades = useAddGrades(courseId);
   const aplusGrades = useFetchAplusGrades(courseId, courseTaskIds, {
     enabled: false,
   });
@@ -138,11 +138,8 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
               <Button
                 onClick={() => {
                   setStep(1);
-                  if (getAplusToken()) {
-                    aplusGrades.refetch();
-                  } else {
-                    setAplusTokenDialogOpen(true);
-                  }
+                  if (getAplusToken()) aplusGrades.refetch();
+                  else setAplusTokenDialogOpen(true);
                 }}
                 disabled={courseTaskIds.length === 0}
               >

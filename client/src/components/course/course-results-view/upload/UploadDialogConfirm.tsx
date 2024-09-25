@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+import 'dayjs/locale/en-gb';
+
 import {ExpandMore} from '@mui/icons-material';
 import {
   Accordion,
@@ -26,7 +28,6 @@ import type {
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import type {Dayjs} from 'dayjs';
-import 'dayjs/locale/en-gb';
 import {
   type Dispatch,
   type JSX,
@@ -45,6 +46,7 @@ export type DateType = {
   completionDate: Dayjs;
   expirationDate: Dayjs | null;
 };
+
 type PropsType = {
   columns: GridColDef[];
   rows: GridRowsProp<GradeUploadColTypes>;
@@ -56,7 +58,6 @@ type PropsType = {
   setExpanded: Dispatch<SetStateAction<'' | 'date' | 'confirm'>>;
   invalidValues: boolean;
 };
-
 const UploadDialogConfirm = ({
   columns,
   rows,
@@ -82,6 +83,7 @@ const UploadDialogConfirm = ({
     return newNonEmptyCols;
   }, [rows]);
 
+  // Check for errors
   useEffect(() => {
     let newError = false;
     for (const date of dates) {
@@ -118,6 +120,7 @@ const UploadDialogConfirm = ({
     );
   };
 
+  // Set row class name if errors
   const getRowClassName = (
     params: GridRowClassNameParams<GridValidRowModel>
   ): string => {

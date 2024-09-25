@@ -6,11 +6,11 @@ import {useContext, useDebugValue} from 'react';
 
 import AuthContext, {type AuthContextType} from '@/context/AuthProvider';
 
-// custom hook for using the authProvider context and for printing out debug information
+// Custom hook for using the authProvider context and for printing out debug information
 const useAuth = (): AuthContextType => {
   const {auth} = useContext(AuthContext);
 
-  // debug information is displayed within the react dev tools
+  // Debug information is displayed within the react dev tools
   useDebugValue(auth, authResult => (authResult ? 'Logged in' : 'Logged out'));
   return useContext(AuthContext);
 };

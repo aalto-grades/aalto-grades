@@ -122,34 +122,31 @@ export const isValidConnection = (
   return !hasCycle(connection.target);
 };
 
+/** Find disconnected edges from require and substitute nodes */
 export const findDisconnectedEdges = (
   oldNodeValues: NodeValues,
   nodes: TypedNode[],
   edges: Edge[]
 ): Edge[] => {
-  const nodeSources: {[key: string]: Set<string>} = {};
   const nodeTargets: {[key: string]: Edge[]} = {};
   for (const edge of edges) {
     if (!(edge.source in nodeTargets)) nodeTargets[edge.source] = [];
     nodeTargets[edge.source].push(edge);
-    if (!(edge.target in nodeSources)) nodeSources[edge.target] = new Set();
-    nodeSources[edge.target].add(edge.source);
   }
 
+  // Set all isConnected values to false
   const newNodeValues = {...oldNodeValues};
   for (const node of nodes) {
-    const sourceNodeValue = newNodeValues[node.id];
-    if (
-      sourceNodeValue.type === 'require' ||
-      sourceNodeValue.type === 'substitute'
-    ) {
-      for (const value of Object.values(sourceNodeValue.sources)) {
-        value.value = 0;
-        value.isConnected = false;
-      }
+    const nodeValue = newNodeValues[node.id];
+    if (nodeValue.type !== 'require' && nodeValue.type !== 'substitute')
+      continue;
+
+    for (const value of Object.values(nodeValue.sources)) {
+      value.isConnected = false;
     }
   }
 
+  // Update isConnected values
   for (const node of nodes) {
     if (!(node.id in nodeTargets)) continue;
     for (const edge of nodeTargets[node.id]) {
@@ -157,32 +154,26 @@ export const findDisconnectedEdges = (
       if (nodeValue.type !== 'require' && nodeValue.type !== 'substitute')
         continue;
 
-      nodeValue.sources[edge.targetHandle!] = {
-        value: 0,
-        isConnected: true,
-      };
+      nodeValue.sources[edge.targetHandle!] = {isConnected: true, value: 0};
     }
   }
 
-  const badEdges = [];
+  // Find disconnected edges
+  const disconnectedEdges = [];
   for (const edge of edges) {
-    const sourceNodeValues = newNodeValues[edge.source];
-
-    if (
-      sourceNodeValues.type !== 'require' &&
-      sourceNodeValues.type !== 'substitute'
-    )
+    const nodeValue = newNodeValues[edge.source];
+    if (nodeValue.type !== 'require' && nodeValue.type !== 'substitute')
       continue;
 
     const sourceHandle = edge.sourceHandle!.replace('-source', '');
     if (
-      !(sourceHandle in sourceNodeValues.sources) ||
-      !sourceNodeValues.sources[sourceHandle].isConnected
+      !(sourceHandle in nodeValue.sources) ||
+      !nodeValue.sources[sourceHandle].isConnected
     ) {
-      badEdges.push(edge);
+      disconnectedEdges.push(edge);
     }
   }
-  return badEdges;
+  return disconnectedEdges;
 };
 
 const elk = new ElkConstructor();
@@ -207,6 +198,7 @@ export const formatGraph = async (
       'elk.layered.spacing.nodeNodeBetweenLayers': '200',
       'elk.spacing.nodeNode': '60',
     },
+    // Tell elk the node handle data (order and side)
     children: nodesForElk.map(node => {
       const nodeValue = nodeValues[node.id];
       if (nodeValue.type === 'source') {
@@ -235,6 +227,7 @@ export const formatGraph = async (
         };
       }
 
+      // Sort handles
       const sortedKeys: string[] = Object.keys(nodeValue.sources);
       if (nodeValue.type === 'substitute') {
         sortedKeys.sort((key1, key2) => {
@@ -286,6 +279,7 @@ export const formatGraph = async (
     })),
   };
 
+  // Return nodes with updated positions
   const newNodes = (await elk.layout(graph)).children!;
   return newNodes.map(newNode => ({
     ...nodes.find(node => node.id === newNode.id)!,

@@ -14,7 +14,13 @@ import {
 import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import type {AplusCourseData, NewAplusGradeSourceData} from '@/common/types';
+import type {
+  AplusCourseData,
+  AplusDifficulty,
+  AplusExercise,
+  AplusModule,
+  NewAplusGradeSourceData,
+} from '@/common/types';
 import {aplusGradeSourcesEqual} from '@/common/util';
 import {useFetchAplusExerciseData} from '@/hooks/useApi';
 import {getLatestAplusModuleDate, newAplusGradeSource} from '@/utils';
@@ -29,7 +35,6 @@ type PropsType = {
     source: NewAplusGradeSourceData
   ) => void;
 };
-
 const SelectAplusGradeSources = ({
   aplusCourse,
   selectedGradeSources,
@@ -45,6 +50,35 @@ const SelectAplusGradeSources = ({
 
   if (aplusExerciseData.data === undefined) return <>{t('general.loading')}</>;
 
+  const fullPoints = newAplusGradeSource(
+    aplusCourse,
+    getLatestAplusModuleDate(aplusExerciseData.data),
+    {}
+  );
+  const modules: [AplusModule, NewAplusGradeSourceData][] =
+    aplusExerciseData.data.modules.map(module => [
+      module,
+      newAplusGradeSource(aplusCourse, module.closingDate, {module}),
+    ]);
+  const exercises: [AplusExercise, NewAplusGradeSourceData][] = [];
+  for (const module of aplusExerciseData.data.modules) {
+    for (const exercise of module.exercises) {
+      exercises.push([
+        exercise,
+        newAplusGradeSource(aplusCourse, module.closingDate, {exercise}),
+      ]);
+    }
+  }
+  const difficulties: [AplusDifficulty, NewAplusGradeSourceData][] =
+    aplusExerciseData.data.difficulties.map(difficulty => [
+      difficulty,
+      newAplusGradeSource(
+        aplusCourse,
+        getLatestAplusModuleDate(aplusExerciseData.data),
+        {difficulty}
+      ),
+    ]);
+
   return (
     <>
       <Accordion defaultExpanded>
@@ -56,23 +90,13 @@ const SelectAplusGradeSources = ({
             label={t('general.full-points')}
             control={
               <Checkbox
-                checked={isChecked(
-                  newAplusGradeSource(
-                    aplusCourse,
-                    getLatestAplusModuleDate(aplusExerciseData.data),
-                    {}
-                  )
-                )}
+                checked={isChecked(fullPoints)}
                 onChange={e =>
                   handleChange(
                     e.target.checked,
                     `[${aplusCourse.name}] ${t('general.full-points')}`,
                     aplusExerciseData.data.maxGrade,
-                    newAplusGradeSource(
-                      aplusCourse,
-                      getLatestAplusModuleDate(aplusExerciseData.data),
-                      {}
-                    )
+                    fullPoints
                   )
                 }
               />
@@ -86,25 +110,19 @@ const SelectAplusGradeSources = ({
         </AccordionSummary>
         <AccordionDetails>
           <FormGroup>
-            {aplusExerciseData.data.modules.map(module => (
+            {modules.map(([module, moduleSource]) => (
               <FormControlLabel
                 key={module.id}
                 label={module.name}
                 control={
                   <Checkbox
-                    checked={isChecked(
-                      newAplusGradeSource(aplusCourse, module.closingDate, {
-                        module,
-                      })
-                    )}
+                    checked={isChecked(moduleSource)}
                     onChange={e =>
                       handleChange(
                         e.target.checked,
                         `[${aplusCourse.name}] ${t('general.module')}: ${module.name}`,
                         module.maxGrade,
-                        newAplusGradeSource(aplusCourse, module.closingDate, {
-                          module,
-                        })
+                        moduleSource
                       )
                     }
                   />
@@ -120,66 +138,48 @@ const SelectAplusGradeSources = ({
         </AccordionSummary>
         <AccordionDetails>
           <FormGroup>
-            {aplusExerciseData.data.modules.map(module =>
-              module.exercises.map(exercise => (
-                <FormControlLabel
-                  key={exercise.id}
-                  label={exercise.name}
-                  control={
-                    <Checkbox
-                      checked={isChecked(
-                        newAplusGradeSource(aplusCourse, module.closingDate, {
-                          exercise,
-                        })
-                      )}
-                      onChange={e =>
-                        handleChange(
-                          e.target.checked,
-                          `[${aplusCourse.name}] ${t('general.exercise')}: ${exercise.name}`,
-                          exercise.maxGrade,
-                          newAplusGradeSource(aplusCourse, module.closingDate, {
-                            exercise,
-                          })
-                        )
-                      }
-                    />
-                  }
-                />
-              ))
-            )}
+            {exercises.map(([exercise, exerciseSource]) => (
+              <FormControlLabel
+                key={exercise.id}
+                label={exercise.name}
+                control={
+                  <Checkbox
+                    checked={isChecked(exerciseSource)}
+                    onChange={e =>
+                      handleChange(
+                        e.target.checked,
+                        `[${aplusCourse.name}] ${t('general.exercise')}: ${exercise.name}`,
+                        exercise.maxGrade,
+                        exerciseSource
+                      )
+                    }
+                  />
+                }
+              />
+            ))}
           </FormGroup>
         </AccordionDetails>
       </Accordion>
-      {aplusExerciseData.data.difficulties.length > 0 && (
+      {difficulties.length > 0 && (
         <Accordion>
           <AccordionSummary expandIcon={<ArrowDropDown />}>
             {t('general.difficulties')}
           </AccordionSummary>
           <AccordionDetails>
             <FormGroup>
-              {aplusExerciseData.data.difficulties.map(difficulty => (
+              {difficulties.map(([difficulty, difficultySource]) => (
                 <FormControlLabel
                   key={difficulty.difficulty}
                   label={difficulty.difficulty}
                   control={
                     <Checkbox
-                      checked={isChecked(
-                        newAplusGradeSource(
-                          aplusCourse,
-                          getLatestAplusModuleDate(aplusExerciseData.data),
-                          {difficulty}
-                        )
-                      )}
+                      checked={isChecked(difficultySource)}
                       onChange={e =>
                         handleChange(
                           e.target.checked,
                           `[${aplusCourse.name}] ${t('general.difficulty')}: ${difficulty.difficulty}`,
                           difficulty.maxGrade,
-                          newAplusGradeSource(
-                            aplusCourse,
-                            getLatestAplusModuleDate(aplusExerciseData.data),
-                            {difficulty}
-                          )
+                          difficultySource
                         )
                       }
                     />
