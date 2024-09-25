@@ -21,7 +21,7 @@ import {type JSX, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 
-import {SystemRole, type UserData} from '@/common/types';
+import type {UserData} from '@/common/types';
 import {useDeleteUser, useGetUsers} from '@/hooks/useApi';
 import type {HeadCellData} from '@/types';
 import ResetAuthDialog from './ResetAuthDialog';
@@ -40,9 +40,8 @@ const UsersTable = (): JSX.Element => {
 
   const shownUsers = useMemo(() => {
     if (users.data === undefined) return [];
-    if (tab === 0)
-      return users.data.filter(user => user.idpUser && user.email !== null);
-    return users.data.filter(user => user.role === SystemRole.Admin);
+    if (tab === 0) return users.data.filter(user => user.idpUser);
+    return users.data.filter(user => user.admin);
   }, [tab, users.data]);
 
   const handleDeleteUser = async (user: UserData): Promise<void> => {
