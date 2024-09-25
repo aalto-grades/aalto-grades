@@ -47,14 +47,14 @@ export const validateLogin = async (
   } else if (NODE_ENV !== 'production' && !user.admin) {
     return {
       id: user.id,
-      role: SystemRole.User,
+      role: SystemRole.User, // In dev and tests some test user accounts also have local login.
       name: user.name,
     };
   }
 
   return {
     id: user.id,
-    role: SystemRole.Admin,
+    role: SystemRole.Admin, // Only admins have username and password login.
     name: user.name,
   };
 };

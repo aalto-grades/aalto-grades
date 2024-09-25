@@ -8,7 +8,6 @@ import {
   type InferAttributes,
   type InferCreationAttributes,
   Model,
-  Op,
 } from 'sequelize';
 
 import {sequelize} from '..';
@@ -108,16 +107,7 @@ User.findByEduUser = async (eduUser: string): Promise<User | null> =>
   User.findOne({where: {eduUser}});
 
 User.findIdpUserByEmail = async (email: string): Promise<User | null> =>
-  User.findOne({
-    where: {
-      email,
-      password: {[Op.is]: undefined},
-    },
-  });
+  User.findOne({where: {email, idpUser: true}});
 
 User.findIdpUsers = async (): Promise<User[]> =>
-  User.findAll({
-    where: {
-      password: {[Op.is]: undefined},
-    },
-  });
+  User.findAll({where: {idpUser: true}});
