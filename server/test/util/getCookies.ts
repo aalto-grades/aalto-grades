@@ -5,6 +5,7 @@
 import {authenticator} from 'otplib';
 import supertest from 'supertest';
 
+import {HttpCode} from '@/common/types';
 import {app} from '../../src/app';
 import User from '../../src/database/models/user';
 
@@ -37,7 +38,8 @@ const generateMfaToken = async (user: UserCredentials): Promise<void> => {
   await request
     .post('/v1/auth/login')
     .set('Accept', 'application/json')
-    .send({email: user.email, password: user.password, otp: null});
+    .send({email: user.email, password: user.password, otp: null})
+    .expect(HttpCode.Ok);
 };
 
 /** Get cookie for user */
