@@ -53,7 +53,7 @@ class CreateData {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  async createUser(user?: Partial<ExtraUserData>): Promise<ExtraUserData> {
+  async createUser(user?: Partial<ExtraUserData>): Promise<UserData> {
     const newUser = await User.create({
       email: user?.email ?? `testUser${this.freeUserId}@aalto.fi`,
       name: user?.name ?? `test user${this.freeUserId}`,
@@ -67,8 +67,6 @@ class CreateData {
       email: newUser.email,
       name: newUser.name,
       studentNumber: newUser.studentNumber,
-      idpUser: newUser.idpUser,
-      admin: newUser.admin,
     };
   }
 
