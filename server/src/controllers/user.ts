@@ -5,6 +5,7 @@
 import * as argon from 'argon2';
 import generator from 'generate-password';
 import {Op} from 'sequelize';
+import {z} from 'zod';
 
 import {
   type CourseData,
@@ -286,8 +287,8 @@ export const addUser: Endpoint<NewUser, NewUserResponse> = async (req, res) => {
     await existingUser
       .set({
         name: req.body.name,
-        password,
         admin: true,
+        password,
         forcePasswordReset: true,
       })
       .save();
@@ -295,8 +296,8 @@ export const addUser: Endpoint<NewUser, NewUserResponse> = async (req, res) => {
     await User.create({
       name: req.body.name,
       email: req.body.email,
-      password,
       admin: true,
+      password,
       forcePasswordReset: true,
     });
   }
@@ -310,8 +311,45 @@ export const addUser: Endpoint<NewUser, NewUserResponse> = async (req, res) => {
  * @throws ApiError(400|404)
  */
 export const deleteUser: Endpoint<void, void> = async (req, res) => {
+  let role: 'idpUser' | 'admin' | null = null;
+  if (req.query.role) {
+    try {
+      role = z
+        .union([z.literal('idpUser'), z.literal('admin')])
+        .parse(req.query.role);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new ApiError(error.message, HttpCode.BadRequest);
+      }
+    }
+  }
+
   const user = await findAndValidateUserId(req.params.userId);
-  await user.destroy();
+
+  // Remove idpUser role
+  if (role === 'idpUser') {
+    if (!user.idpUser) {
+      throw new ApiError('User is not an IDP user', HttpCode.Conflict);
+    }
+    await user.set({idpUser: false}).save();
+
+    return res.sendStatus(HttpCode.Ok);
+  }
+
+  // Remove admin role
+  if (!user.admin) {
+    throw new ApiError('User is not an admin', HttpCode.Conflict);
+  }
+  await user
+    .set({
+      admin: false,
+      password: null,
+      forcePasswordReset: null,
+      mfaSecret: null,
+      mfaConfirmed: false,
+    })
+    .save();
+
   res.sendStatus(HttpCode.Ok);
 };
 

@@ -92,12 +92,14 @@ export const useAddUser = (
   });
 };
 
-export const useDeleteUser = (
-  options?: UseMutationOptions<void, unknown, number>
-): UseMutationResult<void, unknown, number> => {
+type RemoveUserRoleData = {id: number; role: 'idpUser' | 'admin'};
+export const useRemoveUserRole = (
+  options?: UseMutationOptions<void, unknown, RemoveUserRoleData>
+): UseMutationResult<void, unknown, RemoveUserRoleData> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async userId => axios.delete(`/api/v1/users/${userId}`),
+    mutationFn: async userData =>
+      axios.delete(`/api/v1/users/${userData.id}?role=${userData.role}`),
 
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['users']});
