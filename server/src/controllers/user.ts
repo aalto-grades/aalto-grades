@@ -337,18 +337,23 @@ export const deleteUser: Endpoint<void, void> = async (req, res) => {
   }
 
   // Remove admin role
-  if (!user.admin) {
-    throw new ApiError('User is not an admin', HttpCode.Conflict);
+  if (role === 'admin') {
+    if (!user.admin) {
+      throw new ApiError('User is not an admin', HttpCode.Conflict);
+    }
+    await user
+      .set({
+        admin: false,
+        password: null,
+        forcePasswordReset: null,
+        mfaSecret: null,
+        mfaConfirmed: false,
+      })
+      .save();
   }
-  await user
-    .set({
-      admin: false,
-      password: null,
-      forcePasswordReset: null,
-      mfaSecret: null,
-      mfaConfirmed: false,
-    })
-    .save();
+
+  // No role specified, delete user
+  if (role === null) await user.destroy();
 
   res.sendStatus(HttpCode.Ok);
 };

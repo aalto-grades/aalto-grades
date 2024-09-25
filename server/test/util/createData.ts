@@ -29,6 +29,8 @@ import GradingModel from '../../src/database/models/gradingModel';
 import TaskGrade from '../../src/database/models/taskGrade';
 import User from '../../src/database/models/user';
 
+type ExtraUserData = UserData & {idpUser: boolean; admin: boolean};
+
 /**
  * Still relies on the test users admin@aalto.fi, teacher@aalto.fi,
  * assistant@aalto.fi, student@aalto.fi being created in the seed.
@@ -51,12 +53,13 @@ class CreateData {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  async createUser(user?: Partial<UserData>): Promise<UserData> {
+  async createUser(user?: Partial<ExtraUserData>): Promise<ExtraUserData> {
     const newUser = await User.create({
       email: user?.email ?? `testUser${this.freeUserId}@aalto.fi`,
       name: user?.name ?? `test user${this.freeUserId}`,
       studentNumber: user?.studentNumber ?? `12345${this.freeUserId}`,
-      idpUser: true,
+      idpUser: user?.idpUser ?? true,
+      admin: user?.admin ?? true,
     });
     this.freeUserId += 1;
     return {
@@ -64,6 +67,8 @@ class CreateData {
       email: newUser.email,
       name: newUser.name,
       studentNumber: newUser.studentNumber,
+      idpUser: newUser.idpUser,
+      admin: newUser.admin,
     };
   }
 
