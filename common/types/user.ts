@@ -4,7 +4,6 @@
 
 import {z} from 'zod';
 
-import {SystemRoleSchema} from './auth';
 import {AaltoEmailSchema, IdSchema} from './general';
 
 export const UserDataSchema = z.strictObject({
@@ -19,7 +18,7 @@ export const FullUserDataSchema = z.strictObject({
   email: z.string().email().nullable(),
   studentNumber: z.string().nullable(),
   idpUser: z.boolean(),
-  role: SystemRoleSchema,
+  admin: z.boolean(),
 });
 export const StudentDataSchema = z.strictObject({
   id: IdSchema,

@@ -59,7 +59,7 @@ export const selfInfo: Endpoint<void, AuthData> = async (req, res) => {
 
   res.json({
     id: userFromDb.id,
-    role: userFromDb.role,
+    role: user.role,
     name: userFromDb.name,
   });
 };

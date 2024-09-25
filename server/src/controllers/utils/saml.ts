@@ -11,7 +11,7 @@ import {DOMParser} from '@xmldom/xmldom';
 import axios from 'axios';
 import {type SelectReturnType, isArrayOfNodes, useNamespaces} from 'xpath';
 
-import {HttpCode, type SystemRole} from '@/common/types';
+import {HttpCode, SystemRole} from '@/common/types';
 import {
   DEV_SAML_IDP_CERT,
   NODE_ENV,
@@ -90,6 +90,7 @@ export const getSamlStrategy = async (): Promise<SamlStrategy> =>
         if (!email)
           throw new ApiError('No email in assertion', HttpCode.Unauthorized);
 
+        // We only allow SAML login if user has been added as an idpUser to the system
         const user = await User.findIdpUserByEmail(email);
         if (!user) {
           throw new ApiError(
@@ -101,10 +102,11 @@ export const getSamlStrategy = async (): Promise<SamlStrategy> =>
         if (!user.name || user.name === user.email)
           await user.update({name: name});
 
-        // for now if teacher email is added by admin we allow the teacher to sign in
+        // When logging in through saml give user role even though user might also have admin rights.
+        // We only allow admin login through the local login
         return done(null, {
           id: user.id,
-          role: user.role as SystemRole,
+          role: SystemRole.User,
           name: user.name,
         });
       } catch (error) {
