@@ -156,7 +156,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
   authenticate(req, res, next);
 };
 
-/** ()=>void */
+/** () => void */
 export const authLogout: SyncEndpoint<void, void> = (_req, res) => {
   res.clearCookie('jwt', {httpOnly: true});
   res.sendStatus(HttpCode.Ok);

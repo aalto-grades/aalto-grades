@@ -242,11 +242,10 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
       });
     }
 
-    // TODO: Takes a while, optimize?
     await TaskGrade.bulkCreate(preparedBulkCreate, {transaction: t});
   });
 
-  // Create student roles for all the students (TODO: Remove role if grades are removed?)
+  // Create student roles for all the students
   const studentUserIds = students.map(student => student.id);
   const dbCourseRoles = await CourseRole.findAll({
     attributes: ['userId'],

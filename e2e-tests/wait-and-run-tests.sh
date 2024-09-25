@@ -7,14 +7,15 @@
 cmd="$@"
 url="${LOCALHOST_URL}/login"
 
-echo "Waiting for URL ${url}"
+echo "Trying to connect to ${url}"
 
-until curl -s -o /dev/null -w "%{http_code}" ${url} | grep "200" 2>&1 > /dev/null; do
-    >&2 echo "wait-for-frontend.sh: waiting for URL ${url}"
+until curl -s -o /dev/null -w "%{http_code}" ${url} | grep "200" 2>&1 >/dev/null; do
+    echo >&2 "Waiting for ${url}"
     sleep 5
 done
 
+echo "URL reached, sleeping for extra 10 seconds to make sure everything is loaded"
 sleep 10
-echo "URL reached"
 
-npx playwright test
+echo "Starting tests"
+npx playwright test --reporter=list

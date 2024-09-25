@@ -9,6 +9,8 @@ import {
   type GridValidRowModel,
 } from '@mui/x-data-grid';
 
+// Pretty much just adds color to selected and error columns
+
 export type ProcessRowUpdate = (
   newRow: GridValidRowModel,
   oldRow: GridValidRowModel

@@ -100,7 +100,7 @@ const defaults = {
   backendPort: 3000,
   jwtSecret: 'TOP_SECRET',
   frontendCorsOrigin: 'http://localhost:3005',
-  // TODO: Fix SAML callback url to include /api/
+  // TODO: Fix SAML callback url to include /api/ (#848)
   samlCallback: 'https://aalto-grades.cs.aalto.fi/v1/auth/login-idp/callback',
   samlEntrypoint: 'https://devel.idp.aalto.fi/idp/profile/SAML2/Redirect/SSO',
   samlIssuer: 'https://aalto-grades.cs.aalto.fi',
@@ -125,7 +125,8 @@ if (!['test', 'development', 'production'].includes(NODE_ENV)) {
   );
 }
 
-import httpLogger from './winston'; // The logger needs NODE_ENV to be defined
+// The logger needs NODE_ENV to be defined so it has to be imported after it has been defined
+import httpLogger from './winston';
 
 if (NODE_ENV === 'development')
   httpLogger.warn('NODE_ENV = development, TOTP codes will not be validated');

@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  type AplusDifficulty,
-  type AplusExercise,
   type AplusGradeSourceData,
   AplusGradeSourceType,
-  type AplusModule,
+  type AplusSourceDifficulty,
+  type AplusSourceExercise,
+  type AplusSourceModule,
   type NewAplusGradeSourceData,
 } from '../types';
 
@@ -22,10 +22,10 @@ export const aplusGradeSourcesEqual = (
     case AplusGradeSourceType.FullPoints:
       return true;
     case AplusGradeSourceType.Module:
-      return a.moduleId === (b as AplusModule).moduleId;
+      return a.moduleId === (b as AplusSourceModule).moduleId;
     case AplusGradeSourceType.Exercise:
-      return a.exerciseId === (b as AplusExercise).exerciseId;
+      return a.exerciseId === (b as AplusSourceExercise).exerciseId;
     case AplusGradeSourceType.Difficulty:
-      return a.difficulty === (b as AplusDifficulty).difficulty;
+      return a.difficulty === (b as AplusSourceDifficulty).difficulty;
   }
 };

@@ -34,12 +34,6 @@ module.exports = {
       'warn',
       {
         patterns: [
-          // Broken :/
-          // {
-          //   regex: '@/components/(?!(api/enums$)).*',
-          //   message:
-          //     "Sideways component imports shouldn't be necessary outside from importing from shared",
-          // },
           '@/components/app-container/*',
           '@/components/course/*',
           '@/components/front-page/*',

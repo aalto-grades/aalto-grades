@@ -33,14 +33,13 @@ import {useDeleteAplusGradeSource} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 
 type PropsType = {
-  onClose: () => void;
   open: boolean;
+  onClose: () => void;
   aplusGradeSources: AplusGradeSourceData[];
 };
-
 const ViewAplusGradeSourcesDialog = ({
-  onClose,
   open,
+  onClose,
   aplusGradeSources,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();

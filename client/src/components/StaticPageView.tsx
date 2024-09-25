@@ -38,7 +38,6 @@ const StaticPageView = ({url, title}: PropsType): JSX.Element => {
           viewTransitionName: 'content',
           textAlign: 'start',
         }}
-        className="static-page-container"
       >
         {title !== undefined && (
           <Typography variant="h4" sx={{marginBottom: '16px'}}>

@@ -75,16 +75,16 @@ type ColTypes = {
 
 const CoursePartsView = (): JSX.Element => {
   const {t} = useTranslation();
-  const {courseId} = useParams() as {courseId: string};
   const {auth, isTeacherInCharge} = useAuth();
+  const {courseId} = useParams() as {courseId: string};
 
   const gradingModels = useGetAllGradingModels(courseId);
   const courseParts = useGetCourseParts(courseId);
   const editCoursePart = useEditCoursePart(courseId);
 
-  const grades = useGetGrades(courseId);
   const courseTasks = useGetCourseTasks(courseId);
   const modifyCourseTasks = useModifyCourseTasks(courseId);
+  const grades = useGetGrades(courseId);
 
   const [addPartDialogOpen, setAddPartDialogOpen] = useState<boolean>(false);
   const [editPartDialogOpen, setEditPartDialogOpen] = useState<boolean>(false);
@@ -152,10 +152,7 @@ const CoursePartsView = (): JSX.Element => {
   // Warning if leaving with unsaved
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent): void => {
-      if (unsavedChanges) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
+      if (unsavedChanges) e.preventDefault();
     };
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
@@ -199,11 +196,7 @@ const CoursePartsView = (): JSX.Element => {
   };
 
   const handleSubmit = async (): Promise<void> => {
-    const modifications: ModifyCourseTasks = {
-      add: [],
-      edit: [],
-      delete: [],
-    };
+    const modifications: ModifyCourseTasks = {add: [], edit: [], delete: []};
 
     for (const row of rows) {
       if (row.new) {
@@ -235,7 +228,7 @@ const CoursePartsView = (): JSX.Element => {
   };
 
   const getAplusActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
-    const elements: JSX.Element[] = [];
+    const elements = [];
 
     if (editRights) {
       elements.push(
@@ -276,6 +269,7 @@ const CoursePartsView = (): JSX.Element => {
 
   const getActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
     const elements = [];
+
     if (params.row.coursePartId !== -1) {
       elements.push(
         <GridActionsCellItem
@@ -435,10 +429,7 @@ const CoursePartsView = (): JSX.Element => {
       />
       <AddAplusGradeSourceDialog
         onClose={() =>
-          setAddAplusSourcesTo({
-            courseTaskId: null,
-            aplusGradeSources: [],
-          })
+          setAddAplusSourcesTo({courseTaskId: null, aplusGradeSources: []})
         }
         courseTaskId={addAplusSourcesTo.courseTaskId}
         aplusGradeSources={addAplusSourcesTo.aplusGradeSources}
@@ -462,7 +453,6 @@ const CoursePartsView = (): JSX.Element => {
           handleDiscard={confirmDiscard}
           handleSave={handleSubmit}
           disabled={editing}
-          // loading={form.isSubmitting}
         />
       </div>
 

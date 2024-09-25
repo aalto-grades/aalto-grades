@@ -164,6 +164,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
   ): {[key in keyof FormData]?: string[]} | undefined => {
     const result = ValidationSchema.safeParse(values);
     if (result.success) return;
+
     const fieldErrors = result.error.formErrors.fieldErrors;
     return Object.fromEntries(
       Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
@@ -268,7 +269,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               disabled={form.isSubmitting}
               label={`${t('course.edit.teachers-in-charge')}*`}
               margin="normal"
-              InputLabelProps={{shrink: true}}
+              slotProps={{inputLabel: {shrink: true}}}
               helperText={
                 form.errors.teacherEmail ??
                 (teachersInCharge.length === 0
@@ -340,7 +341,7 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               disabled={form.isSubmitting}
               label={`${t('general.assistants')}*`}
               margin="normal"
-              InputLabelProps={{shrink: true}}
+              slotProps={{inputLabel: {shrink: true}}}
               helperText={
                 form.errors.assistantEmail ??
                 (assistants.length === 0
@@ -429,7 +430,6 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
               Cancel
             </Button>
             <Button
-              id="ag-create-course-btn"
               variant="contained"
               onClick={form.submitForm}
               disabled={form.isSubmitting}

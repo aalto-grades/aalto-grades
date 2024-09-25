@@ -15,8 +15,8 @@ import Users from './front-page/users/Users';
 
 const FrontPageView = (): JSX.Element => {
   const {t} = useTranslation();
-  const theme = useTheme();
   const {auth} = useAuth();
+  const theme = useTheme();
   const courses = useGetAllCourses({
     enabled: auth !== null && auth.role === SystemRole.Admin,
   });
@@ -74,7 +74,6 @@ const FrontPageView = (): JSX.Element => {
               {t('general.courses')}
             </Typography>
             <Button
-              id="ag-new-course-btn"
               size="large"
               variant="contained"
               onClick={() => setCreateDialogOpen(true)}

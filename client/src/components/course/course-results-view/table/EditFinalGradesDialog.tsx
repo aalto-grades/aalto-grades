@@ -77,11 +77,28 @@ const EditFinalGradesDialog = ({
   const course = useGetCourse(courseId);
   const gradingModels = useGetAllGradingModels(courseId);
   const addFinalGrades = useAddFinalGrades(courseId);
-  const deleteFinalGrade = useDeleteFinalGrade(courseId);
   const editFinalGrade = useEditFinalGrade(courseId);
+  const deleteFinalGrade = useDeleteFinalGrade(courseId);
 
-  const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
-  const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
+  const getModelName = (modelId: number | null): string | null => {
+    if (modelId === null) return null;
+    if (gradingModels.data === undefined) return t('general.loading');
+    const model = gradingModels.data.find(mod => mod.id === modelId);
+    return model?.name ?? t('course.results.not-found');
+  };
+  const initRows = finalGrades.map((finalGrade, i) => ({
+    id: i,
+    finalGradeId: finalGrade.id,
+    grader: finalGrade.grader.name!,
+    grade: finalGrade.grade,
+    date: finalGrade.date,
+    gradingModel: getModelName(finalGrade.gradingModelId),
+    exportDate: finalGrade.sisuExportDate,
+    comment: finalGrade.comment,
+    selected: '',
+  }));
+
+  const [rows, setRows] = useState<GridRowsProp<ColTypes>>(initRows);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
 
@@ -116,15 +133,13 @@ const EditFinalGradesDialog = ({
   // Warning if leaving with unsaved
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent): void => {
-      if (changes) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
+      if (changes) e.preventDefault();
     };
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [changes]);
 
+  // Update selected column
   useEffect(() => {
     const newRows = rows.map(row => ({
       ...row,
@@ -132,31 +147,6 @@ const EditFinalGradesDialog = ({
     }));
     if (JSON.stringify(rows) !== JSON.stringify(newRows)) setRows(newRows);
   }, [bestGrade, rows]);
-
-  useEffect(() => {
-    const getModelName = (modelId: number | null): string | null => {
-      if (modelId === null) return null;
-      if (gradingModels.data === undefined) return t('general.loading');
-      const model = gradingModels.data.find(mod => mod.id === modelId);
-      return model?.name ?? t('course.results.not-found');
-    };
-
-    const newRows = finalGrades.map((finalGrade, i) => ({
-      id: i,
-      finalGradeId: finalGrade.id,
-      grader: finalGrade.grader.name!,
-      grade: finalGrade.grade,
-      date: finalGrade.date,
-      gradingModel: getModelName(finalGrade.gradingModelId),
-      exportDate: finalGrade.sisuExportDate,
-      comment: finalGrade.comment,
-      selected: '',
-    }));
-    setRows(newRows);
-    setInitRows(structuredClone(newRows));
-  }, [gradingModels.data, finalGrades, t]);
-
-  if (!auth) return <>{t('course.results.not-permitted')}</>; // Not needed?
 
   const columns: GridColDef<ColTypes>[] = [
     {
@@ -232,7 +222,7 @@ const EditFinalGradesDialog = ({
         const newRow: ColTypes = {
           id: freeId,
           finalGradeId: -1,
-          grader: auth.name,
+          grader: auth!.name,
           grade: 0,
           date: new Date(),
           gradingModel: null,
@@ -297,7 +287,6 @@ const EditFinalGradesDialog = ({
 
     onClose();
     enqueueSnackbar(t('course.results.grades-saved'), {variant: 'success'});
-    setInitRows(structuredClone(rows));
   };
 
   const confirmDiscard = async (): Promise<void> => {

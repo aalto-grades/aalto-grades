@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-// import * as path from 'path';
 import react from '@vitejs/plugin-react';
 import fs from 'fs';
 import license from 'rollup-plugin-license';

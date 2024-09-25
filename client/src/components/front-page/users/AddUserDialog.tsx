@@ -90,7 +90,6 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
       <FormControlLabel
         control={
           <Switch
-            id="admin"
             name="admin"
             checked={form.values.admin}
             disabled={form.isSubmitting}
@@ -153,9 +152,7 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
               enqueueSnackbar(t('front-page.password-copied'), {
                 variant: 'success',
               });
-              setTimeout(() => {
-                setCopied(false);
-              }, 1500);
+              setTimeout(() => setCopied(false), 1500);
             }}
           >
             {!copied ? (
@@ -216,7 +213,6 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
               </Button>
             )}
             <Button
-              id="add-user"
               variant="contained"
               onClick={() => {
                 if (userData === null) {

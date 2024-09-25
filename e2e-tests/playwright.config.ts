@@ -10,26 +10,28 @@ import {defineConfig, devices} from '@playwright/test';
 /** See https://playwright.dev/docs/test-configuration. */
 export default defineConfig({
   testDir: './.',
+
   /* Tests currently modify one database. Parallelism will cause problems */
   fullyParallel: false,
+  workers: 1,
+
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: Boolean(process.env.CI),
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Tests currently modify one database. Parallelism will cause problems */
-  workers: 1,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+
+  retries: process.env.CI ? 1 : 0,
+  maxFailures: 8,
+  timeout: 15 * 1000,
+  expect: {timeout: 2 * 1000},
   reporter: 'html',
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.LOCALHOST_URL || 'http://localhost:8080',
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     ignoreHTTPSErrors: true,
   },
 
-  /* Configure projects for major browsers */
   projects: [
     {
       name: 'chromium',
@@ -41,7 +43,7 @@ export default defineConfig({
       use: {...devices['Desktop Firefox']},
     },
 
-    // Broken, TODO: enable
+    // Broken, TODO: enable (#594)
     // {
     //   name: 'webkit',
     //   use: {...devices['Desktop Safari']},

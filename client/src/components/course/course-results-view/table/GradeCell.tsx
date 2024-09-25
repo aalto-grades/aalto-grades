@@ -71,16 +71,12 @@ const GradeCell = ({
           hasInvalidGrade || isGradeExpired
             ? `1px solid rgba(${theme.vars.palette.error.mainChannel} / 0.3)`
             : 'inherit',
-        // borderRight: hasInvalidValue || isGradeExpired
-        //   ? `1px solid rgba(${theme.vars.palette.error.mainChannel} / 0.3)`
-        //   : 'inherit',
         fontSize: '0.85rem',
 
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
       }}
-      // align="center"
     >
       <span>
         {sourceValue.type === 'courseTask'
@@ -107,7 +103,7 @@ const GradeCell = ({
                   right: '0px',
                   top: 'calc(50% - 20px)',
                 }}
-                onClick={(): void => setGradeDialogOpen(true)}
+                onClick={() => setGradeDialogOpen(true)}
               >
                 <MoreVert />
               </IconButton>
@@ -127,17 +123,11 @@ const GradeCell = ({
               grades={sourceValue.task.grades}
             />
           )}
+
           {/* Info/warning icons */}
           {/* Contains invalid grades */}
           {hasInvalidGrade && (
             <Tooltip placement="top" title="Invalid grades">
-              {/* <IconButton
-                  size='small'
-                  color='error'
-                  style={{
-                    position: 'relative',
-                  }}
-                > */}
               <WarningAmberOutlined
                 sx={{
                   position: 'absolute',
@@ -145,15 +135,12 @@ const GradeCell = ({
                   top: '-5%',
                   left: '1%',
                   width: '15px',
-                  // transform: 'translate(-50%, -50%)',
                   color: `rgba(${theme.vars.palette.error.mainChannel} / 0.7)`,
-                  // When over color is 100%
                   '&:hover': {
                     color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
                   },
                 }}
               />
-              {/* </IconButton> */}
             </Tooltip>
           )}
           {/* Expired grade */}
@@ -164,13 +151,6 @@ const GradeCell = ({
                 date: bestGrade?.expiryDate!.toString(),
               })}
             >
-              {/* <IconButton
-                  size='small'
-                  color='error'
-                  style={{
-                    position: 'relative',
-                  }}
-                > */}
               <EventBusyOutlined
                 sx={{
                   position: 'absolute',
@@ -178,18 +158,15 @@ const GradeCell = ({
                   top: '-5%',
                   left: '1%',
                   width: '15px',
-                  // transform: 'translate(-50%, -50%)',
                   color: `rgba(${theme.vars.palette.error.mainChannel} / 0.7)`,
-                  // When over color is 100%
                   '&:hover': {
                     color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
                   },
                 }}
               />
-              {/* </IconButton> */}
             </Tooltip>
           )}
-          {/* Multiple grades (more performance than showing button) TODO: Better solution */}
+          {/* Multiple grades */}
           {!hasInvalidGrade &&
             !isGradeExpired &&
             sourceValue.task.grades.length > 1 && (
@@ -200,7 +177,6 @@ const GradeCell = ({
                   top: '-5%',
                   left: '1%',
                   width: '15px',
-                  // transform: 'translate(-50%, -50%)',
                   color: `rgba(${theme.vars.palette.info.mainChannel} / 0.3)`,
                 }}
               />
@@ -219,15 +195,12 @@ const GradeCell = ({
                 float: 'right',
                 bottom: '-1%',
                 right: '1%',
-                // width: '100%',
                 textAlign: 'right',
                 fontSize: '0.7rem',
-                // transform: 'translate(-50%, -50%)',
                 color: `rgba(${theme.vars.palette.primary.mainChannel} / 0.7)`,
-                // When over color is 100%
-                '&:hover': {
-                  // color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
-                },
+                // '&:hover': {
+                //   color: `rgba(${theme.vars.palette.primary.mainChannel} / 1)`,
+                // },
               }}
             >
               {bestGrade.date.toLocaleDateString()}

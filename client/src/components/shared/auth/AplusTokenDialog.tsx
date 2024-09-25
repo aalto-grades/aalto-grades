@@ -23,7 +23,6 @@ type PropsType = {
   onSubmit: () => void;
   error?: boolean;
 };
-
 const AplusTokenDialog = ({
   open,
   onClose,
