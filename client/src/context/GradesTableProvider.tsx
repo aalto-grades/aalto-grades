@@ -8,7 +8,6 @@ import {Badge, Checkbox} from '@mui/material';
 import {
   type ExpandedState,
   type GroupingState,
-  type Row,
   type RowData,
   type SortingState,
   type VisibilityState,
@@ -70,9 +69,7 @@ export type TableContextProps = {
   setSelectedGradingModel: Dispatch<SetStateAction<GradingModelData | 'any'>>;
 };
 // Create the context
-export const GradesTableContext = createContext<TableContextProps | undefined>(
-  undefined
-);
+export const GradesTableContext = createContext<TableContextProps | null>(null);
 
 // Table creation
 declare module '@tanstack/table-core' {
@@ -173,6 +170,10 @@ export const GradesTableProvider = ({
     GradingModelData | 'any'
   >('any');
 
+  const finalGradeModelSelected =
+    selectedGradingModel === 'any' ||
+    selectedGradingModel.coursePartId === null;
+
   // Filter out archived models
   const gradingModels = useMemo(
     () =>
@@ -246,94 +247,109 @@ export const GradesTableProvider = ({
     t,
   ]);
 
-  // --- Source columns ---
-  const selectedModelSources = useMemo(() => {
-    if (selectedGradingModel === 'any') return courseParts.data ?? [];
-    if (courseParts.data === undefined || courseTasks.data === undefined)
-      return [];
-
-    const sourceIds = new Set(
-      selectedGradingModel.graphStructure.nodes
-        .filter(node => node.type === 'source')
-        .map(node => parseInt(node.id.split('-')[1]))
-    );
-
-    if (selectedGradingModel.coursePartId !== null) {
-      return courseTasks.data.filter(task => sourceIds.has(task.id));
-    }
-    return courseParts.data.filter(part => sourceIds.has(part.id));
-  }, [courseParts.data, courseTasks.data, selectedGradingModel]);
-
-  const sourceColumns = useMemo(
-    () =>
-      selectedModelSources.map(source =>
-        columnHelper.accessor(
-          (row): GradeCellSourceValue => {
-            if (
-              selectedGradingModel !== 'any' &&
-              selectedGradingModel.coursePartId !== null
-            ) {
-              return {
-                type: 'courseTask',
-                task: row.courseTasks.find(
-                  rowCourseTask => rowCourseTask.courseTaskId === source.id
-                )!,
-                maxGrade: (source as CourseTaskData).maxGrade,
-              };
-            }
-            return {
-              type: 'coursePart',
-              grade: coursePartValues[row.user.id][source.id],
-            };
+  // --- Selection column ---
+  const selectionColumn = columnHelper.display({
+    id: 'select',
+    size: 70,
+    meta: {PrettyChipPosition: grouping.length > 0 ? 'last' : 'alone'},
+    header: ({table}) => (
+      <>
+        <Checkbox
+          checked={table.getIsAllRowsSelected()}
+          indeterminate={table.getIsSomeRowsSelected()}
+          onChange={table.getToggleAllRowsSelectedHandler()}
+        />
+        <span style={{marginLeft: '4px', marginRight: '15px'}}>
+          <Badge
+            badgeContent={table.getSelectedRowModel().rows.length || '0'}
+            color="primary"
+            max={999}
+          />
+        </span>
+      </>
+    ),
+    aggregatedCell: ({row}) => (
+      <PrettyChip position="last">
+        <>
+          <Checkbox
+            checked={row.getIsAllSubRowsSelected()}
+            indeterminate={row.getIsSomeSelected()}
+            onChange={() => {
+              if (row.getIsSomeSelected()) {
+                // If some rows are selected, select all
+                row.subRows.forEach(subRow => {
+                  if (!subRow.getIsSelected())
+                    subRow.getToggleSelectedHandler()(subRow);
+                });
+              } else {
+                // All rows are selected, deselect all (and vice versa)
+                row.subRows.forEach(subRow =>
+                  subRow.getToggleSelectedHandler()(subRow)
+                );
+              }
+            }}
+          />
+          <span style={{marginLeft: '4px', marginRight: '15px'}}>
+            <Badge
+              badgeContent={
+                row.subRows.filter(subRow => subRow.getIsSelected()).length ||
+                undefined
+              }
+              max={999}
+              color="secondary"
+              sx={{alignItems: 'end'}}
+            />
+          </span>
+        </>
+      </PrettyChip>
+    ),
+    cell: ({row}) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onChange={row.getToggleSelectedHandler()}
+        style={{
+          marginLeft: '21px',
+        }}
+        sx={{
+          '&::before': {
+            content: '""',
+            width: '11px',
+            height: '113%',
+            borderBlockEnd: '1px solid lightgray',
+            borderLeft: '1px solid lightgray',
+            borderEndStartRadius: '10px',
+            position: 'absolute',
+            left: '0px',
+            bottom: '50%',
+            zIndex: -1,
+            pointerEvents: 'none',
           },
-          {
-            header: source.name,
-            meta: {PrettyChipPosition: 'alone', coursePart: true},
-            enableSorting: false,
-            size: 80,
-            cell: ({getValue, row}) => (
-              <GradeCell
-                studentNumber={row.original.user.studentNumber}
-                sourceValue={getValue()}
-              />
-            ),
-            footer: source.name,
-          }
-        )
-      ),
-    [coursePartValues, selectedGradingModel, selectedModelSources]
-  );
+        }}
+      />
+    ),
+  });
 
   // --- Predicted grade column ---
-  const sortPredictedGrades = (
-    a: Row<GroupedStudentRow>,
-    b: Row<GroupedStudentRow>,
-    columnId: string
-  ): number => {
-    const modelId =
-      selectedGradingModel !== 'any'
-        ? selectedGradingModel.id
-        : finalGradeModels?.length === 1
-          ? finalGradeModels[0].id
-          : 'any';
-    if (modelId === 'any') return 0; // Makes no sense to sort if there is more than one model
-
-    const valA =
-      a.getValue<GroupedStudentRow>(columnId).predictedGraphValues?.[modelId]
-        .finalGrade;
-    const valB =
-      b.getValue<GroupedStudentRow>(columnId).predictedGraphValues?.[modelId]
-        .finalGrade;
-
-    if (valB === undefined) return 1;
-    if (valA === undefined) return -1;
-
-    return valA - valB;
-  };
+  const predictedModelId =
+    selectedGradingModel !== 'any'
+      ? selectedGradingModel.id
+      : finalGradeModels?.length === 1
+        ? finalGradeModels[0].id
+        : 'any';
   const predictedGradeColumn = columnHelper.accessor(row => row, {
     header: t('course.results.table.preview'),
     meta: {PrettyChipPosition: 'middle'},
-    sortingFn: sortPredictedGrades,
+    enableSorting: predictedModelId !== 'any',
+    sortingFn: (rowA, rowB, colId) => {
+      if (predictedModelId === 'any') return 0; // Makes no sense to sort if there is more than one model
+
+      const valA = rowA.getValue<GroupedStudentRow>(colId);
+      const valB = rowB.getValue<GroupedStudentRow>(colId);
+      const a = valA.predictedGraphValues?.[predictedModelId].finalGrade ?? -1;
+      const b = valB.predictedGraphValues?.[predictedModelId].finalGrade ?? -1;
+
+      return a - b;
+    },
     cell: ({getValue}) => (
       <PredictedGradeCell
         row={getValue()}
@@ -356,16 +372,16 @@ export const GradesTableProvider = ({
 
   // --- Model specific columns ---
   let modelColumns = [];
-  if (
-    selectedGradingModel === 'any' ||
-    selectedGradingModel.coursePartId === null
-  ) {
+  if (finalGradeModelSelected) {
     modelColumns = [
+      // Final grade column
       columnHelper.accessor(row => row.finalGrades, {
         header: t('general.final-grade'),
         id: 'finalGrade',
-        enableSorting: false,
         getGroupingValue: row => findBestFinalGrade(row.finalGrades)?.grade,
+        sortingFn: (a, b) =>
+          (findBestFinalGrade(a.original.finalGrades)?.grade ?? -1) -
+          (findBestFinalGrade(b.original.finalGrades)?.grade ?? -1),
         cell: ({getValue, row}) => (
           <FinalGradeCell
             userId={row.original.user.id}
@@ -376,14 +392,40 @@ export const GradesTableProvider = ({
         ),
       }),
 
+      // Predicted grade column
       predictedGradeColumn,
+
+      // Exported to Sisu column
+      columnHelper.accessor(
+        row => {
+          // ATTENTION this function needs to have the same parameters of the one inside the grade cell
+          // Clearly can be done in a better way
+          const bestFinalGrade = findBestFinalGrade(row.finalGrades);
+          if (!bestFinalGrade) return '-';
+          if (bestFinalGrade.sisuExportDate) return '✅';
+          if (findPreviouslyExportedToSisu(bestFinalGrade, row)) return '⚠️';
+          return '-';
+        },
+        {
+          header: t('course.results.table.exported'),
+          meta: {PrettyChipPosition: 'last'},
+          cell: ({getValue}) => getValue(),
+          aggregatedCell: () => null,
+        }
+      ),
     ];
   } else {
     modelColumns = [
+      // Dynamic course part grade
       columnHelper.accessor(row => row, {
         header: t('general.course-part-grade'),
         id: 'coursePartGrade',
-        enableSorting: false,
+        sortingFn: (rowA, rowB) => {
+          const partId = selectedGradingModel.coursePartId!;
+          const a = coursePartValues[rowA.original.user.id][partId] ?? -1;
+          const b = coursePartValues[rowB.original.user.id][partId] ?? -1;
+          return a - b;
+        },
         getGroupingValue: row => findBestFinalGrade(row.finalGrades)?.grade,
         cell: ({getValue}) => (
           <PredictedGradeCell
@@ -407,6 +449,74 @@ export const GradesTableProvider = ({
     ];
   }
 
+  // --- Source column sources ---
+  const selectedModelSources = useMemo(() => {
+    if (selectedGradingModel === 'any') return courseParts.data ?? [];
+    if (courseParts.data === undefined || courseTasks.data === undefined)
+      return [];
+
+    const sourceIds = new Set(
+      selectedGradingModel.graphStructure.nodes
+        .filter(node => node.type === 'source')
+        .map(node => parseInt(node.id.split('-')[1]))
+    );
+
+    if (selectedGradingModel.coursePartId !== null) {
+      return courseTasks.data.filter(task => sourceIds.has(task.id));
+    }
+    return courseParts.data.filter(part => sourceIds.has(part.id));
+  }, [courseParts.data, courseTasks.data, selectedGradingModel]);
+
+  // --- Source columns ---
+  const sourceColumns = useMemo(
+    () =>
+      selectedModelSources.map(source =>
+        columnHelper.accessor(
+          (row): GradeCellSourceValue => {
+            if (finalGradeModelSelected) {
+              return {
+                type: 'coursePart',
+                grade: coursePartValues[row.user.id][source.id],
+              };
+            }
+            return {
+              type: 'courseTask',
+              task: row.courseTasks.find(
+                rowCourseTask => rowCourseTask.courseTaskId === source.id
+              )!,
+              maxGrade: (source as CourseTaskData).maxGrade,
+            };
+          },
+          {
+            header: source.name,
+            meta: {PrettyChipPosition: 'alone', coursePart: true},
+            sortingFn: (rowA, rowB, colId) => {
+              const a = rowA.getValue<GradeCellSourceValue>(colId);
+              const b = rowB.getValue<GradeCellSourceValue>(colId);
+              if (a.type === 'coursePart' && b.type === 'coursePart')
+                return (a.grade ?? -1) - (b.grade ?? -1);
+              else if (a.type === 'courseTask' && b.type === 'courseTask') {
+                return (
+                  (findBestGrade(a.task.grades)?.grade ?? -1) -
+                  (findBestGrade(b.task.grades)?.grade ?? -1)
+                );
+              }
+              return 0; // Shouldn't happen
+            },
+            size: 80,
+            cell: ({getValue, row}) => (
+              <GradeCell
+                studentNumber={row.original.user.studentNumber}
+                sourceValue={getValue()}
+              />
+            ),
+            footer: source.name,
+          }
+        )
+      ),
+    [coursePartValues, finalGradeModelSelected, selectedModelSources]
+  );
+
   // This columns are used to group by data that is not directly shown
   // For example calculating the latest attainment date
   // For example grouping by Exported to sisu has no need to create a column
@@ -423,95 +533,15 @@ export const GradesTableProvider = ({
       }),
     ].filter(column => grouping.includes(column.id ?? ''));
 
-  // Creating static columns
-  const staticColumns = [
+  // Creating columns
+  const columns = [
     ...groupingColumns,
-    // Selection column
-    columnHelper.display({
-      id: 'select',
-      size: 70,
-      meta: {PrettyChipPosition: grouping.length > 0 ? 'last' : 'alone'},
-      header: ({table}) => (
-        <>
-          <Checkbox
-            checked={table.getIsAllRowsSelected()}
-            indeterminate={table.getIsSomeRowsSelected()}
-            onChange={table.getToggleAllRowsSelectedHandler()}
-          />
-          <span style={{marginLeft: '4px', marginRight: '15px'}}>
-            <Badge
-              badgeContent={table.getSelectedRowModel().rows.length || '0'}
-              color="primary"
-              max={999}
-            />
-          </span>
-        </>
-      ),
-      aggregatedCell: ({row}) => (
-        <PrettyChip position="last">
-          <>
-            <Checkbox
-              checked={row.getIsAllSubRowsSelected()}
-              indeterminate={row.getIsSomeSelected()}
-              onChange={() => {
-                if (row.getIsSomeSelected()) {
-                  // If some rows are selected, select all
-                  row.subRows.forEach(subRow => {
-                    if (!subRow.getIsSelected())
-                      subRow.getToggleSelectedHandler()(subRow);
-                  });
-                } else {
-                  // All rows are selected, deselect all (and vice versa)
-                  row.subRows.forEach(subRow =>
-                    subRow.getToggleSelectedHandler()(subRow)
-                  );
-                }
-              }}
-            />
-            <span style={{marginLeft: '4px', marginRight: '15px'}}>
-              <Badge
-                badgeContent={
-                  row.subRows.filter(subRow => subRow.getIsSelected()).length ||
-                  undefined
-                }
-                max={999}
-                color="secondary"
-                sx={{alignItems: 'end'}}
-              />
-            </span>
-          </>
-        </PrettyChip>
-      ),
-      cell: ({row}) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onChange={row.getToggleSelectedHandler()}
-          style={{
-            marginLeft: '21px',
-          }}
-          sx={{
-            '&::before': {
-              content: '""',
-              width: '11px',
-              height: '113%',
-              borderBlockEnd: '1px solid lightgray',
-              borderLeft: '1px solid lightgray',
-              borderEndStartRadius: '10px',
-              position: 'absolute',
-              left: '0px',
-              bottom: '50%',
-              zIndex: -1,
-              pointerEvents: 'none',
-            },
-          }}
-        />
-      ),
-    }),
+    selectionColumn,
+    // Used for filtering columns with errors
     columnHelper.accessor(row => row.errors, {
       header: t('course.results.table.errors'),
       id: 'errors',
       enableHiding: true,
-      // The column only filter, for other type of filtering write another filterFn
       filterFn: row => {
         // Not sure which solution is the best one, for now we keep both
         // return getErrorCount([row.original], selectedGradingModel) > 0;
@@ -523,30 +553,12 @@ export const GradesTableProvider = ({
       meta: {PrettyChipPosition: 'first'},
     }),
     ...modelColumns,
-    columnHelper.accessor(
-      row => {
-        // ATTENTION this function needs to have the same parameters of the one inside the grade cell
-        // Clearly can be done in a better way
-        const bestFinalGrade = findBestFinalGrade(row.finalGrades);
-        if (!bestFinalGrade) return '-';
-        if (bestFinalGrade.sisuExportDate) return '✅';
-        if (findPreviouslyExportedToSisu(bestFinalGrade, row)) return '⚠️';
-        return '-';
-      },
-
-      {
-        header: t('course.results.table.exported'),
-        meta: {PrettyChipPosition: 'last'},
-        cell: ({getValue}) => getValue(),
-        aggregatedCell: () => null,
-      }
-    ),
     ...sourceColumns,
   ];
 
   const table = useReactTable({
     data: groupedData,
-    columns: staticColumns,
+    columns,
     defaultColumn: {size: 100},
     getCoreRowModel: getCoreRowModel(),
     // Selection
@@ -596,10 +608,13 @@ export const GradesTableProvider = ({
           gradingModels === undefined
             ? null
             : [...gradingModels].sort((a, b) => {
+                // Sort final grade models first
                 if (a.coursePartId === null && b.coursePartId !== null)
                   return -1;
                 if (a.coursePartId !== null && b.coursePartId === null)
                   return 1;
+
+                // Return selected model first
                 if (selectedGradingModel === 'any') return a.id - b.id;
                 if (a.id === selectedGradingModel.id) return -1;
                 if (b.id === selectedGradingModel.id) return 1;
