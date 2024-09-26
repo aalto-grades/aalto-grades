@@ -22,7 +22,7 @@ export default defineConfig({
   maxFailures: 8,
   timeout: 15 * 1000,
   expect: {timeout: 2 * 1000},
-  reporter: 'html',
+  reporter: [['list'], ['html']],
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
