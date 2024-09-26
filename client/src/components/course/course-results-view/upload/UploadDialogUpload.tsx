@@ -36,11 +36,11 @@ import MismatchDialog, {type MismatchData} from './MismatchDialog';
 import type {GradeUploadColTypes} from './UploadDialog';
 
 // Wrap parse into an async function to be able to await
-type CSVData = ParseResult<(string | number)[]>;
+type CSVData = ParseResult<string[]>;
 const parseCsv = async (csvData: string | File): Promise<CSVData> =>
   new Promise(resolve => {
     parse(csvData, {
-      dynamicTyping: true,
+      // dynamicTyping: true,
       skipEmptyLines: true,
       complete: resolve,
     });
@@ -114,7 +114,7 @@ const UploadDialogUpload = ({
 
   /** Read data using csv key to course part keyMap */
   const readCSVData = (
-    csvRows: (string | number)[][],
+    csvRows: string[][],
     csvKeys: string[],
     keyMap: {[key: string]: string}
   ): GridRowModel<GradeUploadColTypes>[] => {
@@ -127,15 +127,19 @@ const UploadDialogUpload = ({
 
       const rowData = {id: rowI} as GradeUploadColTypes;
       for (let i = 0; i < csvRow.length; i++) {
+        const value = csvRow[i].trim();
+
+        // Check column type
         const columnKey = keyMap[csvKeys[i]];
         if (columnKey === 'ignoreColumn') continue;
         if (columnKey === 'studentNo') {
-          rowData.studentNo = csvRow[i].toString();
+          rowData.studentNo = value;
           continue;
         }
-        const value = csvRow[i];
-        if (typeof value === 'number') {
-          rowData[columnKey] = value;
+
+        // Task grade column
+        if (value !== '') {
+          rowData[columnKey] = parseInt(value);
         } else {
           // Missing data
           missingData = true;
