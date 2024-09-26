@@ -185,7 +185,7 @@
     "in-swedish": "in Swedish",
     "done": "Done",
     "final-grades": "Final grades",
-    "course-part-grade": "Course Part Value",
+    "course-part-grade": "Course Part Grade",
     "not-int": "Value must be a valid integer"
   },
   "course": {
