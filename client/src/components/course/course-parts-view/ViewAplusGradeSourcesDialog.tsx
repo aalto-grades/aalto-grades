@@ -20,12 +20,17 @@ import {
   TableRow,
   Tooltip,
 } from '@mui/material';
-import type {JSX} from 'react';
+import {type JSX, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import {type AplusGradeSourceData, AplusGradeSourceType} from '@/common/types';
+import {
+  type AplusGradeSourceData,
+  AplusGradeSourceType,
+  SystemRole,
+} from '@/common/types';
 import {useDeleteAplusGradeSource} from '@/hooks/useApi';
+import useAuth from '@/hooks/useAuth';
 
 type PropsType = {
   open: boolean;
@@ -38,8 +43,14 @@ const ViewAplusGradeSourcesDialog = ({
   aplusGradeSources,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
+  const {auth, isTeacherInCharge} = useAuth();
   const {courseId} = useParams() as {courseId: string};
   const deleteAplusGradeSource = useDeleteAplusGradeSource(courseId);
+
+  const editRights = useMemo(
+    () => auth?.role === SystemRole.Admin || isTeacherInCharge,
+    [auth?.role, isTeacherInCharge]
+  );
 
   const getSourceName = (source: AplusGradeSourceData): string => {
     switch (source.sourceType) {
@@ -73,6 +84,7 @@ const ViewAplusGradeSourcesDialog = ({
                 <TableCell>{t('general.course-url')}</TableCell>
                 <TableCell>{t('general.source-name')}</TableCell>
                 <TableCell>{t('general.date')}</TableCell>
+                {editRights && <TableCell>{t('general.manage')}</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -88,16 +100,18 @@ const ViewAplusGradeSourcesDialog = ({
                   </TableCell>
                   <TableCell>{getSourceName(source)}</TableCell>
                   <TableCell>{source.date.toDateString()}</TableCell>
-                  <TableCell>
-                    <Tooltip
-                      placement="top"
-                      title={t('course.parts.delete-a+')}
-                    >
-                      <IconButton onClick={() => handleDelete(source.id)}>
-                        <Delete />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
+                  {editRights && (
+                    <TableCell>
+                      <Tooltip
+                        placement="top"
+                        title={t('course.parts.delete-a+')}
+                      >
+                        <IconButton onClick={() => handleDelete(source.id)}>
+                          <Delete />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

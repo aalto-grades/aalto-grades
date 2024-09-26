@@ -52,6 +52,6 @@ router.delete(
 router.get(
   '/v1/courses/:courseId/aplus-fetch',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  courseAuthorization([CourseRoleType.Teacher]),
+  courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(fetchAplusGrades)
 );
