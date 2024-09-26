@@ -40,7 +40,6 @@ type CSVData = ParseResult<string[]>;
 const parseCsv = async (csvData: string | File): Promise<CSVData> =>
   new Promise(resolve => {
     parse(csvData, {
-      // dynamicTyping: true,
       skipEmptyLines: true,
       complete: resolve,
     });
