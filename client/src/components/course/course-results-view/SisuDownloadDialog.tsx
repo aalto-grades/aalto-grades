@@ -32,7 +32,7 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import type {FinalGradeData, Language, StudentRow} from '@/common/types';
-import {useDownloadSisuGradeCsv} from '@/hooks/useApi';
+import {useDownloadSisuGradeCsv, useGetCourse} from '@/hooks/useApi';
 import {useLocalize} from '@/hooks/useLocalize';
 import {sisuLanguageOptions} from '@/utils';
 
@@ -53,14 +53,18 @@ const SisuDownloadDialog = ({
   const {t} = useTranslation();
   const localize = useLocalize();
   const {courseId} = useParams() as {courseId: string};
+  const course = useGetCourse(courseId);
+  const courseToDisplay = course.data ? course.data.courseCode : courseId;
 
   const downloadSisuGradeCsv = useDownloadSisuGradeCsv({
     onSuccess: gradeCsv => {
       const blob = new Blob([gradeCsv], {type: 'text/csv'});
+      const date = new Date();
+      const dateFormat = `${date.getFullYear()}${date.getMonth()+1}${date.getDate()}`;
 
       const linkElement = document.createElement('a');
       linkElement.href = URL.createObjectURL(blob);
-      linkElement.download = `grades_course_${courseId}.csv`;
+      linkElement.download = `grades_course_${courseToDisplay}_${dateFormat}_${downloadOption}.csv`;
       document.body.append(linkElement);
       linkElement.click();
       linkElement.remove();
