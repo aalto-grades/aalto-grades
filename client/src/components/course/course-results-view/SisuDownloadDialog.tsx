@@ -56,11 +56,20 @@ const SisuDownloadDialog = ({
   const course = useGetCourse(courseId);
   const courseToDisplay = course.data ? course.data.courseCode : courseId;
 
+  // State variables handling the assessment date and completion language.
+  const [dateOverride, setDateOverride] = useState<boolean>(false);
+  const [assessmentDate, setAssessmentDate] = useState<Dayjs | null>(dayjs());
+  const [completionLanguage, setCompletionLanguage] = useState<
+    Language | undefined
+  >(undefined);
+  const [downloadOption, setDownloadOption] =
+    useState<DownloadOption>('unexported');
+
   const downloadSisuGradeCsv = useDownloadSisuGradeCsv({
     onSuccess: gradeCsv => {
       const blob = new Blob([gradeCsv], {type: 'text/csv'});
       const date = new Date();
-      const dateFormat = `${date.getFullYear()}${date.getMonth()+1}${date.getDate()}`;
+      const dateFormat = `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}`;
 
       const linkElement = document.createElement('a');
       linkElement.href = URL.createObjectURL(blob);
@@ -74,15 +83,6 @@ const SisuDownloadDialog = ({
       });
     },
   });
-
-  // State variables handling the assessment date and completion language.
-  const [dateOverride, setDateOverride] = useState<boolean>(false);
-  const [assessmentDate, setAssessmentDate] = useState<Dayjs | null>(dayjs());
-  const [completionLanguage, setCompletionLanguage] = useState<
-    Language | undefined
-  >(undefined);
-  const [downloadOption, setDownloadOption] =
-    useState<DownloadOption>('unexported');
 
   const selectedStudents = selectedRows.map(row => ({
     studentNumber: row.user.studentNumber,
