@@ -19,7 +19,8 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
   await page.getByLabel('Email').fill(`${user}@aalto.fi`);
   await page.getByLabel('Email').press('Tab');
   await page.getByLabel('Password', {exact: true}).fill('password');
-  await page.getByLabel('Password', {exact: true}).press('Enter');
+  // await page.getByLabel('Password', {exact: true}).press('Enter');
+  await page.getByRole('button', {name: 'Log in', exact: true}).click(); // TODO: flaky
 
   const showSecretButton = page.getByRole('button', {
     name: 'Or manually enter the secret',
