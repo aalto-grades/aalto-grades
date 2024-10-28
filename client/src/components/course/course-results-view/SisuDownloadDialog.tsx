@@ -249,7 +249,7 @@ const SisuDownloadDialog = ({
       </DialogContent>
       <DialogActions>
         <Button variant="outlined" onClick={onClose}>
-          {t('general.cancel')}
+          {exportedValuesInList ? t('general.close') : t('general.cancel')}
         </Button>
         <Button variant="contained" onClick={handleDownloadSisuGradeCsv}>
           {t('general.download')}
