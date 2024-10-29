@@ -45,7 +45,7 @@ router.get(
 router.post(
   '/v1/courses',
   passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authorization([SystemRole.Admin]),
+  authorization([SystemRole.Admin, SystemRole.User]),
   express.json(),
   handleInvalidRequestJson,
   processRequestBody(NewCourseDataSchema),

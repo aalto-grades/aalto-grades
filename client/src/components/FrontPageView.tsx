@@ -55,6 +55,24 @@ const FrontPageView = (): JSX.Element => {
           )}
         </>
       )}
+
+      {auth?.role === SystemRole.User && (
+        <>
+          <CreateCourseDialog
+            open={createDialogOpen}
+            onClose={() => setCreateDialogOpen(false)}
+            forceEmail={auth.email}
+          />
+          <Button
+            size="large"
+            variant="contained"
+            onClick={() => setCreateDialogOpen(true)}
+            sx={{mb: -11.25}} // Align with search
+          >
+            {t('front-page.create-new-course')}
+          </Button>
+        </>
+      )}
       {auth?.role === SystemRole.Admin && (
         <>
           <CreateCourseDialog

@@ -41,6 +41,7 @@ export const PasswordSchema = z.string().superRefine((password, ctx) => {
 export const AuthDataSchema = z.strictObject({
   id: IdSchema,
   name: z.string(),
+  email: z.string(),
   role: SystemRoleSchema,
 });
 

@@ -57,9 +57,18 @@ export const selfInfo: Endpoint<void, AuthData> = async (req, res) => {
     );
   }
 
+  if (userFromDb.email === null) {
+    httpLogger.error(`Logged in user ${userFromDb.id} does not have an email`);
+    throw new ApiError(
+      'Logged in user does not have an email',
+      HttpCode.InternalServerError
+    );
+  }
+
   res.json({
     id: userFromDb.id,
     role: user.role,
+    email: userFromDb.email,
     name: userFromDb.name,
   });
 };
@@ -148,6 +157,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
         status: 'ok',
         id: loginResult.id,
         name: loginResult.name,
+        email: loginResult.email,
         role: loginResult.role,
       });
   };

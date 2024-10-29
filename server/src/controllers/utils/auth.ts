@@ -39,6 +39,14 @@ export const validateLogin = async (
     );
   }
 
+  if (user.email === null) {
+    httpLogger.error(`Email was null for user ${user.id}`);
+    throw new ApiError(
+      'User does not have an email',
+      HttpCode.InternalServerError
+    );
+  }
+
   if (NODE_ENV === 'production' && !user.admin) {
     throw new ApiError(
       'User that is not an admin has local login',
@@ -48,6 +56,7 @@ export const validateLogin = async (
     return {
       id: user.id,
       role: SystemRole.User, // In dev and tests some test user accounts also have local login.
+      email: user.email,
       name: user.name,
     };
   }
@@ -55,6 +64,7 @@ export const validateLogin = async (
   return {
     id: user.id,
     role: SystemRole.Admin, // Only admins have username and password login.
+    email: user.email,
     name: user.name,
   };
 };
