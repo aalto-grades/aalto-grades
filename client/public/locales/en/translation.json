@@ -32,7 +32,8 @@
         "length": "The token should be 40 characters long."
       },
       "hide-password": "Click to hide password from view",
-      "show-password": "Click to show password"
+      "show-password": "Click to show password",
+      "token-expired": "Token expired. Refresh the page."
     },
     "graph": {
       "node": {
