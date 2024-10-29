@@ -23,6 +23,7 @@ import {
   ListItemText,
   MenuItem,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import {Formik, type FormikHelpers, type FormikProps} from 'formik';
 import {type JSX, useState} from 'react';
@@ -43,6 +44,7 @@ import {
 import FormField from '@/components/shared/FormikField';
 import FormLanguagesField from '@/components/shared/FormikLanguageField';
 import {useAddCourse} from '@/hooks/useApi';
+import useAuth from '@/hooks/useAuth';
 import {useLocalize} from '@/hooks/useLocalize';
 import {
   convertToClientGradingScale,
@@ -78,14 +80,21 @@ const initialValues = {
   nameSv: '',
 };
 
-type PropsType = {open: boolean; onClose: () => void};
-const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
+type PropsType = {open: boolean; forceEmail?: string; onClose: () => void};
+const CreateCourseDialog = ({
+  open,
+  onClose,
+  forceEmail,
+}: PropsType): JSX.Element => {
   const {t} = useTranslation();
+  const {auth} = useAuth();
   const localize = useLocalize();
   const navigate = useNavigate();
   const addCourse = useAddCourse();
 
-  const [teachersInCharge, setTeachersInCharge] = useState<string[]>([]);
+  const [teachersInCharge, setTeachersInCharge] = useState<string[]>(
+    forceEmail ? [forceEmail] : []
+  );
   const [assistants, setAssistants] = useState<string[]>([]);
 
   const ValidationSchema = z
@@ -312,14 +321,18 @@ const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
                     <ListItem
                       key={teacherEmail}
                       secondaryAction={
-                        <IconButton
-                          edge="end"
-                          disabled={form.isSubmitting}
-                          aria-label="delete"
-                          onClick={() => removeTeacher(teacherEmail)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
+                        teacherEmail !== auth?.email && (
+                          <IconButton
+                            edge="end"
+                            disabled={
+                              form.isSubmitting || teacherEmail === auth?.email
+                            }
+                            aria-label="delete"
+                            onClick={() => removeTeacher(teacherEmail)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        )
                       }
                     >
                       <ListItemAvatar>
