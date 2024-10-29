@@ -62,12 +62,7 @@ const LoginView = (): JSX.Element => {
         setShowOtpPrompt(true);
         break;
       case 'ok':
-        setAuth({
-          id: auth.id,
-          name: auth.name,
-          email: auth.email,
-          role: auth.role,
-        });
+        setAuth({id: auth.id, name: auth.name, role: auth.role});
         navigate('/');
         break;
     }

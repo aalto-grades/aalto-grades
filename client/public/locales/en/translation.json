@@ -377,8 +377,7 @@
       "add-at-least-one-teacher": "Add at least one teacher in charge to the course",
       "add-assistant-emails": "Add emails of the assistants of the course.",
       "no-assistants": "No assistants in the course",
-      "input-at-least-one-assistant": "Input the email address of at least one assistant of the course",
-      "cannot-remove-self": "You cannot remove yourself from the course"
+      "input-at-least-one-assistant": "Input the email address of at least one assistant of the course"
     },
     "list": "Course list"
   },
