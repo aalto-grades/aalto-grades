@@ -23,7 +23,6 @@ import {
   ListItemText,
   MenuItem,
   TextField,
-  Tooltip,
 } from '@mui/material';
 import {Formik, type FormikHelpers, type FormikProps} from 'formik';
 import {type JSX, useState} from 'react';
