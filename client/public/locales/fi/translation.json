@@ -32,7 +32,8 @@
         "length": "UNTRANSLATED"
       },
       "hide-password": "UNTRANSLATED",
-      "show-password": "UNTRANSLATED"
+      "show-password": "UNTRANSLATED",
+      "token-expired": "UNTRANSLATED"
     },
     "graph": {
       "node": {
