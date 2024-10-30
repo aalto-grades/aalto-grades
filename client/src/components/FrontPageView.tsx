@@ -15,8 +15,8 @@ import Users from './front-page/users/Users';
 
 const FrontPageView = (): JSX.Element => {
   const {t} = useTranslation();
-  const theme = useTheme();
   const {auth} = useAuth();
+  const theme = useTheme();
   const courses = useGetAllCourses({
     enabled: auth !== null && auth.role === SystemRole.Admin,
   });
@@ -55,6 +55,24 @@ const FrontPageView = (): JSX.Element => {
           )}
         </>
       )}
+
+      {auth?.role === SystemRole.User && (
+        <>
+          <CreateCourseDialog
+            open={createDialogOpen}
+            onClose={() => setCreateDialogOpen(false)}
+            forceEmail={auth.email}
+          />
+          <Button
+            size="large"
+            variant="contained"
+            onClick={() => setCreateDialogOpen(true)}
+            sx={{mb: -11.25}} // Align with search
+          >
+            {t('front-page.create-new-course')}
+          </Button>
+        </>
+      )}
       {auth?.role === SystemRole.Admin && (
         <>
           <CreateCourseDialog
@@ -74,7 +92,6 @@ const FrontPageView = (): JSX.Element => {
               {t('general.courses')}
             </Typography>
             <Button
-              id="ag-new-course-btn"
               size="large"
               variant="contained"
               onClick={() => setCreateDialogOpen(true)}

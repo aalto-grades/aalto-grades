@@ -13,13 +13,14 @@ import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import type {Blocker} from 'react-router-dom';
 
+type PropsType = {
+  blocker: Blocker | undefined;
+  handleDiscard?: () => void;
+};
 const UnsavedChangesDialog = ({
   blocker,
   handleDiscard,
-}: {
-  blocker: Blocker | undefined;
-  handleDiscard?: () => void;
-}): JSX.Element => {
+}: PropsType): JSX.Element => {
   const {t} = useTranslation();
 
   const onClose = (): void => {
@@ -31,8 +32,6 @@ const UnsavedChangesDialog = ({
       open={blocker !== undefined && blocker.state === 'blocked'}
       onClose={onClose}
       scroll="paper"
-      aria-labelledby="unsaved-changes"
-      aria-describedby="dialog-for-unsaved-changes"
     >
       <DialogTitle>{t('general.unsaved-changes')}</DialogTitle>
       <DialogContent>{t('shared.unsaved-changes.body')}</DialogContent>

@@ -10,9 +10,6 @@ SPDX-License-Identifier: MIT
 
 ### Setting up the database
 
-> If the command `npm i` fails on Apple Silicon, check that there are NO spaces
-> in the folder path
-
 #### Running the database (and pgAdmin) with Docker
 
 For development purposes, you can easily run the database and pgAdmin in Docker
@@ -32,16 +29,19 @@ docker compose down --remove-orphans
 
 #### Running the migrations and seeder
 
-Copy `.env.example` to `.env`:
-
-```
-cp .env.example .env
-```
+> If the command `npm i` fails on Apple Silicon, check that there are NO spaces
+> in the folder path
 
 Install the packages:
 
 ```
 npm i
+```
+
+Also install the packages in the common folder
+
+```
+npm i --prefix ../common
 ```
 
 Build the server to be able to run the migrations and seeder:
@@ -101,10 +101,4 @@ running:
 
 ```
 npm run test
-```
-
-You may also run the tests using Docker Compose:
-
-```
-docker compose -f docker-compose-test.yaml up --build --abort-on-container-exit --exit-code-from backend
 ```

@@ -35,6 +35,16 @@ import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import MismatchDialog, {type MismatchData} from './MismatchDialog';
 import type {GradeUploadColTypes} from './UploadDialog';
 
+// Wrap parse into an async function to be able to await
+type CSVData = ParseResult<string[]>;
+const parseCsv = async (csvData: string | File): Promise<CSVData> =>
+  new Promise(resolve => {
+    parse(csvData, {
+      skipEmptyLines: true,
+      complete: resolve,
+    });
+  });
+
 type PropsType = {
   coursePart: CoursePartData | null;
   columns: GridColDef[];
@@ -70,9 +80,7 @@ const UploadDialogUpload = ({
     const handleClick = (): void => {
       setRows(oldRows => {
         const freeId = Math.max(0, ...oldRows.map(row => row.id)) + 1;
-        const newRow: GradeUploadColTypes = {
-          id: freeId,
-        } as GradeUploadColTypes;
+        const newRow = {id: freeId} as GradeUploadColTypes;
         for (const column of columns) {
           if (column.field === 'studentNo') newRow[column.field] = '-';
           else newRow[column.field] = 0;
@@ -103,9 +111,9 @@ const UploadDialogUpload = ({
     linkElement.remove();
   };
 
-  /** Read data using csv key to course part key map */
+  /** Read data using csv key to course part keyMap */
   const readCSVData = (
-    csvRows: (string | number)[][],
+    csvRows: string[][],
     csvKeys: string[],
     keyMap: {[key: string]: string}
   ): GridRowModel<GradeUploadColTypes>[] => {
@@ -113,19 +121,24 @@ const UploadDialogUpload = ({
     let missingData = false;
     for (let rowI = 0; rowI < csvRows.length; rowI++) {
       const csvRow = csvRows[rowI];
+      // Skip first row (titles) & empty rows
       if (rowI === 0 || csvRow.length === 0) continue;
 
       const rowData = {id: rowI} as GradeUploadColTypes;
       for (let i = 0; i < csvRow.length; i++) {
+        const value = csvRow[i].trim();
+
+        // Check column type
         const columnKey = keyMap[csvKeys[i]];
         if (columnKey === 'ignoreColumn') continue;
         if (columnKey === 'studentNo') {
-          rowData.studentNo = csvRow[i].toString();
+          rowData.studentNo = value;
           continue;
         }
-        const value = csvRow[i];
-        if (typeof value === 'number') {
-          rowData[columnKey] = value;
+
+        // Task grade column
+        if (value !== '') {
+          rowData[columnKey] = parseInt(value);
         } else {
           // Missing data
           missingData = true;
@@ -142,48 +155,46 @@ const UploadDialogUpload = ({
     return newRows;
   };
 
-  const loadCsv = (csvData: string | File): void => {
-    parse(csvData, {
-      dynamicTyping: true,
-      skipEmptyLines: true,
-      complete: (csvRows: ParseResult<(string | number)[]>) => {
-        const fields = columns.map(col => col.field);
-        const csvKeys = csvRows.data[0].map(value => value.toString());
+  const loadCsv = async (csvData: string | File): Promise<void> => {
+    const csvRows = await parseCsv(csvData);
+    const csvKeys = csvRows.data[0].map(value => value.toString());
+    const courseTasks = columns
+      .filter(col => col.field !== 'actions')
+      .map(col => col.field);
 
-        // Find matching keys
-        let mismatches = false;
-        let studentNoFound = false;
-        const csvKeyMap: {[key: string]: string} = {};
-        for (const key of csvKeys) {
-          if (key.toLowerCase() === 'studentno') studentNoFound = true;
-          const matchingField = fields.find(
-            field => field.toLowerCase() === key.toLowerCase()
-          );
-          if (matchingField === undefined) mismatches = true;
-          else csvKeyMap[key] = matchingField;
-        }
+    // Try to match the csv columns with course task names
+    let mismatches = false;
+    let studentNoFound = false;
+    const csvKeyMap: {[key: string]: string} = {};
+    for (const key of csvKeys) {
+      if (key.toLowerCase() === 'studentno') studentNoFound = true;
+      const matchingField = courseTasks.find(
+        task => task.toLowerCase() === key.toLowerCase()
+      );
+      if (matchingField === undefined) mismatches = true;
+      else csvKeyMap[key] = matchingField;
+    }
 
-        if (mismatches || !studentNoFound) {
-          setMismatchDialogOpen(true);
-          setMismatchData({
-            fields: fields.filter(field => field !== 'actions'),
-            keys: csvKeys,
-            onImport: (keyMap: {[key: string]: string}) => {
-              setMismatchDialogOpen(false);
-              setRows(readCSVData(csvRows.data, csvKeys, keyMap));
-              setEditText(true);
-              setExpanded('edit');
-            },
-          });
-        } else {
-          setRows(readCSVData(csvRows.data, csvKeys, csvKeyMap));
+    if (mismatches || !studentNoFound) {
+      setMismatchDialogOpen(true);
+      setMismatchData({
+        csvKeys,
+        courseTasks,
+        onImport: keyMap => {
+          setMismatchDialogOpen(false);
+          setRows(readCSVData(csvRows.data, csvKeys, keyMap));
           setEditText(true);
           setExpanded('edit');
-        }
-      },
-    });
+        },
+      });
+    } else {
+      setRows(readCSVData(csvRows.data, csvKeys, csvKeyMap));
+      setEditText(true);
+      setExpanded('edit');
+    }
   };
 
+  // Set row className if errors
   const getRowClassName = (
     params: GridRowClassNameParams<GridValidRowModel>
   ): string => {
@@ -246,7 +257,7 @@ const UploadDialogUpload = ({
         open={mismatchDialogOpen}
         onClose={() => setMismatchDialogOpen(false)}
         mismatchData={
-          mismatchData ?? {fields: [], keys: [], onImport: () => {}}
+          mismatchData ?? {csvKeys: [], courseTasks: [], onImport: () => {}}
         }
       />
 
@@ -299,7 +310,6 @@ const UploadDialogUpload = ({
           <AccordionDetails>
             <div style={{height: '40vh'}}>
               <StyledDataGrid
-                // autoHeight
                 rows={rows}
                 columns={columns}
                 rowHeight={25}

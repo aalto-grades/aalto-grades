@@ -79,6 +79,7 @@ const CreateGradingModelDialog = ({
     );
   };
 
+  // Check if name should be updated when reopened
   const [oldOpen, setOldOpen] = useState<boolean>(false);
   if (open !== oldOpen) {
     setOldOpen(open);

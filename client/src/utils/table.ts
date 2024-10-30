@@ -93,7 +93,7 @@ export const predictGrades = (
         userId: row.user.id,
         courseTasks: row.courseTasks.map(task => ({
           id: task.courseTaskId,
-          // TODO: Manage expired course tasks?
+          // TODO: Manage expired task grades? (#696)
           grade: findBestGrade(task.grades, {gradeSelectOption})?.grade ?? 0,
         })),
       }))
@@ -148,7 +148,7 @@ export const predictedGradesErrorCheck = (
         info: {modelId: parseInt(modelId)},
       });
     }
-    // if grade is out of range
+    // If grade is out of range
     if (
       (courseScale === GradingScale.Numerical &&
         !(grade.finalGrade >= 0 && grade.finalGrade <= 5)) ||

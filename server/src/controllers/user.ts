@@ -5,6 +5,7 @@
 import * as argon from 'argon2';
 import generator from 'generate-password';
 import {Op} from 'sequelize';
+import {z} from 'zod';
 
 import {
   type CourseData,
@@ -225,9 +226,9 @@ export const getUsers: Endpoint<void, FullUserData[]> = async (_req, res) => {
     id: user.id,
     email: user.email,
     name: user.name,
-    role: user.role,
     studentNumber: user.studentNumber,
-    idpUser: user.password === null,
+    idpUser: user.idpUser,
+    admin: user.admin,
   }));
 
   res.json(users);
@@ -242,17 +243,31 @@ export const addUser: Endpoint<NewUser, NewUserResponse> = async (req, res) => {
   const email = req.body.email;
 
   const existingUser = await User.findByEmail(email);
-  if (existingUser !== null) {
-    throw new ApiError(
-      `User with email ${email} already exists`,
-      HttpCode.Conflict
-    );
+
+  // IDP user
+  if (req.body.admin === false) {
+    if (existingUser !== null && !existingUser.admin) {
+      throw new ApiError(
+        `IDP user with email ${email} already exists`,
+        HttpCode.Conflict
+      );
+    }
+
+    if (existingUser) {
+      // Update existing user
+      await existingUser.set({idpUser: true}).save();
+    } else {
+      await User.create({email, idpUser: true});
+    }
+    return res.status(HttpCode.Created).json({temporaryPassword: null});
   }
 
-  if (!req.body.admin) {
-    await User.create({email: email, role: SystemRole.User});
-    const resData: NewUserResponse = {temporaryPassword: null};
-    return res.status(HttpCode.Created).json(resData);
+  // Admin user
+  if (existingUser !== null && existingUser.admin) {
+    throw new ApiError(
+      `Admin user with email ${email} already exists`,
+      HttpCode.Conflict
+    );
   }
 
   const temporaryPassword = generator.generate({
@@ -260,18 +275,32 @@ export const addUser: Endpoint<NewUser, NewUserResponse> = async (req, res) => {
     numbers: true,
   });
   // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
-  await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: await argon.hash(temporaryPassword, {
-      type: argon.argon2id,
-      memoryCost: 19456,
-      parallelism: 1,
-      timeCost: 2,
-    }),
-    role: SystemRole.Admin,
-    forcePasswordReset: true,
+  const password = await argon.hash(temporaryPassword, {
+    type: argon.argon2id,
+    memoryCost: 19456,
+    parallelism: 1,
+    timeCost: 2,
   });
+
+  if (existingUser) {
+    // Update existing user
+    await existingUser
+      .set({
+        name: req.body.name,
+        admin: true,
+        password,
+        forcePasswordReset: true,
+      })
+      .save();
+  } else {
+    await User.create({
+      name: req.body.name,
+      email: req.body.email,
+      admin: true,
+      password,
+      forcePasswordReset: true,
+    });
+  }
 
   return res.status(HttpCode.Created).json({temporaryPassword});
 };
@@ -282,8 +311,50 @@ export const addUser: Endpoint<NewUser, NewUserResponse> = async (req, res) => {
  * @throws ApiError(400|404)
  */
 export const deleteUser: Endpoint<void, void> = async (req, res) => {
+  let role: 'idpUser' | 'admin' | null = null;
+  if (req.query.role) {
+    try {
+      role = z
+        .union([z.literal('idpUser'), z.literal('admin')])
+        .parse(req.query.role);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new ApiError(error.message, HttpCode.BadRequest);
+      }
+    }
+  }
+
   const user = await findAndValidateUserId(req.params.userId);
-  await user.destroy();
+
+  // Remove idpUser role
+  if (role === 'idpUser') {
+    if (!user.idpUser) {
+      throw new ApiError('User is not an IDP user', HttpCode.Conflict);
+    }
+    await user.set({idpUser: false}).save();
+
+    return res.sendStatus(HttpCode.Ok);
+  }
+
+  // Remove admin role
+  if (role === 'admin') {
+    if (!user.admin) {
+      throw new ApiError('User is not an admin', HttpCode.Conflict);
+    }
+    await user
+      .set({
+        admin: false,
+        password: null,
+        forcePasswordReset: null,
+        mfaSecret: null,
+        mfaConfirmed: false,
+      })
+      .save();
+  }
+
+  // No role specified, delete user
+  if (role === null) await user.destroy();
+
   res.sendStatus(HttpCode.Ok);
 };
 

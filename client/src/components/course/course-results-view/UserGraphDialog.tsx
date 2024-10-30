@@ -55,6 +55,7 @@ const UserGraphDialog = ({
     null
   );
 
+  // Update selected model on data / gradingModels change
   const [oldModels, setOldModels] = useState<typeof gradingModels>(null);
   const [oldData, setOldData] = useState<typeof data>(null);
   if (gradingModels !== oldModels || data !== oldData) {
@@ -67,6 +68,7 @@ const UserGraphDialog = ({
       setSelectedModel(gradingModels[0]);
   }
 
+  // Set sources & sourceValues
   let sources: GraphSource[] = [];
   let sourceValues: GraphSourceValue[] = [];
   if (

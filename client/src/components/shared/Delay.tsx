@@ -4,12 +4,14 @@
 
 import {type JSX, useEffect, useState} from 'react';
 
-type Props = {
+type PropsType = {
   children: JSX.Element;
   waitBeforeShow?: number;
 };
-
-const Delayed = ({children, waitBeforeShow = 1}: Props): JSX.Element | null => {
+const Delayed = ({
+  children,
+  waitBeforeShow = 1,
+}: PropsType): JSX.Element | null => {
   const [isShown, setIsShown] = useState(false);
 
   useEffect(() => {

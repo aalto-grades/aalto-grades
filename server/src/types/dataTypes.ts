@@ -2,6 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
+import type {CourseRoleType} from '@/common/types';
+
+export type NewDbCourseRole = {
+  userId: number;
+  courseId: number;
+  role: CourseRoleType;
+};
+
 export type NewDbFinalGradeData = {
   userId: number;
   courseId: number;

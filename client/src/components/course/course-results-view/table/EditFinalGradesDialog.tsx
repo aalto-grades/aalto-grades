@@ -31,6 +31,7 @@ import {
   type FinalGradeData,
   GradingScale,
   type NewFinalGrade,
+  SystemRole,
 } from '@/common/types';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
@@ -70,19 +71,41 @@ const EditFinalGradesDialog = ({
   finalGrades,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
-  const {auth} = useAuth();
+  const {auth, isTeacherInCharge} = useAuth();
   const {courseId} = useParams() as {courseId: string};
 
   const course = useGetCourse(courseId);
   const gradingModels = useGetAllGradingModels(courseId);
   const addFinalGrades = useAddFinalGrades(courseId);
-  const deleteFinalGrade = useDeleteFinalGrade(courseId);
   const editFinalGrade = useEditFinalGrade(courseId);
+  const deleteFinalGrade = useDeleteFinalGrade(courseId);
 
-  const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
-  const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
+  const getModelName = (modelId: number | null): string | null => {
+    if (modelId === null) return null;
+    if (gradingModels.data === undefined) return t('general.loading');
+    const model = gradingModels.data.find(mod => mod.id === modelId);
+    return model?.name ?? t('course.results.not-found');
+  };
+  const initRows = finalGrades.map((finalGrade, i) => ({
+    id: i,
+    finalGradeId: finalGrade.id,
+    grader: finalGrade.grader.name!,
+    grade: finalGrade.grade,
+    date: finalGrade.date,
+    gradingModel: getModelName(finalGrade.gradingModelId),
+    exportDate: finalGrade.sisuExportDate,
+    comment: finalGrade.comment,
+    selected: '',
+  }));
+
+  const [rows, setRows] = useState<GridRowsProp<ColTypes>>(initRows);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
+
+  const editRights = useMemo(
+    () => auth?.role === SystemRole.Admin || isTeacherInCharge,
+    [auth?.role, isTeacherInCharge]
+  );
 
   const changes = useMemo(
     () =>
@@ -110,15 +133,13 @@ const EditFinalGradesDialog = ({
   // Warning if leaving with unsaved
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent): void => {
-      if (changes) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
+      if (changes) e.preventDefault();
     };
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [changes]);
 
+  // Update selected column
   useEffect(() => {
     const newRows = rows.map(row => ({
       ...row,
@@ -126,31 +147,6 @@ const EditFinalGradesDialog = ({
     }));
     if (JSON.stringify(rows) !== JSON.stringify(newRows)) setRows(newRows);
   }, [bestGrade, rows]);
-
-  useEffect(() => {
-    const getModelName = (modelId: number | null): string | null => {
-      if (modelId === null) return null;
-      if (gradingModels.data === undefined) return t('general.loading');
-      const model = gradingModels.data.find(mod => mod.id === modelId);
-      return model?.name ?? t('course.results.not-found');
-    };
-
-    const newRows = finalGrades.map((finalGrade, i) => ({
-      id: i,
-      finalGradeId: finalGrade.id,
-      grader: finalGrade.grader.name!,
-      grade: finalGrade.grade,
-      date: finalGrade.date,
-      gradingModel: getModelName(finalGrade.gradingModelId),
-      exportDate: finalGrade.sisuExportDate,
-      comment: finalGrade.comment,
-      selected: '',
-    }));
-    setRows(newRows);
-    setInitRows(structuredClone(newRows));
-  }, [gradingModels.data, finalGrades, t]);
-
-  if (!auth) return <>{t('course.results.not-permitted')}</>; // Not needed?
 
   const columns: GridColDef<ColTypes>[] = [
     {
@@ -163,13 +159,13 @@ const EditFinalGradesDialog = ({
       field: 'grade',
       headerName: t('general.grade'),
       type: 'number',
-      editable: true,
+      editable: editRights,
     },
     {
       field: 'date',
       headerName: t('general.date'),
       type: 'date',
-      editable: true,
+      editable: editRights,
       width: 110, // Enough width to fit the calendar icon
     },
     {
@@ -182,29 +178,35 @@ const EditFinalGradesDialog = ({
       field: 'exportDate',
       headerName: t('general.export-date'),
       type: 'date',
-      editable: true,
+      editable: editRights,
       width: 110, // Enough width to fit the calendar icon
     },
     {
       field: 'comment',
       headerName: t('general.comment'),
       type: 'string',
-      editable: true,
+      editable: editRights,
     },
-    {
-      field: 'actions',
-      type: 'actions',
-      getActions: params => [
-        <GridActionsCellItem
-          key={params.id}
-          icon={<Delete />}
-          label={t('general.delete')}
-          onClick={() =>
-            setRows(oldRows => oldRows.filter(row => row.id !== params.id))
-          }
-        />,
-      ],
-    },
+    ...(editRights
+      ? [
+          {
+            field: 'actions',
+            type: 'actions',
+            getActions: params => [
+              <GridActionsCellItem
+                key={params.id}
+                icon={<Delete />}
+                label={t('general.delete')}
+                onClick={() =>
+                  setRows(oldRows =>
+                    oldRows.filter(row => row.id !== params.id)
+                  )
+                }
+              />,
+            ],
+          } as GridColDef<ColTypes>,
+        ]
+      : []),
     {
       field: 'selected',
       type: 'string',
@@ -220,7 +222,7 @@ const EditFinalGradesDialog = ({
         const newRow: ColTypes = {
           id: freeId,
           finalGradeId: -1,
-          grader: auth.name,
+          grader: auth!.name,
           grade: 0,
           date: new Date(),
           gradingModel: null,
@@ -285,7 +287,6 @@ const EditFinalGradesDialog = ({
 
     onClose();
     enqueueSnackbar(t('course.results.grades-saved'), {variant: 'success'});
-    setInitRows(structuredClone(rows));
   };
 
   const confirmDiscard = async (): Promise<void> => {
@@ -324,7 +325,7 @@ const EditFinalGradesDialog = ({
               editMode="row"
               rowSelection={false}
               disableColumnSelector
-              slots={{toolbar: dataGridToolbar}}
+              slots={editRights ? {toolbar: dataGridToolbar} : {}}
               initialState={{
                 sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
               }}
@@ -370,16 +371,18 @@ const EditFinalGradesDialog = ({
           >
             {changes ? t('general.discard') : t('general.close')}
           </Button>
-          <Button
-            onClick={() => {
-              if (changes) handleSubmit();
-              else onClose();
-            }}
-            variant={changes ? 'contained' : 'text'}
-            disabled={error || editing}
-          >
-            {t('general.save')}
-          </Button>
+          {editRights && (
+            <Button
+              onClick={() => {
+                if (changes) handleSubmit();
+                else onClose();
+              }}
+              variant={changes ? 'contained' : 'text'}
+              disabled={error || editing}
+            >
+              {t('general.save')}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </>

@@ -71,7 +71,7 @@ const findAndValidateAplusGradeSourceId = async (
  * Finds a course and A+ grade source by URL param IDs and validates the IDs.
  *
  * @throws ApiError(400|404|409) if invalid, not found, or the A+ grade source
- *   does nto belong to the course.
+ *   does not belong to the course.
  */
 export const validateAplusGradeSourcePath = async (
   courseId: string,

@@ -27,7 +27,7 @@ which case you must also install Docker itself and Docker Compose.
 
 The README files of this repository primarily contain instructions for running
 Aalto Grades and its tests. For more documentation, please see the
-[wiki](https://github.com/aalto-grades/base-repository/wiki).
+[wiki](https://github.com/aalto-grades/aalto-grades/wiki).
 
 ## Building and running
 
@@ -68,9 +68,9 @@ README file of the corresponding directory, such as `client/README.md` and
 3. Create tests for new functionality and check that all tests pass.
 4. Run linters.
 5. Check that the changes follow the
-   [code style](https://github.com/aalto-grades/base-repository/wiki/Code-style),
-   [design guidelines](https://github.com/aalto-grades/base-repository/wiki/Design-Guidelines),
-   and [licensing guidelines](https://github.com/aalto-grades/base-repository/wiki/Licensing-Guidelines).
+   [code style](https://github.com/aalto-grades/aalto-grades/wiki/Code-style),
+   [design guidelines](https://github.com/aalto-grades/aalto-grades/wiki/Design-Guidelines),
+   and [licensing guidelines](https://github.com/aalto-grades/aalto-grades/wiki/Licensing-Guidelines).
 6. Update documentation and API definition as needed.
 7. When developing the client, update (at minimum) the translation keys of all
    languages using `npm run trans-parse` as described in `client/README.md`.

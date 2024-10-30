@@ -14,6 +14,12 @@ Install the packages:
 npm i
 ```
 
+Also install the packages in the common folder
+
+```
+npm i --prefix ../common
+```
+
 Start the client:
 
 ```

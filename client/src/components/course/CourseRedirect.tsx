@@ -26,15 +26,17 @@ const CourseRedirect = (): JSX.Element => {
   )
     return <>{t('general.loading')}</>;
 
-  return courseParts.data.length > 0 && courseTasks.data.length > 0 ? (
-    gradingModels.data.length > 0 ? (
-      <Navigate to={`/${courseId}/course-results`} />
-    ) : (
-      <Navigate to={`/${courseId}/models`} />
-    )
-  ) : (
-    <Navigate to={`/${courseId}/course-parts`} />
-  );
+  if (
+    courseParts.data.length > 0 &&
+    courseTasks.data.length > 0 &&
+    gradingModels.data.length > 0
+  )
+    return <Navigate to={`/${courseId}/course-results`} />;
+
+  if (courseParts.data.length > 0 && courseTasks.data.length > 0)
+    return <Navigate to={`/${courseId}/models`} />;
+
+  return <Navigate to={`/${courseId}/course-parts`} />;
 };
 
 export default CourseRedirect;

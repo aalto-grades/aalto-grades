@@ -15,10 +15,9 @@ type LocalSettings = {onFailSetting: OnFailSetting; minPoints: string};
 
 const MinPointsNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
-  const {id, isConnectable} = props;
-
-  const nodeValues = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
+  const {id, isConnectable} = props;
+  const nodeValues = useContext(NodeValuesContext);
 
   const settings = nodeData[id].settings as MinPointsNodeSettings;
   const initSettings = {
@@ -40,6 +39,7 @@ const MinPointsNode = (props: NodeProps): JSX.Element => {
     };
     setLocalSettings(newLocalSettings);
 
+    // Check if is not valid float
     if (!/^\d+(?:\.\d+?)?$/.test(newLocalSettings.minPoints)) {
       return;
     }

@@ -25,7 +25,7 @@ type JsonError = {
  */
 export const handleInvalidRequestJson = (
   err: JsonError,
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ): void => {

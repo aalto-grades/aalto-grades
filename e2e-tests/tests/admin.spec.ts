@@ -34,16 +34,16 @@ test.describe('Manage users as admin', () => {
     ).toBeAttached();
   });
 
-  test('Delete user', async ({page}) => {
+  test('Remove user role', async ({page}) => {
     await page.goto('/');
     const cell = page.getByRole('cell', {name: 'idpuser@aalto.fi'});
     await expect(cell).toBeAttached();
     const parent = page.getByRole('row').filter({has: cell});
-    await parent.getByTestId('DeleteIcon').click();
+    await parent.getByTestId('PersonRemoveIcon').click();
     await expect(
-      page.getByRole('heading', {name: 'Delete user'})
+      page.getByRole('heading', {name: 'Remove user role'})
     ).toBeVisible();
-    await page.getByRole('button', {name: 'Delete'}).click();
+    await page.getByRole('button', {name: 'Remove'}).click();
     await expect(cell).not.toBeAttached();
   });
 });

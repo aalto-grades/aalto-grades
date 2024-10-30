@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+import 'dayjs/locale/en-gb';
+
 import {
   Box,
   Button,
@@ -24,14 +26,13 @@ import {
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, {type Dayjs} from 'dayjs';
-import 'dayjs/locale/en-gb';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import type {FinalGradeData, Language, StudentRow} from '@/common/types';
-import {useDownloadSisuGradeCsv} from '@/hooks/useApi';
+import {useDownloadSisuGradeCsv, useGetCourse} from '@/hooks/useApi';
 import {useLocalize} from '@/hooks/useLocalize';
 import {sisuLanguageOptions} from '@/utils';
 
@@ -52,14 +53,27 @@ const SisuDownloadDialog = ({
   const {t} = useTranslation();
   const localize = useLocalize();
   const {courseId} = useParams() as {courseId: string};
+  const course = useGetCourse(courseId);
+  const courseToDisplay = course.data ? course.data.courseCode : courseId;
+
+  // State variables handling the assessment date and completion language.
+  const [dateOverride, setDateOverride] = useState<boolean>(false);
+  const [assessmentDate, setAssessmentDate] = useState<Dayjs | null>(dayjs());
+  const [completionLanguage, setCompletionLanguage] = useState<
+    Language | undefined
+  >(undefined);
+  const [downloadOption, setDownloadOption] =
+    useState<DownloadOption>('unexported');
 
   const downloadSisuGradeCsv = useDownloadSisuGradeCsv({
     onSuccess: gradeCsv => {
       const blob = new Blob([gradeCsv], {type: 'text/csv'});
+      const date = new Date();
+      const dateFormat = `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}`;
 
       const linkElement = document.createElement('a');
       linkElement.href = URL.createObjectURL(blob);
-      linkElement.download = `grades_course_${courseId}.csv`;
+      linkElement.download = `grades_course_${courseToDisplay}_${dateFormat}_${downloadOption}.csv`;
       document.body.append(linkElement);
       linkElement.click();
       linkElement.remove();
@@ -70,15 +84,6 @@ const SisuDownloadDialog = ({
     },
   });
 
-  // state variables handling the assessment date and completion language.
-  const [dateOverride, setDateOverride] = useState<boolean>(false);
-  const [assessmentDate, setAssessmentDate] = useState<Dayjs | null>(dayjs());
-  const [completionLanguage, setCompletionLanguage] = useState<
-    Language | undefined
-  >(undefined);
-  const [downloadOption, setDownloadOption] =
-    useState<DownloadOption>('unexported');
-
   const selectedStudents = selectedRows.map(row => ({
     studentNumber: row.user.studentNumber,
     grades: row.finalGrades,
@@ -87,19 +92,13 @@ const SisuDownloadDialog = ({
   const userGradeAlreadyExported = (grades: FinalGradeData[]): boolean =>
     grades.some(finalGrade => finalGrade.sisuExportDate !== null);
 
-  const exportedValuesInList = useMemo(() => {
-    for (const row of selectedRows) {
-      if (userGradeAlreadyExported(row.finalGrades)) {
-        return true;
-      }
-    }
-    return false;
-  }, [selectedRows]);
+  const exportedValuesInList = useMemo(
+    () => selectedRows.some(row => userGradeAlreadyExported(row.finalGrades)),
+    [selectedRows]
+  );
 
   const handleDownloadSisuGradeCsv = async (): Promise<void> => {
     if (!courseId) return;
-
-    enqueueSnackbar(t('course.results.fetching-sisu-csv'), {variant: 'info'});
 
     let studentNumbers: string[] = [];
     switch (downloadOption) {
@@ -124,6 +123,7 @@ const SisuDownloadDialog = ({
       return;
     }
 
+    enqueueSnackbar(t('course.results.fetching-sisu-csv'), {variant: 'info'});
     await downloadSisuGradeCsv.mutateAsync({
       courseId,
       data: {
@@ -154,7 +154,6 @@ const SisuDownloadDialog = ({
           {t('course.results.grading-date-default')}
         </DialogContentText>
         <TextField
-          id="select-grading-completion-language"
           select
           fullWidth
           margin="normal"
@@ -208,7 +207,6 @@ const SisuDownloadDialog = ({
               {t('course.results.will-not-close')}
             </Typography>
             <TextField
-              id="export-option"
               select
               fullWidth
               defaultValue="all"
@@ -251,13 +249,9 @@ const SisuDownloadDialog = ({
       </DialogContent>
       <DialogActions>
         <Button variant="outlined" onClick={onClose}>
-          {t('general.cancel')}
+          {exportedValuesInList ? t('general.close') : t('general.cancel')}
         </Button>
-        <Button
-          id="ag-confirm-file-upload-btn"
-          variant="contained"
-          onClick={handleDownloadSisuGradeCsv}
-        >
+        <Button variant="contained" onClick={handleDownloadSisuGradeCsv}>
           {t('general.download')}
         </Button>
       </DialogActions>

@@ -25,6 +25,9 @@ import {
   type ResetAuthResult,
   type ResetOwnPasswordData,
 } from '@/common/types';
+import {validateLogin} from './utils/auth';
+import {getSamlStrategy} from './utils/saml';
+import {findAndValidateUserId, findUserById} from './utils/user';
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
 import {JWT_SECRET, NODE_ENV, SAML_SP_CERT_FILE} from '../configs/environment';
 import httpLogger from '../configs/winston';
@@ -36,9 +39,6 @@ import {
   type LoginCallback,
   type SyncEndpoint,
 } from '../types';
-import {validateLogin} from './utils/auth';
-import {getSamlStrategy} from './utils/saml';
-import {findAndValidateUserId, findUserById} from './utils/user';
 
 /**
  * () => AuthData
@@ -57,9 +57,18 @@ export const selfInfo: Endpoint<void, AuthData> = async (req, res) => {
     );
   }
 
+  if (userFromDb.email === null) {
+    httpLogger.error(`Logged in user ${userFromDb.id} does not have an email`);
+    throw new ApiError(
+      'Logged in user does not have an email',
+      HttpCode.InternalServerError
+    );
+  }
+
   res.json({
     id: userFromDb.id,
-    role: userFromDb.role,
+    role: user.role,
+    email: userFromDb.email,
     name: userFromDb.name,
   });
 };
@@ -148,6 +157,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
         status: 'ok',
         id: loginResult.id,
         name: loginResult.name,
+        email: loginResult.email,
         role: loginResult.role,
       });
   };
@@ -156,7 +166,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
   authenticate(req, res, next);
 };
 
-/** ()=>void */
+/** () => void */
 export const authLogout: SyncEndpoint<void, void> = (_req, res) => {
   res.clearCookie('jwt', {httpOnly: true});
   res.sendStatus(HttpCode.Ok);

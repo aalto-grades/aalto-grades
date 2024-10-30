@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {type JSX, useContext, useState} from 'react';
+import {type ChangeEvent, type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Handle, type NodeProps, Position} from 'reactflow';
 
@@ -42,10 +42,9 @@ const checkError = (settings: LocalSettings): boolean => {
 
 const StepperNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
-  const {id, isConnectable} = props;
-
-  const nodeValues = useContext(NodeValuesContext);
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
+  const {id, isConnectable} = props;
+  const nodeValues = useContext(NodeValuesContext);
 
   const settings = nodeData[id].settings as StepperNodeSettings;
   const initSettings = {
@@ -53,6 +52,7 @@ const StepperNode = (props: NodeProps): JSX.Element => {
     middlePoints: settings.middlePoints.map(val => val.toString()),
     outputValues: settings.outputValues.map(val => val.toString()),
   };
+
   const [localSettings, setLocalSettings] =
     useState<LocalSettings>(initSettings);
   const [error, setError] = useState<boolean>(false);
@@ -62,7 +62,7 @@ const StepperNode = (props: NodeProps): JSX.Element => {
   const handleChange = (
     type: 'middlePoint' | 'outputValue',
     index: number,
-    event: React.ChangeEvent<HTMLInputElement>
+    event: ChangeEvent<HTMLInputElement>
   ): void => {
     const newLocalSettings = {...localSettings};
     if (type === 'middlePoint') {
