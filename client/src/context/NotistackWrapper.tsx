@@ -15,6 +15,7 @@ const NotistackWrapper = (): JSX.Element => (
     maxSnack={MAX_SNACK}
     autoHideDuration={AUTO_HIDE_DURATION}
     anchorOrigin={POSITION}
+    preventDuplicate
   />
 );
 

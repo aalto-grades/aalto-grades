@@ -6,6 +6,9 @@ import axios from 'axios';
 import i18next from 'i18next';
 import type {ZodError} from 'zod';
 
+import LoginAgainButton from '@/components/shared/LoginAgainButton';
+import {CustomError} from '@/types';
+
 const axiosInstance = axios.create({
   withCredentials: true,
   validateStatus: (status: number) => status < 600 && status >= 100,
@@ -30,7 +33,10 @@ axiosInstance.interceptors.response.use(response => {
 
   // Token expired error
   if (response.status === 401) {
-    throw new Error(i18next.t('shared.auth.token-expired'));
+    throw new CustomError({
+      message: i18next.t('shared.auth.token-expired'),
+      action: LoginAgainButton,
+    });
   }
 
   // Other errors
