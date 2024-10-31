@@ -38,3 +38,13 @@ export const nullableDateSchema = (
   _t: TFunction
 ): z.ZodNullable<z.ZodPipeline<z.ZodString, z.ZodDate>> =>
   z.string().date().pipe(z.coerce.date()).nullable();
+
+export class CustomError extends Error {
+  action?: React.FC | null;
+
+  constructor({message, action}: {message: string; action: React.FC}) {
+    super();
+    this.message = message;
+    this.action = action;
+  }
+}

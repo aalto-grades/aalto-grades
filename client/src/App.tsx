@@ -38,6 +38,7 @@ import GradesView from './components/course/GradesView';
 import ModelsView from './components/course/ModelsView';
 import ConfirmDialog from './components/shared/ConfirmDialog';
 import NotistackWrapper from './context/NotistackWrapper';
+import type {CustomError} from './types';
 
 declare module '@mui/material/styles' {
   interface PaletteOptions {
@@ -200,8 +201,11 @@ const Root = (): JSX.Element => {
     GlobalModal.setUpModal(globalModalRef as Ref<GlobalModalWrapper | null>);
   }, []);
 
-  const handleError = (error: Error): void => {
-    enqueueSnackbar(error.message, {variant: 'error'});
+  const handleError = (error: CustomError): void => {
+    enqueueSnackbar(error.message, {
+      variant: 'error',
+      action: error.action,
+    });
   };
 
   const queryClient = new QueryClient({

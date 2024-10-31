@@ -418,7 +418,8 @@
       "body": "If you have been provided with credentials specifically for Aalto Grades, use this login.",
       "mfa-code": "MFA code",
       "button": "Log in"
-    }
+    },
+    "login-again": "Login again"
   },
   "manage-students": {
     "latest-grade": "Latest grade",
