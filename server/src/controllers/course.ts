@@ -11,7 +11,6 @@ import {
   HttpCode,
   Language,
   type NewCourseData,
-  SystemRole,
 } from '@/common/types';
 import {sequelize} from '../database';
 import Course from '../database/models/course';
@@ -23,7 +22,6 @@ import {
   ApiError,
   type CourseFull,
   type Endpoint,
-  type JwtClaims,
   type NewDbCourseRole,
 } from '../types';
 import {
@@ -149,7 +147,6 @@ export const addCourse: Endpoint<NewCourseData, number> = async (req, res) => {
 export const editCourse: Endpoint<EditCourseData, void> = async (req, res) => {
   const course = await findAndValidateCourseId(req.params.courseId);
   const finalGrade = await FinalGrade.findOne({where: {courseId: course.id}});
-  const user = req.user as JwtClaims;
 
   const {
     courseCode,
@@ -183,12 +180,6 @@ export const editCourse: Endpoint<EditCourseData, void> = async (req, res) => {
       : null;
   const newAssistants =
     assistants !== undefined ? await validateEmailList(assistants) : null;
-
-  if (user.role !== SystemRole.Admin) {
-    validateRoleUniqueness(oldTeachers, newAssistants ?? oldAssistants);
-    await CourseRole.updateCourseRoles(null, newAssistants, course.id);
-    return res.sendStatus(HttpCode.Ok);
-  }
 
   if (
     minCredits !== undefined &&

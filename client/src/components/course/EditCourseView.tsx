@@ -262,6 +262,14 @@ const EditCourseView = (): JSX.Element => {
     }
   };
 
+  const isDisabled = (): boolean => {
+    if (auth?.role === SystemRole.Admin) {
+      return false;
+    } else {
+      return !(auth?.email && initTeachersInCharge.includes(auth.email));
+    }
+  };
+
   if (!initialValues || finalGrades.data === undefined)
     return <Typography>{t('general.loading')}</Typography>;
 
@@ -304,13 +312,13 @@ const EditCourseView = (): JSX.Element => {
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="courseCode"
-                disabled={auth?.role !== SystemRole.Admin}
+                disabled={isDisabled()}
                 label={`${t('general.course-code')}*`}
                 helperText={t('course.edit.course-code-help')}
               />
               <FormLanguagesField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
-                disabled={auth?.role !== SystemRole.Admin}
+                disabled={isDisabled()}
                 valueFormat="name%"
                 labelFormat={`${t('course.edit.course-name-in-format')}*`}
                 helperTextFormat={t('course.edit.course-name-in-help-format')}
@@ -318,7 +326,7 @@ const EditCourseView = (): JSX.Element => {
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="department"
-                disabled={auth?.role !== SystemRole.Admin}
+                disabled={isDisabled()}
                 label={`${t('general.organizing-department')}*`}
                 helperText={t('course.edit.organizing-department-help')}
                 select
@@ -332,7 +340,7 @@ const EditCourseView = (): JSX.Element => {
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="minCredits"
-                disabled={auth?.role !== SystemRole.Admin}
+                disabled={isDisabled()}
                 label={`${t('course.edit.min-credits')}*`}
                 helperText={t('course.edit.min-credits-help')}
                 type="number"
@@ -340,7 +348,7 @@ const EditCourseView = (): JSX.Element => {
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="maxCredits"
-                disabled={auth?.role !== SystemRole.Admin}
+                disabled={isDisabled()}
                 label={`${t('course.edit.max-credits')}*`}
                 helperText={t('course.edit.max-credits-help')}
                 type="number"
@@ -348,9 +356,7 @@ const EditCourseView = (): JSX.Element => {
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="gradingScale"
-                disabled={
-                  auth?.role !== SystemRole.Admin && finalGrades.data.length > 0
-                }
+                disabled={isDisabled() && finalGrades.data.length > 0}
                 label={`${t('course.edit.grading-scale')}*`}
                 helperText={t('course.edit.grading-scale-help')}
                 select
@@ -364,7 +370,7 @@ const EditCourseView = (): JSX.Element => {
               <FormField
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="languageOfInstruction"
-                disabled={auth?.role !== SystemRole.Admin}
+                disabled={isDisabled()}
                 label={`${t('course.edit.language')}*`}
                 helperText={t('course.edit.language-help')}
                 select
@@ -382,7 +388,7 @@ const EditCourseView = (): JSX.Element => {
                 type="text"
                 fullWidth
                 value={form.values.teacherEmail}
-                disabled={auth?.role !== SystemRole.Admin || form.isSubmitting}
+                disabled={isDisabled() || form.isSubmitting}
                 label={`${t('course.edit.teachers-in-charge')}*`}
                 margin="normal"
                 slotProps={{inputLabel: {shrink: true}}}
