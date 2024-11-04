@@ -31,20 +31,20 @@ axiosInstance.interceptors.response.use(response => {
     );
   }
 
-  // Token expired error
-  if (response.status === 401) {
-    throw new CustomError({
-      message: i18next.t('shared.auth.token-expired'),
-      action: LoginAgainButton,
-    });
-  }
-
   // Other errors
   if (resData !== null && typeof resData === 'object' && 'errors' in resData) {
-    throw new Error(
-      `${response.status} - ${response.statusText}: ` +
-        resData.errors.join(', ')
-    );
+    // Token expired error
+    if (resData.errors.includes('TokenExpiredError')) {
+      throw new CustomError({
+        message: i18next.t('shared.auth.token-expired'),
+        action: LoginAgainButton,
+      });
+    } else {
+      throw new Error(
+        `${response.status} - ${response.statusText}: ` +
+          resData.errors.join(', ')
+      );
+    }
   }
 
   return response;

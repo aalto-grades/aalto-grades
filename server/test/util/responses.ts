@@ -66,7 +66,10 @@ export class ResponseTests {
   }
 
   /** Send a request and expect a 401 unauthorized */
-  testUnauthorized(url: string, expected: string = '{}'): ReturnType {
+  testUnauthorized(
+    url: string,
+    expected: string = '{"errors":["Error"]}'
+  ): ReturnType {
     const call = async (request: Test): Promise<void> => {
       const res = await request
         .set('Accept', 'application/json')
