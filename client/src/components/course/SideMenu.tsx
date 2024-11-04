@@ -40,7 +40,7 @@ const SideMenuButton = ({
   to,
   Icon,
   IconOutlined,
-  unstable_viewTransition,
+  viewTransition,
 }: {
   text: string;
   to: string;
@@ -48,7 +48,7 @@ const SideMenuButton = ({
   IconOutlined: OverridableComponent<SvgIconTypeMap> & {
     muiName: string;
   };
-  unstable_viewTransition?: boolean;
+  viewTransition?: boolean;
 }): JSX.Element => (
   <ListItem disablePadding>
     <NavLink
@@ -58,7 +58,7 @@ const SideMenuButton = ({
         width: '100%',
         textDecoration: 'none',
       }}
-      unstable_viewTransition={unstable_viewTransition}
+      viewTransition={viewTransition}
     >
       {({isActive, isPending, isTransitioning}) => (
         <ListItemButton
@@ -115,7 +115,7 @@ const SideMenu = (): JSX.Element => {
           to="/"
           Icon={HomeMaxRounded}
           IconOutlined={ArrowBack}
-          unstable_viewTransition
+          viewTransition
         />
         <Divider sx={{my: 2}} />
         <SideMenuButton

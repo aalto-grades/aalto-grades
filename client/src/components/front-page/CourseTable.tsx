@@ -135,13 +135,13 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
               role="button"
               onClick={() =>
                 navigate(`/${course.id}`, {
-                  unstable_viewTransition: true,
+                  viewTransition: true,
                 })
               }
               onKeyDown={e => {
                 if (e.key === 'Enter') {
                   navigate(`/${course.id}`, {
-                    unstable_viewTransition: true,
+                    viewTransition: true,
                   });
                 }
               }}
