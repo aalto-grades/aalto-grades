@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, {type RequestHandler, Router} from 'express';
-import passport from 'passport';
+import express, {Router} from 'express';
 import {processRequestBody} from 'zod-express-middleware';
 
 import {
@@ -19,6 +18,7 @@ import {
   getCourse,
 } from '../controllers/course';
 import {handleInvalidRequestJson} from '../middleware';
+import {jwtAuthentication} from '../middleware/authentication';
 import {authorization, courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
@@ -26,7 +26,7 @@ export const router = Router();
 
 router.get(
   '/v1/courses/:courseId',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([
     CourseRoleType.Teacher,
     CourseRoleType.Assistant,
@@ -37,14 +37,14 @@ router.get(
 
 router.get(
   '/v1/courses',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   authorization([SystemRole.Admin]),
   controllerDispatcher(getAllCourses)
 );
 
 router.post(
   '/v1/courses',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   authorization([SystemRole.Admin, SystemRole.User]),
   express.json(),
   handleInvalidRequestJson,
@@ -54,7 +54,7 @@ router.post(
 
 router.put(
   '/v1/courses/:courseId',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,

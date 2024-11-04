@@ -27,6 +27,7 @@ import {
   selfInfo,
 } from '../controllers/auth';
 import {handleInvalidRequestJson} from '../middleware';
+import {jwtAuthentication} from '../middleware/authentication';
 import {authorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {rateLimiterMemoryMiddleware} from '../middleware/rateLimiterMemory';
@@ -35,7 +36,7 @@ export const router = Router();
 
 router.get(
   '/v1/auth/self-info',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   controllerDispatcher(selfInfo)
 );
 
@@ -49,11 +50,7 @@ router.post(
   authLogin
 );
 
-router.post(
-  '/v1/auth/logout',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
-  authLogout
-);
+router.post('/v1/auth/logout', jwtAuthentication, authLogout);
 
 // Dispatchers not needed, because not async
 router.post(
@@ -67,7 +64,7 @@ router.post(
 
 router.post(
   '/v1/auth/reset-auth/:userId',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
@@ -77,7 +74,7 @@ router.post(
 
 router.post(
   '/v1/auth/change-own-auth',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,
@@ -87,7 +84,7 @@ router.post(
 
 router.post(
   '/v1/auth/confirm-mfa',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   authorization([SystemRole.Admin]),
   express.json(),
   handleInvalidRequestJson,

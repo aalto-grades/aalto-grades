@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, {type RequestHandler, Router} from 'express';
-import passport from 'passport';
+import express, {Router} from 'express';
 import {processRequestBody} from 'zod-express-middleware';
 
 import {
@@ -20,6 +19,7 @@ import {
   getSisuFormattedGradingCSV,
 } from '../controllers/finalGrade';
 import {handleInvalidRequestJson} from '../middleware';
+import {jwtAuthentication} from '../middleware/authentication';
 import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
@@ -27,14 +27,14 @@ export const router = Router();
 
 router.get(
   '/v1/courses/:courseId/final-grades',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(getFinalGrades)
 );
 
 router.post(
   '/v1/courses/:courseId/final-grades',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
@@ -44,7 +44,7 @@ router.post(
 
 router.put(
   '/v1/courses/:courseId/final-grades/:finalGradeId',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
@@ -54,7 +54,7 @@ router.put(
 
 router.delete(
   '/v1/courses/:courseId/final-grades/:finalGradeId',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher]),
   controllerDispatcher(deleteFinalGrade)
 );
@@ -62,7 +62,7 @@ router.delete(
 // Actually gets the csv but the request type must be post to be able to use request.body
 router.post(
   '/v1/courses/:courseId/final-grades/csv/sisu',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json({limit: '10mb'}),
   handleInvalidRequestJson,

@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, {type RequestHandler, Router} from 'express';
-import passport from 'passport';
+import express, {Router} from 'express';
 import {processRequestBody} from 'zod-express-middleware';
 
 import {
@@ -19,6 +18,7 @@ import {
   getGradingModel,
 } from '../controllers/gradingModel';
 import {handleInvalidRequestJson} from '../middleware';
+import {jwtAuthentication} from '../middleware/authentication';
 import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
@@ -26,21 +26,21 @@ export const router = Router();
 
 router.get(
   '/v1/courses/:courseId/grading-models/:gradingModelId',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(getGradingModel)
 );
 
 router.get(
   '/v1/courses/:courseId/grading-models',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(getAllGradingModels)
 );
 
 router.post(
   '/v1/courses/:courseId/grading-models',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
@@ -50,7 +50,7 @@ router.post(
 
 router.put(
   '/v1/courses/:courseId/grading-models/:gradingModelId',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
@@ -60,7 +60,7 @@ router.put(
 
 router.delete(
   '/v1/courses/:courseId/grading-models/:gradingModelId',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher]),
   controllerDispatcher(deleteGradingModel)
 );

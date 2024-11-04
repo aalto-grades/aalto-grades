@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import express, {type RequestHandler, Router} from 'express';
-import passport from 'passport';
+import express, {Router} from 'express';
 import {processRequestBody} from 'zod-express-middleware';
 
 import {CourseRoleType, NewAplusGradeSourceArraySchema} from '@/common/types';
@@ -15,6 +14,7 @@ import {
   fetchAplusGrades,
 } from '../controllers/aplus';
 import {handleInvalidRequestJson} from '../middleware';
+import {jwtAuthentication} from '../middleware/authentication';
 import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
@@ -22,19 +22,19 @@ export const router = Router();
 
 router.get(
   '/v1/aplus/courses',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   controllerDispatcher(fetchAplusCourses)
 );
 
 router.get(
   '/v1/aplus/courses/:aplusCourseId',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   controllerDispatcher(fetchAplusExerciseData)
 );
 
 router.post(
   '/v1/courses/:courseId/aplus-sources',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
@@ -44,14 +44,14 @@ router.post(
 
 router.delete(
   '/v1/courses/:courseId/aplus-sources/:aplusGradeSourceId',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher]),
   controllerDispatcher(deleteAplusGradeSource)
 );
 
 router.get(
   '/v1/courses/:courseId/aplus-fetch',
-  passport.authenticate('jwt', {session: false}) as RequestHandler,
+  jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(fetchAplusGrades)
 );
