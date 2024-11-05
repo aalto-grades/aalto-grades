@@ -45,13 +45,13 @@ const Header = (): JSX.Element => {
         sx={{
           textDecoration: 'none',
           mr: 2,
-          width: '184px',
+          minWidth: '184px',
           cursor: 'pointer',
           fontWeight: 'bold',
           color: 'primary.main',
         }}
         data-testid="a-grades-header-link" // For e2e tests
-        unstable_viewTransition
+        viewTransition
       >
         A{logoVariant} Grades
       </Typography>
@@ -64,7 +64,7 @@ const Header = (): JSX.Element => {
               px: 2,
               py: 0,
               mr: 1,
-              width: 'fit-content',
+              minWidth: 'fit-content',
               borderRadius: '15px',
               height: '40px',
               alignItems: 'center',
@@ -93,10 +93,12 @@ const Header = (): JSX.Element => {
               px: 2,
               py: 0,
               mr: 1,
-              width: 'fit-content',
+              minWidth: '10px',
+              maxWidth: 'fit-content',
               borderRadius: '15px',
               height: '40px',
               alignItems: 'center',
+              flex: '1 1 fit-content',
             }}
           >
             <Typography
@@ -106,8 +108,9 @@ const Header = (): JSX.Element => {
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
-                maxWidth: '300px',
-                display: 'flex',
+                lineHeight: '40px',
+                // width: '100px',
+                // display: 'flex',
                 alignItems: 'center',
                 height: '100%',
               }}

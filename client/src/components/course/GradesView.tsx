@@ -4,10 +4,7 @@
 
 import {Box, Typography} from '@mui/material';
 import type {JSX} from 'react';
-import {
-  useParams,
-  unstable_useViewTransitionState as useViewTransitionState,
-} from 'react-router-dom';
+import {useParams, useViewTransitionState} from 'react-router-dom';
 
 import Delayed from '@/components/shared/Delay';
 import {GradesTableProvider} from '@/context/GradesTableProvider';
