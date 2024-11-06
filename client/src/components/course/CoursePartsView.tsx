@@ -48,6 +48,7 @@ import {
 import SaveBar from '@/components/shared/SaveBar';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
+  useDeleteCoursePart,
   useEditCoursePart,
   useGetAllGradingModels,
   useGetCourseParts,
@@ -81,6 +82,7 @@ const CoursePartsView = (): JSX.Element => {
   const gradingModels = useGetAllGradingModels(courseId);
   const courseParts = useGetCourseParts(courseId);
   const editCoursePart = useEditCoursePart(courseId);
+  const delCoursePart = useDeleteCoursePart(courseId);
 
   const courseTasks = useGetCourseTasks(courseId);
   const modifyCourseTasks = useModifyCourseTasks(courseId);
@@ -122,7 +124,7 @@ const CoursePartsView = (): JSX.Element => {
     return withGrades;
   }, [grades.data]);
 
-  const coursePartsWithModels = useMemo(() => {
+  const courseTasksWithModels = useMemo(() => {
     const withModels = new Set<number>();
     if (gradingModels.data === undefined) return withModels;
     for (const model of gradingModels.data) {
@@ -133,6 +135,55 @@ const CoursePartsView = (): JSX.Element => {
     }
     return withModels;
   }, [gradingModels.data]);
+
+  const courseTasksByCoursePartId = (coursePartId: number): Array<number> => {
+    if (courseTasks.data) {
+      return courseTasks.data
+        .filter(courseTask => courseTask.coursePartId === coursePartId)
+        .map(courseTask => courseTask.id);
+    }
+    return [];
+  };
+
+  const deleteCoursePartConfirmMessage = (
+    coursePartId: number
+  ): string | undefined => {
+    const courseTasksOfPart = courseTasksByCoursePartId(coursePartId);
+    const includeTaskWithModels = courseTasksOfPart.some(taskId =>
+      courseTasksWithModels.has(taskId)
+    );
+    if (includeTaskWithModels)
+      return t('course.parts.delete-with-model-message');
+    if (courseTasksOfPart.length > 0)
+      return t('course.parts.delete-with-task-message');
+    return t('course.parts.delete-message');
+  };
+
+  const handleDelCoursePart = async (coursePartId: number): Promise<void> => {
+    const confirmation = await AsyncConfirmationModal({
+      title: t('course.parts.delete'),
+      message: deleteCoursePartConfirmMessage(coursePartId),
+      confirmDelete: true,
+    });
+    if (confirmation) {
+      delCoursePart.mutate(coursePartId);
+      if (selectedPart === coursePartId) {
+        const currentRows = [...rows];
+        const newRows = currentRows.filter(
+          row => row.coursePartId !== coursePartId
+        );
+        setRows(newRows);
+        setInitRows(structuredClone(newRows));
+        setSelectedPart(null);
+      }
+    }
+  };
+
+  const isCoursePartDeletable = (coursePartId: number): boolean => {
+    return courseTasksByCoursePartId(coursePartId).some(taskId =>
+      courseTasksWithGrades.has(taskId)
+    );
+  };
 
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge,
@@ -164,7 +215,7 @@ const CoursePartsView = (): JSX.Element => {
       .filter(courseTask => courseTask.coursePartId === partId)
       .map(courseTask => ({
         id: courseTask.id,
-        coursePartId: courseTask.id,
+        coursePartId: courseTask.coursePartId,
         name: courseTask.name,
         daysValid: courseTask.daysValid,
         maxGrade: courseTask.maxGrade,
@@ -208,20 +259,17 @@ const CoursePartsView = (): JSX.Element => {
         });
       } else {
         modifications.edit!.push({
-          id: row.coursePartId,
+          id: row.id,
           name: row.name,
           daysValid: row.daysValid,
           maxGrade: row.maxGrade,
         });
       }
     }
-
-    const newAttIds = new Set(rows.map(row => row.coursePartId));
+    const newAttIds = new Set(rows.map(row => row.id));
     for (const initRow of initRows) {
-      if (!newAttIds.has(initRow.coursePartId))
-        modifications.delete!.push(initRow.coursePartId);
+      if (!newAttIds.has(initRow.id)) modifications.delete!.push(initRow.id);
     }
-
     await modifyCourseTasks.mutateAsync(modifications);
     enqueueSnackbar(t('course.parts.saved'), {variant: 'success'});
     setInitRows(structuredClone(rows));
@@ -291,17 +339,17 @@ const CoursePartsView = (): JSX.Element => {
         />
       );
     }
-    if (!courseTasksWithGrades.has(params.row.coursePartId)) {
+    if (!courseTasksWithGrades.has(params.row.id)) {
       elements.push(
         <GridActionsCellItem
           icon={<Delete />}
           label={t('general.delete')}
           onClick={async () => {
             let confirmation = true;
-            if (coursePartsWithModels.has(params.row.coursePartId)) {
+            if (courseTasksWithModels.has(params.row.id)) {
               confirmation = await AsyncConfirmationModal({
-                title: t('course.parts.delete'),
-                message: t('course.parts.delete-message'),
+                title: t('course.parts.delete-task'),
+                message: t('course.parts.delete-task-message'),
                 confirmDelete: true,
               });
             }
@@ -517,6 +565,26 @@ const CoursePartsView = (): JSX.Element => {
                         >
                           {coursePart.archived ? <Unarchive /> : <Archive />}
                         </IconButton>
+                      </Tooltip>
+                      <Tooltip
+                        placement="top"
+                        title={
+                          isCoursePartDeletable(coursePart.id)
+                            ? t('course.parts.cannot-delete-with-grades')
+                            : t('course.parts.delete')
+                        }
+                      >
+                        <span>
+                          <IconButton
+                            disabled={isCoursePartDeletable(coursePart.id)}
+                            edge="end"
+                            onClick={async () =>
+                              handleDelCoursePart(coursePart.id)
+                            }
+                          >
+                            <Delete />
+                          </IconButton>
+                        </span>
                       </Tooltip>
                     </>
                   ) : null
