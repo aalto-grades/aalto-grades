@@ -159,7 +159,9 @@ const CoursePartsView = (): JSX.Element => {
     return t('course.parts.delete-message');
   };
 
-  const handleDeleteCoursePart = async (coursePartId: number): Promise<void> => {
+  const handleDeleteCoursePart = async (
+    coursePartId: number
+  ): Promise<void> => {
     const confirmation = await AsyncConfirmationModal({
       title: t('course.parts.delete'),
       message: deleteCoursePartConfirmMessage(coursePartId),
