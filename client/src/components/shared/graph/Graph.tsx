@@ -510,6 +510,18 @@ const Graph = ({
                   )
                   .map(node => ({type: 'remove', id: node.id}))
               );
+
+              const selectedIds = selected.map(node => node.id);
+
+              onEdgesChange(
+                edges
+                  .filter(
+                    edge =>
+                      selectedIds.includes(edge.target) ||
+                      selectedIds.includes(edge.source)
+                  )
+                  .map(edge => ({type: 'remove', id: edge.id}))
+              );
             }}
             variant="contained"
             color="error"
