@@ -5,7 +5,12 @@
 import express, {Router} from 'express';
 import {processRequestBody, validateRequestBody} from 'zod-express-middleware';
 
-import {NewUserSchema, SystemRole, UserIdArraySchema} from '@/common/types';
+import {
+  NewUserSchema,
+  SystemRole,
+  UserIdArraySchema,
+  VerifyEmailSchema,
+} from '@/common/types';
 import {
   addUser,
   deleteUser,
@@ -14,6 +19,7 @@ import {
   getOwnCourses,
   getStudents,
   getUsers,
+  verifyEmail,
 } from '../controllers/user';
 import {handleInvalidRequestJson} from '../middleware';
 import {jwtAuthentication} from '../middleware/authentication';
@@ -55,6 +61,15 @@ router.post(
   handleInvalidRequestJson,
   processRequestBody(NewUserSchema),
   controllerDispatcher(addUser)
+);
+
+router.post(
+  '/v1/users/verify-email',
+  jwtAuthentication,
+  express.json(),
+  handleInvalidRequestJson,
+  processRequestBody(VerifyEmailSchema),
+  controllerDispatcher(verifyEmail)
 );
 
 router.delete(

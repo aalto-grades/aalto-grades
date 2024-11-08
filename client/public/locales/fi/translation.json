@@ -383,7 +383,8 @@
       "add-assistant-emails": "UNTRANSLATED",
       "no-assistants": "UNTRANSLATED",
       "input-at-least-one-assistant": "UNTRANSLATED",
-      "cannot-remove-self": "UNTRANSLATED"
+      "cannot-remove-self": "UNTRANSLATED",
+      "user-not-exist": "UNTRANSLATED"
     },
     "list": "UNTRANSLATED"
   },
