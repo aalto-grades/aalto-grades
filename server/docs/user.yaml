@@ -142,7 +142,7 @@ definitions:
         $ref: '#/definitions/NullableTemporaryPassword'
     required:
       - temporaryPassword
-  
+
   VerifyEmail:
     type: object
     properties:
