@@ -14,6 +14,7 @@ import {
   UserDataArraySchema,
   UserDataSchema,
   UserWithRoleArraySchema,
+  VerifyEmailResponseSchema,
 } from '@/common/types';
 import {app} from '../../src/app';
 import User from '../../src/database/models/user';
@@ -225,6 +226,56 @@ describe('Test GET /v1/users/ - get all users', () => {
         cookies.studentCookie,
       ])
       .get();
+  });
+});
+
+describe('Test POST /v1/users/verify-email - verify the existence of email', () => {
+  it('should return true when email exists', async () => {
+    const res = await request
+      .post('/v1/users/verify-email')
+      .send({email: 'idpuser@aalto.fi'})
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    const result = VerifyEmailResponseSchema.safeParse(res.body);
+    expect(result.success).toBeTruthy();
+    if (result.success) {
+      expect(result.data.exists).toBeTruthy();
+    }
+  });
+  it('should return false when email does not exist', async () => {
+    const res = await request
+      .post('/v1/users/verify-email')
+      .send({email: 'idpuser10000@aalto.fi'})
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    const result = VerifyEmailResponseSchema.safeParse(res.body);
+    expect(result.success).toBeTruthy();
+    if (result.success) {
+      expect(result.data.exists).toBeFalsy();
+    }
+  });
+  it('should return 400 when email is not provided or in wrong format', async () => {
+    await request
+      .post('/v1/users/verify-email')
+      .send({email: 'idpuser'})
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.BadRequest);
+
+    await request
+      .post('/v1/users/verify-email')
+      .send({username: 'idpuser'})
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.BadRequest);
+  });
+  it('should respond with 401 if not authorized', async () => {
+    const url = '/v1/users/verify-email';
+    await responseTests.testUnauthorized(url).post({email: 'idpuser@aalto.fi'});
   });
 });
 
