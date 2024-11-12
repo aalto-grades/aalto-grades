@@ -21,3 +21,6 @@ node_modules
 
 # Local GitHub workflow
 .actrc
+
+# Local env
+.env

@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import 'dotenv/config';
 import {Client} from 'pg';
 
 const pgHost = process.env.POSTGRES_URL || 'localhost';
