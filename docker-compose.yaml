@@ -37,8 +37,9 @@ services:
     image: postgres:16-alpine
     container_name: aalto-grades-database-dev
     env_file:
-      - .env
+      - path: .env
+        required: false
     ports:
-     - ${E2E_DB_PORT:-5432}:5432 # Exposed for e2e tests to work; set E2E_DB_PORT in .env to avoid conflicts with local Postgres
+     - ${E2E_DB_PORT:-5432}:5432 # Exposed for e2e tests to work; set E2E_DB_PORT in to avoid conflicts with local Postgres
     environment:
       POSTGRES_PASSWORD: 'postgres'
