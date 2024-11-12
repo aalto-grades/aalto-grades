@@ -55,6 +55,14 @@ export const UserIdArraySchema = z
   .array(IdSchema)
   .refine(items => new Set(items).size === items.length);
 
+export const VerifyEmailSchema = z.strictObject({
+  email: z.string().email(),
+});
+
+export const VerifyEmailResponseSchema = z.strictObject({
+  exists: z.boolean(),
+});
+
 export const UserDataArraySchema = z.array(UserDataSchema);
 export const UserWithRoleArraySchema = z.array(FullUserDataSchema);
 
@@ -65,3 +73,5 @@ export type TeacherData = z.infer<typeof TeacherDataSchema>;
 export type NewUser = z.infer<typeof NewUserSchema>;
 export type NewUserResponse = z.infer<typeof NewUserResponseSchema>;
 export type UserIdArray = z.infer<typeof UserIdArraySchema>;
+export type VerifyEmail = z.infer<typeof VerifyEmailSchema>;
+export type VerifyEmailResponse = z.infer<typeof VerifyEmailResponseSchema>;

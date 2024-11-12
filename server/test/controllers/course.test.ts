@@ -22,6 +22,7 @@ import {
   findCourseFullById,
   parseCourseFull,
 } from '../../src/controllers/utils/course';
+import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
 import {type Cookies, getCookies} from '../util/getCookies';
@@ -212,15 +213,31 @@ describe('Test POST /v1/courses - create new course', () => {
   //     .post(courseData);
   // });
 
-  it('should respond with 404 when email does not exist', async () => {
+  it('should create new IDP user when email does not exist', async () => {
     const courseData = createCourseData();
-    const url = '/v1/courses';
 
     const testData = {
       ...courseData,
       teachersInCharge: ['teacher@aalto.fi', 'teacher1000@aalto.fi'],
+      assistants: ['assistant1000@aalto.fi'],
     };
-    await responseTests.testNotFound(url, cookies.adminCookie).post(testData);
+    const res = await request
+      .post('/v1/courses')
+      .send(testData)
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Created);
+
+    const result = IdSchema.safeParse(res.body);
+    expect(result.success).toBeTruthy();
+
+    const newTeacher = await User.findByEmail('teacher1000@aalto.fi');
+    expect(newTeacher).not.toBe(null);
+    expect(newTeacher?.idpUser).toBeTruthy();
+
+    const newAssistant = await User.findByEmail('assistant1000@aalto.fi');
+    expect(newAssistant).not.toBe(null);
+    expect(newAssistant?.idpUser).toBeTruthy();
   });
 
   it('should respond with 409 when course code exists', async () => {
@@ -495,13 +512,25 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     await responseTests.testNotFound(url, cookies.adminCookie).put(data);
   });
 
-  it('should respond with 404 when email does not exist', async () => {
-    const url = `/v1/courses/${courseId}`;
-
+  it('should create new IDP user when email does not exist', async () => {
     const testData: EditCourseData = {
-      teachersInCharge: ['teacher@aalto.fi', 'teacher1000@aalto.fi'],
+      teachersInCharge: ['teacher@aalto.fi', 'teacher2000@aalto.fi'],
+      assistants: ['assistant2000@aalto.fi'],
     };
-    await responseTests.testNotFound(url, cookies.adminCookie).put(testData);
+    await request
+      .put(`/v1/courses/${courseId}`)
+      .send(testData)
+      .set('Cookie', cookies.adminCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
+
+    const newTeacher = await User.findByEmail('teacher2000@aalto.fi');
+    expect(newTeacher).not.toBe(null);
+    expect(newTeacher?.idpUser).toBeTruthy();
+
+    const newAssistant = await User.findByEmail('assistant2000@aalto.fi');
+    expect(newAssistant).not.toBe(null);
+    expect(newAssistant?.idpUser).toBeTruthy();
   });
 
   it('should respond with 409 when course code exists', async () => {

@@ -25,6 +25,9 @@ import {
   UserDataArraySchema,
   type UserIdArray,
   UserWithRoleArraySchema,
+  type VerifyEmail,
+  type VerifyEmailResponse,
+  VerifyEmailResponseSchema,
 } from '@/common/types';
 import type {Numeric} from '@/types';
 import axios from './axios';
@@ -75,6 +78,18 @@ export const useGetUsers = (
       UserWithRoleArraySchema.parse((await axios.get('/api/v1/users')).data),
     ...options,
   });
+
+export const useVerifyEmail = (
+  options?: UseMutationOptions<VerifyEmailResponse, unknown, VerifyEmail>
+): UseMutationResult<VerifyEmailResponse, unknown, VerifyEmail> => {
+  return useMutation({
+    mutationFn: async email =>
+      VerifyEmailResponseSchema.parse(
+        (await axios.post('/api/v1/users/verify-email', email)).data
+      ),
+    ...options,
+  });
+};
 
 export const useAddUser = (
   options?: UseMutationOptions<NewUserResponse, unknown, NewUser>

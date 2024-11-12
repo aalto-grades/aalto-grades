@@ -8,6 +8,7 @@ import {
   Person as PersonIcon,
 } from '@mui/icons-material';
 import {
+  Alert,
   Avatar,
   Box,
   Button,
@@ -42,7 +43,7 @@ import {
 } from '@/common/types';
 import FormField from '@/components/shared/FormikField';
 import FormLanguagesField from '@/components/shared/FormikLanguageField';
-import {useAddCourse} from '@/hooks/useApi';
+import {useAddCourse, useVerifyEmail} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import {useLocalize} from '@/hooks/useLocalize';
 import {
@@ -90,9 +91,13 @@ const CreateCourseDialog = ({
   const localize = useLocalize();
   const navigate = useNavigate();
   const addCourse = useAddCourse();
+  const emailExisted = useVerifyEmail();
 
   const [teachersInCharge, setTeachersInCharge] = useState<string[]>(
     forceEmail ? [forceEmail] : []
+  );
+  const [nonExistingEmails, setNonExistingEmails] = useState<Set<string>>(
+    new Set<string>()
   );
   const [assistants, setAssistants] = useState<string[]>([]);
 
@@ -275,7 +280,7 @@ const CreateCourseDialog = ({
               fullWidth
               value={form.values.teacherEmail}
               disabled={form.isSubmitting}
-              label={`${t('course.edit.teachers-in-charge')}*`}
+              label={t('course.edit.teachers-in-charge')}
               margin="normal"
               slotProps={{inputLabel: {shrink: true}}}
               helperText={
@@ -301,9 +306,18 @@ const CreateCourseDialog = ({
                 teachersInCharge.includes(form.values.teacherEmail) ||
                 form.isSubmitting
               }
-              onClick={() => {
+              onClick={async () => {
+                const teacherEmail = form.values.teacherEmail;
+                const isEmailExisted = await emailExisted.mutateAsync({
+                  email: teacherEmail,
+                });
+                if (!isEmailExisted.exists) {
+                  setNonExistingEmails(oldNonExistingEmail =>
+                    oldNonExistingEmail.add(teacherEmail)
+                  );
+                }
                 setTeachersInCharge(oldTeachers =>
-                  oldTeachers.concat(form.values.teacherEmail)
+                  oldTeachers.concat(teacherEmail)
                 );
                 form.setFieldValue('teacherEmail', '');
               }}
@@ -340,6 +354,11 @@ const CreateCourseDialog = ({
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText primary={teacherEmail} />
+                      {nonExistingEmails.has(teacherEmail) && (
+                        <Alert severity="warning">
+                          {t('course.edit.user-not-exist')}
+                        </Alert>
+                      )}
                     </ListItem>
                   ))}
                 </List>
@@ -351,7 +370,7 @@ const CreateCourseDialog = ({
               fullWidth
               value={form.values.assistantEmail}
               disabled={form.isSubmitting}
-              label={`${t('general.assistants')}*`}
+              label={t('general.assistants')}
               margin="normal"
               slotProps={{inputLabel: {shrink: true}}}
               helperText={
@@ -377,9 +396,18 @@ const CreateCourseDialog = ({
                 assistants.includes(form.values.assistantEmail) ||
                 form.isSubmitting
               }
-              onClick={() => {
+              onClick={async () => {
+                const assistantEmail = form.values.assistantEmail;
+                const isEmailExisted = await emailExisted.mutateAsync({
+                  email: assistantEmail,
+                });
+                if (!isEmailExisted.exists) {
+                  setNonExistingEmails(oldNonExistingEmail =>
+                    oldNonExistingEmail.add(assistantEmail)
+                  );
+                }
                 setAssistants(oldAssistants =>
-                  oldAssistants.concat(form.values.assistantEmail)
+                  oldAssistants.concat(assistantEmail)
                 );
                 form.setFieldValue('assistantEmail', '');
               }}
@@ -414,6 +442,11 @@ const CreateCourseDialog = ({
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText primary={emailAssistant} />
+                      {nonExistingEmails.has(emailAssistant) && (
+                        <Alert severity="warning">
+                          {t('course.edit.user-not-exist')}
+                        </Alert>
+                      )}
                     </ListItem>
                   ))}
                 </List>

@@ -168,12 +168,10 @@ export const validateEmailList = async (
     const userEmails = new Set(users.map(user => user.email));
     const missingEmails = emailList.filter(email => !userEmails.has(email));
 
-    throw new ApiError(
-      missingEmails.map(
-        (email: string) => `No user with email address ${email} found`
-      ),
-      HttpCode.NotFound
-    );
+    for (const email of missingEmails) {
+      const newUser = await User.create({email, idpUser: true});
+      users.push(newUser);
+    }
   }
 
   return users;
