@@ -40,6 +40,7 @@ services:
       - path: .env
         required: false
     ports:
-      - ${E2E_DB_PORT:-5432}:5432 # Exposed for e2e tests to work; set E2E_DB_PORT in to avoid conflicts with local Postgres
+      - ${E2E_DB_PORT:-5432}:5432 # Exposed for e2e tests to work
+      # Set E2E_DB_PORT to avoid conflicts with local Postgres
     environment:
       POSTGRES_PASSWORD: 'postgres'
