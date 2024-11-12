@@ -8,6 +8,7 @@ import {
   Person as PersonIcon,
 } from '@mui/icons-material';
 import {
+  Alert,
   Avatar,
   Box,
   Button,
@@ -44,7 +45,12 @@ import FormField from '@/components/shared/FormikField';
 import FormLanguagesField from '@/components/shared/FormikLanguageField';
 import SaveBar from '@/components/shared/SaveBar';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
-import {useEditCourse, useGetCourse, useGetFinalGrades} from '@/hooks/useApi';
+import {
+  useEditCourse,
+  useGetCourse,
+  useGetFinalGrades,
+  useVerifyEmail,
+} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import {useLocalize} from '@/hooks/useLocalize';
 import {
@@ -76,9 +82,13 @@ const EditCourseView = (): JSX.Element => {
   const course = useGetCourse(courseId);
   const editCourse = useEditCourse();
   const finalGrades = useGetFinalGrades(courseId);
+  const emailExisted = useVerifyEmail();
 
   const [initTeachersInCharge, setInitTeachersInCharge] = useState<string[]>(
     []
+  );
+  const [nonExistingEmails, setNonExistingEmails] = useState<Set<string>>(
+    new Set<string>()
   );
   const [teachersInCharge, setTeachersInCharge] = useState<string[]>([]);
   const [initAssistants, setInitAssistants] = useState<string[]>([]);
@@ -196,6 +206,8 @@ const EditCourseView = (): JSX.Element => {
         onError: () => setSubmitting(false),
       }
     );
+
+    setNonExistingEmails(new Set<string>());
   };
 
   const ValidationSchema = z
@@ -410,15 +422,24 @@ const EditCourseView = (): JSX.Element => {
                 variant="outlined"
                 startIcon={<PersonAddAlt1Icon />}
                 disabled={
-                  auth?.role !== SystemRole.Admin ||
+                  isDisabled() ||
                   form.errors.teacherEmail !== undefined ||
                   form.values.teacherEmail.length === 0 ||
                   teachersInCharge.includes(form.values.teacherEmail) ||
                   form.isSubmitting
                 }
-                onClick={() => {
+                onClick={async () => {
+                  const teacherEmail = form.values.teacherEmail;
+                  const isEmailExisted = await emailExisted.mutateAsync({
+                    email: teacherEmail,
+                  });
+                  if (!isEmailExisted.exists) {
+                    setNonExistingEmails(oldNonExistingEmail =>
+                      oldNonExistingEmail.add(teacherEmail)
+                    );
+                  }
                   setTeachersInCharge(oldTeachers =>
-                    oldTeachers.concat(form.values.teacherEmail)
+                    oldTeachers.concat(teacherEmail)
                   );
                   form.setFieldValue('teacherEmail', '');
                 }}
@@ -426,7 +447,7 @@ const EditCourseView = (): JSX.Element => {
               >
                 Add
               </Button>
-              <Box sx={{mt: 8, mb: 2, width: '50%'}}>
+              <Box sx={{mt: 8, mb: 2}}>
                 {teachersInCharge.length === 0 ? (
                   t('course.edit.add-at-least-one-teacher')
                 ) : (
@@ -453,6 +474,11 @@ const EditCourseView = (): JSX.Element => {
                           </Avatar>
                         </ListItemAvatar>
                         <ListItemText primary={teacherEmail} />
+                        {nonExistingEmails.has(teacherEmail) && (
+                          <Alert severity="warning">
+                            {t('course.edit.user-not-exist')}
+                          </Alert>
+                        )}
                       </ListItem>
                     ))}
                   </List>
@@ -489,9 +515,18 @@ const EditCourseView = (): JSX.Element => {
                   assistants.includes(form.values.assistantEmail) ||
                   form.isSubmitting
                 }
-                onClick={() => {
+                onClick={async () => {
+                  const assistantEmail = form.values.assistantEmail;
+                  const isEmailExisted = await emailExisted.mutateAsync({
+                    email: assistantEmail,
+                  });
+                  if (!isEmailExisted.exists) {
+                    setNonExistingEmails(oldNonExistingEmail =>
+                      oldNonExistingEmail.add(assistantEmail)
+                    );
+                  }
                   setAssistants(oldAssistants =>
-                    oldAssistants.concat(form.values.assistantEmail)
+                    oldAssistants.concat(assistantEmail)
                   );
                   form.setFieldValue('assistantEmail', '');
                 }}
@@ -499,7 +534,7 @@ const EditCourseView = (): JSX.Element => {
               >
                 {t('general.add')}
               </Button>
-              <Box sx={{mt: 8, mb: 2, width: '50%'}}>
+              <Box sx={{mt: 8, mb: 2}}>
                 {assistants.length === 0 ? (
                   t('course.edit.no-assistants')
                 ) : (
@@ -524,6 +559,11 @@ const EditCourseView = (): JSX.Element => {
                           </Avatar>
                         </ListItemAvatar>
                         <ListItemText primary={emailAssistant} />
+                        {nonExistingEmails.has(emailAssistant) && (
+                          <Alert severity="warning">
+                            {t('course.edit.user-not-exist')}
+                          </Alert>
+                        )}
                       </ListItem>
                     ))}
                   </List>

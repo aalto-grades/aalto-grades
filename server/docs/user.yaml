@@ -143,6 +143,22 @@ definitions:
     required:
       - temporaryPassword
 
+  VerifyEmail:
+    type: object
+    properties:
+      email:
+        type: string
+        description: Email to verify existence
+        example: teacher@aalto.fi
+
+  VerifyEmailResponse:
+    type: object
+    properties:
+      exists:
+        type: boolean
+        description: If the email existed in the database
+        example: true
+
 /v1/users/own-courses:
   get:
     tags: [User]
@@ -293,6 +309,34 @@ definitions:
     responses:
       200:
         description: Users deleted.
+      400:
+        $ref: '#/responses/BadRequest'
+      401:
+        $ref: '#/responses/Unauthorized'
+      403:
+        $ref: '#/responses/Forbidden'
+      404:
+        $ref: '#/responses/NotFound'
+    security:
+      - cookieAuth: []
+
+/v1/users/verify-email:
+  post:
+    tags: [User]
+    description: Verify whether an email exists in the database
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/definitions/VerifyEmail'
+    responses:
+      200:
+        description: Result to indicate whether the email exists or not.
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/VerifyEmailResponse'
       400:
         $ref: '#/responses/BadRequest'
       401:

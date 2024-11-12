@@ -18,6 +18,8 @@ import {
   SystemRole,
   type UserData,
   type UserIdArray,
+  type VerifyEmail,
+  type VerifyEmailResponse,
 } from '@/common/types';
 import Course from '../database/models/course';
 import CourseRole from '../database/models/courseRole';
@@ -303,6 +305,26 @@ export const addUser: Endpoint<NewUser, NewUserResponse> = async (req, res) => {
   }
 
   return res.status(HttpCode.Created).json({temporaryPassword});
+};
+
+/**
+ * (VerifyEmail) => VerifyEmailResponse
+ *
+ * @throws ApiError(400)
+ */
+export const verifyEmail: Endpoint<VerifyEmail, VerifyEmailResponse> = async (
+  req,
+  res
+) => {
+  const email = req.body.email;
+
+  const existingUser = await User.findByEmail(email);
+
+  if (existingUser !== null) {
+    return res.json({exists: true});
+  } else {
+    return res.json({exists: false});
+  }
 };
 
 /**

@@ -383,7 +383,8 @@
       "add-assistant-emails": "Add emails of the assistants of the course.",
       "no-assistants": "No assistants in the course",
       "input-at-least-one-assistant": "Input the email address of at least one assistant of the course",
-      "cannot-remove-self": "You cannot remove yourself from the course"
+      "cannot-remove-self": "You cannot remove yourself from the course",
+      "user-not-exist": "User doesn't exist. Will be created on submit."
     },
     "list": "Course list"
   },

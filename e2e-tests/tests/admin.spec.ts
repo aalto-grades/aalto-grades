@@ -74,11 +74,11 @@ test.describe('Test courses as admin', () => {
     await page.getByRole('option', {name: 'Pass-Fail'}).click();
     await page.getByLabel('Course language*').click();
     await page.getByRole('option', {name: 'Japanese'}).click();
-    await page.getByLabel('Teachers in charge*').click();
-    await page.getByLabel('Teachers in charge*').fill('teacher@aalto.fi');
+    await page.getByLabel('Teachers in charge').click();
+    await page.getByLabel('Teachers in charge').fill('teacher@aalto.fi');
     await page.getByRole('button', {name: 'Add'}).first().click();
-    await page.getByLabel('Assistants*').click();
-    await page.getByLabel('Assistants*').fill('assistant@aalto.fi');
+    await page.getByLabel('Assistants').click();
+    await page.getByLabel('Assistants').fill('assistant@aalto.fi');
     await page.getByRole('button', {name: 'Add'}).nth(1).click();
     await page.getByRole('button', {name: 'Submit'}).click();
     await expect(page.getByRole('heading', {name: 'testCourse'})).toBeVisible();
