@@ -13,7 +13,7 @@ export default defineConfig({
 
   /* Tests currently modify one database. Parallelism will cause problems */
   fullyParallel: false,
-  workers: 1,
+  workers: 3,
 
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: Boolean(process.env.CI),
@@ -33,14 +33,19 @@ export default defineConfig({
   },
 
   projects: [
+    {name: 'setup', testMatch: /.*\.setup\.ts/},
+    {name: 'cleanDB', testMatch: /.*\.teardown\.ts/},
     {
       name: 'chromium',
       use: {...devices['Desktop Chrome']},
+      dependencies: ['setup'],
+      teardown: 'cleanDB',
     },
-
     {
       name: 'firefox',
       use: {...devices['Desktop Firefox']},
+      dependencies: ['setup'],
+      teardown: 'cleanDB',
     },
 
     // Broken, TODO: enable (#594)

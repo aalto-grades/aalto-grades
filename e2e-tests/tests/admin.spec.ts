@@ -4,31 +4,29 @@
 
 import {expect, test} from '@playwright/test';
 
-import {cleanDb, setupDb} from './helper';
-import {login} from './login';
+import {setupDb} from './helper';
 
 test.beforeAll(async () => {
   await setupDb();
 });
 
 test.beforeEach(async ({page}) => {
-  await login('admin', page);
+  await page.goto('/');
 });
 
 test.afterEach(async ({page}) => {
-  await cleanDb();
   await page.goto('/');
   await page.getByRole('button', {name: 'Andy Admin'}).click();
   await page.getByRole('menuitem', {name: 'Log out'}).click();
 });
 
+test.use({storageState: 'playwright/.auth/admin.json'});
 test.describe('Manage users as admin', () => {
   test('Add user', async ({page}) => {
     await page.getByRole('button', {name: 'Add user'}).click();
     await page.getByLabel('Email').click();
     await page.getByLabel('Email').fill('testuser@aalto.fi');
     await page.getByRole('button', {name: 'Add user'}).click();
-    await page.goto('/');
     await expect(
       page.getByRole('cell', {name: 'testuser@aalto.fi'})
     ).toBeAttached();
@@ -118,9 +116,9 @@ test.describe('Test courses as admin', () => {
     await page.getByRole('option', {name: 'Chinese'}).click();
 
     await page.getByRole('button', {name: 'Save'}).click();
+    await expect(page.getByText('CS-A1120 - edit')).toBeVisible();
     await page.getByTestId('a-grades-header-link').click();
     await page.getByRole('cell', {name: 'O1'}).click();
-    await expect(page.getByText('CS-A1120 - edit')).toBeVisible();
     await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
   });
 
@@ -129,7 +127,7 @@ test.describe('Test courses as admin', () => {
     await page.getByRole('button', {name: 'Grading models'}).click();
     await page.getByLabel('Create new final grade model').click();
     await page.getByLabel('Name *').click();
-    await page.getByLabel('Name *').fill('Test model');
+    await page.getByLabel('Name *').fill('Test model admin');
     await page.getByLabel('Select template').click();
     await page.getByRole('option', {name: 'Addition'}).click();
     await page.getByRole('button', {name: 'Submit'}).click();
@@ -142,6 +140,8 @@ test.describe('Test courses as admin', () => {
     await expect(page.getByText('Model saved successfully')).toBeVisible();
     await page.getByRole('button', {name: 'Grades', exact: true}).click();
     await page.getByRole('button', {name: 'Grading models'}).click();
-    await expect(page.getByRole('button', {name: 'Test model'})).toBeVisible();
+    await expect(
+      page.getByRole('button', {name: 'Test model admin'})
+    ).toBeVisible();
   });
 });

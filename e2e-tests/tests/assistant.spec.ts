@@ -4,24 +4,22 @@
 
 import {expect, test} from '@playwright/test';
 
-import {cleanDb, setupDb} from './helper';
-import {login} from './login';
+import {setupDb} from './helper';
 
 test.beforeAll(async () => {
   await setupDb();
 });
 
 test.beforeEach(async ({page}) => {
-  await login('assistant', page);
+  await page.goto('/');
 });
 
 test.afterEach(async ({page}) => {
-  await cleanDb();
   await page.goto('/');
   await page.getByRole('button', {name: 'Alex Assistant'}).click();
   await page.getByRole('menuitem', {name: 'Log out'}).click();
 });
-
+test.use({storageState: 'playwright/.auth/assistant.json'});
 test.describe('Test courses as Assistant', () => {
   test('Check course', async ({page}) => {
     await page.getByRole('cell', {name: 'O1'}).click();
