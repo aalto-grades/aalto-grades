@@ -39,7 +39,7 @@ test.describe('Test courses as teacher', () => {
     await page.getByRole('button', {name: 'Grading models'}).click();
     await page.getByLabel('Create new final grade model').click();
     await page.getByLabel('Name *').click();
-    await page.getByLabel('Name *').fill('Test model');
+    await page.getByLabel('Name *').fill('Test model teacher');
     await page.getByLabel('Select template').click();
     await page.getByRole('option', {name: 'Addition'}).click();
     await page.getByRole('button', {name: 'Submit'}).click();
@@ -52,7 +52,9 @@ test.describe('Test courses as teacher', () => {
     await expect(page.getByText('Model saved successfully')).toBeVisible();
     await page.getByRole('button', {name: 'Grades', exact: true}).click();
     await page.getByRole('button', {name: 'Grading models'}).click();
-    await expect(page.getByRole('button', {name: 'Test model'})).toBeVisible();
+    await expect(
+      page.getByRole('button', {name: 'Test model teacher'})
+    ).toBeVisible();
   });
 
   test('View Course Parts', async ({page}) => {

@@ -71,12 +71,17 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
   throw new Error(`Failed to log in with user ${user}`);
 };
 
-for (const role of ['admin', 'teacher', 'assistant', 'student'] as UserType[]) {
-  setup(`authenticate as user ${role}`, async ({page}) => {
-    await setupDb();
+setup('authenticate as user', async ({page}) => {
+  await setupDb();
+  for (const role of [
+    'admin',
+    'teacher',
+    'assistant',
+    'student',
+  ] as UserType[]) {
     const userFile = `playwright/.auth/${role}.json`;
     await login(role, page);
     await page.context().storageState({path: userFile});
-    await cleanDb();
-  });
-}
+  }
+  await cleanDb();
+});
