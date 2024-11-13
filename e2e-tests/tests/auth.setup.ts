@@ -71,7 +71,7 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
   throw new Error(`Failed to log in with user ${user}`);
 };
 
-setup('authenticate as user', async ({page}) => {
+setup('authenticate all user roles', async ({page}) => {
   await setupDb();
   for (const role of [
     'admin',
