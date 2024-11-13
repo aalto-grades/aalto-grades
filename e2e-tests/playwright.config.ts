@@ -11,9 +11,7 @@ import {defineConfig, devices} from '@playwright/test';
 export default defineConfig({
   testDir: './.',
 
-  /* Tests currently modify one database. Parallelism will cause problems */
-  fullyParallel: false,
-  workers: 3,
+  fullyParallel: true,
 
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: Boolean(process.env.CI),
