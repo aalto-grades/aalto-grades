@@ -41,10 +41,11 @@ import {
   useAddGrades,
   useDeleteGrade,
   useEditGrade,
+  useGetCourseParts,
   useGetCourseTasks,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
-import {findBestGrade} from '@/utils';
+import {findBestGrade, getCoursePartExpiryDate} from '@/utils';
 
 type ColTypes = {
   id: number;
@@ -81,6 +82,7 @@ const EditGradesDialog = ({
   const {courseId} = useParams() as {courseId: string};
   const {gradeSelectOption} = useTableContext();
 
+  const courseParts = useGetCourseParts(courseId);
   const courseTasks = useGetCourseTasks(courseId);
   const addGrades = useAddGrades(courseId);
   const editGrade = useEditGrade(courseId);
@@ -109,13 +111,21 @@ const EditGradesDialog = ({
     [initRows, rows]
   );
 
+  const coursePartExipryDate = useMemo(() => {
+    return getCoursePartExpiryDate(
+      courseParts.data,
+      courseTasks.data,
+      courseTaskId
+    );
+  }, [courseParts, courseTasks, courseTaskId]);
+
   const bestGrade = useMemo(
     () =>
-      findBestGrade(rows, {
-        expiredOption: 'prefer_non_expired',
+      findBestGrade(rows, coursePartExipryDate, {
+        expiredOption: 'non_expired',
         gradeSelectOption,
       }),
-    [gradeSelectOption, rows]
+    [gradeSelectOption, rows, coursePartExipryDate]
   );
 
   const blocker = useBlocker(

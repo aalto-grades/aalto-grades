@@ -45,7 +45,7 @@ const PredictedGradeCell = ({
   );
 
   let previewValue = 'N/A';
-  if (gradingScale === null) previewValue = value!.toString();
+  if (gradingScale === null) previewValue = value ? value.toString() : '0';
   else {
     previewValue = gradingModelIds
       .map(modelId =>

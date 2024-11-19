@@ -25,7 +25,7 @@ import type {
 import Graph from '@/components/shared/graph/Graph';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useGetCourseParts, useGetCourseTasks} from '@/hooks/useApi';
-import {findBestGrade} from '@/utils';
+import {findBestGrade, getCoursePartExpiryDate} from '@/utils';
 
 type PropsType = {
   open: boolean;
@@ -94,7 +94,15 @@ const UserGraphDialog = ({
       );
       sourceValues = data.row.courseTasks.map(task => ({
         id: task.courseTaskId,
-        value: findBestGrade(task.grades)?.grade ?? 0,
+        value:
+          findBestGrade(
+            task.grades,
+            getCoursePartExpiryDate(
+              courseParts.data,
+              courseTasks.data,
+              task.courseTaskId
+            )
+          )?.grade ?? 0,
       }));
     }
   }

@@ -350,7 +350,8 @@
       },
       "final-grade-preview": "Final grade preview",
       "course-part-value-preview": "Course part value",
-      "data-undefined": "Data is undefined"
+      "data-undefined": "Data is undefined",
+      "all-grades-expired": "All grades are expired"
     },
     "edit": {
       "saved": "Course details saved.",

@@ -31,6 +31,7 @@ import {
   useAddFinalGrades,
   useGetAllGradingModels,
   useGetCourse,
+  useGetCourseParts,
   useGetCourseTasks,
   useGetGrades,
 } from '@/hooks/useApi';
@@ -38,6 +39,7 @@ import useAuth from '@/hooks/useAuth';
 import {
   findBestGrade,
   findLatestGrade,
+  getCoursePartExpiryDate,
   getErrorCount,
   getMaxFinalGrade,
 } from '@/utils';
@@ -333,6 +335,7 @@ const GradesTableToolbar = (): JSX.Element => {
   const course = useGetCourse(courseId);
   const allGradingModels = useGetAllGradingModels(courseId);
   const courseTasks = useGetCourseTasks(courseId);
+  const courseParts = useGetCourseParts(courseId);
   const getGrades = useGetGrades(courseId);
   const addFinalGrades = useAddFinalGrades(courseId);
 
@@ -405,8 +408,16 @@ const GradesTableToolbar = (): JSX.Element => {
         userId: selectedRow.user.id,
         courseTasks: selectedRow.courseTasks.map(task => ({
           id: task.courseTaskId,
-          // TODO: Manage expired task grades? (#696)
-          grade: findBestGrade(task.grades, {gradeSelectOption})?.grade ?? 0,
+          grade:
+            findBestGrade(
+              task.grades,
+              getCoursePartExpiryDate(
+                courseParts.data,
+                courseTasks.data,
+                task.courseTaskId
+              ),
+              {expiredOption: 'non_expired', gradeSelectOption}
+            )?.grade ?? 0,
         })),
       }))
     );

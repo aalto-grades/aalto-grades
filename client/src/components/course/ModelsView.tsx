@@ -31,7 +31,7 @@ import {
   useGetGrades,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
-import {findBestGrade, getCourseRole} from '@/utils';
+import {findBestGrade, getCoursePartExpiryDate, getCourseRole} from '@/utils';
 import CreateGradingModelDialog from './models-view/CreateGradingModelDialog';
 import MissingModelButton from './models-view/MissingModelButton';
 import ModelButton from './models-view/ModelButton';
@@ -220,7 +220,14 @@ const ModelsView = (): JSX.Element => {
             .filter(task => task.grades.length > 0)
             .map(task => ({
               id: task.courseTaskId,
-              grade: findBestGrade(task.grades)!.grade,
+              grade: findBestGrade(
+                task.grades,
+                getCoursePartExpiryDate(
+                  courseParts.data,
+                  courseTasks.data,
+                  task.courseTaskId
+                )
+              )!.grade,
             })),
         },
       ])[userRow.user.id]
@@ -234,6 +241,8 @@ const ModelsView = (): JSX.Element => {
     navigate,
     t,
     userId,
+    courseParts.data,
+    courseTasks.data,
   ]);
 
   const handleArchiveModel = (
@@ -392,7 +401,15 @@ const ModelsView = (): JSX.Element => {
             currentModel.coursePartId
               ? (currentUserRow?.courseTasks.map(task => ({
                   id: task.courseTaskId,
-                  value: findBestGrade(task.grades)?.grade ?? 0,
+                  value:
+                    findBestGrade(
+                      task.grades,
+                      getCoursePartExpiryDate(
+                        courseParts.data,
+                        courseTasks.data,
+                        task.courseTaskId
+                      )
+                    )?.grade ?? 0,
                 })) ?? null)
               : coursePartValues === null
                 ? null
