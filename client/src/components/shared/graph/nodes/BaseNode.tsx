@@ -9,10 +9,13 @@ import type {NodeProps} from 'reactflow';
 
 import {ExtraNodeDataContext, NodeDataContext} from '@/context/GraphProvider';
 
-type PropsType = NodeProps & {
-  error?: boolean;
-  fullFail?: boolean;
-} & PropsWithChildren;
+type PropsType = PropsWithChildren<
+  NodeProps & {
+    error?: boolean;
+    fullFail?: boolean;
+  }
+>;
+
 const BaseNode = ({
   id,
   type,

@@ -2,21 +2,102 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-name: Pull Request Workflow
-run-name: ${{ github.head_ref }} pull request (${{ github.actor }})
-
+name: PR Workflow
+run-name: ${{ github.actor }} pull request
 on: # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
       - dev
 
 jobs:
-  run_e2e_tests:
-    uses: ./.github/workflows/e2e-tests.yaml
+  test_and_lint_client:
+    name: Test and lint client
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Install common dependencies
+        run: npm --prefix ../common ci
+      - name: Install linter dependencies
+        run: npm --prefix .. ci
+      - name: Run linter
+        run: npm run lint
 
-  server_tests:
-    uses: ./.github/workflows/server-tests.yaml
+  test_and_lint_server:
+    name: Test and lint server
+    runs-on: self-hosted
+    env:
+      POSTGRES_PASSWORD: postgres
+      NODE_ENV: test
+    defaults:
+      run:
+        working-directory: ./server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Docker compose down
+        run: docker-compose -f docker-compose-test.yaml down --volumes --remove-orphans
+      - name: Docker compose build
+        run: docker-compose -f docker-compose-test.yaml build --no-cache
+      - name: Run tests
+        run: >
+          set -o pipefail &&
+          docker-compose -f docker-compose-test.yaml up
+          --abort-on-container-exit --exit-code-from backend
+          2>&1 | sed '/database_1/d; s/^[^|]*[^ ]* //'
+      - name: Install dependencies
+        run: npm ci
+      - name: Install common dependencies
+        run: npm --prefix ../common ci
+      - name: Install linter dependencies
+        run: npm --prefix .. ci
+      - name: Run linter
+        run: npm run lint
 
-  lint_project:
-    uses: ./.github/workflows/lint-project.yaml
+  lint_common:
+    name: Lint common
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./common
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Install linter dependencies
+        run: npm --prefix .. ci
+      - name: Run linter
+        run: npm run lint
+
+  lint_yaml_files:
+    name: Lint project YAML files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install yamllint
+        run: pip install yamllint
+      - name: Lint YAML files
+        run: yamllint .
+
+  reuse_lint:
+    name: Check REUSE compliance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: fsfe/reuse-action@v4

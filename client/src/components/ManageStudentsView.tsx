@@ -56,13 +56,15 @@ const ManageStudentsView = (): JSX.Element => {
   // Warning if leaving with unsaved
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent): void => {
-      if (changes) e.preventDefault();
+      if (changes) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
     };
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [changes]);
 
-  // Update rows when student data loads / changes
   const [oldStudentData, setOldStudentData] =
     useState<typeof students.data>(undefined);
   if (students.data !== oldStudentData) {

@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import {type JSX, useEffect, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
@@ -21,8 +21,8 @@ import type {
 import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
 import {useAddAplusGradeSources, useFetchAplusCourses} from '@/hooks/useApi';
 import {getAplusToken} from '@/utils';
-import SelectAplusCourse from './aplus-components/SelectAplusCourse';
-import SelectAplusGradeSource from './aplus-components/SelectAplusGradeSource';
+import SelectAplusCourse from './SelectAplusCourse';
+import SelectAplusGradeSource from './SelectAplusGradeSource';
 
 type PropsType = {
   onClose: () => void;
@@ -49,10 +49,6 @@ const AddAplusGradeSourceDialog = ({
 
   const open = courseTaskId !== null;
 
-  useEffect(() => {
-    setAplusTokenDialogOpen(!getAplusToken() || aplusCourses.isError);
-  }, [open, aplusCourses]);
-
   const handleResetAndClose = (): void => {
     setStep(0);
     setAplusCourse(null);
@@ -61,6 +57,50 @@ const AddAplusGradeSourceDialog = ({
 
   return (
     <>
+      <Dialog open={open} onClose={handleResetAndClose} maxWidth="md" fullWidth>
+        {step === 0 && <DialogTitle>{t('general.a+-courses')}</DialogTitle>}
+        {step === 1 && (
+          <DialogTitle>{t('course.parts.select-grade-source')}</DialogTitle>
+        )}
+        <DialogContent>
+          {step === 0 && aplusCourses.data !== undefined && (
+            <SelectAplusCourse
+              aplusCourses={aplusCourses.data}
+              selectedAplusCourse={aplusCourse}
+              setAplusCourse={setAplusCourse}
+            />
+          )}
+          {step === 1 && aplusCourse !== null && (
+            <SelectAplusGradeSource
+              aplusCourse={aplusCourse}
+              aplusGradeSources={aplusGradeSources}
+              handleSelect={(aplusGradeSource: NewAplusGradeSourceData) => {
+                if (courseTaskId !== null) {
+                  addAplusGradeSources.mutate([
+                    {
+                      ...aplusGradeSource,
+                      courseTaskId,
+                    },
+                  ]);
+                }
+                handleResetAndClose();
+              }}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          {step === 0 && (
+            <Button disabled={!aplusCourse} onClick={() => setStep(step + 1)}>
+              {t('general.next')}
+            </Button>
+          )}
+          {step === 1 && (
+            <Button onClick={() => setStep(step - 1)}>
+              {t('general.back')}
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
       <AplusTokenDialog
         open={aplusTokenDialogOpen && open}
         onClose={onClose}
@@ -70,59 +110,6 @@ const AddAplusGradeSourceDialog = ({
         }}
         error={aplusCourses.isError}
       />
-      <Dialog
-        open={open && !aplusTokenDialogOpen}
-        onClose={handleResetAndClose}
-        maxWidth="md"
-        fullWidth
-      >
-        {step === 0 && (
-          <>
-            <DialogTitle>{t('general.a+-courses')}</DialogTitle>
-            <DialogContent>
-              {aplusCourses.data !== undefined && (
-                <SelectAplusCourse
-                  aplusCourses={aplusCourses.data}
-                  selectedAplusCourse={aplusCourse}
-                  setAplusCourse={setAplusCourse}
-                />
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button disabled={!aplusCourse} onClick={() => setStep(step + 1)}>
-                {t('general.next')}
-              </Button>
-            </DialogActions>
-          </>
-        )}
-
-        {step === 1 && (
-          <>
-            <DialogTitle>{t('course.parts.select-grade-source')}</DialogTitle>
-            <DialogContent>
-              {aplusCourse !== null && (
-                <SelectAplusGradeSource
-                  aplusCourse={aplusCourse}
-                  aplusGradeSources={aplusGradeSources}
-                  handleSelect={(aplusGradeSource: NewAplusGradeSourceData) => {
-                    if (courseTaskId !== null) {
-                      addAplusGradeSources.mutate([
-                        {...aplusGradeSource, courseTaskId},
-                      ]);
-                    }
-                    handleResetAndClose();
-                  }}
-                />
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setStep(step - 1)}>
-                {t('general.back')}
-              </Button>
-            </DialogActions>
-          </>
-        )}
-      </Dialog>
     </>
   );
 };

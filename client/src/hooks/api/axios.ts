@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import axios from 'axios';
-import i18next from 'i18next';
 import type {ZodError} from 'zod';
 
 const axiosInstance = axios.create({
@@ -26,11 +25,6 @@ axiosInstance.interceptors.response.use(response => {
           .map(issue => `'/${issue.path.join('/')} : ${issue.message}'`)
           .join(', ')
     );
-  }
-
-  // Token expired error
-  if (response.status === 401) {
-    throw new Error(i18next.t('shared.auth.token-expired'));
   }
 
   // Other errors

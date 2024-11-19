@@ -44,12 +44,10 @@ const ModelsView = (): JSX.Element => {
   const {courseId, modelId, userId} = useParams() as ParamsType;
   const navigate = useNavigate();
 
-  const course = useGetCourse(courseId);
-  const allGradingModels = useGetAllGradingModels(courseId);
-  const editModel = useEditGradingModel();
-  const delModel = useDeleteGradingModel();
   const courseParts = useGetCourseParts(courseId);
   const courseTasks = useGetCourseTasks(courseId);
+  const allGradingModels = useGetAllGradingModels(courseId);
+  const course = useGetCourse(courseId);
   const finalGrades = useGetFinalGrades(courseId, {
     enabled:
       auth !== null &&
@@ -57,6 +55,8 @@ const ModelsView = (): JSX.Element => {
         (course.data &&
           getCourseRole(course.data, auth) === CourseRoleType.Teacher)),
   });
+  const editModel = useEditGradingModel();
+  const delModel = useDeleteGradingModel();
   const grades = useGetGrades(courseId);
 
   const [currentModel, setCurrentModel] = useState<GradingModelData | null>(

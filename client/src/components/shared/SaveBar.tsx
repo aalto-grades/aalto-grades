@@ -9,10 +9,10 @@ import {useTranslation} from 'react-i18next';
 
 type PropsType = {
   show: boolean;
-  handleSave?: () => void;
-  handleDiscard: () => void;
   loading?: boolean;
   disabled?: boolean;
+  handleSave?: () => void;
+  handleDiscard: () => void;
 };
 const SaveBar = ({
   show,
@@ -23,7 +23,6 @@ const SaveBar = ({
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const theme = useTheme();
-
   return (
     <Fade in={show}>
       <Box
@@ -40,8 +39,16 @@ const SaveBar = ({
           boxSizing: 'border-box',
         }}
       >
+        {/* // TODO: fix flickering when saving with loading text enabled */}
+        {/* {loading ? (
+            <Typography variant="body2">{t('general.saving')}...</Typography>
+          ) : (
+            <Typography variant="body2">{t('general.unsaved-changes')}</Typography>
+            )}{' '}   */}
         <Typography variant="body2">{t('general.unsaved-changes')}</Typography>
         <Button
+          id="ag-save-course-btn"
+          // variant="outlined"
           type="submit"
           size="small"
           startIcon={<SaveOutlined />}
@@ -56,8 +63,10 @@ const SaveBar = ({
           {t('general.save')}
         </Button>
         <Button
+          // variant="tonal"
           size="small"
           disabled={loading || disabled}
+          // sx={{float: 'right', mr: 2}}
           color="error"
           onClick={handleDiscard}
           startIcon={<ClearRounded />}

@@ -20,12 +20,12 @@ import ChangePasswordDialog from './ChangePasswordDialog';
 
 const UserButton = (): JSX.Element => {
   const {t} = useTranslation();
-  const {auth, setAuth} = useAuth();
   const navigate = useNavigate();
+  const {auth, setAuth} = useAuth();
   const queryClient = useQueryClient();
-  const confirmMfa = useConfirmMfa();
   const logOut = useLogOut();
   const resetOwnAuth = useResetOwnAuth();
+  const confirmMfa = useConfirmMfa();
 
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [anchorWidth, setAnchorWidth] = useState<number | null>(null);
@@ -69,8 +69,9 @@ const UserButton = (): JSX.Element => {
 
   const menuOpen = Boolean(anchorEl);
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  if (auth === null) return <></>;
+  if (auth?.name === undefined) {
+    return <div data-testid="not-logged-in" />;
+  }
 
   return (
     <>
@@ -102,9 +103,9 @@ const UserButton = (): JSX.Element => {
       )}
 
       <Button
-        id="user-button"
+        id="basic-button"
         color="inherit"
-        aria-controls={menuOpen ? 'user-menu' : undefined}
+        aria-controls={menuOpen ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={menuOpen ? 'true' : undefined}
         onClick={event => {
@@ -119,14 +120,13 @@ const UserButton = (): JSX.Element => {
         <ArrowDropDownIcon color="inherit" />
       </Button>
       <Menu
-        id="user-menu"
+        id="basic-menu"
         anchorEl={anchorEl}
         open={menuOpen}
         onClose={() => setAnchorEl(null)}
-        MenuListProps={{'aria-labelledby': 'user-button'}}
+        MenuListProps={{'aria-labelledby': 'basic-button'}}
       >
         <MenuItem
-          key="aplus-token"
           sx={{width: anchorWidth ?? '100%'}}
           onClick={() => {
             setAnchorEl(null);

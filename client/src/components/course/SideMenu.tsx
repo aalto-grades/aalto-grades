@@ -71,6 +71,7 @@ const SideMenuButton = ({
             backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
             transition: 'border-radius 1s',
           }}
+          // onClick={() => navigate(to)}
         >
           <ListItemIcon>
             {isPending || isTransitioning ? (

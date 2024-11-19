@@ -21,7 +21,7 @@ export default class AplusGradeSource extends Model<
 > {
   declare id: CreationOptional<number>;
   declare courseTaskId: ForeignKey<CourseTask['id']>;
-  declare aplusCourse: AplusCourseData;
+  declare aplusCourse: AplusCourseData; // TODO: Store as a table? Or individual fields?
   declare date: Date | string;
   declare sourceType: AplusGradeSourceType;
   declare moduleId: CreationOptional<number | null>;

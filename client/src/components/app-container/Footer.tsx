@@ -46,7 +46,9 @@ const Footer = (): JSX.Element => {
       </Link>
       <Tooltip title={t('app.footer.source.tooltip')}>
         <Link
-          href={`https://github.com/aalto-grades/aalto-grades/tree/v${AALTO_GRADES_VERSION}`}
+          // TODO: Once we have releases and employ a versioning scheme, link the version tag
+          // to={`https://github.com/aalto-grades/aalto-grades/tree/${AALTO_GRADES_VERSION}`}
+          href="https://github.com/aalto-grades/aalto-grades"
           target="_blank"
           rel="noreferrer"
           underline="none"

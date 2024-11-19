@@ -25,7 +25,6 @@ import type {UserData} from '@/common/types';
 import {useGetCoursesOfStudent, useGetStudents} from '@/hooks/useApi';
 import {useLocalize} from '@/hooks/useLocalize';
 
-/** Get user option string */
 const getString = (student: UserData): string => {
   let string = student.studentNumber!.toString();
   if (student.name) string = `${student.name}, ${string}`;
@@ -35,8 +34,8 @@ const getString = (student: UserData): string => {
 
 const StudentsView = (): JSX.Element => {
   const {t} = useTranslation();
-  const {userId} = useParams();
   const localize = useLocalize();
+  const {userId} = useParams();
   const navigate = useNavigate();
   const students = useGetStudents();
 
@@ -48,7 +47,6 @@ const StudentsView = (): JSX.Element => {
         : null,
     [students.data, userId]
   );
-
   const [selectedStudent, setSelectedStudent] = useState<UserData | null>(
     urlStudent ?? null
   );
@@ -90,7 +88,7 @@ const StudentsView = (): JSX.Element => {
             })}
           </Typography>
           <TableContainer component={Paper}>
-            <Table sx={{minWidth: 650}}>
+            <Table sx={{minWidth: 650}} aria-label="simple table">
               <TableHead>
                 <TableRow>
                   <TableCell>{t('general.course')}</TableCell>

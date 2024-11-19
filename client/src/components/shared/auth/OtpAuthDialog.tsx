@@ -68,7 +68,7 @@ const OtpAuthDialog = ({
         </Box>
         <Collapse in={showSecret}>
           <DialogContentText
-            data-testid="mfa-secret" // For e2e tests
+            data-testid="mfa-secret"
             sx={{mt: 1, textAlign: 'center'}}
           >
             {splitString(secret, 26)}
@@ -78,7 +78,7 @@ const OtpAuthDialog = ({
           {t('shared.auth.enter-totp')}
         </DialogContentText>
         <MuiOtpInput
-          data-testid="mfa-input" // For e2e tests
+          data-testid="mfa-input"
           title="Mfa code"
           sx={{my: 1}}
           length={6}

@@ -302,34 +302,6 @@ describe('Test DELETE /v1/users/:userId - delete a user', () => {
     expect(deletedUser).toBe(null);
   });
 
-  it('should delete a user role', async () => {
-    const user = await createData.createUser({idpUser: true, admin: true});
-
-    // Delete admin role
-    let res = await request
-      .delete(`/v1/users/${user.id}?role=admin`)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
-
-    expect(JSON.stringify(res.body)).toBe('{}');
-
-    let deletedUser = await User.findByPk(user.id);
-    expect(deletedUser?.admin).toBeFalsy();
-
-    // Delete idpUser role
-    res = await request
-      .delete(`/v1/users/${user.id}?role=idpUser`)
-      .set('Cookie', cookies.adminCookie)
-      .set('Accept', 'application/json')
-      .expect(HttpCode.Ok);
-
-    expect(JSON.stringify(res.body)).toBe('{}');
-
-    deletedUser = await User.findByPk(user.id);
-    expect(deletedUser?.idpUser).toBeFalsy();
-  });
-
   it('should respond with 401 or 403 if not authorized', async () => {
     const user = await createData.createUser();
 

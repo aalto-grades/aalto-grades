@@ -75,16 +75,16 @@ type ColTypes = {
 
 const CoursePartsView = (): JSX.Element => {
   const {t} = useTranslation();
-  const {auth, isTeacherInCharge} = useAuth();
   const {courseId} = useParams() as {courseId: string};
+  const {auth, isTeacherInCharge} = useAuth();
 
   const gradingModels = useGetAllGradingModels(courseId);
   const courseParts = useGetCourseParts(courseId);
   const editCoursePart = useEditCoursePart(courseId);
 
+  const grades = useGetGrades(courseId);
   const courseTasks = useGetCourseTasks(courseId);
   const modifyCourseTasks = useModifyCourseTasks(courseId);
-  const grades = useGetGrades(courseId);
 
   const [addPartDialogOpen, setAddPartDialogOpen] = useState<boolean>(false);
   const [editPartDialogOpen, setEditPartDialogOpen] = useState<boolean>(false);
@@ -152,7 +152,10 @@ const CoursePartsView = (): JSX.Element => {
   // Warning if leaving with unsaved
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent): void => {
-      if (unsavedChanges) e.preventDefault();
+      if (unsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
     };
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
@@ -196,7 +199,11 @@ const CoursePartsView = (): JSX.Element => {
   };
 
   const handleSubmit = async (): Promise<void> => {
-    const modifications: ModifyCourseTasks = {add: [], edit: [], delete: []};
+    const modifications: ModifyCourseTasks = {
+      add: [],
+      edit: [],
+      delete: [],
+    };
 
     for (const row of rows) {
       if (row.new) {
@@ -228,27 +235,26 @@ const CoursePartsView = (): JSX.Element => {
   };
 
   const getAplusActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
-    const elements = [];
+    const elements: JSX.Element[] = [];
 
-    if (editRights) {
-      elements.push(
-        <Tooltip title={unsavedChanges ? t('course.parts.a+-disabled') : ''}>
-          <span>
-            <GridActionsCellItem
-              label={t('course.parts.add-a+-source')}
-              icon={<AddCircle />}
-              disabled={unsavedChanges}
-              onClick={() =>
-                setAddAplusSourcesTo({
-                  courseTaskId: params.row.id,
-                  aplusGradeSources: params.row.aplusGradeSources,
-                })
-              }
-            />
-          </span>
-        </Tooltip>
-      );
-    }
+    // span is necessary to show the tooltip while the button is disabled
+    elements.push(
+      <Tooltip title={unsavedChanges ? t('course.parts.a+-disabled') : ''}>
+        <span>
+          <GridActionsCellItem
+            disabled={unsavedChanges}
+            icon={<AddCircle />}
+            label={t('course.parts.add-a+-source')}
+            onClick={() =>
+              setAddAplusSourcesTo({
+                courseTaskId: params.row.id,
+                aplusGradeSources: params.row.aplusGradeSources,
+              })
+            }
+          />
+        </span>
+      </Tooltip>
+    );
 
     if (params.row.aplusGradeSources.length > 0) {
       elements.push(
@@ -269,7 +275,6 @@ const CoursePartsView = (): JSX.Element => {
 
   const getActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
     const elements = [];
-
     if (params.row.coursePartId !== -1) {
       elements.push(
         <GridActionsCellItem
@@ -321,19 +326,19 @@ const CoursePartsView = (): JSX.Element => {
       field: 'name',
       headerName: t('general.name'),
       type: 'string',
-      editable: editRights,
+      editable: true,
     },
     {
       field: 'daysValid',
       headerName: t('general.days-valid'),
       type: 'number',
-      editable: editRights,
+      editable: true,
     },
     {
       field: 'maxGrade',
       headerName: t('general.max-grade'),
       type: 'number',
-      editable: editRights,
+      editable: true,
     },
     {
       field: 'aplusGradeSources',
@@ -380,7 +385,7 @@ const CoursePartsView = (): JSX.Element => {
         <Button
           startIcon={<Add />}
           onClick={handleClick}
-          disabled={selectedPart === null || !editRights}
+          disabled={selectedPart === null}
         >
           {t('course.parts.add-new-task')}
         </Button>
@@ -389,7 +394,7 @@ const CoursePartsView = (): JSX.Element => {
             <Button
               startIcon={<Add />}
               onClick={() => setAplusDialogOpen(true)}
-              disabled={selectedPart === null || unsavedChanges || !editRights}
+              disabled={selectedPart === null || unsavedChanges}
             >
               {t('course.parts.add-from-a+')}
             </Button>
@@ -429,7 +434,10 @@ const CoursePartsView = (): JSX.Element => {
       />
       <AddAplusGradeSourceDialog
         onClose={() =>
-          setAddAplusSourcesTo({courseTaskId: null, aplusGradeSources: []})
+          setAddAplusSourcesTo({
+            courseTaskId: null,
+            aplusGradeSources: [],
+          })
         }
         courseTaskId={addAplusSourcesTo.courseTaskId}
         aplusGradeSources={addAplusSourcesTo.aplusGradeSources}
@@ -453,6 +461,7 @@ const CoursePartsView = (): JSX.Element => {
           handleDiscard={confirmDiscard}
           handleSave={handleSubmit}
           disabled={editing}
+          // loading={form.isSubmitting}
         />
       </div>
 
@@ -548,7 +557,7 @@ const CoursePartsView = (): JSX.Element => {
               editMode="row"
               rowSelection={false}
               disableColumnSelector
-              slots={editRights ? {toolbar: DataGridToolbar} : {}}
+              slots={{toolbar: DataGridToolbar}}
               onRowEditStart={() => setEditing(true)}
               onRowEditStop={() => setEditing(false)}
               processRowUpdate={updatedRow => {

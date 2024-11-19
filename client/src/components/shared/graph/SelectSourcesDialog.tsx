@@ -17,7 +17,13 @@ import {useTranslation} from 'react-i18next';
 
 import type {GraphSource, TypedNode} from '@/common/types';
 
-type PropsType = {
+const SelectSourcesDialog = ({
+  nodes,
+  sources,
+  open,
+  onClose,
+  handleSourceSelect,
+}: {
   nodes: TypedNode[];
   sources: GraphSource[];
   open: boolean;
@@ -26,16 +32,8 @@ type PropsType = {
     newSources: GraphSource[],
     removedSources: GraphSource[]
   ) => void;
-};
-const SelectSourcesDialog = ({
-  nodes,
-  sources,
-  open,
-  onClose,
-  handleSourceSelect,
-}: PropsType): JSX.Element => {
+}): JSX.Element => {
   const {t} = useTranslation();
-
   const sourceNodeIds = new Set(
     nodes
       .filter(node => node.type === 'source')
@@ -73,6 +71,7 @@ const SelectSourcesDialog = ({
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
       <DialogTitle>{t('shared.graph.select-sources')}</DialogTitle>
+
       <DialogContent>
         <FormGroup>
           {sources

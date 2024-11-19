@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import type {Row} from '@tanstack/react-table';
 import {enqueueSnackbar} from 'notistack';
-import {type JSX, type MouseEvent, forwardRef, useMemo, useState} from 'react';
+import {type JSX, forwardRef, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {z} from 'zod';
@@ -46,7 +46,10 @@ import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
 import SisuDownloadDialog from './SisuDownloadDialog';
 import UploadDialog from './upload/UploadDialog';
 
-/** Toggle a string in an array */
+/**
+ * Toggle a string in an array: Adds it if not present, removes it if already
+ * present.
+ */
 const toggleString = (arr: string[], str: string): string[] => {
   const index = arr.indexOf(str);
   if (index > -1) arr.splice(index, 1);
@@ -56,17 +59,16 @@ const toggleString = (arr: string[], str: string): string[] => {
 };
 const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
   const {t} = useTranslation();
-  const {table} = useTableContext();
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
   const open = Boolean(anchorEl);
-  const handleClick = (event: MouseEvent<HTMLElement>): void => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>): void => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = (): void => {
     setAnchorEl(null);
   };
+  const {table} = useTableContext();
   const groupByElements = [
     [
       {
@@ -145,6 +147,8 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
               display: 'flex',
               borderRadius: '0px 8px 8px 0',
               textAlign: 'center',
+              // border: '1px solid black',
+              // border: '0px 1px 1px 1px',
               alignContent: 'center',
               padding: '0px 8px',
               fontSize: '14px',
@@ -152,8 +156,11 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
               lineHeight: '20px',
               cursor: 'pointer',
               position: 'relative',
+              // backgroundColor: 'transparent',
+              // ...(isActive && {
               backgroundColor: theme.vars.palette.info.light,
               border: 'none',
+              // }),
             }}
             onClick={() => table.setGrouping([])}
           >
@@ -162,10 +169,13 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
         )}
       </span>
       <Menu
+        id="long-menu"
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        style={{maxHeight: '50vh'}}
+        style={{
+          maxHeight: '50vh',
+        }}
       >
         {groupByElements.map((groups, i) => [
           ...groups.map(element => (
@@ -205,20 +215,20 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
   (props, ref): JSX.Element => {
     const {t} = useTranslation();
     const {courseId} = useParams() as {courseId: string};
-    const {table} = useTableContext();
-    const {selectedGradingModel, setSelectedGradingModel} = useTableContext();
-
     const theme = useTheme();
-    const allGradingModels = useGetAllGradingModels(courseId);
+    const {table} = useTableContext();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
     const open = Boolean(anchorEl);
-    const handleClick = (event: MouseEvent<HTMLElement>): void => {
+    const handleClick = (event: React.MouseEvent<HTMLElement>): void => {
       setAnchorEl(event.currentTarget);
     };
     const handleClose = (): void => {
       setAnchorEl(null);
     };
+
+    const {selectedGradingModel, setSelectedGradingModel} = useTableContext();
+
+    const allGradingModels = useGetAllGradingModels(courseId);
 
     // Filter out archived models
     const gradingModels = useMemo(
@@ -235,6 +245,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
       <>
         <span {...props} style={{display: 'flex'}} ref={ref}>
           <ButtonBase
+            id="select-grading-model-option"
             style={{
               display: 'flex',
               borderRadius: '8px',
@@ -280,6 +291,8 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
                 display: 'flex',
                 borderRadius: '0px 8px 8px 0',
                 textAlign: 'center',
+                // border: '1px solid black',
+                // border: '0px 1px 1px 1px',
                 alignContent: 'center',
                 padding: '0px 8px',
                 fontSize: '14px',
@@ -287,8 +300,11 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
                 lineHeight: '20px',
                 cursor: 'pointer',
                 position: 'relative',
+                // backgroundColor: 'transparent',
+                // ...(isActive && {
                 backgroundColor: theme.vars.palette.info.light,
                 border: 'none',
+                // }),
               }}
               onClick={() => setSelectedGradingModel('any')}
             >
@@ -297,10 +313,13 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
           )}
         </span>
         <Menu
+          id="long-menu"
           anchorEl={anchorEl}
           open={open}
           onClose={handleClose}
-          style={{maxHeight: '50vh'}}
+          style={{
+            maxHeight: '50vh',
+          }}
         >
           {(gradingModels ?? []).map(model => (
             <MenuItem
@@ -325,16 +344,16 @@ AssessmentFilterButton.displayName = 'AssessmentFilterButton';
 
 const GradesTableToolbar = (): JSX.Element => {
   const {t} = useTranslation();
-  const {auth, isTeacherInCharge} = useAuth();
   const {courseId} = useParams() as {courseId: string};
+  const {auth, isTeacherInCharge} = useAuth();
   const {table, gradeSelectOption, selectedGradingModel} = useTableContext();
   const theme = useTheme();
 
-  const course = useGetCourse(courseId);
   const allGradingModels = useGetAllGradingModels(courseId);
-  const courseTasks = useGetCourseTasks(courseId);
-  const getGrades = useGetGrades(courseId);
   const addFinalGrades = useAddFinalGrades(courseId);
+  const getGrades = useGetGrades(courseId);
+  const course = useGetCourse(courseId);
+  const courseTasks = useGetCourseTasks(courseId);
 
   const [showCalculateDialog, setShowCalculateDialog] =
     useState<boolean>(false);
@@ -379,6 +398,24 @@ const GradesTableToolbar = (): JSX.Element => {
     );
   }
 
+  // // If asking for a refetch then it also update the selectedRows
+  // // Refresh selectedRows for updating children's state
+  // const refreshFinalGrades = (): void => {
+  //   getFinalGrades.refetch().then(newFinalGrades => {
+  //     if (!newFinalGrades.data) return;
+  //     setSelectedRows(oldSelectedRows =>
+  //       oldSelectedRows.map(oldSelectedRow => ({
+  //         ...oldSelectedRow,
+  //         finalGrades: [
+  //           ...newFinalGrades.data.filter(
+  //             element => element.userId === oldSelectedRow.user.id
+  //           ),
+  //         ],
+  //       }))
+  //     );
+  //   });
+  // };
+
   // Firing the refetch after the transition for closing is finished
   // to avoid abrupt layout changes in the dialog
   const handleExitedSisuDialog = (): void => {
@@ -405,13 +442,11 @@ const GradesTableToolbar = (): JSX.Element => {
         userId: selectedRow.user.id,
         courseTasks: selectedRow.courseTasks.map(task => ({
           id: task.courseTaskId,
-          // TODO: Manage expired task grades? (#696)
+          // TODO: Manage expired course tasks?
           grade: findBestGrade(task.grades, {gradeSelectOption})?.grade ?? 0,
         })),
       }))
     );
-
-    // Check for invalid final grades
     for (const grade of Object.values(finalGrades)) {
       const maxFinalGrade = getMaxFinalGrade(course.data.gradingScale);
       const Schema = z.number().int().min(0).max(maxFinalGrade);
@@ -424,7 +459,6 @@ const GradesTableToolbar = (): JSX.Element => {
         return false;
       }
     }
-
     await addFinalGrades.mutateAsync(
       selectedRows.map(selectedRow => ({
         userId: selectedRow.user.id,
@@ -437,6 +471,7 @@ const GradesTableToolbar = (): JSX.Element => {
     enqueueSnackbar(t('course.results.final-calculated'), {
       variant: 'success',
     });
+    // refreshFinalGrades();
     return true;
   };
 
@@ -464,6 +499,7 @@ const GradesTableToolbar = (): JSX.Element => {
       {table.getSelectedRowModel().rows.length === 0 ? (
         <Box
           sx={{
+            // mx: 1,
             p: 0.5,
             borderRadius: 3,
             display: 'flex',
@@ -472,6 +508,7 @@ const GradesTableToolbar = (): JSX.Element => {
                 ? 'none'
                 : theme.vars.palette.primary.light,
             width: '700px',
+            // height: '45px',
           }}
         >
           <Button
@@ -506,6 +543,7 @@ const GradesTableToolbar = (): JSX.Element => {
         <Fade in={table.getSelectedRowModel().rows.length > 0}>
           <Box
             sx={{
+              // mx: 1,
               p: 0.5,
               borderRadius: 3,
               display: 'flex',
@@ -514,6 +552,7 @@ const GradesTableToolbar = (): JSX.Element => {
                   ? 'none'
                   : theme.vars.palette.primary.light,
               width: '700px',
+              // height: '45px',
             }}
           >
             <Box
@@ -523,13 +562,14 @@ const GradesTableToolbar = (): JSX.Element => {
                 alignItems: 'center',
                 gap: 1,
                 px: 1,
+                // backgroundColor: theme.vars.palette.primary.light,
+                // border: '1px solid black',
                 borderRadius: 200,
               }}
             >
               <div style={{alignContent: 'center'}}>
-                {t('course.results.selected-student', {
-                  count: table.getSelectedRowModel().rows.length,
-                })}
+                {table.getSelectedRowModel().rows.length} selected student
+                {table.getSelectedRowModel().rows.length > 1 && 's'}
               </div>
               {editRights && (
                 <Box
@@ -560,6 +600,7 @@ const GradesTableToolbar = (): JSX.Element => {
                         }
                         onClick={() => setShowCalculateDialog(true)}
                         disabled={table.getSelectedRowModel().rows.length === 0}
+                        id="calculate-final-grades"
                       >
                         {missingFinalGrades
                           ? t('course.results.calculate-final')
@@ -572,7 +613,7 @@ const GradesTableToolbar = (): JSX.Element => {
                       table.getSelectedRowModel().rows.length === 0
                         ? t('course.results.select-one-student-download')
                         : missingFinalGrades
-                          ? t('course.results.sisu-csv-missing-final-grades')
+                          ? t('course.results.pending-download')
                           : t('course.results.download-as-sisu-compat-csv')
                     }
                     placement="top"
@@ -603,10 +644,12 @@ const GradesTableToolbar = (): JSX.Element => {
       )}
       <Box
         sx={{
+          // mx: 1,
           py: 1,
           borderRadius: 200,
           display: 'flex',
           gap: 1,
+          // backgroundColor: theme.vars.palette.hoverGrey2,
         }}
       >
         <Tooltip
@@ -625,6 +668,8 @@ const GradesTableToolbar = (): JSX.Element => {
             <AssessmentFilterButton />
           </Tooltip>
         )}
+
+        {/* <Chip variant="outlined" label="Filters" /> */}
 
         <input
           style={{
@@ -662,6 +707,7 @@ const GradesTableToolbar = (): JSX.Element => {
               sx={{
                 background: theme.vars.palette.Alert.errorStandardBg,
                 color: theme.vars.palette.error.main,
+                // fontWeight: theme.vars.typography.fontWeightBold,
                 fontWeight: '500',
                 p: 0.5,
                 px: 2,
@@ -679,10 +725,13 @@ const GradesTableToolbar = (): JSX.Element => {
               }}
               onClick={() => {
                 if (
+                  // table.getVisibleFlatColumns().find(c => c.id === 'errors')
                   table.getColumn('errors')?.getFilterValue() === 'errorsFilter'
                 ) {
+                  // table.setColumnVisibility({errors: false});
                   table.getColumn('errors')?.setFilterValue('');
                 } else {
+                  // table.setColumnVisibility({errors: true});
                   table.getColumn('errors')?.setFilterValue('errorsFilter');
                 }
               }}
@@ -697,6 +746,32 @@ const GradesTableToolbar = (): JSX.Element => {
           </Fade>
         </Box>
       </Box>
+      {/* <Box
+        sx={{
+          // mx: 1,
+          p: 1,
+          borderRadius: 200,
+          display: 'flex',
+          // backgroundColor: theme.vars.palette.hoverGrey2,
+        }}
+      >
+        <FormControl>
+          <InputLabel id="select-grade-select-option">
+            Grade selection criterion
+          </InputLabel>
+          <Select
+            labelId="select-grade-select-option"
+            value={gradeSelectOption}
+            label="Grade selection criterion"
+            onChange={e =>
+              setGradeSelectOption(e.target.value as GradeSelectOption)
+            }
+          >
+            <MenuItem value="best">Select best grade</MenuItem>
+            <MenuItem value="latest">Select latest grade</MenuItem>
+          </Select>
+        </FormControl>
+      </Box> */}
     </>
   );
 };

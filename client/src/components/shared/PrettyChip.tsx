@@ -10,13 +10,20 @@ type PropsType = ButtonProps & {
   position?: 'first' | 'middle' | 'last';
 };
 
-const PrettyChip = ({children, ...props}: PropsType): JSX.Element => (
+const PrettyChip = ({
+  children,
+  // position,
+  ...props
+}: PropsType): JSX.Element => (
   <Box
     sx={{
       width: '100%',
       height: '100%',
+      // borderRight: '1px black solid',
+      // borderLeft: '1px black solid',
       display: 'flex',
       alignItems: 'center',
+      // overflow: 'hidden',
       ...props.sx,
     }}
   >
@@ -28,6 +35,22 @@ const PrettyChip = ({children, ...props}: PropsType): JSX.Element => (
         textTransform: 'none',
         color: 'inherit',
         backgroundColor: 'white',
+        // border: '1px solid lightgray',
+        // borderLeft: `${
+        //   position === 'first' || !position
+        //     ? '1px solid lightgray'
+        //     : '0px'
+        // }`,
+        // borderRadius: `${
+        //   !position
+        //     ? '50px 50px 50px 50px'
+        //     : position === 'first'
+        //       ? '50px 0px 0px 50px'
+        //       : position === 'last'
+        //         ? '0px 50px 50px 0px'
+        //         : '0px'
+        // }`,
+
         width: '100%',
         height: '90%',
         ...props.style,

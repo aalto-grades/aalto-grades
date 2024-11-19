@@ -7,11 +7,14 @@ Files:
  .github/PULL_REQUEST_TEMPLATE.md
  package*.json
  client/package*.json
+ client/license-exceptions.json
+ client/.env
  common/package*.json
  e2e-tests/package*.json
  server/package*.json
  server/pgAdminpass
  server/pgAdminSetup.json
+ server/test/mock-data/csv/*.csv
 Copyright: The Aalto Grades Developers
 License: MIT
 

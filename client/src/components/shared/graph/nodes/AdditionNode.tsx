@@ -10,6 +10,7 @@ import {
   Position,
   useUpdateNodeInternals,
 } from 'reactflow';
+import 'reactflow/dist/style.css';
 
 import type {AdditionNodeValue} from '@/common/types';
 import {NodeValuesContext} from '@/context/GraphProvider';

@@ -79,6 +79,7 @@ const ModelButton = ({
                   : t('course.models.delete-grading-model')
               }
             >
+              {/* The span is necessary because tooltips don't like disabled buttons*/}
               <span>
                 <IconButton
                   disabled={modelsWithFinalGrades.has(model.id)}

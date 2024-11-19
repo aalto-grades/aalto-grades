@@ -69,9 +69,9 @@ type FormData = {
 
 const EditCourseView = (): JSX.Element => {
   const {t} = useTranslation();
-  const {auth} = useAuth();
-  const {courseId} = useParams() as {courseId: string};
   const localize = useLocalize();
+  const {courseId} = useParams() as {courseId: string};
+  const {auth} = useAuth();
 
   const course = useGetCourse(courseId);
   const editCourse = useEditCourse();
@@ -99,7 +99,10 @@ const EditCourseView = (): JSX.Element => {
   // Warning if leaving with unsaved
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent): void => {
-      if (changes) e.preventDefault();
+      if (changes || formChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
     };
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
@@ -107,7 +110,6 @@ const EditCourseView = (): JSX.Element => {
 
   const formRef = useRef<FormikProps<FormData>>(null);
 
-  // Initialize when course data becomes available
   const [oldCourseData, setOldCourseData] =
     useState<typeof course.data>(undefined);
   if (course.data !== oldCourseData) {
@@ -241,10 +243,8 @@ const EditCourseView = (): JSX.Element => {
     values: FormData
   ): {[key in keyof FormData]?: string[]} | undefined => {
     setFormChanges(formChanged(values)); // Hacky workaround to get form data
-
     const result = ValidationSchema.safeParse(values);
     if (result.success) return;
-
     const fieldErrors = result.error.formErrors.fieldErrors;
     return Object.fromEntries(
       Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
@@ -385,7 +385,7 @@ const EditCourseView = (): JSX.Element => {
                 disabled={auth?.role !== SystemRole.Admin || form.isSubmitting}
                 label={`${t('course.edit.teachers-in-charge')}*`}
                 margin="normal"
-                slotProps={{inputLabel: {shrink: true}}}
+                InputLabelProps={{shrink: true}}
                 helperText={
                   form.errors.teacherEmail ??
                   (teachersInCharge.length === 0
@@ -460,7 +460,7 @@ const EditCourseView = (): JSX.Element => {
                 disabled={form.isSubmitting}
                 label={`${t('general.assistants')}*`}
                 margin="normal"
-                slotProps={{inputLabel: {shrink: true}}}
+                InputLabelProps={{shrink: true}}
                 helperText={
                   form.errors.assistantEmail ??
                   (assistants.includes(form.values.assistantEmail)

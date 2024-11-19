@@ -24,8 +24,8 @@ import ShowPasswordButton from './shared/auth/ShowPasswordButton';
 
 const LoginView = (): JSX.Element => {
   const {t} = useTranslation();
-  const {setAuth} = useAuth();
   const navigate = useNavigate();
+  const {setAuth} = useAuth();
   const logIn = useLogIn();
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -62,12 +62,7 @@ const LoginView = (): JSX.Element => {
         setShowOtpPrompt(true);
         break;
       case 'ok':
-        setAuth({
-          id: auth.id,
-          name: auth.name,
-          email: auth.email,
-          role: auth.role,
-        });
+        setAuth({id: auth.id, name: auth.name, role: auth.role});
         navigate('/');
         break;
     }
@@ -135,7 +130,7 @@ const LoginView = (): JSX.Element => {
               label={t('general.email')}
               fullWidth
               onChange={e => setEmail(e.target.value)}
-              slotProps={{inputLabel: {shrink: true}}}
+              InputLabelProps={{shrink: true}}
               margin="normal"
             />
             <TextField
@@ -145,16 +140,14 @@ const LoginView = (): JSX.Element => {
               label={t('general.password')}
               fullWidth
               onChange={e => setPassword(e.target.value)}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <ShowPasswordButton
-                      shown={showPassword}
-                      onClick={() => setShowPassword(oldShow => !oldShow)}
-                    />
-                  ),
-                },
-                inputLabel: {shrink: true},
+              InputLabelProps={{shrink: true}}
+              InputProps={{
+                endAdornment: (
+                  <ShowPasswordButton
+                    shown={showPassword}
+                    onClick={() => setShowPassword(oldShow => !oldShow)}
+                  />
+                ),
               }}
               margin="normal"
             />
@@ -164,7 +157,7 @@ const LoginView = (): JSX.Element => {
               </Typography>
               {showOtpPrompt && (
                 <MuiOtpInput
-                  data-testid="mfa-input" // For e2e tests
+                  data-testid="mfa-input"
                   title={t('login.local.mfa-code')}
                   sx={{my: 1}}
                   length={6}

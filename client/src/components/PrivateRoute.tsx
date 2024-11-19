@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+// Used to determine if a user is authenticated and if they are allowed to access a page
+// if not, the user is redirected to the login page
+
 import {type JSX, useEffect, useState} from 'react';
 import {Navigate, Outlet} from 'react-router-dom';
 
@@ -10,10 +13,6 @@ import {useGetRefreshToken} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 
 type PropsType = {children?: JSX.Element; roles: SystemRole[]};
-/**
- * Used to determine if a user is authenticated and if they are allowed to
- * access a page if not, the user is redirected to the login page.
- */
 const PrivateRoute = ({children, roles}: PropsType): JSX.Element | null => {
   const {auth, setAuth, isTeacherInCharge} = useAuth();
   const [loading, setLoading] = useState<boolean>(true);

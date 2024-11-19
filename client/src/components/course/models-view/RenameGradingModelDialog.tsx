@@ -36,10 +36,9 @@ const RenameGradingModelDialog = ({
 
   const [newName, setNewName] = useState<string>('');
 
-  // Update newName state when name prop changes
-  const [oldName, setOldName] = useState<typeof name>(null);
-  if (name !== oldName) {
-    setOldName(name);
+  const [oldNameProp, setOldNameProp] = useState<typeof name>(null);
+  if (name !== oldNameProp) {
+    setOldNameProp(name);
     if (name !== null && name !== newName) setNewName(name);
   }
 

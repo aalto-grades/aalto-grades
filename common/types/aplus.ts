@@ -24,83 +24,81 @@ export const AplusCourseDataArraySchema = z.array(AplusCourseDataSchema);
 
 export const AplusGradeSourceTypeSchema = z.nativeEnum(AplusGradeSourceType);
 
-const AplusExerciseSchema = z.strictObject({
-  id: z.number().int(),
-  name: z.string(),
-  maxGrade: z.number().int(),
-});
-const AplusModuleSchema = z.strictObject({
-  id: z.number().int(),
-  name: z.string(),
-  closingDate: DateSchema,
-  maxGrade: z.number().int(),
-  exercises: z.array(AplusExerciseSchema),
-});
-const AplusDifficultySchema = z.strictObject({
-  difficulty: z.string(),
-  maxGrade: z.number().int(),
-});
-
 export const AplusExerciseDataSchema = z.strictObject({
   maxGrade: z.number().int(),
-  modules: z.array(AplusModuleSchema),
-  difficulties: z.array(AplusDifficultySchema),
+  modules: z.array(
+    z.strictObject({
+      id: z.number().int(),
+      name: z.string(),
+      closingDate: DateSchema,
+      maxGrade: z.number().int(),
+      exercises: z.array(
+        z.strictObject({
+          id: z.number().int(),
+          name: z.string(),
+          maxGrade: z.number().int(),
+        })
+      ),
+    })
+  ),
+  difficulties: z.array(
+    z.strictObject({
+      difficulty: z.string(),
+      maxGrade: z.number().int(),
+    })
+  ),
 });
 
-const FullPointsBaseSchema = z.strictObject({
+const FullPointsBase = z.strictObject({
   sourceType: z.literal(AplusGradeSourceType.FullPoints),
 });
-const ModuleBaseSchema = z.strictObject({
+const ModuleBase = z.strictObject({
   sourceType: z.literal(AplusGradeSourceType.Module),
   moduleId: z.number().int(),
   moduleName: z.string(),
 });
-const ExerciseBaseSchema = z.strictObject({
+const ExerciseBase = z.strictObject({
   sourceType: z.literal(AplusGradeSourceType.Exercise),
   exerciseId: z.number().int(),
   exerciseName: z.string(),
 });
-const DifficultyBaseSchema = z.strictObject({
+const DifficultyBase = z.strictObject({
   sourceType: z.literal(AplusGradeSourceType.Difficulty),
   difficulty: z.string(),
 });
 
-const GradeSourceBaseSchema = z.strictObject({
+const GradeSourceBase = z.strictObject({
   id: IdSchema,
   courseTaskId: IdSchema,
   aplusCourse: AplusCourseDataSchema,
   date: DateSchema,
 });
 export const AplusGradeSourceDataSchema = z.discriminatedUnion('sourceType', [
-  GradeSourceBaseSchema.merge(FullPointsBaseSchema).strict(),
-  GradeSourceBaseSchema.merge(ModuleBaseSchema).strict(),
-  GradeSourceBaseSchema.merge(ExerciseBaseSchema).strict(),
-  GradeSourceBaseSchema.merge(DifficultyBaseSchema).strict(),
+  GradeSourceBase.merge(FullPointsBase).strict(),
+  GradeSourceBase.merge(ModuleBase).strict(),
+  GradeSourceBase.merge(ExerciseBase).strict(),
+  GradeSourceBase.merge(DifficultyBase).strict(),
 ]);
 
-const NewGradeSourceBaseSchema = z.strictObject({
+const NewGradeSourceBase = z.strictObject({
   courseTaskId: IdSchema,
   aplusCourse: AplusCourseDataSchema,
   date: DateSchema,
 });
 export const NewAplusGradeSourceSchema = z.discriminatedUnion('sourceType', [
-  NewGradeSourceBaseSchema.merge(FullPointsBaseSchema).strict(),
-  NewGradeSourceBaseSchema.merge(ModuleBaseSchema).strict(),
-  NewGradeSourceBaseSchema.merge(ExerciseBaseSchema).strict(),
-  NewGradeSourceBaseSchema.merge(DifficultyBaseSchema).strict(),
+  NewGradeSourceBase.merge(FullPointsBase).strict(),
+  NewGradeSourceBase.merge(ModuleBase).strict(),
+  NewGradeSourceBase.merge(ExerciseBase).strict(),
+  NewGradeSourceBase.merge(DifficultyBase).strict(),
 ]);
 export const NewAplusGradeSourceArraySchema = z.array(
   NewAplusGradeSourceSchema
 );
 
-export type AplusModule = z.infer<typeof AplusModuleSchema>;
-export type AplusExercise = z.infer<typeof AplusExerciseSchema>;
-export type AplusDifficulty = z.infer<typeof AplusDifficultySchema>;
-
-export type AplusSourceFullPoints = z.infer<typeof FullPointsBaseSchema>;
-export type AplusSourceModule = z.infer<typeof ModuleBaseSchema>;
-export type AplusSourceExercise = z.infer<typeof ExerciseBaseSchema>;
-export type AplusSourceDifficulty = z.infer<typeof DifficultyBaseSchema>;
+export type AplusFullPoints = z.infer<typeof FullPointsBase>;
+export type AplusModule = z.infer<typeof ModuleBase>;
+export type AplusExercise = z.infer<typeof ExerciseBase>;
+export type AplusDifficulty = z.infer<typeof DifficultyBase>;
 
 export type AplusCourseData = z.infer<typeof AplusCourseDataSchema>;
 export type AplusExerciseData = z.infer<typeof AplusExerciseDataSchema>;

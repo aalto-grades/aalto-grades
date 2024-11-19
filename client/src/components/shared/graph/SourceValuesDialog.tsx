@@ -17,14 +17,6 @@ import type {GraphSource, NodeValues, TypedNode} from '@/common/types';
 
 const testFloat = (val: string): boolean => /^\d+(?:\.\d+?)?$/.test(val);
 
-type PropsType = {
-  nodes: TypedNode[];
-  nodeValues: NodeValues;
-  sources: GraphSource[];
-  open: boolean;
-  onClose: () => void;
-  handleSetSourceValues: (sourceValues: {[key: number]: number}) => void;
-};
 const SourceValuesDialog = ({
   nodes,
   nodeValues,
@@ -32,7 +24,14 @@ const SourceValuesDialog = ({
   open,
   onClose,
   handleSetSourceValues,
-}: PropsType): JSX.Element => {
+}: {
+  nodes: TypedNode[];
+  nodeValues: NodeValues;
+  sources: GraphSource[];
+  open: boolean;
+  onClose: () => void;
+  handleSetSourceValues: (sourceValues: {[key: number]: number}) => void;
+}): JSX.Element => {
   const {t} = useTranslation();
   const sourceNodeIds = useMemo(
     () =>
@@ -49,7 +48,6 @@ const SourceValuesDialog = ({
     const newInitValues: {[key: number]: string} = {};
     for (const [nodeId, nodeValue] of Object.entries(nodeValues)) {
       if (nodeValue.type !== 'source') continue;
-
       const sourceId = parseInt(nodeId.split('-')[1]);
       if (sourceNodeIds.includes(sourceId))
         newInitValues[sourceId] = nodeValue.source.toString();

@@ -13,18 +13,13 @@ import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useGetAllGradingModels} from '@/hooks/useApi';
 import {getGradeString} from '@/utils';
 
-// If gradingScale is null then value is defined.
 type PropsType = {
   row: GroupedStudentRow;
-  gradingModelIds: number[];
+  gradingModelIds: number[] | undefined;
   onClick: () => void;
   gradingScale?: GradingScale | null;
   value?: number | null;
 };
-/**
- * If gradingScale is set then this is a final grade preview cell, otherwise
- * this is a course part grade preview cell
- */
 const PredictedGradeCell = ({
   row,
   gradingModelIds,
@@ -33,30 +28,9 @@ const PredictedGradeCell = ({
   value = null,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
+  const [hover, setHover] = useState<boolean>(false);
   const {courseId} = useParams() as {courseId: string};
   const gradingModels = useGetAllGradingModels(courseId);
-  const [hover, setHover] = useState<boolean>(false);
-
-  const gradeErrors = row.errors?.filter(
-    e =>
-      (e.type === 'InvalidPredictedGrade' ||
-        e.type === 'OutOfRangePredictedGrade') &&
-      gradingModelIds.includes(Number(e.info.modelId))
-  );
-
-  let previewValue = 'N/A';
-  if (gradingScale === null) previewValue = value!.toString();
-  else {
-    previewValue = gradingModelIds
-      .map(modelId =>
-        getGradeString(
-          t,
-          gradingScale,
-          row.predictedGraphValues?.[modelId]?.finalGrade
-        )
-      )
-      .join(' / ');
-  }
 
   return (
     <div
@@ -69,10 +43,23 @@ const PredictedGradeCell = ({
         position: 'relative',
       }}
     >
-      {gradeErrors !== undefined && gradeErrors.length > 0 && (
+      {row.errors?.some(
+        error =>
+          (error.type === 'InvalidPredictedGrade' ||
+            error.type === 'OutOfRangePredictedGrade') &&
+          gradingModelIds?.includes(Number(error.info.modelId))
+      ) && (
         <Box sx={{position: 'absolute', top: 0}}>
           <Tooltip
-            title={gradeErrors.map(e => e.message).join('\n')}
+            title={row.errors
+              .filter(
+                e =>
+                  (e.type === 'InvalidPredictedGrade' ||
+                    e.type === 'OutOfRangePredictedGrade') &&
+                  gradingModelIds?.includes(Number(e.info.modelId))
+              )
+              .map(e => e.message)
+              .join('\n')}
             placement="top"
             disableInteractive
           >
@@ -82,19 +69,31 @@ const PredictedGradeCell = ({
       )}
       <Tooltip
         title={
-          gradingModelIds.length > 1
-            ? gradingModels.data
+          gradingModelIds !== undefined && gradingModelIds.length > 1
+            ? `${gradingModels.data
                 ?.filter(model => gradingModelIds.includes(model.id))
                 .map(model => model.name)
-                .join(' / ')
+                .join(' / ')}`
             : undefined
         }
         placement="top"
         disableInteractive
       >
-        <p style={{margin: 0, display: 'inline'}}>{previewValue}</p>
+        <p style={{margin: 0, display: 'inline'}}>
+          {gradingScale !== null
+            ? gradingModelIds
+                ?.map(modelId =>
+                  getGradeString(
+                    t,
+                    gradingScale,
+                    row.predictedGraphValues?.[modelId]?.finalGrade
+                  )
+                )
+                .join(' / ') || 'N/A'
+            : value!}
+        </p>
       </Tooltip>
-      {gradingModelIds.length > 0 && hover && (
+      {gradingModelIds !== undefined && gradingModelIds.length > 0 && hover && (
         <Tooltip
           title={t('course.results.view-graph')}
           placement="top"

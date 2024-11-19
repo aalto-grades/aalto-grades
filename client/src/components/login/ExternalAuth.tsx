@@ -27,6 +27,7 @@ const ExternalAuth = (): JSX.Element => {
         {t('login.external.body')}
       </Typography>
       <Button
+        id="ag-sso-login-btn"
         variant="contained"
         type="submit"
         fullWidth

@@ -67,12 +67,16 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
       }}
       fullWidth
       maxWidth="xs"
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
     >
-      <DialogTitle>{t('front-page.reset-auth')}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">
+        {t('front-page.reset-auth')}
+      </DialogTitle>
       <DialogContent>
         {temporaryPassword === null ? (
           <>
-            <DialogContentText>
+            <DialogContentText id="alert-dialog-description">
               {t('front-page.resetting-password-for', {user: user?.name})}
             </DialogContentText>
             <FormGroup sx={{mt: 1}}>
@@ -132,7 +136,9 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
                     enqueueSnackbar(t('front-page.password-copied'), {
                       variant: 'success',
                     });
-                    setTimeout(() => setCopied(false), 1500);
+                    setTimeout(() => {
+                      setCopied(false);
+                    }, 1500);
                   }}
                 >
                   {!copied ? (
