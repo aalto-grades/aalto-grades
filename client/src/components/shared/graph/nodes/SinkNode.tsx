@@ -13,8 +13,8 @@ import BaseNode from './BaseNode';
 const SinkNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
   const {id, isConnectable} = props;
-  const nodeValues = useContext(NodeValuesContext);
 
+  const nodeValues = useContext(NodeValuesContext);
   const nodeValue = nodeValues[id] as SinkNodeValue;
 
   return (

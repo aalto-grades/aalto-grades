@@ -12,7 +12,7 @@ import type {FinalGradeData, GradingScale} from '@/common/types';
 import {findBestFinalGrade, getGradeString} from '@/utils';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
 
-type PropsType = {
+type FinalGradeCellProps = {
   userId: number;
   studentNumber: string;
   finalGrades: FinalGradeData[];
@@ -23,7 +23,7 @@ const FinalGradeCell = ({
   studentNumber,
   finalGrades,
   gradingScale,
-}: PropsType): JSX.Element => {
+}: FinalGradeCellProps): JSX.Element => {
   const {t} = useTranslation();
   const theme = useTheme();
 
@@ -49,6 +49,7 @@ const FinalGradeCell = ({
         alignItems: 'center',
         justifyContent: 'center',
       }}
+      // align="center"
     >
       <span>{getGradeString(t, gradingScale, bestFinalGrade?.grade)}</span>
       {/* If there are multiple final grades "show more" icon*/}
@@ -97,11 +98,14 @@ const FinalGradeCell = ({
               float: 'right',
               bottom: '-1%',
               right: '1%',
+              // width: '100%',
               textAlign: 'right',
               fontSize: '0.7rem',
+              // transform: 'translate(-50%, -50%)',
               color: `rgba(${theme.vars.palette.primary.mainChannel} / 0.7)`,
+              // When over color is 100%
               '&:hover': {
-                color: `rgba(${theme.vars.palette.primary.mainChannel} / 1)`,
+                // color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
               },
             }}
           >

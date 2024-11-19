@@ -44,8 +44,30 @@ const SelectAplusCourse = ({
       selectedAplusCourse ? getInstanceOption(selectedAplusCourse) : null
     );
 
+  const setInstance = useCallback(
+    (aplusCourse: AplusCourseData | undefined): void => {
+      setSelectedInstance(
+        aplusCourse !== undefined ? getInstanceOption(aplusCourse) : null
+      );
+      setAplusCourse(aplusCourse ?? null);
+    },
+    [setAplusCourse]
+  );
+
+  const setCourse = useCallback(
+    (courseCode: string | undefined): void => {
+      const aplusCourse = aplusCourses.find(ac => ac.courseCode === courseCode);
+
+      setSelectedCourse(
+        aplusCourse !== undefined ? getCourseOption(aplusCourse) : null
+      );
+      setInstance(aplusCourse);
+    },
+    [aplusCourses, setInstance]
+  );
+
   const courseOptions = aplusCourses
-    // Filter to only take first instance of each course
+    // Only take first instance
     .filter(
       (a, index) =>
         index === aplusCourses.findIndex(b => a.courseCode === b.courseCode)
@@ -58,29 +80,6 @@ const SelectAplusCourse = ({
     )
     .map(getInstanceOption);
 
-  // Set instance
-  const setInstance = useCallback(
-    (aplusCourse: AplusCourseData | undefined): void => {
-      if (!aplusCourse) return;
-      setSelectedInstance(getInstanceOption(aplusCourse));
-      setAplusCourse(aplusCourse);
-    },
-    [setAplusCourse]
-  );
-
-  // Set course & instance
-  const setCourse = useCallback(
-    (courseCode: string | undefined): void => {
-      const aplusCourse = aplusCourses.find(ac => ac.courseCode === courseCode);
-      if (!aplusCourse) return;
-
-      setSelectedCourse(getCourseOption(aplusCourse));
-      setInstance(aplusCourse);
-    },
-    [aplusCourses, setInstance]
-  );
-
-  // Try to set course if not selected yet
   useEffect(() => {
     if (!selectedAplusCourse) setCourse(course.data?.courseCode);
   }, [course.data?.courseCode, selectedAplusCourse, setCourse]);

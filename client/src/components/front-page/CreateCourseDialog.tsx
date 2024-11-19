@@ -43,7 +43,6 @@ import {
 import FormField from '@/components/shared/FormikField';
 import FormLanguagesField from '@/components/shared/FormikLanguageField';
 import {useAddCourse} from '@/hooks/useApi';
-import useAuth from '@/hooks/useAuth';
 import {useLocalize} from '@/hooks/useLocalize';
 import {
   convertToClientGradingScale,
@@ -79,21 +78,14 @@ const initialValues = {
   nameSv: '',
 };
 
-type PropsType = {open: boolean; forceEmail?: string; onClose: () => void};
-const CreateCourseDialog = ({
-  open,
-  onClose,
-  forceEmail,
-}: PropsType): JSX.Element => {
+type PropsType = {open: boolean; onClose: () => void};
+const CreateCourseDialog = ({open, onClose}: PropsType): JSX.Element => {
   const {t} = useTranslation();
-  const {auth} = useAuth();
   const localize = useLocalize();
   const navigate = useNavigate();
   const addCourse = useAddCourse();
 
-  const [teachersInCharge, setTeachersInCharge] = useState<string[]>(
-    forceEmail ? [forceEmail] : []
-  );
+  const [teachersInCharge, setTeachersInCharge] = useState<string[]>([]);
   const [assistants, setAssistants] = useState<string[]>([]);
 
   const ValidationSchema = z
@@ -172,7 +164,6 @@ const CreateCourseDialog = ({
   ): {[key in keyof FormData]?: string[]} | undefined => {
     const result = ValidationSchema.safeParse(values);
     if (result.success) return;
-
     const fieldErrors = result.error.formErrors.fieldErrors;
     return Object.fromEntries(
       Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
@@ -277,7 +268,7 @@ const CreateCourseDialog = ({
               disabled={form.isSubmitting}
               label={`${t('course.edit.teachers-in-charge')}*`}
               margin="normal"
-              slotProps={{inputLabel: {shrink: true}}}
+              InputLabelProps={{shrink: true}}
               helperText={
                 form.errors.teacherEmail ??
                 (teachersInCharge.length === 0
@@ -320,18 +311,14 @@ const CreateCourseDialog = ({
                     <ListItem
                       key={teacherEmail}
                       secondaryAction={
-                        teacherEmail !== auth?.email && (
-                          <IconButton
-                            edge="end"
-                            disabled={
-                              form.isSubmitting || teacherEmail === auth?.email
-                            }
-                            aria-label="delete"
-                            onClick={() => removeTeacher(teacherEmail)}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        )
+                        <IconButton
+                          edge="end"
+                          disabled={form.isSubmitting}
+                          aria-label="delete"
+                          onClick={() => removeTeacher(teacherEmail)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
                       }
                     >
                       <ListItemAvatar>
@@ -353,7 +340,7 @@ const CreateCourseDialog = ({
               disabled={form.isSubmitting}
               label={`${t('general.assistants')}*`}
               margin="normal"
-              slotProps={{inputLabel: {shrink: true}}}
+              InputLabelProps={{shrink: true}}
               helperText={
                 form.errors.assistantEmail ??
                 (assistants.length === 0
@@ -442,6 +429,7 @@ const CreateCourseDialog = ({
               Cancel
             </Button>
             <Button
+              id="ag-create-course-btn"
               variant="contained"
               onClick={form.submitForm}
               disabled={form.isSubmitting}

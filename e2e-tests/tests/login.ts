@@ -19,51 +19,67 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
   await page.getByLabel('Email').fill(`${user}@aalto.fi`);
   await page.getByLabel('Email').press('Tab');
   await page.getByLabel('Password', {exact: true}).fill('password');
-  // await page.getByLabel('Password', {exact: true}).press('Enter');
-  await page.getByRole('button', {name: 'Log in', exact: true}).click(); // TODO: flaky
+  await page.getByLabel('Password', {exact: true}).press('Enter');
 
+  // Wait for the MFA prompt to appear (if it ever does)
+  await page.waitForTimeout(100);
   const showSecretButton = page.getByRole('button', {
     name: 'Or manually enter the secret',
   });
 
-  // Wait for the MFA secret prompt to appear (if it ever does)
-  await showSecretButton
-    .waitFor({state: 'visible', timeout: 1000})
-    .then(async () => {
-      await showSecretButton.click();
+  // Login when MFA qr code is shown
+  if (await showSecretButton.isVisible()) {
+    await showSecretButton.click();
 
-      // Get new MFA secret
-      const secretText = await page.getByTestId('mfa-secret').textContent();
-      const secret = secretText!.replaceAll('\n', '').replaceAll(' ', '');
-      mfaSecrets[user] = secret;
-    })
-    .catch(() => console.log('Using old MFA secret'));
+    const secretText = await page.getByTestId('mfa-secret').textContent();
+    const secret = secretText!.replaceAll('\n', '').replaceAll(' ', '');
+    mfaSecrets[user] = secret;
 
-  if (mfaSecrets[user] === '') {
-    throw new Error(`MFA secret is empty for user ${user}`);
+    const mfaLocator = page.getByTestId('mfa-input');
+    const inputFields = await mfaLocator.locator('input').elementHandles();
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const token = authenticator.generate(mfaSecrets[user]);
+
+      for (let i = 0; i < inputFields.length; i++) {
+        await inputFields[i].fill(token[i]);
+      }
+
+      // Wait for the login to go through
+      await page.waitForTimeout(200);
+
+      const success = await page
+        .getByRole('heading', {name: 'Courses'})
+        .isVisible();
+      if (success) return;
+
+      for (let i = inputFields.length - 1; i >= 0; i--) {
+        await inputFields[i].fill('');
+      }
+    }
+    throw new Error('Failed to log in');
   }
 
-  // Find MFA input fields
+  // Login when MFA qr code is not shown
   const mfaLocator = page.getByTestId('mfa-input');
-  const mfaInputFields = await mfaLocator.locator('input').elementHandles();
-
-  // Try MFA 3 times in case the code expires
+  const inputFields = await mfaLocator.locator('input').elementHandles();
   for (let attempt = 0; attempt < 3; attempt++) {
     const token = authenticator.generate(mfaSecrets[user]);
 
-    for (let i = 0; i < mfaInputFields.length; i++) {
-      await mfaInputFields[i].fill(token[i]);
+    for (let i = 0; i < inputFields.length; i++) {
+      await inputFields[i].fill(token[i]);
     }
 
-    try {
-      await mfaInputFields[0].waitForElementState('hidden', {timeout: 1000});
-      return; // Login success
-    } catch {
-      // Clear input fields for next attempt
-      for (let i = mfaInputFields.length - 1; i >= 0; i--) {
-        await mfaInputFields[i].fill('');
-      }
+    // Wait for the login to go through
+    await page.waitForTimeout(100);
+
+    const success = await page
+      .getByRole('heading', {name: 'Courses'})
+      .isVisible();
+    if (success) return;
+
+    for (let i = inputFields.length - 1; i >= 0; i--) {
+      await inputFields[i].fill('');
     }
   }
-  throw new Error(`Failed to log in with user ${user}`);
+  throw new Error('Failed to log in');
 };

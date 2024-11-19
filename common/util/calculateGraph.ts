@@ -154,6 +154,7 @@ export const calculateNodeValues = (
   return newNodeValues;
 };
 
+// TODO: Stress test?
 /** Calculate course part values for all students. */
 export const batchCalculateCourseParts = (
   models: GradingModelData[],
@@ -202,6 +203,8 @@ export const batchCalculateCourseParts = (
   return result;
 };
 
+// TODO: Handle expired course parts?
+// TODO: Stress test?
 /** Calculate course part values and final grades for all students. */
 export const batchCalculateFinalGrades = (
   finalModel: GradingModelData,

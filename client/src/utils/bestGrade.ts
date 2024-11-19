@@ -37,7 +37,7 @@ const gradeIsBetter = (
 
 // The type is a template to be able to use with EditGradesDialog rows.
 
-// TODO: Remove option latest? (#889)
+// TODO: Remove option latest?
 export type GradeSelectOption = 'best' | 'latest';
 /**
  * Finds the best grade from a list of grades based on provided search options.

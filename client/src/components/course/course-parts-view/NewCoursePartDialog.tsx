@@ -56,7 +56,6 @@ const NewCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
   const validateForm = (
     values: FormData
   ): {[key in keyof FormData]?: string[]} | undefined => {
-    // Set to null if empty
     if (values.expiryDate === '') values.expiryDate = null;
 
     const result = ValidationSchema.safeParse(values);

@@ -126,6 +126,7 @@ export const addFinalGrades: Endpoint<NewFinalGrade[], void> = async (
     })
   );
 
+  // TODO: Optimize if datasets are big.
   await FinalGrade.bulkCreate(preparedBulkCreate);
 
   return res.sendStatus(HttpCode.Created);

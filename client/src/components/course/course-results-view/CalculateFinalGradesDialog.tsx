@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import 'dayjs/locale/en-gb';
-
 import {
   Alert,
   Button,
@@ -23,6 +21,7 @@ import {
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, {type Dayjs} from 'dayjs';
+import 'dayjs/locale/en-gb';
 import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
@@ -55,6 +54,7 @@ const CalculateFinalGradesDialog = ({
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const allGradingModels = useGetAllGradingModels(courseId);
+  // TODO: Auto select the model used in the table view?
 
   const [dateOverride, setDateOverride] = useState<boolean>(false);
   const [gradingDate, setGradingDate] = useState<Dayjs>(dayjs());

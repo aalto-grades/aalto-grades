@@ -24,79 +24,68 @@ import {type JSX, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 export type MismatchData = {
-  csvKeys: string[];
-  courseTasks: string[];
+  fields: string[];
+  keys: string[];
   onImport: (keyMap: {[key: string]: string}) => void;
 };
-type MismatchError = '' | 'empty' | 'duplicate' | 'noStudentNo';
-type Selections = {[key: string]: string | null};
 
-type PropsType = {
-  open: boolean;
-  onClose: () => void;
-  mismatchData: MismatchData;
-};
+type MismatchError = '' | 'empty' | 'duplicate' | 'noStudentNo';
+
 const MismatchDialog = ({
   open,
   onClose,
   mismatchData,
-}: PropsType): JSX.Element => {
+}: {
+  open: boolean;
+  onClose: () => void;
+  mismatchData: MismatchData;
+}): JSX.Element => {
   const {t} = useTranslation();
-  const [selections, setSelections] = useState<Selections>({});
+  const [selections, setSelections] = useState<{[key: string]: string}>({});
   const [error, setError] = useState<MismatchError>('');
   const [duplicate, setDuplicate] = useState<string>('');
 
-  const [oldMismatchData, setOldMismatchData] = useState<MismatchData | null>(
-    null
-  );
-  if (mismatchData !== oldMismatchData) {
-    setOldMismatchData(mismatchData);
-
-    // Set new selections and try to match some keys.
-    const newSelections: Selections = {};
-    for (const key of mismatchData.csvKeys) {
-      const matchingTask = mismatchData.courseTasks.find(
-        task => task.toLowerCase() === key.toLowerCase()
+  useEffect(() => {
+    const newSelections: {[key: string]: string} = {};
+    for (const key of mismatchData.keys) {
+      const matchingField = mismatchData.fields.find(
+        field => field.toLowerCase() === key.toLowerCase()
       );
-      if (matchingTask) newSelections[key] = matchingTask;
-      else newSelections[key] = null;
+      if (matchingField) newSelections[key] = matchingField;
     }
     setSelections(newSelections);
-  }
+  }, [mismatchData.fields, mismatchData.keys]);
 
   // Find errors
   useEffect(() => {
-    // Empty target
-    const emptyTarget = Object.values(selections).some(
-      target => target === null
-    );
-    if (emptyTarget) {
-      setError('empty');
-      return;
-    }
-
-    // Duplicate target
-    const usedSelections: string[] = [];
-    for (const target of Object.values(selections)) {
-      if (usedSelections.includes(target!) && target !== 'ignoreColumn') {
-        setError('duplicate');
-        setDuplicate(target!);
+    // Find empty
+    for (const key of mismatchData.keys) {
+      if (!(key in selections)) {
+        setError('empty');
         return;
       }
-      usedSelections.push(target!);
     }
 
-    // Student number target not found
-    const studentNumberTarget = Object.values(selections).some(
-      target => target === 'studentNo'
-    );
-    if (!studentNumberTarget) {
+    // Find duplicates
+    const usedSelections: string[] = [];
+    for (const value of Object.values(selections)) {
+      if (usedSelections.includes(value) && value !== 'ignoreColumn') {
+        setError('duplicate');
+        setDuplicate(value);
+        return;
+      }
+      usedSelections.push(value);
+    }
+
+    // Find no student number
+    const found = Object.values(selections).find(key => key === 'studentNo');
+    if (!found) {
       setError('noStudentNo');
       return;
     }
 
     setError('');
-  }, [mismatchData.csvKeys, selections]);
+  }, [mismatchData.keys, selections]);
 
   const getErrorText = (): string => {
     switch (error) {
@@ -127,11 +116,12 @@ const MismatchDialog = ({
               </TableRow>
             </TableHead>
             <TableBody>
-              {Object.entries(selections).map(([key, target]) => (
+              {mismatchData.keys.map(key => (
                 <TableRow
                   key={key}
                   sx={{
-                    background: target === 'ignoreColumn' ? '#eceff1' : '',
+                    background:
+                      selections[key] === 'ignoreColumn' ? '#eceff1' : '',
                   }}
                 >
                   <TableCell>{key}</TableCell>
@@ -139,8 +129,8 @@ const MismatchDialog = ({
                     <FormControl
                       sx={{background: 'white'}}
                       error={
-                        (error === 'empty' && target === null) ||
-                        (error === 'duplicate' && target === duplicate)
+                        (error === 'empty' && !(key in selections)) ||
+                        (error === 'duplicate' && selections[key] === duplicate)
                       }
                     >
                       <InputLabel id={`mismatch-select-${key}`}>
@@ -150,7 +140,7 @@ const MismatchDialog = ({
                         labelId={`mismatch-select-${key}`}
                         label={t('course.results.upload.import-as')}
                         size="small"
-                        value={target ?? ''}
+                        value={selections[key] ?? ''}
                         onChange={e =>
                           setSelections(oldSelections => ({
                             ...oldSelections,
@@ -159,16 +149,16 @@ const MismatchDialog = ({
                         }
                         sx={{minWidth: 200}}
                       >
-                        {mismatchData.courseTasks.map((task, index) => (
+                        {mismatchData.fields.map((field, index) => (
                           <MenuItem
-                            key={task}
-                            value={task}
+                            key={field}
+                            value={field}
                             divider={
                               index === 0 ||
-                              index === mismatchData.courseTasks.length - 1
+                              index === mismatchData.fields.length - 1
                             }
                           >
-                            {task}
+                            {field}
                           </MenuItem>
                         ))}
                         <MenuItem key="ignoreColumn" value="ignoreColumn">
@@ -186,9 +176,7 @@ const MismatchDialog = ({
       <DialogActions>
         <Button onClick={onClose}>{t('general.cancel')}</Button>
         <Button
-          onClick={() =>
-            mismatchData.onImport(selections as {[key: string]: string})
-          }
+          onClick={() => mismatchData.onImport(selections)}
           variant="contained"
           disabled={error !== ''}
         >

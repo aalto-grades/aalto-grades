@@ -12,9 +12,9 @@ import LanguageSelectButton from './LanguageSelectButton';
 import UserButton from './UserButton';
 
 const Header = (): JSX.Element => {
-  const {courseId} = useParams<{courseId: string}>();
   const localize = useLocalize();
   const theme = useTheme();
+  const {courseId} = useParams<{courseId: string}>();
   const course = useGetCourse(courseId ?? '', {enabled: Boolean(courseId)});
 
   // The logo variants are intended to be used randomly, so why not?
@@ -30,6 +30,7 @@ const Header = (): JSX.Element => {
       sx={{
         backgroundColor: theme.vars.palette.primary.light,
         boxShadow: 'none',
+        //   color: theme.vars.palette.primary.main,
         color: 'black',
         height: '100%',
         display: 'flex',
@@ -50,70 +51,182 @@ const Header = (): JSX.Element => {
           fontWeight: 'bold',
           color: 'primary.main',
         }}
-        data-testid="a-grades-header-link" // For e2e tests
+        data-testid="a-grades-header-link"
         unstable_viewTransition
       >
         A{logoVariant} Grades
       </Typography>
+      {/* <Box
+            sx={{
+              //   //   backgroundColor: theme.vars.palette.background.paper,
+              //   //   backgroundColor: theme.vars.palette.background.paper,
+              //   px: 1.2,
+              // py: 0.2,
+              //   //   border: '1px solid gray',
+              //   width: 'fit-content',
+              //   borderRadius: '15px',
+              //   translateY: '-50%',
+              mr: 1,
+            }}
+          >
+            <NavLink
+              to={'/'}
+              style={{
+                color: 'inherit',
+                textDecoration: 'none',
+              }}
+              // onClick={() => navigate('/')}
+              unstable_viewTransition
+            >
+              {({isActive, isPending: _, isTransitioning: __}) => {
+                if (courseId === undefined) {
+                  return null;
+                }
+                return (
+                  <ButtonBase
+                    sx={{
+                      display: 'flex',
+                      color: 'inherit',
+                      alignItems: 'center',
+                      // width: '100%',
+                      py: '0px',
+                      px: 1,
+                      borderRadius: '8px',
+                      border: '1px solid black',
+                      fontSize: '1rem',
+                      textAlign: 'left',
+                      backgroundColor: isActive ? 'rgba(0, 0, 0, 0.1)' : '',
+                    }}
+                    // onClick={ev => {
+                    //   ev.preventDefault();
+                    //   document.startViewTransition(() => {
+                    //     flushSync(() => {
+                    //       navigate('/');
+                    //     });
+                    //   });
+                    // }}
+                  >
+                    <Icon>
+                      <ArrowBack />
+                    </Icon>
+                    <ListItemText primary="Courses" />
+                  </ButtonBase>
+                );
+              }}
+            </NavLink>
+          </Box> */}
 
       {course.data !== undefined && (
         <>
           <Box
             sx={{
+              // backgroundColor: theme.vars.palette.background.paper,
               backgroundColor: theme.vars.palette.background.paper,
               px: 2,
               py: 0,
               mr: 1,
+              //   border: '1px solid gray',
               width: 'fit-content',
               borderRadius: '15px',
+              // translateY: '-50%',
               height: '40px',
               alignItems: 'center',
             }}
           >
-            <Typography
-              align="left"
-              variant="body1"
-              fontWeight="bold"
-              sx={{
-                color: 'primary.main',
+            <span
+              style={{
                 display: 'flex',
                 alignItems: 'center',
                 height: '100%',
               }}
             >
-              {course.data.courseCode}
-            </Typography>
+              {/* <div
+                style={{
+                  padding: '0px 5px',
+                  border: '1px solid black',
+                  borderRadius: '8px',
+                  marginRight: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  viewTransitionName: `code-${course.data.id}`,
+                  minWidth: 'fit-content',
+                  maxWidth: 'fit-content',
+                }}
+              >
+                <Typography align="left">{course.data.courseCode}</Typography>
+              </div> */}
+
+              <Typography
+                align="left"
+                variant="body1"
+                sx={{color: 'primary.main'}}
+              >
+                <b>{course.data.courseCode}</b>
+              </Typography>
+            </span>
           </Box>
           <Typography variant="h2" sx={{mr: 1}}>
             {' - '}
           </Typography>
           <Box
             sx={{
+              // backgroundColor: theme.vars.palette.background.paper,
               backgroundColor: theme.vars.palette.background.paper,
               px: 2,
               py: 0,
               mr: 1,
+              //   border: '1px solid gray',
               width: 'fit-content',
               borderRadius: '15px',
+              // translateY: '-50%',
               height: '40px',
               alignItems: 'center',
             }}
           >
-            <Typography
-              variant="h2"
-              align="left"
-              sx={{
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                maxWidth: '300px',
+            <span
+              style={{
                 display: 'flex',
                 alignItems: 'center',
                 height: '100%',
               }}
             >
-              {localize(course.data.name)}
-            </Typography>
+              {/* <div
+                  style={{
+                    padding: '0px 5px',
+                    border: '1px solid black',
+                    borderRadius: '8px',
+                    marginRight: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    viewTransitionName: `code-${course.data.id}`,
+                    minWidth: 'fit-content',
+                    maxWidth: 'fit-content',
+                  }}
+                >
+                  <Typography align="left">{course.data.courseCode}</Typography>
+                </div> */}
+
+              <Typography
+                variant="h2"
+                align="left"
+                sx={{
+                  viewTransitionName: `course-name-${course.data.id}`,
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  maxWidth: '300px',
+                }}
+              >
+                {localize(course.data.name)}
+              </Typography>
+              {/* <Typography
+                    align="left"
+                    type="body2"
+                    sx={{color: 'primary.main', mr: 1}}
+                  >
+                    {course.data.courseCode}
+                  </Typography> */}
+            </span>
           </Box>
         </>
       )}

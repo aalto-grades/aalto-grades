@@ -13,6 +13,7 @@ import {
   GradingScale,
   Language,
   type NewCourseData,
+  SystemRole,
   type UserData,
 } from '@/common/types';
 import {initGraph} from '@/common/util';
@@ -28,8 +29,6 @@ import FinalGrade from '../../src/database/models/finalGrade';
 import GradingModel from '../../src/database/models/gradingModel';
 import TaskGrade from '../../src/database/models/taskGrade';
 import User from '../../src/database/models/user';
-
-type ExtraUserData = UserData & {idpUser: boolean; admin: boolean};
 
 /**
  * Still relies on the test users admin@aalto.fi, teacher@aalto.fi,
@@ -53,13 +52,12 @@ class CreateData {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  async createUser(user?: Partial<ExtraUserData>): Promise<UserData> {
+  async createUser(user?: Partial<UserData>): Promise<UserData> {
     const newUser = await User.create({
       email: user?.email ?? `testUser${this.freeUserId}@aalto.fi`,
       name: user?.name ?? `test user${this.freeUserId}`,
       studentNumber: user?.studentNumber ?? `12345${this.freeUserId}`,
-      idpUser: user?.idpUser ?? true,
-      admin: user?.admin ?? true,
+      role: SystemRole.User,
     });
     this.freeUserId += 1;
     return {
@@ -91,7 +89,7 @@ class CreateData {
       email: user?.email ?? `testUser${this.freeUserId}@aalto.fi`,
       name: user?.name ?? `test user${this.freeUserId}`,
       studentNumber: user?.studentNumber ?? `12345${this.freeUserId}`,
-      admin: true,
+      role: SystemRole.Admin,
       password: password,
       forcePasswordReset: user?.forcePasswordReset ?? false,
       mfaSecret: user?.mfaSecret ?? null,
@@ -295,6 +293,7 @@ class CreateData {
     return finalGrade.id;
   }
 
+  // TODO: Support and test with final grade models.
   /** Creates a grading model that uses the average model */
   async createGradingModel(
     courseId: number,

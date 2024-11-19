@@ -11,16 +11,12 @@ import {
 } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import {enqueueSnackbar} from 'notistack';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import type {
-  CoursePartData,
-  CourseTaskData,
-  NewTaskGrade,
-} from '@/common/types';
+import type {CoursePartData, NewTaskGrade} from '@/common/types';
 import {useAddGrades, useGetCourseTasks} from '@/hooks/useApi';
 import UploadDialogConfirm, {type DateType} from './UploadDialogConfirm';
 import UploadDialogSelectCoursePart from './UploadDialogSelectCoursePart';
@@ -81,12 +77,8 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     return false;
   }, [courseTaskData, rows]);
 
-  const [oldCourseTaskData, setOldCourseTaskData] = useState<
-    CourseTaskData[] | null
-  >(null);
-  if (oldCourseTaskData !== courseTaskData) {
-    setOldCourseTaskData(courseTaskData);
-
+  useEffect(() => {
+    if (courseTaskData.length === dates.length) return;
     setDates(
       courseTaskData.map(task => ({
         courseTaskName: task.name,
@@ -95,7 +87,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
           task.daysValid === null ? null : dayjs().add(task.daysValid, 'day'),
       }))
     );
-  }
+  }, [courseTaskData, dates.length]);
 
   const columns: GridColDef<GradeUploadColTypes>[] = [
     {
@@ -194,7 +186,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
-      {currentStep === 0 && (
+      {currentStep === 0 ? (
         <UploadDialogSelectCoursePart
           setCoursePart={newCoursePart => {
             setCoursePart(newCoursePart);
@@ -202,8 +194,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
             setReady(true);
           }}
         />
-      )}
-      {currentStep === 1 && (
+      ) : currentStep === 1 ? (
         <UploadDialogUpload
           coursePart={coursePart}
           columns={columns}
@@ -215,8 +206,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
           setExpanded={setUploadExpanded}
           invalidValues={invalidValues}
         />
-      )}
-      {currentStep === 2 && (
+      ) : (
         <UploadDialogConfirm
           columns={readOnlyColumns}
           rows={rows}
@@ -229,16 +219,16 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
           invalidValues={invalidValues}
         />
       )}
-
       <DialogActions>
         {currentStep > 0 && (
           <Button
             onClick={async () => {
               if (currentStep === 1 && rows.length > 0) {
-                const confirm = await AsyncConfirmationModal({
+                const result = await AsyncConfirmationModal({
                   confirmDiscard: true,
                 });
-                if (confirm) reset();
+                if (!result) return;
+                reset();
                 return;
               }
               setCurrentStep(cur => cur - 1);

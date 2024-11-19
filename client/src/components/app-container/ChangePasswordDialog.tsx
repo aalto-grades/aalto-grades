@@ -84,7 +84,6 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
     );
   };
 
-  // Wrapper for ShowPasswordButton
   type ButtonPropsType = {type: keyof ShowPassword};
   const ShowPasswordButton = ({type}: ButtonPropsType): JSX.Element => (
     <BaseShowPasswordButton

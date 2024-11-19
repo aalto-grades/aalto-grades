@@ -35,7 +35,7 @@ const CreateAplusCourseTasks = ({
 
   return (
     <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
-      {courseTasksWithSource.map(([courseTask], index) => (
+      {courseTasksWithSource.map(([courseTask, _], index) => (
         <Card key={index} sx={{m: 1}}>
           <CardContent
             sx={{display: 'flex', flexDirection: 'column', width: 370}}
@@ -52,7 +52,6 @@ const CreateAplusCourseTasks = ({
               type="string"
               inputMode="numeric"
               value={courseTask.daysValid ?? ''}
-              // Cast input to a number
               // I'd rather show a warning but this works fine enough
               onChange={e =>
                 handleChange(index, {

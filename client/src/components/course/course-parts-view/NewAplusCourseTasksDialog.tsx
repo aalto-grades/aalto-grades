@@ -27,9 +27,9 @@ import {
   useModifyCourseTasks,
 } from '@/hooks/useApi';
 import {getAplusToken} from '@/utils';
-import CreateAplusCourseTasks from './aplus-components/CreateAplusCourseTasks';
-import SelectAplusCourse from './aplus-components/SelectAplusCourse';
-import SelectAplusGradeSources from './aplus-components/SelectAplusGradeSources';
+import CreateAplusCourseTasks from './CreateAplusCourseTasks';
+import SelectAplusCourse from './SelectAplusCourse';
+import SelectAplusGradeSources from './SelectAplusGradeSources';
 
 type PropsType = {
   open: boolean;
@@ -55,7 +55,7 @@ const NewAplusCourseTasksDialog = ({
   const [step, setStep] = useState<number>(0);
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
-  const [newTasks, setNewTasks] = useState<
+  const [courseTasksWithSource, setCourseTasksWithSource] = useState<
     [NewCourseTaskData, NewAplusGradeSourceData][]
   >([]);
 
@@ -66,7 +66,7 @@ const NewAplusCourseTasksDialog = ({
   const handleResetAndClose = (): void => {
     setStep(0);
     setAplusCourse(null);
-    setNewTasks([]);
+    setCourseTasksWithSource([]);
     onClose();
   };
 
@@ -78,7 +78,7 @@ const NewAplusCourseTasksDialog = ({
   ): void => {
     if (checked) {
       // Cannot use concat for some reason
-      setNewTasks(oldTasks => [
+      setCourseTasksWithSource(oldTasks => [
         ...oldTasks,
         [
           {
@@ -91,7 +91,7 @@ const NewAplusCourseTasksDialog = ({
         ],
       ]);
     } else {
-      setNewTasks(oldTasks =>
+      setCourseTasksWithSource(oldTasks =>
         oldTasks.filter(
           ([_, oldSource]) => !aplusGradeSourcesEqual(oldSource, source)
         )
@@ -103,8 +103,8 @@ const NewAplusCourseTasksDialog = ({
     index: number,
     courseTaskEdit: Omit<EditCourseTaskData, 'id'>
   ): void => {
-    setNewTasks(
-      newTasks.map(([courseTask, source], i) => {
+    setCourseTasksWithSource(
+      courseTasksWithSource.map(([courseTask, source], i) => {
         if (i === index) {
           return [
             {
@@ -128,8 +128,8 @@ const NewAplusCourseTasksDialog = ({
   };
 
   const handleSubmit = async (): Promise<void> => {
-    const courseTasks = newTasks.map(([courseTask]) => courseTask);
-    const sources = newTasks.map(([, source]) => source);
+    const courseTasks = courseTasksWithSource.map(([courseTask]) => courseTask);
+    const sources = courseTasksWithSource.map(([, source]) => source);
 
     const newIds = await modifyCourseTasks.mutateAsync({add: courseTasks});
     const newSources = newIds.map((courseTaskId, i) => ({
@@ -157,81 +157,65 @@ const NewAplusCourseTasksDialog = ({
         maxWidth="md"
         fullWidth
       >
-        {step === 0 && (
-          <>
-            <DialogTitle>{t('general.a+-courses')}</DialogTitle>
-            <DialogContent>
-              {aplusCourses.data !== undefined && (
-                <SelectAplusCourse
-                  aplusCourses={aplusCourses.data}
-                  selectedAplusCourse={aplusCourse}
-                  setAplusCourse={course => {
-                    setAplusCourse(course);
-                    if (course) setNewTasks([]);
-                  }}
-                />
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button disabled={!aplusCourse} onClick={() => setStep(step + 1)}>
-                {t('general.next')}
-              </Button>
-            </DialogActions>
-          </>
-        )}
-
+        {step === 0 && <DialogTitle>{t('general.a+-courses')}</DialogTitle>}
         {step === 1 && (
-          <>
-            <DialogTitle>{t('course.parts.select-grade-sources')}</DialogTitle>
-            <DialogContent>
-              {aplusCourse !== null && (
-                <SelectAplusGradeSources
-                  aplusCourse={aplusCourse}
-                  selectedGradeSources={newTasks.map(([_, s]) => s)}
-                  handleChange={handleSelectionChange}
-                />
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setStep(step - 1)} sx={{mr: 'auto'}}>
-                {t('general.back')}
-              </Button>
-              <Button
-                disabled={newTasks.length === 0}
-                onClick={() => setStep(step + 1)}
-              >
-                {t('general.next')}
-              </Button>
-            </DialogActions>
-          </>
+          <DialogTitle>{t('course.parts.select-grade-sources')}</DialogTitle>
         )}
-
         {step === 2 && (
-          <>
-            <DialogTitle>{t('course.parts.create-tasks')}</DialogTitle>
-            <DialogContent>
-              {aplusCourse !== null && (
-                <CreateAplusCourseTasks
-                  courseTasksWithSource={newTasks}
-                  handleChange={handleCourseTaskChange}
-                />
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setStep(step - 1)} sx={{mr: 'auto'}}>
-                {t('general.back')}
-              </Button>
-              <Button
-                onClick={async () => {
-                  await handleSubmit();
-                  handleResetAndClose();
-                }}
-              >
-                {t('general.submit')}
-              </Button>
-            </DialogActions>
-          </>
+          <DialogTitle>{t('course.parts.create-tasks')}</DialogTitle>
         )}
+        <DialogContent>
+          {step === 0 && aplusCourses.data !== undefined && (
+            <SelectAplusCourse
+              aplusCourses={aplusCourses.data}
+              selectedAplusCourse={aplusCourse}
+              setAplusCourse={course => {
+                setAplusCourse(course);
+                if (course) setCourseTasksWithSource([]);
+              }}
+            />
+          )}
+          {step === 1 && aplusCourse !== null && (
+            <SelectAplusGradeSources
+              aplusCourse={aplusCourse}
+              selectedGradeSources={courseTasksWithSource.map(([_, s]) => s)}
+              handleChange={handleSelectionChange}
+            />
+          )}
+          {step === 2 && aplusCourse !== null && (
+            <CreateAplusCourseTasks
+              courseTasksWithSource={courseTasksWithSource}
+              handleChange={handleCourseTaskChange}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          {step > 0 && (
+            <Button onClick={() => setStep(step - 1)} sx={{mr: 'auto'}}>
+              {t('general.back')}
+            </Button>
+          )}
+          {step <= 1 && (
+            <Button
+              disabled={
+                step === 0 ? !aplusCourse : courseTasksWithSource.length === 0
+              }
+              onClick={() => setStep(step + 1)}
+            >
+              {t('general.next')}
+            </Button>
+          )}
+          {step === 2 && (
+            <Button
+              onClick={async () => {
+                await handleSubmit();
+                handleResetAndClose();
+              }}
+            >
+              {t('general.submit')}
+            </Button>
+          )}
+        </DialogActions>
       </Dialog>
     </>
   );

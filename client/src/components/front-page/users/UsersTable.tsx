@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {LockReset, PersonRemove} from '@mui/icons-material';
+import {Delete, LockReset} from '@mui/icons-material';
 import {
   Box,
   IconButton,
@@ -21,15 +21,15 @@ import {type JSX, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 
-import type {UserData} from '@/common/types';
-import {useGetUsers, useRemoveUserRole} from '@/hooks/useApi';
+import {SystemRole, type UserData} from '@/common/types';
+import {useDeleteUser, useGetUsers} from '@/hooks/useApi';
 import type {HeadCellData} from '@/types';
 import ResetAuthDialog from './ResetAuthDialog';
 
 const UsersTable = (): JSX.Element => {
   const {t} = useTranslation();
   const users = useGetUsers();
-  const removeUserRole = useRemoveUserRole();
+  const deleteUser = useDeleteUser();
   const [tab, setTab] = useState<number>(0);
   const [toBeReset, setToBeReset] = useState<UserData | null>(null);
 
@@ -40,22 +40,20 @@ const UsersTable = (): JSX.Element => {
 
   const shownUsers = useMemo(() => {
     if (users.data === undefined) return [];
-    if (tab === 0) return users.data.filter(user => user.idpUser);
-    return users.data.filter(user => user.admin);
+    if (tab === 0)
+      return users.data.filter(user => user.idpUser && user.email !== null);
+    return users.data.filter(user => user.role === SystemRole.Admin);
   }, [tab, users.data]);
 
-  const handleRemoveUserRole = async (user: UserData): Promise<void> => {
-    const role = tab === 0 ? 'idpUser' : 'admin';
-
+  const handleDeleteUser = async (user: UserData): Promise<void> => {
     const confirmation = await AsyncConfirmationModal({
-      title: t('front-page.remove-user-role'),
-      message: t('front-page.remove-user-role-message', {user: user.email}),
-      confirmButtonText: t('general.remove'),
+      title: t('front-page.delete-user'),
+      message: t('front-page.delete-user-message', {user: user.email}),
       confirmDelete: true,
     });
     if (confirmation) {
-      await removeUserRole.mutateAsync({id: user.id, role});
-      enqueueSnackbar(t('front-page.user-role-removed'), {variant: 'success'});
+      await deleteUser.mutateAsync(user.id);
+      enqueueSnackbar(t('front-page.user-deleted'), {variant: 'success'});
     }
   };
 
@@ -110,16 +108,13 @@ const UsersTable = (): JSX.Element => {
                       </IconButton>
                     </span>
                   </Tooltip>
-                  <Tooltip
-                    title={t('front-page.remove-user-role')}
-                    placement="top"
-                  >
+                  <Tooltip title={t('front-page.delete-user')} placement="top">
                     <span>
                       <IconButton
-                        aria-label="remove role"
-                        onClick={async () => handleRemoveUserRole(user)}
+                        aria-label="delete"
+                        onClick={async () => handleDeleteUser(user)}
                       >
-                        <PersonRemove />
+                        <Delete />
                       </IconButton>
                     </span>
                   </Tooltip>

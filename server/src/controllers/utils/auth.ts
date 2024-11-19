@@ -4,8 +4,7 @@
 
 import argon from 'argon2';
 
-import {type AuthData, HttpCode, SystemRole} from '@/common/types';
-import {NODE_ENV} from '../../configs/environment';
+import {type AuthData, HttpCode, type SystemRole} from '@/common/types';
 import httpLogger from '../../configs/winston';
 import User from '../../database/models/user';
 import {ApiError} from '../../types';
@@ -39,32 +38,9 @@ export const validateLogin = async (
     );
   }
 
-  if (user.email === null) {
-    httpLogger.error(`Email was null for user ${user.id}`);
-    throw new ApiError(
-      'User does not have an email',
-      HttpCode.InternalServerError
-    );
-  }
-
-  if (NODE_ENV === 'production' && !user.admin) {
-    throw new ApiError(
-      'User that is not an admin has local login',
-      HttpCode.InternalServerError
-    );
-  } else if (NODE_ENV !== 'production' && !user.admin) {
-    return {
-      id: user.id,
-      role: SystemRole.User, // In dev and tests some test user accounts also have local login.
-      email: user.email,
-      name: user.name,
-    };
-  }
-
   return {
     id: user.id,
-    role: SystemRole.Admin, // Only admins have username and password login.
-    email: user.email,
+    role: user.role as SystemRole,
     name: user.name,
   };
 };

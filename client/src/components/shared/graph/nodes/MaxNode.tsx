@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {type ChangeEvent, type JSX, useContext, useState} from 'react';
+import {type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
   Handle,
@@ -21,13 +21,13 @@ const rowHeight = 33.9;
 
 const MaxNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
-  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {id, isConnectable} = props;
+
   const updateNodeInternals = useUpdateNodeInternals();
   const nodeValues = useContext(NodeValuesContext);
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const settings = nodeData[id].settings as MaxNodeSettings;
-
   const [localSettings, setLocalSettings] = useState<LocalSettings>({
     minValue: settings.minValue.toString(),
   });
@@ -62,12 +62,11 @@ const MaxNode = (props: NodeProps): JSX.Element => {
     }
   }
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const newLocalSettings = {...localSettings};
     newLocalSettings.minValue = event.target.value;
     setLocalSettings(newLocalSettings);
 
-    // Check if is not valid float
     if (!/^\d+(?:\.\d+?)?$/.test(event.target.value)) {
       setError(true);
       return;

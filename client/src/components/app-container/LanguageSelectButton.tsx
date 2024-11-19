@@ -23,12 +23,14 @@ const LanguageSelectButton = (): JSX.Element => {
   return (
     <>
       <Button
-        id="language-button"
+        id="basic-button"
         color="inherit"
-        aria-controls={menuOpen ? 'language-menu' : undefined}
+        aria-controls={menuOpen ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={menuOpen ? 'true' : undefined}
-        onClick={event => setAnchorEl(event.currentTarget)}
+        onClick={event => {
+          setAnchorEl(event.currentTarget);
+        }}
       >
         <Box sx={{marginRight: 1, marginTop: 1}}>
           <Language color="inherit" />
@@ -41,11 +43,11 @@ const LanguageSelectButton = (): JSX.Element => {
         <ArrowDropDown color="inherit" />
       </Button>
       <Menu
-        id="language-menu"
+        id="basic-menu"
         anchorEl={anchorEl}
         open={menuOpen}
         onClose={() => setAnchorEl(null)}
-        MenuListProps={{'aria-labelledby': 'language-button'}}
+        MenuListProps={{'aria-labelledby': 'basic-button'}}
       >
         <MenuItem onClick={() => setLanguage('en')}>English</MenuItem>
         <MenuItem onClick={() => setLanguage('fi')}>Finnish</MenuItem>

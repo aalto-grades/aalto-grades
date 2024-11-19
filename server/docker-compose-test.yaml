@@ -9,7 +9,7 @@ services:
   backend:
     build:
       context: ..
-      dockerfile: ./server/Dockerfile.test
+      dockerfile: ./server/dockerfiles/Dockerfile.test
     container_name: 'aalto-grades-backend-test'
     environment:
       POSTGRES_URL: 'database'

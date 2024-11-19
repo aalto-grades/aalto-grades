@@ -11,7 +11,7 @@ import {
 
 export const useTableContext = (): TableContextProps => {
   const context = useContext(GradesTableContext);
-  if (context === null) {
+  if (context === undefined) {
     throw new Error('useTableContext must be used within a TableProvider');
   }
   return context;

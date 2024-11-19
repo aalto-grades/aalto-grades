@@ -15,16 +15,16 @@ type LocalSettings = {onFailSetting: OnFailSetting; minPoints: string};
 
 const SourceNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
-  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {id, isConnectable} = props;
+
   const nodeValues = useContext(NodeValuesContext);
+  const {nodeData, setNodeSettings} = useContext(NodeDataContext);
 
   const settings = nodeData[id].settings as SourceNodeSettings;
   const initSettings = {
     ...settings,
     minPoints: settings.minPoints !== null ? settings.minPoints.toString() : '',
   };
-
   const [localSettings, setLocalSettings] =
     useState<LocalSettings>(initSettings);
   const [error, setError] = useState<boolean>(false);
@@ -40,7 +40,6 @@ const SourceNode = (props: NodeProps): JSX.Element => {
     };
     setLocalSettings(newLocalSettings);
 
-    // Check if is not valid float
     if (!/^\d+(?:\.\d+?)?$/.test(newLocalSettings.minPoints)) {
       return;
     }
@@ -54,7 +53,6 @@ const SourceNode = (props: NodeProps): JSX.Element => {
     const newLocalSettings = {...localSettings, minPoints: event.target.value};
     setLocalSettings(newLocalSettings);
 
-    // Check if is not valid float
     if (
       newLocalSettings.minPoints !== '' &&
       !/^\d+(?:\.\d+?)?$/.test(newLocalSettings.minPoints)

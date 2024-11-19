@@ -101,7 +101,7 @@ export const validateGradingModelPath = async (
   return [course, gradingModel];
 };
 
-/** Checks if grading model has expired, archived, or deleted course sources. */
+/** Checks if grading model has deleted or archived course sources. */
 export const checkGradingModelSources = (
   gradingModel: GradingModel,
   sources: CourseTaskData[] | CoursePartData[]

@@ -15,9 +15,7 @@ import type {IModalProps} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 
 type PropsType = IModalProps & {
-  confirmButtonText?: string | null;
   confirmNavigate: boolean;
-  confirmDiscard: boolean;
   confirmDelete: boolean;
 };
 const ConfirmDialog = ({
@@ -25,7 +23,6 @@ const ConfirmDialog = ({
   title,
   children,
   actions,
-  confirmButtonText = null,
   confirmNavigate,
   confirmDiscard,
   confirmDelete,
@@ -67,13 +64,11 @@ const ConfirmDialog = ({
           variant="contained"
           color={confirmNavigate || confirmDelete ? 'error' : 'primary'}
         >
-          {confirmButtonText
-            ? confirmButtonText
-            : confirmNavigate || confirmDiscard
-              ? t('shared.unsaved-changes.discard')
-              : confirmDelete
-                ? t('general.delete')
-                : t('general.confirm')}
+          {confirmNavigate || confirmDiscard
+            ? t('shared.unsaved-changes.discard')
+            : confirmDelete
+              ? t('general.delete')
+              : t('general.confirm')}
         </Button>
       </DialogActions>
     </Dialog>

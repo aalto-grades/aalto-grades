@@ -26,9 +26,9 @@ import {departments, getCourseRole} from '@/utils';
 
 const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
   const {t} = useTranslation();
-  const {auth} = useAuth();
-  const localize = useLocalize();
   const navigate = useNavigate();
+  const localize = useLocalize();
+  const {auth} = useAuth();
   const [page, setPage] = useState<number>(1);
   const [searchText, setSearchText] = useState<string>('');
 
@@ -45,6 +45,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
       if (auth.role === SystemRole.Admin) return t('general.admin');
 
       const courseRole = getCourseRole(course, auth);
+
       switch (courseRole) {
         case CourseRoleType.Teacher:
           return t('general.teacher');
@@ -127,6 +128,7 @@ const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
           {coursePage.map(course => (
             <TableRow
               key={course.id}
+              id={`ag-see-instances-tr-${course.id}`}
               hover
               sx={{
                 cursor: 'pointer',

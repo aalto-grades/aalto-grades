@@ -8,8 +8,10 @@ import {
   type InferAttributes,
   type InferCreationAttributes,
   Model,
+  Op,
 } from 'sequelize';
 
+import type {SystemRole} from '@/common/types';
 import {sequelize} from '..';
 
 export default class User extends Model<
@@ -21,8 +23,7 @@ export default class User extends Model<
   declare email: CreationOptional<string | null>;
   declare studentNumber: CreationOptional<string | null>;
   declare eduUser: CreationOptional<string | null>;
-  declare idpUser: CreationOptional<boolean>;
-  declare admin: CreationOptional<boolean>;
+  declare role: CreationOptional<SystemRole>;
   declare password: CreationOptional<string | null>;
   declare forcePasswordReset: CreationOptional<boolean | null>;
   declare mfaSecret: CreationOptional<string | null>;
@@ -64,15 +65,10 @@ User.init(
       unique: true,
       allowNull: true,
     },
-    idpUser: {
-      type: DataTypes.BOOLEAN(),
+    role: {
+      type: DataTypes.ENUM('USER', 'ADMIN'),
       allowNull: false,
-      defaultValue: false,
-    },
-    admin: {
-      type: DataTypes.BOOLEAN(),
-      allowNull: false,
-      defaultValue: false,
+      defaultValue: 'USER',
     },
     password: {
       type: new DataTypes.CHAR(255),
@@ -107,7 +103,16 @@ User.findByEduUser = async (eduUser: string): Promise<User | null> =>
   User.findOne({where: {eduUser}});
 
 User.findIdpUserByEmail = async (email: string): Promise<User | null> =>
-  User.findOne({where: {email, idpUser: true}});
+  User.findOne({
+    where: {
+      email,
+      password: {[Op.is]: undefined},
+    },
+  });
 
 User.findIdpUsers = async (): Promise<User[]> =>
-  User.findAll({where: {idpUser: true}});
+  User.findAll({
+    where: {
+      password: {[Op.is]: undefined},
+    },
+  });
