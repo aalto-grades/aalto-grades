@@ -29,16 +29,21 @@ import {type GradeSelectOption, findBestGrade} from './bestGrade';
  */
 export const groupByLatestBestGrade = (
   gradesList: ExtendedStudentRow[],
-  gradeSelectOption: GradeSelectOption
+  gradeSelectOption: GradeSelectOption,
+  getCoursePartExpiryDate: (courseTaskId: number) => Date | null | undefined
 ): GroupedStudentRow[] => {
   const findLatestBestGradeDate = (row: StudentRow): string => {
     let newestDate = new Date(0);
 
     for (const courseTask of row.courseTasks) {
-      const bestGrade = findBestGrade(courseTask.grades, {
-        expiredOption: 'prefer_non_expired',
-        gradeSelectOption,
-      });
+      const bestGrade = findBestGrade(
+        courseTask.grades,
+        getCoursePartExpiryDate(courseTask.courseTaskId),
+        {
+          expiredOption: 'non_expired',
+          gradeSelectOption,
+        }
+      );
       const bestGradeDate =
         bestGrade === null ? new Date(0) : new Date(bestGrade.date);
 
@@ -77,7 +82,8 @@ export const findLatestGrade = (row: StudentRow): Date => {
 export const predictGrades = (
   rows: StudentRow[],
   gradingModels: GradingModelData[],
-  gradeSelectOption: GradeSelectOption
+  gradeSelectOption: GradeSelectOption,
+  getCoursePartExpiryDate: (courseTaskId: number) => Date | null | undefined
 ): {
   [key: GradingModelData['id']]: ReturnType<typeof batchCalculateFinalGrades>;
 } => {
@@ -94,7 +100,12 @@ export const predictGrades = (
         courseTasks: row.courseTasks.map(task => ({
           id: task.courseTaskId,
           // TODO: Manage expired task grades? (#696)
-          grade: findBestGrade(task.grades, {gradeSelectOption})?.grade ?? 0,
+          grade:
+            findBestGrade(
+              task.grades,
+              getCoursePartExpiryDate(task.courseTaskId),
+              {expiredOption: 'non_expired', gradeSelectOption}
+            )?.grade ?? 0,
         })),
       }))
     );

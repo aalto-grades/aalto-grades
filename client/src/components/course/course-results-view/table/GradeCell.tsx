@@ -19,7 +19,12 @@ import {findBestGrade, gradeIsExpired} from '@/utils';
 import EditGradesDialog from './EditGradesDialog';
 
 export type GradeCellSourceValue =
-  | {type: 'courseTask'; task: CourseTaskGradesData; maxGrade: number | null}
+  | {
+      type: 'courseTask';
+      task: CourseTaskGradesData;
+      maxGrade: number | null;
+      coursePartExpiryDate: Date | null | undefined;
+    }
   | {type: 'coursePart'; grade: number | null};
 
 type GradeCellProps = {
@@ -48,10 +53,14 @@ const GradeCell = ({
   const bestGrade =
     sourceValue.type === 'coursePart'
       ? null
-      : findBestGrade(sourceValue.task.grades, {
-          expiredOption: 'prefer_non_expired',
-          gradeSelectOption,
-        });
+      : findBestGrade(
+          sourceValue.task.grades,
+          sourceValue.coursePartExpiryDate,
+          {
+            expiredOption: 'non_expired',
+            gradeSelectOption,
+          }
+        );
   const isGradeExpired = gradeIsExpired(bestGrade);
 
   return (
@@ -206,6 +215,27 @@ const GradeCell = ({
               {bestGrade.date.toLocaleDateString()}
             </Typography>
             // </Tooltip>
+          )}
+
+          {sourceValue.task.grades.length > 0 && bestGrade === null && (
+            <Tooltip
+              placement="top"
+              title={t('course.results.all-grades-expired')}
+            >
+              <EventBusyOutlined
+                sx={{
+                  position: 'absolute',
+                  float: 'left',
+                  top: '-5%',
+                  left: '1%',
+                  width: '15px',
+                  color: `rgba(${theme.vars.palette.error.mainChannel} / 0.7)`,
+                  '&:hover': {
+                    color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
+                  },
+                }}
+              />
+            </Tooltip>
           )}
         </>
       )}

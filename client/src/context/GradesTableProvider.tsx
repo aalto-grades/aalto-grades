@@ -25,6 +25,7 @@ import {
   type PropsWithChildren,
   type SetStateAction,
   createContext,
+  useCallback,
   useMemo,
   useState,
 } from 'react';
@@ -55,6 +56,7 @@ import {
 import {
   findBestFinalGrade,
   findBestGrade,
+  getCoursePartExpiryDate,
   getRowErrors,
   groupByLatestBestGrade,
   predictGrades,
@@ -186,6 +188,16 @@ export const GradesTableProvider = ({
     model => model.coursePartId === null
   );
 
+  const getCoursePartExpiryDateFromTaskId = useCallback(
+    (courseTaskId: number): Date | null | undefined => {
+      return getCoursePartExpiryDate(
+        courseParts.data,
+        courseTasks.data,
+        courseTaskId
+      );
+    },
+    [courseParts.data, courseTasks.data]
+  );
   const coursePartValues = useMemo(
     () =>
       batchCalculateCourseParts(
@@ -196,12 +208,19 @@ export const GradesTableProvider = ({
             .filter(task => task.grades.length > 0)
             .map(task => ({
               id: task.courseTaskId,
-              // TODO: Handle expired task grades? (#696)
-              grade: findBestGrade(task.grades)!.grade,
+              grade: findBestGrade(
+                task.grades,
+                getCoursePartExpiryDateFromTaskId(task.courseTaskId)
+              )
+                ? findBestGrade(
+                    task.grades,
+                    getCoursePartExpiryDateFromTaskId(task.courseTaskId)
+                  )!.grade
+                : 0,
             })),
         }))
       ),
-    [allGradingModels.data, data]
+    [allGradingModels.data, data, getCoursePartExpiryDateFromTaskId]
   );
 
   // Some grouping options require infering data not readily available so we create these columns in advance here
@@ -210,7 +229,12 @@ export const GradesTableProvider = ({
     // Here we predict the grades for the students
     let predictedGrades: ReturnType<typeof predictGrades> = {};
     if (gradingModels) {
-      predictedGrades = predictGrades(data, gradingModels, gradeSelectOption);
+      predictedGrades = predictGrades(
+        data,
+        gradingModels,
+        gradeSelectOption,
+        getCoursePartExpiryDateFromTaskId
+      );
     }
 
     // Add all auxiliary columns to the data
@@ -236,15 +260,17 @@ export const GradesTableProvider = ({
           ),
         };
       }),
-      gradeSelectOption
+      gradeSelectOption,
+      getCoursePartExpiryDateFromTaskId
     );
   }, [
-    course.data?.gradingScale,
-    courseTasks.data,
+    gradingModels,
     data,
     gradeSelectOption,
-    gradingModels,
+    getCoursePartExpiryDateFromTaskId,
     t,
+    courseTasks.data,
+    course.data?.gradingScale,
   ]);
 
   // --- Selection column ---
@@ -485,6 +511,9 @@ export const GradesTableProvider = ({
                 rowCourseTask => rowCourseTask.courseTaskId === source.id
               )!,
               maxGrade: (source as CourseTaskData).maxGrade,
+              coursePartExpiryDate: getCoursePartExpiryDateFromTaskId(
+                source.id
+              ),
             };
           },
           {
@@ -497,8 +526,14 @@ export const GradesTableProvider = ({
                 return (a.grade ?? -1) - (b.grade ?? -1);
               else if (a.type === 'courseTask' && b.type === 'courseTask') {
                 return (
-                  (findBestGrade(a.task.grades)?.grade ?? -1) -
-                  (findBestGrade(b.task.grades)?.grade ?? -1)
+                  (findBestGrade(
+                    a.task.grades,
+                    getCoursePartExpiryDateFromTaskId(a.task.courseTaskId)
+                  )?.grade ?? -1) -
+                  (findBestGrade(
+                    b.task.grades,
+                    getCoursePartExpiryDateFromTaskId(b.task.courseTaskId)
+                  )?.grade ?? -1)
                 );
               }
               return 0; // Shouldn't happen
@@ -514,7 +549,12 @@ export const GradesTableProvider = ({
           }
         )
       ),
-    [coursePartValues, finalGradeModelSelected, selectedModelSources]
+    [
+      coursePartValues,
+      finalGradeModelSelected,
+      selectedModelSources,
+      getCoursePartExpiryDateFromTaskId,
+    ]
   );
 
   // This columns are used to group by data that is not directly shown

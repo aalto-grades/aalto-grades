@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+import type {CoursePartData, CourseTaskData} from '@/common/types';
+
 type BaseType = {
   id: number;
   grade: number;
@@ -9,14 +11,31 @@ type BaseType = {
   expiryDate: Date | null;
 };
 
-export const gradeIsExpired = (grade: BaseType | null): boolean => {
-  if (!grade?.expiryDate) return false;
-  return Date.now() > grade.expiryDate.getTime();
+const isDateExpired = (date: Date | null | undefined): boolean => {
+  if (!date) return false;
+  return Date.now() > date.getTime();
+};
+
+export const gradeIsExpired = (
+  grade: BaseType | null,
+  coursePartExpiryDate?: Date | null
+): boolean => {
+  if (
+    grade?.expiryDate &&
+    !isDateExpired(grade.expiryDate) &&
+    isDateExpired(coursePartExpiryDate)
+  ) {
+    return false;
+  }
+
+  return (
+    isDateExpired(grade?.expiryDate) || isDateExpired(coursePartExpiryDate)
+  );
 };
 
 const gradeIsNewer = (
-  newGrade: BaseType,
-  oldGrade: BaseType | null
+  newGrade: BaseType | BestFinalGradeData,
+  oldGrade: BaseType | BestFinalGradeData | null
 ): boolean => {
   if (oldGrade === null) return true;
   const newDateTime = newGrade.date.getTime();
@@ -26,8 +45,8 @@ const gradeIsNewer = (
 };
 
 const gradeIsBetter = (
-  newGrade: BaseType,
-  oldGrade: BaseType | null
+  newGrade: BaseType | BestFinalGradeData,
+  oldGrade: BaseType | BestFinalGradeData | null
 ): boolean => {
   if (oldGrade === null) return true;
   if (newGrade.grade === oldGrade.grade)
@@ -44,8 +63,8 @@ export type GradeSelectOption = 'best' | 'latest';
  *
  * @param {readonly T[]} grades An array of grades to search through.
  * @param {Object} [searchOptions] Options for customizing the search behavior.
- * @param {'any' | 'prefer_non_expired' | 'non_expired'} [searchOptions.expiredOption='any']
- *   Specifies how to handle expired grades. Default is `'any'`
+ * @param {'any' | 'prefer_non_expired' | 'non_expired'} [searchOptions.expiredOption='non_expired']
+ *   Specifies how to handle expired grades. Default is `'non_expired'`
  * @param {'best' | 'latest'} [searchOptions.gradeSelectOption='best'] -
  *   Specifies the criterion for selecting the best grade. Default is `'best'`
  * @returns {T | null} The best grade found based on the search options, or null
@@ -53,11 +72,12 @@ export type GradeSelectOption = 'best' | 'latest';
  */
 export const findBestGrade = <T extends BaseType>(
   grades: readonly T[],
+  coursePartExpiryDate?: Date | null,
   searchOptions: {
     expiredOption?: 'any' | 'prefer_non_expired' | 'non_expired';
     gradeSelectOption?: GradeSelectOption;
   } = {
-    expiredOption: 'any',
+    expiredOption: 'non_expired',
     gradeSelectOption: 'best',
   }
 ): T | null => {
@@ -66,7 +86,10 @@ export const findBestGrade = <T extends BaseType>(
   const isBetter =
     searchOptions.gradeSelectOption === 'latest' ? gradeIsNewer : gradeIsBetter;
   for (const grade of grades) {
-    if (searchOptions.expiredOption !== 'any' && gradeIsExpired(grade)) {
+    if (
+      searchOptions.expiredOption !== 'any' &&
+      gradeIsExpired(grade, coursePartExpiryDate)
+    ) {
       if (isBetter(grade, bestSoFarExpired)) bestSoFarExpired = grade;
     } else {
       if (isBetter(grade, bestSoFar)) bestSoFar = grade;
@@ -79,6 +102,7 @@ export const findBestGrade = <T extends BaseType>(
 };
 
 type BestFinalGradeData = {
+  id: number;
   grade: number;
   date: Date;
   gradingModelId: number | null;
@@ -88,7 +112,12 @@ type BestFinalGradeData = {
  * ones.
  */
 export const findBestFinalGrade = <T extends BestFinalGradeData>(
-  finalGrades: readonly T[]
+  finalGrades: readonly T[],
+  searchOptions: {
+    gradeSelectOption?: GradeSelectOption;
+  } = {
+    gradeSelectOption: 'latest',
+  }
 ): T | null => {
   let bestSoFar: T | null = null;
   for (const finalGrade of finalGrades) {
@@ -106,14 +135,26 @@ export const findBestFinalGrade = <T extends BestFinalGradeData>(
     } else if (oldIsManual && !newIsManual) {
       continue;
     }
+    const isBetter =
+      searchOptions.gradeSelectOption === 'latest'
+        ? gradeIsNewer
+        : gradeIsBetter;
 
-    if (finalGrade.grade > bestSoFar.grade) bestSoFar = finalGrade;
-    else if (
-      finalGrade.grade === bestSoFar.grade &&
-      finalGrade.date >= bestSoFar.date
-    )
-      bestSoFar = finalGrade;
+    bestSoFar = isBetter(finalGrade, bestSoFar) ? finalGrade : bestSoFar;
   }
 
   return bestSoFar;
+};
+
+export const getCoursePartExpiryDate = (
+  courseParts?: CoursePartData[],
+  courseTasks?: CourseTaskData[],
+  courseTaskId?: number
+): Date | null | undefined => {
+  const coursePart = courseParts?.find(
+    part =>
+      part.id ===
+      courseTasks?.find(taskData => taskData.id === courseTaskId)?.coursePartId
+  );
+  return coursePart?.expiryDate;
 };
