@@ -321,7 +321,7 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
     .set({
       grade: grade ?? gradeData.grade,
       date: date ?? gradeData.date,
-      expiryDate: expiryDate ?? gradeData.expiryDate,
+      expiryDate: expiryDate,
       comment: comment !== undefined ? comment : gradeData.comment,
       graderId: grader.id,
     })
