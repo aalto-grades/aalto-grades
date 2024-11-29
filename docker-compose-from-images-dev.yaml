@@ -29,3 +29,23 @@ services:
     extends:
       file: ./docker-compose-from-images.yaml
       service: database
+
+  watchtower:
+    image: containrrr/watchtower
+    # run docker compose with flag '--profile test' to run watchtower
+    profiles:
+      - test
+    environment:
+      WATCHTOWER_NOTIFICATIONS: email
+      WATCHTOWER_NOTIFICATION_EMAIL_FROM: root@aalto-grades-test.cs.aalto.fi
+      WATCHTOWER_NOTIFICATION_EMAIL_TO: trong.d.vu@aalto.fi,guido.bordonaro@aalto.fi
+      # Using local smtp server of aalto vm
+      WATCHTOWER_NOTIFICATION_EMAIL_SERVER: localhost
+      WATCHTOWER_NOTIFICATION_EMAIL_DELAY: 2
+      WATCHTOWER_NOTIFICATION_EMAIL_SERVER_TLS_SKIP_VERIFY: true
+      WATCHTOWER_NOTIFICATIONS_LEVEL: error
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    # To use the local smtp server of aalto vm
+    network_mode: host
+    command: --interval 600 --cleanup

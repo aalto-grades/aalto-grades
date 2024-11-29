@@ -23,6 +23,10 @@ services:
       - ./reverse-proxy.conf:/etc/nginx/templates/nginx.conf.template
     environment:
       SERVER_NAME: '${SERVER_NAME}'
+    # To automatically recreate proxy container in test server with watchtower
+    depends_on:
+      - frontend
+      - backend
 
   frontend:
     image: ghcr.io/aalto-grades/aalto-grades-frontend:main
