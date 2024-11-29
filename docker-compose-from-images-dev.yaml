@@ -29,7 +29,7 @@ services:
     extends:
       file: ./docker-compose-from-images.yaml
       service: database
-      
+
   watchtower:
     image: containrrr/watchtower
     environment:
