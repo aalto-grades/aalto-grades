@@ -243,9 +243,14 @@ const EditGradesDialog = ({
     const deletedGrades: number[] = [];
     const editedGrades: {gradeId: number; data: EditTaskGradeData}[] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const replacer = (key: string, value: any): any => {
-      // ignore the 'selected' property
+    /**
+     * Replacer function used in the JSON.stringify cxomparison, ignore the
+     * 'selected' property by returning undefined
+     */
+    const ignoreSelectedColumn = (
+      key: string,
+      value: ColTypes[keyof ColTypes]
+    ): ColTypes[keyof ColTypes] | undefined => {
       if (key === 'selected') {
         return undefined;
       }
@@ -273,7 +278,8 @@ const EditGradesDialog = ({
       } else {
         const newRow = rows.find(row => row.gradeId === initRow.gradeId);
         if (
-          JSON.stringify(newRow, replacer) !== JSON.stringify(initRow, replacer)
+          JSON.stringify(newRow, ignoreSelectedColumn) !==
+          JSON.stringify(initRow, ignoreSelectedColumn)
         ) {
           editedGrades.push({
             gradeId: newRow!.gradeId,
