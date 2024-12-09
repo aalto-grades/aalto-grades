@@ -243,6 +243,16 @@ const EditGradesDialog = ({
     const deletedGrades: number[] = [];
     const editedGrades: {gradeId: number; data: EditTaskGradeData}[] = [];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const replacer = (key: string, value: any): any => {
+      // ignore the 'selected' property
+      if (key === 'selected') {
+        return undefined;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return value;
+    };
+
     for (const row of rows) {
       if (row.gradeId === -1) {
         newGrades.push({
@@ -254,24 +264,30 @@ const EditGradesDialog = ({
           expiryDate: row.expiryDate,
           comment: row.comment,
         });
-      } else {
-        editedGrades.push({
-          gradeId: row.gradeId,
-          data: {
-            grade: row.aplusGrade ? undefined : row.grade,
-            date: row.date,
-            expiryDate: row.expiryDate,
-            comment: row.comment,
-          },
-        });
       }
     }
 
     const rowIds = new Set(rows.map(row => row.gradeId));
     for (const initRow of initRows) {
-      if (!rowIds.has(initRow.gradeId)) deletedGrades.push(initRow.gradeId);
+      if (!rowIds.has(initRow.gradeId)) {
+        deletedGrades.push(initRow.gradeId);
+      } else {
+        const newRow = rows.find(row => row.gradeId === initRow.gradeId);
+        if (
+          JSON.stringify(newRow, replacer) !== JSON.stringify(initRow, replacer)
+        ) {
+          editedGrades.push({
+            gradeId: newRow!.gradeId,
+            data: {
+              grade: newRow!.aplusGrade ? undefined : newRow!.grade,
+              date: newRow!.date,
+              expiryDate: newRow!.expiryDate,
+              comment: newRow!.comment,
+            },
+          });
+        }
+      }
     }
-
     await Promise.all([
       addGrades.mutateAsync(newGrades),
       ...deletedGrades.map(async gradeId => deleteGrade.mutateAsync(gradeId)),
