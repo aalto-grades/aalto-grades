@@ -13,3 +13,4 @@ export * from './gradingModel';
 export * from './graph';
 export * from './taskGrade';
 export * from './user';
+export * from './logs';

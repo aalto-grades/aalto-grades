@@ -1,9 +1,11 @@
 // SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
+import cloneDeep from 'lodash/cloneDeep';
 import {Op} from 'sequelize';
 
 import {
+  ActionType,
   CourseRoleType,
   type EditTaskGradeData,
   type FinalGradeData,
@@ -28,6 +30,7 @@ import {
   type Endpoint,
   type JwtClaims,
   type NewDbTaskGradeData,
+  type NewDbTaskGradeLogData,
 } from '../types';
 import {validateAplusGradeSourceBelongsToCourseTask} from './utils/aplus';
 import {validateCourseId} from './utils/course';
@@ -38,6 +41,7 @@ import {
   parseTaskGrade,
   validateUserAndGrader,
 } from './utils/taskGrade';
+import TaskGradeLog from '../database/models/taskGradeLog';
 
 /**
  * () => StudentRow[]
@@ -134,6 +138,7 @@ export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
  * @throws ApiError(400|404|409)
  */
 export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
+  console.log('create task grade');
   const grader = req.user as JwtClaims;
   const courseId = await validateCourseId(req.params.courseId);
 
@@ -242,7 +247,25 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
       });
     }
 
-    await TaskGrade.bulkCreate(preparedBulkCreate, {transaction: t});
+    // await TaskGrade.bulkCreate(preparedBulkCreate, {transaction: t});
+    const createdTaskGrades = await TaskGrade.bulkCreate(preparedBulkCreate, {
+      transaction: t,
+    });
+
+    if (createdTaskGrades.length > 0) {
+      const preparedLogsBulkCreate: NewDbTaskGradeLogData[] = [];
+      for (const taskGrade of createdTaskGrades) {
+        preparedLogsBulkCreate.push({
+          userId: grader.id,
+          taskGradeId: taskGrade.id,
+          actionType: ActionType.Create,
+          updatedState: taskGrade,
+        });
+      }
+      await TaskGradeLog.bulkCreate(preparedLogsBulkCreate, {
+        transaction: t,
+      });
+    }
   });
 
   // Create student roles for all the students
@@ -317,15 +340,25 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
     );
   }
 
-  await gradeData
-    .set({
-      grade: grade ?? gradeData.grade,
-      date: date ?? gradeData.date,
-      expiryDate: expiryDate,
-      comment: comment !== undefined ? comment : gradeData.comment,
-      graderId: grader.id,
-    })
-    .save();
+  const previousState = cloneDeep(gradeData);
+
+  const updatedState = {
+    grade: grade ?? gradeData.grade,
+    date: date ?? gradeData.date,
+    expiryDate: expiryDate,
+    comment: comment !== undefined ? comment : gradeData.comment,
+    graderId: grader.id,
+  };
+
+  const updatedGrade = await gradeData.set(updatedState).save();
+
+  await TaskGradeLog.create({
+    userId: grader.id,
+    taskGradeId: gradeData.id,
+    actionType: ActionType.Update,
+    updatedState: updatedGrade,
+    previousState,
+  });
 
   res.sendStatus(HttpCode.Ok);
 };
@@ -340,7 +373,15 @@ export const deleteGrade: Endpoint<void, void> = async (req, res) => {
     req.params.courseId,
     req.params.gradeId
   );
+  const grader = req.user as JwtClaims;
+
   await grade.destroy();
+
+  await TaskGradeLog.create({
+    userId: grader.id,
+    actionType: ActionType.Delete,
+    previousState: grade,
+  });
 
   res.sendStatus(HttpCode.Ok);
 };
