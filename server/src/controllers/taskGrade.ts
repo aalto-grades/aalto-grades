@@ -259,7 +259,6 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
           userId: grader.id,
           taskGradeId: taskGrade.id,
           actionType: ActionType.Create,
-          updatedState: taskGrade,
         });
       }
       await TaskGradeLog.bulkCreate(preparedLogsBulkCreate, {
@@ -342,21 +341,20 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
 
   const previousState = cloneDeep(gradeData);
 
-  const updatedState = {
-    grade: grade ?? gradeData.grade,
-    date: date ?? gradeData.date,
-    expiryDate: expiryDate,
-    comment: comment !== undefined ? comment : gradeData.comment,
-    graderId: grader.id,
-  };
-
-  const updatedGrade = await gradeData.set(updatedState).save();
+  await gradeData
+    .set({
+      grade: grade ?? gradeData.grade,
+      date: date ?? gradeData.date,
+      expiryDate: expiryDate,
+      comment: comment !== undefined ? comment : gradeData.comment,
+      graderId: grader.id,
+    })
+    .save();
 
   await TaskGradeLog.create({
     userId: grader.id,
     taskGradeId: gradeData.id,
     actionType: ActionType.Update,
-    updatedState: updatedGrade,
     previousState,
   });
 

@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import type {ActionType, CourseRoleType} from '@/common/types';
-import type TaskGrade from '../database/models/taskGrade';
 
 export type NewDbCourseRole = {
   userId: number;
@@ -38,7 +37,6 @@ export type NewDbTaskGradeLogData = {
   userId: number;
   taskGradeId: number;
   actionType: ActionType;
-  updatedState: TaskGrade;
 };
 
 export type SisuCsvFormat = {

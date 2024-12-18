@@ -24,7 +24,6 @@ export default class TaskGradeLog extends Model<
   declare userId: ForeignKey<User['id']>;
   declare taskGradeId?: ForeignKey<TaskGrade['id']>;
   declare actionType: ActionType;
-  declare updatedState?: TaskGrade;
   declare previousState?: TaskGrade;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -56,10 +55,6 @@ TaskGradeLog.init(
     actionType: {
       type: DataTypes.ENUM('CREATE', 'UPDATE', 'DELETE'),
       allowNull: false,
-    },
-    updatedState: {
-      type: DataTypes.JSON,
-      allowNull: true,
     },
     previousState: {
       type: DataTypes.JSON,
