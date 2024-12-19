@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 import cloneDeep from 'lodash/cloneDeep';
-import {Op} from 'sequelize';
+import {Op, type WhereOptions} from 'sequelize';
 
 import {
   ActionType,
@@ -130,6 +130,58 @@ export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
   );
 
   res.json(studentRows);
+};
+
+/** () => TaskGradeLog[] */
+export const getGradeLogs: Endpoint<void, TaskGradeLog[]> = async (
+  req,
+  res
+) => {
+  const userId = req.query.userId as string | undefined;
+  const taskGradeId = req.query.taskGradeId as string | undefined;
+
+  const isConvertibleToInteger = (value: string | undefined): boolean => {
+    return (
+      value !== undefined &&
+      !isNaN(Number(value)) &&
+      Number.isInteger(Number(value))
+    );
+  };
+
+  if (userId !== undefined && !isConvertibleToInteger(userId)) {
+    throw new ApiError(`Invalid user id ${userId}`, HttpCode.BadRequest);
+  }
+
+  if (taskGradeId !== undefined && !isConvertibleToInteger(taskGradeId)) {
+    throw new ApiError(
+      `Invalid task grade id ${taskGradeId}`,
+      HttpCode.BadRequest
+    );
+  }
+
+  const whereCondition: WhereOptions = {};
+
+  if (isConvertibleToInteger(userId)) {
+    whereCondition.userId = userId;
+  }
+
+  if (isConvertibleToInteger(taskGradeId)) {
+    whereCondition.taskGradeId = taskGradeId;
+  }
+
+  const gradeLogs = await TaskGradeLog.findAll({
+    include: [
+      {
+        model: User,
+        as: 'user',
+        attributes: ['id', 'name', 'email', 'studentNumber'],
+      },
+      {model: TaskGrade, as: 'taskGrade'},
+    ],
+    where: whereCondition,
+    attributes: {exclude: ['userId', 'UserId', 'taskGradeId', 'TaskGradeId']},
+  });
+  res.json(gradeLogs);
 };
 
 /**

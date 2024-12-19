@@ -27,6 +27,8 @@ export default class TaskGradeLog extends Model<
   declare previousState?: TaskGrade;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+  user?: User;
+  taskGrade?: TaskGrade;
 }
 
 TaskGradeLog.init(
@@ -70,7 +72,7 @@ TaskGradeLog.init(
 );
 
 User.hasMany(TaskGradeLog, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
-TaskGradeLog.belongsTo(User, {foreignKey: 'userId'});
+TaskGradeLog.belongsTo(User, {foreignKey: 'userId', as: 'user'});
 
 TaskGrade.hasMany(TaskGradeLog, {onDelete: 'SET NULL', onUpdate: 'CASADE'});
-TaskGradeLog.belongsTo(TaskGrade, {foreignKey: 'taskGradeId'});
+TaskGradeLog.belongsTo(TaskGrade, {foreignKey: 'taskGradeId', as: 'taskGrade'});
