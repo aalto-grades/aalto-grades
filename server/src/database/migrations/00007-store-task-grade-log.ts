@@ -30,6 +30,16 @@ export default {
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE',
           },
+          course_task_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+              model: 'course_task',
+              key: 'id',
+            },
+            onDelete: 'SET NULL',
+            onUpdate: 'CASCADE',
+          },
           task_grade_id: {
             type: DataTypes.INTEGER,
             allowNull: true,

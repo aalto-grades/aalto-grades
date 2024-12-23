@@ -35,6 +35,7 @@ export type NewDbTaskGradeData = {
 
 export type NewDbTaskGradeLogData = {
   userId: number;
+  courseTaskId: number;
   taskGradeId: number;
   actionType: ActionType;
 };

@@ -138,6 +138,7 @@ export const getGradeLogs: Endpoint<void, TaskGradeLog[]> = async (
   res
 ) => {
   const userId = req.query.userId as string | undefined;
+  const courseTaskIds = req.query.courseTaskIds as string | undefined;
   const taskGradeId = req.query.taskGradeId as string | undefined;
 
   const isConvertibleToInteger = (value: string | undefined): boolean => {
@@ -167,6 +168,25 @@ export const getGradeLogs: Endpoint<void, TaskGradeLog[]> = async (
 
   if (isConvertibleToInteger(taskGradeId)) {
     whereCondition.taskGradeId = taskGradeId;
+  }
+
+  const courseTaskIdsSet: Set<number> = new Set();
+
+  if (courseTaskIds !== undefined) {
+    const courseTaskIdsStringList: string[] = courseTaskIds.split(',');
+    for (const taskId of courseTaskIdsStringList) {
+      if (isConvertibleToInteger(taskId)) {
+        courseTaskIdsSet.add(Number(taskId.trim()));
+      } else {
+        throw new ApiError(
+          `Invalid course task ids [${courseTaskIds}]`,
+          HttpCode.BadRequest
+        );
+      }
+    }
+    whereCondition.courseTaskId = {
+      [Op.in]: Array.from(courseTaskIdsSet),
+    };
   }
 
   const gradeLogs = await TaskGradeLog.findAll({
@@ -309,6 +329,7 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
       for (const taskGrade of createdTaskGrades) {
         preparedLogsBulkCreate.push({
           userId: grader.id,
+          courseTaskId: taskGrade.courseTaskId,
           taskGradeId: taskGrade.id,
           actionType: ActionType.Create,
         });
@@ -405,6 +426,7 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
 
   await TaskGradeLog.create({
     userId: grader.id,
+    courseTaskId: gradeData.courseTaskId,
     taskGradeId: gradeData.id,
     actionType: ActionType.Update,
     previousState,
@@ -429,6 +451,7 @@ export const deleteGrade: Endpoint<void, void> = async (req, res) => {
 
   await TaskGradeLog.create({
     userId: grader.id,
+    courseTaskId: grade.courseTaskId,
     actionType: ActionType.Delete,
     previousState: grade,
   });

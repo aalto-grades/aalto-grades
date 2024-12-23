@@ -184,6 +184,8 @@ definitions:
     properties:
       id:
         $ref: '#/definitions/TaskGradeLogId'
+      courseTaskId:
+        $ref: '#/definitions/CourseTaskId'
       actionType:
         $ref: '#/definitions/ActionType'
       previousState:
@@ -272,6 +274,12 @@ definitions:
           type: integer
         description: Internal task grade database ID
         example: 1
+      - in: query
+        name: courseTaskIds
+        schema:
+          type: string
+        description: List of internal course task database IDs separated by commna
+        example: 1,2,3
     responses:
       200:
         description: Returns logs of the task grade.

@@ -13,6 +13,7 @@ import {
 
 import type {ActionType} from '@/common/types';
 import {sequelize} from '..';
+import CourseTask from './courseTask';
 import TaskGrade from './taskGrade';
 import User from './user';
 
@@ -22,6 +23,7 @@ export default class TaskGradeLog extends Model<
 > {
   declare id: CreationOptional<number>;
   declare userId: ForeignKey<User['id']>;
+  declare courseTaskId: ForeignKey<CourseTask['id']>;
   declare taskGradeId?: ForeignKey<TaskGrade['id']>;
   declare actionType: ActionType;
   declare previousState?: TaskGrade;
@@ -43,6 +45,14 @@ TaskGradeLog.init(
       allowNull: false,
       references: {
         model: 'user',
+        key: 'id',
+      },
+    },
+    courseTaskId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'course_task',
         key: 'id',
       },
     },
@@ -73,6 +83,9 @@ TaskGradeLog.init(
 
 User.hasMany(TaskGradeLog, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
 TaskGradeLog.belongsTo(User, {foreignKey: 'userId', as: 'user'});
+
+CourseTask.hasMany(TaskGradeLog, {onDelete: 'SET NULL', onUpdate: 'CASADE'});
+TaskGradeLog.belongsTo(CourseTask, {foreignKey: 'courseTaskId'});
 
 TaskGrade.hasMany(TaskGradeLog, {onDelete: 'SET NULL', onUpdate: 'CASADE'});
 TaskGradeLog.belongsTo(TaskGrade, {foreignKey: 'taskGradeId', as: 'taskGrade'});
