@@ -12,6 +12,9 @@ services:
     extends:
       file: ./docker-compose-from-images.yaml
       service: reverse-proxy
+    depends_on:
+      - frontend
+      - backend
 
   frontend:
     extends:
