@@ -48,3 +48,8 @@ export class CustomError extends Error {
     this.action = action;
   }
 }
+
+export type AssistantData = {
+  email: string;
+  expiryDate: Date | null;
+};

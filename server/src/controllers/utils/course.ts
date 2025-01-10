@@ -40,7 +40,7 @@ export const findCourseFullById = async (
       {model: CourseTranslation},
       {
         model: User,
-        through: {attributes: ['role']},
+        through: {attributes: ['role', 'expiryDate']},
       },
     ],
   })) as CourseFull | null;
@@ -133,9 +133,14 @@ export const parseCourseFull = (course: CourseFull): CourseData => {
       case CourseRoleType.Teacher:
         courseData.teachersInCharge.push(userData);
         break;
-      case CourseRoleType.Assistant:
-        courseData.assistants.push(userData);
+      case CourseRoleType.Assistant: {
+        const assistantRoleData = {
+          ...userData,
+          expiryDate: user.CourseRole.expiryDate,
+        };
+        courseData.assistants.push(assistantRoleData);
         break;
+      }
     }
   }
 

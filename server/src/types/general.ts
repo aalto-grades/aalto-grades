@@ -36,7 +36,9 @@ export const stringToIdSchema = z
 
 export type JwtClaims = {role: SystemRole; id: number};
 
-type UserWithRole = User & {CourseRole: {role: CourseRoleType}};
+export type UserWithRole = User & {
+  CourseRole: {role: CourseRoleType; expiryDate: string};
+};
 export type CourseFull = Course & {
   CourseTranslations: CourseTranslation[];
   Users: UserWithRole[];
