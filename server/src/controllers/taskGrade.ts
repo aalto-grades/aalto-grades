@@ -14,6 +14,8 @@ import {
   type NewTaskGrade,
   type StudentRow,
   type TaskGradeData,
+  type TaskGradeHistory,
+  type TaskGradeHistoryArray,
   type UserData,
   type UserIdArray,
 } from '@/common/types';
@@ -24,6 +26,7 @@ import CourseRole from '../database/models/courseRole';
 import CourseTask from '../database/models/courseTask';
 import FinalGrade from '../database/models/finalGrade';
 import TaskGrade from '../database/models/taskGrade';
+import TaskGradeLog from '../database/models/taskGradeLog';
 import User from '../database/models/user';
 import {
   ApiError,
@@ -36,12 +39,12 @@ import {validateAplusGradeSourceBelongsToCourseTask} from './utils/aplus';
 import {validateCourseId} from './utils/course';
 import {validateCourseTaskBelongsToCourse} from './utils/courseTask';
 import {parseFinalGrade} from './utils/finalGrade';
+import {parsePreviousState} from './utils/history';
 import {
   findAndValidateTaskGradePath,
   parseTaskGrade,
   validateUserAndGrader,
 } from './utils/taskGrade';
-import TaskGradeLog from '../database/models/taskGradeLog';
 
 /**
  * () => StudentRow[]
@@ -133,7 +136,7 @@ export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
 };
 
 /** () => TaskGradeLog[] */
-export const getGradeLogs: Endpoint<void, TaskGradeLog[]> = async (
+export const getGradeLogs: Endpoint<void, TaskGradeHistoryArray> = async (
   req,
   res
 ) => {
@@ -196,12 +199,40 @@ export const getGradeLogs: Endpoint<void, TaskGradeLog[]> = async (
         as: 'user',
         attributes: ['id', 'name', 'email', 'studentNumber'],
       },
-      {model: TaskGrade, as: 'taskGrade'},
+      {
+        model: TaskGrade,
+        as: 'taskGrade',
+        include: [
+          {model: User, attributes: ['id', 'name', 'email', 'studentNumber']},
+          {
+            model: User,
+            as: 'grader',
+            attributes: ['id', 'name', 'email', 'studentNumber'],
+          },
+          {model: AplusGradeSource},
+        ],
+      },
     ],
     where: whereCondition,
     attributes: {exclude: ['userId', 'UserId', 'taskGradeId', 'TaskGradeId']},
   });
-  res.json(gradeLogs);
+
+  const parsedGradeLogs: TaskGradeHistoryArray = gradeLogs.map(log => {
+    return {
+      id: log.id,
+      courseTaskId: log.courseTaskId,
+      actionType: log.actionType,
+      createdAt: log.createdAt,
+      updatedAt: log.updatedAt,
+      user: log.user,
+      taskGrade: log.taskGrade ? parseTaskGrade(log.taskGrade) : null,
+      previousState: log.previousState
+        ? parsePreviousState(log.previousState)
+        : null,
+    } as TaskGradeHistory;
+  });
+
+  res.json(parsedGradeLogs);
 };
 
 /**
@@ -332,6 +363,7 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
           courseTaskId: taskGrade.courseTaskId,
           taskGradeId: taskGrade.id,
           actionType: ActionType.Create,
+          previousState: cloneDeep(taskGrade),
         });
       }
       await TaskGradeLog.bulkCreate(preparedLogsBulkCreate, {

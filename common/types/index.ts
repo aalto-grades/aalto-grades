@@ -11,6 +11,6 @@ export * from './finalGrade';
 export * from './general';
 export * from './gradingModel';
 export * from './graph';
+export * from './history';
 export * from './taskGrade';
 export * from './user';
-export * from './logs';

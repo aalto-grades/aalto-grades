@@ -2,13 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Add, Delete} from '@mui/icons-material';
+import {Add, Delete, History} from '@mui/icons-material';
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
 import {
   GridActionsCellItem,
@@ -19,9 +21,10 @@ import {
   type GridRowsProp,
   GridToolbarContainer,
   type GridValidRowModel,
+  useGridApiRef,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
-import {type JSX, useEffect, useMemo, useState} from 'react';
+import {type JSX, forwardRef, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker, useParams} from 'react-router-dom';
@@ -31,6 +34,7 @@ import type {
   NewTaskGrade,
   TaskGradeData,
 } from '@/common/types';
+import GradesHistoryDialog from '@/components/course/course-results-view/HistoryDialog';
 import StyledDataGrid, {
   type GetRowClassName,
   type ProcessRowUpdate,
@@ -46,6 +50,35 @@ import {
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import {findBestGrade, getCoursePartExpiryDate} from '@/utils';
+
+type HistoryButtonProps = {
+  courseTaskId: number;
+  studentNumber: string;
+};
+
+const HistoryButton = forwardRef<HTMLSpanElement, HistoryButtonProps>(
+  ({courseTaskId, studentNumber}): JSX.Element => {
+    const {t} = useTranslation();
+    const [historyOpen, setHistoryOpen] = useState<boolean>(false);
+
+    return (
+      <>
+        <Tooltip title={t('course.results.history')}>
+          <IconButton onClick={() => setHistoryOpen(true)}>
+            <History />
+          </IconButton>
+        </Tooltip>
+        <GradesHistoryDialog
+          studentId={studentNumber}
+          courseTaskId={courseTaskId}
+          open={historyOpen}
+          onClose={() => setHistoryOpen(false)}
+        />
+      </>
+    );
+  }
+);
+HistoryButton.displayName = 'HistoryButton';
 
 type ColTypes = {
   id: number;
@@ -81,6 +114,7 @@ const EditGradesDialog = ({
   const {auth} = useAuth();
   const {courseId} = useParams() as {courseId: string};
   const {gradeSelectOption} = useTableContext();
+  const apiRef = useGridApiRef();
 
   const courseParts = useGetCourseParts(courseId);
   const courseTasks = useGetCourseTasks(courseId);
@@ -149,7 +183,13 @@ const EditGradesDialog = ({
       selected: bestGrade !== null && row.id === bestGrade.id ? 'selected' : '',
     }));
     if (JSON.stringify(rows) !== JSON.stringify(newRows)) setRows(newRows);
-  }, [bestGrade, rows]);
+    // Autosize if table is already rendered
+    setTimeout(() => {
+      if (Object.keys(apiRef.current).length !== 0) {
+        apiRef.current.autosizeColumns();
+      }
+    }, 1);
+  }, [apiRef, bestGrade, rows]);
 
   const courseTask =
     courseTasks.data?.find(task => task.id === courseTaskId) ?? null;
@@ -172,14 +212,14 @@ const EditGradesDialog = ({
       headerName: t('general.date'),
       type: 'date',
       editable: true,
-      width: 120,
+      // width: 120,
     },
     {
       field: 'expiryDate',
       headerName: t('general.expiry-date'),
       type: 'date',
       editable: true,
-      width: 120,
+      // width: 120,
     },
     {
       field: 'comment',
@@ -365,16 +405,25 @@ const EditGradesDialog = ({
         fullWidth
         maxWidth="md"
       >
-        <DialogTitle>{title}</DialogTitle>
+        <DialogTitle>
+          {title}
+          <HistoryButton
+            studentNumber={studentNumber}
+            courseTaskId={courseTaskId}
+          />
+        </DialogTitle>
+
         <DialogContent>
           <div style={{height: '30vh'}}>
             <StyledDataGrid
+              apiRef={apiRef}
               rows={rows}
               columns={columns as GridColDef<GridValidRowModel>[]}
               rowHeight={25}
               editMode="row"
               rowSelection={false}
               disableColumnSelector
+              autosizeOnMount
               slots={{toolbar: dataGridToolbar}}
               sx={{maxHeight: '70vh', minHeight: '20vh'}}
               initialState={{

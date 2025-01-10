@@ -84,8 +84,8 @@ TaskGradeLog.init(
 User.hasMany(TaskGradeLog, {onDelete: 'CASCADE', onUpdate: 'CASCADE'});
 TaskGradeLog.belongsTo(User, {foreignKey: 'userId', as: 'user'});
 
-CourseTask.hasMany(TaskGradeLog, {onDelete: 'SET NULL', onUpdate: 'CASADE'});
+CourseTask.hasMany(TaskGradeLog, {onDelete: 'SET NULL', onUpdate: 'CASCADE'});
 TaskGradeLog.belongsTo(CourseTask, {foreignKey: 'courseTaskId'});
 
-TaskGrade.hasMany(TaskGradeLog, {onDelete: 'SET NULL', onUpdate: 'CASADE'});
+TaskGrade.hasMany(TaskGradeLog, {onDelete: 'SET NULL', onUpdate: 'CASCADE'});
 TaskGradeLog.belongsTo(TaskGrade, {foreignKey: 'taskGradeId', as: 'taskGrade'});
