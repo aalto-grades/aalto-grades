@@ -128,8 +128,8 @@ definitions:
         items:
           type: object
           properties:
-            email: 
-              $ref: '#/definitions/UserEmail' 
+            email:
+              $ref: '#/definitions/UserEmail'
             expiryDate:
               $ref: '#/definitions/NullableAssistantExpiryDate'
     required:
@@ -170,8 +170,8 @@ definitions:
         items:
           type: object
           properties:
-            email: 
-              $ref: '#/definitions/UserEmail' 
+            email:
+              $ref: '#/definitions/UserEmail'
             expiryDate:
               $ref: '#/definitions/NullableAssistantExpiryDate'
 
