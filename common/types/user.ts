@@ -32,11 +32,7 @@ export const TeacherDataSchema = z.strictObject({
   email: z.string().email(),
   studentNumber: z.string().nullable(),
 });
-export const AssistantDataSchema = z.strictObject({
-  id: IdSchema,
-  name: z.string().nullable(),
-  email: z.string().email(),
-  studentNumber: z.string().nullable(),
+export const AssistantDataSchema = TeacherDataSchema.extend({
   expiryDate: z.string().nullable(),
 });
 export const NewAssistantDataSchema = z.strictObject({

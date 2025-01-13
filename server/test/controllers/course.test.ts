@@ -320,36 +320,25 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     assistants: [],
   };
 
-  const findTeachers = (
+  const findUsers = (
     emails: string[] | undefined
-  ): TeacherData[] | undefined => {
+  ): Partial<AssistantData>[] | undefined => {
     if (emails === undefined) return undefined;
     const users = [];
     for (const email of emails) {
-      const user = teachers.find(teacher => teacher.email === email);
+      let user = teachers.find(teacher => teacher.email === email);
       if (user !== undefined) {
         users.push(user);
         continue;
       }
 
-      throw new Error(`Email ${email} not in test teachers`);
-    }
-    return users;
-  };
-
-  const findAssistants = (
-    emails: string[] | undefined
-  ): AssistantData[] | undefined => {
-    if (emails === undefined) return undefined;
-    const users = [];
-    for (const email of emails) {
-      const user = assistants.find(assistant => assistant.email === email);
+      user = assistants.find(assistant => assistant.email === email);
       if (user !== undefined) {
         users.push(user);
         continue;
       }
 
-      throw new Error(`Email ${email} not in test assistants`);
+      throw new Error(`Email ${email} not in test teachers | assistants`);
     }
     return users;
   };
@@ -375,10 +364,12 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       ...edit1,
       id: courseId,
       teachersInCharge:
-        findTeachers(edit1.teachersInCharge) ?? initState.teachersInCharge,
+        (findUsers(edit1.teachersInCharge) as TeacherData[] | undefined) ??
+        initState.teachersInCharge,
       assistants:
-        findAssistants(edit1.assistants?.map(assistant => assistant.email)) ??
-        initState.assistants,
+        (findUsers(edit1.assistants?.map(assistant => assistant.email)) as
+          | AssistantData[]
+          | undefined) ?? initState.assistants,
     };
 
     const courseEdit2: CourseData = {
@@ -387,12 +378,12 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       ...edit2,
       id: courseId,
       teachersInCharge:
-        findTeachers(edit2.teachersInCharge) ??
-        findTeachers(edit1.teachersInCharge) ??
+        findUsers(edit2.teachersInCharge) ??
+        findUsers(edit1.teachersInCharge) ??
         initState.teachersInCharge,
       assistants:
-        findAssistants(edit2.assistants?.map(assistant => assistant.email)) ??
-        findAssistants(edit1.assistants?.map(assistant => assistant.email)) ??
+        findUsers(edit2.assistants?.map(assistant => assistant.email)) ??
+        findUsers(edit1.assistants?.map(assistant => assistant.email)) ??
         initState.assistants,
     } as unknown as CourseData;
 
