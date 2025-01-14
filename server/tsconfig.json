@@ -4,6 +4,7 @@
 
 {
   "compilerOptions": {
+  
     "module": "commonjs",
     // "module": "ESNext",
     "paths": {
