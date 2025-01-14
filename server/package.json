@@ -3,7 +3,7 @@
   "license": "Expat (MIT)",
   "author": "The Aalto Grades Developers",
   "scripts": {
-    "build": "tsc && tsc-alias",
+    "build": "npm run util:cleanBuild && tsc && tsc-alias",
     "citest": "GITHUB_ACTIONS=1 jest --detectOpenHandles",
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
     "lint": "eslint . --ext ts --report-unused-disable-directives",
@@ -14,7 +14,8 @@
     "seed:down": "npx sequelize-cli db:seed:undo",
     "seed:up": "npx sequelize-cli db:seed:all",
     "start": "node build/server/src/server.js",
-    "test": "jest --verbose --detectOpenHandles --coverage"
+    "test": "jest --verbose --detectOpenHandles --coverage",
+    "util:cleanBuild": "node ./clean.js -p ./build"
   },
   "dependencies": {
     "@node-saml/passport-saml": "^5.0.0",
