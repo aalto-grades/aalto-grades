@@ -14,7 +14,7 @@ module.exports = {
   ],
   plugins: ['@typescript-eslint'],
   parser: '@typescript-eslint/parser',
-  ignorePatterns: ['node_modules', 'build', '.eslintrc.cjs'],
+  ignorePatterns: ['node_modules', 'build', '.eslintrc.cjs', 'clean.js'],
   settings: {
     'import/resolver': {
       typescript: {project: `${__dirname}/`}, // this loads <rootdir>/tsconfig.json to eslint
