@@ -383,6 +383,11 @@
       "add-at-least-one-teacher": "UNTRANSLATED",
       "add-assistant-emails": "UNTRANSLATED",
       "no-assistants": "UNTRANSLATED",
+      "assistant-expiry-date": "UNTRANSLATED",
+      "assistant-expiry-date-helper": "UNTRANSLATED",
+      "assistant-expiry-date-info": "UNTRANSLATED",
+      "assistant-expired-at": "UNTRANSLATED",
+      "assistant-expiry-date-change": "UNTRANSLATED",
       "input-at-least-one-assistant": "UNTRANSLATED",
       "cannot-remove-self": "UNTRANSLATED",
       "user-not-exist": "UNTRANSLATED"

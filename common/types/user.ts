@@ -4,7 +4,7 @@
 
 import {z} from 'zod';
 
-import {AaltoEmailSchema, IdSchema} from './general';
+import {AaltoEmailSchema, DateSchema, IdSchema} from './general';
 
 export const UserDataSchema = z.strictObject({
   id: IdSchema,
@@ -31,6 +31,13 @@ export const TeacherDataSchema = z.strictObject({
   name: z.string().nullable(),
   email: z.string().email(),
   studentNumber: z.string().nullable(),
+});
+export const AssistantDataSchema = TeacherDataSchema.extend({
+  expiryDate: z.string().nullable(),
+});
+export const NewAssistantDataSchema = z.strictObject({
+  email: z.string().email(),
+  expiryDate: DateSchema.nullable(),
 });
 
 export const NewUserSchema = z.discriminatedUnion('admin', [
@@ -70,6 +77,7 @@ export type UserData = z.infer<typeof UserDataSchema>;
 export type FullUserData = z.infer<typeof FullUserDataSchema>;
 export type StudentData = z.infer<typeof StudentDataSchema>;
 export type TeacherData = z.infer<typeof TeacherDataSchema>;
+export type AssistantData = z.infer<typeof AssistantDataSchema>;
 export type NewUser = z.infer<typeof NewUserSchema>;
 export type NewUserResponse = z.infer<typeof NewUserResponseSchema>;
 export type UserIdArray = z.infer<typeof UserIdArraySchema>;

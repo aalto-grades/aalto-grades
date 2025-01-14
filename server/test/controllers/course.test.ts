@@ -5,6 +5,7 @@
 import supertest from 'supertest';
 
 import {
+  type AssistantData,
   type CourseData,
   CourseDataArraySchema,
   CourseDataSchema,
@@ -36,7 +37,7 @@ let cookies: Cookies = {} as Cookies;
 let courseId = -1;
 let noRoleCourseId = -1;
 const teachers: TeacherData[] = [];
-const assistants: TeacherData[] = [];
+const assistants: AssistantData[] = [];
 
 const nonExistentId = 1000000;
 
@@ -66,7 +67,10 @@ beforeAll(async () => {
       email: `assistant${i}@aalto.fi`,
       name: `assistant${i}`,
     });
-    assistants.push(newUser as TeacherData);
+    assistants.push(newUser as AssistantData);
+    for (const assistant of assistants) {
+      assistant.expiryDate = null;
+    }
   }
 });
 
@@ -157,7 +161,7 @@ describe('Test POST /v1/courses - create new course', () => {
     gradingScale: GradingScale.Numerical,
     languageOfInstruction: Language.English,
     teachersInCharge: ['teacher@aalto.fi'],
-    assistants: ['assistant@aalto.fi'],
+    assistants: [{email: 'assistant@aalto.fi', expiryDate: new Date()}],
     name: {
       fi: 'Signaalit ja järjestelmät',
       en: 'Signals and Systems',
@@ -219,7 +223,7 @@ describe('Test POST /v1/courses - create new course', () => {
     const testData = {
       ...courseData,
       teachersInCharge: ['teacher@aalto.fi', 'teacher1000@aalto.fi'],
-      assistants: ['assistant1000@aalto.fi'],
+      assistants: [{email: 'assistant1000@aalto.fi', expiryDate: null}],
     };
     const res = await request
       .post('/v1/courses')
@@ -263,7 +267,10 @@ describe('Test POST /v1/courses - create new course', () => {
 
     testData = {
       ...courseData,
-      assistants: ['assistant@aalto.fi', 'assistant@aalto.fi'],
+      assistants: [
+        {email: 'assistant@aalto.fi', expiryDate: new Date()},
+        {email: 'assistant@aalto.fi', expiryDate: new Date()},
+      ],
     };
     await responseTests
       .testUnprocessableEntity(url, cookies.adminCookie)
@@ -272,7 +279,7 @@ describe('Test POST /v1/courses - create new course', () => {
     testData = {
       ...courseData,
       teachersInCharge: ['teacher@aalto.fi'],
-      assistants: ['teacher@aalto.fi'],
+      assistants: [{email: 'teacher@aalto.fi', expiryDate: new Date()}],
     };
     await responseTests
       .testUnprocessableEntity(url, cookies.adminCookie)
@@ -315,7 +322,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
 
   const findUsers = (
     emails: string[] | undefined
-  ): TeacherData[] | undefined => {
+  ): Partial<AssistantData>[] | undefined => {
     if (emails === undefined) return undefined;
     const users = [];
     for (const email of emails) {
@@ -357,8 +364,12 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       ...edit1,
       id: courseId,
       teachersInCharge:
-        findUsers(edit1.teachersInCharge) ?? initState.teachersInCharge,
-      assistants: findUsers(edit1.assistants) ?? initState.assistants,
+        (findUsers(edit1.teachersInCharge) as TeacherData[] | undefined) ??
+        initState.teachersInCharge,
+      assistants:
+        (findUsers(edit1.assistants?.map(assistant => assistant.email)) as
+          | AssistantData[]
+          | undefined) ?? initState.assistants,
     };
 
     const courseEdit2: CourseData = {
@@ -371,8 +382,8 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
         findUsers(edit1.teachersInCharge) ??
         initState.teachersInCharge,
       assistants:
-        findUsers(edit2.assistants) ??
-        findUsers(edit1.assistants) ??
+        findUsers(edit2.assistants?.map(assistant => assistant.email)) ??
+        findUsers(edit1.assistants?.map(assistant => assistant.email)) ??
         initState.assistants,
     } as unknown as CourseData;
 
@@ -409,8 +420,13 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       .expect(HttpCode.Ok);
 
     await testCourseEditSuccess(
-      {assistants: ['assistant1@aalto.fi']},
-      {assistants: ['assistant1@aalto.fi', 'assistant2@aalto.fi']},
+      {assistants: [{email: 'assistant1@aalto.fi', expiryDate: null}]},
+      {
+        assistants: [
+          {email: 'assistant1@aalto.fi', expiryDate: null},
+          {email: 'assistant2@aalto.fi', expiryDate: null},
+        ],
+      },
       cookies.teacherCookie
     );
   });
@@ -419,11 +435,14 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     await testCourseEditSuccess(
       {
         teachersInCharge: ['teacher1@aalto.fi'],
-        assistants: ['assistant1@aalto.fi'],
+        assistants: [{email: 'assistant1@aalto.fi', expiryDate: null}],
       },
       {
         teachersInCharge: ['teacher1@aalto.fi', 'teacher2@aalto.fi'],
-        assistants: ['assistant1@aalto.fi', 'assistant2@aalto.fi'],
+        assistants: [
+          {email: 'assistant1@aalto.fi', expiryDate: null},
+          {email: 'assistant2@aalto.fi', expiryDate: null},
+        ],
       }
     );
   });
@@ -432,11 +451,14 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     await testCourseEditSuccess(
       {
         teachersInCharge: ['teacher1@aalto.fi', 'teacher2@aalto.fi'],
-        assistants: ['assistant1@aalto.fi', 'assistant2@aalto.fi'],
+        assistants: [
+          {email: 'assistant1@aalto.fi', expiryDate: null},
+          {email: 'assistant2@aalto.fi', expiryDate: null},
+        ],
       },
       {
         teachersInCharge: ['teacher1@aalto.fi'],
-        assistants: ['assistant1@aalto.fi'],
+        assistants: [{email: 'assistant1@aalto.fi', expiryDate: null}],
       }
     );
   });
@@ -445,11 +467,17 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
     await testCourseEditSuccess(
       {
         teachersInCharge: ['teacher1@aalto.fi', 'teacher2@aalto.fi'],
-        assistants: ['assistant1@aalto.fi', 'assistant2@aalto.fi'],
+        assistants: [
+          {email: 'assistant1@aalto.fi', expiryDate: null},
+          {email: 'assistant2@aalto.fi', expiryDate: null},
+        ],
       },
       {
         teachersInCharge: ['teacher2@aalto.fi', 'teacher3@aalto.fi'],
-        assistants: ['assistant2@aalto.fi', 'assistant3@aalto.fi'],
+        assistants: [
+          {email: 'assistant2@aalto.fi', expiryDate: null},
+          {email: 'assistant3@aalto.fi', expiryDate: null},
+        ],
       }
     );
   });
@@ -489,7 +517,9 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
 
   it('should respond with 401 or 403 if not authorized', async () => {
     let url = `/v1/courses/${courseId}`;
-    const data: EditCourseData = {assistants: ['assistant1@aalto.fi']};
+    const data: EditCourseData = {
+      assistants: [{email: 'assistant1@aalto.fi', expiryDate: new Date()}],
+    };
     await responseTests.testUnauthorized(url).put(data);
 
     await responseTests
@@ -515,7 +545,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
   it('should create new IDP user when email does not exist', async () => {
     const testData: EditCourseData = {
       teachersInCharge: ['teacher@aalto.fi', 'teacher2000@aalto.fi'],
-      assistants: ['assistant2000@aalto.fi'],
+      assistants: [{email: 'assistant2000@aalto.fi', expiryDate: new Date()}],
     };
     await request
       .put(`/v1/courses/${courseId}`)
@@ -552,7 +582,10 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       .put(testData);
 
     testData = {
-      assistants: ['assistant@aalto.fi', 'assistant@aalto.fi'],
+      assistants: [
+        {email: 'assistant@aalto.fi', expiryDate: new Date()},
+        {email: 'assistant@aalto.fi', expiryDate: new Date()},
+      ],
     };
     await responseTests
       .testUnprocessableEntity(url, cookies.adminCookie)
@@ -560,7 +593,7 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
 
     testData = {
       teachersInCharge: ['teacher@aalto.fi'],
-      assistants: ['teacher@aalto.fi'],
+      assistants: [{email: 'teacher@aalto.fi', expiryDate: new Date()}],
     };
     await responseTests
       .testUnprocessableEntity(url, cookies.adminCookie)

@@ -93,7 +93,7 @@ export const getCoursesOfUser: Endpoint<void, CourseWithFinalGrades[]> = async (
       {model: CourseTranslation},
       {
         model: User,
-        through: {attributes: ['role']},
+        through: {attributes: ['role', 'expiryDate']},
       },
       // Add final grades to the data
       {

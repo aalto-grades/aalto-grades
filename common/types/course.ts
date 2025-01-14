@@ -6,7 +6,11 @@ import {z} from 'zod';
 
 import {FinalGradeDataArraySchema} from './finalGrade';
 import {IdSchema, LanguageSchema, LocalizedStringSchema} from './general';
-import {TeacherDataSchema} from './user';
+import {
+  AssistantDataSchema,
+  NewAssistantDataSchema,
+  TeacherDataSchema,
+} from './user';
 
 export enum GradingScale {
   PassFail = 'PASS_FAIL',
@@ -71,7 +75,7 @@ export const BaseCourseDataSchema = z.strictObject({
   languageOfInstruction: LanguageSchema,
   name: LocalizedStringSchema,
   teachersInCharge: z.array(TeacherDataSchema),
-  assistants: z.array(TeacherDataSchema),
+  assistants: z.array(AssistantDataSchema),
 });
 
 export const CourseDataSchema = BaseCourseDataSchema.refine(
@@ -80,14 +84,14 @@ export const CourseDataSchema = BaseCourseDataSchema.refine(
 export const NewCourseDataSchema = BaseCourseDataSchema.omit({id: true})
   .extend({
     teachersInCharge: z.array(z.string().email()),
-    assistants: z.array(z.string().email()),
+    assistants: z.array(NewAssistantDataSchema),
   })
   .strict()
   .refine(val => val.maxCredits >= val.minCredits, {path: ['maxCredits']});
 export const EditCourseDataSchema = BaseCourseDataSchema.omit({id: true})
   .extend({
     teachersInCharge: z.array(z.string().email()),
-    assistants: z.array(z.string().email()),
+    assistants: z.array(NewAssistantDataSchema),
   })
   .strict()
   .partial()

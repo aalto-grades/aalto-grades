@@ -4,14 +4,11 @@
 
 INSERT INTO public.course_role (user_id, course_id, role, created_at, updated_at) VALUES
 (2, 1, 'TEACHER', NOW(), NOW()),
-(3, 1, 'ASSISTANT', NOW(), NOW()),
 (4, 1, 'STUDENT', NOW(), NOW()),
 (2, 2, 'TEACHER', NOW(), NOW()),
 (2, 3, 'TEACHER', NOW(), NOW()),
-(3, 3, 'ASSISTANT', NOW(), NOW()),
 (4, 3, 'STUDENT', NOW(), NOW()),
 (2, 4, 'TEACHER', NOW(), NOW()),
-(3, 4, 'ASSISTANT', NOW(), NOW()),
 (4, 4, 'STUDENT', NOW(), NOW()),
 
 (6, 3, 'STUDENT', NOW(), NOW()),
@@ -64,3 +61,8 @@ INSERT INTO public.course_role (user_id, course_id, role, created_at, updated_at
 (53, 3, 'STUDENT', NOW(), NOW()),
 (54, 3, 'STUDENT', NOW(), NOW()),
 (55, 3, 'STUDENT', NOW(), NOW());
+
+INSERT INTO public.course_role (user_id, course_id, role, created_at, updated_at, expiry_date) VALUES
+(3, 1, 'ASSISTANT', NOW(), NOW(), CURRENT_DATE + INTERVAL '40 days'),
+(3, 3, 'ASSISTANT', NOW(), NOW(), CURRENT_DATE + INTERVAL '40 days'),
+(3, 4, 'ASSISTANT', NOW(), NOW(), CURRENT_DATE + INTERVAL '40 days');

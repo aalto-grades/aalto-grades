@@ -383,6 +383,11 @@
       "add-at-least-one-teacher": "Add at least one teacher in charge to the course",
       "add-assistant-emails": "Add emails of the assistants of the course.",
       "no-assistants": "No assistants in the course",
+      "assistant-expiry-date": "Assistant expiry date",
+      "assistant-expiry-date-helper": "Expiry date for assistant role",
+      "assistant-expiry-date-info": "Expiry date: {{expiryDate}}",
+      "assistant-expired-at": "Expired at {{expiryDate}}",
+      "assistant-expiry-date-change": "To change the expire date, remove and add again the assistant",
       "input-at-least-one-assistant": "Input the email address of at least one assistant of the course",
       "cannot-remove-self": "You cannot remove yourself from the course",
       "user-not-exist": "User doesn't exist. Will be created on submit."

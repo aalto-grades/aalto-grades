@@ -54,6 +54,11 @@ definitions:
     enum: [FI, SV, EN, ES, JA, ZH, PT, FR, DE, RU]
     description: Course language.
     example: EN
+  NullableAssistantExpiryDate:
+    type: string
+    format: date
+    description: Date when the course assistant role expires.
+    example: 2024-04-01T00:00:00.000Z
 
   # Bigger schemas
   CourseData:
@@ -83,7 +88,7 @@ definitions:
       assistants:
         type: array
         items:
-          $ref: '#/definitions/TeacherData'
+          $ref: '#/definitions/AssistantData'
     required:
       - id
       - courseCode
@@ -121,7 +126,12 @@ definitions:
       assistants:
         type: array
         items:
-          $ref: '#/definitions/UserEmail'
+          type: object
+          properties:
+            email:
+              $ref: '#/definitions/UserEmail'
+            expiryDate:
+              $ref: '#/definitions/NullableAssistantExpiryDate'
     required:
       - courseCode
       - minCredits
@@ -158,7 +168,12 @@ definitions:
       assistants:
         type: array
         items:
-          $ref: '#/definitions/UserEmail'
+          type: object
+          properties:
+            email:
+              $ref: '#/definitions/UserEmail'
+            expiryDate:
+              $ref: '#/definitions/NullableAssistantExpiryDate'
 
   CourseDataWithFinalGrades:
     type: object

@@ -4,6 +4,7 @@
 
 import {
   Delete as DeleteIcon,
+  HelpOutlined,
   PersonAddAlt1 as PersonAddAlt1Icon,
   Person as PersonIcon,
 } from '@mui/icons-material';
@@ -21,9 +22,11 @@ import {
   List,
   ListItem,
   ListItemAvatar,
+  ListItemIcon,
   ListItemText,
   MenuItem,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import {Formik, type FormikHelpers, type FormikProps} from 'formik';
 import {type JSX, useState} from 'react';
@@ -46,6 +49,7 @@ import FormLanguagesField from '@/components/shared/FormikLanguageField';
 import {useAddCourse, useVerifyEmail} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import {useLocalize} from '@/hooks/useLocalize';
+import {type AssistantData, nullableDateSchema} from '@/types';
 import {
   convertToClientGradingScale,
   departments,
@@ -60,6 +64,7 @@ type FormData = {
   gradingScale: GradingScale;
   teacherEmail: string;
   assistantEmail: string;
+  assistantExpiryDate: string;
   languageOfInstruction: Language;
   nameEn: string;
   nameFi: string;
@@ -75,6 +80,7 @@ const initialValues = {
   languageOfInstruction: Language.English,
   teacherEmail: '',
   assistantEmail: '',
+  assistantExpiryDate: '',
   nameEn: '',
   nameFi: '',
   nameSv: '',
@@ -99,7 +105,7 @@ const CreateCourseDialog = ({
   const [nonExistingEmails, setNonExistingEmails] = useState<Set<string>>(
     new Set<string>()
   );
-  const [assistants, setAssistants] = useState<string[]>([]);
+  const [assistants, setAssistants] = useState<AssistantData[]>([]);
 
   const ValidationSchema = z
     .object({
@@ -120,6 +126,7 @@ const CreateCourseDialog = ({
       languageOfInstruction: LanguageSchema,
       teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
       assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
+      assistantExpiryDate: z.string().or(z.date().nullable()),
       department: z.nativeEnum(Department),
       nameEn: z
         .string({required_error: t('course.edit.name-english')})
@@ -136,12 +143,19 @@ const CreateCourseDialog = ({
       message: t('course.edit.max-below-min'),
     });
 
+  const AssistantValidationSchema = z.strictObject({
+    email: z.string().email(),
+    expiryDate: nullableDateSchema(t),
+  });
+
   const removeTeacher = (value: string): void => {
     setTeachersInCharge(teachersInCharge.filter(teacher => teacher !== value));
   };
 
-  const removeAssistant = (value: string): void => {
-    setAssistants(assistants.filter(assistant => assistant !== value));
+  const removeAssistant = (value: AssistantData): void => {
+    setAssistants(
+      assistants.filter(assistant => assistant.email !== value.email)
+    );
   };
 
   const handleSubmit = (
@@ -377,7 +391,9 @@ const CreateCourseDialog = ({
                 form.errors.assistantEmail ??
                 (assistants.length === 0
                   ? t('course.edit.input-at-least-one-assistant')
-                  : assistants.includes(form.values.assistantEmail)
+                  : assistants
+                        .map(assistant => assistant.email)
+                        .includes(form.values.assistantEmail)
                     ? t('course.edit.email-in-list')
                     : t('course.edit.add-assistant-emails'))
               }
@@ -387,17 +403,33 @@ const CreateCourseDialog = ({
               }
               onChange={form.handleChange}
             />
+            <FormField
+              form={form as unknown as FormikProps<{[key: string]: unknown}>}
+              value="assistantExpiryDate"
+              label={t('course.edit.assistant-expiry-date')}
+              helperText={t('course.edit.assistant-expiry-date-helper')}
+              type="date"
+              InputProps={{
+                inputProps: {min: new Date().toISOString().slice(0, 10)},
+              }}
+            />
             <Button
               variant="outlined"
               startIcon={<PersonAddAlt1Icon />}
               disabled={
                 form.errors.assistantEmail !== undefined ||
                 form.values.assistantEmail.length === 0 ||
-                assistants.includes(form.values.assistantEmail) ||
+                assistants
+                  .map(assistant => assistant.email)
+                  .includes(form.values.assistantEmail) ||
                 form.isSubmitting
               }
               onClick={async () => {
                 const assistantEmail = form.values.assistantEmail;
+                const assistantExpiryDate =
+                  form.values.assistantExpiryDate === ''
+                    ? null
+                    : form.values.assistantExpiryDate;
                 const isEmailExisted = await emailExisted.mutateAsync({
                   email: assistantEmail,
                 });
@@ -407,9 +439,15 @@ const CreateCourseDialog = ({
                   );
                 }
                 setAssistants(oldAssistants =>
-                  oldAssistants.concat(assistantEmail)
+                  oldAssistants.concat(
+                    AssistantValidationSchema.parse({
+                      email: assistantEmail,
+                      expiryDate: assistantExpiryDate,
+                    })
+                  )
                 );
                 form.setFieldValue('assistantEmail', '');
+                form.setFieldValue('assistantExpiryDate', '');
               }}
               sx={{mt: 1}}
             >
@@ -420,16 +458,16 @@ const CreateCourseDialog = ({
                 t('course.edit.no-assistants')
               ) : (
                 <List dense>
-                  {assistants.map((emailAssistant: string) => (
+                  {assistants.map((assistant: AssistantData) => (
                     <ListItem
-                      key={emailAssistant}
+                      key={assistant.email}
                       secondaryAction={
                         <IconButton
                           edge="end"
                           disabled={form.isSubmitting}
                           aria-label="delete"
                           onClick={(): void => {
-                            removeAssistant(emailAssistant);
+                            removeAssistant(assistant);
                           }}
                         >
                           <DeleteIcon />
@@ -441,8 +479,39 @@ const CreateCourseDialog = ({
                           <PersonIcon />
                         </Avatar>
                       </ListItemAvatar>
-                      <ListItemText primary={emailAssistant} />
-                      {nonExistingEmails.has(emailAssistant) && (
+                      <ListItemText primary={assistant.email} />
+                      {assistant.expiryDate && (
+                        <div style={{display: 'flex'}}>
+                          <ListItemText
+                            secondary={t(
+                              'course.edit.assistant-expiry-date-info',
+                              {
+                                expiryDate: assistant.expiryDate
+                                  .toISOString()
+                                  .slice(0, 10),
+                              }
+                            )}
+                            sx={{
+                              marginRight: '0.5em',
+                            }}
+                          />
+                          <Tooltip
+                            placement="top"
+                            title={t(
+                              'course.edit.assistant-expiry-date-change'
+                            )}
+                          >
+                            <ListItemIcon>
+                              <HelpOutlined
+                                sx={{
+                                  width: '0.6em',
+                                }}
+                              />
+                            </ListItemIcon>
+                          </Tooltip>
+                        </div>
+                      )}
+                      {nonExistingEmails.has(assistant.email) && (
                         <Alert severity="warning">
                           {t('course.edit.user-not-exist')}
                         </Alert>

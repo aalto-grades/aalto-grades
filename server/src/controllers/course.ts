@@ -41,7 +41,6 @@ import {
 export const getCourse: Endpoint<void, CourseData> = async (req, res) => {
   const courseId = await validateCourseId(req.params.courseId);
   const courseData = parseCourseFull(await findCourseFullById(courseId));
-
   res.json(courseData);
 };
 
@@ -69,7 +68,9 @@ export const getAllCourses: Endpoint<void, CourseData[]> = async (
  */
 export const addCourse: Endpoint<NewCourseData, number> = async (req, res) => {
   const teachers = await validateEmailList(req.body.teachersInCharge);
-  const assistants = await validateEmailList(req.body.assistants);
+  const assistants = await validateEmailList(
+    req.body.assistants.map(assistant => assistant.email)
+  );
 
   validateRoleUniqueness(teachers, assistants);
 
@@ -124,11 +125,17 @@ export const addCourse: Endpoint<NewCourseData, number> = async (req, res) => {
       userId: teacher.id,
       role: CourseRoleType.Teacher,
     }));
-    const assistantRoles: NewDbCourseRole[] = assistants.map(assistant => ({
-      courseId: newCourse.id,
-      userId: assistant.id,
-      role: CourseRoleType.Assistant,
-    }));
+    const assistantRoles: NewDbCourseRole[] = assistants.map(assistant => {
+      const assistantExpiryDate = req.body.assistants.find(
+        reqAssistant => reqAssistant.email === assistant.email
+      )?.expiryDate;
+      return {
+        courseId: newCourse.id,
+        userId: assistant.id,
+        role: CourseRoleType.Assistant,
+        expiryDate: assistantExpiryDate,
+      };
+    });
     await CourseRole.bulkCreate([...teacherRoles, ...assistantRoles], {
       transaction: t,
     });
@@ -179,7 +186,9 @@ export const editCourse: Endpoint<EditCourseData, void> = async (req, res) => {
       ? await validateEmailList(teachersInCharge)
       : null;
   const newAssistants =
-    assistants !== undefined ? await validateEmailList(assistants) : null;
+    assistants !== undefined
+      ? await validateEmailList(assistants.map(assistant => assistant.email))
+      : null;
 
   if (
     minCredits !== undefined &&
@@ -256,7 +265,29 @@ export const editCourse: Endpoint<EditCourseData, void> = async (req, res) => {
       newTeachers ?? oldTeachers,
       newAssistants ?? oldAssistants
     );
-    await CourseRole.updateCourseRoles(newTeachers, newAssistants, course.id);
+    const teacherRoles: NewDbCourseRole[] | null =
+      newTeachers !== null
+        ? newTeachers.map(teacher => ({
+            courseId: course.id,
+            userId: teacher.id,
+            role: CourseRoleType.Teacher,
+          }))
+        : null;
+    const assistantRoles: NewDbCourseRole[] | null =
+      newAssistants !== null
+        ? newAssistants.map(assistant => {
+            const assistantExpiryDate = assistants?.find(
+              reqAssistant => reqAssistant.email === assistant.email
+            )?.expiryDate;
+            return {
+              courseId: course.id,
+              userId: assistant.id,
+              role: CourseRoleType.Assistant,
+              expiryDate: assistantExpiryDate,
+            };
+          })
+        : null;
+    await CourseRole.updateCourseRoles(teacherRoles, assistantRoles, course.id);
   }
 
   res.sendStatus(HttpCode.Ok);

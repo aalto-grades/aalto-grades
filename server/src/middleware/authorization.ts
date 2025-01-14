@@ -4,7 +4,7 @@
 
 import type {NextFunction, Request, Response} from 'express';
 
-import {type CourseRoleType, HttpCode, SystemRole} from '@/common/types';
+import {CourseRoleType, HttpCode, SystemRole} from '@/common/types';
 import {getUserCourseRole} from '../controllers/utils/user';
 import {type JwtClaims, stringToIdSchema} from '../types';
 
@@ -60,6 +60,18 @@ export const courseAuthorization = (
         result.data,
         req.user as JwtClaims
       );
+      if (
+        courseRole.role === CourseRoleType.Assistant &&
+        courseRole.expiryDate
+      ) {
+        const currentDate = new Date();
+        const expiryDate = new Date(courseRole.expiryDate);
+        if (expiryDate.getDate() < currentDate.getDate()) {
+          return res
+            .status(HttpCode.Forbidden)
+            .send({errors: ['Course Role Expired']});
+        }
+      }
       if (!allowedRoles.includes(courseRole.role)) {
         return res.status(HttpCode.Forbidden).send({errors: ['Forbidden']});
       }

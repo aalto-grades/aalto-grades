@@ -118,6 +118,26 @@ definitions:
       - email
       - studentNumber
 
+  AssistantData:
+    type: object
+    properties:
+      id:
+        $ref: '#/definitions/UserId'
+      name:
+        $ref: '#/definitions/NullableUserName'
+      email:
+        $ref: '#/definitions/UserEmail'
+      studentNumber:
+        $ref: '#/definitions/NullableStudentNumber'
+      expiryDate:
+        $ref: '#/definitions/NullableAssistantExpiryDate'
+    required:
+      - id
+      - name
+      - email
+      - studentNumber
+      - expiryDate
+
   # Actually a union
   NewUser:
     type: object
