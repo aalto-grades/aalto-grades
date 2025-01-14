@@ -12,6 +12,9 @@ services:
     extends:
       file: ./docker-compose-from-images.yaml
       service: reverse-proxy
+    depends_on:
+      - frontend
+      - backend
 
   frontend:
     extends:
@@ -48,4 +51,4 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     # To use the local smtp server of aalto vm
     network_mode: host
-    command: --interval 600 --cleanup
+    command: --interval 3600 --cleanup

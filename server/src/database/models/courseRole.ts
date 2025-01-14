@@ -16,6 +16,7 @@ import {CourseRoleType} from '@/common/types';
 import {sequelize} from '..';
 import Course from './course';
 import User from './user';
+import type {NewDbCourseRole} from '../../types';
 
 export default class CourseRole extends Model<
   InferAttributes<CourseRole>,
@@ -27,13 +28,14 @@ export default class CourseRole extends Model<
   declare role: CourseRoleType;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+  declare expiryDate?: Date | string | null;
   /**
    * Updates database to match new teachers and assistants. If value is null, it
    * won't be updated. Will mutate the arrays.
    */
   static updateCourseRoles: (
-    teachers: User[] | null,
-    assistants: User[] | null,
+    teachers: NewDbCourseRole[] | null,
+    assistants: NewDbCourseRole[] | null,
     courseId: number
   ) => Promise<void>;
 }
@@ -65,6 +67,10 @@ CourseRole.init(
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
+    expiryDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
   },
   {
     sequelize,
@@ -87,8 +93,8 @@ Course.belongsToMany(User, {
 Course.hasMany(CourseRole);
 
 CourseRole.updateCourseRoles = async (
-  teachers: User[] | null,
-  assistants: User[] | null,
+  teachers: NewDbCourseRole[] | null,
+  assistants: NewDbCourseRole[] | null,
   courseId: number
 ): Promise<void> => {
   const oldRoles = await CourseRole.findAll({
@@ -102,28 +108,23 @@ CourseRole.updateCourseRoles = async (
 
   const updateForRole = async (
     role: CourseRoleType,
-    users: User[] | null
+    roles: NewDbCourseRole[] | null
   ): Promise<void> => {
-    if (users === null) return;
+    if (roles === null) return;
 
     for (const oldRole of oldRoles) {
       if (oldRole.role !== role) continue;
 
-      const existingUserIndex = users.findIndex(
-        teacher => teacher.id === oldRole.userId
+      const existingUserIndex = roles.findIndex(
+        newRole =>
+          newRole.userId === oldRole.userId &&
+          newRole.expiryDate === oldRole.expiryDate
       );
-      if (existingUserIndex >= 0) users.splice(existingUserIndex, 1);
+      if (existingUserIndex >= 0) roles.splice(existingUserIndex, 1);
       else await oldRole.destroy();
     }
-
-    if (users.length > 0) {
-      await CourseRole.bulkCreate(
-        users.map(user => ({
-          userId: user.id,
-          courseId: courseId,
-          role: role,
-        }))
-      );
+    if (roles.length > 0) {
+      await CourseRole.bulkCreate(roles);
     }
   };
 

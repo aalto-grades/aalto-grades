@@ -9,6 +9,7 @@ export type NewDbCourseRole = {
   userId: number;
   courseId: number;
   role: CourseRoleType;
+  expiryDate?: Date | null;
 };
 
 export type NewDbFinalGradeData = {
