@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 var fs = require('fs');
 var path = require('path');
 
