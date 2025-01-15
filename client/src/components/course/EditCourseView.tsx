@@ -607,7 +607,7 @@ const EditCourseView = (): JSX.Element => {
                         </ListItemAvatar>
                         <ListItemText primary={assistant.email} />
                         {assistant.expiryDate && (
-                          <div style={{display: 'flex'}}>
+                          <div style={{display: 'flex', marginLeft: '0.5em'}}>
                             <ListItemText
                               secondary={t(
                                 assistant.expiryDate.getDate() >=
@@ -615,8 +615,9 @@ const EditCourseView = (): JSX.Element => {
                                   ? 'course.edit.assistant-expiry-date-info'
                                   : 'course.edit.assistant-expired-at',
                                 {
-                                  expiryDate:
-                                    assistant.expiryDate.toLocaleDateString(),
+                                  expiryDate: assistant.expiryDate
+                                    .toISOString()
+                                    .slice(0, 10),
                                 }
                               )}
                               sx={{
