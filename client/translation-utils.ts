@@ -199,12 +199,13 @@ const updateTranslation = (file: File, changes: Change[]): void => {
   fs.writeFileSync(file, JSON.stringify(object, null, 2));
 };
 
-
 /**
- * Renames the translations by parsing the original and updated translation files,
- * finding the changes, and updating the source code and translation files accordingly.
+ * Renames the translations by parsing the original and updated translation
+ * files, finding the changes, and updating the source code and translation
+ * files accordingly.
  *
  * The function performs the following steps:
+ *
  * 1. Parses the original translation file (English).
  * 2. Parses the updated translation file ('translation.json').
  * 3. Finds the changes between the original and updated translation files.
