@@ -7,6 +7,7 @@ import type {GridColDef, GridValidRowModel} from '@mui/x-data-grid';
 import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
+import type {StudentData} from '@/common/types';
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import {useGetGradesHistory} from '@/hooks/api/history';
 
@@ -18,23 +19,22 @@ type ColTypes = {
 type PropsType = {
   open: boolean;
   onClose: () => void;
-  studentId?: string;
+  studentUser?: StudentData;
   courseTaskId?: number;
 };
 const GradesHistoryDialog = ({
   open,
   onClose,
-  studentId,
+  studentUser,
   courseTaskId,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const gradesHistory = useGetGradesHistory(courseTaskId);
   const gradesHistoryFiltered = gradesHistory.data?.filter(
     entry =>
-      entry.previousState?.userId === studentId ||
-      entry.taskGrade?.user.studentNumber === studentId
+      entry.previousState?.userId === studentUser?.id ||
+      entry.taskGrade?.user.id === studentUser?.id
   );
-  console.dir(gradesHistory.data);
 
   const rows =
     gradesHistoryFiltered?.map((entry, i) => ({
@@ -46,28 +46,25 @@ const GradesHistoryDialog = ({
       user: entry.user?.name,
     })) ?? [];
 
-  // console.dir(initRows);
-  // const [rows, setRows] = useState<GridRowsProp<ColTypes>>(initRows);
-  console.dir(rows);
   const columns: GridColDef<ColTypes>[] = [
-    {
-      field: 'gradeId',
-      headerName: t('general.name'),
-      type: 'string',
-    },
+    // {
+    //   field: 'gradeId',
+    //   headerName: t('general.name'),
+    //   type: 'string',
+    // },
     {
       field: 'actionType',
-      // headerName: t('general.days-valid'),
+      headerName: t('general.results.history.action-type'),
       type: 'string',
     },
     {
       field: 'date',
-      headerName: t('general.date'),
+      headerName: t('general.results.history.action-date'),
       type: 'dateTime',
     },
     {
       field: 'user',
-      headerName: t('general.users'),
+      headerName: t('general.results.history.author'),
       type: 'string',
     },
   ];

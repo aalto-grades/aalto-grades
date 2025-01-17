@@ -32,6 +32,7 @@ import {useBlocker, useParams} from 'react-router-dom';
 import type {
   EditTaskGradeData,
   NewTaskGrade,
+  StudentData,
   TaskGradeData,
 } from '@/common/types';
 import GradesHistoryDialog from '@/components/course/course-results-view/HistoryDialog';
@@ -53,11 +54,11 @@ import {findBestGrade, getCoursePartExpiryDate} from '@/utils';
 
 type HistoryButtonProps = {
   courseTaskId: number;
-  studentNumber: string;
+  studentUser: StudentData;
 };
 
 const HistoryButton = forwardRef<HTMLSpanElement, HistoryButtonProps>(
-  ({courseTaskId, studentNumber}): JSX.Element => {
+  ({courseTaskId, studentUser}): JSX.Element => {
     const {t} = useTranslation();
     const [historyOpen, setHistoryOpen] = useState<boolean>(false);
 
@@ -69,7 +70,7 @@ const HistoryButton = forwardRef<HTMLSpanElement, HistoryButtonProps>(
           </IconButton>
         </Tooltip>
         <GradesHistoryDialog
-          studentId={studentNumber}
+          studentUser={studentUser}
           courseTaskId={courseTaskId}
           open={historyOpen}
           onClose={() => setHistoryOpen(false)}
@@ -95,7 +96,7 @@ type ColTypes = {
 type PropsType = {
   open: boolean;
   onClose: () => void;
-  studentNumber: string;
+  studentUser: StudentData;
   courseTaskId: number;
   maxGrade: number | null;
   title: string;
@@ -104,7 +105,7 @@ type PropsType = {
 const EditGradesDialog = ({
   open,
   onClose,
-  studentNumber,
+  studentUser,
   courseTaskId,
   maxGrade,
   title,
@@ -300,7 +301,7 @@ const EditGradesDialog = ({
     for (const row of rows) {
       if (row.gradeId === -1) {
         newGrades.push({
-          studentNumber,
+          studentNumber: studentUser.studentNumber,
           courseTaskId: courseTaskId,
           aplusGradeSourceId: null,
           grade: row.grade,
@@ -408,7 +409,7 @@ const EditGradesDialog = ({
         <DialogTitle>
           {title}
           <HistoryButton
-            studentNumber={studentNumber}
+            studentUser={studentUser}
             courseTaskId={courseTaskId}
           />
         </DialogTitle>
