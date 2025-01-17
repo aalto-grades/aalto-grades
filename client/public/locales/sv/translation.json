@@ -149,13 +149,20 @@
     "grading-model": "UNTRANSLATED",
     "grading-date": "UNTRANSLATED",
     "final-grade": "UNTRANSLATED",
+    "results": {
+      "history": {
+        "action-type": "UNTRANSLATED",
+        "action-date": "UNTRANSLATED",
+        "author": "UNTRANSLATED"
+      }
+    },
+    "close": "UNTRANSLATED",
     "download": "UNTRANSLATED",
     "grader": "UNTRANSLATED",
     "export-date": "UNTRANSLATED",
     "comment": "UNTRANSLATED",
     "delete": "UNTRANSLATED",
     "discard": "UNTRANSLATED",
-    "close": "UNTRANSLATED",
     "grades-saved": "UNTRANSLATED",
     "import": "UNTRANSLATED",
     "course-part": "UNTRANSLATED",
@@ -206,17 +213,16 @@
       "select-for-fetching": "UNTRANSLATED",
       "fetching-grades": "UNTRANSLATED",
       "fetching-grades-wait": "UNTRANSLATED",
+      "delete-with-model-message": "UNTRANSLATED",
+      "delete-with-task-message": "UNTRANSLATED",
+      "delete-message": "UNTRANSLATED",
+      "delete": "UNTRANSLATED",
       "saved": "UNTRANSLATED",
       "a+-disabled": "UNTRANSLATED",
       "add-a+-source": "UNTRANSLATED",
       "view-a+-sources": "UNTRANSLATED",
       "unarchive": "UNTRANSLATED",
       "archive": "UNTRANSLATED",
-      "delete": "UNTRANSLATED",
-      "delete-message": "UNTRANSLATED",
-      "delete-with-task-message": "UNTRANSLATED",
-      "delete-with-model-message": "UNTRANSLATED",
-      "cannot-delete-with-grades": "UNTRANSLATED",
       "delete-task": "UNTRANSLATED",
       "delete-task-message": "UNTRANSLATED",
       "archived": "UNTRANSLATED",
@@ -225,6 +231,7 @@
       "add-new-part": "UNTRANSLATED",
       "no-course-parts": "UNTRANSLATED",
       "edit-part": "UNTRANSLATED",
+      "cannot-delete-with-grades": "UNTRANSLATED",
       "no-expiry-date": "UNTRANSLATED"
     },
     "models": {
@@ -309,6 +316,7 @@
       "not-found": "UNTRANSLATED",
       "add-final": "UNTRANSLATED",
       "grades-saved": "UNTRANSLATED",
+      "history": "UNTRANSLATED",
       "add-grade": "UNTRANSLATED",
       "expiry-before": "UNTRANSLATED",
       "edit-final": "UNTRANSLATED",
@@ -320,6 +328,7 @@
       "multiple-grade": "UNTRANSLATED",
       "grade-of-for": "UNTRANSLATED",
       "grade-expired-on": "UNTRANSLATED",
+      "all-grades-expired": "UNTRANSLATED",
       "view-graph": "UNTRANSLATED",
       "upload": {
         "all-done": "UNTRANSLATED",
@@ -350,8 +359,7 @@
       },
       "final-grade-preview": "UNTRANSLATED",
       "course-part-value-preview": "UNTRANSLATED",
-      "data-undefined": "UNTRANSLATED",
-      "all-grades-expired": "UNTRANSLATED"
+      "data-undefined": "UNTRANSLATED"
     },
     "edit": {
       "saved": "UNTRANSLATED",
@@ -381,16 +389,14 @@
       "email-in-list": "UNTRANSLATED",
       "add-teacher-emails": "UNTRANSLATED",
       "add-at-least-one-teacher": "UNTRANSLATED",
+      "user-not-exist": "UNTRANSLATED",
       "add-assistant-emails": "UNTRANSLATED",
-      "no-assistants": "UNTRANSLATED",
       "assistant-expiry-date": "UNTRANSLATED",
       "assistant-expiry-date-helper": "UNTRANSLATED",
-      "assistant-expiry-date-info": "UNTRANSLATED",
-      "assistant-expired-at": "UNTRANSLATED",
+      "no-assistants": "UNTRANSLATED",
       "assistant-expiry-date-change": "UNTRANSLATED",
       "input-at-least-one-assistant": "UNTRANSLATED",
-      "cannot-remove-self": "UNTRANSLATED",
-      "user-not-exist": "UNTRANSLATED"
+      "assistant-expiry-date-info": "UNTRANSLATED"
     },
     "list": "UNTRANSLATED"
   },
