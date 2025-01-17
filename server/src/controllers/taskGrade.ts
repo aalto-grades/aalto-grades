@@ -1,9 +1,11 @@
 // SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
-import {Op} from 'sequelize';
+import cloneDeep from 'lodash/cloneDeep';
+import {Op, type WhereOptions} from 'sequelize';
 
 import {
+  ActionType,
   CourseRoleType,
   type EditTaskGradeData,
   type FinalGradeData,
@@ -12,6 +14,8 @@ import {
   type NewTaskGrade,
   type StudentRow,
   type TaskGradeData,
+  type TaskGradeHistory,
+  type TaskGradeHistoryArray,
   type UserData,
   type UserIdArray,
 } from '@/common/types';
@@ -22,17 +26,20 @@ import CourseRole from '../database/models/courseRole';
 import CourseTask from '../database/models/courseTask';
 import FinalGrade from '../database/models/finalGrade';
 import TaskGrade from '../database/models/taskGrade';
+import TaskGradeLog from '../database/models/taskGradeLog';
 import User from '../database/models/user';
 import {
   ApiError,
   type Endpoint,
   type JwtClaims,
   type NewDbTaskGradeData,
+  type NewDbTaskGradeLogData,
 } from '../types';
 import {validateAplusGradeSourceBelongsToCourseTask} from './utils/aplus';
 import {validateCourseId} from './utils/course';
 import {validateCourseTaskBelongsToCourse} from './utils/courseTask';
 import {parseFinalGrade} from './utils/finalGrade';
+import {parsePreviousState} from './utils/history';
 import {
   findAndValidateTaskGradePath,
   parseTaskGrade,
@@ -128,12 +135,113 @@ export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
   res.json(studentRows);
 };
 
+/** () => TaskGradeLog[] */
+export const getGradeLogs: Endpoint<void, TaskGradeHistoryArray> = async (
+  req,
+  res
+) => {
+  const userId = req.query.userId as string | undefined;
+  const courseTaskIds = req.query.courseTaskIds as string | undefined;
+  const taskGradeId = req.query.taskGradeId as string | undefined;
+
+  const isConvertibleToInteger = (value: string | undefined): boolean => {
+    return (
+      value !== undefined &&
+      !isNaN(Number(value)) &&
+      Number.isInteger(Number(value))
+    );
+  };
+
+  if (userId !== undefined && !isConvertibleToInteger(userId)) {
+    throw new ApiError(`Invalid user id ${userId}`, HttpCode.BadRequest);
+  }
+
+  if (taskGradeId !== undefined && !isConvertibleToInteger(taskGradeId)) {
+    throw new ApiError(
+      `Invalid task grade id ${taskGradeId}`,
+      HttpCode.BadRequest
+    );
+  }
+
+  const whereCondition: WhereOptions = {};
+
+  if (isConvertibleToInteger(userId)) {
+    whereCondition.userId = userId;
+  }
+
+  if (isConvertibleToInteger(taskGradeId)) {
+    whereCondition.taskGradeId = taskGradeId;
+  }
+
+  const courseTaskIdsSet: Set<number> = new Set();
+
+  if (courseTaskIds !== undefined) {
+    const courseTaskIdsStringList: string[] = courseTaskIds.split(',');
+    for (const taskId of courseTaskIdsStringList) {
+      if (isConvertibleToInteger(taskId)) {
+        courseTaskIdsSet.add(Number(taskId.trim()));
+      } else {
+        throw new ApiError(
+          `Invalid course task ids [${courseTaskIds}]`,
+          HttpCode.BadRequest
+        );
+      }
+    }
+    whereCondition.courseTaskId = {
+      [Op.in]: Array.from(courseTaskIdsSet),
+    };
+  }
+
+  const gradeLogs = await TaskGradeLog.findAll({
+    include: [
+      {
+        model: User,
+        as: 'user',
+        attributes: ['id', 'name', 'email', 'studentNumber'],
+      },
+      {
+        model: TaskGrade,
+        as: 'taskGrade',
+        include: [
+          {model: User, attributes: ['id', 'name', 'email', 'studentNumber']},
+          {
+            model: User,
+            as: 'grader',
+            attributes: ['id', 'name', 'email', 'studentNumber'],
+          },
+          {model: AplusGradeSource},
+        ],
+      },
+    ],
+    where: whereCondition,
+    attributes: {exclude: ['userId', 'UserId', 'taskGradeId', 'TaskGradeId']},
+  });
+
+  const parsedGradeLogs: TaskGradeHistoryArray = gradeLogs.map(log => {
+    return {
+      id: log.id,
+      courseTaskId: log.courseTaskId,
+      actionType: log.actionType,
+      createdAt: log.createdAt,
+      updatedAt: log.updatedAt,
+      user: log.user,
+      taskGrade: log.taskGrade ? parseTaskGrade(log.taskGrade) : null,
+      previousState: log.previousState
+        ? parsePreviousState(log.previousState)
+        : null,
+    } as TaskGradeHistory;
+  });
+
+  res.json(parsedGradeLogs);
+};
+
 /**
  * (NewTaskGrade[]) => void
  *
  * @throws ApiError(400|404|409)
  */
 export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
+  console.log('create task grade');
   const grader = req.user as JwtClaims;
   const courseId = await validateCourseId(req.params.courseId);
 
@@ -242,7 +350,26 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
       });
     }
 
-    await TaskGrade.bulkCreate(preparedBulkCreate, {transaction: t});
+    // await TaskGrade.bulkCreate(preparedBulkCreate, {transaction: t});
+    const createdTaskGrades = await TaskGrade.bulkCreate(preparedBulkCreate, {
+      transaction: t,
+    });
+
+    if (createdTaskGrades.length > 0) {
+      const preparedLogsBulkCreate: NewDbTaskGradeLogData[] = [];
+      for (const taskGrade of createdTaskGrades) {
+        preparedLogsBulkCreate.push({
+          userId: grader.id,
+          courseTaskId: taskGrade.courseTaskId,
+          taskGradeId: taskGrade.id,
+          actionType: ActionType.Create,
+          previousState: cloneDeep(taskGrade),
+        });
+      }
+      await TaskGradeLog.bulkCreate(preparedLogsBulkCreate, {
+        transaction: t,
+      });
+    }
   });
 
   // Create student roles for all the students
@@ -317,6 +444,8 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
     );
   }
 
+  const previousState = cloneDeep(gradeData);
+
   await gradeData
     .set({
       grade: grade ?? gradeData.grade,
@@ -326,6 +455,14 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
       graderId: grader.id,
     })
     .save();
+
+  await TaskGradeLog.create({
+    userId: grader.id,
+    courseTaskId: gradeData.courseTaskId,
+    taskGradeId: gradeData.id,
+    actionType: ActionType.Update,
+    previousState,
+  });
 
   res.sendStatus(HttpCode.Ok);
 };
@@ -340,7 +477,16 @@ export const deleteGrade: Endpoint<void, void> = async (req, res) => {
     req.params.courseId,
     req.params.gradeId
   );
+  const grader = req.user as JwtClaims;
+
   await grade.destroy();
+
+  await TaskGradeLog.create({
+    userId: grader.id,
+    courseTaskId: grade.courseTaskId,
+    actionType: ActionType.Delete,
+    previousState: grade,
+  });
 
   res.sendStatus(HttpCode.Ok);
 };

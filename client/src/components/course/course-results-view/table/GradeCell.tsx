@@ -13,7 +13,7 @@ import type {} from '@mui/material/themeCssVarsAugmentation';
 import {type JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import type {CourseTaskGradesData} from '@/common/types';
+import type {CourseTaskGradesData, StudentData} from '@/common/types';
 import {useTableContext} from '@/context/useTableContext';
 import {findBestGrade, gradeIsExpired} from '@/utils';
 import EditGradesDialog from './EditGradesDialog';
@@ -28,13 +28,10 @@ export type GradeCellSourceValue =
   | {type: 'coursePart'; grade: number | null};
 
 type GradeCellProps = {
-  studentNumber: string;
+  studentUser: StudentData;
   sourceValue: GradeCellSourceValue;
 };
-const GradeCell = ({
-  studentNumber,
-  sourceValue,
-}: GradeCellProps): JSX.Element => {
+const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
   const {t} = useTranslation();
   const {gradeSelectOption} = useTableContext();
   const theme = useTheme();
@@ -122,11 +119,11 @@ const GradeCell = ({
             <EditGradesDialog
               open={gradeDialogOpen}
               onClose={() => setGradeDialogOpen(false)}
-              studentNumber={studentNumber}
+              studentUser={studentUser}
               courseTaskId={sourceValue.task.courseTaskId}
               maxGrade={sourceValue.maxGrade}
               title={t('course.results.grade-of-for', {
-                user: studentNumber,
+                user: studentUser.studentNumber,
                 part: sourceValue.task.courseTaskName,
               })}
               grades={sourceValue.task.grades}

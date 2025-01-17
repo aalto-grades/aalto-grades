@@ -51,6 +51,9 @@ export const useAddGrades = (
       queryClient.invalidateQueries({
         queryKey: ['grades', courseId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ['grades-history'],
+      });
     },
     ...options,
   });
@@ -60,15 +63,22 @@ type EditGradeVars = {gradeId: Numeric; data: EditTaskGradeData};
 export const useEditGrade = (
   courseId: Numeric,
   options?: UseMutationOptions<void, unknown, EditGradeVars>
-): UseMutationResult<void, unknown, EditGradeVars> =>
-  useMutation({
+): UseMutationResult<void, unknown, EditGradeVars> => {
+  const queryClient = useQueryClient();
+  return useMutation({
     mutationFn: async vars =>
       axios.put(
         `/api/v1/courses/${courseId}/grades/${vars.gradeId}`,
         vars.data
       ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['grades-history'],
+      });
+    },
     ...options,
   });
+};
 
 export const useDeleteGrade = (
   courseId: Numeric,
@@ -83,6 +93,9 @@ export const useDeleteGrade = (
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['course-parts', courseId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['grades-history'],
       });
     },
     ...options,

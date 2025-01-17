@@ -16,6 +16,7 @@ import {
   addGrades,
   deleteGrade,
   editGrade,
+  getGradeLogs,
   getGrades,
   getLatestGrades,
 } from '../controllers/taskGrade';
@@ -31,6 +32,12 @@ router.get(
   jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(getGrades)
+);
+
+router.get(
+  '/v1/grade-logs',
+  jwtAuthentication,
+  controllerDispatcher(getGradeLogs)
 );
 
 router.post(

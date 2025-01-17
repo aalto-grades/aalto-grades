@@ -9,7 +9,7 @@ import {FinalGradeDataArraySchema} from './finalGrade';
 import {DateSchema, IdSchema} from './general';
 import {StudentDataSchema, TeacherDataSchema} from './user';
 
-const BaseGradeDataSchema = z.strictObject({
+export const BaseGradeDataSchema = z.strictObject({
   id: IdSchema,
   user: StudentDataSchema,
   courseTaskId: IdSchema,

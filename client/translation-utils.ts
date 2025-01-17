@@ -199,6 +199,21 @@ const updateTranslation = (file: File, changes: Change[]): void => {
   fs.writeFileSync(file, JSON.stringify(object, null, 2));
 };
 
+/**
+ * Renames the translations by parsing the original and updated translation
+ * files, finding the changes, and updating the source code and translation
+ * files accordingly.
+ *
+ * The function performs the following steps:
+ *
+ * 1. Parses the original translation file (English).
+ * 2. Parses the updated translation file ('translation.json').
+ * 3. Finds the changes between the original and updated translation files.
+ * 4. Updates the source code with the found changes.
+ * 5. Updates the English translation file with the found changes.
+ * 6. Updates the Finnish translation file with the found changes.
+ * 7. Updates the Swedish translation file with the found changes.
+ */
 const rename = (): void => {
   const original = parseFileEntries(File.English);
   const updated = parseFileEntries('translation.json');
@@ -210,6 +225,23 @@ const rename = (): void => {
   updateTranslation(File.Swedish, changes);
 };
 
+/**
+ * Merges duplicate translation keys by prompting the user to select a key to
+ * use for the values.
+ *
+ * This function performs the following steps:
+ *
+ * 1. Parses the file entries for the English translation file.
+ * 2. Finds duplicate values among the translation keys.
+ * 3. If no duplicates are found, logs a message and exits.
+ * 4. If duplicates are found, prompts the user to select a key to use for the
+ *    values or enter a new key.
+ * 5. Collects the changes based on user input.
+ * 6. Updates the source code and translation files (English, Finnish, and Swedish)
+ *    with the changes.
+ *
+ * @returns {void}
+ */
 const merge = (): void => {
   const fileEntries = parseFileEntries(File.English);
   const duplicates = findDuplicateValues(fileEntries.entries);

@@ -10,6 +10,12 @@ definitions:
     description: Internal grade database ID.
     minimum: 0
     example: 1
+  TaskGradeLogId:
+    type: integer
+    format: int32
+    description: Internal grade log database ID.
+    minimum: 0
+    example: 1
   TaskGradeGrade:
     type: number
     format: int32
@@ -31,6 +37,11 @@ definitions:
     nullable: true
     description: Comment.
     example: Corrected.
+  ActionType:
+    type: string
+    enum: [CREATE, UPDATE, DELETE]
+    description: Action types for changes to task grade
+    example: UPDATE
 
   # Bigger schemas
   GradeData:
@@ -144,6 +155,50 @@ definitions:
         - userId
         - date
 
+  TaskGrade:
+    type: object
+    description: Task grade object in task grade database
+    properties:
+      id:
+        $ref: '#/definitions/TaskGradeId'
+      userId:
+        $ref: '#/definitions/UserId'
+      courseTaskId:
+        $ref: '#/definitions/CourseTaskId'
+      graderId:
+        $ref: '#/definitions/UserId'
+      aplusGradeSourceId:
+        $ref: '#/definitions/NullableAplusGradeSourceId'
+      grade:
+        $ref: '#/definitions/TaskGradeGrade'
+      date:
+        $ref: '#/definitions/TaskGradeDate'
+      expiryDate:
+        $ref: '#/definitions/NullableTaskGradeExpiryDate'
+      comment:
+        $ref: '#/definitions/NullableTaskGradeComment'
+
+  TaskGradeLog:
+    type: object
+    description: Log of changes to task grade
+    properties:
+      id:
+        $ref: '#/definitions/TaskGradeLogId'
+      courseTaskId:
+        $ref: '#/definitions/CourseTaskId'
+      actionType:
+        $ref: '#/definitions/ActionType'
+      previousState:
+        $ref: '#/definitions/TaskGrade'
+      user:
+        $ref: '#/definitions/StudentData'
+      taskGrade:
+        $ref: '#/definitions/TaskGrade'
+    required:
+      - id
+      - actionType
+      - user
+
 /v1/courses/{courseId}/grades:
   get:
     tags: [Task Grade]
@@ -198,6 +253,62 @@ definitions:
         $ref: '#/responses/NotFound'
       409:
         $ref: '#/responses/Conflict'
+    security:
+      - cookieAuth: []
+
+/v1/grade-logs:
+  get:
+    tags: [Task Grade]
+    description: >
+      Get the grade logs.
+    parameters:
+      - in: query
+        name: userId
+        schema:
+          type: integer
+        description: Internal user database ID
+        example: 1
+      - in: query
+        name: taskGradeId
+        schema:
+          type: integer
+        description: Internal task grade database ID
+        example: 1
+      - in: query
+        name: courseTaskIds
+        schema:
+          type: string
+        description: List of internal course task database IDs separated by commna
+        example: 1,2,3
+    responses:
+      200:
+        description: Returns logs of the task grade.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/TaskGradeLog'
+      400:
+        description: Invalid user id or task grade id.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                errors:
+                  type: array
+                  items:
+                    type: string
+                  description: Error message(s) explaining the error(s).
+                  example:
+                    [
+                      "Invalid user id abc"
+                    ]
+      401:
+        $ref: '#/responses/Unauthorized'
+      403:
+        $ref: '#/responses/Forbidden'
     security:
       - cookieAuth: []
 

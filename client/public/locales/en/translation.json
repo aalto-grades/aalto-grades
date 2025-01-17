@@ -149,13 +149,20 @@
     "grading-model": "Grading model",
     "grading-date": "Grading date",
     "final-grade": "Final grade",
+    "results": {
+      "history": {
+        "action-type": "Action type",
+        "action-date": "Date",
+        "author": "Author"
+      }
+    },
+    "close": "Close",
     "download": "Download",
     "grader": "Grader",
     "export-date": "Export date",
     "comment": "Comment",
     "delete": "Delete",
     "discard": "Discard",
-    "close": "Close",
     "grades-saved": "Grades saved",
     "import": "Import",
     "course-part": "Course part",
@@ -206,17 +213,16 @@
       "select-for-fetching": "Select the course parts you want to fetch grades for from A+.",
       "fetching-grades": "Fetching grades",
       "fetching-grades-wait": "Fetching grades from A+, this may take a few minutes...",
+      "delete-with-model-message": "Are you sure want to delete this course part and all included course tasks that are used by some models?",
+      "delete-with-task-message": "Are you sure want to delete this course part and all included course tasks?",
+      "delete-message": "Are you sure want to delete this course part?",
+      "delete": "Delete course part",
       "saved": "Course parts saved successfully",
       "a+-disabled": "Adding A+ grade sources is disabled while there are unsaved changes",
       "add-a+-source": "Add A+ grade source",
       "view-a+-sources": "View A+ grade sources",
       "unarchive": "Unarchive course part",
       "archive": "Archive course part",
-      "delete": "Delete course part",
-      "delete-message": "Are you sure want to delete this course part?",
-      "delete-with-task-message": "Are you sure want to delete this course part and all included course tasks?",
-      "delete-with-model-message": "Are you sure want to delete this course part and all included course tasks that are used by some models?",
-      "cannot-delete-with-grades": "Cannot delete a course part with grades",
       "delete-task": "Delete course task",
       "delete-task-message": "Some models are using this course task. Are you sure you want to delete it?",
       "archived": "Archived",
@@ -225,6 +231,7 @@
       "add-new-part": "Add new course part",
       "no-course-parts": "No course parts. Please add course parts to get started.",
       "edit-part": "Edit course part",
+      "cannot-delete-with-grades": "Cannot delete a course part with grades",
       "no-expiry-date": "No expiry date"
     },
     "models": {
@@ -309,6 +316,7 @@
       "not-found": "Not found",
       "add-final": "Add final grade",
       "grades-saved": "Grades saved successfully",
+      "history": "Open the history of this user grades for the current task",
       "add-grade": "Add grade",
       "expiry-before": "Expiry date cannot be before date",
       "edit-final": "Edit final grades",
@@ -320,6 +328,7 @@
       "multiple-grade": "Multiple grades, click to show",
       "grade-of-for": "Grades of {{user}} for {{part}}",
       "grade-expired-on": "Grade expired on {{date}}",
+      "all-grades-expired": "All grades are expired",
       "view-graph": "View graph",
       "upload": {
         "all-done": "All done!",
@@ -350,8 +359,7 @@
       },
       "final-grade-preview": "Final grade preview",
       "course-part-value-preview": "Course part value",
-      "data-undefined": "Data is undefined",
-      "all-grades-expired": "All grades are expired"
+      "data-undefined": "Data is undefined"
     },
     "edit": {
       "saved": "Course details saved.",
@@ -381,16 +389,14 @@
       "email-in-list": "Email already on list.",
       "add-teacher-emails": "Add emails of the teachers in charge of the course.",
       "add-at-least-one-teacher": "Add at least one teacher in charge to the course",
+      "user-not-exist": "User doesn't exist. Will be created on submit.",
       "add-assistant-emails": "Add emails of the assistants of the course.",
-      "no-assistants": "No assistants in the course",
       "assistant-expiry-date": "Assistant expiry date",
       "assistant-expiry-date-helper": "Expiry date for assistant role",
-      "assistant-expiry-date-info": "Expiry date: {{expiryDate}}",
-      "assistant-expired-at": "Expired at {{expiryDate}}",
+      "no-assistants": "No assistants in the course",
       "assistant-expiry-date-change": "To change the expire date, remove and add again the assistant",
       "input-at-least-one-assistant": "Input the email address of at least one assistant of the course",
-      "cannot-remove-self": "You cannot remove yourself from the course",
-      "user-not-exist": "User doesn't exist. Will be created on submit."
+      "assistant-expiry-date-info": "Expiry date: {{expiryDate}}"
     },
     "list": "Course list"
   },

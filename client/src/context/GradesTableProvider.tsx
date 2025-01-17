@@ -541,7 +541,7 @@ export const GradesTableProvider = ({
             size: 80,
             cell: ({getValue, row}) => (
               <GradeCell
-                studentNumber={row.original.user.studentNumber}
+                studentUser={row.original.user}
                 sourceValue={getValue()}
               />
             ),
