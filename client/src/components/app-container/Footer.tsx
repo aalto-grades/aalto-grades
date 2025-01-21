@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Ossi Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -66,7 +66,7 @@ const Footer = (): JSX.Element => {
           {t('app.footer.feedback.text')}
         </Link>
       </Tooltip>
-      <Typography>Aalto Grades {AALTO_GRADES_VERSION}</Typography>
+      <Typography>Ossi {AALTO_GRADES_VERSION}</Typography>
     </Box>
   );
 };

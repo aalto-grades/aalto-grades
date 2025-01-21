@@ -1,10 +1,10 @@
 <!--
-SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+SPDX-FileCopyrightText: 2022 The Ossi Developers
 
 SPDX-License-Identifier: MIT
 -->
 
-# Aalto Grades server
+# Ossi server
 
 ## Running
 

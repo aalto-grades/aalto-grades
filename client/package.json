@@ -1,7 +1,7 @@
 {
   "name": "aalto-grades-client",
   "license": "Expat (MIT)",
-  "author": "The Aalto Grades Developers",
+  "author": "The Ossi Developers",
   "scripts": {
     "build": "tsc -b && vite build",
     "postinstall": "patch-package",

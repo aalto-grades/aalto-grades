@@ -1,7 +1,7 @@
 {
   "name": "aalto-grades-server",
   "license": "Expat (MIT)",
-  "author": "The Aalto Grades Developers",
+  "author": "The Ossi Developers",
   "scripts": {
     "build": "npm run clean && tsc && tsc-alias",
     "citest": "GITHUB_ACTIONS=1 jest --detectOpenHandles",
