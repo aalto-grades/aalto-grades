@@ -1,5 +1,4 @@
 {
-  "language": "Suomi (fi)",
   "shared": {
     "auth": {
       "password": {
@@ -114,6 +113,7 @@
       }
     }
   },
+  "language": "Suomi (fi)",
   "general": {
     "a+-api-token": "A+ API-käyttöoikeustietue",
     "a+-courses": "A+ kurssit",
@@ -171,10 +171,10 @@
     "edit": "Muokkaa",
     "course-parts": "Kurssin osat",
     "organizing-department": "Järjestävä laitos",
-    "assistants": "Avustajat",
     "add": "Lisää",
-    "grading-models": "Arviointimallit",
+    "assistants": "Avustajat",
     "grades": "Arvosanat",
+    "grading-models": "Arviointimallit",
     "code": "Koodi",
     "role": "Rooli",
     "admin": "Ylläpitäjä",
@@ -297,9 +297,9 @@
       "download-sisu-csv": "Lataa Sisu CSV",
       "group-columns": "Ryhmittele sarakkeet",
       "show-model-parts": "Näytä mallin osat",
+      "search-bar-placeholder": "Etsi...",
       "showing-n-rows": "Näytetään {{n}} riviä",
       "n-errors": "{{n}} virhettä",
-      "search-bar-placeholder": "Etsi...",
       "final-downloaded": "Lopullinen arvosana ladattu",
       "download-at-least-one": "Lataa vähintään yksi",
       "fetching-sisu-csv": "Haetaan Sisu CSV",

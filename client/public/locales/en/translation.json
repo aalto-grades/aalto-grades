@@ -1,5 +1,4 @@
 {
-  "language": "English (en)",
   "shared": {
     "auth": {
       "password": {
@@ -114,6 +113,7 @@
       }
     }
   },
+  "language": "English (en)",
   "general": {
     "a+-api-token": "A+ API token",
     "a+-courses": "A+ courses",
@@ -171,10 +171,10 @@
     "edit": "Edit",
     "course-parts": "Course parts",
     "organizing-department": "Organizing department",
-    "assistants": "Assistants",
     "add": "Add",
-    "grading-models": "Grading models",
+    "assistants": "Assistants",
     "grades": "Grades",
+    "grading-models": "Grading models",
     "code": "Code",
     "role": "Role",
     "admin": "Admin",
@@ -297,9 +297,9 @@
       "download-sisu-csv": "Download Sisu CSV",
       "group-columns": "Group rows based on other columns",
       "show-model-parts": "Show only course parts used in the model",
+      "search-bar-placeholder": "Search...",
       "showing-n-rows": "Showing {{n}} rows",
       "n-errors": "{{n}} errors",
-      "search-bar-placeholder": "Search...",
       "final-downloaded": "Final grades downloaded in the Sisu CSV format successfully.",
       "download-at-least-one": "You must download data for at least one student.",
       "fetching-sisu-csv": "Fetching Sisu CSV...",

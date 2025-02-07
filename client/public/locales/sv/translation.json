@@ -1,5 +1,4 @@
 {
-  "language": "Svenska (sv)",
   "shared": {
     "auth": {
       "password": {
@@ -114,6 +113,7 @@
       }
     }
   },
+  "language": "Svenska (sv)",
   "general": {
     "a+-api-token": "UNTRANSLATED",
     "a+-courses": "UNTRANSLATED",
@@ -171,10 +171,10 @@
     "edit": "UNTRANSLATED",
     "course-parts": "UNTRANSLATED",
     "organizing-department": "UNTRANSLATED",
-    "assistants": "UNTRANSLATED",
     "add": "UNTRANSLATED",
-    "grading-models": "UNTRANSLATED",
+    "assistants": "UNTRANSLATED",
     "grades": "UNTRANSLATED",
+    "grading-models": "UNTRANSLATED",
     "code": "UNTRANSLATED",
     "role": "UNTRANSLATED",
     "admin": "UNTRANSLATED",
@@ -297,9 +297,9 @@
       "download-sisu-csv": "UNTRANSLATED",
       "group-columns": "UNTRANSLATED",
       "show-model-parts": "UNTRANSLATED",
+      "search-bar-placeholder": "UNTRANSLATED",
       "showing-n-rows": "UNTRANSLATED",
       "n-errors": "UNTRANSLATED",
-      "search-bar-placeholder": "UNTRANSLATED",
       "final-downloaded": "UNTRANSLATED",
       "download-at-least-one": "UNTRANSLATED",
       "fetching-sisu-csv": "UNTRANSLATED",
