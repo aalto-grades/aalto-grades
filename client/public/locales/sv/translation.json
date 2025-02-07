@@ -1,4 +1,5 @@
 {
+  "language": "Svenska (sv)",
   "shared": {
     "auth": {
       "password": {
@@ -298,6 +299,7 @@
       "show-model-parts": "UNTRANSLATED",
       "showing-n-rows": "UNTRANSLATED",
       "n-errors": "UNTRANSLATED",
+      "search-bar-placeholder": "UNTRANSLATED",
       "final-downloaded": "UNTRANSLATED",
       "download-at-least-one": "UNTRANSLATED",
       "fetching-sisu-csv": "UNTRANSLATED",
