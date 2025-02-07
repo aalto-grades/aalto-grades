@@ -33,11 +33,13 @@ const ConfirmDialog = ({
   const {t} = useTranslation();
 
   type ActionButton = {title: string; onClick: () => void};
+
   const cancelButton = actions!.find(
-    (el: ActionButton) => el.title === t('general.cancel')
+    (el: ActionButton) => el.title.toLowerCase() === "cancel"
   ) as ActionButton;
+
   const confirmButton = actions!.find(
-    (el: ActionButton) => el.title === t('general.confirm')
+    (el: ActionButton) => el.title.toLowerCase() === "confirm"
   ) as ActionButton;
 
   const childrenProp = children as {props: {message: string}};
@@ -45,8 +47,10 @@ const ConfirmDialog = ({
 
   const defaultTitle = 'AsyncConfirmation Modal Title';
   const defaultBody = 'AsynConfirmation Modal message'; // Default body has typo lol
+
   if ((confirmNavigate || confirmDiscard) && title === defaultTitle)
     title = t('general.unsaved-changes');
+
   if ((confirmNavigate || confirmDiscard) && body === defaultBody)
     body = t('shared.unsaved-changes.body');
 
