@@ -3,10 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {darken, lighten, styled} from '@mui/material';
-import {
-  type GridRowClassNameParams,
-  type GridValidRowModel,
-} from '@mui/x-data-grid';
+import type {GridRowClassNameParams, GridValidRowModel} from '@mui/x-data-grid';
 
 import DataGridBase from '@/components/shared/DataGridBase';
 // Pretty much just adds color to selected and error columns

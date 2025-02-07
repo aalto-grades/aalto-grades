@@ -35,11 +35,11 @@ const ConfirmDialog = ({
   type ActionButton = {title: string; onClick: () => void};
 
   const cancelButton = actions!.find(
-    (el: ActionButton) => el.title.toLowerCase() === "cancel"
+    (el: ActionButton) => el.title.toLowerCase() === 'cancel'
   ) as ActionButton;
 
   const confirmButton = actions!.find(
-    (el: ActionButton) => el.title.toLowerCase() === "confirm"
+    (el: ActionButton) => el.title.toLowerCase() === 'confirm'
   ) as ActionButton;
 
   const childrenProp = children as {props: {message: string}};

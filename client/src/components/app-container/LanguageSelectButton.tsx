@@ -13,7 +13,7 @@ const LanguageSelectButton = (): JSX.Element => {
 
   const menuOpen = Boolean(anchorEl);
 
-  const handleClose = () => setAnchorEl(null);
+  const handleClose = (): void => setAnchorEl(null);
 
   const setLanguage = (language: string): void => {
     i18n.changeLanguage(language);
@@ -43,26 +43,53 @@ const LanguageSelectButton = (): JSX.Element => {
         onClose={handleClose}
         MenuListProps={{'aria-labelledby': 'language-button'}}
       >
-        <MenuItem onClick={() => setLanguage("en")}>
-          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
-            <Box sx={{ width: 24, display: 'flex', justifyContent: 'center' }}>
-              {i18n.language === "en" && <Check color="inherit" fontSize='small' />}
+        <MenuItem onClick={() => setLanguage('en')}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 1,
+              alignItems: 'center',
+            }}
+          >
+            <Box sx={{width: 24, display: 'flex', justifyContent: 'center'}}>
+              {i18n.language === 'en' && (
+                <Check color="inherit" fontSize="small" />
+              )}
             </Box>
             <Box>English (en)</Box>
           </Box>
         </MenuItem>
-        <MenuItem onClick={() => setLanguage("fi")}>
-          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
-            <Box sx={{ width: 24, display: 'flex', justifyContent: 'center' }}>
-              {i18n.language === "fi" && <Check color="inherit" fontSize='small' />}
+        <MenuItem onClick={() => setLanguage('fi')}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 1,
+              alignItems: 'center',
+            }}
+          >
+            <Box sx={{width: 24, display: 'flex', justifyContent: 'center'}}>
+              {i18n.language === 'fi' && (
+                <Check color="inherit" fontSize="small" />
+              )}
             </Box>
             <Box>Suomi (fi)</Box>
           </Box>
         </MenuItem>
-        <MenuItem onClick={() => setLanguage("sv")}>
-          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
-            <Box sx={{ width: 24, display: 'flex', justifyContent: 'center' }}>
-              {i18n.language === "sv" && <Check color="inherit" fontSize='small' />}
+        <MenuItem onClick={() => setLanguage('sv')}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 1,
+              alignItems: 'center',
+            }}
+          >
+            <Box sx={{width: 24, display: 'flex', justifyContent: 'center'}}>
+              {i18n.language === 'sv' && (
+                <Check color="inherit" fontSize="small" />
+              )}
             </Box>
             <Box>Svenska (sv)</Box>
           </Box>

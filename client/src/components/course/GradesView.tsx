@@ -4,7 +4,7 @@
 
 import {Box, Typography} from '@mui/material';
 import type {JSX} from 'react';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import {useParams, useViewTransitionState} from 'react-router-dom';
 
 import Delayed from '@/components/shared/Delay';
@@ -14,7 +14,7 @@ import GradesTable from './course-results-view/GradesTable';
 import GradesTableToolbar from './course-results-view/GradesTableToolbar';
 
 const GradesView = (): JSX.Element => {
-  const {t} = useTranslation()
+  const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const isTransitioning = useViewTransitionState('');
   const gradesQuery = useGetGrades(courseId);

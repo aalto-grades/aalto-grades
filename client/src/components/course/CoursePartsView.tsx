@@ -621,7 +621,7 @@ const CoursePartsView = (): JSX.Element => {
               slots={editRights ? {toolbar: DataGridToolbar} : {}}
               onRowEditStart={() => setEditing(true)}
               onRowEditStop={() => setEditing(false)}
-              processRowUpdate={updatedRow => {
+              processRowUpdate={(updatedRow: ColTypes) => {
                 setRows(oldRows =>
                   oldRows.map(row =>
                     row.id === updatedRow.id ? updatedRow : row

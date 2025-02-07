@@ -250,7 +250,9 @@ const router = createBrowserRouter([
       },
       {
         path: '/privacy-notice',
-        element: <StaticPageView url="/privacy-notice.html" title="Privacy Notice"/>,
+        element: (
+          <StaticPageView url="/privacy-notice.html" title="Privacy Notice" />
+        ),
       },
       {
         path: '/support',

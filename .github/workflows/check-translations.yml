@@ -5,7 +5,7 @@
 
 name: Check Translation Keys
 
-on:
+on: # yamllint disable-line rule:truthy
   push:
     paths:
       - 'client/public/locales/**' # Run only when updates to the locales i.e., client translations

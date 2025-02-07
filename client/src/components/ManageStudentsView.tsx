@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import {Button, Typography} from '@mui/material';
-import {
-  type GridColDef,
-  type GridRowSelectionModel,
-  type GridRowsProp,
+import type {
+  GridColDef,
+  GridRowSelectionModel,
+  GridRowsProp,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useEffect, useMemo, useState} from 'react';
@@ -143,9 +143,7 @@ const ManageStudentsView = (): JSX.Element => {
   return (
     <>
       <UnsavedChangesDialog blocker={blocker} />
-      <Typography variant="h2">
-        {t('manage-students.title')}
-      </Typography>
+      <Typography variant="h2">{t('manage-students.title')}</Typography>
       <Button
         onClick={handleDelete}
         disabled={rowSelectionModel.length === 0}
