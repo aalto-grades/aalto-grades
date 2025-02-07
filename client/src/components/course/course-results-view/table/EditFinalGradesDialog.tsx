@@ -11,7 +11,6 @@ import {
   DialogTitle,
 } from '@mui/material';
 import {
-  DataGrid,
   GridActionsCellItem,
   type GridCellParams,
   type GridColDef,
@@ -33,6 +32,7 @@ import {
   type NewFinalGrade,
   SystemRole,
 } from '@/common/types';
+import DataGridBase from '@/components/shared/DataGridBase';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
   useAddFinalGrades,
@@ -318,7 +318,7 @@ const EditFinalGradesDialog = ({
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
           <div style={{height: '30vh'}}>
-            <DataGrid
+            <DataGridBase
               rows={rows}
               columns={columns}
               rowHeight={25}

@@ -26,7 +26,6 @@ import {
 } from '@mui/material';
 import {grey} from '@mui/material/colors';
 import {
-  DataGrid,
   GridActionsCellItem,
   type GridColDef,
   type GridRowParams,
@@ -45,6 +44,7 @@ import {
   type ModifyCourseTasks,
   SystemRole,
 } from '@/common/types';
+import DataGridBase from '@/components/shared/DataGridBase';
 import SaveBar from '@/components/shared/SaveBar';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
@@ -611,7 +611,7 @@ const CoursePartsView = (): JSX.Element => {
         </Grid>
         <Grid size={8}>
           <div style={{height: '100%', maxHeight: '70vh'}}>
-            <DataGrid
+            <DataGridBase
               rows={rows}
               columns={columns}
               rowHeight={25}

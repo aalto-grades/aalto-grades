@@ -4,7 +4,6 @@
 
 import {Button, Typography} from '@mui/material';
 import {
-  DataGrid,
   type GridColDef,
   type GridRowSelectionModel,
   type GridRowsProp,
@@ -15,6 +14,7 @@ import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker} from 'react-router-dom';
 
+import DataGridBase from '@/components/shared/DataGridBase';
 import {
   useDeleteUsers,
   useGetLatestGrades,
@@ -143,8 +143,7 @@ const ManageStudentsView = (): JSX.Element => {
   return (
     <>
       <UnsavedChangesDialog blocker={blocker} />
-
-      <Typography variant="h2" sx={{pb: 2}}>
+      <Typography variant="h2">
         {t('manage-students.title')}
       </Typography>
       <Button
@@ -152,11 +151,12 @@ const ManageStudentsView = (): JSX.Element => {
         disabled={rowSelectionModel.length === 0}
         variant="contained"
         color="error"
+        sx={{my: 2}}
       >
         {t('manage-students.delete', {count: rowSelectionModel.length})}
       </Button>
       <div style={{height: '30vh'}}>
-        <DataGrid
+        <DataGridBase
           rows={rows}
           columns={columns}
           rowHeight={25}
