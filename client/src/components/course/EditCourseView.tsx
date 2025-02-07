@@ -468,7 +468,7 @@ const EditCourseView = (): JSX.Element => {
                 }}
                 sx={{mt: 1, float: 'left'}}
               >
-                Add
+                {t('general.add')}
               </Button>
               <Box sx={{mt: 8, mb: 2}}>
                 {teachersInCharge.length === 0 ? (
