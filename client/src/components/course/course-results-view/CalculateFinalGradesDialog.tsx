@@ -20,14 +20,13 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
-import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
-import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, {type Dayjs} from 'dayjs';
 import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import type {GradingModelData, StudentRow} from '@/common/types';
+import LocalizedDatePicker from '@/components/shared/LocalizedDatePicker';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useGetAllGradingModels} from '@/hooks/useApi';
 import {type GradeSelectOption, getErrorTypes} from '@/utils';
@@ -188,18 +187,12 @@ const CalculateFinalGradesDialog = ({
           label={t('course.results.override-date')}
         />
         <Collapse in={dateOverride}>
-          <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-            adapterLocale="en-gb"
-          >
-            <DatePicker
-              label={t('general.grading-date')}
-              sx={{width: '100%', mt: 2}}
-              format="DD.MM.YYYY"
-              value={gradingDate}
-              onChange={newDate => newDate !== null && setGradingDate(newDate)}
-            />
-          </LocalizationProvider>
+          <LocalizedDatePicker
+            label={t('general.grading-date')}
+            sx={{width: '100%', mt: 2}}
+            value={gradingDate}
+            onChange={newDate => newDate !== null && setGradingDate(newDate)}
+          />
         </Collapse>
       </DialogContent>
       <DialogActions>
