@@ -326,12 +326,10 @@ const UploadDialogUpload = ({
                   setReady(!error);
                 }}
                 getRowClassName={getRowClassName}
-                processRowUpdate={updatedRow => {
+                processRowUpdate={(updatedRow: GradeUploadColTypes) => {
                   setRows(oldRows =>
                     oldRows.map(row =>
-                      row.id === updatedRow.id
-                        ? (updatedRow as GradeUploadColTypes)
-                        : row
+                      row.id === updatedRow.id ? updatedRow : row
                     )
                   );
 

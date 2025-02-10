@@ -102,7 +102,7 @@
       "privacy": "Privacy notice",
       "accessibility": "Accessibility statement",
       "support": "Support",
-      "licenses": "JavaScript licenses",
+      "licenses": "Licenses",
       "source": {
         "tooltip": "Source code opens in a new tab",
         "text": "Source code"
@@ -113,6 +113,7 @@
       }
     }
   },
+  "language": "English (en)",
   "general": {
     "a+-api-token": "A+ API token",
     "a+-courses": "A+ courses",
@@ -170,10 +171,10 @@
     "edit": "Edit",
     "course-parts": "Course parts",
     "organizing-department": "Organizing department",
-    "assistants": "Assistants",
     "add": "Add",
-    "grading-models": "Grading models",
+    "assistants": "Assistants",
     "grades": "Grades",
+    "grading-models": "Grading models",
     "code": "Code",
     "role": "Role",
     "admin": "Admin",
@@ -296,6 +297,7 @@
       "download-sisu-csv": "Download Sisu CSV",
       "group-columns": "Group rows based on other columns",
       "show-model-parts": "Show only course parts used in the model",
+      "search-bar-placeholder": "Search...",
       "showing-n-rows": "Showing {{n}} rows",
       "n-errors": "{{n}} errors",
       "final-downloaded": "Final grades downloaded in the Sisu CSV format successfully.",
@@ -441,8 +443,8 @@
   },
   "manage-students": {
     "latest-grade": "Latest grade",
-    "delete_one": "Delete student",
-    "delete_other": "Delete students",
+    "delete_one": "Delete selected student",
+    "delete_other": "Delete selected students",
     "delete-message_one": "All of the data of the student will be deleted permanently!",
     "delete-message_other": "All of the data of the students will be deleted permanently!",
     "delete-success_one": "Student deleted",
