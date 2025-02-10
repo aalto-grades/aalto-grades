@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import {AccountTreeRounded, Error} from '@mui/icons-material';
-import {Box, IconButton, Tooltip} from '@mui/material';
-import {type JSX, useState} from 'react';
+import {Box, Tooltip} from '@mui/material';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
@@ -12,6 +12,7 @@ import type {GradingScale} from '@/common/types';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useGetAllGradingModels} from '@/hooks/useApi';
 import {getGradeString} from '@/utils';
+import IconButtonWithTip from './IconButtonWithTip';
 
 // If gradingScale is null then value is defined.
 type PropsType = {
@@ -21,6 +22,7 @@ type PropsType = {
   gradingScale?: GradingScale | null;
   value?: number | null;
 };
+
 /**
  * If gradingScale is set then this is a final grade preview cell, otherwise
  * this is a course part grade preview cell
@@ -35,7 +37,6 @@ const PredictedGradeCell = ({
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const gradingModels = useGetAllGradingModels(courseId);
-  const [hover, setHover] = useState<boolean>(false);
 
   const gradeErrors = row.errors?.filter(
     e =>
@@ -60,8 +61,7 @@ const PredictedGradeCell = ({
 
   return (
     <div
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      className="hoverable-container"
       style={{
         width: '100%',
         height: '100%',
@@ -94,19 +94,13 @@ const PredictedGradeCell = ({
       >
         <p style={{margin: 0, display: 'inline'}}>{previewValue}</p>
       </Tooltip>
-      {gradingModelIds.length > 0 && hover && (
-        <Tooltip
+      {gradingModelIds.length > 0 && (
+        <IconButtonWithTip
+          onClick={onClick}
           title={t('course.results.view-graph')}
-          placement="top"
-          disableInteractive
         >
-          <IconButton
-            sx={{position: 'absolute', right: '0px', top: 'calc(50% - 20px)'}}
-            onClick={onClick}
-          >
-            <AccountTreeRounded color="primary" />
-          </IconButton>
-        </Tooltip>
+          <AccountTreeRounded color="primary" />
+        </IconButtonWithTip>
       )}
     </div>
   );

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {MoreVert} from '@mui/icons-material';
-import {Box, IconButton, Tooltip, useTheme} from '@mui/material';
+import {Box, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -11,6 +11,7 @@ import {useTranslation} from 'react-i18next';
 import type {FinalGradeData, GradingScale} from '@/common/types';
 import {findBestFinalGrade, getGradeString} from '@/utils';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
+import IconButtonWithTip from './IconButtonWithTip';
 
 type PropsType = {
   userId: number;
@@ -27,15 +28,13 @@ const FinalGradeCell = ({
   const {t} = useTranslation();
   const theme = useTheme();
 
-  const [hover, setHover] = useState<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const bestFinalGrade = findBestFinalGrade(finalGrades);
 
   return (
     <Box
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      className="hoverable-container"
       sx={{
         position: 'relative',
         minWidth: '100px',
@@ -44,7 +43,6 @@ const FinalGradeCell = ({
         color: 'inherit',
         bgcolor: 'inherit',
         borderLeft: 'inherit',
-
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -52,28 +50,16 @@ const FinalGradeCell = ({
     >
       <span>{getGradeString(t, gradingScale, bestFinalGrade?.grade)}</span>
       {/* If there are multiple final grades "show more" icon*/}
-      {(finalGrades.length > 1 || hover) && (
-        <Tooltip
-          placement="top"
-          title={
-            finalGrades.length <= 1
-              ? t('course.results.edit-final')
-              : t('course.results.multiple-final')
-          }
-        >
-          <IconButton
-            color="primary"
-            sx={{
-              position: 'absolute',
-              right: '0px',
-              top: 'calc(50% - 20px)',
-            }}
-            onClick={(): void => setEditDialogOpen(true)}
-          >
-            <MoreVert />
-          </IconButton>
-        </Tooltip>
-      )}
+      <IconButtonWithTip
+        onClick={(): void => setEditDialogOpen(true)}
+        title={
+          finalGrades.length <= 1
+            ? t('course.results.edit-final')
+            : t('course.results.multiple-final')
+        }
+      >
+        <MoreVert />
+      </IconButtonWithTip>
       {editDialogOpen && (
         <EditFinalGradesDialog
           open={editDialogOpen}
