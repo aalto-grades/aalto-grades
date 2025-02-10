@@ -337,7 +337,7 @@ const CreateCourseDialog = ({
               }}
               sx={{mt: 1}}
             >
-              Add
+              {t('general.add')}
             </Button>
             <Box sx={{mt: 3, mb: 2}}>
               {teachersInCharge.length === 0 ? (
@@ -541,7 +541,7 @@ const CreateCourseDialog = ({
                 }
               }}
             >
-              Cancel
+              {t('general.cancel')}
             </Button>
             <Button
               variant="contained"

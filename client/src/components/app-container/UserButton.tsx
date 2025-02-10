@@ -28,7 +28,6 @@ const UserButton = (): JSX.Element => {
   const resetOwnAuth = useResetOwnAuth();
 
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-  const [anchorWidth, setAnchorWidth] = useState<number | null>(null);
   const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
     useState<boolean>(false);
   const [changePasswordDialogOpen, setChangePasswordDialogOpen] =
@@ -109,7 +108,6 @@ const UserButton = (): JSX.Element => {
         aria-expanded={menuOpen ? 'true' : undefined}
         onClick={event => {
           setAnchorEl(event.currentTarget);
-          setAnchorWidth(event.currentTarget.offsetWidth);
         }}
       >
         <Box sx={{marginRight: 1, marginTop: 1}}>
@@ -127,7 +125,6 @@ const UserButton = (): JSX.Element => {
       >
         <MenuItem
           key="aplus-token"
-          sx={{width: anchorWidth ?? '100%'}}
           onClick={() => {
             setAnchorEl(null);
             setAplusTokenDialogOpen(true);

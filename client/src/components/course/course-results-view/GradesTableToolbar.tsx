@@ -476,6 +476,7 @@ const GradesTableToolbar = (): JSX.Element => {
         <Box
           sx={{
             p: 0.5,
+            gap: 2,
             borderRadius: 3,
             display: 'flex',
             backgroundColor:
@@ -636,7 +637,6 @@ const GradesTableToolbar = (): JSX.Element => {
             <AssessmentFilterButton />
           </Tooltip>
         )}
-
         <input
           style={{
             borderRadius: '200px',
@@ -654,7 +654,7 @@ const GradesTableToolbar = (): JSX.Element => {
               .getColumn('user_studentNumber')
               ?.setFilterValue(e.target.value);
           }}
-          placeholder="Search..."
+          placeholder={t('course.results.search-bar-placeholder')}
           className="w-36 border shadow rounded"
         />
         <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>

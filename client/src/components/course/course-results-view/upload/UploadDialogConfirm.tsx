@@ -25,8 +25,6 @@ import type {
   GridRowsProp,
   GridValidRowModel,
 } from '@mui/x-data-grid';
-import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
-import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import type {Dayjs} from 'dayjs';
 import {
   type Dispatch,
@@ -38,6 +36,7 @@ import {
 } from 'react';
 import {useTranslation} from 'react-i18next';
 
+import LocalizedDatePicker from '@/components/shared/LocalizedDatePicker';
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import type {GradeUploadColTypes} from './UploadDialog';
 
@@ -153,7 +152,7 @@ const UploadDialogConfirm = ({
               <TableRow key={date.courseTaskName}>
                 <TableCell>{date.courseTaskName}</TableCell>
                 <TableCell>
-                  <DatePicker
+                  <LocalizedDatePicker
                     slotProps={{textField: {size: 'small'}}}
                     value={date.completionDate}
                     onChange={value =>
@@ -162,7 +161,7 @@ const UploadDialogConfirm = ({
                   />
                 </TableCell>
                 <TableCell>
-                  <DatePicker
+                  <LocalizedDatePicker
                     disabled={date.expirationDate === null}
                     slotProps={{
                       textField: {
@@ -222,12 +221,7 @@ const UploadDialogConfirm = ({
                 {t('course.results.upload.hidden')}
               </Alert>
             )}
-            <LocalizationProvider
-              dateAdapter={AdapterDayjs}
-              adapterLocale="en-gb"
-            >
-              <DateTable />
-            </LocalizationProvider>
+            <DateTable />
           </AccordionDetails>
         </Accordion>
 

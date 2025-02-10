@@ -3,12 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import {darken, lighten, styled} from '@mui/material';
-import {
-  DataGrid,
-  type GridRowClassNameParams,
-  type GridValidRowModel,
-} from '@mui/x-data-grid';
+import type {GridRowClassNameParams, GridValidRowModel} from '@mui/x-data-grid';
 
+import DataGridBase from '@/components/shared/DataGridBase';
 // Pretty much just adds color to selected and error columns
 
 export type ProcessRowUpdate = (
@@ -34,7 +31,7 @@ const getSelectedHoverBackgroundColor = (
   mode: string
 ): string => (mode === 'dark' ? darken(color, 0.4) : lighten(color, 0.4));
 
-const StyledDataGrid = styled(DataGrid)(({theme}) => ({
+const StyledDataGrid = styled(DataGridBase)(({theme}) => ({
   '& .invalid-value-data-grid': {
     backgroundColor: getBackgroundColor(
       theme.palette.error.main,

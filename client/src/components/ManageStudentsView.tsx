@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 import {Button, Typography} from '@mui/material';
-import {
-  DataGrid,
-  type GridColDef,
-  type GridRowSelectionModel,
-  type GridRowsProp,
+import type {
+  GridColDef,
+  GridRowSelectionModel,
+  GridRowsProp,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useEffect, useMemo, useState} from 'react';
@@ -15,6 +14,7 @@ import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker} from 'react-router-dom';
 
+import DataGridBase from '@/components/shared/DataGridBase';
 import {
   useDeleteUsers,
   useGetLatestGrades,
@@ -143,20 +143,18 @@ const ManageStudentsView = (): JSX.Element => {
   return (
     <>
       <UnsavedChangesDialog blocker={blocker} />
-
-      <Typography variant="h2" sx={{pb: 2}}>
-        {t('manage-students.title')}
-      </Typography>
+      <Typography variant="h2">{t('manage-students.title')}</Typography>
       <Button
         onClick={handleDelete}
         disabled={rowSelectionModel.length === 0}
         variant="contained"
         color="error"
+        sx={{my: 2}}
       >
         {t('manage-students.delete', {count: rowSelectionModel.length})}
       </Button>
       <div style={{height: '30vh'}}>
-        <DataGrid
+        <DataGridBase
           rows={rows}
           columns={columns}
           rowHeight={25}

@@ -55,7 +55,6 @@ const Header = (): JSX.Element => {
       >
         A{logoVariant} Grades
       </Typography>
-
       {course.data !== undefined && (
         <>
           <Box
@@ -102,15 +101,13 @@ const Header = (): JSX.Element => {
             }}
           >
             <Typography
-              variant="h2"
+              variant="h6"
               align="left"
               sx={{
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 lineHeight: '40px',
-                // width: '100px',
-                // display: 'flex',
                 alignItems: 'center',
                 height: '100%',
               }}
