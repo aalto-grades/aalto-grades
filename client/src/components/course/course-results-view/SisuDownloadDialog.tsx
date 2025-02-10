@@ -23,8 +23,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
-import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, {type Dayjs} from 'dayjs';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useMemo, useState} from 'react';
@@ -32,6 +30,7 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import type {FinalGradeData, Language, StudentRow} from '@/common/types';
+import LocalizedDatePicker from '@/components/shared/LocalizedDatePicker';
 import {useDownloadSisuGradeCsv, useGetCourse} from '@/hooks/useApi';
 import {useLocalize} from '@/hooks/useLocalize';
 import {sisuLanguageOptions} from '@/utils';
@@ -186,17 +185,12 @@ const SisuDownloadDialog = ({
           label={t('course.results.override-date')}
         />
         <Collapse in={dateOverride}>
-          <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-            adapterLocale="en-gb"
-          >
-            <DatePicker
-              sx={{mt: 2}}
-              label={t('course.results.assessment-date')}
-              value={assessmentDate}
-              onChange={newDate => newDate && setAssessmentDate(newDate)}
-            />
-          </LocalizationProvider>
+          <LocalizedDatePicker
+            sx={{mt: 2}}
+            label={t('course.results.assessment-date')}
+            value={assessmentDate}
+            onChange={newDate => newDate && setAssessmentDate(newDate)}
+          />
         </Collapse>
         {exportedValuesInList && (
           <Box sx={{my: 2}}>
