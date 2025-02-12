@@ -8,6 +8,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Alert,
+  Box,
   Button,
   ButtonGroup,
   Collapse,
@@ -16,6 +17,7 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  Typography,
 } from '@mui/material';
 import {
   type GridColDef,
@@ -25,25 +27,59 @@ import {
   GridToolbarContainer,
   type GridValidRowModel,
 } from '@mui/x-data-grid';
+import * as fs from 'fs';
 import {enqueueSnackbar} from 'notistack';
 import {type ParseResult, parse, unparse} from 'papaparse';
 import {type Dispatch, type JSX, type SetStateAction, useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {read, set_fs, utils, writeFile} from 'xlsx';
 
 import type {CoursePartData} from '@/common/types';
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import MismatchDialog, {type MismatchData} from './MismatchDialog';
 import type {GradeUploadColTypes} from './UploadDialog';
 
+// Set internal fs instance for xlsx
+set_fs(fs);
+
 // Wrap parse into an async function to be able to await
-type CSVData = ParseResult<string[]>;
-const parseCsv = async (csvData: string | File): Promise<CSVData> =>
+type ParsedImportData = Omit<ParseResult<string[]>, 'meta'>;
+
+const parseCsv = async (csvData: string | File): Promise<ParsedImportData> =>
   new Promise(resolve => {
     parse(csvData, {
       skipEmptyLines: true,
       complete: resolve,
     });
   });
+
+// TODO
+const parseExcel = async (loadedData: File): Promise<ParsedImportData> => {
+  const data = await loadedData.arrayBuffer();
+  const workbook = read(data);
+
+  const parsed: ParsedImportData = {
+    data: [],
+    errors: [],
+  };
+
+  workbook.SheetNames.forEach(sheetName => {
+    const workbookJson = utils.sheet_to_json(workbook.Sheets[sheetName]);
+    const firstRow = workbookJson[0];
+
+    if (typeof firstRow === 'object' && firstRow !== null) {
+      const keysArray: string[] = Object.keys(firstRow);
+      console.log(keysArray); // Logs column headers as string[]
+    }
+
+    console.log(firstRow);
+    // const xxx = Object.keys(firstRow);
+
+    // console.log(sheetName);
+  });
+
+  return parsed;
+};
 
 type PropsType = {
   coursePart: CoursePartData | null;
@@ -56,6 +92,7 @@ type PropsType = {
   setExpanded: Dispatch<SetStateAction<'' | 'upload' | 'edit'>>;
   invalidValues: boolean;
 };
+
 const UploadDialogUpload = ({
   coursePart,
   columns,
@@ -97,30 +134,38 @@ const UploadDialogUpload = ({
     );
   };
 
-  const downloadTemplate = (): void => {
+  const downloadTemplate = (type: 'csv' | 'excel'): void => {
     const data = unparse([
       columns.filter(col => col.field !== 'actions').map(col => col.field),
     ]);
-    const fileBlob = new Blob([data], {type: 'text/csv'});
 
-    const linkElement = document.createElement('a');
-    linkElement.href = URL.createObjectURL(fileBlob);
-    linkElement.download = 'template.csv';
-    document.body.append(linkElement);
-    linkElement.click();
-    linkElement.remove();
+    if (type === 'excel') {
+      const ws = utils.aoa_to_sheet([data.split(',')]);
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, ws, 'Sheet1');
+      writeFile(wb, 'template.xlsx');
+    } else {
+      const fileBlob = new Blob([data], {type: 'text/csv'});
+
+      const linkElement = document.createElement('a');
+      linkElement.href = URL.createObjectURL(fileBlob);
+      linkElement.download = 'template.csv';
+      document.body.append(linkElement);
+      linkElement.click();
+      linkElement.remove();
+    }
   };
 
-  /** Read data using csv key to course part keyMap */
-  const readCSVData = (
-    csvRows: string[][],
-    csvKeys: string[],
+  /** Read data using uploaded data key to course part keyMap */
+  const readData = (
+    dataRows: string[][],
+    columnKeys: string[],
     keyMap: {[key: string]: string}
   ): GridRowModel<GradeUploadColTypes>[] => {
     const newRows = [];
     let missingData = false;
-    for (let rowI = 0; rowI < csvRows.length; rowI++) {
-      const csvRow = csvRows[rowI];
+    for (let rowI = 0; rowI < dataRows.length; rowI++) {
+      const csvRow = dataRows[rowI];
       // Skip first row (titles) & empty rows
       if (rowI === 0 || csvRow.length === 0) continue;
 
@@ -129,7 +174,7 @@ const UploadDialogUpload = ({
         const value = csvRow[i].trim();
 
         // Check column type
-        const columnKey = keyMap[csvKeys[i]];
+        const columnKey = keyMap[columnKeys[i]];
         if (columnKey === 'ignoreColumn') continue;
         if (columnKey === 'studentNo') {
           rowData.studentNo = value;
@@ -155,40 +200,55 @@ const UploadDialogUpload = ({
     return newRows;
   };
 
-  const loadCsv = async (csvData: string | File): Promise<void> => {
-    const csvRows = await parseCsv(csvData);
-    const csvKeys = csvRows.data[0].map(value => value.toString());
+  const loadFile = async (loadedData: string | File): Promise<void> => {
+    let dataRows: ParsedImportData | null = null;
+
+    if (typeof loadedData !== 'string') {
+      const fileName = loadedData.name;
+      const fileExtension = fileName.split('.').pop()?.toLowerCase();
+
+      if (fileExtension && ['xls', 'xlsx'].includes(fileExtension)) {
+        dataRows = await parseExcel(loadedData);
+      }
+    }
+
+    if (dataRows === null) {
+      dataRows = await parseCsv(loadedData);
+    }
+
+    const columnKeys = dataRows.data[0].map(value => value.toString());
     const courseTasks = columns
       .filter(col => col.field !== 'actions')
       .map(col => col.field);
 
-    // Try to match the csv columns with course task names
+    // Try to match the loaded data columns with course task names
     let mismatches = false;
     let studentNoFound = false;
-    const csvKeyMap: {[key: string]: string} = {};
-    for (const key of csvKeys) {
+    const keyMaps: {[key: string]: string} = {};
+
+    for (const key of columnKeys) {
       if (key.toLowerCase() === 'studentno') studentNoFound = true;
       const matchingField = courseTasks.find(
         task => task.toLowerCase() === key.toLowerCase()
       );
       if (matchingField === undefined) mismatches = true;
-      else csvKeyMap[key] = matchingField;
+      else keyMaps[key] = matchingField;
     }
 
     if (mismatches || !studentNoFound) {
       setMismatchDialogOpen(true);
       setMismatchData({
-        csvKeys,
+        columnKeys,
         courseTasks,
         onImport: keyMap => {
           setMismatchDialogOpen(false);
-          setRows(readCSVData(csvRows.data, csvKeys, keyMap));
+          setRows(readData(dataRows.data, columnKeys, keyMap));
           setEditText(true);
           setExpanded('edit');
         },
       });
     } else {
-      setRows(readCSVData(csvRows.data, csvKeys, csvKeyMap));
+      setRows(readData(dataRows.data, columnKeys, keyMaps));
       setEditText(true);
       setExpanded('edit');
     }
@@ -245,7 +305,7 @@ const UploadDialogUpload = ({
             variant="contained"
             onClick={() => {
               setTextFieldOpen(false);
-              loadCsv(textFieldText);
+              loadFile(textFieldText);
             }}
           >
             {t('general.import')}
@@ -257,7 +317,7 @@ const UploadDialogUpload = ({
         open={mismatchDialogOpen}
         onClose={() => setMismatchDialogOpen(false)}
         mismatchData={
-          mismatchData ?? {csvKeys: [], courseTasks: [], onImport: () => {}}
+          mismatchData ?? {columnKeys: [], courseTasks: [], onImport: () => {}}
         }
       />
 
@@ -277,25 +337,52 @@ const UploadDialogUpload = ({
             {t('course.results.upload.upload-grades')}
           </AccordionSummary>
           <AccordionDetails>
-            <ButtonGroup>
-              <Button component="label" variant="outlined">
-                {t('course.results.upload.upload-csv')}
-                <input
-                  type="file"
-                  accept=".csv"
-                  hidden
-                  onChange={e => {
-                    if (e.target.files !== null) loadCsv(e.target.files[0]);
-                  }}
-                />
-              </Button>
-              <Button variant="outlined" onClick={downloadTemplate}>
-                {t('course.results.upload.download-template')}
-              </Button>
-              <Button variant="outlined" onClick={() => setTextFieldOpen(true)}>
-                {t('course.results.upload.paste-text')}
-              </Button>
-            </ButtonGroup>
+            <Box sx={{display: 'flex', gap: 3}}>
+              <Box>
+                <Typography variant="body1">
+                  {t('course.results.upload.upload-button-group-title')}
+                </Typography>
+                <ButtonGroup>
+                  <Button component="label" variant="outlined">
+                    {t('course.results.upload.upload-file')}
+                    <input
+                      type="file"
+                      accept=".csv,.xlsx"
+                      hidden
+                      onChange={e => {
+                        if (e.target.files !== null)
+                          loadFile(e.target.files[0]);
+                      }}
+                    />
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setTextFieldOpen(true)}
+                  >
+                    {t('course.results.upload.paste-text')}
+                  </Button>
+                </ButtonGroup>
+              </Box>
+              <Box>
+                <Typography variant="body1">
+                  {t('course.results.upload.download-button-group-title')}
+                </Typography>
+                <ButtonGroup>
+                  <Button
+                    variant="outlined"
+                    onClick={() => downloadTemplate('csv')}
+                  >
+                    {t('course.results.upload.download-csv-template')}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => downloadTemplate('excel')}
+                  >
+                    {t('course.results.upload.download-excel-template')}
+                  </Button>
+                </ButtonGroup>
+              </Box>
+            </Box>
           </AccordionDetails>
         </Accordion>
         <Accordion
