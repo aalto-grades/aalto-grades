@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {expect, test} from '@playwright/test';
+import path from 'path';
 
 import {setupDb} from './helper';
 
@@ -26,7 +27,7 @@ test.describe('Test courses as teacher', () => {
     await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
   });
 
-  test('Download grades csv template', async ({page}) => {
+  test('Download grades CSV template', async ({page}) => {
     const downloadPromise = page.waitForEvent('download');
     await page.getByRole('button', {name: 'Add grades manually'}).click();
     await page.getByRole('button', {name: 'Exercises 2024'}).click();
@@ -39,9 +40,46 @@ test.describe('Test courses as teacher', () => {
     const downloadPromise = page.waitForEvent('download');
     await page.getByRole('button', {name: 'Add grades manually'}).click();
     await page.getByRole('button', {name: 'Exercises 2024'}).click();
-    await page.getByText('Download Excel template').click();
+    await page.getByRole('button', {name: 'Download Excel template'}).click();
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toBe('template.xlsx');
+  });
+
+  test('Import grades using CSV file', async ({page}) => {
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await page.getByRole('button', {name: 'Add grades manually'}).click();
+    await page.getByRole('button', {name: 'Exercises 2024'}).click();
+    await page.getByRole('button', {name: 'Upload CSV or Excel file'}).click();
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(path.join(__dirname, './files/grades.csv'));
+    // Check that student number from grades example CSV is loaded to the edit table
+    await expect(page.getByRole('row', {name: '993456'})).toBeVisible();
+  });
+
+  test('Import grades using Excel file', async ({page}) => {
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await page.getByRole('button', {name: 'Add grades manually'}).click();
+    await page.getByRole('button', {name: 'Exercises 2024'}).click();
+    await page.getByRole('button', {name: 'Upload CSV or Excel file'}).click();
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(path.join(__dirname, './files/grades.xlsx'));
+    // Check that student number from grades example Excel file is loaded to the edit table
+    await expect(page.getByRole('row', {name: '487258'})).toBeVisible();
+  });
+
+  test('Import grades by pasting text', async ({page}) => {
+    const input = `studentNo,Tier A,Tier B,Tier C
+      177756,1,1,1
+      423896,1,1,1
+      643456,1,1,1`;
+
+    await page.getByRole('button', {name: 'Add grades manually'}).click();
+    await page.getByRole('button', {name: 'Exercises 2024'}).click();
+    await page.getByRole('button', {name: 'Paste text'}).click();
+    await page.getByPlaceholder('Input raw text here').fill(input);
+    await page.getByRole('button', {name: 'Import'}).click();
+    // Check that student number from pasted text is loaded to the edit table
+    await expect(page.getByRole('row', {name: '423896'})).toBeVisible();
   });
 
   test('View grading model', async ({page}) => {
