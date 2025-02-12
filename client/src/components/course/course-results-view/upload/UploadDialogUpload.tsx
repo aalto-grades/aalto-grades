@@ -42,9 +42,9 @@ import type {GradeUploadColTypes} from './UploadDialog';
 // Set internal fs instance for xlsx
 set_fs(fs);
 
-// Wrap parse into an async function to be able to await
-type ParsedImportData = Omit<ParseResult<string[]>, 'meta'>;
+type ParsedImportData = ParseResult<string[]>;
 
+// Wrap parse into an async function to be able to await
 const parseCsv = async (csvData: string | File): Promise<ParsedImportData> =>
   new Promise(resolve => {
     parse(csvData, {
@@ -53,31 +53,14 @@ const parseCsv = async (csvData: string | File): Promise<ParsedImportData> =>
     });
   });
 
-// TODO
 const parseExcel = async (loadedData: File): Promise<ParsedImportData> => {
   const data = await loadedData.arrayBuffer();
   const workbook = read(data);
-
-  const parsed: ParsedImportData = {
-    data: [],
-    errors: [],
-  };
-
-  workbook.SheetNames.forEach(sheetName => {
-    const workbookJson = utils.sheet_to_json(workbook.Sheets[sheetName]);
-    const firstRow = workbookJson[0];
-
-    if (typeof firstRow === 'object' && firstRow !== null) {
-      const keysArray: string[] = Object.keys(firstRow);
-      console.log(keysArray); // Logs column headers as string[]
-    }
-
-    console.log(firstRow);
-    // const xxx = Object.keys(firstRow);
-
-    // console.log(sheetName);
+  // Processes only the first sheet, should we loop all sheets to the final result?
+  const csv = utils.sheet_to_csv(workbook.Sheets[workbook.SheetNames[0]], {
+    FS: ',',
   });
-
+  const parsed = parseCsv(csv);
   return parsed;
 };
 
@@ -334,7 +317,9 @@ const UploadDialogUpload = ({
           }
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            {t('course.results.upload.upload-grades')}
+            <Typography variant="h6">
+              {t('course.results.upload.upload-grades')}
+            </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Box sx={{display: 'flex', gap: 3}}>
@@ -390,9 +375,11 @@ const UploadDialogUpload = ({
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'edit' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            {editText
-              ? t('general.edit')
-              : t('course.results.upload.add-manually')}
+            <Typography variant="h6">
+              {editText
+                ? t('general.edit')
+                : t('course.results.upload.add-manually')}
+            </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <div style={{height: '40vh'}}>
