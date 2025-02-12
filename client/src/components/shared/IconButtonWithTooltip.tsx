@@ -15,7 +15,7 @@ type PropsType = {
  * To control the "hovering area" where this component becomes visible, set the
  * parent element's className to "hoverable-container".
  */
-const IconButtonWithTip = ({
+const IconButtonWithTooltip = ({
   title,
   children,
   onClick,
@@ -38,4 +38,4 @@ const IconButtonWithTip = ({
   </Tooltip>
 );
 
-export default IconButtonWithTip;
+export default IconButtonWithTooltip;

@@ -9,9 +9,9 @@ import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import type {FinalGradeData, GradingScale} from '@/common/types';
+import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
 import {findBestFinalGrade, getGradeString} from '@/utils';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
-import IconButtonWithTip from './IconButtonWithTip';
 
 type PropsType = {
   userId: number;

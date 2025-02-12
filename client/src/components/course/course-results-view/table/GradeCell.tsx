@@ -14,10 +14,10 @@ import {type JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import type {CourseTaskGradesData, StudentData} from '@/common/types';
+import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
 import {useTableContext} from '@/context/useTableContext';
 import {findBestGrade, gradeIsExpired} from '@/utils';
 import EditGradesDialog from './EditGradesDialog';
-import IconButtonWithTip from './IconButtonWithTip';
 
 export type GradeCellSourceValue =
   | {

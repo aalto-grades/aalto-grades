@@ -9,10 +9,10 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import type {GradingScale} from '@/common/types';
+import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useGetAllGradingModels} from '@/hooks/useApi';
 import {getGradeString} from '@/utils';
-import IconButtonWithTip from './IconButtonWithTip';
 
 // If gradingScale is null then value is defined.
 type PropsType = {
