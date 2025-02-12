@@ -353,6 +353,7 @@
         "missing-grades": "Joiltakin opiskelijoilta puuttuu arvosanoja",
         "upload-grades-to-part": "Lataa arvosanat kurssin osaan {{part}}",
         "paste-text": "Liitä tekstinä",
+        "paste-text-placeholder": "Syötä teksti tähän kenttään",
         "upload-grades": "Lataa arvosanat",
         "upload-button-group-title": "Lisää arvasana data",
         "upload-file": "Lataa CSV- tai Excel-tiedosto",

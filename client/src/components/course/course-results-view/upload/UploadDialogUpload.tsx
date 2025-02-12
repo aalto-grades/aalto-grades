@@ -268,6 +268,7 @@ const UploadDialogUpload = ({
         <DialogTitle>{t('course.results.upload.paste-text')}</DialogTitle>
         <DialogContent>
           <TextField
+            placeholder={t('course.results.upload.paste-text-placeholder')}
             multiline
             minRows={15}
             fullWidth

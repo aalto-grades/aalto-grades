@@ -353,6 +353,7 @@
         "missing-grades": "Some students have missing grades",
         "upload-grades-to-part": "Upload grades to course part {{part}}",
         "paste-text": "Paste text",
+        "paste-text-placeholder": "Input raw text here",
         "upload-grades": "Upload grades",
         "upload-button-group-title": "Upload grades",
         "upload-file": "Upload CSV or Excel file",
