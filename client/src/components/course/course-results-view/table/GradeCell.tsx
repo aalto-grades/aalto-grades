@@ -8,12 +8,13 @@ import {
   MoreVert,
   WarningAmberOutlined,
 } from '@mui/icons-material';
-import {Box, IconButton, Tooltip, Typography, useTheme} from '@mui/material';
+import {Box, Tooltip, Typography, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import {type JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import type {CourseTaskGradesData, StudentData} from '@/common/types';
+import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
 import {useTableContext} from '@/context/useTableContext';
 import {findBestGrade, gradeIsExpired} from '@/utils';
 import EditGradesDialog from './EditGradesDialog';
@@ -36,7 +37,6 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
   const {gradeSelectOption} = useTableContext();
   const theme = useTheme();
 
-  const [hover, setHover] = useState<boolean>(false);
   const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
 
   const hasInvalidGrade = useMemo(() => {
@@ -62,8 +62,7 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
 
   return (
     <Box
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      className="hoverable-container"
       sx={{
         position: 'relative',
         minWidth: '100px',
@@ -93,28 +92,16 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
       {/* Course task specific elements */}
       {sourceValue.type === 'courseTask' && (
         <>
-          {hover && (
-            <Tooltip
-              placement="top"
-              title={
-                sourceValue.task.grades.length <= 1
-                  ? t('course.results.edit-grade')
-                  : t('course.results.multiple-grade')
-              }
-            >
-              <IconButton
-                color="primary"
-                sx={{
-                  position: 'absolute',
-                  right: '0px',
-                  top: 'calc(50% - 20px)',
-                }}
-                onClick={() => setGradeDialogOpen(true)}
-              >
-                <MoreVert />
-              </IconButton>
-            </Tooltip>
-          )}
+          <IconButtonWithTip
+            onClick={() => setGradeDialogOpen(true)}
+            title={
+              sourceValue.task.grades.length <= 1
+                ? t('course.results.edit-grade')
+                : t('course.results.multiple-grade')
+            }
+          >
+            <MoreVert />
+          </IconButtonWithTip>
           {gradeDialogOpen && (
             <EditGradesDialog
               open={gradeDialogOpen}
@@ -189,12 +176,6 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
             )}
 
           {bestGrade?.date && (
-            // The tooltip has poor performance.
-            // <Tooltip
-            //   placement="top"
-            //   title={`Grade obtained on ${bestGrade.date.toString()}`}
-            //   disableInteractive
-            // >
             <Typography
               sx={{
                 position: 'absolute',
@@ -204,14 +185,10 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
                 textAlign: 'right',
                 fontSize: '0.7rem',
                 color: `rgba(${theme.vars.palette.primary.mainChannel} / 0.7)`,
-                // '&:hover': {
-                //   color: `rgba(${theme.vars.palette.primary.mainChannel} / 1)`,
-                // },
               }}
             >
               {bestGrade.date.toLocaleDateString()}
             </Typography>
-            // </Tooltip>
           )}
 
           {sourceValue.task.grades.length > 0 && bestGrade === null && (
