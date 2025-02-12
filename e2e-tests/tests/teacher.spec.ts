@@ -12,6 +12,7 @@ test.beforeAll(async () => {
 
 test.beforeEach(async ({page}) => {
   await page.goto('/');
+  await page.getByRole('cell', {name: 'O1'}).click();
 });
 
 test.afterEach(async ({page}) => {
@@ -22,20 +23,34 @@ test.afterEach(async ({page}) => {
 test.use({storageState: 'playwright/.auth/teacher.json'});
 test.describe('Test courses as teacher', () => {
   test('Check course', async ({page}) => {
-    await page.getByRole('cell', {name: 'O1'}).click();
     await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
   });
 
-  test('View grading model', async ({page}) => {
-    await page.getByRole('cell', {name: 'O1'}).click();
-    await page.getByRole('button', {name: 'Grading models'}).click();
+  test('Download grades csv template', async ({page}) => {
+    const downloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', {name: 'Add grades manually'}).click();
+    await page.getByRole('button', {name: 'Exercises 2024'}).click();
+    await page.getByText('Download CSV template').click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toBe('template.csv');
+  });
 
+  test('Download grades excel template', async ({page}) => {
+    const downloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', {name: 'Add grades manually'}).click();
+    await page.getByRole('button', {name: 'Exercises 2024'}).click();
+    await page.getByText('Download Excel template').click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toBe('template.xlsx');
+  });
+
+  test('View grading model', async ({page}) => {
+    await page.getByRole('button', {name: 'Grading models'}).click();
     await page.getByRole('button', {name: 'Exercises 2024'}).click();
     await expect(page.getByTestId('rf__wrapper')).toBeVisible();
   });
 
   test('Create grading model', async ({page}) => {
-    await page.getByRole('cell', {name: 'O1'}).click();
     await page.getByRole('button', {name: 'Grading models'}).click();
     await page.getByLabel('Create new final grade model').click();
     await page.getByLabel('Name *').click();
@@ -58,7 +73,6 @@ test.describe('Test courses as teacher', () => {
   });
 
   test('View Course Parts', async ({page}) => {
-    await page.getByRole('cell', {name: 'O1'}).click();
     await page
       .getByRole('link', {name: 'Course parts'})
       .getByRole('button')
@@ -68,7 +82,6 @@ test.describe('Test courses as teacher', () => {
   });
 
   test('Add Course Part', async ({page}) => {
-    await page.getByRole('cell', {name: 'O1'}).click();
     await page
       .getByRole('link', {name: 'Course parts'})
       .getByRole('button')
