@@ -354,8 +354,11 @@
         "upload-grades-to-part": "Upload grades to course part {{part}}",
         "paste-text": "Paste text",
         "upload-grades": "Upload grades",
-        "upload-csv": "Upload CSV",
-        "download-template": "Download CSV template",
+        "upload-button-group-title": "Upload grades",
+        "upload-file": "Upload CSV or Excel file",
+        "download-button-group-title": "Grading templates",
+        "download-csv-template": "Download CSV template",
+        "download-excel-template": "Download Excel template",
         "add-manually": "Or add them manually",
         "student-number-empty": "Student number cannot be empty"
       },
