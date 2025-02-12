@@ -30,6 +30,14 @@ if (rootElement) {
   code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
       monospace;
+  }
+
+  .hoverable-icon {
+    visibility: hidden;
+  }
+
+  .hoverable-container:hover .hoverable-icon {
+    visibility: visible;
   }`;
 
   const root = createRoot(rootElement);
