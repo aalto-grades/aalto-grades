@@ -34,6 +34,8 @@
       },
       "token-general": {
         "current": "UNTRANSLATED",
+        "hide-token-tip": "UNTRANSLATED",
+        "show-token-tip": "UNTRANSLATED",
         "label": "UNTRANSLATED",
         "invalid": "UNTRANSLATED",
         "length": "UNTRANSLATED"

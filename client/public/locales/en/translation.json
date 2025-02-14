@@ -34,6 +34,8 @@
       },
       "token-general": {
         "current": "Your current token",
+        "hide-token-tip": "Hide token",
+        "show-token-tip": "Show full token",
         "label": "API token",
         "invalid": "The token you have entered is invalid, please make sure your token is correct.",
         "length": "The token should be {{length}} characters long."

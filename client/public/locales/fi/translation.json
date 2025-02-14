@@ -34,6 +34,8 @@
       },
       "token-general": {
         "current": "Nykyinen käyttöoikeustietueesi",
+        "hide-token-tip": "Piilota käyttöoikeustietue",
+        "show-token-tip": "Näytä koko käyttöoikeustietue",
         "label": "API-käyttöoikeustietue",
         "invalid": "Syöttämäsi käyttöoikeustietue on virheellinen, varmista että käyttöoikeustietue on oikein.",
         "length": "Käyttöoikeustietueen tulisi olla {{length}} merkkiä pitkä."
