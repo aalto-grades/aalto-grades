@@ -24,15 +24,20 @@
       "reset-mfa": "UNTRANSLATED",
       "log-out": "UNTRANSLATED",
       "enter-totp": "UNTRANSLATED",
+      "hide-password": "UNTRANSLATED",
+      "show-password": "UNTRANSLATED",
       "a+-token": {
-        "body": "UNTRANSLATED",
+        "body": "UNTRANSLATED"
+      },
+      "sisu-token": {
+        "body": "UNTRANSLATED"
+      },
+      "token-general": {
         "current": "UNTRANSLATED",
         "label": "UNTRANSLATED",
         "invalid": "UNTRANSLATED",
         "length": "UNTRANSLATED"
       },
-      "hide-password": "UNTRANSLATED",
-      "show-password": "UNTRANSLATED",
       "token-expired": "UNTRANSLATED"
     },
     "graph": {
@@ -116,6 +121,7 @@
   "language": "Svenska (sv)",
   "general": {
     "a+-api-token": "UNTRANSLATED",
+    "sisu-api-token": "UNTRANSLATED",
     "a+-courses": "UNTRANSLATED",
     "next": "UNTRANSLATED",
     "back": "UNTRANSLATED",

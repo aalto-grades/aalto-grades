@@ -24,15 +24,20 @@
       "reset-mfa": "Nollaa MFA",
       "log-out": "Kirjaudu ulos",
       "enter-totp": "Syötä TOTP-koodi",
+      "hide-password": "Klikkaa piilottaaksesi salasanan",
+      "show-password": "Klikkaa näyttääksesi salasanan",
       "a+-token": {
-        "body": "Löydät API-käyttöoikeustietueesi kirjautumalla A+:aan ja siirtymällä sivulle",
+        "body": "Löydät API-käyttöoikeustietueesi kirjautumalla A+:aan ja siirtymällä sivulle"
+      },
+      "sisu-token": {
+        "body": "Voit generoida API-käyttöoikeustietueesi kirjautumalla Aalto API Gateway-sivustolle ja siirtymällä sivulle"
+      },
+      "token-general": {
         "current": "Nykyinen käyttöoikeustietueesi",
         "label": "API-käyttöoikeustietue",
         "invalid": "Syöttämäsi käyttöoikeustietue on virheellinen, varmista että käyttöoikeustietue on oikein.",
-        "length": "Käyttöoikeustietueen tulisi olla 40 merkkiä pitkä."
+        "length": "Käyttöoikeustietueen tulisi olla {{length}} merkkiä pitkä."
       },
-      "hide-password": "Klikkaa piilottaaksesi salasanan",
-      "show-password": "Klikkaa näyttääksesi salasanan",
       "token-expired": "Käyttöoikeustietue on vanhentunut. Päivitä sivu."
     },
     "graph": {
@@ -116,6 +121,7 @@
   "language": "Suomi (fi)",
   "general": {
     "a+-api-token": "A+ API-käyttöoikeustietue",
+    "sisu-api-token": "Sisu API-käyttöoikeustietue",
     "a+-courses": "A+ kurssit",
     "next": "Seuraava",
     "back": "Takaisin",

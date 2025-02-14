@@ -24,15 +24,20 @@
       "reset-mfa": "Reset MFA",
       "log-out": "Log out",
       "enter-totp": "Enter TOTP code",
+      "hide-password": "Click to hide password from view",
+      "show-password": "Click to show password",
       "a+-token": {
-        "body": "You can find your API token by logging in to A+ and navigating to",
+        "body": "You can find your API token by logging in to A+ and navigating to"
+      },
+      "sisu-token": {
+        "body": "You can generate your API token by logging in to Aalto API Gateway and navigating to"
+      },
+      "token-general": {
         "current": "Your current token",
         "label": "API token",
         "invalid": "The token you have entered is invalid, please make sure your token is correct.",
-        "length": "The token should be 40 characters long."
+        "length": "The token should be {{length}} characters long."
       },
-      "hide-password": "Click to hide password from view",
-      "show-password": "Click to show password",
       "token-expired": "Token expired. Refresh the page."
     },
     "graph": {
@@ -116,6 +121,7 @@
   "language": "English (en)",
   "general": {
     "a+-api-token": "A+ API token",
+    "sisu-api-token": "Sisu API token",
     "a+-courses": "A+ courses",
     "next": "Next",
     "back": "Back",
