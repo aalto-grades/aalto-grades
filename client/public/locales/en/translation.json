@@ -160,6 +160,7 @@
     "final-grade": "Final grade",
     "results": {
       "history": {
+        "title": "History",
         "action-type": "Action type",
         "action-date": "Date",
         "author": "Author"

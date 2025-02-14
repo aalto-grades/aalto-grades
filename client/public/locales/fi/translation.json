@@ -160,6 +160,7 @@
     "final-grade": "Lopullinen arvosana",
     "results": {
       "history": {
+        "title": "Historia",
         "action-type": "Toiminnon tyyppi",
         "action-date": "Päivämäärä",
         "author": "Tekijä"
