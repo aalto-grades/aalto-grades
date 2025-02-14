@@ -18,9 +18,9 @@ import type {
   AplusGradeSourceData,
   NewAplusGradeSourceData,
 } from '@/common/types';
-import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
+import TokenDialog from '@/components/shared/auth/TokenDialog';
 import {useAddAplusGradeSources, useFetchAplusCourses} from '@/hooks/useApi';
-import {getAplusToken} from '@/utils';
+import {getToken} from '@/utils';
 import SelectAplusCourse from './aplus-components/SelectAplusCourse';
 import SelectAplusGradeSource from './aplus-components/SelectAplusGradeSource';
 
@@ -38,7 +38,7 @@ const AddAplusGradeSourceDialog = ({
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const aplusCourses = useFetchAplusCourses({
-    enabled: Boolean(getAplusToken()),
+    enabled: Boolean(getToken('a+')),
   });
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
@@ -50,7 +50,7 @@ const AddAplusGradeSourceDialog = ({
   const open = courseTaskId !== null;
 
   useEffect(() => {
-    setAplusTokenDialogOpen(!getAplusToken() || aplusCourses.isError);
+    setAplusTokenDialogOpen(!getToken('a+') || aplusCourses.isError);
   }, [open, aplusCourses]);
 
   const handleResetAndClose = (): void => {
@@ -61,13 +61,14 @@ const AddAplusGradeSourceDialog = ({
 
   return (
     <>
-      <AplusTokenDialog
+      <TokenDialog
         open={aplusTokenDialogOpen && open}
         onClose={onClose}
         onSubmit={() => {
           setAplusTokenDialogOpen(false);
           aplusCourses.refetch();
         }}
+        tokenType="a+"
         error={aplusCourses.isError}
       />
       <Dialog

@@ -52,6 +52,7 @@ const TokenDialog = ({
   const [showFullToken, setShowFullToken] = useState<boolean>(false);
 
   const {length, link} = useMemo(() => TOKEN_DETAILS[tokenType], [tokenType]);
+
   const isError =
     error || (tokenInput.length > 0 && tokenInput.length !== length);
 

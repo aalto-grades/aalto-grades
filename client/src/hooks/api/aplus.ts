@@ -23,11 +23,11 @@ import {
   NewTaskGradeArraySchema,
 } from '@/common/types';
 import type {Numeric} from '@/types';
-import {getAplusToken} from '@/utils';
+import {getToken} from '@/utils';
 import axios from './axios';
 
 const getHeaders = (): AxiosRequestConfig => ({
-  headers: {Authorization: `Aplus-Token ${getAplusToken()}`},
+  headers: {Authorization: `Aplus-Token ${getToken('a+')}`},
 });
 
 export const useFetchAplusCourses = (
