@@ -1,0 +1,73 @@
+// SPDX-FileCopyrightText: 2025 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
+import {z} from 'zod';
+
+import {LocalizedStringSchema} from './general';
+
+const CourseUnitSchema = z.object({
+  courseUnitGroupId: z.string(),
+  credits: z.union([z.string(), z.number(), z.null()]),
+});
+
+const OrganizationSchema = z.object({
+  organisationId: z.string(),
+  educationalInstitutionUrn: z.union([z.string(), z.null()]),
+  roleUrn: z.string(),
+  share: z.number(),
+});
+
+const StudySubGroupSchema = z.object({
+  id: z.string(),
+  name: LocalizedStringSchema,
+  type: LocalizedStringSchema,
+});
+
+export const SisuCourseInstanceSchema = z.strictObject({
+  id: z.string(),
+  code: z.string(),
+  startDate: z.string(),
+  endDate: z.string(),
+  type: z.string(),
+  name: LocalizedStringSchema,
+  summary: z.object({
+    workload: LocalizedStringSchema,
+    prerequisites: LocalizedStringSchema,
+    learningOutcomes: LocalizedStringSchema,
+    literature: z.union([LocalizedStringSchema, z.null()]),
+    languageOfInstruction: LocalizedStringSchema,
+    registration: LocalizedStringSchema,
+    content: LocalizedStringSchema,
+    cefrLevel: z.string(),
+    level: LocalizedStringSchema,
+    teacherInCharge: z.array(z.string()),
+    assesmentMethods: LocalizedStringSchema,
+    substitutes: z.strictObject({
+      ...LocalizedStringSchema.shape,
+      courseUnits: z.array(z.array(CourseUnitSchema)),
+    }),
+    additionalInformation: LocalizedStringSchema,
+    gradingScale: LocalizedStringSchema,
+    teachingPeriod: LocalizedStringSchema,
+  }),
+  organizations: z.array(OrganizationSchema),
+  organizationId: z.string(),
+  organizationName: LocalizedStringSchema,
+  credits: z.object({
+    min: z.number(),
+    max: z.number(),
+  }),
+  courseUnitId: z.string(),
+  languageOfInstructionCodes: z.array(z.string()),
+  teachers: z.array(z.string()),
+  enrolmentStartDate: z.string(),
+  enrolmentEndDate: z.string(),
+  mincredits: z.string(),
+  studySubGroups: z.array(StudySubGroupSchema),
+});
+
+export type CourseUnit = z.infer<typeof CourseUnitSchema>;
+export type Organization = z.infer<typeof OrganizationSchema>;
+export type StudySubGroup = z.infer<typeof StudySubGroupSchema>;
+export type SisuCourseInstance = z.infer<typeof SisuCourseInstanceSchema>;
