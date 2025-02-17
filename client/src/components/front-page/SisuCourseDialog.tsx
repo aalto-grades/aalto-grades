@@ -15,7 +15,7 @@ import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import type {SisuCourseInstance} from '@/common/types';
-import SisuCourseCard from './SisuCourseCardd';
+import SisuInstance from './SisuInstance';
 
 type PropsType = {
   open: boolean;
@@ -41,7 +41,7 @@ const SisuCourseDialog = ({
         <Divider sx={{mb: 2}} />
         <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
           {courses.map(course => (
-            <SisuCourseCard
+            <SisuInstance
               key={course.startDate + course.endDate}
               course={course}
               selectCourse={() => selectCourse(course)}

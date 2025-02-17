@@ -6,7 +6,7 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
-import type {JSX} from 'react';
+import {Fragment, type JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import type {
@@ -35,8 +35,9 @@ type PropsType = {
   selectCourse: () => void;
 };
 
-const SisuCourseCard = ({course, selectCourse}: PropsType): JSX.Element => {
+const SisuInstance = ({course, selectCourse}: PropsType): JSX.Element => {
   const {t, i18n} = useTranslation();
+  const localLang = i18n.language as keyof LocalizedString;
 
   const otherLanguages = ['fi', 'en', 'sv'].filter(
     lang => lang !== i18n.language
@@ -53,24 +54,24 @@ const SisuCourseCard = ({course, selectCourse}: PropsType): JSX.Element => {
       return 'unknown';
     }
 
-    return found.language[i18n.language as keyof LocalizedString];
+    return found.language[localLang];
   };
 
   return (
     <StyledCard>
       <CardContent>
         <Typography gutterBottom sx={{color: 'text.secondary', fontSize: 14}}>
-          {course.organizationName[i18n.language as keyof LocalizedString]}
+          {course.organizationName[localLang]}
         </Typography>
         <Typography variant="h5" component="div">
-          {course.name[i18n.language as keyof LocalizedString]}
+          {course.name[localLang]}
         </Typography>
         <Typography sx={{color: 'text.secondary', mb: 1.5}}>
           {otherLanguages.map(lang => (
-            <>
+            <Fragment key={lang}>
               {lang}: {course.name[lang as keyof LocalizedString]}
               <br />
-            </>
+            </Fragment>
           ))}
         </Typography>
         <Typography variant="body1">
@@ -87,11 +88,7 @@ const SisuCourseCard = ({course, selectCourse}: PropsType): JSX.Element => {
               {t('course.edit.language')}: {getCourseLanguage()}
               <br />
               {t('course.edit.grading-scale')}:{' '}
-              {
-                course.summary.gradingScale[
-                  i18n.language as keyof LocalizedString
-                ]
-              }
+              {course.summary.gradingScale[localLang]}
             </Box>
             <Divider orientation="vertical" flexItem />
             <Box>
@@ -119,4 +116,4 @@ const SisuCourseCard = ({course, selectCourse}: PropsType): JSX.Element => {
   );
 };
 
-export default SisuCourseCard;
+export default SisuInstance;
