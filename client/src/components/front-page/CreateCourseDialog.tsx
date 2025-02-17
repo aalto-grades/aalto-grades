@@ -8,6 +8,7 @@ import {
   PersonAddAlt1 as PersonAddAlt1Icon,
   Person as PersonIcon,
 } from '@mui/icons-material';
+import SearchIcon from '@mui/icons-material/Search';
 import {
   Alert,
   Avatar,
@@ -44,8 +45,8 @@ import {
   Language,
   LanguageSchema,
   type NewCourseData,
+  type SisuCourseInstance,
 } from '@/common/types';
-import SisuCourseDialog from '@/components/front-page/SisuCourseDialog';
 import FormField from '@/components/shared/FormikField';
 import FormLanguagesField from '@/components/shared/FormikLanguageField';
 import {useSearchSisuCourses} from '@/hooks/api/sisu';
@@ -58,6 +59,7 @@ import {
   departments,
   sisuLanguageOptions,
 } from '@/utils';
+import SisuCourseDialog from './SisuCourseDialog';
 
 type FormData = {
   courseCode: string;
@@ -111,6 +113,7 @@ const CreateCourseDialog = ({
   );
   const [assistants, setAssistants] = useState<AssistantData[]>([]);
   const [queryString, setQueryString] = useState<string>('');
+  const [showDialog, setShowDialog] = useState<boolean>(false);
 
   const {data, isLoading, isFetching} = useSearchSisuCourses(queryString, {
     enabled: queryString.length > 0,
@@ -223,13 +226,24 @@ const CreateCourseDialog = ({
   );
 
   const fetchSisu = (courseCode: string): void => {
+    setShowDialog(true);
     setQueryString(courseCode);
+  };
+
+  const selectCourse = (course: SisuCourseInstance): void => {
+    // Placeholder
+    console.log('selected', course.endDate);
   };
 
   return (
     <>
-      {data !== undefined && data.length > 1 && (
-        <SisuCourseDialog open onClose={() => console.log()} courses={data} />
+      {showDialog && data !== undefined && data.length > 1 && (
+        <SisuCourseDialog
+          open={showDialog}
+          onClose={() => setShowDialog(false)}
+          selectCourse={selectCourse}
+          courses={data}
+        />
       )}
       <Formik
         initialValues={initialValues}
@@ -241,7 +255,7 @@ const CreateCourseDialog = ({
             <DialogTitle>{t('front-page.create-course')}</DialogTitle>
             <DialogContent dividers>
               <Box sx={{display: 'flex', gap: 2}}>
-                <Box sx={{width: '50%'}}>
+                <Box sx={{width: '60%'}}>
                   <FormField
                     form={
                       form as unknown as FormikProps<{[key: string]: unknown}>
@@ -252,17 +266,30 @@ const CreateCourseDialog = ({
                     disabled={form.isSubmitting || isLoading || isFetching}
                   />
                 </Box>
-                <Box sx={{width: '50%', alignContent: 'center'}}>
-                  <Button
-                    onClick={() => fetchSisu(form.values.courseCode)}
-                    disabled={form.values.courseCode.length === 0}
-                    variant="outlined"
-                  >
-                    Fetch data from Sisu
-                  </Button>
-                  <Typography variant="body2">
-                    Try to find course data from Sisu based on course code
-                  </Typography>
+                <Box
+                  sx={{
+                    width: '40%',
+                    alignContent: 'center',
+                    mt: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <Box>
+                    <Button
+                      onClick={() => fetchSisu(form.values.courseCode)}
+                      disabled={form.values.courseCode.length === 0}
+                      variant="outlined"
+                      startIcon={<SearchIcon />}
+                    >
+                      {t('course.edit.sisu-search-button')}
+                    </Button>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption">
+                      {t('course.edit.sisu-search-button-helper')}
+                    </Typography>
+                  </Box>
                 </Box>
               </Box>
               <FormLanguagesField
