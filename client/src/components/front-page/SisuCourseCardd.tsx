@@ -1,0 +1,122 @@
+import {Divider, styled} from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Chip from '@mui/material/Chip';
+import Typography from '@mui/material/Typography';
+import type {JSX} from 'react';
+import {useTranslation} from 'react-i18next';
+
+import type {
+  Language,
+  LocalizedString,
+  SisuCourseInstance,
+} from '@/common/types';
+import {sisuLanguageOptions} from '@/utils';
+
+const StyledCard = styled(Card)(({theme}) => ({
+  height: '100%',
+  minHeight: '170px',
+  display: 'flex',
+  flexDirection: 'column',
+  '&:hover': {
+    boxShadow: `0 4px 8px ${
+      theme.palette.mode === 'dark'
+        ? 'rgba(137, 130, 130, 0.2)'
+        : 'rgba(0,0,0,0.2)'
+    }`,
+  },
+}));
+
+type PropsType = {
+  course: SisuCourseInstance;
+  selectCourse: () => void;
+};
+
+const SisuCourseCard = ({course, selectCourse}: PropsType): JSX.Element => {
+  const {t, i18n} = useTranslation();
+
+  const otherLanguages = ['fi', 'en', 'sv'].filter(
+    lang => lang !== i18n.language
+  );
+
+  const getCourseLanguage = (): string => {
+    const found = sisuLanguageOptions.find(
+      lang =>
+        lang.id ===
+        (course.languageOfInstructionCodes[0].toUpperCase() as Language)
+    );
+
+    if (!found) {
+      return 'unknown';
+    }
+
+    return found.language[i18n.language as keyof LocalizedString];
+  };
+
+  return (
+    <StyledCard>
+      <CardContent>
+        <Typography gutterBottom sx={{color: 'text.secondary', fontSize: 14}}>
+          {course.organizationName[i18n.language as keyof LocalizedString]}
+        </Typography>
+        <Typography variant="h5" component="div">
+          {course.name[i18n.language as keyof LocalizedString]}
+        </Typography>
+        <Typography sx={{color: 'text.secondary', mb: 1.5}}>
+          {otherLanguages.map(lang => (
+            <>
+              {lang}: {course.name[lang as keyof LocalizedString]}
+              <br />
+            </>
+          ))}
+        </Typography>
+        <Typography variant="body1">
+          <Box sx={{display: 'flex', gap: 2, my: 2}}>
+            <Box>{t('course.edit.teachers-in-charge')}:</Box>
+            <Box>
+              {course.teachers.map(teacher => (
+                <Chip sx={{mx: 1}} key={teacher} label={teacher} size="small" />
+              ))}
+            </Box>
+          </Box>
+          <Box sx={{display: 'flex', gap: 2}}>
+            <Box>
+              {t('course.edit.language')}: {getCourseLanguage()}
+              <br />
+              {t('course.edit.grading-scale')}:{' '}
+              {
+                course.summary.gradingScale[
+                  i18n.language as keyof LocalizedString
+                ]
+              }
+            </Box>
+            <Divider orientation="vertical" flexItem />
+            <Box>
+              {t('course.edit.start-date')}: {course.startDate}
+              <br />
+              {t('course.edit.end-date')}: {course.endDate}
+            </Box>
+            <Divider orientation="vertical" flexItem />
+            <Box>
+              {t('course.edit.min-credits')}: {course.credits.min}
+              <br />
+              {t('course.edit.max-credits')}: {course.credits.max}
+            </Box>
+          </Box>
+        </Typography>
+      </CardContent>
+      <CardActions>
+        <Box sx={{display: 'flex', marginLeft: 'auto'}}>
+          <Button onClick={selectCourse} variant="contained">
+            {t('general.select')}
+          </Button>
+        </Box>
+      </CardActions>
+    </StyledCard>
+  );
+};
+
+export default SisuCourseCard;
