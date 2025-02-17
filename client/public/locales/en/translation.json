@@ -374,6 +374,9 @@
       "data-undefined": "Data is undefined"
     },
     "edit": {
+      "sisu-search-title": "Multiple Sisu instances found for course code",
+      "sisu-search-button": "Search from Sisu",
+      "sisu-search-button-helper": "Try to find course data from Sisu based on course code",
       "saved": "Course details saved.",
       "course-code-required": "Course code is required (e.g. CS-A1111)",
       "min-credits-required": "Minimum credits is required",
@@ -384,6 +387,8 @@
       "name-swedish": "Please input a valid course name in Swedish",
       "max-below-min": "Maximum credits cannot be lower than minimum credits",
       "title": "Edit course",
+      "start-date": "Start date",
+      "end-date": "End date",
       "course-code-help": "Give code for the new course.",
       "course-name-in-format": "Course name %",
       "course-name-in-help-format": "Give the name of the course %",

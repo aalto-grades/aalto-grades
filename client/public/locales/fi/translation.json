@@ -374,6 +374,9 @@
       "data-undefined": "Tiedot eivät ole määritelty"
     },
     "edit": {
+      "sisu-search-title": "Useita kurssi instansseja löydetty kurssikoodilla",
+      "sisu-search-button": "Etsi Sisusta",
+      "sisu-search-button-helper": "Hae kurssin tiedot Sisusta kurssikoodin perusteella",
       "saved": "Kurssin tiedot tallennettu.",
       "course-code-required": "Kurssikoodi on pakollinen (esim. CS-A1111)",
       "min-credits-required": "Vähimmäisopintopisteet ovat pakollisia",
@@ -384,6 +387,8 @@
       "name-swedish": "Anna kurssin nimi ruotsiksi",
       "max-below-min": "Enimmäisopintopisteet eivät voi olla pienemmät kuin vähimmäisopintopisteet",
       "title": "Muokkaa kurssia",
+      "start-date": "Aloitus päivämäärä",
+      "end-date": "Lopetus päivämäärä",
       "course-code-help": "Anna uuden kurssin koodi.",
       "course-name-in-format": "Kurssin nimi %",
       "course-name-in-help-format": "Anna kurssin nimi %",

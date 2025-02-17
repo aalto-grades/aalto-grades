@@ -374,6 +374,9 @@
       "data-undefined": "UNTRANSLATED"
     },
     "edit": {
+      "sisu-search-title": "UNTRANSLATED",
+      "sisu-search-button": "UNTRANSLATED",
+      "sisu-search-button-helper": "UNTRANSLATED",
       "saved": "UNTRANSLATED",
       "course-code-required": "UNTRANSLATED",
       "min-credits-required": "UNTRANSLATED",
@@ -384,6 +387,8 @@
       "name-swedish": "UNTRANSLATED",
       "max-below-min": "UNTRANSLATED",
       "title": "UNTRANSLATED",
+      "start-date": "UNTRANSLATED",
+      "end-date": "UNTRANSLATED",
       "course-code-help": "UNTRANSLATED",
       "course-name-in-format": "UNTRANSLATED",
       "course-name-in-help-format": "UNTRANSLATED",
