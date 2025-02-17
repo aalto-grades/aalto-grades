@@ -18,13 +18,7 @@ const OrganizationSchema = z.object({
   share: z.number(),
 });
 
-const StudySubGroupSchema = z.object({
-  id: z.string(),
-  name: LocalizedStringSchema,
-  type: LocalizedStringSchema,
-});
-
-export const SisuCourseInstanceSchema = z.strictObject({
+export const SisuCourseInstanceSchema = z.object({
   id: z.string(),
   code: z.string(),
   startDate: z.string(),
@@ -64,10 +58,8 @@ export const SisuCourseInstanceSchema = z.strictObject({
   enrolmentStartDate: z.string(),
   enrolmentEndDate: z.string(),
   mincredits: z.string(),
-  studySubGroups: z.array(StudySubGroupSchema),
 });
 
 export type CourseUnit = z.infer<typeof CourseUnitSchema>;
 export type Organization = z.infer<typeof OrganizationSchema>;
-export type StudySubGroup = z.infer<typeof StudySubGroupSchema>;
 export type SisuCourseInstance = z.infer<typeof SisuCourseInstanceSchema>;
