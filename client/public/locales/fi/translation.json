@@ -128,7 +128,6 @@
     "next": "Seuraava",
     "back": "Takaisin",
     "name": "Nimi",
-    "select": "Valitse",
     "days-valid": "Voimassaolopäivät",
     "max-grade": "Maksimiarvosana",
     "loading": "Ladataan",
@@ -143,7 +142,6 @@
     "difficulty": "Vaikeustaso",
     "expiry-date": "Viimeinen voimassaolopäivä",
     "cancel": "Peruuta",
-    "clear": "Tyhjennä",
     "save": "Tallenna",
     "submit": "Lähetä",
     "a+-grade-sources": "A+ arvosanalähteet",
@@ -162,10 +160,10 @@
     "final-grade": "Lopullinen arvosana",
     "results": {
       "history": {
-        "title": "Historia",
         "action-type": "Toiminnon tyyppi",
         "action-date": "Päivämäärä",
-        "author": "Tekijä"
+        "author": "Tekijä",
+        "title": "Historia"
       }
     },
     "close": "Sulje",
@@ -192,6 +190,9 @@
     "teacher": "Opettaja",
     "assistant": "Assistentti",
     "student": "Opiskelija",
+    "clear": "Tyhjennä",
+    "no-content": "Ei sisältöä",
+    "select": "Valitse",
     "email": "Sähköposti",
     "copy": "Kopioi",
     "users": "Käyttäjät",
@@ -375,9 +376,6 @@
       "data-undefined": "Tiedot eivät ole määritelty"
     },
     "edit": {
-      "sisu-search-title": "Useita kurssi instansseja löydetty kurssikoodilla",
-      "sisu-search-button": "Etsi Sisusta",
-      "sisu-search-button-helper": "Hae kurssin tiedot Sisusta kurssikoodin perusteella",
       "saved": "Kurssin tiedot tallennettu.",
       "course-code-required": "Kurssikoodi on pakollinen (esim. CS-A1111)",
       "min-credits-required": "Vähimmäisopintopisteet ovat pakollisia",
@@ -388,8 +386,6 @@
       "name-swedish": "Anna kurssin nimi ruotsiksi",
       "max-below-min": "Enimmäisopintopisteet eivät voi olla pienemmät kuin vähimmäisopintopisteet",
       "title": "Muokkaa kurssia",
-      "start-date": "Aloitus päivämäärä",
-      "end-date": "Lopetus päivämäärä",
       "course-code-help": "Anna uuden kurssin koodi.",
       "course-name-in-format": "Kurssin nimi %",
       "course-name-in-help-format": "Anna kurssin nimi %",
@@ -413,8 +409,17 @@
       "assistant-expiry-date-helper": "Avustajan roolin päättymispäivä",
       "no-assistants": "Kurssilla ei ole avustajia",
       "assistant-expiry-date-change": "Muuta päättymispäivää poistamalla ja lisäämällä avustaja uudelleen",
+      "sisu-search-button": "Etsi Sisusta",
+      "sisu-search-button-helper": "Hae kurssin tiedot Sisusta kurssikoodin perusteella",
       "input-at-least-one-assistant": "Syötä vähintään yhden kurssiavustajan sähköpostiosoite",
-      "assistant-expiry-date-info": "Päättymispäivä: {{expiryDate}}"
+      "assistant-expiry-date-info": "Päättymispäivä: {{expiryDate}}",
+      "sisu-search-title": "Seuraavat kurssi instanssit löydetty Sisusta kurssikoodilla",
+      "sisu-search-basic-information": "Perustiedot",
+      "start-date": "Aloitus päivämäärä",
+      "end-date": "Lopetus päivämäärä",
+      "sisu-search-content": "Sisältö",
+      "sisu-search-additional-information": "Lisätiedot",
+      "sisu-search-assessment-methods": "Arviointitapa"
     },
     "list": "Kurssilista"
   },
@@ -442,6 +447,19 @@
     "your-courses": "Kurssisi",
     "no-courses": "Sinulla ei ole kursseja. Ota yhteyttä tukeen kurssin lisäämiseksi.",
     "create-new-course": "Luo uusi kurssi"
+  },
+  "utils": {
+    "scale-numerical": "Arviointiasteikko, 0-5",
+    "scale-pass-fail": "Hyväksytty-Hylätty",
+    "second-lang": "UNTRANSLATED",
+    "grade-higher-than-max": "Arvosana on suurempi kuin sallittu maksimiarvo",
+    "grade-not-an-int": "Ennustettu lopullinen arvosana ei ole kokonaisluku",
+    "grade-out-of-range": "Ennustettu lopullinen arvosana on sallitun alueen ulkopuolella",
+    "scale-second-lang": "Toinen kotimainen kieli",
+    "fail": "Hylätty",
+    "pass": "Hyväksytty",
+    "sat": "Tyydyttävä",
+    "good": "Hyvä"
   },
   "login": {
     "external": {
@@ -475,17 +493,5 @@
   "students": {
     "select": "Valitse opiskelija",
     "viewing": "Näytetään arvosanat käyttäjälle {{user}}"
-  },
-  "utils": {
-    "grade-higher-than-max": "Arvosana on suurempi kuin sallittu maksimiarvo",
-    "grade-not-an-int": "Ennustettu lopullinen arvosana ei ole kokonaisluku",
-    "grade-out-of-range": "Ennustettu lopullinen arvosana on sallitun alueen ulkopuolella",
-    "scale-numerical": "Arviointiasteikko, 0-5",
-    "scale-pass-fail": "Hyväksytty-Hylätty",
-    "scale-second-lang": "Toinen kotimainen kieli",
-    "fail": "Hylätty",
-    "pass": "Hyväksytty",
-    "sat": "Tyydyttävä",
-    "good": "Hyvä"
   }
 }

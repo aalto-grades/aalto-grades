@@ -128,7 +128,6 @@
     "next": "Next",
     "back": "Back",
     "name": "Name",
-    "select": "Select",
     "days-valid": "Days valid",
     "max-grade": "Max grade",
     "loading": "Loading",
@@ -143,7 +142,6 @@
     "difficulty": "Difficulty",
     "expiry-date": "Expiry date",
     "cancel": "Cancel",
-    "clear": "Clear",
     "save": "Save",
     "submit": "Submit",
     "a+-grade-sources": "A+ grade sources",
@@ -162,10 +160,10 @@
     "final-grade": "Final grade",
     "results": {
       "history": {
-        "title": "History",
         "action-type": "Action type",
         "action-date": "Date",
-        "author": "Author"
+        "author": "Author",
+        "title": "History"
       }
     },
     "close": "Close",
@@ -192,6 +190,9 @@
     "teacher": "Teacher",
     "assistant": "Assistant",
     "student": "Student",
+    "clear": "Clear",
+    "no-content": "No content",
+    "select": "Select",
     "email": "Email",
     "copy": "Copy",
     "users": "Users",
@@ -375,9 +376,6 @@
       "data-undefined": "Data is undefined"
     },
     "edit": {
-      "sisu-search-title": "Multiple Sisu instances found for course code",
-      "sisu-search-button": "Search from Sisu",
-      "sisu-search-button-helper": "Try to find course data from Sisu based on course code",
       "saved": "Course details saved.",
       "course-code-required": "Course code is required (e.g. CS-A1111)",
       "min-credits-required": "Minimum credits is required",
@@ -388,8 +386,6 @@
       "name-swedish": "Please input a valid course name in Swedish",
       "max-below-min": "Maximum credits cannot be lower than minimum credits",
       "title": "Edit course",
-      "start-date": "Start date",
-      "end-date": "End date",
       "course-code-help": "Give code for the new course.",
       "course-name-in-format": "Course name %",
       "course-name-in-help-format": "Give the name of the course %",
@@ -413,8 +409,17 @@
       "assistant-expiry-date-helper": "Expiry date for assistant role",
       "no-assistants": "No assistants in the course",
       "assistant-expiry-date-change": "To change the expire date, remove and add again the assistant",
+      "sisu-search-button": "Search from Sisu",
+      "sisu-search-button-helper": "Try to find course data from Sisu based on course code",
       "input-at-least-one-assistant": "Input the email address of at least one assistant of the course",
-      "assistant-expiry-date-info": "Expiry date: {{expiryDate}}"
+      "assistant-expiry-date-info": "Expiry date: {{expiryDate}}",
+      "sisu-search-title": "Sisu instances found for course code",
+      "sisu-search-basic-information": "Basic Information",
+      "start-date": "Start date",
+      "end-date": "End date",
+      "sisu-search-content": "Content",
+      "sisu-search-additional-information": "Additional Information",
+      "sisu-search-assessment-methods": "Assesment Methods"
     },
     "list": "Course list"
   },
@@ -442,6 +447,19 @@
     "your-courses": "Your courses",
     "no-courses": "You have no courses. Please contact support to have your course added.",
     "create-new-course": "Create new course"
+  },
+  "utils": {
+    "scale-numerical": "Grading scale, 0-5",
+    "scale-pass-fail": "Pass-Fail",
+    "second-lang": "UNTRANSLATED",
+    "grade-higher-than-max": "Grade is higher than maximum allowed value",
+    "grade-not-an-int": "The predicted final grade is not an integer",
+    "grade-out-of-range": "The predicted final grade is out of range",
+    "scale-second-lang": "Second national language",
+    "fail": "Fail",
+    "pass": "Pass",
+    "sat": "Sat",
+    "good": "Good"
   },
   "login": {
     "external": {
@@ -475,17 +493,5 @@
   "students": {
     "select": "Select student",
     "viewing": "Viewing grades for {{user}}"
-  },
-  "utils": {
-    "grade-higher-than-max": "Grade is higher than maximum allowed value",
-    "grade-not-an-int": "The predicted final grade is not an integer",
-    "grade-out-of-range": "The predicted final grade is out of range",
-    "scale-numerical": "Grading scale, 0-5",
-    "scale-pass-fail": "Pass-Fail",
-    "scale-second-lang": "Second national language",
-    "fail": "Fail",
-    "pass": "Pass",
-    "sat": "Sat",
-    "good": "Good"
   }
 }

@@ -128,7 +128,6 @@
     "next": "UNTRANSLATED",
     "back": "UNTRANSLATED",
     "name": "UNTRANSLATED",
-    "select": "UNTRANSLATED",
     "days-valid": "UNTRANSLATED",
     "max-grade": "UNTRANSLATED",
     "loading": "UNTRANSLATED",
@@ -143,7 +142,6 @@
     "difficulty": "UNTRANSLATED",
     "expiry-date": "UNTRANSLATED",
     "cancel": "UNTRANSLATED",
-    "clear": "UNTRANSLATED",
     "save": "UNTRANSLATED",
     "submit": "UNTRANSLATED",
     "a+-grade-sources": "UNTRANSLATED",
@@ -162,10 +160,10 @@
     "final-grade": "UNTRANSLATED",
     "results": {
       "history": {
-        "title": "UNTRANSLATED",
         "action-type": "UNTRANSLATED",
         "action-date": "UNTRANSLATED",
-        "author": "UNTRANSLATED"
+        "author": "UNTRANSLATED",
+        "title": "UNTRANSLATED"
       }
     },
     "close": "UNTRANSLATED",
@@ -192,6 +190,9 @@
     "teacher": "UNTRANSLATED",
     "assistant": "UNTRANSLATED",
     "student": "UNTRANSLATED",
+    "clear": "UNTRANSLATED",
+    "no-content": "UNTRANSLATED",
+    "select": "UNTRANSLATED",
     "email": "UNTRANSLATED",
     "copy": "UNTRANSLATED",
     "users": "UNTRANSLATED",
@@ -375,9 +376,6 @@
       "data-undefined": "UNTRANSLATED"
     },
     "edit": {
-      "sisu-search-title": "UNTRANSLATED",
-      "sisu-search-button": "UNTRANSLATED",
-      "sisu-search-button-helper": "UNTRANSLATED",
       "saved": "UNTRANSLATED",
       "course-code-required": "UNTRANSLATED",
       "min-credits-required": "UNTRANSLATED",
@@ -388,8 +386,6 @@
       "name-swedish": "UNTRANSLATED",
       "max-below-min": "UNTRANSLATED",
       "title": "UNTRANSLATED",
-      "start-date": "UNTRANSLATED",
-      "end-date": "UNTRANSLATED",
       "course-code-help": "UNTRANSLATED",
       "course-name-in-format": "UNTRANSLATED",
       "course-name-in-help-format": "UNTRANSLATED",
@@ -413,8 +409,17 @@
       "assistant-expiry-date-helper": "UNTRANSLATED",
       "no-assistants": "UNTRANSLATED",
       "assistant-expiry-date-change": "UNTRANSLATED",
+      "sisu-search-button": "UNTRANSLATED",
+      "sisu-search-button-helper": "UNTRANSLATED",
       "input-at-least-one-assistant": "UNTRANSLATED",
-      "assistant-expiry-date-info": "UNTRANSLATED"
+      "assistant-expiry-date-info": "UNTRANSLATED",
+      "sisu-search-title": "UNTRANSLATED",
+      "sisu-search-basic-information": "UNTRANSLATED",
+      "start-date": "UNTRANSLATED",
+      "end-date": "UNTRANSLATED",
+      "sisu-search-content": "UNTRANSLATED",
+      "sisu-search-additional-information": "UNTRANSLATED",
+      "sisu-search-assessment-methods": "UNTRANSLATED"
     },
     "list": "UNTRANSLATED"
   },
@@ -442,6 +447,19 @@
     "your-courses": "UNTRANSLATED",
     "no-courses": "UNTRANSLATED",
     "create-new-course": "UNTRANSLATED"
+  },
+  "utils": {
+    "scale-numerical": "UNTRANSLATED",
+    "scale-pass-fail": "UNTRANSLATED",
+    "second-lang": "UNTRANSLATED",
+    "grade-higher-than-max": "UNTRANSLATED",
+    "grade-not-an-int": "UNTRANSLATED",
+    "grade-out-of-range": "UNTRANSLATED",
+    "scale-second-lang": "UNTRANSLATED",
+    "fail": "UNTRANSLATED",
+    "pass": "UNTRANSLATED",
+    "sat": "UNTRANSLATED",
+    "good": "UNTRANSLATED"
   },
   "login": {
     "external": {
@@ -475,17 +493,5 @@
   "students": {
     "select": "UNTRANSLATED",
     "viewing": "UNTRANSLATED"
-  },
-  "utils": {
-    "grade-higher-than-max": "UNTRANSLATED",
-    "grade-not-an-int": "UNTRANSLATED",
-    "grade-out-of-range": "UNTRANSLATED",
-    "scale-numerical": "UNTRANSLATED",
-    "scale-pass-fail": "UNTRANSLATED",
-    "scale-second-lang": "UNTRANSLATED",
-    "fail": "UNTRANSLATED",
-    "pass": "UNTRANSLATED",
-    "sat": "UNTRANSLATED",
-    "good": "UNTRANSLATED"
   }
 }
