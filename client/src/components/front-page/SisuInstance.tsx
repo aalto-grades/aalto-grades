@@ -1,11 +1,18 @@
-import {Divider, styled} from '@mui/material';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Chip from '@mui/material/Chip';
-import Typography from '@mui/material/Typography';
+// SPDX-FileCopyrightText: 2025 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Chip,
+  Divider,
+  Typography,
+  styled,
+} from '@mui/material';
 import {Fragment, type JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
@@ -74,36 +81,44 @@ const SisuInstance = ({course, selectCourse}: PropsType): JSX.Element => {
             </Fragment>
           ))}
         </Typography>
-        <Typography variant="body1">
-          <Box sx={{display: 'flex', gap: 2, my: 2}}>
-            <Box>{t('course.edit.teachers-in-charge')}:</Box>
-            <Box>
-              {course.teachers.map(teacher => (
-                <Chip sx={{mx: 1}} key={teacher} label={teacher} size="small" />
-              ))}
-            </Box>
+        <Box sx={{display: 'flex', gap: 2, my: 2}}>
+          <Box>
+            <Typography variant="body1">
+              {t('course.edit.teachers-in-charge')}:
+            </Typography>
           </Box>
-          <Box sx={{display: 'flex', gap: 2}}>
-            <Box>
+          <Box>
+            {course.teachers.map(teacher => (
+              <Chip sx={{mx: 1}} key={teacher} label={teacher} size="small" />
+            ))}
+          </Box>
+        </Box>
+        <Box sx={{display: 'flex', gap: 2}}>
+          <Box>
+            <Typography variant="body1">
               {t('course.edit.language')}: {getCourseLanguage()}
               <br />
               {t('course.edit.grading-scale')}:{' '}
               {course.summary.gradingScale[localLang]}
-            </Box>
-            <Divider orientation="vertical" flexItem />
-            <Box>
+            </Typography>
+          </Box>
+          <Divider orientation="vertical" flexItem />
+          <Box>
+            <Typography variant="body1">
               {t('course.edit.start-date')}: {course.startDate}
               <br />
               {t('course.edit.end-date')}: {course.endDate}
-            </Box>
-            <Divider orientation="vertical" flexItem />
-            <Box>
+            </Typography>
+          </Box>
+          <Divider orientation="vertical" flexItem />
+          <Box>
+            <Typography variant="body1">
               {t('course.edit.min-credits')}: {course.credits.min}
               <br />
               {t('course.edit.max-credits')}: {course.credits.max}
-            </Box>
+            </Typography>
           </Box>
-        </Typography>
+        </Box>
       </CardContent>
       <CardActions>
         <Box sx={{display: 'flex', marginLeft: 'auto'}}>

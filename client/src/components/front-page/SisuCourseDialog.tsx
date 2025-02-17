@@ -38,8 +38,8 @@ const SisuCourseDialog = ({
         {t('course.edit.sisu-search-title')}: <b>{courses[0].code}</b>
       </DialogTitle>
       <DialogContent>
-        <Divider sx={{mb: 2}} />
-        <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+        <Divider />
+        <Box sx={{display: 'flex', flexDirection: 'column', gap: 2, my: 2}}>
           {courses.map(course => (
             <SisuInstance
               key={course.startDate + course.endDate}
@@ -48,14 +48,12 @@ const SisuCourseDialog = ({
             />
           ))}
         </Box>
-        <Divider sx={{mt: 2}} />
-        <Box>
-          <DialogActions>
-            <Button variant="outlined" onClick={onClose}>
-              {t('general.cancel')}
-            </Button>
-          </DialogActions>
-        </Box>
+        <Divider />
+        <DialogActions>
+          <Button variant="outlined" color="error" onClick={onClose}>
+            {t('general.cancel')}
+          </Button>
+        </DialogActions>
       </DialogContent>
     </Dialog>
   );
