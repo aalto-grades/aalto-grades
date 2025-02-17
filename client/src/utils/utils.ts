@@ -249,6 +249,16 @@ export const departments: DepartmentOption[] = [
       sv: 'Institutionen för neurovetenskap och biomedicinsk teknik',
     },
   },
+
+  // Other
+  {
+    id: Department.LanguageCentre,
+    department: {
+      fi: 'Aalto University, Kielikeskus',
+      en: 'Aalto University, Language Centre',
+      sv: 'Språkcentret',
+    },
+  },
 ];
 
 /** Available completion languages used in Sisu. */
