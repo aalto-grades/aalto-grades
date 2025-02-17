@@ -42,7 +42,7 @@ const SisuCourseDialog = ({
         <Box sx={{display: 'flex', flexDirection: 'column', gap: 2, my: 2}}>
           {courses.map(course => (
             <SisuInstance
-              key={course.startDate + course.endDate}
+              key={course.id}
               course={course}
               selectCourse={() => selectCourse(course)}
             />
