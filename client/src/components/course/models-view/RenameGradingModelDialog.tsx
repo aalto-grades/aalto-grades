@@ -4,7 +4,6 @@
 
 import {
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -16,6 +15,7 @@ import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
+import LoadingButton from '@/components/shared/LoadingButton';
 import {useEditGradingModel} from '@/hooks/useApi';
 
 type PropsType = {
@@ -77,26 +77,15 @@ const RenameGradingModelDialog = ({
         >
           {t('general.cancel')}
         </Button>
-        <Button
+        <LoadingButton
+          loading={editGradingModel.isPending}
           onClick={handleSave}
           variant="contained"
           type="submit"
           disabled={newName.length === 0 || editGradingModel.isPending}
         >
           {t('general.save')}
-          {editGradingModel.isPending && (
-            <CircularProgress
-              size={24}
-              sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                marginTop: '-12px',
-                marginLeft: '-12px',
-              }}
-            />
-          )}
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

@@ -48,13 +48,13 @@ const SisuCourseDialog = ({
             />
           ))}
         </Box>
-        <Divider />
-        <DialogActions>
-          <Button variant="outlined" color="error" onClick={onClose}>
-            {t('general.cancel')}
-          </Button>
-        </DialogActions>
       </DialogContent>
+      <Divider />
+      <DialogActions>
+        <Button variant="outlined" color="error" onClick={onClose}>
+          {t('general.cancel')}
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 };

@@ -4,7 +4,6 @@
 
 import {
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -21,6 +20,7 @@ import {useParams} from 'react-router-dom';
 
 import type {CoursePartData} from '@/common/types';
 import {type GraphTemplate, initGraph} from '@/common/util';
+import LoadingButton from '@/components/shared/LoadingButton';
 import {
   useAddGradingModel,
   useGetCourseParts,
@@ -144,26 +144,15 @@ const CreateGradingModelDialog = ({
         >
           {t('general.cancel')}
         </Button>
-        <Button
+        <LoadingButton
+          loading={addGradingModel.isPending}
           onClick={handleSubmit}
           variant="contained"
           type="submit"
           disabled={name.length === 0 || addGradingModel.isPending}
         >
           {t('general.submit')}
-          {addGradingModel.isPending && (
-            <CircularProgress
-              size={24}
-              sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                marginTop: '-12px',
-                marginLeft: '-12px',
-              }}
-            />
-          )}
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );
