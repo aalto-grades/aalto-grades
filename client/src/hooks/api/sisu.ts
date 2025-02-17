@@ -36,8 +36,9 @@ export const useSearchSisuCourses = (
         }
       }
 
-      const data = instances.parse(await response.json());
-      return data;
+      const data: unknown = await response.json();
+
+      return instances.parse(data);
     },
     ...options,
   });
