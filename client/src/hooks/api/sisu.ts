@@ -29,7 +29,11 @@ export const useSearchSisuCourses = (
       const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error('Network response was not ok, data not found');
+        if (response.status === 404) {
+          throw new Error('No courses found with the provided course code');
+        } else {
+          throw new Error('Something went wrong, please try again');
+        }
       }
 
       const data = instances.parse(await response.json());
