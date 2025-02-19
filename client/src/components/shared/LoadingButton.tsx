@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {Button, type ButtonProps, CircularProgress} from '@mui/material';
 import type {JSX} from 'react';
 
