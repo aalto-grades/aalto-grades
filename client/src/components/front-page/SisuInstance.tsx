@@ -95,12 +95,44 @@ const AccordionDetails = styled(MuiAccordionDetails)(({theme}) => ({
   borderTop: '1px solid rgba(0, 0, 0, .125)',
 }));
 
+// Highlights matching parts of the course code based on the search query
+const HighlightedText = (query: string, text: string): JSX.Element => {
+  const regex = new RegExp(`(${query})`, 'gi');
+  const parts = text.split(regex);
+
+  return (
+    <>
+      {parts.map((part, index) =>
+        part.toLowerCase() === query.toLowerCase() ? (
+          <span
+            key={index}
+            style={{
+              backgroundColor: '#90EE90',
+              fontWeight: 'bold',
+              borderRadius: '2px',
+            }}
+          >
+            {part}
+          </span>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+};
+
 type PropsType = {
   course: SisuCourseInstance;
   selectCourse: () => void;
+  queryString: string;
 };
 
-const SisuInstance = ({course, selectCourse}: PropsType): JSX.Element => {
+const SisuInstance = ({
+  course,
+  selectCourse,
+  queryString,
+}: PropsType): JSX.Element => {
   const {t, i18n} = useTranslation();
   const [expanded, setExpanded] = useState<string | false>(false);
 
@@ -130,7 +162,7 @@ const SisuInstance = ({course, selectCourse}: PropsType): JSX.Element => {
       case 'hyl-hyv':
         return t('utils.scale-pass-fail');
       case 'toinen-kotim':
-        return t('utils.second-lang');
+        return t('utils.scale-second-lang');
       default:
         return value;
     }
@@ -153,13 +185,19 @@ const SisuInstance = ({course, selectCourse}: PropsType): JSX.Element => {
             flexDirection: {xs: 'column-reverse', sm: 'row'},
           }}
         >
-          <Typography
-            variant="subtitle2"
-            gutterBottom
-            sx={{color: 'text.secondary'}}
-          >
-            {course.organizationName[uiLang]}
-          </Typography>
+          <Box sx={{display: 'flex', gap: 1}}>
+            <Typography variant="subtitle2" gutterBottom>
+              {HighlightedText(queryString, course.code)}
+            </Typography>
+            {' - '}
+            <Typography
+              variant="subtitle2"
+              gutterBottom
+              sx={{color: 'text.secondary'}}
+            >
+              {course.organizationName[uiLang]}
+            </Typography>
+          </Box>
           <Typography
             variant="subtitle2"
             gutterBottom

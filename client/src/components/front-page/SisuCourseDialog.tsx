@@ -22,6 +22,7 @@ type PropsType = {
   onClose: () => void;
   selectCourse: (instance: SisuCourseInstance) => void;
   courses: SisuCourseInstance[];
+  queryString: string;
 };
 
 const SisuCourseDialog = ({
@@ -29,13 +30,14 @@ const SisuCourseDialog = ({
   onClose,
   selectCourse,
   courses,
+  queryString,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
       <DialogTitle>
-        {t('course.edit.sisu-search-title')}: <b>{courses[0].code}</b>
+        {t('course.edit.sisu-search-title')}: <b>{queryString}</b>
       </DialogTitle>
       <DialogContent>
         <Divider />
@@ -45,6 +47,7 @@ const SisuCourseDialog = ({
               key={course.id}
               course={course}
               selectCourse={() => selectCourse(course)}
+              queryString={queryString}
             />
           ))}
         </Box>
