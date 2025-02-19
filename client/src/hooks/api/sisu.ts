@@ -10,7 +10,6 @@ import {
 import axios from 'axios';
 import {type ZodError, z} from 'zod';
 
-import data from '@/common/mocks/sisu.json';
 import {
   type SisuCourseInstance,
   SisuCourseInstanceSchema,
@@ -55,21 +54,13 @@ export const useSearchSisuCourses = (
 ): UseQueryResult<SisuCourseInstance[]> =>
   useQuery({
     queryKey: ['sisu-instances', courseCode],
-    queryFn: async () => {
-      if (
-        import.meta.env.MODE === 'development' &&
-        courseCode.startsWith('mock')
-      ) {
-        return z.array(SisuCourseInstanceSchema).parse(data);
-      }
-
-      return z.array(SisuCourseInstanceSchema).parse(
+    queryFn: async () =>
+      z.array(SisuCourseInstanceSchema).parse(
         (
           await axiosSisuInstance.get('/courseunitrealisations', {
             params: {code: courseCode},
           })
         ).data
-      );
-    },
+      ),
     ...options,
   });
