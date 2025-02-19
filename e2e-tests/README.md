@@ -5,7 +5,8 @@ SPDX-License-Identifier: MIT
 -->
 
 ## Running tests
-> The fist time (or to update the tested browser agents):
+
+> The first time (or to update the tested browser agents):
     ```
     npx playwright install
     ```
@@ -16,7 +17,9 @@ project:
 ```
 docker compose up --build
 ```
->If you changed the port of postgres remember to add POSTGRES_PORT to this folder .env
+
+>If you changed the port of postgres remember to add POSTGRES_PORT to this folder .env.
+
 Then launch Playwright in this directory in CLI mode:
 
 ```

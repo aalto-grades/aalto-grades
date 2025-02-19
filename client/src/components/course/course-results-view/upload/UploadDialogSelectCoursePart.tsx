@@ -5,12 +5,13 @@
 import {
   DialogContent,
   DialogTitle,
+  Divider,
   List,
   ListItemButton,
   ListItemText,
   Paper,
 } from '@mui/material';
-import type {JSX} from 'react';
+import {Fragment, type JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
@@ -32,10 +33,13 @@ const UploadDialogSelectCoursePart = ({
       <DialogTitle>{t('course.results.upload.select-course-part')}</DialogTitle>
       <DialogContent>
         <List component={Paper}>
-          {courseParts.data?.map(part => (
-            <ListItemButton key={part.id} onClick={() => setCoursePart(part)}>
-              <ListItemText primary={part.name} />
-            </ListItemButton>
+          {courseParts.data?.map((part, index) => (
+            <Fragment key={part.id}>
+              <ListItemButton onClick={() => setCoursePart(part)}>
+                <ListItemText primary={part.name} />
+              </ListItemButton>
+              {courseParts.data.length - 1 !== index && <Divider />}
+            </Fragment>
           ))}
         </List>
       </DialogContent>

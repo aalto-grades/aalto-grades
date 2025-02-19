@@ -24,7 +24,7 @@ import {type JSX, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 export type MismatchData = {
-  csvKeys: string[];
+  columnKeys: string[];
   courseTasks: string[];
   onImport: (keyMap: {[key: string]: string}) => void;
 };
@@ -54,7 +54,7 @@ const MismatchDialog = ({
 
     // Set new selections and try to match some keys.
     const newSelections: Selections = {};
-    for (const key of mismatchData.csvKeys) {
+    for (const key of mismatchData.columnKeys) {
       const matchingTask = mismatchData.courseTasks.find(
         task => task.toLowerCase() === key.toLowerCase()
       );
@@ -96,7 +96,7 @@ const MismatchDialog = ({
     }
 
     setError('');
-  }, [mismatchData.csvKeys, selections]);
+  }, [mismatchData.columnKeys, selections]);
 
   const getErrorText = (): string => {
     switch (error) {
