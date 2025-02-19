@@ -60,6 +60,14 @@ export const SisuCourseInstanceSchema = z.object({
   mincredits: z.string(),
 });
 
+export const SisuErrorSchema = z.object({
+  error: z.strictObject({
+    code: z.number(),
+    message: z.string(),
+  }),
+});
+
 export type CourseUnit = z.infer<typeof CourseUnitSchema>;
 export type Organization = z.infer<typeof OrganizationSchema>;
 export type SisuCourseInstance = z.infer<typeof SisuCourseInstanceSchema>;
+export type SisuError = z.infer<typeof SisuErrorSchema>;
