@@ -113,10 +113,10 @@ const UserButton = (): JSX.Element => {
           setAnchorEl(event.currentTarget);
         }}
       >
-        <Box sx={{marginRight: 1, marginTop: 1}}>
+        <Box sx={{mr: {xs: 0, sm: 1}, mt: 1}}>
           <PersonIcon color="inherit" />
         </Box>
-        {auth.name}
+        <Box sx={{display: {xs: 'none', sm: 'block'}}}>{auth.name}</Box>
         <ArrowDropDownIcon color="inherit" />
       </Button>
       <Menu
