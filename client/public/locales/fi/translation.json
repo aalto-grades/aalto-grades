@@ -411,6 +411,7 @@
       "assistant-expiry-date-change": "Muuta päättymispäivää poistamalla ja lisäämällä avustaja uudelleen",
       "sisu-search-button": "Etsi Sisusta",
       "sisu-search-button-helper": "Hae kurssin tiedot Sisusta kurssikoodin perusteella",
+      "sisu-search-set-key": "Aseta Sisun API-käyttöoikeustietue hakeaksesi kursseja Sisusta",
       "input-at-least-one-assistant": "Syötä vähintään yhden kurssiavustajan sähköpostiosoite",
       "assistant-expiry-date-info": "Päättymispäivä: {{expiryDate}}",
       "sisu-search-title": "Seuraavat kurssi instanssit löydetty Sisusta kurssikoodilla",
@@ -426,7 +427,7 @@
   "front-page": {
     "not-logged-in": "Et ole kirjautunut sisään",
     "search": "haku",
-    "create-course": "Luo uusi kurssi",
+    "create-new-course": "Luo uusi kurssi",
     "user-added": "Käyttäjä lisätty onnistuneesti",
     "email-help": "Aalto-sähköposti esim. etunimi.sukunimi@aalto.fi.",
     "admin-name-help": "Ylläpitäjän nimi",
@@ -445,17 +446,15 @@
     "no-users": "Käyttäjiä ei löytynyt",
     "reset-password-mfa": "Nollaa salasana / MFA",
     "your-courses": "Kurssisi",
-    "no-courses": "Sinulla ei ole kursseja. Ota yhteyttä tukeen kurssin lisäämiseksi.",
-    "create-new-course": "Luo uusi kurssi"
+    "no-courses": "Sinulla ei ole kursseja. Ota yhteyttä tukeen kurssin lisäämiseksi."
   },
   "utils": {
     "scale-numerical": "Arviointiasteikko, 0-5",
     "scale-pass-fail": "Hyväksytty-Hylätty",
-    "second-lang": "UNTRANSLATED",
+    "scale-second-lang": "Toinen kotimainen kieli",
     "grade-higher-than-max": "Arvosana on suurempi kuin sallittu maksimiarvo",
     "grade-not-an-int": "Ennustettu lopullinen arvosana ei ole kokonaisluku",
     "grade-out-of-range": "Ennustettu lopullinen arvosana on sallitun alueen ulkopuolella",
-    "scale-second-lang": "Toinen kotimainen kieli",
     "fail": "Hylätty",
     "pass": "Hyväksytty",
     "sat": "Tyydyttävä",

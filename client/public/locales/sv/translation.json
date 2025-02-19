@@ -411,6 +411,7 @@
       "assistant-expiry-date-change": "UNTRANSLATED",
       "sisu-search-button": "UNTRANSLATED",
       "sisu-search-button-helper": "UNTRANSLATED",
+      "sisu-search-set-key": "UNTRANSLATED",
       "input-at-least-one-assistant": "UNTRANSLATED",
       "assistant-expiry-date-info": "UNTRANSLATED",
       "sisu-search-title": "UNTRANSLATED",
@@ -426,7 +427,7 @@
   "front-page": {
     "not-logged-in": "UNTRANSLATED",
     "search": "UNTRANSLATED",
-    "create-course": "UNTRANSLATED",
+    "create-new-course": "UNTRANSLATED",
     "user-added": "UNTRANSLATED",
     "email-help": "UNTRANSLATED",
     "admin-name-help": "UNTRANSLATED",
@@ -445,17 +446,15 @@
     "no-users": "UNTRANSLATED",
     "reset-password-mfa": "UNTRANSLATED",
     "your-courses": "UNTRANSLATED",
-    "no-courses": "UNTRANSLATED",
-    "create-new-course": "UNTRANSLATED"
+    "no-courses": "UNTRANSLATED"
   },
   "utils": {
     "scale-numerical": "UNTRANSLATED",
     "scale-pass-fail": "UNTRANSLATED",
-    "second-lang": "UNTRANSLATED",
+    "scale-second-lang": "UNTRANSLATED",
     "grade-higher-than-max": "UNTRANSLATED",
     "grade-not-an-int": "UNTRANSLATED",
     "grade-out-of-range": "UNTRANSLATED",
-    "scale-second-lang": "UNTRANSLATED",
     "fail": "UNTRANSLATED",
     "pass": "UNTRANSLATED",
     "sat": "UNTRANSLATED",

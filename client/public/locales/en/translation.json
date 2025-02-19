@@ -411,6 +411,7 @@
       "assistant-expiry-date-change": "To change the expire date, remove and add again the assistant",
       "sisu-search-button": "Search from Sisu",
       "sisu-search-button-helper": "Try to find course data from Sisu based on course code",
+      "sisu-search-set-key": "Please set the Sisu API token to search courses from Sisu",
       "input-at-least-one-assistant": "Input the email address of at least one assistant of the course",
       "assistant-expiry-date-info": "Expiry date: {{expiryDate}}",
       "sisu-search-title": "Sisu instances found for course code",
@@ -426,7 +427,7 @@
   "front-page": {
     "not-logged-in": "Not logged in",
     "search": "search",
-    "create-course": "Create a new course",
+    "create-new-course": "Create new course",
     "user-added": "User added successfully",
     "email-help": "Aalto email e.g. firstname.lastname@aalto.fi.",
     "admin-name-help": "Name of the admin",
@@ -445,17 +446,15 @@
     "no-users": "No users found",
     "reset-password-mfa": "Reset password / MFA",
     "your-courses": "Your courses",
-    "no-courses": "You have no courses. Please contact support to have your course added.",
-    "create-new-course": "Create new course"
+    "no-courses": "You have no courses. Please contact support to have your course added."
   },
   "utils": {
     "scale-numerical": "Grading scale, 0-5",
     "scale-pass-fail": "Pass-Fail",
-    "second-lang": "UNTRANSLATED",
+    "scale-second-lang": "Second national language",
     "grade-higher-than-max": "Grade is higher than maximum allowed value",
     "grade-not-an-int": "The predicted final grade is not an integer",
     "grade-out-of-range": "The predicted final grade is out of range",
-    "scale-second-lang": "Second national language",
     "fail": "Fail",
     "pass": "Pass",
     "sat": "Sat",
