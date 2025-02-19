@@ -18,6 +18,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   IconButton,
   List,
   ListItem,
@@ -58,6 +59,7 @@ import {
   convertSisuToClientGradingScale,
   convertToClientGradingScale,
   departments,
+  getToken,
   sisuLanguageOptions,
 } from '@/utils';
 import {withZodSchema} from '@/utils/forms';
@@ -93,6 +95,13 @@ const initialValues = {
   nameSv: '',
 };
 
+/**
+ * Generates an email address based on the given name. Normalizes Scandinavian
+ * characters (ä, å → a and ö → o) and constructs an email address in the format
+ * 'firstname.lastname@aalto.fi'. Drops middle names. Sisu API does not provide
+ * email addresses any incorrect emails must be manually corrected during the
+ * course creation process by the user.
+ */
 const generateEmailAddressString = (name: string): string => {
   const normalize = (str: string): string =>
     str.replace(/[äå]/g, 'a').replace(/ö/g, 'o');
@@ -102,6 +111,41 @@ const generateEmailAddressString = (name: string): string => {
   const lastName = normalize(parts[parts.length - 1]);
 
   return `${firstName}.${lastName}@aalto.fi`.toLowerCase();
+};
+
+const sisuInstanceToForm = (instance: SisuCourseInstance): FormData => {
+  const data = {
+    courseCode: instance.code,
+    department: Department.ComputerScience,
+    minCredits: instance.credits.min,
+    maxCredits: instance.credits.max,
+    gradingScale: convertSisuToClientGradingScale(
+      instance.summary.gradingScale.en
+    ) as GradingScale,
+    languageOfInstruction: Language.English,
+    teacherEmail: '',
+    assistantEmail: '',
+    assistantExpiryDate: '',
+    nameEn: instance.name.en,
+    nameFi: instance.name.fi,
+    nameSv: instance.name.sv,
+  };
+
+  const department = departments.find(
+    d => d.department.en === instance.organizationName.en
+  );
+
+  if (department) {
+    data.department = department.id;
+  }
+
+  // Instruction language, use first one from list
+  if (instance.languageOfInstructionCodes[0].length > 0) {
+    data.languageOfInstruction =
+      instance.languageOfInstructionCodes[0].toUpperCase() as Language;
+  }
+
+  return data;
 };
 
 type PropsType = {open: boolean; forceEmail?: string; onClose: () => void};
@@ -117,6 +161,7 @@ const CreateCourseDialog = ({
   const navigate = useNavigate();
   const addCourse = useAddCourse();
   const emailExisted = useVerifyEmail();
+  const hasApiKey = getToken('sisu') !== null;
 
   const [teachersInCharge, setTeachersInCharge] = useState<string[]>(
     forceEmail ? [forceEmail] : []
@@ -257,40 +302,9 @@ const CreateCourseDialog = ({
   const selectCourse = async (course: SisuCourseInstance): Promise<void> => {
     resetForm();
     setShowDialog(false);
+    form.setValues(sisuInstanceToForm(course));
 
-    // Course code
-    form.setFieldValue('courseCode', course.code);
-
-    // Language
-    form.setFieldValue('nameFi', course.name.fi);
-    form.setFieldValue('nameSv', course.name.sv);
-    form.setFieldValue('nameEn', course.name.en);
-
-    // Department
-    const department = sortedDepartments.find(
-      d => d.department.en === course.organizationName.en
-    );
-    if (department) {
-      form.setFieldValue('department', department.id);
-    }
-
-    // Credits
-    form.setFieldValue('minCredits', course.credits.min);
-    form.setFieldValue('maxCredits', course.credits.max);
-
-    // Instruction language
-    form.setFieldValue(
-      'languageOfInstruction',
-      course.languageOfInstructionCodes[0].toUpperCase()
-    );
-
-    // Grading scale
-    form.setFieldValue(
-      'gradingScale',
-      convertSisuToClientGradingScale(course.summary.gradingScale.en)
-    );
-
-    // Teachers in charge
+    // Teachers in charge, validate one by one
     for (let i = 0; i < course.teachers.length; ++i) {
       await validateTeacher(generateEmailAddressString(course.teachers[i]));
     }
@@ -304,11 +318,12 @@ const CreateCourseDialog = ({
           onClose={() => setShowDialog(false)}
           selectCourse={selectCourse}
           courses={data}
+          queryString={queryString}
         />
       )}
       <form onSubmit={form.handleSubmit}>
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-          <DialogTitle>{t('front-page.create-course')}</DialogTitle>
+          <DialogTitle>{t('front-page.create-new-course')}</DialogTitle>
           <DialogContent dividers>
             <Box
               sx={{
@@ -342,7 +357,7 @@ const CreateCourseDialog = ({
                   <LoadingButton
                     loading={isLoading || isFetching}
                     onClick={() => fetchSisu(form.values.courseCode)}
-                    disabled={form.values.courseCode.length === 0}
+                    disabled={form.values.courseCode.length === 0 || !hasApiKey}
                     variant="outlined"
                     startIcon={<SearchIcon />}
                   >
@@ -350,8 +365,13 @@ const CreateCourseDialog = ({
                   </LoadingButton>
                 </Box>
                 <Box>
-                  <Typography variant="caption">
-                    {t('course.edit.sisu-search-button-helper')}
+                  <Typography
+                    variant="caption"
+                    color={hasApiKey ? undefined : 'error'}
+                  >
+                    {hasApiKey
+                      ? t('course.edit.sisu-search-button-helper')
+                      : t('course.edit.sisu-search-set-key')}
                   </Typography>
                 </Box>
               </Box>
@@ -504,6 +524,13 @@ const CreateCourseDialog = ({
                   {teachersInCharge.map(teacherEmail => (
                     <ListItem
                       key={teacherEmail}
+                      sx={{
+                        display: 'flex',
+                        gap: 2,
+                        justifyContent: 'space-between',
+                        justifyItems: 'start',
+                        flexDirection: {xs: 'column', sm: 'row'},
+                      }}
                       secondaryAction={
                         teacherEmail !== auth?.email && (
                           <IconButton
@@ -519,17 +546,27 @@ const CreateCourseDialog = ({
                         )
                       }
                     >
-                      <ListItemAvatar>
-                        <Avatar>
-                          <PersonIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText primary={teacherEmail} />
-                      {nonExistingEmails.has(teacherEmail) && (
-                        <Alert severity="warning">
-                          {t('course.edit.user-not-exist')}
-                        </Alert>
-                      )}
+                      <Box sx={{display: 'flex'}}>
+                        <ListItemAvatar>
+                          <Avatar>
+                            <PersonIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary={teacherEmail} />
+                      </Box>
+                      <Box>
+                        {nonExistingEmails.has(teacherEmail) && (
+                          <Alert
+                            severity="warning"
+                            sx={{width: {xs: '90%', sm: '80%'}}}
+                          >
+                            {t('course.edit.user-not-exist')}
+                          </Alert>
+                        )}
+                        <Divider
+                          sx={{my: 1, display: {xs: 'block', sm: 'none'}}}
+                        />
+                      </Box>
                     </ListItem>
                   ))}
                 </List>
@@ -621,6 +658,13 @@ const CreateCourseDialog = ({
                   {assistants.map((assistant: AssistantData) => (
                     <ListItem
                       key={assistant.email}
+                      sx={{
+                        display: 'flex',
+                        gap: 2,
+                        justifyContent: 'space-between',
+                        justifyItems: 'start',
+                        flexDirection: {xs: 'column', sm: 'row'},
+                      }}
                       secondaryAction={
                         <IconButton
                           edge="end"
@@ -634,48 +678,59 @@ const CreateCourseDialog = ({
                         </IconButton>
                       }
                     >
-                      <ListItemAvatar>
-                        <Avatar>
-                          <PersonIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText primary={assistant.email} />
-                      {assistant.expiryDate && (
-                        <div style={{display: 'flex'}}>
-                          <ListItemText
-                            secondary={t(
-                              'course.edit.assistant-expiry-date-info',
-                              {
-                                expiryDate: assistant.expiryDate
-                                  .toISOString()
-                                  .slice(0, 10),
-                              }
-                            )}
-                            sx={{
-                              marginRight: '0.5em',
-                            }}
-                          />
-                          <Tooltip
-                            placement="top"
-                            title={t(
-                              'course.edit.assistant-expiry-date-change'
-                            )}
-                          >
-                            <ListItemIcon>
-                              <HelpOutlined
+                      <Box sx={{display: 'flex'}}>
+                        <ListItemAvatar>
+                          <Avatar>
+                            <PersonIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary={assistant.email} />
+                      </Box>
+                      <Box>
+                        {assistant.expiryDate && (
+                          <Box sx={{display: 'flex', justifyContent: 'start'}}>
+                            <Box>
+                              <ListItemText
+                                secondary={t(
+                                  'course.edit.assistant-expiry-date-info',
+                                  {
+                                    expiryDate: assistant.expiryDate
+                                      .toISOString()
+                                      .slice(0, 10),
+                                  }
+                                )}
                                 sx={{
-                                  width: '0.6em',
+                                  marginRight: '0.5em',
                                 }}
                               />
-                            </ListItemIcon>
-                          </Tooltip>
-                        </div>
-                      )}
-                      {nonExistingEmails.has(assistant.email) && (
-                        <Alert severity="warning">
-                          {t('course.edit.user-not-exist')}
-                        </Alert>
-                      )}
+                            </Box>
+                            <Box>
+                              <Tooltip
+                                placement="top"
+                                title={t(
+                                  'course.edit.assistant-expiry-date-change'
+                                )}
+                              >
+                                <ListItemIcon>
+                                  <HelpOutlined
+                                    sx={{
+                                      width: '0.6em',
+                                    }}
+                                  />
+                                </ListItemIcon>
+                              </Tooltip>
+                            </Box>
+                          </Box>
+                        )}
+                        {nonExistingEmails.has(assistant.email) && (
+                          <Alert severity="warning">
+                            {t('course.edit.user-not-exist')}
+                          </Alert>
+                        )}
+                        <Divider
+                          sx={{my: 1, display: {xs: 'block', sm: 'none'}}}
+                        />
+                      </Box>
                     </ListItem>
                   ))}
                 </List>
