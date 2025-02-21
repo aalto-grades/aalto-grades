@@ -27,7 +27,7 @@ import {getToken} from '@/utils';
 import axios from './axios';
 
 const getHeaders = (): AxiosRequestConfig => ({
-  headers: {Authorization: `Aplus-Token ${getToken('a+')}`},
+  headers: {Authorization: `Aplus-Token ${getToken()}`},
 });
 
 export const useFetchAplusCourses = (

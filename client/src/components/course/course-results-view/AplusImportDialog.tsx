@@ -70,7 +70,7 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
     if (step !== 1) return;
 
     if (!aplusGrades.data) {
-      setAplusTokenDialogOpen(!getToken('a+') || aplusGrades.isError);
+      setAplusTokenDialogOpen(!getToken() || aplusGrades.isError);
     } else if (aplusGrades.data.length === 0) {
       enqueueSnackbar(t('course.parts.no-aplus-grades'), {
         variant: 'warning',
@@ -108,7 +108,6 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
           setAplusTokenDialogOpen(false);
           aplusGrades.refetch();
         }}
-        tokenType="a+"
         error={aplusGrades.isError}
       />
       <Dialog open={open} onClose={handleResetAndClose} maxWidth="md" fullWidth>
@@ -139,7 +138,7 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
               <Button
                 onClick={() => {
                   setStep(1);
-                  if (getToken('a+')) aplusGrades.refetch();
+                  if (getToken()) aplusGrades.refetch();
                   else setAplusTokenDialogOpen(true);
                 }}
                 disabled={courseTaskIds.length === 0}

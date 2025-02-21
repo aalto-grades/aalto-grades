@@ -151,8 +151,12 @@ const SisuInstance = ({
     return found.language[uiLang];
   };
 
-  const getContent = (content: string): string => {
-    return content.length > 0 ? content : t('general.no-content');
+  const getContent = (content: string | null | undefined): string => {
+    if (content === null || !content || content.length === 0) {
+      return t('general.no-content');
+    }
+
+    return content;
   };
 
   const getGrading = (value: string): string => {

@@ -59,7 +59,6 @@ import {
   convertSisuToClientGradingScale,
   convertToClientGradingScale,
   departments,
-  getToken,
   sisuLanguageOptions,
 } from '@/utils';
 import {withZodSchema} from '@/utils/forms';
@@ -161,7 +160,6 @@ const CreateCourseDialog = ({
   const navigate = useNavigate();
   const addCourse = useAddCourse();
   const emailExisted = useVerifyEmail();
-  const hasApiKey = getToken('sisu') !== null;
 
   const [teachersInCharge, setTeachersInCharge] = useState<string[]>(
     forceEmail ? [forceEmail] : []
@@ -312,19 +310,17 @@ const CreateCourseDialog = ({
 
   return (
     <>
-      {showDialog && data !== undefined && (
-        <SisuCourseDialog
-          open={showDialog}
-          onClose={() => setShowDialog(false)}
-          selectCourse={selectCourse}
-          courses={data}
-          queryString={queryString}
-        />
-      )}
+      <SisuCourseDialog
+        open={showDialog && data !== undefined}
+        onClose={() => setShowDialog(false)}
+        selectCourse={selectCourse}
+        courses={data ?? []}
+        queryString={queryString}
+      />
       <form onSubmit={form.handleSubmit}>
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
           <DialogTitle>{t('front-page.create-new-course')}</DialogTitle>
-          <DialogContent dividers>
+          <DialogContent dividers data-testid="new-course-form">
             <Box
               sx={{
                 display: 'flex',
@@ -357,7 +353,7 @@ const CreateCourseDialog = ({
                   <LoadingButton
                     loading={isLoading || isFetching}
                     onClick={() => fetchSisu(form.values.courseCode)}
-                    disabled={form.values.courseCode.length === 0 || !hasApiKey}
+                    disabled={form.values.courseCode.length === 0}
                     variant="outlined"
                     startIcon={<SearchIcon />}
                   >
@@ -365,13 +361,8 @@ const CreateCourseDialog = ({
                   </LoadingButton>
                 </Box>
                 <Box>
-                  <Typography
-                    variant="caption"
-                    color={hasApiKey ? undefined : 'error'}
-                  >
-                    {hasApiKey
-                      ? t('course.edit.sisu-search-button-helper')
-                      : t('course.edit.sisu-search-set-key')}
+                  <Typography variant="caption">
+                    {t('course.edit.sisu-search-button-helper')}
                   </Typography>
                 </Box>
               </Box>

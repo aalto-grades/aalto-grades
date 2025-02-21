@@ -38,7 +38,7 @@ const AddAplusGradeSourceDialog = ({
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const aplusCourses = useFetchAplusCourses({
-    enabled: Boolean(getToken('a+')),
+    enabled: Boolean(getToken()),
   });
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
@@ -50,7 +50,7 @@ const AddAplusGradeSourceDialog = ({
   const open = courseTaskId !== null;
 
   useEffect(() => {
-    setAplusTokenDialogOpen(!getToken('a+') || aplusCourses.isError);
+    setAplusTokenDialogOpen(!getToken() || aplusCourses.isError);
   }, [open, aplusCourses]);
 
   const handleResetAndClose = (): void => {
@@ -68,7 +68,6 @@ const AddAplusGradeSourceDialog = ({
           setAplusTokenDialogOpen(false);
           aplusCourses.refetch();
         }}
-        tokenType="a+"
         error={aplusCourses.isError}
       />
       <Dialog

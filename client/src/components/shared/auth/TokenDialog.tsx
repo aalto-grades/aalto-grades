@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Visibility, VisibilityOff} from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -14,47 +13,33 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {type JSX, useMemo, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import IconButtonWithTooltip from '@/components/shared/IconButtonWithTooltip';
-import {type Token, getToken, setToken} from '@/utils';
+import {getToken, setToken} from '@/utils';
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  tokenType: Token;
   error?: boolean;
-};
-
-const TOKEN_DETAILS = {
-  'a+': {
-    length: 40,
-    link: 'https://plus.cs.aalto.fi/accounts/accounts/',
-  },
-  sisu: {
-    length: 32,
-    link: 'https://3scale.apps.ocp4.aalto.fi/admin/applications',
-  },
 };
 
 const TokenDialog = ({
   open,
   onClose,
   onSubmit,
-  tokenType,
   error = false,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
-  const currentToken = getToken(tokenType);
+  const currentToken = getToken();
   const [tokenInput, setTokenInput] = useState<string>('');
   const [showFullToken, setShowFullToken] = useState<boolean>(false);
-
-  const {length, link} = useMemo(() => TOKEN_DETAILS[tokenType], [tokenType]);
+  const link = 'https://plus.cs.aalto.fi/accounts/accounts/';
+  const tokenLenght = 40;
 
   const isError =
-    error || (tokenInput.length > 0 && tokenInput.length !== length);
+    error || (tokenInput.length > 0 && tokenInput.length !== tokenLenght);
 
   const handleClose = (): void => {
     setTokenInput('');
@@ -62,7 +47,8 @@ const TokenDialog = ({
   };
 
   const handleSubmit = (): void => {
-    if (tokenInput) setToken(tokenType, tokenInput);
+    if (tokenInput) setToken(tokenInput);
+    setTokenInput('');
     onSubmit();
   };
 
@@ -76,25 +62,25 @@ const TokenDialog = ({
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>
-        {tokenType === 'a+'
-          ? t('general.a+-api-token')
-          : t('general.sisu-api-token')}
-      </DialogTitle>
+      <DialogTitle>{t('general.a+-api-token')}</DialogTitle>
       <DialogContent>
         <Typography sx={{mb: 2}}>
-          {tokenType === 'a+'
-            ? t('shared.auth.a+-token.body')
-            : t('shared.auth.sisu-token.body')}
-          :{' '}
+          {t('shared.auth.token.body')}:{' '}
           <Link href={link} target="_blank">
             {link}
           </Link>
         </Typography>
         {currentToken && (
           <Typography>
-            {t('shared.auth.token-general.current')}:
-            <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+            {t('shared.auth.token.current')}:
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+                gap: 1,
+              }}
+            >
               <Box
                 component="span"
                 sx={{
@@ -108,24 +94,18 @@ const TokenDialog = ({
               >
                 {displayToken}
               </Box>
-              <IconButtonWithTooltip
-                onClick={toggleTokenVisibility}
-                sx={{}}
-                title={
-                  showFullToken
-                    ? t('shared.auth.token-general.hide-token-tip')
-                    : t('shared.auth.token-general.show-token-tip')
-                }
-              >
-                {showFullToken ? <VisibilityOff /> : <Visibility />}
-              </IconButtonWithTooltip>
+              <Button onClick={toggleTokenVisibility} size="small">
+                {showFullToken
+                  ? t('shared.auth.token.hide-token-tip')
+                  : t('shared.auth.token.show-token-tip')}
+              </Button>
             </Box>
           </Typography>
         )}
         <TextField
           autoFocus
           sx={{mt: 2, width: 1}}
-          label={t('shared.auth.token-general.label')}
+          label={t('shared.auth.token.label')}
           value={tokenInput}
           onChange={e => setTokenInput(e.target.value)}
           required
@@ -133,8 +113,8 @@ const TokenDialog = ({
           helperText={
             isError
               ? tokenInput.length === 0
-                ? t('shared.auth.token-general.invalid')
-                : t('shared.auth.token-general.length', {length})
+                ? t('shared.auth.token.invalid')
+                : t('shared.auth.token.length', {length: tokenLenght})
               : null
           }
         />
@@ -142,7 +122,7 @@ const TokenDialog = ({
       <DialogActions>
         <Button onClick={handleClose}>{t('general.cancel')}</Button>
         <Button
-          disabled={!tokenInput || tokenInput.length !== length}
+          disabled={!tokenInput || tokenInput.length !== tokenLenght}
           variant="contained"
           onClick={handleSubmit}
         >

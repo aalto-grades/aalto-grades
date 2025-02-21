@@ -16,7 +16,6 @@ import OtpAuthDialog from '@/components/shared/auth/OtpAuthDialog';
 import TokenDialog from '@/components/shared/auth/TokenDialog';
 import {useConfirmMfa, useLogOut, useResetOwnAuth} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
-import type {Token} from '@/utils';
 import ChangePasswordDialog from './ChangePasswordDialog';
 
 const UserButton = (): JSX.Element => {
@@ -29,7 +28,7 @@ const UserButton = (): JSX.Element => {
   const resetOwnAuth = useResetOwnAuth();
 
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-  const [tokenDialogOpen, setTokenDialogOpen] = useState<Token | null>(null);
+  const [tokenDialogOpen, setTokenDialogOpen] = useState<boolean>(false);
   const [changePasswordDialogOpen, setChangePasswordDialogOpen] =
     useState<boolean>(false);
   const [showMfaDialog, setShowMfaDialog] = useState<boolean>(false);
@@ -73,14 +72,11 @@ const UserButton = (): JSX.Element => {
 
   return (
     <>
-      {tokenDialogOpen !== null && (
-        <TokenDialog
-          open
-          onClose={() => setTokenDialogOpen(null)}
-          onSubmit={() => setTokenDialogOpen(null)}
-          tokenType={tokenDialogOpen}
-        />
-      )}
+      <TokenDialog
+        open={tokenDialogOpen}
+        onClose={() => setTokenDialogOpen(false)}
+        onSubmit={() => setTokenDialogOpen(false)}
+      />
       {auth.role === SystemRole.Admin && (
         <>
           <ChangePasswordDialog
@@ -102,7 +98,6 @@ const UserButton = (): JSX.Element => {
           />
         </>
       )}
-
       <Button
         id="user-button"
         color="inherit"
@@ -130,19 +125,10 @@ const UserButton = (): JSX.Element => {
           key="aplus-token"
           onClick={() => {
             setAnchorEl(null);
-            setTokenDialogOpen('a+');
+            setTokenDialogOpen(true);
           }}
         >
           {t('general.a+-api-token')}
-        </MenuItem>
-        <MenuItem
-          key="sisu-token"
-          onClick={() => {
-            setAnchorEl(null);
-            setTokenDialogOpen('sisu');
-          }}
-        >
-          {t('general.sisu-api-token')}
         </MenuItem>
         {auth.role === SystemRole.Admin && [
           <MenuItem
