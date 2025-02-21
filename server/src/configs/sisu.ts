@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 The Aalto Grades Developers
+//
+// SPDX-License-Identifier: MIT
+
 export const apiMockData = [
   {
     id: 'aalto-CUR-191724-3109137',
