@@ -5,11 +5,15 @@
 import axios from 'axios';
 import type {ZodSchema} from 'zod';
 
-import {HttpCode} from '@/common/types';
+import {HttpCode, type SisuError} from '@/common/types';
 import {AXIOS_TIMEOUT} from '../../configs/constants';
 import {SISU_API_TOKEN, SISU_API_URL} from '../../configs/environment';
 import httpLogger from '../../configs/winston';
 import {ApiError, nonEmptyStringSchema} from '../../types';
+
+const isSisuError = (data: unknown): data is SisuError => {
+  return typeof data === 'object' && data !== null && 'error' in data;
+};
 
 /**
  * Fetches data from Sisu API using the given URL path and params.
@@ -24,15 +28,24 @@ export const fetchFromSisu = async <T>(
   const url = `${SISU_API_URL}/${path}`;
   httpLogger.http(`Calling Sisu With "GET ${url}"`);
 
-  const result = schema.safeParse(
-    (
-      await axios.get<T>(url, {
-        timeout: AXIOS_TIMEOUT,
-        validateStatus: (status: number) => status === 200,
-        params: {...params, USER_KEY: SISU_API_TOKEN},
-      })
-    ).data
-  );
+  const data = (
+    await axios.get<T | SisuError>(url, {
+      timeout: AXIOS_TIMEOUT,
+      validateStatus: (status: number) => {
+        return status >= 200 && status < 500;
+      },
+      params: {...params, USER_KEY: SISU_API_TOKEN},
+    })
+  ).data;
+
+  if (isSisuError(data)) {
+    throw new ApiError(
+      `Sisu API error: ${data.error.message}`,
+      HttpCode.NotFound
+    );
+  }
+
+  const result = schema.safeParse(data);
 
   if (!result.success) {
     throw new ApiError(

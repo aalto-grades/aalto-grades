@@ -187,10 +187,10 @@ export const SISU_API_URL: string =
   process.env.AALTO_GRADES_SISU_API_URL || defaults.sisuApiUrl;
 export const SISU_API_TOKEN: string =
   process.env.AALTO_GRADES_SISU_API_TOKEN || defaults.sisuApiToken;
-export const SISU_TOKEN_PROVIDED: boolean =
-  SISU_API_TOKEN !== defaults.sisuApiToken;
+export const ENABLE_SISU_MOCKS: boolean =
+  SISU_API_TOKEN === defaults.sisuApiToken && NODE_ENV !== 'test';
 
-if (!SISU_TOKEN_PROVIDED) {
+if (ENABLE_SISU_MOCKS) {
   httpLogger.warn(
     'No AALTO_GRADES_SISU_API_TOKEN specified, using default value. Sisu endpoints will return only mock data'
   );

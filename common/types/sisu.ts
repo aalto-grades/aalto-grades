@@ -67,6 +67,8 @@ export const SisuErrorSchema = z.object({
   }),
 });
 
+export const SisuCourseInstanceArraySchema = z.array(SisuCourseInstanceSchema);
+
 export type CourseUnit = z.infer<typeof CourseUnitSchema>;
 export type Organization = z.infer<typeof OrganizationSchema>;
 export type SisuCourseInstance = z.infer<typeof SisuCourseInstanceSchema>;

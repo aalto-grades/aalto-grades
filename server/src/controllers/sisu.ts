@@ -2,15 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {z} from 'zod';
-
 import {
   type SisuCourseInstance,
-  SisuCourseInstanceSchema,
+  SisuCourseInstanceArraySchema,
 } from '@/common/types';
 import type {Endpoint} from '../types';
 import {fetchFromSisu, validateSisuCourseCode} from './utils/sisu';
-import {SISU_TOKEN_PROVIDED} from '../configs/environment';
+import {ENABLE_SISU_MOCKS} from '../configs/environment';
 import {apiMockData} from '../configs/sisu';
 
 /**
@@ -22,17 +20,17 @@ export const fetchSisuCoursesByCode: Endpoint<
   void,
   SisuCourseInstance[]
 > = async (req, res) => {
-  const courseCode = validateSisuCourseCode(req.params.courseCode);
+  const code = validateSisuCourseCode(req.params.courseCode);
 
-  if (!SISU_TOKEN_PROVIDED) {
+  if (ENABLE_SISU_MOCKS) {
     res.json(apiMockData);
     return;
   }
 
   const response = await fetchFromSisu(
     'courseunitrealisations',
-    {courseCode},
-    z.array(SisuCourseInstanceSchema)
+    {code},
+    SisuCourseInstanceArraySchema
   );
 
   res.json(response);
