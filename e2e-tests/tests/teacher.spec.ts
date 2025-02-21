@@ -2,21 +2,24 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {expect, test} from '@playwright/test';
+import {test} from '@playwright/test';
 
 import {
+  addCoursePart,
   checkCourse,
   createCourse,
   createGradingModel,
   downloadCSVTemplate,
   downloadExcelTemplate,
   editCourse,
+  importFromSisu,
   importGradesWithCSV,
   importGradesWithExcel,
   importGradesWithText,
   viewCourseParts,
   viewGradingModel,
 } from './common/course.spec';
+import {aPlusToken} from './common/token.spec';
 import {setupDb} from './helper';
 
 test.beforeAll(async () => {
@@ -80,45 +83,17 @@ test.describe('Test courses as teacher', () => {
     await createGradingModel(page);
   });
 
-  test('View Course Parts', async ({page}) => {
-    await page
-      .getByRole('link', {name: 'Course parts'})
-      .getByRole('button')
-      .click();
-    await expect(page.getByText('Days valid')).toBeVisible();
-    await expect(page.getByText('Exercises 2024')).toBeVisible();
-  });
-
   test('Add Course Part', async ({page}) => {
-    await page
-      .getByRole('link', {name: 'Course parts'})
-      .getByRole('button')
-      .click();
-    await expect(page.getByText('Days valid')).toBeVisible();
-    await expect(page.getByText('Exercises 2024')).toBeVisible();
-    await page.getByRole('button', {name: 'Add new course part'}).click();
-    await page.getByLabel('Name*').click();
-    await page.getByLabel('Name*').fill('Exercises 2025');
-    await page.getByRole('button', {name: 'Save'}).click();
-    await expect(
-      page.getByRole('button', {name: 'Exercises 2025 No expiry date'})
-    ).toBeVisible();
+    await addCoursePart(page);
   });
 
-  test('Import course from Sisu - no API key', async ({page}) => {
-    await page.getByRole('button', {name: 'Timmy Teacher'}).click();
-    await page.getByRole('menuitem', {name: 'Sisu API token'}).click();
-    await expect(page.getByText('Your current token')).not.toBeVisible();
-    await page.getByRole('button', {name: 'Cancel'}).click();
-    await page.getByRole('button', {name: 'Create new course'}).click();
-    await expect(
-      page.getByText(
-        'Please set the Sisu API token to search courses from Sisu'
-      )
-    ).toBeVisible();
+  test('Import course from Sisu', async ({page}) => {
+    await importFromSisu(page);
+  });
+});
 
-    const searchButton = page.getByRole('button', {name: 'Search from Sisu'});
-
-    await expect(searchButton).toBeDisabled();
+test.describe('Test API token as teacher', () => {
+  test('Set A+ token', async ({page}) => {
+    await aPlusToken(page, 'Timmy Teacher');
   });
 });

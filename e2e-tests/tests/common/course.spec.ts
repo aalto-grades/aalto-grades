@@ -83,7 +83,7 @@ export const createGradingModel = async (page: Page): Promise<void> => {
   await page.getByRole('button', {name: 'Grading models'}).click();
   await page.getByLabel('Create new final grade model').click();
   await page.getByLabel('Name *').click();
-  await page.getByLabel('Name *').fill('Test model admin');
+  await page.getByLabel('Name *').fill('Test model');
   await page.getByLabel('Select template').click();
   await page.getByRole('option', {name: 'Addition'}).click();
   await page.getByRole('button', {name: 'Submit'}).click();
@@ -96,9 +96,7 @@ export const createGradingModel = async (page: Page): Promise<void> => {
   await expect(page.getByText('Model saved successfully')).toBeVisible();
   await page.getByRole('button', {name: 'Grades', exact: true}).click();
   await page.getByRole('button', {name: 'Grading models'}).click();
-  await expect(
-    page.getByRole('button', {name: 'Test model admin'})
-  ).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Test model'})).toBeVisible();
 };
 
 export const viewGradingModel = async (page: Page): Promise<void> => {
@@ -114,7 +112,25 @@ export const viewCourseParts = async (page: Page): Promise<void> => {
     .getByRole('link', {name: 'Course parts'})
     .getByRole('button')
     .click();
+  await expect(page.getByText('Days valid')).toBeVisible();
+
   await expect(page.getByText('Exercises 2024')).toBeVisible();
+};
+
+export const addCoursePart = async (page: Page): Promise<void> => {
+  await page
+    .getByRole('link', {name: 'Course parts'})
+    .getByRole('button')
+    .click();
+  await expect(page.getByText('Days valid')).toBeVisible();
+  await expect(page.getByText('Exercises 2024')).toBeVisible();
+  await page.getByRole('button', {name: 'Add new course part'}).click();
+  await page.getByLabel('Name*').click();
+  await page.getByLabel('Name*').fill('Exercises 2025');
+  await page.getByRole('button', {name: 'Save'}).click();
+  await expect(
+    page.getByRole('button', {name: 'Exercises 2025 No expiry date'})
+  ).toBeVisible();
 };
 
 export const downloadCSVTemplate = async (page: Page): Promise<void> => {
@@ -175,4 +191,68 @@ export const importGradesWithText = async (page: Page): Promise<void> => {
   await page.getByRole('button', {name: 'Import'}).click();
   // Check that student number from pasted text is loaded to the edit table
   await expect(page.getByRole('row', {name: '423896'})).toBeVisible();
+};
+
+export const importFromSisu = async (page: Page): Promise<void> => {
+  await page.getByRole('button', {name: 'Create new course'}).click();
+  await expect(
+    page.getByText('Try to find course data from Sisu based on course code')
+  ).toBeVisible();
+
+  await page.getByLabel('Course code*').click();
+  await page.getByLabel('Course code*').fill('CS-A1111');
+  await page.getByRole('button', {name: 'Search from Sisu'}).click();
+
+  await expect(
+    page.getByText('Sisu instances found for course code: CS-A1111')
+  ).toBeVisible();
+
+  await page.getByRole('button', {name: 'Select'}).nth(1).click();
+
+  await expect(page.getByLabel('Course name in English*')).toHaveValue(
+    'Basic Course in Programming Y1, Exam (retake exam for 2024 courses)'
+  );
+  await expect(page.getByLabel('Course name in Finnish*')).toHaveValue(
+    'Ohjelmoinnin peruskurssi Y1, Tentti (rästitentti 2024 kursseille)'
+  );
+  await expect(page.getByLabel('Course name in Swedish*')).toHaveValue(
+    'Grundkurs i programmering Y1, Tentamen (för 2024 kurs)'
+  );
+  await expect(page.getByLabel('Minimum course credits (ECTS)*')).toHaveValue(
+    '5'
+  );
+  await expect(page.getByLabel('Maximum course credits (ECTS)*')).toHaveValue(
+    '5'
+  );
+
+  // Scroll to reveal the teachers list
+  await page.evaluate(() => {
+    const dialogContent = document.querySelector(
+      '[data-testid="new-course-form"]'
+    );
+    if (dialogContent)
+      dialogContent.scrollTop = dialogContent.scrollHeight / 2.5;
+  });
+
+  await expect(page.getByText('mike.mock@aalto.fi').nth(0)).toBeVisible();
+  await expect(page.getByText('filipa.fake@aalto.fi').nth(0)).toBeVisible();
+
+  await page.getByRole('button', {name: 'Submit'}).click();
+  await expect(
+    page.getByRole('heading', {
+      name: 'Basic Course in Programming Y1, Exam (retake exam for 2024 courses)',
+    })
+  ).toBeVisible();
+  await page.getByTestId('a-grades-header-link').click();
+  await expect(
+    page
+      .getByRole('cell', {
+        name: 'Basic Course in Programming Y1, Exam (retake exam for 2024 courses)',
+      })
+      .nth(0)
+  ).toBeVisible();
+  await expect(
+    page.getByRole('cell', {name: 'Department of Computer Science'}).nth(0)
+  ).toBeVisible();
+  await expect(page.getByRole('cell', {name: 'CS-A1111'}).nth(0)).toBeVisible();
 };

@@ -5,18 +5,21 @@
 import {expect, test} from '@playwright/test';
 
 import {
+  addCoursePart,
   checkCourse,
   createCourse,
   createGradingModel,
   downloadCSVTemplate,
   downloadExcelTemplate,
   editCourse,
+  importFromSisu,
   importGradesWithCSV,
   importGradesWithExcel,
   importGradesWithText,
   viewCourseParts,
   viewGradingModel,
 } from './common/course.spec';
+import {aPlusToken} from './common/token.spec';
 import {setupDb} from './helper';
 
 test.beforeAll(async () => {
@@ -77,6 +80,10 @@ test.describe('Test courses as admin', () => {
     await viewCourseParts(page);
   });
 
+  test('Add Course Part', async ({page}) => {
+    await addCoursePart(page);
+  });
+
   test('View grading model', async ({page}) => {
     await viewGradingModel(page);
   });
@@ -103,5 +110,15 @@ test.describe('Test courses as admin', () => {
 
   test('Import grades by pasting text', async ({page}) => {
     await importGradesWithText(page);
+  });
+
+  test('Import course from Sisu', async ({page}) => {
+    await importFromSisu(page);
+  });
+});
+
+test.describe('Test API token as admin', () => {
+  test('Set A+ token', async ({page}) => {
+    await aPlusToken(page, 'Andy Admin');
   });
 });
