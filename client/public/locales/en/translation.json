@@ -26,13 +26,8 @@
       "enter-totp": "Enter TOTP code",
       "hide-password": "Click to hide password from view",
       "show-password": "Click to show password",
-      "a+-token": {
-        "body": "You can find your API token by logging in to A+ and navigating to"
-      },
-      "sisu-token": {
-        "body": "You can generate your API token by logging in to Aalto API Gateway and navigating to"
-      },
-      "token-general": {
+      "token": {
+        "body": "You can find your API token by logging in to A+ and navigating to",
         "current": "Your current token",
         "hide-token-tip": "Hide token",
         "show-token-tip": "Show full token",
@@ -123,7 +118,6 @@
   "language": "English (en)",
   "general": {
     "a+-api-token": "A+ API token",
-    "sisu-api-token": "Sisu API token",
     "a+-courses": "A+ courses",
     "next": "Next",
     "back": "Back",
@@ -415,7 +409,6 @@
       "assistant-expiry-date-change": "To change the expire date, remove and add again the assistant",
       "sisu-search-button": "Search from Sisu",
       "sisu-search-button-helper": "Try to find course data from Sisu based on course code",
-      "sisu-search-set-key": "Please set the Sisu API token to search courses from Sisu",
       "input-at-least-one-assistant": "Input the email address of at least one assistant of the course",
       "assistant-expiry-date-info": "Expiry date: {{expiryDate}}",
       "sisu-search-title": "Sisu instances found for course code",

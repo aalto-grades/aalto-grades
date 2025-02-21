@@ -26,13 +26,8 @@
       "enter-totp": "Syötä TOTP-koodi",
       "hide-password": "Klikkaa piilottaaksesi salasanan",
       "show-password": "Klikkaa näyttääksesi salasanan",
-      "a+-token": {
-        "body": "Löydät API-käyttöoikeustietueesi kirjautumalla A+:aan ja siirtymällä sivulle"
-      },
-      "sisu-token": {
-        "body": "Voit generoida API-käyttöoikeustietueesi kirjautumalla Aalto API Gateway-sivustolle ja siirtymällä sivulle"
-      },
-      "token-general": {
+      "token": {
+        "body": "Löydät API-käyttöoikeustietueesi kirjautumalla A+:aan ja siirtymällä sivulle",
         "current": "Nykyinen käyttöoikeustietueesi",
         "hide-token-tip": "Piilota käyttöoikeustietue",
         "show-token-tip": "Näytä koko käyttöoikeustietue",
@@ -123,7 +118,6 @@
   "language": "Suomi (fi)",
   "general": {
     "a+-api-token": "A+ API-käyttöoikeustietue",
-    "sisu-api-token": "Sisu API-käyttöoikeustietue",
     "a+-courses": "A+ kurssit",
     "next": "Seuraava",
     "back": "Takaisin",
@@ -415,7 +409,6 @@
       "assistant-expiry-date-change": "Muuta päättymispäivää poistamalla ja lisäämällä avustaja uudelleen",
       "sisu-search-button": "Etsi Sisusta",
       "sisu-search-button-helper": "Hae kurssin tiedot Sisusta kurssikoodin perusteella",
-      "sisu-search-set-key": "Aseta Sisun API-käyttöoikeustietue hakeaksesi kursseja Sisusta",
       "input-at-least-one-assistant": "Syötä vähintään yhden kurssiavustajan sähköpostiosoite",
       "assistant-expiry-date-info": "Päättymispäivä: {{expiryDate}}",
       "sisu-search-title": "Seuraavat kurssi instanssit löydetty Sisusta kurssikoodilla",

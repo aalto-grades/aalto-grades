@@ -26,13 +26,8 @@
       "enter-totp": "UNTRANSLATED",
       "hide-password": "UNTRANSLATED",
       "show-password": "UNTRANSLATED",
-      "a+-token": {
-        "body": "UNTRANSLATED"
-      },
-      "sisu-token": {
-        "body": "UNTRANSLATED"
-      },
-      "token-general": {
+      "token": {
+        "body": "UNTRANSLATED",
         "current": "UNTRANSLATED",
         "hide-token-tip": "UNTRANSLATED",
         "show-token-tip": "UNTRANSLATED",
@@ -123,7 +118,6 @@
   "language": "Svenska (sv)",
   "general": {
     "a+-api-token": "UNTRANSLATED",
-    "sisu-api-token": "UNTRANSLATED",
     "a+-courses": "UNTRANSLATED",
     "next": "UNTRANSLATED",
     "back": "UNTRANSLATED",
@@ -415,7 +409,6 @@
       "assistant-expiry-date-change": "UNTRANSLATED",
       "sisu-search-button": "UNTRANSLATED",
       "sisu-search-button-helper": "UNTRANSLATED",
-      "sisu-search-set-key": "UNTRANSLATED",
       "input-at-least-one-assistant": "UNTRANSLATED",
       "assistant-expiry-date-info": "UNTRANSLATED",
       "sisu-search-title": "UNTRANSLATED",
