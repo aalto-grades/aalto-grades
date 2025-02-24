@@ -5,15 +5,11 @@
 import axios from 'axios';
 import type {ZodSchema} from 'zod';
 
-import {HttpCode, type SisuError} from '@/common/types';
+import {HttpCode, type SisuError, SisuErrorSchema} from '@/common/types';
 import {AXIOS_TIMEOUT} from '../../configs/constants';
 import {SISU_API_TOKEN, SISU_API_URL} from '../../configs/environment';
 import httpLogger from '../../configs/winston';
 import {ApiError, nonEmptyStringSchema} from '../../types';
-
-const isSisuError = (data: unknown): data is SisuError => {
-  return typeof data === 'object' && data !== null && 'error' in data;
-};
 
 /**
  * Fetches data from Sisu API using the given URL path and params.
@@ -22,7 +18,7 @@ const isSisuError = (data: unknown): data is SisuError => {
  */
 export const fetchFromSisu = async <T>(
   path: string,
-  params: object,
+  params: Record<string, string>,
   schema: ZodSchema<T>
 ): Promise<T> => {
   const url = `${SISU_API_URL}/${path}`;
@@ -38,9 +34,11 @@ export const fetchFromSisu = async <T>(
     })
   ).data;
 
-  if (isSisuError(data)) {
+  const parsed = SisuErrorSchema.safeParse(data);
+
+  if (parsed.success) {
     throw new ApiError(
-      `Sisu API error: ${data.error.message}`,
+      `Sisu API error: ${parsed.data.error.message}`,
       HttpCode.NotFound
     );
   }
