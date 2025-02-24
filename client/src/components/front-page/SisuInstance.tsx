@@ -107,8 +107,10 @@ const HighlightedText = (query: string, text: string): JSX.Element => {
           <span
             key={index}
             style={{
-              backgroundColor: '#90EE90',
-              borderRadius: '2.5px',
+              backgroundColor: '#dbedff',
+              borderRadius: '1.5px',
+              border: '1.5px dotted #484848',
+              padding: '1px 0',
             }}
           >
             {part}
