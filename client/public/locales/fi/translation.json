@@ -103,14 +103,8 @@
       "accessibility": "Saavutettavuusseloste",
       "support": "Tuki",
       "licenses": "Lisenssit",
-      "source": {
-        "tooltip": "Lähdekoodi avautuu uuteen välilehteen",
-        "text": "Lähdekoodi"
-      },
-      "feedback": {
-        "tooltip": "Palaute-lomake avautuu uuteen välilehteen",
-        "text": "Palaute"
-      }
+      "source-text": "Lähdekoodi",
+      "feedback-text": "Palaute"
     }
   },
   "language": "Suomi (fi)",

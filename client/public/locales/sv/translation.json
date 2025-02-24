@@ -103,14 +103,8 @@
       "accessibility": "UNTRANSLATED",
       "support": "UNTRANSLATED",
       "licenses": "UNTRANSLATED",
-      "source": {
-        "tooltip": "UNTRANSLATED",
-        "text": "UNTRANSLATED"
-      },
-      "feedback": {
-        "tooltip": "UNTRANSLATED",
-        "text": "UNTRANSLATED"
-      }
+      "source-text": "UNTRANSLATED",
+      "feedback-text": "UNTRANSLATED"
     }
   },
   "language": "Svenska (sv)",

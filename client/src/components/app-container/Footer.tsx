@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Link, Tooltip, Typography} from '@mui/material';
+import LaunchIcon from '@mui/icons-material/Launch';
+import {Box, Link, Typography} from '@mui/material';
 import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Link as RouterLink} from 'react-router-dom';
@@ -11,63 +12,64 @@ const Footer = (): JSX.Element => {
   const {t} = useTranslation();
 
   return (
-    <Box
-      component="footer"
-      sx={{
-        backgroundColor: 'primary.light',
-        display: 'flex',
-        alignItems: 'center',
-        padding: 2,
-        textAlign: 'left',
-        marginTop: 'auto',
-      }}
-    >
-      <Link
-        component={RouterLink}
-        to="/privacy-notice"
-        underline="none"
-        sx={{mx: 3}}
+    <div style={{gridArea: 'footer'}}>
+      <Box
+        component="footer"
+        sx={{
+          backgroundColor: 'primary.light',
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          padding: 2,
+          gap: 3,
+          textAlign: 'center',
+          marginTop: 'auto',
+          width: '100%',
+          overflowX: 'hidden',
+        }}
       >
-        {t('app.footer.privacy')}
-      </Link>
-      <Link
-        component={RouterLink}
-        to="/accessibility-statement"
-        underline="none"
-        sx={{mr: 3}}
-      >
-        {t('app.footer.accessibility')}
-      </Link>
-      <Link component={RouterLink} to="/support" underline="none" sx={{mr: 3}}>
-        {t('app.footer.support')}
-      </Link>
-      <Link component={RouterLink} to="/licenses" underline="none" sx={{mr: 3}}>
-        {t('app.footer.licenses')}
-      </Link>
-      <Tooltip title={t('app.footer.source.tooltip')}>
+        <Link component={RouterLink} to="/privacy-notice" underline="none">
+          {t('app.footer.privacy')}
+        </Link>
+        <Link
+          component={RouterLink}
+          to="/accessibility-statement"
+          underline="none"
+        >
+          {t('app.footer.accessibility')}
+        </Link>
+        <Link component={RouterLink} to="/support" underline="none">
+          {t('app.footer.support')}
+        </Link>
+        <Link component={RouterLink} to="/licenses" underline="none">
+          {t('app.footer.licenses')}
+        </Link>
         <Link
           href={`https://github.com/aalto-grades/aalto-grades/tree/v${AALTO_GRADES_VERSION}`}
           target="_blank"
           rel="noreferrer"
           underline="none"
-          sx={{mr: 3}}
+          style={{display: 'inline-flex', alignItems: 'center', gap: '2px'}}
         >
-          {t('app.footer.source.text')}
+          {t('app.footer.source-text')}
+          <LaunchIcon fontSize="small" />
         </Link>
-      </Tooltip>
-      <Tooltip title={t('app.footer.feedback.tooltip')}>
         <Link
           href="https://link.webropolsurveys.com/S/E358C6E5E7690C72"
           target="_blank"
           rel="noreferrer"
           underline="none"
-          sx={{mr: 3}}
+          style={{display: 'inline-flex', alignItems: 'center', gap: '2px'}}
         >
-          {t('app.footer.feedback.text')}
+          {t('app.footer.feedback-text')}
+          <LaunchIcon fontSize="small" />
         </Link>
-      </Tooltip>
-      <Typography>Aalto Grades {AALTO_GRADES_VERSION}</Typography>
-    </Box>
+        <Typography sx={{color: 'text.secondary'}}>
+          Ossi v{AALTO_GRADES_VERSION}
+        </Typography>
+      </Box>
+    </div>
   );
 };
 

@@ -103,14 +103,8 @@
       "accessibility": "Accessibility statement",
       "support": "Support",
       "licenses": "Licenses",
-      "source": {
-        "tooltip": "Source code opens in a new tab",
-        "text": "Source code"
-      },
-      "feedback": {
-        "tooltip": "Feedback form opens in a new tab",
-        "text": "Feedback"
-      }
+      "source-text": "Source code",
+      "feedback-text": "Feedback"
     }
   },
   "language": "English (en)",
