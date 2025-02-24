@@ -8,6 +8,7 @@ import {NavLink, useParams} from 'react-router-dom';
 
 import {useGetCourse} from '@/hooks/useApi';
 import {useLocalize} from '@/hooks/useLocalize';
+import ColorModeSelectButton from './ColorModeSelectButton';
 import LanguageSelectButton from './LanguageSelectButton';
 import UserButton from './UserButton';
 
@@ -118,6 +119,7 @@ const Header = (): JSX.Element => {
         </>
       )}
       <Box sx={{flexGrow: 1}} />
+      <ColorModeSelectButton />
       <LanguageSelectButton />
       <UserButton />
     </AppBar>

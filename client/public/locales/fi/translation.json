@@ -97,6 +97,11 @@
       "discard": "Hylkää muutokset"
     }
   },
+  "color-mode": {
+    "system": "Järjestelmä",
+    "light": "Vaalea",
+    "dark": "Tumma"
+  },
   "app": {
     "footer": {
       "privacy": "Tietosuojailmoitus",

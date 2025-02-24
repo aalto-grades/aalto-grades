@@ -97,6 +97,11 @@
       "discard": "Discard changes"
     }
   },
+  "color-mode": {
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
   "app": {
     "footer": {
       "privacy": "Privacy notice",

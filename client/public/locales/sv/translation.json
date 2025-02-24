@@ -97,6 +97,11 @@
       "discard": "UNTRANSLATED"
     }
   },
+  "color-mode": {
+    "system": "UNTRANSLATED",
+    "light": "UNTRANSLATED",
+    "dark": "UNTRANSLATED"
+  },
   "app": {
     "footer": {
       "privacy": "UNTRANSLATED",
