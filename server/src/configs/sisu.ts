@@ -53,7 +53,7 @@ export const apiMockData = [
         sv: 'basic-studies',
         en: 'basic-studies',
       },
-      teacherInCharge: ['Mike Mock', 'Filipa Fake'],
+      teacherInCharge: ['Mike MiddleName Mock', 'Filipa Fake'],
       assesmentMethods: {
         fi: 'Luennot, pakolliset harjoitustehtävät ja tentti. ',
         sv: 'Föreläsningarna, obligatoriska hemuppgifter och tentamen.',

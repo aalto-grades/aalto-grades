@@ -417,7 +417,9 @@
       "end-date": "Lopetus päivämäärä",
       "sisu-search-content": "Sisältö",
       "sisu-search-additional-information": "Lisätiedot",
-      "sisu-search-assessment-methods": "Arviointitapa"
+      "sisu-search-assessment-methods": "Arviointitapa",
+      "sisu-search-accrodion-collapse": "Laajenna kaikki",
+      "sisu-search-accrodion-hide": "Piilota kaikki"
     },
     "list": "Kurssilista"
   },

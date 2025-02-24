@@ -108,8 +108,7 @@ const HighlightedText = (query: string, text: string): JSX.Element => {
             key={index}
             style={{
               backgroundColor: '#90EE90',
-              fontWeight: 'bold',
-              borderRadius: '2px',
+              borderRadius: '2.5px',
             }}
           >
             {part}
@@ -135,6 +134,7 @@ const SisuInstance = ({
 }: PropsType): JSX.Element => {
   const {t, i18n} = useTranslation();
   const [expanded, setExpanded] = useState<string | false>(false);
+  const [expandAll, setExpandAll] = useState<boolean>(false);
 
   const uiLang = i18n.language as keyof LocalizedString;
   const instructionLang =
@@ -151,12 +151,24 @@ const SisuInstance = ({
     return found.language[uiLang];
   };
 
-  const getContent = (content: string | null | undefined): string => {
-    if (content === null || !content || content.length === 0) {
-      return t('general.no-content');
+  const getContent = (content: string | null | undefined): JSX.Element => {
+    if (
+      content === null ||
+      !content ||
+      content.length === 0 ||
+      content === '-'
+    ) {
+      return <>{t('general.no-content')}</>;
     }
 
-    return content;
+    return (
+      <span
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(content),
+        }}
+      />
+    );
   };
 
   const getGrading = (value: string): string => {
@@ -189,19 +201,17 @@ const SisuInstance = ({
             flexDirection: {xs: 'column-reverse', sm: 'row'},
           }}
         >
-          <Box sx={{display: 'flex', gap: 1}}>
-            <Typography variant="subtitle2" gutterBottom>
-              {HighlightedText(queryString, course.code)}
-            </Typography>
+          <Typography
+            variant="subtitle1"
+            gutterBottom
+            sx={{display: 'flex', gap: 1}}
+          >
+            <Typography>{HighlightedText(queryString, course.code)}</Typography>
             {' - '}
-            <Typography
-              variant="subtitle2"
-              gutterBottom
-              sx={{color: 'text.secondary'}}
-            >
+            <Typography sx={{color: 'text.secondary'}}>
               {course.organizationName[uiLang]}
             </Typography>
-          </Box>
+          </Typography>
           <Typography
             variant="subtitle2"
             gutterBottom
@@ -285,9 +295,20 @@ const SisuInstance = ({
             </Typography>
           </Box>
         </Box>
+        <Box>
+          <Button
+            size="small"
+            onClick={() => setExpandAll(prev => !prev)}
+            sx={{mb: -1, mt: 1}}
+          >
+            {expandAll
+              ? t('course.edit.sisu-search-accrodion-hide')
+              : t('course.edit.sisu-search-accrodion-collapse')}
+          </Button>
+        </Box>
         <Box sx={{mt: 2}}>
           <Accordion
-            expanded={expanded === 'panel1'}
+            expanded={expanded === 'panel1' || expandAll}
             onChange={handleChange('panel1')}
           >
             <AccordionSummary
@@ -300,19 +321,12 @@ const SisuInstance = ({
             </AccordionSummary>
             <AccordionDetails>
               <Typography variant="body2">
-                <span
-                  // eslint-disable-next-line react/no-danger
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(
-                      getContent(course.summary.content[uiLang])
-                    ),
-                  }}
-                />
+                {getContent(course.summary.content[uiLang])}
               </Typography>
             </AccordionDetails>
           </Accordion>
           <Accordion
-            expanded={expanded === 'panel2'}
+            expanded={expanded === 'panel2' || expandAll}
             onChange={handleChange('panel2')}
           >
             <AccordionSummary
@@ -325,19 +339,12 @@ const SisuInstance = ({
             </AccordionSummary>
             <AccordionDetails>
               <Typography variant="body2">
-                <span
-                  // eslint-disable-next-line react/no-danger
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(
-                      getContent(course.summary.additionalInformation[uiLang])
-                    ),
-                  }}
-                />
+                {getContent(course.summary.additionalInformation[uiLang])}
               </Typography>
             </AccordionDetails>
           </Accordion>
           <Accordion
-            expanded={expanded === 'panel3'}
+            expanded={expanded === 'panel3' || expandAll}
             onChange={handleChange('panel3')}
           >
             <AccordionSummary
@@ -350,14 +357,7 @@ const SisuInstance = ({
             </AccordionSummary>
             <AccordionDetails>
               <Typography variant="body2">
-                <span
-                  // eslint-disable-next-line react/no-danger
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(
-                      getContent(course.summary.assesmentMethods[uiLang])
-                    ),
-                  }}
-                />
+                {getContent(course.summary.assesmentMethods[uiLang])}
               </Typography>
             </AccordionDetails>
           </Accordion>

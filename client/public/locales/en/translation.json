@@ -417,7 +417,9 @@
       "end-date": "End date",
       "sisu-search-content": "Content",
       "sisu-search-additional-information": "Additional Information",
-      "sisu-search-assessment-methods": "Assesment Methods"
+      "sisu-search-assessment-methods": "Assesment Methods",
+      "sisu-search-accrodion-collapse": "Collapse All",
+      "sisu-search-accrodion-hide": "Hide All"
     },
     "list": "Course list"
   },

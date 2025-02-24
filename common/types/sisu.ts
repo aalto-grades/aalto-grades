@@ -39,7 +39,7 @@ export const SisuCourseInstanceSchema = z.object({
     assesmentMethods: LocalizedStringSchema,
     substitutes: z.strictObject({
       ...LocalizedStringSchema.shape,
-      courseUnits: z.array(z.array(CourseUnitSchema)),
+      courseUnits: z.union([z.array(z.array(CourseUnitSchema)), z.null()]),
     }),
     additionalInformation: LocalizedStringSchema,
     gradingScale: LocalizedStringSchema,
