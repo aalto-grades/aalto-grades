@@ -431,13 +431,14 @@
     "create-new-course": "Luo uusi kurssi"
   },
   "login": {
+    "title": "Kirjaudu sisään Ossiin",
     "external": {
       "title": "Aalto-yliopiston käyttäjät",
       "body": "Kirjaudu sisään Aalto-yliopiston käyttäjätunnuksellasi painamalla alla olevaa painiketta.",
       "button": "Kirjaudu sisään Aalto-tunnuksella"
     },
     "local": {
-      "title": "Kirjaudu sisään Ossiin",
+      "title": "Paikalliset käyttäjät",
       "body": "Jos sinulle on annettu erilliset tunnukset Ossia varten, käytä tätä kirjautumista.",
       "mfa-code": "MFA-koodi",
       "button": "Kirjaudu sisään"

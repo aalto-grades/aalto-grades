@@ -38,7 +38,6 @@ const AppContainer = (): JSX.Element => {
       <Box
         sx={{
           textAlign: 'center',
-          m: 0,
           px: 1,
           height: '100%',
           gridArea: 'content',
