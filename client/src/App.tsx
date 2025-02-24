@@ -5,11 +5,6 @@
 import 'react-global-modal/dist/style.css';
 
 import {
-  Experimental_CssVarsProvider as CssVarsProvider,
-  type CssVarsTheme,
-  extendTheme,
-} from '@mui/material/styles';
-import {
   MutationCache,
   QueryCache,
   QueryClient,
@@ -17,11 +12,12 @@ import {
 } from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
 import {enqueueSnackbar} from 'notistack';
-import {type CSSProperties, type JSX, type Ref, useEffect} from 'react';
+import {type JSX, type Ref, useEffect} from 'react';
 import {GlobalModal, GlobalModalWrapper} from 'react-global-modal';
 import {RouterProvider, createBrowserRouter} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
+import ThemeWrapper from '@/theme/ThemeWrapper';
 import AppContainer from './components/AppContainer';
 import FrontPageView from './components/FrontPageView';
 import LoginView from './components/LoginView';
@@ -39,160 +35,6 @@ import ModelsView from './components/course/ModelsView';
 import ConfirmDialog from './components/shared/ConfirmDialog';
 import NotistackWrapper from './context/NotistackWrapper';
 import type {CustomError} from './types';
-
-declare module '@mui/material/styles' {
-  interface PaletteOptions {
-    black?: string;
-    hoverGrey1?: string;
-    hoverGrey2?: string;
-    hoverGrey3?: string;
-    infoGrey?: string;
-  }
-
-  interface Palette {
-    black: string;
-    hoverGrey1: string;
-    hoverGrey2: string;
-    hoverGrey3: string;
-    infoGrey: string;
-  }
-
-  interface TypographyVariantsOptions {
-    textInput?: CSSProperties;
-  }
-}
-
-declare module '@mui/material/Button' {
-  export interface ButtonPropsVariantOverrides {
-    elevated: true;
-    tonal: true;
-  }
-}
-
-const muiTheme: CssVarsTheme = extendTheme({
-  colorSchemes: {
-    light: {
-      palette: {
-        black: '#000000',
-        primary: {
-          light: '#EFF3FB',
-          main: '#3D5AFE',
-          dark: '#0031CA',
-          contrastText: '#FFF',
-        },
-        secondary: {
-          light: '#F1F8F0',
-          main: '#96CF99',
-          dark: '#519657',
-          contrastText: '#000',
-        },
-        hoverGrey1: '#EAEAEA',
-        hoverGrey2: '#F4F4F4',
-        hoverGrey3: '#6E6E6E',
-        infoGrey: '#545454',
-        contrastThreshold: 4.5,
-      },
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          borderRadius: '8px',
-        },
-      },
-      variants: [
-        {
-          props: {variant: 'elevated'},
-          style: {
-            boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-          },
-        },
-        {
-          props: {variant: 'tonal', color: 'secondary'},
-          style: ({theme}) => ({
-            backgroundColor: theme.vars.palette.secondary.light,
-            color: theme.vars.palette.secondary.main,
-          }),
-        },
-        {
-          props: {variant: 'tonal', color: 'primary'},
-          style: ({theme}) => ({
-            backgroundColor: theme.vars.palette.primary.light,
-            color: theme.vars.palette.primary.main,
-          }),
-        },
-      ],
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          borderRadius: '8px',
-          borderColor: 'black',
-          height: '32px',
-          fontSize: '14px',
-        },
-      },
-    },
-    MuiListItemIcon: {
-      styleOverrides: {
-        root: {
-          minWidth: '48px',
-        },
-      },
-    },
-    MuiMenu: {
-      styleOverrides: {
-        paper: {
-          borderRadius: '8px',
-        },
-      },
-    },
-  },
-  typography: {
-    h1: {
-      fontSize: '48px',
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-      fontWeight: '400',
-    },
-    h2: {
-      fontSize: '28px',
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-      fontWeight: '400',
-    },
-    h3: {
-      fontSize: '24px',
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-      fontWeight: '400',
-    },
-    body1: {
-      fontSize: '16px',
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      fontWeight: '400',
-    },
-    body2: {
-      fontSize: '14px',
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      fontWeight: '400',
-    },
-    textInput: {
-      fontSize: '16px',
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      fontWeight: '400',
-    },
-    button: {
-      fontSize: '14px',
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      fontWeight: '500',
-    },
-    caption: {
-      fontSize: '12px',
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      fontWeight: '400',
-    },
-  },
-});
 
 let globalModalRef: GlobalModalWrapper | null = null;
 
@@ -218,8 +60,9 @@ const Root = (): JSX.Element => {
       },
     },
   });
+
   return (
-    <CssVarsProvider theme={muiTheme}>
+    <ThemeWrapper>
       <NotistackWrapper />
       <GlobalModalWrapper
         customModal={ConfirmDialog}
@@ -230,7 +73,7 @@ const Root = (): JSX.Element => {
         {/* Query debug tool */}
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
-    </CssVarsProvider>
+    </ThemeWrapper>
   );
 };
 
