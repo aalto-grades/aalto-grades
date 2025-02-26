@@ -112,7 +112,7 @@ const defaults = {
   samlPrivateKeyFile: '/keys/saml-private-key.pem',
   samlSpCertFile: '/keys/saml-sp-cert.pem',
 
-  // Sisu API
+  // Sisu API, default token is just a placeholder, not valid.
   sisuApiToken: '507f508dfa595cc9kya86d9200c7cca9f',
   sisuApiUrl: 'https://course.api.aalto.fi:443/api/sisu/v1',
 };
@@ -184,14 +184,14 @@ export const SAML_SP_CERT_FILE = defaults.samlSpCertFile;
 export const APLUS_API_URL = process.env.APLUS_API_URL || defaults.aPlusApiUrl;
 
 export const SISU_API_URL: string =
-  process.env.AALTO_GRADES_SISU_API_URL || defaults.sisuApiUrl;
+  process.env.SISU_API_URL || defaults.sisuApiUrl;
 export const SISU_API_TOKEN: string =
-  process.env.AALTO_GRADES_SISU_API_TOKEN || defaults.sisuApiToken;
+  process.env.SISU_API_TOKEN || defaults.sisuApiToken;
 export const ENABLE_SISU_MOCKS: boolean =
   SISU_API_TOKEN === defaults.sisuApiToken && NODE_ENV !== 'test';
 
 if (ENABLE_SISU_MOCKS) {
   httpLogger.warn(
-    'No AALTO_GRADES_SISU_API_TOKEN specified, using default value. Sisu endpoints will return only mock data'
+    'No SISU_API_TOKEN specified, using default value. Sisu endpoints will return only mock data'
   );
 }
