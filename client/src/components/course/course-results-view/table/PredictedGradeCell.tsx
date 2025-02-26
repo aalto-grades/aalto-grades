@@ -96,6 +96,7 @@ const PredictedGradeCell = ({
       </Tooltip>
       {gradingModelIds.length > 0 && (
         <IconButtonWithTip
+          defaultVisible={false}
           onClick={onClick}
           title={t('course.results.view-graph')}
         >

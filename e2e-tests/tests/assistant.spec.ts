@@ -2,8 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {expect, test} from '@playwright/test';
+import {test} from '@playwright/test';
 
+import {
+  checkCourse,
+  viewCourseParts,
+  viewGradingModel,
+} from './common/course.spec';
 import {setupDb} from './helper';
 
 test.beforeAll(async () => {
@@ -19,27 +24,19 @@ test.afterEach(async ({page}) => {
   await page.getByRole('button', {name: 'Alex Assistant'}).click();
   await page.getByRole('menuitem', {name: 'Log out'}).click();
 });
+
 test.use({storageState: 'playwright/.auth/assistant.json'});
+
 test.describe('Test courses as Assistant', () => {
   test('Check course', async ({page}) => {
-    await page.getByRole('cell', {name: 'O1'}).click();
-    await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
+    await checkCourse(page);
   });
 
   test('View grading model', async ({page}) => {
-    await page.getByRole('cell', {name: 'O1'}).click();
-    await page.getByRole('button', {name: 'Grading models'}).click();
-
-    await page.getByRole('button', {name: 'Exercises 2024'}).click();
-    await expect(page.getByTestId('rf__wrapper')).toBeVisible();
+    await viewGradingModel(page);
   });
 
   test('View course parts', async ({page}) => {
-    await page.getByRole('cell', {name: 'O1'}).click();
-    await page
-      .getByRole('link', {name: 'Course parts'})
-      .getByRole('button')
-      .click();
-    await expect(page.getByText('Exercises 2024')).toBeVisible();
+    await viewCourseParts(page);
   });
 });

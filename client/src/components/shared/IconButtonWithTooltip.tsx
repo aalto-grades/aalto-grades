@@ -8,6 +8,7 @@ import type {JSX} from 'react';
 
 type PropsType = {
   title: string;
+  defaultVisible?: boolean;
   children?: JSX.Element;
 } & IconButtonProps;
 
@@ -17,13 +18,14 @@ type PropsType = {
  */
 const IconButtonWithTooltip = ({
   title,
+  defaultVisible = true,
   children,
   onClick,
   ...props
 }: PropsType): JSX.Element => (
   <Tooltip placement="top" title={title} disableInteractive>
     <IconButton
-      className="hoverable-icon"
+      className={defaultVisible ? '' : 'hoverable-icon'}
       color="primary"
       sx={{
         position: 'absolute',

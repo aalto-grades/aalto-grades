@@ -241,7 +241,6 @@ export const getGradeLogs: Endpoint<void, TaskGradeHistoryArray> = async (
  * @throws ApiError(400|404|409)
  */
 export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
-  console.log('create task grade');
   const grader = req.user as JwtClaims;
   const courseId = await validateCourseId(req.params.courseId);
 

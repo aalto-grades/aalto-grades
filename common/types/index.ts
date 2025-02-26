@@ -12,5 +12,6 @@ export * from './general';
 export * from './gradingModel';
 export * from './graph';
 export * from './history';
+export * from './sisu';
 export * from './taskGrade';
 export * from './user';

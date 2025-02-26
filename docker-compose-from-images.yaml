@@ -52,6 +52,8 @@ services:
       SAML_ENTRYPOINT: '${SAML_ENTRYPOINT}'
       SAML_ISSUER: '${SAML_ISSUER}'
       SAML_METADATA_URL: '${SAML_METADATA_URL}'
+      SISU_API_TOKEN: '${SISU_API_TOKEN}'
+      SISU_API_URL: '${SISU_API_URL}'
     volumes:
       - ${SAML_DECRYPTION_PVK_FILE}:/keys/saml-decryption-key.pem
       - ${SAML_PRIVATE_KEY_FILE}:/keys/saml-private-key.pem
