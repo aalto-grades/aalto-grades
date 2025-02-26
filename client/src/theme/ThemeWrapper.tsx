@@ -32,6 +32,10 @@ const ThemeWrapper = (props: AppThemeProps): JSX.Element => {
     typography,
     shadows,
     shape,
+    // https://mui.com/material-ui/customization/palette/#accessibility
+    palette: {
+      contrastThreshold: 4.5,
+    },
     components: {
       ...inputsCustomizations,
       ...navigationCustomizations,
@@ -40,7 +44,7 @@ const ThemeWrapper = (props: AppThemeProps): JSX.Element => {
   });
 
   return (
-    <ThemeProvider theme={theme} disableTransitionOnChange>
+    <ThemeProvider theme={theme} defaultMode="system" disableTransitionOnChange>
       <CssBaseline enableColorScheme />
       {children}
     </ThemeProvider>

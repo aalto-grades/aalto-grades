@@ -16,12 +16,14 @@ type ColTypes = {
   actionType: string;
   date: string;
 };
+
 type PropsType = {
   open: boolean;
   onClose: () => void;
   studentUser?: StudentData;
   courseTaskId?: number;
 };
+
 const GradesHistoryDialog = ({
   open,
   onClose,
@@ -71,7 +73,7 @@ const GradesHistoryDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
-      <DialogTitle>History</DialogTitle>
+      <DialogTitle>{t('general.results.history.title')}</DialogTitle>
       {gradesHistory.data !== undefined && (
         <DialogContent>
           <div style={{height: '30vh'}}>
