@@ -93,6 +93,7 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
       {sourceValue.type === 'courseTask' && (
         <>
           <IconButtonWithTip
+            defaultVisible={false}
             onClick={() => setGradeDialogOpen(true)}
             title={
               sourceValue.task.grades.length <= 1

@@ -9,12 +9,6 @@ import {
   type NewAplusGradeSourceData,
 } from '../../../common/types';
 
-export const setAplusToken = (token: string): void =>
-  localStorage.setItem('Aplus-Token', token);
-
-export const getAplusToken = (): string | null =>
-  localStorage.getItem('Aplus-Token');
-
 export const getLatestAplusModuleDate = (
   aplusExerciseData: AplusExerciseData
 ): Date =>

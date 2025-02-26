@@ -24,15 +24,17 @@
       "reset-mfa": "UNTRANSLATED",
       "log-out": "UNTRANSLATED",
       "enter-totp": "UNTRANSLATED",
-      "a+-token": {
+      "hide-password": "UNTRANSLATED",
+      "show-password": "UNTRANSLATED",
+      "token": {
         "body": "UNTRANSLATED",
         "current": "UNTRANSLATED",
+        "hide-token-tip": "UNTRANSLATED",
+        "show-token-tip": "UNTRANSLATED",
         "label": "UNTRANSLATED",
         "invalid": "UNTRANSLATED",
         "length": "UNTRANSLATED"
       },
-      "hide-password": "UNTRANSLATED",
-      "show-password": "UNTRANSLATED",
       "token-expired": "UNTRANSLATED"
     },
     "graph": {
@@ -154,7 +156,8 @@
       "history": {
         "action-type": "UNTRANSLATED",
         "action-date": "UNTRANSLATED",
-        "author": "UNTRANSLATED"
+        "author": "UNTRANSLATED",
+        "title": "UNTRANSLATED"
       }
     },
     "close": "UNTRANSLATED",
@@ -181,6 +184,9 @@
     "teacher": "UNTRANSLATED",
     "assistant": "UNTRANSLATED",
     "student": "UNTRANSLATED",
+    "clear": "UNTRANSLATED",
+    "no-content": "UNTRANSLATED",
+    "select": "UNTRANSLATED",
     "email": "UNTRANSLATED",
     "copy": "UNTRANSLATED",
     "users": "UNTRANSLATED",
@@ -401,15 +407,26 @@
       "assistant-expiry-date-helper": "UNTRANSLATED",
       "no-assistants": "UNTRANSLATED",
       "assistant-expiry-date-change": "UNTRANSLATED",
+      "sisu-search-button": "UNTRANSLATED",
+      "sisu-search-button-helper": "UNTRANSLATED",
       "input-at-least-one-assistant": "UNTRANSLATED",
-      "assistant-expiry-date-info": "UNTRANSLATED"
+      "assistant-expiry-date-info": "UNTRANSLATED",
+      "sisu-search-title": "UNTRANSLATED",
+      "sisu-search-basic-information": "UNTRANSLATED",
+      "start-date": "UNTRANSLATED",
+      "end-date": "UNTRANSLATED",
+      "sisu-search-content": "UNTRANSLATED",
+      "sisu-search-additional-information": "UNTRANSLATED",
+      "sisu-search-assessment-methods": "UNTRANSLATED",
+      "sisu-search-accrodion-collapse": "UNTRANSLATED",
+      "sisu-search-accrodion-hide": "UNTRANSLATED"
     },
     "list": "UNTRANSLATED"
   },
   "front-page": {
     "not-logged-in": "UNTRANSLATED",
     "search": "UNTRANSLATED",
-    "create-course": "UNTRANSLATED",
+    "create-new-course": "UNTRANSLATED",
     "user-added": "UNTRANSLATED",
     "email-help": "UNTRANSLATED",
     "admin-name-help": "UNTRANSLATED",
@@ -428,8 +445,19 @@
     "no-users": "UNTRANSLATED",
     "reset-password-mfa": "UNTRANSLATED",
     "your-courses": "UNTRANSLATED",
-    "no-courses": "UNTRANSLATED",
-    "create-new-course": "UNTRANSLATED"
+    "no-courses": "UNTRANSLATED"
+  },
+  "utils": {
+    "scale-numerical": "UNTRANSLATED",
+    "scale-pass-fail": "UNTRANSLATED",
+    "scale-second-lang": "UNTRANSLATED",
+    "grade-higher-than-max": "UNTRANSLATED",
+    "grade-not-an-int": "UNTRANSLATED",
+    "grade-out-of-range": "UNTRANSLATED",
+    "fail": "UNTRANSLATED",
+    "pass": "UNTRANSLATED",
+    "sat": "UNTRANSLATED",
+    "good": "UNTRANSLATED"
   },
   "login": {
     "external": {
@@ -463,17 +491,5 @@
   "students": {
     "select": "UNTRANSLATED",
     "viewing": "UNTRANSLATED"
-  },
-  "utils": {
-    "grade-higher-than-max": "UNTRANSLATED",
-    "grade-not-an-int": "UNTRANSLATED",
-    "grade-out-of-range": "UNTRANSLATED",
-    "scale-numerical": "UNTRANSLATED",
-    "scale-pass-fail": "UNTRANSLATED",
-    "scale-second-lang": "UNTRANSLATED",
-    "fail": "UNTRANSLATED",
-    "pass": "UNTRANSLATED",
-    "sat": "UNTRANSLATED",
-    "good": "UNTRANSLATED"
   }
 }

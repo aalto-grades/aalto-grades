@@ -28,6 +28,25 @@ export const convertToClientGradingScale = (
 };
 
 /**
+ * Change Sisu formatted grading string to GradingScale value. These are for the
+ * UI forms.
+ */
+export const convertSisuToClientGradingScale = (
+  sisuGradingScale: string
+): string => {
+  switch (sisuGradingScale) {
+    case '0-5':
+      return GradingScale.Numerical;
+    case 'hyl-hyv':
+      return GradingScale.PassFail;
+    case 'toinen-kotim':
+      return GradingScale.SecondNationalLanguage;
+    default:
+      return sisuGradingScale;
+  }
+};
+
+/**
  * Convert grading scale + grade into a string describing the grade, e.g. 0-5,
  * pass/fail, good/sat/fail
  */
