@@ -16,13 +16,13 @@ jobs:
       run:
         working-directory: ./e2e-tests
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/cache@v3
         id: playwright-cache
         with:
           path: |
             ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('e2e-tests/package-lock.json') }}
-      - uses: actions/checkout@v4
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
       - uses: actions/setup-node@v4
         with:
           node-version: 20
