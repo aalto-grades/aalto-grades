@@ -16,6 +16,7 @@ import OtpAuthDialog from '@/components/shared/auth/OtpAuthDialog';
 import TokenDialog from '@/components/shared/auth/TokenDialog';
 import {useConfirmMfa, useLogOut, useResetOwnAuth} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
+import {resetToken} from '@/utils';
 import ChangePasswordDialog from './ChangePasswordDialog';
 
 const UserButton = (): JSX.Element => {
@@ -36,6 +37,7 @@ const UserButton = (): JSX.Element => {
 
   const handleLogOut = async (): Promise<void> => {
     await logOut.mutateAsync();
+    resetToken();
     setAuth(null);
     setAnchorEl(null);
     queryClient.clear();
