@@ -200,7 +200,7 @@ const UploadDialogConfirm = ({
 
   return (
     <>
-      <DialogTitle>Confirm</DialogTitle>
+      <DialogTitle>{t('general.confirm')}</DialogTitle>
       <DialogContent>
         {invalidValues && (
           <Alert severity="warning" sx={{mb: 2}}>
