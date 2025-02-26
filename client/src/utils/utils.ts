@@ -12,11 +12,6 @@ import {
 } from '@/common/types';
 import type {DepartmentOption, LanguageOption} from '@/types';
 
-export const setToken = (token: string): void =>
-  localStorage.setItem('a+', token);
-
-export const getToken = (): string | null => localStorage.getItem('a+');
-
 export const getMaxFinalGrade = (gradingScale: GradingScale): number => {
   switch (gradingScale) {
     case GradingScale.Numerical:
