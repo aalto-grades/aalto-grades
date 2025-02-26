@@ -33,7 +33,7 @@
         "show-token-tip": "Show full token",
         "label": "API token",
         "invalid": "The token you have entered is invalid, please make sure your token is correct.",
-        "length": "The token should be {{length}} characters long."
+        "length": "The token should be {{length}} characters long. Current length {{inputLen}}/{{length}}"
       },
       "token-expired": "Token expired. Refresh the page."
     },

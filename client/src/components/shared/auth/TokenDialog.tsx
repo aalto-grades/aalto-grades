@@ -36,10 +36,10 @@ const TokenDialog = ({
   const [tokenInput, setTokenInput] = useState<string>('');
   const [showFullToken, setShowFullToken] = useState<boolean>(false);
   const link = 'https://plus.cs.aalto.fi/accounts/accounts/';
-  const tokenLenght = 40;
+  const tokenLength = 40;
 
   const isError =
-    error || (tokenInput.length > 0 && tokenInput.length !== tokenLenght);
+    error || (tokenInput.length > 0 && tokenInput.length !== tokenLength);
 
   const handleClose = (): void => {
     setTokenInput('');
@@ -114,7 +114,10 @@ const TokenDialog = ({
             isError
               ? tokenInput.length === 0
                 ? t('shared.auth.token.invalid')
-                : t('shared.auth.token.length', {length: tokenLenght})
+                : t('shared.auth.token.length', {
+                    length: tokenLength,
+                    inputLen: tokenInput.length,
+                  })
               : null
           }
         />
@@ -122,7 +125,7 @@ const TokenDialog = ({
       <DialogActions>
         <Button onClick={handleClose}>{t('general.cancel')}</Button>
         <Button
-          disabled={!tokenInput || tokenInput.length !== tokenLenght}
+          disabled={!tokenInput || tokenInput.length !== tokenLength}
           variant="contained"
           onClick={handleSubmit}
         >
