@@ -60,6 +60,9 @@ export enum Department {
   IndustrialEngineeringAndManagement = 'INDUSTRIAL_ENGINEERING_AND_MANAGEMENT',
   MathematicsAndSystemsAnalysis = 'MATHEMATICS_AND_SYSTEMS_ANALYSIS',
   NeuroscienceAndBiomedicalEngineering = 'NEUROSCIENCE_AND_BIOMEDICAL_ENGINEERING',
+
+  // Other
+  LanguageCentre = 'LANGUAGE_CENTRE',
 }
 
 export const GradingScaleSchema = z.nativeEnum(GradingScale);

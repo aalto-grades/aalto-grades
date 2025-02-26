@@ -12,6 +12,11 @@ import {
 } from '@/common/types';
 import type {DepartmentOption, LanguageOption} from '@/types';
 
+export const setToken = (token: string): void =>
+  localStorage.setItem('a+', token);
+
+export const getToken = (): string | null => localStorage.getItem('a+');
+
 export const getMaxFinalGrade = (gradingScale: GradingScale): number => {
   switch (gradingScale) {
     case GradingScale.Numerical:
@@ -239,6 +244,16 @@ export const departments: DepartmentOption[] = [
       fi: 'Neurotieteen ja lääketieteellisen tekniikan laitos',
       en: 'Department of Neuroscience and Biomedical Engineering',
       sv: 'Institutionen för neurovetenskap och biomedicinsk teknik',
+    },
+  },
+
+  // Other
+  {
+    id: Department.LanguageCentre,
+    department: {
+      fi: 'Aalto University, Kielikeskus',
+      en: 'Aalto University, Language Centre',
+      sv: 'Språkcentret',
     },
   },
 ];

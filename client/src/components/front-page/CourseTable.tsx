@@ -24,7 +24,9 @@ import {useLocalize} from '@/hooks/useLocalize';
 import type {HeadCellData} from '@/types';
 import {departments, getCourseRole} from '@/utils';
 
-const CourseTable = ({courses}: {courses: CourseData[]}): JSX.Element => {
+type PropsType = {courses: CourseData[]};
+
+const CourseTable = ({courses}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {auth} = useAuth();
   const localize = useLocalize();

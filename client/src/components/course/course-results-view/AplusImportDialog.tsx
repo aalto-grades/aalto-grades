@@ -32,14 +32,14 @@ import {
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
+import TokenDialog from '@/components/shared/auth/TokenDialog';
 import {
   useAddGrades,
   useFetchAplusGrades,
   useGetCourseParts,
   useGetCourseTasks,
 } from '@/hooks/useApi';
-import {getAplusToken} from '@/utils';
+import {getToken} from '@/utils';
 
 type PropsType = {open: boolean; onClose: () => void};
 const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
@@ -70,7 +70,7 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
     if (step !== 1) return;
 
     if (!aplusGrades.data) {
-      setAplusTokenDialogOpen(!getAplusToken() || aplusGrades.isError);
+      setAplusTokenDialogOpen(!getToken() || aplusGrades.isError);
     } else if (aplusGrades.data.length === 0) {
       enqueueSnackbar(t('course.parts.no-aplus-grades'), {
         variant: 'warning',
@@ -101,7 +101,7 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
 
   return (
     <>
-      <AplusTokenDialog
+      <TokenDialog
         open={aplusTokenDialogOpen}
         onClose={handleResetAndClose}
         onSubmit={() => {
@@ -138,7 +138,7 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
               <Button
                 onClick={() => {
                   setStep(1);
-                  if (getAplusToken()) aplusGrades.refetch();
+                  if (getToken()) aplusGrades.refetch();
                   else setAplusTokenDialogOpen(true);
                 }}
                 disabled={courseTaskIds.length === 0}

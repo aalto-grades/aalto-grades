@@ -8,16 +8,17 @@ import {
   PersonAddAlt1 as PersonAddAlt1Icon,
   Person as PersonIcon,
 } from '@mui/icons-material';
+import SearchIcon from '@mui/icons-material/Search';
 import {
   Alert,
   Avatar,
   Box,
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   IconButton,
   List,
   ListItem,
@@ -27,8 +28,9 @@ import {
   MenuItem,
   TextField,
   Tooltip,
+  Typography,
 } from '@mui/material';
-import {Formik, type FormikHelpers, type FormikProps} from 'formik';
+import {type FormikHelpers, type FormikProps, useFormik} from 'formik';
 import {type JSX, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
@@ -43,18 +45,24 @@ import {
   Language,
   LanguageSchema,
   type NewCourseData,
+  type SisuCourseInstance,
 } from '@/common/types';
 import FormField from '@/components/shared/FormikField';
 import FormLanguagesField from '@/components/shared/FormikLanguageField';
+import LoadingButton from '@/components/shared/LoadingButton';
+import {useSearchSisuCourses} from '@/hooks/api/sisu';
 import {useAddCourse, useVerifyEmail} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import {useLocalize} from '@/hooks/useLocalize';
 import {type AssistantData, nullableDateSchema} from '@/types';
 import {
+  convertSisuToClientGradingScale,
   convertToClientGradingScale,
   departments,
   sisuLanguageOptions,
 } from '@/utils';
+import {withZodSchema} from '@/utils/forms';
+import SisuCourseDialog from './SisuCourseDialog';
 
 type FormData = {
   courseCode: string;
@@ -86,7 +94,61 @@ const initialValues = {
   nameSv: '',
 };
 
+/**
+ * Generates an email address based on the given name. Normalizes Scandinavian
+ * characters (ä, å → a and ö → o) and constructs an email address in the format
+ * 'firstname.lastname@aalto.fi'. Drops middle names. Sisu API does not provide
+ * email addresses any incorrect emails must be manually corrected during the
+ * course creation process by the user.
+ */
+const generateEmailAddressString = (name: string): string => {
+  const normalize = (str: string): string =>
+    str.replace(/[äå]/g, 'a').replace(/ö/g, 'o');
+
+  const parts = name.split(' ');
+  const firstName = normalize(parts[0]);
+  const lastName = normalize(parts[parts.length - 1]);
+
+  return `${firstName}.${lastName}@aalto.fi`.toLowerCase();
+};
+
+const sisuInstanceToForm = (instance: SisuCourseInstance): FormData => {
+  const data = {
+    courseCode: instance.code,
+    department: Department.ComputerScience,
+    minCredits: instance.credits.min,
+    maxCredits: instance.credits.max,
+    gradingScale: convertSisuToClientGradingScale(
+      instance.summary.gradingScale.en
+    ) as GradingScale,
+    languageOfInstruction: Language.English,
+    teacherEmail: '',
+    assistantEmail: '',
+    assistantExpiryDate: '',
+    nameEn: instance.name.en,
+    nameFi: instance.name.fi,
+    nameSv: instance.name.sv,
+  };
+
+  const department = departments.find(
+    d => d.department.en === instance.organizationName.en
+  );
+
+  if (department) {
+    data.department = department.id;
+  }
+
+  // Instruction language, use first one from list
+  if (instance.languageOfInstructionCodes[0].length > 0) {
+    data.languageOfInstruction =
+      instance.languageOfInstructionCodes[0].toUpperCase() as Language;
+  }
+
+  return data;
+};
+
 type PropsType = {open: boolean; forceEmail?: string; onClose: () => void};
+
 const CreateCourseDialog = ({
   open,
   onClose,
@@ -106,8 +168,14 @@ const CreateCourseDialog = ({
     new Set<string>()
   );
   const [assistants, setAssistants] = useState<AssistantData[]>([]);
+  const [queryString, setQueryString] = useState<string>('');
+  const [showDialog, setShowDialog] = useState<boolean>(false);
 
-  const ValidationSchema = z
+  const {data, isLoading, isFetching} = useSearchSisuCourses(queryString, {
+    enabled: queryString.length > 0,
+  });
+
+  const validationSchema = z
     .object({
       courseCode: z
         .string({
@@ -158,45 +226,34 @@ const CreateCourseDialog = ({
     );
   };
 
-  const handleSubmit = (
-    values: FormData,
-    {setSubmitting}: FormikHelpers<FormData>
-  ): void => {
-    const courseData: NewCourseData = {
-      courseCode: values.courseCode,
-      minCredits: values.minCredits,
-      maxCredits: values.maxCredits,
-      gradingScale: values.gradingScale,
-      languageOfInstruction: values.languageOfInstruction,
-      department: values.department,
-      name: {
-        fi: values.nameFi,
-        sv: values.nameSv,
-        en: values.nameEn,
-      },
-      teachersInCharge,
-      assistants,
-    };
+  const form = useFormik<FormData>({
+    validateOnChange: true,
+    initialValues,
+    validate: withZodSchema(validationSchema),
+    onSubmit: values => {
+      const courseData: NewCourseData = {
+        courseCode: values.courseCode,
+        minCredits: values.minCredits,
+        maxCredits: values.maxCredits,
+        gradingScale: values.gradingScale,
+        languageOfInstruction: values.languageOfInstruction,
+        department: values.department,
+        name: {
+          fi: values.nameFi,
+          sv: values.nameSv,
+          en: values.nameEn,
+        },
+        teachersInCharge,
+        assistants,
+      };
 
-    addCourse.mutate(courseData, {
-      onSuccess: newCourseId => {
-        navigate(`/${newCourseId}`);
-      },
-      onError: () => setSubmitting(false),
-    });
-  };
-
-  const validateForm = (
-    values: FormData
-  ): {[key in keyof FormData]?: string[]} | undefined => {
-    const result = ValidationSchema.safeParse(values);
-    if (result.success) return;
-
-    const fieldErrors = result.error.formErrors.fieldErrors;
-    return Object.fromEntries(
-      Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
-    );
-  };
+      addCourse.mutate(courseData, {
+        onSuccess: newCourseId => {
+          navigate(`/${newCourseId}`);
+        },
+      });
+    },
+  });
 
   const confirmDiscard = async ({
     resetForm,
@@ -209,91 +266,214 @@ const CreateCourseDialog = ({
     }
   };
 
+  const validateTeacher = async (email: string): Promise<void> => {
+    const isEmailExisted = await emailExisted.mutateAsync({
+      email,
+    });
+
+    if (!isEmailExisted.exists) {
+      setNonExistingEmails(oldNonExistingEmail =>
+        oldNonExistingEmail.add(email)
+      );
+    }
+
+    setTeachersInCharge(oldTeachers => oldTeachers.concat(email));
+    form.setFieldValue('teacherEmail', '');
+  };
+
   const sortedDepartments = [...departments].sort((a, b) =>
     localize(a.department).localeCompare(localize(b.department))
   );
 
+  const fetchSisu = (courseCode: string): void => {
+    setShowDialog(true);
+    setQueryString(courseCode.trim());
+  };
+
+  const resetForm = (): void => {
+    form.resetForm();
+    setTeachersInCharge([]);
+    setAssistants([]);
+    setNonExistingEmails(new Set());
+  };
+
+  const selectCourse = async (course: SisuCourseInstance): Promise<void> => {
+    resetForm();
+    setShowDialog(false);
+    form.setValues(sisuInstanceToForm(course));
+
+    // Teachers in charge, validate one by one
+    for (let i = 0; i < course.teachers.length; ++i) {
+      await validateTeacher(generateEmailAddressString(course.teachers[i]));
+    }
+  };
+
   return (
-    <Formik
-      initialValues={initialValues}
-      validate={validateForm}
-      onSubmit={handleSubmit}
-    >
-      {form => (
+    <>
+      <SisuCourseDialog
+        open={showDialog && data !== undefined}
+        onClose={() => setShowDialog(false)}
+        selectCourse={selectCourse}
+        courses={data ?? []}
+        queryString={queryString}
+      />
+      <form onSubmit={form.handleSubmit}>
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-          <DialogTitle>{t('front-page.create-course')}</DialogTitle>
-          <DialogContent dividers>
-            <FormField
-              form={form as unknown as FormikProps<{[key: string]: unknown}>}
-              value="courseCode"
-              label={`${t('general.course-code')}*`}
-              helperText={t('course.edit.course-code-help')}
-            />
+          <DialogTitle>{t('front-page.create-new-course')}</DialogTitle>
+          <DialogContent dividers data-testid="new-course-form">
+            <Box
+              sx={{
+                display: 'flex',
+                gap: {xs: 0, sm: 2},
+                flexDirection: {xs: 'column', sm: 'row'},
+              }}
+            >
+              <Box sx={{width: {xs: '100%', sm: '60%'}}}>
+                <FormField
+                  form={
+                    form as unknown as FormikProps<{[key: string]: unknown}>
+                  }
+                  value="courseCode"
+                  label={`${t('general.course-code')}*`}
+                  helperText={t('course.edit.course-code-help')}
+                  disabled={form.isSubmitting || isLoading || isFetching}
+                />
+              </Box>
+              <Box
+                sx={{
+                  width: {xs: '100%', sm: '40%'},
+                  alignContent: 'center',
+                  mt: {xs: 0, sm: 2},
+                  gap: {xs: 2, sm: 0},
+                  display: 'flex',
+                  flexDirection: {xs: 'row', sm: 'column'},
+                }}
+              >
+                <Box>
+                  <LoadingButton
+                    loading={isLoading || isFetching}
+                    onClick={() => fetchSisu(form.values.courseCode)}
+                    disabled={form.values.courseCode.length === 0}
+                    variant="outlined"
+                    startIcon={<SearchIcon />}
+                  >
+                    {t('course.edit.sisu-search-button')}
+                  </LoadingButton>
+                </Box>
+                <Box>
+                  <Typography variant="caption">
+                    {t('course.edit.sisu-search-button-helper')}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
             <FormLanguagesField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
               valueFormat="name%"
               labelFormat={`${t('course.edit.course-name-in-format')}*`}
               helperTextFormat={t('course.edit.course-name-in-help-format')}
+              disabled={form.isSubmitting || isLoading || isFetching}
             />
-            <FormField
-              form={form as unknown as FormikProps<{[key: string]: unknown}>}
-              value="department"
-              label={`${t('general.organizing-department')}*`}
-              helperText={t('course.edit.organizing-department-help')}
-              select
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: {xs: 'column', sm: 'row'},
+                gap: 2,
+              }}
             >
-              {sortedDepartments.map(department => (
-                <MenuItem key={department.id} value={department.id}>
-                  {localize(department.department)}
-                </MenuItem>
-              ))}
-            </FormField>
-            <FormField
-              form={form as unknown as FormikProps<{[key: string]: unknown}>}
-              value="minCredits"
-              label={`${t('course.edit.min-credits')}*`}
-              helperText={t('course.edit.min-credits-help')}
-              type="number"
-            />
-            <FormField
-              form={form as unknown as FormikProps<{[key: string]: unknown}>}
-              value="maxCredits"
-              label={`${t('course.edit.max-credits')}*`}
-              helperText={t('course.edit.max-credits-help')}
-              type="number"
-            />
-            <FormField
-              form={form as unknown as FormikProps<{[key: string]: unknown}>}
-              value="gradingScale"
-              label={`${t('course.edit.grading-scale')}*`}
-              helperText={t('course.edit.grading-scale-help')}
-              select
-            >
-              {Object.values(GradingScale).map(value => (
-                <MenuItem key={value} value={value}>
-                  {convertToClientGradingScale(t, value)}
-                </MenuItem>
-              ))}
-            </FormField>
-            <FormField
-              form={form as unknown as FormikProps<{[key: string]: unknown}>}
-              value="languageOfInstruction"
-              label={`${t('course.edit.language')}*`}
-              helperText={t('course.edit.language-help')}
-              select
-            >
-              {sisuLanguageOptions.map(option => (
-                <MenuItem key={option.id} value={option.id}>
-                  {localize(option.language)}
-                </MenuItem>
-              ))}
-            </FormField>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 1,
+                  flexDirection: 'column',
+                  width: {xs: '100%', sm: '50%'},
+                }}
+              >
+                <FormField
+                  form={
+                    form as unknown as FormikProps<{[key: string]: unknown}>
+                  }
+                  value="department"
+                  label={`${t('general.organizing-department')}*`}
+                  helperText={t('course.edit.organizing-department-help')}
+                  disabled={form.isSubmitting || isLoading || isFetching}
+                  select
+                >
+                  {sortedDepartments.map(department => (
+                    <MenuItem key={department.id} value={department.id}>
+                      {localize(department.department)}
+                    </MenuItem>
+                  ))}
+                </FormField>
+                <FormField
+                  form={
+                    form as unknown as FormikProps<{[key: string]: unknown}>
+                  }
+                  value="gradingScale"
+                  label={`${t('course.edit.grading-scale')}*`}
+                  helperText={t('course.edit.grading-scale-help')}
+                  disabled={form.isSubmitting || isLoading || isFetching}
+                  select
+                >
+                  {Object.values(GradingScale).map(value => (
+                    <MenuItem key={value} value={value}>
+                      {convertToClientGradingScale(t, value)}
+                    </MenuItem>
+                  ))}
+                </FormField>
+                <FormField
+                  form={
+                    form as unknown as FormikProps<{[key: string]: unknown}>
+                  }
+                  value="languageOfInstruction"
+                  label={`${t('course.edit.language')}*`}
+                  helperText={t('course.edit.language-help')}
+                  disabled={form.isSubmitting || isLoading || isFetching}
+                  select
+                >
+                  {sisuLanguageOptions.map(option => (
+                    <MenuItem key={option.id} value={option.id}>
+                      {localize(option.language)}
+                    </MenuItem>
+                  ))}
+                </FormField>
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 1,
+                  flexDirection: 'column',
+                  width: {xs: '100%', sm: '50%'},
+                }}
+              >
+                <FormField
+                  form={
+                    form as unknown as FormikProps<{[key: string]: unknown}>
+                  }
+                  value="minCredits"
+                  label={`${t('course.edit.min-credits')}*`}
+                  helperText={t('course.edit.min-credits-help')}
+                  disabled={form.isSubmitting || isLoading || isFetching}
+                  type="number"
+                />
+                <FormField
+                  form={
+                    form as unknown as FormikProps<{[key: string]: unknown}>
+                  }
+                  value="maxCredits"
+                  label={`${t('course.edit.max-credits')}*`}
+                  helperText={t('course.edit.max-credits-help')}
+                  disabled={form.isSubmitting || isLoading || isFetching}
+                  type="number"
+                />
+              </Box>
+            </Box>
             <TextField
               id="teacherEmail" // Must be in camelCase to match data
               type="text"
               fullWidth
               value={form.values.teacherEmail}
-              disabled={form.isSubmitting}
+              disabled={form.isSubmitting || isLoading || isFetching}
               label={t('course.edit.teachers-in-charge')}
               margin="normal"
               slotProps={{inputLabel: {shrink: true}}}
@@ -318,23 +498,11 @@ const CreateCourseDialog = ({
                 form.errors.teacherEmail !== undefined ||
                 form.values.teacherEmail.length === 0 ||
                 teachersInCharge.includes(form.values.teacherEmail) ||
-                form.isSubmitting
+                form.isSubmitting ||
+                isLoading ||
+                isFetching
               }
-              onClick={async () => {
-                const teacherEmail = form.values.teacherEmail;
-                const isEmailExisted = await emailExisted.mutateAsync({
-                  email: teacherEmail,
-                });
-                if (!isEmailExisted.exists) {
-                  setNonExistingEmails(oldNonExistingEmail =>
-                    oldNonExistingEmail.add(teacherEmail)
-                  );
-                }
-                setTeachersInCharge(oldTeachers =>
-                  oldTeachers.concat(teacherEmail)
-                );
-                form.setFieldValue('teacherEmail', '');
-              }}
+              onClick={async () => validateTeacher(form.values.teacherEmail)}
               sx={{mt: 1}}
             >
               {t('general.add')}
@@ -347,6 +515,13 @@ const CreateCourseDialog = ({
                   {teachersInCharge.map(teacherEmail => (
                     <ListItem
                       key={teacherEmail}
+                      sx={{
+                        display: 'flex',
+                        gap: 2,
+                        justifyContent: 'space-between',
+                        justifyItems: 'start',
+                        flexDirection: {xs: 'column', sm: 'row'},
+                      }}
                       secondaryAction={
                         teacherEmail !== auth?.email && (
                           <IconButton
@@ -362,17 +537,27 @@ const CreateCourseDialog = ({
                         )
                       }
                     >
-                      <ListItemAvatar>
-                        <Avatar>
-                          <PersonIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText primary={teacherEmail} />
-                      {nonExistingEmails.has(teacherEmail) && (
-                        <Alert severity="warning">
-                          {t('course.edit.user-not-exist')}
-                        </Alert>
-                      )}
+                      <Box sx={{display: 'flex'}}>
+                        <ListItemAvatar>
+                          <Avatar>
+                            <PersonIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary={teacherEmail} />
+                      </Box>
+                      <Box>
+                        {nonExistingEmails.has(teacherEmail) && (
+                          <Alert
+                            severity="warning"
+                            sx={{width: {xs: '90%', sm: '80%'}}}
+                          >
+                            {t('course.edit.user-not-exist')}
+                          </Alert>
+                        )}
+                        <Divider
+                          sx={{my: 1, display: {xs: 'block', sm: 'none'}}}
+                        />
+                      </Box>
                     </ListItem>
                   ))}
                 </List>
@@ -383,7 +568,7 @@ const CreateCourseDialog = ({
               type="text"
               fullWidth
               value={form.values.assistantEmail}
-              disabled={form.isSubmitting}
+              disabled={form.isSubmitting || isLoading || isFetching}
               label={t('general.assistants')}
               margin="normal"
               slotProps={{inputLabel: {shrink: true}}}
@@ -408,6 +593,7 @@ const CreateCourseDialog = ({
               value="assistantExpiryDate"
               label={t('course.edit.assistant-expiry-date')}
               helperText={t('course.edit.assistant-expiry-date-helper')}
+              disabled={form.isSubmitting || isLoading || isFetching}
               type="date"
               InputProps={{
                 inputProps: {min: new Date().toISOString().slice(0, 10)},
@@ -422,7 +608,9 @@ const CreateCourseDialog = ({
                 assistants
                   .map(assistant => assistant.email)
                   .includes(form.values.assistantEmail) ||
-                form.isSubmitting
+                form.isSubmitting ||
+                isLoading ||
+                isFetching
               }
               onClick={async () => {
                 const assistantEmail = form.values.assistantEmail;
@@ -461,6 +649,13 @@ const CreateCourseDialog = ({
                   {assistants.map((assistant: AssistantData) => (
                     <ListItem
                       key={assistant.email}
+                      sx={{
+                        display: 'flex',
+                        gap: 2,
+                        justifyContent: 'space-between',
+                        justifyItems: 'start',
+                        flexDirection: {xs: 'column', sm: 'row'},
+                      }}
                       secondaryAction={
                         <IconButton
                           edge="end"
@@ -474,48 +669,59 @@ const CreateCourseDialog = ({
                         </IconButton>
                       }
                     >
-                      <ListItemAvatar>
-                        <Avatar>
-                          <PersonIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText primary={assistant.email} />
-                      {assistant.expiryDate && (
-                        <div style={{display: 'flex'}}>
-                          <ListItemText
-                            secondary={t(
-                              'course.edit.assistant-expiry-date-info',
-                              {
-                                expiryDate: assistant.expiryDate
-                                  .toISOString()
-                                  .slice(0, 10),
-                              }
-                            )}
-                            sx={{
-                              marginRight: '0.5em',
-                            }}
-                          />
-                          <Tooltip
-                            placement="top"
-                            title={t(
-                              'course.edit.assistant-expiry-date-change'
-                            )}
-                          >
-                            <ListItemIcon>
-                              <HelpOutlined
+                      <Box sx={{display: 'flex'}}>
+                        <ListItemAvatar>
+                          <Avatar>
+                            <PersonIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary={assistant.email} />
+                      </Box>
+                      <Box>
+                        {assistant.expiryDate && (
+                          <Box sx={{display: 'flex', justifyContent: 'start'}}>
+                            <Box>
+                              <ListItemText
+                                secondary={t(
+                                  'course.edit.assistant-expiry-date-info',
+                                  {
+                                    expiryDate: assistant.expiryDate
+                                      .toISOString()
+                                      .slice(0, 10),
+                                  }
+                                )}
                                 sx={{
-                                  width: '0.6em',
+                                  marginRight: '0.5em',
                                 }}
                               />
-                            </ListItemIcon>
-                          </Tooltip>
-                        </div>
-                      )}
-                      {nonExistingEmails.has(assistant.email) && (
-                        <Alert severity="warning">
-                          {t('course.edit.user-not-exist')}
-                        </Alert>
-                      )}
+                            </Box>
+                            <Box>
+                              <Tooltip
+                                placement="top"
+                                title={t(
+                                  'course.edit.assistant-expiry-date-change'
+                                )}
+                              >
+                                <ListItemIcon>
+                                  <HelpOutlined
+                                    sx={{
+                                      width: '0.6em',
+                                    }}
+                                  />
+                                </ListItemIcon>
+                              </Tooltip>
+                            </Box>
+                          </Box>
+                        )}
+                        {nonExistingEmails.has(assistant.email) && (
+                          <Alert severity="warning">
+                            {t('course.edit.user-not-exist')}
+                          </Alert>
+                        )}
+                        <Divider
+                          sx={{my: 1, display: {xs: 'block', sm: 'none'}}}
+                        />
+                      </Box>
                     </ListItem>
                   ))}
                 </List>
@@ -523,49 +729,58 @@ const CreateCourseDialog = ({
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="outlined"
-              color={
-                JSON.stringify(initialValues) !== JSON.stringify(form.values)
-                  ? 'error'
-                  : 'primary'
-              }
-              disabled={form.isSubmitting}
-              onClick={() => {
-                if (
-                  JSON.stringify(initialValues) !== JSON.stringify(form.values)
-                ) {
-                  confirmDiscard(form);
-                } else {
-                  onClose();
-                }
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '100%',
               }}
             >
-              {t('general.cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              onClick={form.submitForm}
-              disabled={form.isSubmitting}
-            >
-              {t('general.submit')}
-              {form.isSubmitting && (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: '-12px',
-                    marginLeft: '-12px',
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={resetForm}
+                disabled={form.isSubmitting || isLoading || isFetching}
+              >
+                {t('general.clear')}
+              </Button>
+              <Box sx={{display: 'flex', gap: 2}}>
+                <Button
+                  variant="outlined"
+                  color={
+                    JSON.stringify(initialValues) !==
+                    JSON.stringify(form.values)
+                      ? 'error'
+                      : 'primary'
+                  }
+                  disabled={form.isSubmitting || isLoading || isFetching}
+                  onClick={() => {
+                    if (
+                      JSON.stringify(initialValues) !==
+                      JSON.stringify(form.values)
+                    ) {
+                      confirmDiscard(form);
+                    } else {
+                      onClose();
+                    }
                   }}
-                />
-              )}
-            </Button>
+                >
+                  {t('general.cancel')}
+                </Button>
+                <LoadingButton
+                  loading={form.isSubmitting}
+                  variant="contained"
+                  onClick={form.submitForm}
+                  disabled={form.isSubmitting || isLoading || isFetching}
+                >
+                  {t('general.submit')}
+                </LoadingButton>
+              </Box>
+            </Box>
           </DialogActions>
         </Dialog>
-      )}
-    </Formik>
+      </form>
+    </>
   );
 };
 

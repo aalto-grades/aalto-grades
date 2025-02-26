@@ -20,13 +20,13 @@ import type {
   NewCourseTaskData,
 } from '@/common/types';
 import {aplusGradeSourcesEqual} from '@/common/util';
-import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
+import TokenDialog from '@/components/shared/auth/TokenDialog';
 import {
   useAddAplusGradeSources,
   useFetchAplusCourses,
   useModifyCourseTasks,
 } from '@/hooks/useApi';
-import {getAplusToken} from '@/utils';
+import {getToken} from '@/utils';
 import CreateAplusCourseTasks from './aplus-components/CreateAplusCourseTasks';
 import SelectAplusCourse from './aplus-components/SelectAplusCourse';
 import SelectAplusGradeSources from './aplus-components/SelectAplusGradeSources';
@@ -45,7 +45,7 @@ const NewAplusCourseTasksDialog = ({
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const aplusCourses = useFetchAplusCourses({
-    enabled: Boolean(getAplusToken()),
+    enabled: Boolean(getToken()),
   });
   const modifyCourseTasks = useModifyCourseTasks(courseId);
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
@@ -60,7 +60,7 @@ const NewAplusCourseTasksDialog = ({
   >([]);
 
   useEffect(() => {
-    setAplusTokenDialogOpen(!getAplusToken() || aplusCourses.isError);
+    setAplusTokenDialogOpen(!getToken() || aplusCourses.isError);
   }, [open, aplusCourses]);
 
   const handleResetAndClose = (): void => {
@@ -142,7 +142,7 @@ const NewAplusCourseTasksDialog = ({
 
   return (
     <>
-      <AplusTokenDialog
+      <TokenDialog
         open={open && aplusTokenDialogOpen}
         onClose={onClose}
         onSubmit={() => {

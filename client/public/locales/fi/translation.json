@@ -24,15 +24,17 @@
       "reset-mfa": "Nollaa MFA",
       "log-out": "Kirjaudu ulos",
       "enter-totp": "Syötä TOTP-koodi",
-      "a+-token": {
-        "body": "Löydät API-käyttöoikeustietueesi kirjautumalla A+:aan ja siirtymällä sivulle",
-        "current": "Nykyinen käyttöoikeustietueesi",
-        "label": "API-käyttöoikeustietue",
-        "invalid": "Syöttämäsi käyttöoikeustietue on virheellinen, varmista että käyttöoikeustietue on oikein.",
-        "length": "Käyttöoikeustietueen tulisi olla 40 merkkiä pitkä."
-      },
       "hide-password": "Klikkaa piilottaaksesi salasanan",
       "show-password": "Klikkaa näyttääksesi salasanan",
+      "token": {
+        "body": "Löydät API-käyttöoikeustietueesi kirjautumalla A+:aan ja siirtymällä sivulle",
+        "current": "Nykyinen käyttöoikeustietueesi",
+        "hide-token-tip": "Piilota käyttöoikeustietue",
+        "show-token-tip": "Näytä koko käyttöoikeustietue",
+        "label": "API-käyttöoikeustietue",
+        "invalid": "Syöttämäsi käyttöoikeustietue on virheellinen, varmista että käyttöoikeustietue on oikein.",
+        "length": "Käyttöoikeustietueen tulisi olla {{length}} merkkiä pitkä."
+      },
       "token-expired": "Käyttöoikeustietue on vanhentunut. Päivitä sivu."
     },
     "graph": {
@@ -154,7 +156,8 @@
       "history": {
         "action-type": "Toiminnon tyyppi",
         "action-date": "Päivämäärä",
-        "author": "Tekijä"
+        "author": "Tekijä",
+        "title": "Historia"
       }
     },
     "close": "Sulje",
@@ -181,6 +184,9 @@
     "teacher": "Opettaja",
     "assistant": "Assistentti",
     "student": "Opiskelija",
+    "clear": "Tyhjennä",
+    "no-content": "Ei sisältöä",
+    "select": "Valitse",
     "email": "Sähköposti",
     "copy": "Kopioi",
     "users": "Käyttäjät",
@@ -401,15 +407,26 @@
       "assistant-expiry-date-helper": "Avustajan roolin päättymispäivä",
       "no-assistants": "Kurssilla ei ole avustajia",
       "assistant-expiry-date-change": "Muuta päättymispäivää poistamalla ja lisäämällä avustaja uudelleen",
+      "sisu-search-button": "Etsi Sisusta",
+      "sisu-search-button-helper": "Hae kurssin tiedot Sisusta kurssikoodin perusteella",
       "input-at-least-one-assistant": "Syötä vähintään yhden kurssiavustajan sähköpostiosoite",
-      "assistant-expiry-date-info": "Päättymispäivä: {{expiryDate}}"
+      "assistant-expiry-date-info": "Päättymispäivä: {{expiryDate}}",
+      "sisu-search-title": "Seuraavat kurssi instanssit löydetty Sisusta kurssikoodilla",
+      "sisu-search-basic-information": "Perustiedot",
+      "start-date": "Aloitus päivämäärä",
+      "end-date": "Lopetus päivämäärä",
+      "sisu-search-content": "Sisältö",
+      "sisu-search-additional-information": "Lisätiedot",
+      "sisu-search-assessment-methods": "Arviointitapa",
+      "sisu-search-accrodion-collapse": "Laajenna kaikki",
+      "sisu-search-accrodion-hide": "Piilota kaikki"
     },
     "list": "Kurssilista"
   },
   "front-page": {
     "not-logged-in": "Et ole kirjautunut sisään",
     "search": "haku",
-    "create-course": "Luo uusi kurssi",
+    "create-new-course": "Luo uusi kurssi",
     "user-added": "Käyttäjä lisätty onnistuneesti",
     "email-help": "Aalto-sähköposti esim. etunimi.sukunimi@aalto.fi.",
     "admin-name-help": "Ylläpitäjän nimi",
@@ -428,8 +445,19 @@
     "no-users": "Käyttäjiä ei löytynyt",
     "reset-password-mfa": "Nollaa salasana / MFA",
     "your-courses": "Kurssisi",
-    "no-courses": "Sinulla ei ole kursseja. Ota yhteyttä tukeen kurssin lisäämiseksi.",
-    "create-new-course": "Luo uusi kurssi"
+    "no-courses": "Sinulla ei ole kursseja. Ota yhteyttä tukeen kurssin lisäämiseksi."
+  },
+  "utils": {
+    "scale-numerical": "Arviointiasteikko, 0-5",
+    "scale-pass-fail": "Hyväksytty-Hylätty",
+    "scale-second-lang": "Toinen kotimainen kieli",
+    "grade-higher-than-max": "Arvosana on suurempi kuin sallittu maksimiarvo",
+    "grade-not-an-int": "Ennustettu lopullinen arvosana ei ole kokonaisluku",
+    "grade-out-of-range": "Ennustettu lopullinen arvosana on sallitun alueen ulkopuolella",
+    "fail": "Hylätty",
+    "pass": "Hyväksytty",
+    "sat": "Tyydyttävä",
+    "good": "Hyvä"
   },
   "login": {
     "external": {
@@ -463,17 +491,5 @@
   "students": {
     "select": "Valitse opiskelija",
     "viewing": "Näytetään arvosanat käyttäjälle {{user}}"
-  },
-  "utils": {
-    "grade-higher-than-max": "Arvosana on suurempi kuin sallittu maksimiarvo",
-    "grade-not-an-int": "Ennustettu lopullinen arvosana ei ole kokonaisluku",
-    "grade-out-of-range": "Ennustettu lopullinen arvosana on sallitun alueen ulkopuolella",
-    "scale-numerical": "Arviointiasteikko, 0-5",
-    "scale-pass-fail": "Hyväksytty-Hylätty",
-    "scale-second-lang": "Toinen kotimainen kieli",
-    "fail": "Hylätty",
-    "pass": "Hyväksytty",
-    "sat": "Tyydyttävä",
-    "good": "Hyvä"
   }
 }

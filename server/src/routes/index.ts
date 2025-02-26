@@ -15,6 +15,7 @@ import {router as coursePartRouter} from './coursePart';
 import {router as courseTaskRouter} from './courseTask';
 import {router as finalGradesRouter} from './finalGrade';
 import {router as gradingModelRouter} from './gradingModel';
+import {router as sisuRouter} from './sisu';
 import {router as gradesRouter} from './taskGrade';
 import {router as userRouter} from './user';
 import {FRONTEND_ORIGIN} from '../configs/environment';
@@ -38,6 +39,7 @@ router.use(courseTaskRouter);
 router.use(finalGradesRouter);
 router.use(gradesRouter);
 router.use(gradingModelRouter);
+router.use(sisuRouter);
 router.use(userRouter);
 
 router.use('/api-docs', swaggerUI.serve);

@@ -51,6 +51,7 @@ const FinalGradeCell = ({
       <span>{getGradeString(t, gradingScale, bestFinalGrade?.grade)}</span>
       {/* If there are multiple final grades "show more" icon*/}
       <IconButtonWithTip
+        defaultVisible={false}
         onClick={(): void => setEditDialogOpen(true)}
         title={
           finalGrades.length <= 1

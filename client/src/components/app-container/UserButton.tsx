@@ -12,8 +12,8 @@ import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
-import AplusTokenDialog from '@/components/shared/auth/AplusTokenDialog';
 import OtpAuthDialog from '@/components/shared/auth/OtpAuthDialog';
+import TokenDialog from '@/components/shared/auth/TokenDialog';
 import {useConfirmMfa, useLogOut, useResetOwnAuth} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import ChangePasswordDialog from './ChangePasswordDialog';
@@ -28,8 +28,7 @@ const UserButton = (): JSX.Element => {
   const resetOwnAuth = useResetOwnAuth();
 
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-  const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
-    useState<boolean>(false);
+  const [tokenDialogOpen, setTokenDialogOpen] = useState<boolean>(false);
   const [changePasswordDialogOpen, setChangePasswordDialogOpen] =
     useState<boolean>(false);
   const [showMfaDialog, setShowMfaDialog] = useState<boolean>(false);
@@ -73,10 +72,10 @@ const UserButton = (): JSX.Element => {
 
   return (
     <>
-      <AplusTokenDialog
-        open={aplusTokenDialogOpen}
-        onClose={() => setAplusTokenDialogOpen(false)}
-        onSubmit={() => setAplusTokenDialogOpen(false)}
+      <TokenDialog
+        open={tokenDialogOpen}
+        onClose={() => setTokenDialogOpen(false)}
+        onSubmit={() => setTokenDialogOpen(false)}
       />
       {auth.role === SystemRole.Admin && (
         <>
@@ -99,7 +98,6 @@ const UserButton = (): JSX.Element => {
           />
         </>
       )}
-
       <Button
         id="user-button"
         color="inherit"
@@ -110,10 +108,10 @@ const UserButton = (): JSX.Element => {
           setAnchorEl(event.currentTarget);
         }}
       >
-        <Box sx={{marginRight: 1, marginTop: 1}}>
+        <Box sx={{mr: {xs: 0, sm: 1}, mt: 1}}>
           <PersonIcon color="inherit" />
         </Box>
-        {auth.name}
+        <Box sx={{display: {xs: 'none', sm: 'block'}}}>{auth.name}</Box>
         <ArrowDropDownIcon color="inherit" />
       </Button>
       <Menu
@@ -127,7 +125,7 @@ const UserButton = (): JSX.Element => {
           key="aplus-token"
           onClick={() => {
             setAnchorEl(null);
-            setAplusTokenDialogOpen(true);
+            setTokenDialogOpen(true);
           }}
         >
           {t('general.a+-api-token')}

@@ -16,6 +16,7 @@ type ColTypes = {
   actionType: string;
   date: string;
 };
+
 type PropsType = {
   open: boolean;
   onClose: () => void;
@@ -47,11 +48,6 @@ const GradesHistoryDialog = ({
     })) ?? [];
 
   const columns: GridColDef<ColTypes>[] = [
-    // {
-    //   field: 'gradeId',
-    //   headerName: t('general.name'),
-    //   type: 'string',
-    // },
     {
       field: 'actionType',
       headerName: t('general.results.history.action-type'),
@@ -71,7 +67,7 @@ const GradesHistoryDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
-      <DialogTitle>History</DialogTitle>
+      <DialogTitle>{t('general.results.history.title')}</DialogTitle>
       {gradesHistory.data !== undefined && (
         <DialogContent>
           <div style={{height: '30vh'}}>
@@ -82,12 +78,10 @@ const GradesHistoryDialog = ({
               rowSelection={false}
               autosizeOnMount
               disableColumnSelector
-              // slots={{toolbar: dataGridToolbar}}
               sx={{maxHeight: '70vh', minHeight: '20vh'}}
               initialState={{
                 sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
               }}
-              // getRowClassName={getRowClassName as unknown as GetRowClassName}
             />
           </div>
         </DialogContent>

@@ -30,10 +30,10 @@ const LanguageSelectButton = (): JSX.Element => {
         aria-expanded={menuOpen ? 'true' : undefined}
         onClick={event => setAnchorEl(event.currentTarget)}
       >
-        <Box sx={{marginRight: 1, marginTop: 1}}>
+        <Box sx={{mr: {xs: 0, sm: 1}, mt: 1}}>
           <Language color="inherit" />
         </Box>
-        {t('language')}
+        <Box sx={{display: {xs: 'none', sm: 'block'}}}>{t('language')}</Box>
         <ArrowDropDown color="inherit" />
       </Button>
       <Menu
