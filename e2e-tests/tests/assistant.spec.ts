@@ -4,11 +4,7 @@
 
 import {test} from '@playwright/test';
 
-import {
-  checkCourse,
-  viewCourseParts,
-  viewGradingModel,
-} from './common/course.spec';
+import {checkCourse, viewCourseParts, viewGradingModel} from './common/course';
 import {setupDb} from './helper';
 
 test.beforeAll(async () => {

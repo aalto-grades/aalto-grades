@@ -18,8 +18,8 @@ import {
   importGradesWithText,
   viewCourseParts,
   viewGradingModel,
-} from './common/course.spec';
-import {aPlusToken} from './common/token.spec';
+} from './common/course';
+import {aPlusToken} from './common/token';
 import {setupDb} from './helper';
 
 test.beforeAll(async () => {
