@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: Aalto Grades
-Upstream-Contact: The Aalto Grades Developers
+Upstream-Name: Ossi
+Upstream-Contact: The Ossi Developers
 Source: https://github.com/aalto-grades
 
 Files:
@@ -12,13 +12,13 @@ Files:
  server/package*.json
  server/pgAdminpass
  server/pgAdminSetup.json
-Copyright: The Aalto Grades Developers
+Copyright: The Ossi Developers
 License: MIT
 
 Files:
  .github/ISSUE_TEMPLATE/bug-report.md
  .github/ISSUE_TEMPLATE/feature-request.md
-Copyright: The Aalto Grades Developers
+Copyright: The Ossi Developers
 License: MIT
 Comment:
  These files are based on GitHub's default bug report and feature request issue

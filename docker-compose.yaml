@@ -1,8 +1,8 @@
-# SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+# SPDX-FileCopyrightText: 2022 The Ossi Developers
 #
 # SPDX-License-Identifier: MIT
 
-# This is a Docker Compose configuration for running Aalto Grades locally,
+# This is a Docker Compose configuration for running Ossi locally,
 
 ---
 services:

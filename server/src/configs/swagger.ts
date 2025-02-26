@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Ossi Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -14,7 +14,7 @@ export const definition: OAS3Definition = {
   info: {
     version: '1.0.0',
     title: 'API documentation',
-    description: 'Documentation of Aalto Grades backend API',
+    description: 'Documentation of Ossi backend API',
     termsOfService: '',
     license: {
       name: 'Expat (MIT)',

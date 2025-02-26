@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Ossi Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -107,11 +107,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
       mfaSecret = authenticator.generateSecret(64);
       await user.set({mfaSecret, mfaConfirmed: false}).save();
     }
-    const otpAuth = authenticator.keyuri(
-      req.body.email,
-      'Aalto Grades',
-      mfaSecret
-    );
+    const otpAuth = authenticator.keyuri(req.body.email, 'Ossi', mfaSecret);
 
     // Force password reset
     if (user.forcePasswordReset) return res.json({status: 'resetPassword'});
@@ -311,7 +307,7 @@ export const changeOwnAuth: Endpoint<
     await dbUser.set({mfaSecret, mfaConfirmed: false}).save();
     const otpAuth = authenticator.keyuri(
       dbUser.email as string,
-      'Aalto Grades',
+      'Ossi',
       mfaSecret
     );
     return res.json({otpAuth});
