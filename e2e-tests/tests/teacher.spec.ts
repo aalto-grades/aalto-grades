@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {test} from '@playwright/test';
+import {expect, test} from '@playwright/test';
 
 import {
   addCoursePart,
@@ -77,6 +77,10 @@ test.describe('Test courses as teacher', () => {
 
   test('View grading model', async ({page}) => {
     await viewGradingModel(page);
+  });
+
+  test('should fail', ({page}) => {
+    expect(1).toBe(3);
   });
 
   test('Create grading model', async ({page}) => {
