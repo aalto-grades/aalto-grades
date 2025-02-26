@@ -34,6 +34,8 @@ export const stringToIdSchema = z
   .regex(/^\d+$/)
   .pipe(z.coerce.number().int().min(1));
 
+export const nonEmptyStringSchema = z.string().min(1).max(25);
+
 export type JwtClaims = {role: SystemRole; id: number};
 
 export type UserWithRole = User & {

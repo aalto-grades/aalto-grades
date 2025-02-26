@@ -24,15 +24,17 @@
       "reset-mfa": "Reset MFA",
       "log-out": "Log out",
       "enter-totp": "Enter TOTP code",
-      "a+-token": {
-        "body": "You can find your API token by logging in to A+ and navigating to",
-        "current": "Your current token",
-        "label": "API token",
-        "invalid": "The token you have entered is invalid, please make sure your token is correct.",
-        "length": "The token should be 40 characters long."
-      },
       "hide-password": "Click to hide password from view",
       "show-password": "Click to show password",
+      "token": {
+        "body": "You can find your API token by logging in to A+ and navigating to",
+        "current": "Your current token",
+        "hide-token-tip": "Hide token",
+        "show-token-tip": "Show full token",
+        "label": "API token",
+        "invalid": "The token you have entered is invalid, please make sure your token is correct.",
+        "length": "The token should be {{length}} characters long."
+      },
       "token-expired": "Token expired. Refresh the page."
     },
     "graph": {
@@ -181,6 +183,9 @@
     "teacher": "Teacher",
     "assistant": "Assistant",
     "student": "Student",
+    "clear": "Clear",
+    "no-content": "No content",
+    "select": "Select",
     "email": "Email",
     "copy": "Copy",
     "users": "Users",
@@ -401,15 +406,26 @@
       "assistant-expiry-date-helper": "Expiry date for assistant role",
       "no-assistants": "No assistants in the course",
       "assistant-expiry-date-change": "To change the expire date, remove and add again the assistant",
+      "sisu-search-button": "Search from Sisu",
+      "sisu-search-button-helper": "Try to find course data from Sisu based on course code",
       "input-at-least-one-assistant": "Input the email address of at least one assistant of the course",
-      "assistant-expiry-date-info": "Expiry date: {{expiryDate}}"
+      "assistant-expiry-date-info": "Expiry date: {{expiryDate}}",
+      "sisu-search-title": "Sisu instances found for course code",
+      "sisu-search-basic-information": "Basic Information",
+      "start-date": "Start date",
+      "end-date": "End date",
+      "sisu-search-content": "Content",
+      "sisu-search-additional-information": "Additional Information",
+      "sisu-search-assessment-methods": "Assesment Methods",
+      "sisu-search-accrodion-collapse": "Collapse All",
+      "sisu-search-accrodion-hide": "Hide All"
     },
     "list": "Course list"
   },
   "front-page": {
     "not-logged-in": "Not logged in",
     "search": "search",
-    "create-course": "Create a new course",
+    "create-new-course": "Create new course",
     "user-added": "User added successfully",
     "email-help": "Aalto email e.g. firstname.lastname@aalto.fi.",
     "admin-name-help": "Name of the admin",
@@ -428,8 +444,19 @@
     "no-users": "No users found",
     "reset-password-mfa": "Reset password / MFA",
     "your-courses": "Your courses",
-    "no-courses": "You have no courses. Please contact support to have your course added.",
-    "create-new-course": "Create new course"
+    "no-courses": "You have no courses. Please contact support to have your course added."
+  },
+  "utils": {
+    "scale-numerical": "Grading scale, 0-5",
+    "scale-pass-fail": "Pass-Fail",
+    "scale-second-lang": "Second national language",
+    "grade-higher-than-max": "Grade is higher than maximum allowed value",
+    "grade-not-an-int": "The predicted final grade is not an integer",
+    "grade-out-of-range": "The predicted final grade is out of range",
+    "fail": "Fail",
+    "pass": "Pass",
+    "sat": "Sat",
+    "good": "Good"
   },
   "login": {
     "title": "Log in to Aalto Grades",
@@ -464,17 +491,5 @@
   "students": {
     "select": "Select student",
     "viewing": "Viewing grades for {{user}}"
-  },
-  "utils": {
-    "grade-higher-than-max": "Grade is higher than maximum allowed value",
-    "grade-not-an-int": "The predicted final grade is not an integer",
-    "grade-out-of-range": "The predicted final grade is out of range",
-    "scale-numerical": "Grading scale, 0-5",
-    "scale-pass-fail": "Pass-Fail",
-    "scale-second-lang": "Second national language",
-    "fail": "Fail",
-    "pass": "Pass",
-    "sat": "Sat",
-    "good": "Good"
   }
 }

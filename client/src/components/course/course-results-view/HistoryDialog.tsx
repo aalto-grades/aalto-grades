@@ -49,11 +49,6 @@ const GradesHistoryDialog = ({
     })) ?? [];
 
   const columns: GridColDef<ColTypes>[] = [
-    // {
-    //   field: 'gradeId',
-    //   headerName: t('general.name'),
-    //   type: 'string',
-    // },
     {
       field: 'actionType',
       headerName: t('general.results.history.action-type'),
@@ -84,12 +79,10 @@ const GradesHistoryDialog = ({
               rowSelection={false}
               autosizeOnMount
               disableColumnSelector
-              // slots={{toolbar: dataGridToolbar}}
               sx={{maxHeight: '70vh', minHeight: '20vh'}}
               initialState={{
                 sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
               }}
-              // getRowClassName={getRowClassName as unknown as GetRowClassName}
             />
           </div>
         </DialogContent>
