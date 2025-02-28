@@ -20,7 +20,16 @@ export const addUser = async (page: Page): Promise<string> => {
 export const logOut = async (page: Page, name: string): Promise<void> => {
   await page.goto('/');
   await page.getByRole('button', {name}).click();
+
+  /**
+   * Tokens are cleared from localstorage after logout, wait for succesful
+   * logout response before checking local storage state
+   */
+  const responsePromise = page.waitForResponse(
+    resp => resp.url().includes('/auth/logout') && resp.status() === 200
+  );
   await page.getByRole('menuitem', {name: 'Log out'}).click();
+  await responsePromise;
 
   expect(
     await page.evaluate(() => {
