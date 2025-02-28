@@ -211,7 +211,10 @@ export const importGradesWithText = async (page: Page): Promise<void> => {
   await expect(page.getByRole('row', {name: '423896'})).toBeVisible();
 };
 
-export const importFromSisu = async (page: Page): Promise<void> => {
+export const importFromSisu = async (
+  page: Page,
+  teacherEmail?: string
+): Promise<void> => {
   const courseCode = randomCourseCode();
 
   await page.getByRole('button', {name: 'Create new course'}).click();
@@ -260,6 +263,12 @@ export const importFromSisu = async (page: Page): Promise<void> => {
 
   await expect(page.getByText('mike.mock@aalto.fi').nth(0)).toBeVisible();
   await expect(page.getByText('filipa.fake@aalto.fi').nth(0)).toBeVisible();
+
+  if (teacherEmail) {
+    await page.getByLabel('Teachers in charge').click();
+    await page.getByLabel('Teachers in charge').fill(teacherEmail);
+    await page.getByRole('button', {name: 'Add'}).first().click();
+  }
 
   await page.getByRole('button', {name: 'Submit'}).click();
   await expect(

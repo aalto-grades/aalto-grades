@@ -87,7 +87,7 @@ test.describe('Test courses as teacher', () => {
   });
 
   test('Import course from Sisu', async ({page}) => {
-    await importFromSisu(page);
+    await importFromSisu(page, 'teacher@aalto.fi');
   });
 });
 
