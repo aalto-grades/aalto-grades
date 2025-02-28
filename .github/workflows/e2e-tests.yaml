@@ -17,6 +17,12 @@ jobs:
         working-directory: ./e2e-tests
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/cache@v3
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -33,6 +39,7 @@ jobs:
         run: docker compose up -d
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
       - name: Run Playwright tests
         run: ./wait-and-run-tests.sh
       - uses: actions/upload-artifact@v4

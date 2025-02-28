@@ -18,8 +18,9 @@ import {
   importGradesWithText,
   viewCourseParts,
   viewGradingModel,
-} from './common/course.spec';
-import {aPlusToken} from './common/token.spec';
+} from './common/course';
+import {aPlusToken} from './common/token';
+import {logOut} from './common/user';
 import {setupDb} from './helper';
 
 test.beforeAll(async () => {
@@ -31,9 +32,7 @@ test.beforeEach(async ({page}) => {
 });
 
 test.afterEach(async ({page}) => {
-  await page.goto('/');
-  await page.getByRole('button', {name: 'Timmy Teacher'}).click();
-  await page.getByRole('menuitem', {name: 'Log out'}).click();
+  await logOut(page, 'Timmy Teacher');
 });
 
 test.use({storageState: 'playwright/.auth/teacher.json'});
@@ -88,7 +87,7 @@ test.describe('Test courses as teacher', () => {
   });
 
   test('Import course from Sisu', async ({page}) => {
-    await importFromSisu(page);
+    await importFromSisu(page, 'teacher@aalto.fi');
   });
 });
 

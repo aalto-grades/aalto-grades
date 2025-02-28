@@ -33,9 +33,9 @@
         "show-token-tip": "Näytä koko käyttöoikeustietue",
         "label": "API-käyttöoikeustietue",
         "invalid": "Syöttämäsi käyttöoikeustietue on virheellinen, varmista että käyttöoikeustietue on oikein.",
-        "length": "Käyttöoikeustietueen tulisi olla {{length}} merkkiä pitkä."
-      },
-      "token-expired": "Käyttöoikeustietue on vanhentunut. Päivitä sivu."
+        "length": "Käyttöoikeustietueen tulisi olla {{length}} merkkiä pitkä. Tämänhetkinen pituus {{inputLen}}/{{length}}",
+        "expired": "Käyttöoikeustietue on vanhentunut. Päivitä sivu."
+      }
     },
     "graph": {
       "node": {
