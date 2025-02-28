@@ -22,8 +22,9 @@ export const logOut = async (page: Page, name: string): Promise<void> => {
   await page.getByRole('button', {name}).click();
   await page.getByRole('menuitem', {name: 'Log out'}).click();
 
-  const localStorageToken = await page.evaluate(() => {
-    return localStorage.getItem('a+');
-  });
-  expect(localStorageToken).toBe(null);
+  expect(
+    await page.evaluate(() => {
+      return localStorage.getItem('a+');
+    })
+  ).toBe(null);
 };
