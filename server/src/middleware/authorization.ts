@@ -66,7 +66,7 @@ export const courseAuthorization = (
       ) {
         const currentDate = new Date();
         const expiryDate = new Date(courseRole.expiryDate);
-        if (expiryDate.getDate() < currentDate.getDate()) {
+        if (expiryDate < currentDate) {
           return res
             .status(HttpCode.Forbidden)
             .send({errors: ['Course Role Expired']});
