@@ -10,6 +10,9 @@ import {randomEmail} from './user';
 export const randomCourseCode = (): string =>
   `cs-${crypto.randomUUID().split('-')[0]}`;
 
+export const randomName = (): string =>
+  `name-${crypto.randomUUID().split('-')[0]}`;
+
 export const createCourse = async (page: Page): Promise<void> => {
   const courseCode = randomCourseCode();
   const teacherEmail = randomEmail();
@@ -44,10 +47,9 @@ export const createCourse = async (page: Page): Promise<void> => {
   await page.getByRole('button', {name: 'Add'}).nth(1).click();
   await page.getByRole('button', {name: 'Submit'}).click();
   await expect(page.getByRole('heading', {name: 'testCourse'})).toBeVisible();
+  await expect(page.getByText(courseCode)).toBeVisible();
   await page.getByTestId('a-grades-header-link').click();
-  await expect(
-    page.getByRole('cell', {name: 'testCourse'}).nth(1)
-  ).toBeVisible();
+  await expect(page.getByRole('cell', {name: courseCode}).nth(0)).toBeVisible();
 };
 
 export const checkCourse = async (page: Page): Promise<void> => {
@@ -90,7 +92,7 @@ export const editCourse = async (page: Page): Promise<void> => {
 };
 
 export const createGradingModel = async (page: Page): Promise<void> => {
-  const modelName = `Test model ${new Date().getTime()}`;
+  const modelName = randomName();
 
   await page.getByRole('cell', {name: 'O1'}).click();
   await page.getByRole('button', {name: 'Grading models'}).click();
@@ -131,7 +133,7 @@ export const viewCourseParts = async (page: Page): Promise<void> => {
 };
 
 export const addCoursePart = async (page: Page): Promise<void> => {
-  const coursePartName = `Test model ${new Date().getTime()}`;
+  const coursePartName = randomName();
 
   await page.getByRole('cell', {name: 'O1'}).click();
   await page
