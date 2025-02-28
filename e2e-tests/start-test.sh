@@ -12,7 +12,7 @@ mkdir -p ./blob-reporter
 
 npx playwright test --project chromium --reporter=list,blob
 
-CODE=$?
+PLAYWRIGHT_EXIT_CODE=$?
 
 mv ./blob-report/report-chromium.zip ./blob-reporter/shard-1.zip
 
@@ -25,4 +25,5 @@ npx playwright merge-reports --reporter=html ./blob-reporter
 echo "Test finished, cleaning up..."
 rm -rf ./blob-reporter
 
-echo "Exit code: $CODE"
+echo "Exit code: $PLAYWRIGHT_EXIT_CODE"
+exit $PLAYWRIGHT_EXIT_CODE
