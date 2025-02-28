@@ -36,7 +36,7 @@ axiosInstance.interceptors.response.use(response => {
     // Token expired error
     if (resData.errors.includes('TokenExpiredError')) {
       throw new CustomError({
-        message: i18next.t('shared.auth.token-expired'),
+        message: i18next.t('shared.auth.token.expired'),
         action: LoginAgainButton,
       });
     } else {

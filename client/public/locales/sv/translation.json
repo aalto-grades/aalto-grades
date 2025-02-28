@@ -33,9 +33,9 @@
         "show-token-tip": "UNTRANSLATED",
         "label": "UNTRANSLATED",
         "invalid": "UNTRANSLATED",
-        "length": "UNTRANSLATED"
-      },
-      "token-expired": "UNTRANSLATED"
+        "length": "UNTRANSLATED",
+        "expired": "UNTRANSLATED"
+      }
     },
     "graph": {
       "node": {

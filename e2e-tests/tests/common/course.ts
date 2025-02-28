@@ -5,10 +5,22 @@
 import {type Page, expect} from '@playwright/test';
 import path from 'path';
 
+import {randomEmail} from './user';
+
+export const randomCourseCode = (): string =>
+  `cs-${crypto.randomUUID().split('-')[0]}`;
+
+export const randomName = (): string =>
+  `name-${crypto.randomUUID().split('-')[0]}`;
+
 export const createCourse = async (page: Page): Promise<void> => {
+  const courseCode = randomCourseCode();
+  const teacherEmail = randomEmail();
+  const assistantEmail = randomEmail();
+
   await page.getByRole('button', {name: 'Create new course'}).click();
   await page.getByLabel('Course code*').click();
-  await page.getByLabel('Course code*').fill('cs-testCourse123');
+  await page.getByLabel('Course code*').fill(courseCode);
   await page.getByLabel('Course code*').press('Tab');
   await page.getByLabel('Course name in English*').fill('testCourse');
   await page.getByLabel('Course name in Finnish*').click();
@@ -28,17 +40,16 @@ export const createCourse = async (page: Page): Promise<void> => {
   await page.getByLabel('Course language*').click();
   await page.getByRole('option', {name: 'Japanese'}).click();
   await page.getByLabel('Teachers in charge').click();
-  await page.getByLabel('Teachers in charge').fill('teacher@aalto.fi');
+  await page.getByLabel('Teachers in charge').fill(teacherEmail);
   await page.getByRole('button', {name: 'Add'}).first().click();
   await page.getByLabel('Assistants').click();
-  await page.getByLabel('Assistants').fill('assistant@aalto.fi');
+  await page.getByLabel('Assistants').fill(assistantEmail);
   await page.getByRole('button', {name: 'Add'}).nth(1).click();
   await page.getByRole('button', {name: 'Submit'}).click();
   await expect(page.getByRole('heading', {name: 'testCourse'})).toBeVisible();
+  await expect(page.getByText(courseCode)).toBeVisible();
   await page.getByTestId('a-grades-header-link').click();
-  await expect(
-    page.getByRole('cell', {name: 'testCourse'}).nth(1)
-  ).toBeVisible();
+  await expect(page.getByRole('cell', {name: courseCode}).nth(0)).toBeVisible();
 };
 
 export const checkCourse = async (page: Page): Promise<void> => {
@@ -47,10 +58,12 @@ export const checkCourse = async (page: Page): Promise<void> => {
 };
 
 export const editCourse = async (page: Page): Promise<void> => {
+  const courseCode = randomCourseCode();
+
   await page.getByRole('cell', {name: 'O1'}).click();
   await page.getByRole('button', {name: 'Edit course'}).click();
   await page.getByLabel('Course code*').click();
-  await page.getByLabel('Course code*').fill('CS-A1120 - edit');
+  await page.getByLabel('Course code*').fill(courseCode);
   await page.getByLabel('Course code*').press('Tab');
   await page.getByLabel('Course name in Finnish*').click();
   await page.getByLabel('Course name in Finnish*').fill('Ohjelmointi 2 - edit');
@@ -72,18 +85,20 @@ export const editCourse = async (page: Page): Promise<void> => {
   await page.getByRole('option', {name: 'Chinese'}).click();
 
   await page.getByRole('button', {name: 'Save'}).click();
-  await expect(page.getByText('CS-A1120 - edit')).toBeVisible();
+  await expect(page.getByText(courseCode)).toBeVisible();
   await page.getByTestId('a-grades-header-link').click();
   await page.getByRole('cell', {name: 'O1'}).click();
   await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
 };
 
 export const createGradingModel = async (page: Page): Promise<void> => {
+  const modelName = randomName();
+
   await page.getByRole('cell', {name: 'O1'}).click();
   await page.getByRole('button', {name: 'Grading models'}).click();
   await page.getByLabel('Create new final grade model').click();
   await page.getByLabel('Name *').click();
-  await page.getByLabel('Name *').fill('Test model');
+  await page.getByLabel('Name *').fill(modelName);
   await page.getByLabel('Select template').click();
   await page.getByRole('option', {name: 'Addition'}).click();
   await page.getByRole('button', {name: 'Submit'}).click();
@@ -96,7 +111,7 @@ export const createGradingModel = async (page: Page): Promise<void> => {
   await expect(page.getByText('Model saved successfully')).toBeVisible();
   await page.getByRole('button', {name: 'Grades', exact: true}).click();
   await page.getByRole('button', {name: 'Grading models'}).click();
-  await expect(page.getByRole('button', {name: 'Test model'})).toBeVisible();
+  await expect(page.getByRole('button', {name: modelName})).toBeVisible();
 };
 
 export const viewGradingModel = async (page: Page): Promise<void> => {
@@ -118,6 +133,9 @@ export const viewCourseParts = async (page: Page): Promise<void> => {
 };
 
 export const addCoursePart = async (page: Page): Promise<void> => {
+  const coursePartName = randomName();
+
+  await page.getByRole('cell', {name: 'O1'}).click();
   await page
     .getByRole('link', {name: 'Course parts'})
     .getByRole('button')
@@ -126,10 +144,10 @@ export const addCoursePart = async (page: Page): Promise<void> => {
   await expect(page.getByText('Exercises 2024')).toBeVisible();
   await page.getByRole('button', {name: 'Add new course part'}).click();
   await page.getByLabel('Name*').click();
-  await page.getByLabel('Name*').fill('Exercises 2025');
+  await page.getByLabel('Name*').fill(coursePartName);
   await page.getByRole('button', {name: 'Save'}).click();
   await expect(
-    page.getByRole('button', {name: 'Exercises 2025 No expiry date'})
+    page.getByRole('button', {name: `${coursePartName} No expiry date`})
   ).toBeVisible();
 };
 
@@ -193,21 +211,30 @@ export const importGradesWithText = async (page: Page): Promise<void> => {
   await expect(page.getByRole('row', {name: '423896'})).toBeVisible();
 };
 
-export const importFromSisu = async (page: Page): Promise<void> => {
+export const importFromSisu = async (
+  page: Page,
+  teacherEmail?: string
+): Promise<void> => {
+  const courseCode = randomCourseCode();
+
   await page.getByRole('button', {name: 'Create new course'}).click();
   await expect(
     page.getByText('Try to find course data from Sisu based on course code')
   ).toBeVisible();
 
   await page.getByLabel('Course code*').click();
-  await page.getByLabel('Course code*').fill('CS-A1111');
+  await page.getByLabel('Course code*').fill(courseCode);
   await page.getByRole('button', {name: 'Search from Sisu'}).click();
 
   await expect(
-    page.getByText('Sisu instances found for course code: CS-A1111')
+    page.getByText(`Sisu instances found for course code: ${courseCode}`)
   ).toBeVisible();
 
   await page.getByRole('button', {name: 'Select'}).nth(1).click();
+
+  await expect(page.getByLabel('Course code*')).toHaveValue('CS-A1111');
+
+  await page.getByLabel('Course code*').fill(courseCode);
 
   await expect(page.getByLabel('Course name in English*')).toHaveValue(
     'Basic Course in Programming Y1, Exam (retake exam for 2024 courses)'
@@ -237,6 +264,12 @@ export const importFromSisu = async (page: Page): Promise<void> => {
   await expect(page.getByText('mike.mock@aalto.fi').nth(0)).toBeVisible();
   await expect(page.getByText('filipa.fake@aalto.fi').nth(0)).toBeVisible();
 
+  if (teacherEmail) {
+    await page.getByLabel('Teachers in charge').click();
+    await page.getByLabel('Teachers in charge').fill(teacherEmail);
+    await page.getByRole('button', {name: 'Add'}).first().click();
+  }
+
   await page.getByRole('button', {name: 'Submit'}).click();
   await expect(
     page.getByRole('heading', {
@@ -254,5 +287,5 @@ export const importFromSisu = async (page: Page): Promise<void> => {
   await expect(
     page.getByRole('cell', {name: 'Department of Computer Science'}).nth(0)
   ).toBeVisible();
-  await expect(page.getByRole('cell', {name: 'CS-A1111'}).nth(0)).toBeVisible();
+  await expect(page.getByRole('cell', {name: courseCode}).nth(0)).toBeVisible();
 };

@@ -30,7 +30,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import {type FormikHelpers, type FormikProps, useFormik} from 'formik';
+import {type FormikProps, useFormik} from 'formik';
 import {type JSX, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
@@ -255,17 +255,6 @@ const CreateCourseDialog = ({
     },
   });
 
-  const confirmDiscard = async ({
-    resetForm,
-  }: FormikHelpers<FormData>): Promise<void> => {
-    if (await AsyncConfirmationModal({confirmNavigate: true})) {
-      onClose();
-      resetForm();
-      setTeachersInCharge([]);
-      setAssistants([]);
-    }
-  };
-
   const validateTeacher = async (email: string): Promise<void> => {
     const isEmailExisted = await emailExisted.mutateAsync({
       email,
@@ -307,6 +296,20 @@ const CreateCourseDialog = ({
       await validateTeacher(generateEmailAddressString(course.teachers[i]));
     }
   };
+
+  const handleClose = (): void => {
+    resetForm();
+    onClose();
+  };
+
+  const confirmDiscard = async (): Promise<void> => {
+    if (await AsyncConfirmationModal({confirmNavigate: true})) {
+      handleClose();
+    }
+  };
+
+  const formDirty =
+    form.dirty || teachersInCharge.length > 0 || assistants.length > 0;
 
   return (
     <>
@@ -747,21 +750,13 @@ const CreateCourseDialog = ({
               <Box sx={{display: 'flex', gap: 2}}>
                 <Button
                   variant="outlined"
-                  color={
-                    JSON.stringify(initialValues) !==
-                    JSON.stringify(form.values)
-                      ? 'error'
-                      : 'primary'
-                  }
+                  color={formDirty ? 'error' : 'primary'}
                   disabled={form.isSubmitting || isLoading || isFetching}
                   onClick={() => {
-                    if (
-                      JSON.stringify(initialValues) !==
-                      JSON.stringify(form.values)
-                    ) {
-                      confirmDiscard(form);
+                    if (formDirty) {
+                      confirmDiscard();
                     } else {
-                      onClose();
+                      handleClose();
                     }
                   }}
                 >
