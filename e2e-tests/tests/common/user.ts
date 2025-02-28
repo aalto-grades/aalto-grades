@@ -16,3 +16,14 @@ export const addUser = async (page: Page): Promise<string> => {
 
   return email;
 };
+
+export const logOut = async (page: Page, name: string): Promise<void> => {
+  await page.goto('/');
+  await page.getByRole('button', {name}).click();
+  await page.getByRole('menuitem', {name: 'Log out'}).click();
+
+  const localStorageToken = await page.evaluate(() => {
+    return localStorage.getItem('a+');
+  });
+  expect(localStorageToken).toBe(null);
+};

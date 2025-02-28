@@ -30,6 +30,12 @@ export const aPlusToken = async (page: Page, name: string): Promise<void> => {
   await expect(page.getByText(token)).not.toBeVisible();
   await expect(page.getByText('dfguifg983hf...')).toBeVisible();
 
+  const localStorageToken = await page.evaluate(() => {
+    return localStorage.getItem('a+');
+  });
+
+  expect(localStorageToken).toBe(token);
+
   await expect(page.getByLabel('API token *')).toBeEmpty();
   await page.getByRole('button', {name: 'cancel'}).click();
 };

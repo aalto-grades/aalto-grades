@@ -20,7 +20,7 @@ import {
   viewGradingModel,
 } from './common/course';
 import {aPlusToken} from './common/token';
-import {addUser} from './common/user';
+import {addUser, logOut} from './common/user';
 import {setupDb} from './helper';
 
 test.beforeAll(async () => {
@@ -32,9 +32,7 @@ test.beforeEach(async ({page}) => {
 });
 
 test.afterEach(async ({page}) => {
-  await page.goto('/');
-  await page.getByRole('button', {name: 'Andy Admin'}).click();
-  await page.getByRole('menuitem', {name: 'Log out'}).click();
+  await logOut(page, 'Andy Admin');
 });
 
 test.use({storageState: 'playwright/.auth/admin.json'});

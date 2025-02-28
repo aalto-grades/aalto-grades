@@ -5,6 +5,7 @@
 import {test} from '@playwright/test';
 
 import {checkCourse, viewCourseParts, viewGradingModel} from './common/course';
+import {logOut} from './common/user';
 import {setupDb} from './helper';
 
 test.beforeAll(async () => {
@@ -16,9 +17,7 @@ test.beforeEach(async ({page}) => {
 });
 
 test.afterEach(async ({page}) => {
-  await page.goto('/');
-  await page.getByRole('button', {name: 'Alex Assistant'}).click();
-  await page.getByRole('menuitem', {name: 'Log out'}).click();
+  await logOut(page, 'Alex Assistant');
 });
 
 test.use({storageState: 'playwright/.auth/assistant.json'});
