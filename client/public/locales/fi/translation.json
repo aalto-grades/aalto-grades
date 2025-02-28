@@ -99,20 +99,19 @@
       "discard": "Hylkää muutokset"
     }
   },
+  "color-mode": {
+    "system": "Järjestelmä",
+    "light": "Vaalea",
+    "dark": "Tumma"
+  },
   "app": {
     "footer": {
       "privacy": "Tietosuojailmoitus",
       "accessibility": "Saavutettavuusseloste",
       "support": "Tuki",
       "licenses": "Lisenssit",
-      "source": {
-        "tooltip": "Lähdekoodi avautuu uuteen välilehteen",
-        "text": "Lähdekoodi"
-      },
-      "feedback": {
-        "tooltip": "Palaute-lomake avautuu uuteen välilehteen",
-        "text": "Palaute"
-      }
+      "source-text": "Lähdekoodi",
+      "feedback-text": "Palaute"
     }
   },
   "language": "Suomi (fi)",
@@ -460,13 +459,14 @@
     "good": "Hyvä"
   },
   "login": {
+    "title": "Kirjaudu sisään Ossiin",
     "external": {
       "title": "Aalto-yliopiston käyttäjät",
       "body": "Kirjaudu sisään Aalto-yliopiston käyttäjätunnuksellasi painamalla alla olevaa painiketta.",
       "button": "Kirjaudu sisään Aalto-tunnuksella"
     },
     "local": {
-      "title": "Kirjaudu sisään Ossiin",
+      "title": "Paikalliset käyttäjät",
       "body": "Jos sinulle on annettu erilliset tunnukset Ossia varten, käytä tätä kirjautumista.",
       "mfa-code": "MFA-koodi",
       "button": "Kirjaudu sisään"

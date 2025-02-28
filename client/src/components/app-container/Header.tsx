@@ -8,6 +8,7 @@ import {NavLink, useParams} from 'react-router-dom';
 
 import {useGetCourse} from '@/hooks/useApi';
 import {useLocalize} from '@/hooks/useLocalize';
+import ColorModeSelectButton from './ColorModeSelectButton';
 import LanguageSelectButton from './LanguageSelectButton';
 import UserButton from './UserButton';
 
@@ -25,19 +26,7 @@ const Header = (): JSX.Element => {
   );
 
   return (
-    <AppBar
-      position="static"
-      sx={{
-        backgroundColor: theme.vars.palette.primary.light,
-        boxShadow: 'none',
-        color: 'black',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        flexDirection: 'row',
-        px: 3,
-      }}
-    >
+    <AppBar position="static" sx={{px: 3}}>
       <Typography
         variant="h2"
         component={NavLink}
@@ -50,7 +39,7 @@ const Header = (): JSX.Element => {
           fontWeight: 'bold',
           color: 'primary.main',
         }}
-        data-testid="a-grades-header-link" // For e2e tests
+        data-testid="a-grades-header-link"
         viewTransition
       >
         A{logoVariant} Grades
@@ -118,6 +107,7 @@ const Header = (): JSX.Element => {
         </>
       )}
       <Box sx={{flexGrow: 1}} />
+      <ColorModeSelectButton />
       <LanguageSelectButton />
       <UserButton />
     </AppBar>

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Button, Typography, useTheme} from '@mui/material';
+import {Box, Button, Typography} from '@mui/material';
 import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
@@ -16,7 +16,6 @@ import Users from './front-page/users/Users';
 const FrontPageView = (): JSX.Element => {
   const {t} = useTranslation();
   const {auth} = useAuth();
-  const theme = useTheme();
   const courses = useGetAllCourses({
     enabled: auth !== null && auth.role === SystemRole.Admin,
   });
@@ -43,13 +42,7 @@ const FrontPageView = (): JSX.Element => {
           {coursesOfUser.data && coursesOfUser.data.length > 0 ? (
             <CourseTable courses={coursesOfUser.data} />
           ) : (
-            <Box
-              sx={{
-                backgroundColor: theme.vars.palette.hoverGrey2,
-                p: 1,
-                mt: 1,
-              }}
-            >
+            <Box sx={{p: 1, mt: 1}}>
               <Typography>{t('front-page.no-courses')}</Typography>
             </Box>
           )}

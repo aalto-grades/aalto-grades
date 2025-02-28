@@ -2,11 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Button, Typography} from '@mui/material';
-import type {
-  GridColDef,
-  GridRowSelectionModel,
-  GridRowsProp,
+import {Box, Button, Typography} from '@mui/material';
+import {
+  type GridColDef,
+  type GridRowSelectionModel,
+  type GridRowsProp,
+  GridToolbarColumnsButton,
+  GridToolbarContainer,
+  GridToolbarFilterButton,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useEffect, useMemo, useState} from 'react';
@@ -104,14 +107,14 @@ const ManageStudentsView = (): JSX.Element => {
       headerName: t('general.student-number'),
       type: 'string',
       editable: false,
-      width: 120,
+      width: 150,
     },
     {
       field: 'email',
       headerName: t('general.email'),
       type: 'string',
       editable: false,
-      width: 150,
+      width: 250,
     },
     {
       field: 'latestGrade',
@@ -144,16 +147,7 @@ const ManageStudentsView = (): JSX.Element => {
     <>
       <UnsavedChangesDialog blocker={blocker} />
       <Typography variant="h2">{t('manage-students.title')}</Typography>
-      <Button
-        onClick={handleDelete}
-        disabled={rowSelectionModel.length === 0}
-        variant="contained"
-        color="error"
-        sx={{my: 2}}
-      >
-        {t('manage-students.delete', {count: rowSelectionModel.length})}
-      </Button>
-      <div style={{height: '30vh'}}>
+      <div style={{height: '90%'}}>
         <DataGridBase
           rows={rows}
           columns={columns}
@@ -164,6 +158,28 @@ const ManageStudentsView = (): JSX.Element => {
           }}
           rowSelectionModel={rowSelectionModel}
           disableRowSelectionOnClick
+          slots={{
+            toolbar: () => {
+              return (
+                <GridToolbarContainer sx={{mb: 1}}>
+                  <GridToolbarColumnsButton />
+                  <GridToolbarFilterButton />
+                  <Box sx={{flexGrow: 1}} />
+                  <Button
+                    onClick={handleDelete}
+                    disabled={rowSelectionModel.length === 0}
+                    variant="contained"
+                    color="error"
+                    size="small"
+                  >
+                    {t('manage-students.delete', {
+                      count: rowSelectionModel.length,
+                    })}
+                  </Button>
+                </GridToolbarContainer>
+              );
+            },
+          }}
         />
       </div>
     </>

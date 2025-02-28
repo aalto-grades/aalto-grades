@@ -53,6 +53,7 @@ const UsersTable = (): JSX.Element => {
       confirmButtonText: t('general.remove'),
       confirmDelete: true,
     });
+
     if (confirmation) {
       await removeUserRole.mutateAsync({id: user.id, role});
       enqueueSnackbar(t('front-page.user-role-removed'), {variant: 'success'});
@@ -69,7 +70,6 @@ const UsersTable = (): JSX.Element => {
         onClose={() => setToBeReset(null)}
         user={toBeReset}
       />
-
       <Tabs
         value={tab}
         onChange={(_, newTab: number) => setTab(newTab)}

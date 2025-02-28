@@ -109,12 +109,13 @@ const LoginView = (): JSX.Element => {
         direction="column"
         alignItems="center"
         justifyContent="center"
+        sx={{mt: 2}}
       >
-        <Typography variant="h2">{t('login.local.title')}</Typography>
+        <Typography variant="h2">{t('login.title')}</Typography>
         <ExternalAuth />
         <Box
           sx={{
-            width: 1 / 2,
+            width: {xs: '80%', sm: '60%', md: '40%'},
             border: 1,
             borderRadius: '8px',
             borderColor: 'gray',

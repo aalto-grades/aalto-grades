@@ -119,7 +119,7 @@ const ViewAplusGradeSourcesDialog = ({
         </TableContainer>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>{t('general.close')}</Button>
       </DialogActions>
     </Dialog>
   );

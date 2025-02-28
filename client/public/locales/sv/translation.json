@@ -99,20 +99,19 @@
       "discard": "UNTRANSLATED"
     }
   },
+  "color-mode": {
+    "system": "UNTRANSLATED",
+    "light": "UNTRANSLATED",
+    "dark": "UNTRANSLATED"
+  },
   "app": {
     "footer": {
       "privacy": "UNTRANSLATED",
       "accessibility": "UNTRANSLATED",
       "support": "UNTRANSLATED",
       "licenses": "UNTRANSLATED",
-      "source": {
-        "tooltip": "UNTRANSLATED",
-        "text": "UNTRANSLATED"
-      },
-      "feedback": {
-        "tooltip": "UNTRANSLATED",
-        "text": "UNTRANSLATED"
-      }
+      "source-text": "UNTRANSLATED",
+      "feedback-text": "UNTRANSLATED"
     }
   },
   "language": "Svenska (sv)",
@@ -460,6 +459,7 @@
     "good": "UNTRANSLATED"
   },
   "login": {
+    "title": "UNTRANSLATED",
     "external": {
       "title": "UNTRANSLATED",
       "body": "UNTRANSLATED",

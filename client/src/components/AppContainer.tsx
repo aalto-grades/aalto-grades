@@ -18,8 +18,6 @@ const AppContainer = (): JSX.Element => {
         minHeight: '100vh',
         height: '100vh',
         maxHeight: '100vh',
-        overflow: 'clip',
-
         display: 'grid',
         gridTemplateRows: '60px calc(100vh - 110px) 50px',
         gridTemplateColumns: '[content] 100%',
@@ -37,11 +35,9 @@ const AppContainer = (): JSX.Element => {
       >
         <Header />
       </Box>
-
       <Box
         sx={{
           textAlign: 'center',
-          m: 0,
           px: 1,
           height: '100%',
           gridArea: 'content',
@@ -49,10 +45,7 @@ const AppContainer = (): JSX.Element => {
       >
         <Outlet />
       </Box>
-
-      <div style={{gridArea: 'footer'}}>
-        <Footer />
-      </div>
+      <Footer />
     </Box>
   );
 };

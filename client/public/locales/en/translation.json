@@ -99,20 +99,19 @@
       "discard": "Discard changes"
     }
   },
+  "color-mode": {
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
   "app": {
     "footer": {
       "privacy": "Privacy notice",
       "accessibility": "Accessibility statement",
       "support": "Support",
       "licenses": "Licenses",
-      "source": {
-        "tooltip": "Source code opens in a new tab",
-        "text": "Source code"
-      },
-      "feedback": {
-        "tooltip": "Feedback form opens in a new tab",
-        "text": "Feedback"
-      }
+      "source-text": "Source code",
+      "feedback-text": "Feedback"
     }
   },
   "language": "English (en)",
@@ -460,13 +459,14 @@
     "good": "Good"
   },
   "login": {
+    "title": "Log in to Aalto Grades",
     "external": {
       "title": "Aalto University users",
       "body": "Log in with your Aalto University user account by clicking on the button below.",
       "button": "Log in with Aalto account"
     },
     "local": {
-      "title": "Log in to Aalto Grades",
+      "title": "Local users",
       "body": "If you have been provided with credentials specifically for Aalto Grades, use this login.",
       "mfa-code": "MFA code",
       "button": "Log in"
