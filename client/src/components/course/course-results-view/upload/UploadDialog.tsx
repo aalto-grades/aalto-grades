@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Delete} from '@mui/icons-material';
-import {Button, Dialog, DialogActions} from '@mui/material';
+import {Button, DialogActions} from '@mui/material';
 import {
   GridActionsCellItem,
   type GridColDef,
@@ -21,6 +21,7 @@ import type {
   CourseTaskData,
   NewTaskGrade,
 } from '@/common/types';
+import Dialog from '@/components/shared/Dialog';
 import {useAddGrades, useGetCourseTasks} from '@/hooks/useApi';
 import UploadDialogConfirm, {type DateType} from './UploadDialogConfirm';
 import UploadDialogSelectCoursePart from './UploadDialogSelectCoursePart';
