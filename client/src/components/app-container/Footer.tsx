@@ -16,7 +16,6 @@ const Footer = (): JSX.Element => {
       <Box
         component="footer"
         sx={{
-          backgroundColor: 'primary.light',
           display: 'flex',
           flexDirection: 'row',
           flexWrap: 'wrap',
@@ -29,27 +28,22 @@ const Footer = (): JSX.Element => {
           overflowX: 'hidden',
         }}
       >
-        <Link component={RouterLink} to="/privacy-notice" underline="none">
+        <Link component={RouterLink} to="/privacy-notice">
           {t('app.footer.privacy')}
         </Link>
-        <Link
-          component={RouterLink}
-          to="/accessibility-statement"
-          underline="none"
-        >
+        <Link component={RouterLink} to="/accessibility-statement">
           {t('app.footer.accessibility')}
         </Link>
-        <Link component={RouterLink} to="/support" underline="none">
+        <Link component={RouterLink} to="/support">
           {t('app.footer.support')}
         </Link>
-        <Link component={RouterLink} to="/licenses" underline="none">
+        <Link component={RouterLink} to="/licenses">
           {t('app.footer.licenses')}
         </Link>
         <Link
           href={`https://github.com/aalto-grades/aalto-grades/tree/v${AALTO_GRADES_VERSION}`}
           target="_blank"
           rel="noreferrer"
-          underline="none"
           style={{display: 'inline-flex', alignItems: 'center', gap: '2px'}}
         >
           {t('app.footer.source-text')}
@@ -59,7 +53,6 @@ const Footer = (): JSX.Element => {
           href="https://link.webropolsurveys.com/S/E358C6E5E7690C72"
           target="_blank"
           rel="noreferrer"
-          underline="none"
           style={{display: 'inline-flex', alignItems: 'center', gap: '2px'}}
         >
           {t('app.footer.feedback-text')}
