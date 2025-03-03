@@ -4,7 +4,7 @@
 
 import type {Components, Theme} from '@mui/material/styles';
 
-export const componentCustomizations: Components<Theme> = {
+export const components: Components<Theme> = {
   MuiAppBar: {
     styleOverrides: {
       root: ({theme}) => ({
@@ -13,9 +13,9 @@ export const componentCustomizations: Components<Theme> = {
         display: 'flex',
         alignItems: 'center',
         flexDirection: 'row',
-        color: 'black',
-        ...theme.applyStyles('dark', {
-          color: 'white',
+        backgroundColor: theme.palette.primary.light,
+        ...theme.applyStyles('light', {
+          color: 'black',
         }),
       }),
     },
