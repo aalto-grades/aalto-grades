@@ -2,11 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import LaunchIcon from '@mui/icons-material/Launch';
 import {Box, Link, Typography} from '@mui/material';
 import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Link as RouterLink} from 'react-router-dom';
+
+import ExternalLink from '@/components/shared/ExternalLink';
 
 const Footer = (): JSX.Element => {
   const {t} = useTranslation();
@@ -40,24 +41,14 @@ const Footer = (): JSX.Element => {
         <Link component={RouterLink} to="/licenses">
           {t('app.footer.licenses')}
         </Link>
-        <Link
+        <ExternalLink
           href={`https://github.com/aalto-grades/aalto-grades/tree/v${AALTO_GRADES_VERSION}`}
-          target="_blank"
-          rel="noreferrer"
-          style={{display: 'inline-flex', alignItems: 'center', gap: '2px'}}
-        >
-          {t('app.footer.source-text')}
-          <LaunchIcon fontSize="small" />
-        </Link>
-        <Link
+          linkText={t('app.footer.source-text')}
+        />
+        <ExternalLink
           href="https://link.webropolsurveys.com/S/E358C6E5E7690C72"
-          target="_blank"
-          rel="noreferrer"
-          style={{display: 'inline-flex', alignItems: 'center', gap: '2px'}}
-        >
-          {t('app.footer.feedback-text')}
-          <LaunchIcon fontSize="small" />
-        </Link>
+          linkText={t('app.footer.feedback-text')}
+        />
         <Typography sx={{color: 'text.secondary'}}>
           Ossi v{AALTO_GRADES_VERSION}
         </Typography>
