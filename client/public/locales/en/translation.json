@@ -144,6 +144,7 @@
     "source-name": "Source name",
     "date": "Date",
     "manage": "Manage",
+    "close": "Close",
     "confirm": "Confirm",
     "student-number": "Student number",
     "course-task": "Course task",
@@ -159,7 +160,6 @@
         "title": "History"
       }
     },
-    "close": "Close",
     "download": "Download",
     "grader": "Grader",
     "export-date": "Export date",
@@ -414,17 +414,18 @@
       "sisu-search-basic-information": "Basic Information",
       "start-date": "Start date",
       "end-date": "End date",
+      "sisu-search-accrodion-hide": "Hide All",
+      "sisu-search-accrodion-collapse": "Collapse All",
       "sisu-search-content": "Content",
       "sisu-search-additional-information": "Additional Information",
-      "sisu-search-assessment-methods": "Assesment Methods",
-      "sisu-search-accrodion-collapse": "Collapse All",
-      "sisu-search-accrodion-hide": "Hide All"
+      "sisu-search-assessment-methods": "Assesment Methods"
     },
     "list": "Course list"
   },
   "front-page": {
     "not-logged-in": "Not logged in",
     "search": "search",
+    "no-results": "No courses found",
     "create-new-course": "Create new course",
     "user-added": "User added successfully",
     "email-help": "Aalto email e.g. firstname.lastname@aalto.fi.",
@@ -459,12 +460,12 @@
     "good": "Good"
   },
   "login": {
-    "title": "Log in to Aalto Grades",
     "external": {
       "title": "Aalto University users",
       "body": "Log in with your Aalto University user account by clicking on the button below.",
       "button": "Log in with Aalto account"
     },
+    "title": "Log in to Aalto Grades",
     "local": {
       "title": "Local users",
       "body": "If you have been provided with credentials specifically for Aalto Grades, use this login.",

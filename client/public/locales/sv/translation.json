@@ -144,6 +144,7 @@
     "source-name": "UNTRANSLATED",
     "date": "UNTRANSLATED",
     "manage": "UNTRANSLATED",
+    "close": "UNTRANSLATED",
     "confirm": "UNTRANSLATED",
     "student-number": "UNTRANSLATED",
     "course-task": "UNTRANSLATED",
@@ -159,7 +160,6 @@
         "title": "UNTRANSLATED"
       }
     },
-    "close": "UNTRANSLATED",
     "download": "UNTRANSLATED",
     "grader": "UNTRANSLATED",
     "export-date": "UNTRANSLATED",
@@ -414,17 +414,18 @@
       "sisu-search-basic-information": "UNTRANSLATED",
       "start-date": "UNTRANSLATED",
       "end-date": "UNTRANSLATED",
+      "sisu-search-accrodion-hide": "UNTRANSLATED",
+      "sisu-search-accrodion-collapse": "UNTRANSLATED",
       "sisu-search-content": "UNTRANSLATED",
       "sisu-search-additional-information": "UNTRANSLATED",
-      "sisu-search-assessment-methods": "UNTRANSLATED",
-      "sisu-search-accrodion-collapse": "UNTRANSLATED",
-      "sisu-search-accrodion-hide": "UNTRANSLATED"
+      "sisu-search-assessment-methods": "UNTRANSLATED"
     },
     "list": "UNTRANSLATED"
   },
   "front-page": {
     "not-logged-in": "UNTRANSLATED",
     "search": "UNTRANSLATED",
+    "no-results": "UNTRANSLATED",
     "create-new-course": "UNTRANSLATED",
     "user-added": "UNTRANSLATED",
     "email-help": "UNTRANSLATED",
@@ -459,12 +460,12 @@
     "good": "UNTRANSLATED"
   },
   "login": {
-    "title": "UNTRANSLATED",
     "external": {
       "title": "UNTRANSLATED",
       "body": "UNTRANSLATED",
       "button": "UNTRANSLATED"
     },
+    "title": "UNTRANSLATED",
     "local": {
       "title": "UNTRANSLATED",
       "body": "UNTRANSLATED",

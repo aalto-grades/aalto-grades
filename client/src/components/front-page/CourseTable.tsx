@@ -82,6 +82,7 @@ const CourseTable = ({courses}: PropsType): JSX.Element => {
       }),
     [courses, getCourseDepartment, getCourseRoleString, searchText]
   );
+
   const sortedCourses = useMemo(
     () =>
       filteredCourses.sort((a, b) => {
@@ -153,40 +154,52 @@ const CourseTable = ({courses}: PropsType): JSX.Element => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {coursePage.map(course => (
-            <TableRow
-              key={course.id}
-              hover
-              sx={{
-                cursor: 'pointer',
-                '&:focus': {backgroundColor: 'rgba(0, 0, 0, 0.04)'},
-              }}
-              role="button"
-              onClick={() =>
-                navigate(`/${course.id}`, {
-                  viewTransition: true,
-                })
-              }
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
+          {sortedCourses.length === 0 ? (
+            <TableRow>
+              <TableCell align="center" colSpan={4}>
+                {t('front-page.no-results')}
+              </TableCell>
+            </TableRow>
+          ) : (
+            coursePage.map(course => (
+              <TableRow
+                key={course.id}
+                hover
+                sx={{
+                  cursor: 'pointer',
+                  '&:focus': {backgroundColor: 'rgba(0, 0, 0, 0.04)'},
+                }}
+                role="button"
+                onClick={() =>
                   navigate(`/${course.id}`, {
                     viewTransition: true,
-                  });
+                  })
                 }
-              }}
-              tabIndex={0}
-            >
-              <TableCell>{course.courseCode}</TableCell>
-              <TableCell>{localize(course.name)}</TableCell>
-              <TableCell>{getCourseDepartment(course)}</TableCell>
-              <TableCell>{getCourseRoleString(course)}</TableCell>
-            </TableRow>
-          ))}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    navigate(`/${course.id}`, {
+                      viewTransition: true,
+                    });
+                  }
+                }}
+                tabIndex={0}
+              >
+                <TableCell>{course.courseCode}</TableCell>
+                <TableCell>{localize(course.name)}</TableCell>
+                <TableCell>{getCourseDepartment(course)}</TableCell>
+                <TableCell>{getCourseRoleString(course)}</TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
-      {courses.length > coursesPerPage && (
+      {sortedCourses.length > coursesPerPage && (
         <Pagination
-          count={Math.ceil(courses.length / coursesPerPage)}
+          count={
+            sortedCourses.length === courses.length
+              ? Math.ceil(courses.length / coursesPerPage)
+              : Math.ceil(sortedCourses.length / coursesPerPage)
+          }
           page={page}
           onChange={(_, newPage) => setPage(newPage)}
           sx={{mt: 1}}
