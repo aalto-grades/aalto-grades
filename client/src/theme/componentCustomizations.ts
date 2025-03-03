@@ -4,7 +4,22 @@
 
 import type {Components, Theme} from '@mui/material/styles';
 
-export const inputsCustomizations: Components<Theme> = {
+export const componentCustomizations: Components<Theme> = {
+  MuiAppBar: {
+    styleOverrides: {
+      root: ({theme}) => ({
+        boxShadow: 'none',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        flexDirection: 'row',
+        color: 'black',
+        ...theme.applyStyles('dark', {
+          color: 'white',
+        }),
+      }),
+    },
+  },
   MuiButton: {
     styleOverrides: {
       root: {
@@ -22,15 +37,15 @@ export const inputsCustomizations: Components<Theme> = {
       {
         props: {variant: 'tonal', color: 'secondary'},
         style: ({theme}) => ({
-          backgroundColor: theme.vars.palette.secondary.light,
-          color: theme.vars.palette.secondary.main,
+          backgroundColor: theme.palette.secondary.light,
+          color: theme.palette.secondary.main,
         }),
       },
       {
         props: {variant: 'tonal', color: 'primary'},
         style: ({theme}) => ({
-          backgroundColor: theme.vars.palette.primary.light,
-          color: theme.vars.palette.primary.main,
+          backgroundColor: theme.palette.primary.light,
+          color: theme.palette.primary.main,
         }),
       },
     ],
@@ -42,6 +57,20 @@ export const inputsCustomizations: Components<Theme> = {
         borderColor: 'black',
         height: '32px',
         fontSize: '14px',
+      },
+    },
+  },
+  MuiMenu: {
+    styleOverrides: {
+      paper: {
+        borderRadius: '8px',
+      },
+    },
+  },
+  MuiListItemIcon: {
+    styleOverrides: {
+      root: {
+        minWidth: '48px',
       },
     },
   },
