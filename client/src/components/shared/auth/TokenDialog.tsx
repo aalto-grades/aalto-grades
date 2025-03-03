@@ -84,7 +84,7 @@ const TokenDialog = ({
               <Box
                 component="span"
                 sx={{
-                  bgcolor: 'grey.200',
+                  bgcolor: 'primary.light',
                   alignContent: 'center',
                   px: 1,
                   py: 0.5,

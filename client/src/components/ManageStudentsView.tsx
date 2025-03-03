@@ -107,7 +107,7 @@ const ManageStudentsView = (): JSX.Element => {
       headerName: t('general.student-number'),
       type: 'string',
       editable: false,
-      width: 150,
+      width: 200,
     },
     {
       field: 'email',
@@ -121,7 +121,7 @@ const ManageStudentsView = (): JSX.Element => {
       headerName: t('manage-students.latest-grade'),
       type: 'date',
       editable: false,
-      width: 150,
+      width: 200,
     },
   ];
 
@@ -146,7 +146,9 @@ const ManageStudentsView = (): JSX.Element => {
   return (
     <>
       <UnsavedChangesDialog blocker={blocker} />
-      <Typography variant="h2">{t('manage-students.title')}</Typography>
+      <Typography variant="h2" sx={{my: 1}}>
+        {t('manage-students.title')}
+      </Typography>
       <div style={{height: '90%'}}>
         <DataGridBase
           rows={rows}

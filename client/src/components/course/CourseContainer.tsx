@@ -41,7 +41,6 @@ const CourseContainer = (): JSX.Element => {
       <Box
         sx={{
           gridArea: 'side',
-
           '--side-menu-width': '200px',
           display: courseId ? 'block' : 'none',
           width: courseId ? 'var(--side-menu-width)' : '0px',
@@ -54,12 +53,11 @@ const CourseContainer = (): JSX.Element => {
       >
         <SideMenu />
       </Box>
-
       <Box
         sx={{
           width: '100%',
           overflow: 'auto',
-          backgroundColor: theme.vars.palette.background.paper,
+          backgroundColor: theme.palette.background.paper,
           borderRadius: '15px',
           px: 2,
           pt: 1,

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AppBar, Box, Typography, useTheme} from '@mui/material';
+import {AppBar, Box, Tooltip, Typography, useTheme} from '@mui/material';
 import {useMemo} from 'react';
 import {NavLink, useParams} from 'react-router-dom';
 
@@ -37,7 +37,7 @@ const Header = (): JSX.Element => {
           minWidth: '184px',
           cursor: 'pointer',
           fontWeight: 'bold',
-          color: 'primary.main',
+          color: 'primary.dark',
         }}
         data-testid="a-grades-header-link"
         viewTransition
@@ -48,7 +48,7 @@ const Header = (): JSX.Element => {
         <>
           <Box
             sx={{
-              backgroundColor: theme.vars.palette.background.paper,
+              backgroundColor: theme.palette.background.paper,
               px: 2,
               py: 0,
               mr: 1,
@@ -60,7 +60,7 @@ const Header = (): JSX.Element => {
           >
             <Typography
               align="left"
-              variant="body1"
+              variant="h6"
               fontWeight="bold"
               sx={{
                 color: 'primary.main',
@@ -75,35 +75,37 @@ const Header = (): JSX.Element => {
           <Typography variant="h2" sx={{mr: 1}}>
             {' - '}
           </Typography>
-          <Box
-            sx={{
-              backgroundColor: theme.vars.palette.background.paper,
-              px: 2,
-              py: 0,
-              mr: 1,
-              minWidth: '10px',
-              maxWidth: 'fit-content',
-              borderRadius: '15px',
-              height: '40px',
-              alignItems: 'center',
-              flex: '1 1 fit-content',
-            }}
-          >
-            <Typography
-              variant="h6"
-              align="left"
+          <Tooltip title={localize(course.data.name)}>
+            <Box
               sx={{
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                lineHeight: '40px',
+                backgroundColor: theme.palette.background.paper,
+                px: 2,
+                py: 0,
+                mr: 1,
+                minWidth: '10px',
+                maxWidth: 'fit-content',
+                borderRadius: '15px',
+                height: '40px',
                 alignItems: 'center',
-                height: '100%',
+                flex: '1 1 fit-content',
               }}
             >
-              {localize(course.data.name)}
-            </Typography>
-          </Box>
+              <Typography
+                variant="h6"
+                align="left"
+                sx={{
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  lineHeight: '40px',
+                  alignItems: 'center',
+                  height: '100%',
+                }}
+              >
+                {localize(course.data.name)}
+              </Typography>
+            </Box>
+          </Tooltip>
         </>
       )}
       <Box sx={{flexGrow: 1}} />

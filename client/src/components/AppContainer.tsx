@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, useTheme} from '@mui/material';
+import {Box} from '@mui/material';
 import type {JSX} from 'react';
 import {Outlet} from 'react-router-dom';
 
@@ -10,8 +10,6 @@ import Footer from './app-container/Footer';
 import Header from './app-container/Header';
 
 const AppContainer = (): JSX.Element => {
-  const theme = useTheme();
-
   return (
     <Box
       sx={{
@@ -25,7 +23,7 @@ const AppContainer = (): JSX.Element => {
           "content"
           "footer"`,
         flexDirection: 'column',
-        backgroundColor: theme.vars.palette.primary.light,
+        backgroundColor: 'primary.light',
       }}
     >
       <Box
