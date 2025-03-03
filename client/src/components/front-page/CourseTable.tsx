@@ -2,8 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
+import CloseIcon from '@mui/icons-material/Close';
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import {
   Grid2 as Grid,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
   Pagination,
   Table,
   TableBody,
@@ -11,7 +16,6 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
-  TextField,
   Typography,
 } from '@mui/material';
 import {type JSX, useCallback, useMemo, useState} from 'react';
@@ -23,6 +27,8 @@ import useAuth from '@/hooks/useAuth';
 import {useLocalize} from '@/hooks/useLocalize';
 import type {HeadCellData} from '@/types';
 import {departments, getCourseRole} from '@/utils';
+
+const coursesPerPage = 10;
 
 type PropsType = {courses: CourseData[]};
 
@@ -87,20 +93,41 @@ const CourseTable = ({courses}: PropsType): JSX.Element => {
       }),
     [filteredCourses]
   );
-  const coursePage = sortedCourses.slice((page - 1) * 10, page * 10);
+
+  const coursePage = sortedCourses.slice(
+    (page - 1) * coursesPerPage,
+    page * coursesPerPage
+  );
 
   return (
     <>
       <Grid container justifyContent="flex-start" sx={{mt: 1}}>
-        <TextField
+        <OutlinedInput
           sx={{minWidth: 300}}
           size="small"
-          label={t('front-page.search')}
+          placeholder={t('front-page.search')}
           value={searchText}
           onChange={e => {
             setSearchText(e.target.value);
             if (page > 1) setPage(1);
           }}
+          startAdornment={
+            <InputAdornment position="start" sx={{color: 'text.primary'}}>
+              <SearchRoundedIcon fontSize="small" />
+            </InputAdornment>
+          }
+          endAdornment={
+            searchText.length > 0 && (
+              <IconButton
+                sx={{border: 'none', backgroundColor: 'transparent'}}
+                aria-label="reset-filter"
+                size="small"
+                onClick={() => setSearchText('')}
+              >
+                <CloseIcon />
+              </IconButton>
+            )
+          }
         />
       </Grid>
       <Table>
@@ -157,9 +184,9 @@ const CourseTable = ({courses}: PropsType): JSX.Element => {
           ))}
         </TableBody>
       </Table>
-      {courses.length > 10 && (
+      {courses.length > coursesPerPage && (
         <Pagination
-          count={Math.ceil(courses.length / 10)}
+          count={Math.ceil(courses.length / coursesPerPage)}
           page={page}
           onChange={(_, newPage) => setPage(newPage)}
           sx={{mt: 1}}
