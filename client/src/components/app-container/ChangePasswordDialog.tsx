@@ -2,14 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Link,
-} from '@mui/material';
+import {Button, DialogActions, DialogContent, DialogTitle} from '@mui/material';
 import {Formik, type FormikHelpers, type FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useState} from 'react';
@@ -17,6 +10,8 @@ import {useTranslation} from 'react-i18next';
 import {z} from 'zod';
 
 import {PasswordSchema} from '@/common/types';
+import Dialog from '@/components/shared/Dialog';
+import ExternalLink from '@/components/shared/ExternalLink';
 import FormField from '@/components/shared/FormikField';
 import BaseShowPasswordButton from '@/components/shared/auth/ShowPasswordButton';
 import {useResetOwnAuth} from '@/hooks/useApi';
@@ -33,6 +28,7 @@ type ShowPassword = {
 };
 
 type PropsType = {open: boolean; onClose: () => void};
+
 const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const resetOwnAuth = useResetOwnAuth();
@@ -132,13 +128,14 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
                 alignItems: 'flex-end',
               }}
             >
-              <Link
-                sx={{mb: 1, ml: 1.5}}
+              <ExternalLink
                 href="https://www.aalto.fi/en/services/password-guidelines"
-                target="_blank"
-              >
-                {t('shared.auth.password.requirements')}
-              </Link>
+                linkText={t('shared.auth.password.requirements')}
+                sx={{
+                  mb: 1,
+                  ml: 1.5,
+                }}
+              />
               <Button
                 variant="contained"
                 onClick={form.submitForm}
@@ -153,4 +150,5 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
     </Dialog>
   );
 };
+
 export default ChangePasswordDialog;
