@@ -17,7 +17,7 @@ import {GlobalModal, GlobalModalWrapper} from 'react-global-modal';
 import {RouterProvider, createBrowserRouter} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
-import ThemeWrapper from '@/theme/ThemeWrapper';
+import ThemeProvider from '@/theme/ThemeProvider';
 import AppContainer from './components/AppContainer';
 import FrontPageView from './components/FrontPageView';
 import LoginView from './components/LoginView';
@@ -62,7 +62,7 @@ const Root = (): JSX.Element => {
   });
 
   return (
-    <ThemeWrapper>
+    <ThemeProvider>
       <NotistackWrapper />
       <GlobalModalWrapper
         customModal={ConfirmDialog}
@@ -73,7 +73,7 @@ const Root = (): JSX.Element => {
         {/* Query debug tool */}
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
-    </ThemeWrapper>
+    </ThemeProvider>
   );
 };
 
