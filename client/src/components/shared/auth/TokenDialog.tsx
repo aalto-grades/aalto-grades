@@ -9,13 +9,13 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Link,
   TextField,
   Typography,
 } from '@mui/material';
 import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
+import ExternalLink from '@/components/shared/ExternalLink';
 import {getToken, setToken} from '@/utils';
 
 type PropsType = {
@@ -66,9 +66,7 @@ const TokenDialog = ({
       <DialogContent>
         <Typography sx={{mb: 2}}>
           {t('shared.auth.token.body')}:{' '}
-          <Link href={link} target="_blank">
-            {link}
-          </Link>
+          <ExternalLink href={link}>{link}</ExternalLink>
         </Typography>
         {currentToken && (
           <Typography>

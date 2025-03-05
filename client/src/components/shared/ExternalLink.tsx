@@ -5,15 +5,15 @@
 import LaunchIcon from '@mui/icons-material/Launch';
 import type {SxProps, Theme} from '@mui/material';
 import Link from '@mui/material/Link';
-import type {JSX} from 'react';
+import type {JSX, ReactNode} from 'react';
 
 type PropsType = {
   href: string;
-  linkText: string;
+  children: ReactNode;
   sx?: SxProps<Theme>;
 };
 
-const ExternalLink = ({href, linkText, sx = {}}: PropsType): JSX.Element => {
+const ExternalLink = ({href, children, sx = {}}: PropsType): JSX.Element => {
   return (
     <Link
       rel="noreferrer"
@@ -26,7 +26,7 @@ const ExternalLink = ({href, linkText, sx = {}}: PropsType): JSX.Element => {
         ...sx,
       }}
     >
-      {linkText}
+      {children}
       <LaunchIcon fontSize="small" />
     </Link>
   );

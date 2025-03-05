@@ -42,12 +42,12 @@ const Footer = (): JSX.Element => {
       </Link>
       <ExternalLink
         href={`https://github.com/aalto-grades/aalto-grades/tree/v${AALTO_GRADES_VERSION}`}
-        linkText={t('app.footer.source-text')}
-      />
-      <ExternalLink
-        href="https://link.webropolsurveys.com/S/E358C6E5E7690C72"
-        linkText={t('app.footer.feedback-text')}
-      />
+      >
+        {t('app.footer.source-text')}
+      </ExternalLink>
+      <ExternalLink href="https://link.webropolsurveys.com/S/E358C6E5E7690C72">
+        {t('app.footer.feedback-text')}
+      </ExternalLink>
       <Typography sx={{color: 'text.secondary'}}>
         Ossi v{AALTO_GRADES_VERSION}
       </Typography>

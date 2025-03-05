@@ -130,12 +130,13 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
             >
               <ExternalLink
                 href="https://www.aalto.fi/en/services/password-guidelines"
-                linkText={t('shared.auth.password.requirements')}
                 sx={{
                   mb: 1,
                   ml: 1.5,
                 }}
-              />
+              >
+                {t('shared.auth.password.requirements')}
+              </ExternalLink>
               <Button
                 variant="contained"
                 onClick={form.submitForm}
