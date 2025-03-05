@@ -116,6 +116,7 @@
   },
   "language": "English (en)",
   "general": {
+    "search": "search",
     "a+-api-token": "A+ API token",
     "a+-courses": "A+ courses",
     "next": "Next",
@@ -303,7 +304,6 @@
       "download-sisu-csv": "Download Sisu CSV",
       "group-columns": "Group rows based on other columns",
       "show-model-parts": "Show only course parts used in the model",
-      "search-bar-placeholder": "Search...",
       "showing-n-rows": "Showing {{n}} rows",
       "n-errors": "{{n}} errors",
       "final-downloaded": "Final grades downloaded in the Sisu CSV format successfully.",
@@ -425,7 +425,6 @@
   },
   "front-page": {
     "not-logged-in": "Not logged in",
-    "search": "search",
     "no-results": "No courses found",
     "create-new-course": "Create new course",
     "user-added": "User added successfully",

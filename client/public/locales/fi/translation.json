@@ -116,6 +116,7 @@
   },
   "language": "Suomi (fi)",
   "general": {
+    "search": "Haku",
     "a+-api-token": "A+ API-käyttöoikeustietue",
     "a+-courses": "A+ kurssit",
     "next": "Seuraava",
@@ -303,7 +304,6 @@
       "download-sisu-csv": "Lataa Sisu CSV",
       "group-columns": "Ryhmittele sarakkeet",
       "show-model-parts": "Näytä mallin osat",
-      "search-bar-placeholder": "Etsi...",
       "showing-n-rows": "Näytetään {{n}} riviä",
       "n-errors": "{{n}} virhettä",
       "final-downloaded": "Lopullinen arvosana ladattu",
@@ -425,7 +425,6 @@
   },
   "front-page": {
     "not-logged-in": "Et ole kirjautunut sisään",
-    "search": "haku",
     "no-results": "Kursseja ei löytynyt",
     "create-new-course": "Luo uusi kurssi",
     "user-added": "Käyttäjä lisätty onnistuneesti",

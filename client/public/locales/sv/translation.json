@@ -116,6 +116,7 @@
   },
   "language": "Svenska (sv)",
   "general": {
+    "search": "UNTRANSLATED",
     "a+-api-token": "UNTRANSLATED",
     "a+-courses": "UNTRANSLATED",
     "next": "UNTRANSLATED",
@@ -303,7 +304,6 @@
       "download-sisu-csv": "UNTRANSLATED",
       "group-columns": "UNTRANSLATED",
       "show-model-parts": "UNTRANSLATED",
-      "search-bar-placeholder": "UNTRANSLATED",
       "showing-n-rows": "UNTRANSLATED",
       "n-errors": "UNTRANSLATED",
       "final-downloaded": "UNTRANSLATED",
@@ -425,7 +425,6 @@
   },
   "front-page": {
     "not-logged-in": "UNTRANSLATED",
-    "search": "UNTRANSLATED",
     "no-results": "UNTRANSLATED",
     "create-new-course": "UNTRANSLATED",
     "user-added": "UNTRANSLATED",

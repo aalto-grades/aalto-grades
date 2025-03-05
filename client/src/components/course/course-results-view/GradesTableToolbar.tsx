@@ -25,6 +25,7 @@ import {z} from 'zod';
 
 import {type StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateFinalGrades} from '@/common/util';
+import Search from '@/components/shared/Search';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 import {
@@ -638,14 +639,7 @@ const GradesTableToolbar = (): JSX.Element => {
             <AssessmentFilterButton />
           </Tooltip>
         )}
-        <input
-          style={{
-            borderRadius: '200px',
-            border: '0px solid black',
-            background: 'lightgrey',
-            padding: '0px 15px',
-          }}
-          type="text"
+        <Search
           value={
             (table.getColumn('user_studentNumber')?.getFilterValue() ??
               '') as string
@@ -655,8 +649,9 @@ const GradesTableToolbar = (): JSX.Element => {
               .getColumn('user_studentNumber')
               ?.setFilterValue(e.target.value);
           }}
-          placeholder={t('course.results.search-bar-placeholder')}
-          className="w-36 border shadow rounded"
+          reset={() =>
+            table.getColumn('user_studentNumber')?.setFilterValue('')
+          }
         />
         <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
           {t('course.results.showing-n-rows', {

@@ -43,7 +43,13 @@ const AppContainer = (): JSX.Element => {
       >
         <Outlet />
       </Box>
-      <Footer />
+      <Box
+        sx={{
+          gridArea: 'footer',
+        }}
+      >
+        <Footer />
+      </Box>
     </Box>
   );
 };

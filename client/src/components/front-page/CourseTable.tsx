@@ -2,13 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import CloseIcon from '@mui/icons-material/Close';
-import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import {
   Grid2 as Grid,
-  IconButton,
-  InputAdornment,
-  OutlinedInput,
   Pagination,
   Table,
   TableBody,
@@ -18,11 +13,18 @@ import {
   TableSortLabel,
   Typography,
 } from '@mui/material';
-import {type JSX, useCallback, useMemo, useState} from 'react';
+import {
+  type ChangeEvent,
+  type JSX,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
 import {type CourseData, CourseRoleType, SystemRole} from '@/common/types';
+import Search from '@/components/shared/Search';
 import useAuth from '@/hooks/useAuth';
 import {useLocalize} from '@/hooks/useLocalize';
 import type {HeadCellData} from '@/types';
@@ -100,35 +102,21 @@ const CourseTable = ({courses}: PropsType): JSX.Element => {
     page * coursesPerPage
   );
 
+  const onChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ): void => {
+    setSearchText(e.target.value);
+    if (page > 1) setPage(1);
+  };
+
   return (
     <>
       <Grid container justifyContent="flex-start" sx={{mt: 1}}>
-        <OutlinedInput
-          sx={{minWidth: 300}}
-          size="small"
-          placeholder={t('front-page.search')}
+        <Search
           value={searchText}
-          onChange={e => {
-            setSearchText(e.target.value);
-            if (page > 1) setPage(1);
-          }}
-          startAdornment={
-            <InputAdornment position="start" sx={{color: 'text.primary'}}>
-              <SearchRoundedIcon fontSize="small" />
-            </InputAdornment>
-          }
-          endAdornment={
-            searchText.length > 0 && (
-              <IconButton
-                sx={{border: 'none', backgroundColor: 'transparent'}}
-                aria-label="reset-filter"
-                size="small"
-                onClick={() => setSearchText('')}
-              >
-                <CloseIcon />
-              </IconButton>
-            )
-          }
+          onChange={onChange}
+          reset={() => setSearchText('')}
+          sx={{minWidth: 300}}
         />
       </Grid>
       <Table>
