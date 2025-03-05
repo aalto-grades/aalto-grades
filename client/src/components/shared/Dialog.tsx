@@ -35,7 +35,7 @@ const Dialog = ({
   const {t} = useTranslation();
 
   return (
-    <MuiDialog open={open} onClose={onClose} fullWidth maxWidth="xs" {...props}>
+    <MuiDialog open={open} onClose={onClose} {...props}>
       <Tooltip title={t('general.close-window')} placement="top">
         <CloseButton onClick={onClose} aria-label="close-dialog">
           <CloseIcon />

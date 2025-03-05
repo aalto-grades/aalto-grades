@@ -5,7 +5,6 @@
 import {
   Box,
   Button,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -15,6 +14,7 @@ import {
 import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
+import Dialog from '@/components/shared/Dialog';
 import ExternalLink from '@/components/shared/ExternalLink';
 import {getToken, setToken} from '@/utils';
 
@@ -61,7 +61,7 @@ const TokenDialog = ({
     : currentToken?.slice(0, 12) + '...';
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm">
       <DialogTitle>{t('general.a+-api-token')}</DialogTitle>
       <DialogContent>
         <Typography sx={{mb: 2}}>
