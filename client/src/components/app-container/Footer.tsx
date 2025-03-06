@@ -57,7 +57,7 @@ const Footer = (): JSX.Element => {
       </Tooltip>
       <Tooltip title={t('app.footer.feedback.tooltip')}>
         <Link
-          href="https://link.webropolsurveys.com/S/E358C6E5E7690C72"
+          href="https://link.webropol.com/s/ossi-feedback"
           target="_blank"
           rel="noreferrer"
           underline="none"
