@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 The Ossi Developers
+// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -30,7 +30,6 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-
 import {type FormikProps, useFormik} from 'formik';
 import {type JSX, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
@@ -311,29 +310,6 @@ const CreateCourseDialog = ({
 
   const formDirty =
     form.dirty || teachersInCharge.length > 0 || assistants.length > 0;
-
-  const fetchSisu = (courseCode: string): void => {
-    setShowDialog(true);
-    setQueryString(courseCode.trim());
-  };
-
-  const resetForm = (): void => {
-    form.resetForm();
-    setTeachersInCharge([]);
-    setAssistants([]);
-    setNonExistingEmails(new Set());
-  };
-
-  const selectCourse = async (course: SisuCourseInstance): Promise<void> => {
-    resetForm();
-    setShowDialog(false);
-    form.setValues(sisuInstanceToForm(course));
-
-    // Teachers in charge, validate one by one
-    for (let i = 0; i < course.teachers.length; ++i) {
-      await validateTeacher(generateEmailAddressString(course.teachers[i]));
-    }
-  };
 
   return (
     <>
