@@ -27,7 +27,7 @@ describe('Test behavior to unknown endpoints', () => {
         .set('Content-Type', 'application/json')
         .expect(HttpCode.NotFound),
       'Cannot PUT /v1/auth/login. Please refer to the API documentation at ' +
-        'https://aalto-grades.cs.aalto.fi/api-docs/ for a list of available endpoints.'
+        'https://ossi.cs.aalto.fi/api-docs/ for a list of available endpoints.'
     );
 
     evaluateResponse(
@@ -35,7 +35,7 @@ describe('Test behavior to unknown endpoints', () => {
         .get('/v1/course/all')
         .set('Content-Type', 'application/json'),
       'Cannot GET /v1/course/all. Please refer to the API documentation at ' +
-        'https://aalto-grades.cs.aalto.fi/api-docs/ for a list of available endpoints.'
+        'https://ossi.cs.aalto.fi/api-docs/ for a list of available endpoints.'
     );
 
     evaluateResponse(
@@ -43,7 +43,7 @@ describe('Test behavior to unknown endpoints', () => {
         .post('/v1/sisu/courses/CS-A1110')
         .set('Content-Type', 'application/json'),
       'Cannot POST /v1/sisu/courses/CS-A1110. Please refer to the API documentation at ' +
-        'https://aalto-grades.cs.aalto.fi/api-docs/ for a list of available endpoints.'
+        'https://ossi.cs.aalto.fi/api-docs/ for a list of available endpoints.'
     );
 
     evaluateResponse(
@@ -51,7 +51,7 @@ describe('Test behavior to unknown endpoints', () => {
         .delete('/v1/user/1')
         .set('Content-Type', 'application/json'),
       'Cannot DELETE /v1/user/1. Please refer to the API documentation at ' +
-        'https://aalto-grades.cs.aalto.fi/api-docs/ for a list of available endpoints.'
+        'https://ossi.cs.aalto.fi/api-docs/ for a list of available endpoints.'
     );
   });
 });

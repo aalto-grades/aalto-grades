@@ -16,8 +16,8 @@ services:
       - 443:443
       - 80:80
     volumes:
-      - ${CERT_FILE}:/etc/ssl/certs/aalto-grades.cs.aalto.fi.crt
-      - ${CERT_KEY_FILE}:/etc/ssl/private/aalto-grades.cs.aalto.fi.key
+      - ${CERT_FILE}:/etc/ssl/certs/ossi.cs.aalto.fi.crt
+      - ${CERT_KEY_FILE}:/etc/ssl/private/ossi.cs.aalto.fi.key
       # We use the /templates/ folder because we need to be able to use
       # ${SERVER_NAME} in the nginx.conf
       - ./reverse-proxy.conf:/etc/nginx/templates/nginx.conf.template
