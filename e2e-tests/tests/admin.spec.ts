@@ -18,8 +18,9 @@ import {
   importGradesWithText,
   viewCourseParts,
   viewGradingModel,
-} from './common/course.spec';
-import {aPlusToken} from './common/token.spec';
+} from './common/course';
+import {aPlusToken} from './common/token';
+import {addUser, logOut} from './common/user';
 import {setupDb} from './helper';
 
 test.beforeAll(async () => {
@@ -31,27 +32,21 @@ test.beforeEach(async ({page}) => {
 });
 
 test.afterEach(async ({page}) => {
-  await page.goto('/');
-  await page.getByRole('button', {name: 'Andy Admin'}).click();
-  await page.getByRole('menuitem', {name: 'Log out'}).click();
+  await logOut(page, 'Andy Admin');
 });
 
 test.use({storageState: 'playwright/.auth/admin.json'});
 
 test.describe('Manage users as admin', () => {
   test('Add user', async ({page}) => {
-    await page.getByRole('button', {name: 'Add user'}).click();
-    await page.getByLabel('Email').click();
-    await page.getByLabel('Email').fill('testuser@aalto.fi');
-    await page.getByRole('button', {name: 'Add user'}).click();
-    await expect(
-      page.getByRole('cell', {name: 'testuser@aalto.fi'})
-    ).toBeAttached();
+    await addUser(page);
   });
 
   test('Remove user role', async ({page}) => {
+    const email = await addUser(page);
+
     await page.goto('/');
-    const cell = page.getByRole('cell', {name: 'idpuser@aalto.fi'});
+    const cell = page.getByRole('cell', {name: email});
     await expect(cell).toBeAttached();
     const parent = page.getByRole('row').filter({has: cell});
     await parent.getByTestId('PersonRemoveIcon').click();

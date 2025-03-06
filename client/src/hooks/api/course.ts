@@ -57,6 +57,7 @@ export const useAddCourse = (
 
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['all-courses']});
+      queryClient.invalidateQueries({queryKey: ['own-courses']});
     },
     ...options,
   });
