@@ -21,7 +21,6 @@ import {
 } from './common/course';
 import {aPlusToken} from './common/token';
 import {logOut} from './common/user';
-
 import {setupDb} from './helper';
 
 test.beforeAll(async () => {
