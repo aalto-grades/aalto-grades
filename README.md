@@ -1,12 +1,12 @@
 <!--
-SPDX-FileCopyrightText: 2022 The Aalto Grades Developers
+SPDX-FileCopyrightText: 2022 The Ossi Developers
 
 SPDX-License-Identifier: MIT
 -->
 
-# Aalto Grades
+# Ossi
 
-Aalto Grades is a grade management system for storing the grades (or points) of
+Ossi is a grade management system for storing the grades (or points) of
 students to course parts such as an exam, exercises, or a project, and
 optionally individual assigned tasks which make up these course parts, such as a
 particular essay or exercise. The grades of these tasks can then be used to
@@ -14,8 +14,8 @@ calculate the grades of the course parts as well as students' final grades of
 the course. These final grades can then be exported to an external system for
 tracking course completion.
 
-Aalto Grades contains integration with [A+](https://github.com/apluslms/a-plus),
-allowing results to be directly imported to Aalto Grades through the A+ API.
+Ossi contains integration with [A+](https://github.com/apluslms/a-plus),
+allowing results to be directly imported to Ossi through the A+ API.
 
 ## Getting started
 
@@ -26,12 +26,12 @@ You may also wish to run the system using [Docker](https://www.docker.com), in
 which case you must also install Docker itself and Docker Compose.
 
 The README files of this repository primarily contain instructions for running
-Aalto Grades and its tests. For more documentation, please see the
+Ossi and its tests. For more documentation, please see the
 [wiki](https://github.com/aalto-grades/aalto-grades/wiki).
 
 ## Building and running
 
-You can run the development build of the whole Aalto Grades system, including
+You can run the development build of the whole Ossi system, including
 the frontend, backend, and database, by running Docker Compose at the root of
 the project:
 
@@ -80,4 +80,4 @@ README file of the corresponding directory, such as `client/README.md` and
 
 ## License
 
-Aalto Grades is free software released under the Expat (or "MIT") License.
+Ossi is free software released under the Expat (or "MIT") License.
