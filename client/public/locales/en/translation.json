@@ -116,7 +116,6 @@
   },
   "language": "English (en)",
   "general": {
-    "search": "search",
     "a+-api-token": "A+ API token",
     "a+-courses": "A+ courses",
     "next": "Next",
@@ -201,6 +200,7 @@
     "in-finnish": "in Finnish",
     "in-swedish": "in Swedish",
     "done": "Done",
+    "search": "search",
     "final-grades": "Final grades",
     "course-part-grade": "Course Part Grade",
     "not-int": "Value must be a valid integer"
@@ -231,16 +231,19 @@
       "view-a+-sources": "View A+ grade sources",
       "unarchive": "Unarchive course part",
       "archive": "Archive course part",
+      "cannot-delete-with-grades": "Cannot delete a course part with grades",
+      "edit-part": "Edit course part",
+      "no-expiry-date": "No expiry date",
       "delete-task": "Delete course task",
       "delete-task-message": "Some models are using this course task. Are you sure you want to delete it?",
       "archived": "Archived",
+      "actions": "Actions",
       "add-new-task": "Add new course task",
       "add-from-a+": "Add course tasks from A+",
       "add-new-part": "Add new course part",
       "no-course-parts": "No course parts. Please add course parts to get started.",
-      "edit-part": "Edit course part",
-      "cannot-delete-with-grades": "Cannot delete a course part with grades",
-      "no-expiry-date": "No expiry date"
+      "active-parts": "Active course parts",
+      "archived-parts": "Archived course parts"
     },
     "models": {
       "has-multiple-warnings": "Model has multiple warnings",

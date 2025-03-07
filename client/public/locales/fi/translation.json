@@ -116,7 +116,6 @@
   },
   "language": "Suomi (fi)",
   "general": {
-    "search": "Haku",
     "a+-api-token": "A+ API-käyttöoikeustietue",
     "a+-courses": "A+ kurssit",
     "next": "Seuraava",
@@ -201,6 +200,7 @@
     "in-finnish": "suomeksi",
     "in-swedish": "ruotsiksi",
     "done": "Valmis",
+    "search": "Haku",
     "final-grades": "Lopulliset arvosanat",
     "course-part-grade": "Kurssin osan arvosana",
     "not-int": "Arvon on oltava validi kokonaisluku"
@@ -231,16 +231,19 @@
       "view-a+-sources": "Näytä A+ lähteet",
       "unarchive": "Palauta arkistosta",
       "archive": "Arkistoi",
+      "cannot-delete-with-grades": "Ei voi poistaa, koska sisältää arvosanoja",
+      "edit-part": "Muokkaa osaa",
+      "no-expiry-date": "Ei voimassaolopäivää",
       "delete-task": "Poista tehtävä",
       "delete-task-message": "Haluatko varmasti poistaa tämän tehtävän?",
       "archived": "Arkistoitu",
+      "actions": "Toiminnot",
       "add-new-task": "Lisää uusi tehtävä",
       "add-from-a+": "Lisää A+:sta",
       "add-new-part": "Lisää uusi kurssin osa",
       "no-course-parts": "Ei kurssin osia",
-      "edit-part": "Muokkaa osaa",
-      "cannot-delete-with-grades": "Ei voi poistaa, koska sisältää arvosanoja",
-      "no-expiry-date": "Ei voimassaolopäivää"
+      "active-parts": "Aktiiviset kurssin osat",
+      "archived-parts": "Arkistoidut kurssin osat"
     },
     "models": {
       "has-multiple-warnings": "Sisältää useita varoituksia",
