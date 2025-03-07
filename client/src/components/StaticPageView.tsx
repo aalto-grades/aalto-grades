@@ -30,7 +30,7 @@ const StaticPageView = ({url, title}: PropsType): JSX.Element => {
         sx={{
           width: '100%',
           overflowY: 'auto',
-          backgroundColor: 'var(--mui-palette-background-paper)',
+          backgroundColor: 'primary.staticBg',
           borderRadius: '15px',
           paddingLeft: '16px',
           paddingRight: '16px',

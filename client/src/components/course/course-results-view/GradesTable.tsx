@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
-import {Badge, Icon, IconButton} from '@mui/material';
+import {Badge, Icon, IconButton, useTheme} from '@mui/material';
 import {type Cell, type Row, flexRender} from '@tanstack/react-table';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import {type JSX, useRef} from 'react';
@@ -79,6 +79,7 @@ const RenderCell = ({
 };
 
 const GradesTable = (): JSX.Element => {
+  const theme = useTheme();
   const {table} = useTableContext();
   const {rows} = table.getRowModel();
 
@@ -98,7 +99,8 @@ const GradesTable = (): JSX.Element => {
         overflowY: 'auto', // Scrollable table container
         position: 'relative', // Needed for sticky header
         height: 'calc(100vh - 255px)', // Should be a fixed height
-        width: 'fit-content',
+        width: '100%',
+        borderRadius: 5,
         maxWidth: '100%',
       }}
     >
@@ -121,7 +123,10 @@ const GradesTable = (): JSX.Element => {
               style={{
                 display: 'flex',
                 width: '100%',
-                backgroundColor: 'white',
+                backgroundColor:
+                  theme.palette.mode === 'dark'
+                    ? theme.palette.primary.main
+                    : theme.palette.primary.light,
                 borderBottom: '1px solid lightgray',
               }}
             >
@@ -153,6 +158,10 @@ const GradesTable = (): JSX.Element => {
                             'middle')
                       }
                       style={{
+                        backgroundColor:
+                          theme.palette.mode === 'dark'
+                            ? theme.palette.primary.main
+                            : theme.palette.primary.light,
                         fontWeight: 'bold',
                       }}
                       onClick={

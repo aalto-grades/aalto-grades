@@ -16,6 +16,7 @@ export const colorSchemes = {
         main: '#3D5AFE',
         dark: '#0031CA',
         contrastText: '#FFF',
+        staticBg: 'white',
       },
       secondary: {
         light: '#F1F8F0',
@@ -33,6 +34,7 @@ export const colorSchemes = {
         main: 'hsl(0, 0.00%, 46.70%)',
         dark: 'hsl(0, 1.20%, 15.90%)',
         contrastText: '#FFF',
+        staticBg: '#121212',
       },
     },
   },
