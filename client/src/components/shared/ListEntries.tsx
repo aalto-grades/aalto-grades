@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2025 The Ossi Developers
 //
 // SPDX-License-Identifier: MIT
 
