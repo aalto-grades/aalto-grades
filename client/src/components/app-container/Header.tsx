@@ -37,7 +37,10 @@ const Header = (): JSX.Element => {
           minWidth: '184px',
           cursor: 'pointer',
           fontWeight: 'bold',
-          color: 'primary.dark',
+          color:
+            theme.palette.mode === 'light'
+              ? 'primary.dark'
+              : 'primary.contrastText',
         }}
         data-testid="a-grades-header-link"
         viewTransition
