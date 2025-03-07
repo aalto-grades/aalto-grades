@@ -272,7 +272,10 @@
       "save-null": "UNTRANSLATED",
       "create-final-grade-model": "UNTRANSLATED",
       "back": "UNTRANSLATED",
-      "no-models": "UNTRANSLATED"
+      "no-models": "UNTRANSLATED",
+      "active-models": "UNTRANSLATED",
+      "archived-models": "UNTRANSLATED",
+      "missing-models": "UNTRANSLATED"
     },
     "results": {
       "calculate-final": "UNTRANSLATED",

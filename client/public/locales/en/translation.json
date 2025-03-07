@@ -272,7 +272,10 @@
       "save-null": "Tried to save null model",
       "create-final-grade-model": "Create new final grade model",
       "back": "Back to models",
-      "no-models": "No grading models. Please add grading models in order to calculate the grades of students."
+      "no-models": "No grading models. Please add grading models in order to calculate the grades of students.",
+      "active-models": "Active grading models",
+      "archived-models": "Archived grading models",
+      "missing-models": "Missing grading models"
     },
     "results": {
       "calculate-final": "Calculate final grades",

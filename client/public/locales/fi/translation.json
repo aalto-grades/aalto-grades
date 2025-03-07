@@ -272,7 +272,10 @@
       "save-null": "Tallennusvirhe",
       "create-final-grade-model": "Luo lopullinen arviointimalli",
       "back": "Takaisin",
-      "no-models": "Ei malleja"
+      "no-models": "Ei malleja",
+      "active-models": "Aktiiviset arviointimallit",
+      "archived-models": "Arkistoidut arviointimallit",
+      "missing-models": "Puuttuvat arviointimallit"
     },
     "results": {
       "calculate-final": "Laske lopullinen arvosana",
