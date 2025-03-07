@@ -42,7 +42,7 @@ const Header = (): JSX.Element => {
         data-testid="a-grades-header-link"
         viewTransition
       >
-        {logoVariant}Ossi
+        Ossi{logoVariant}
       </Typography>
       {course.data !== undefined && (
         <>
