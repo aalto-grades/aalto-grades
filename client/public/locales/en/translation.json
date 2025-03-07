@@ -474,7 +474,7 @@
     "title": "Log in to Aalto Grades",
     "local": {
       "title": "Local users",
-      "body": "If you have been provided with credentials specifically for Aalto Grades, use this login.",
+      "body": "If you have been provided with credentials specifically for Ossi, use this login.",
       "mfa-code": "MFA code",
       "button": "Log in"
     },

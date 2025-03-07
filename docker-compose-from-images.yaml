@@ -1,8 +1,8 @@
-# SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+# SPDX-FileCopyrightText: 2023 The Ossi Developers
 #
 # SPDX-License-Identifier: MIT
 
-# This is a Docker Compose configuration for deploying Aalto Grades to a
+# This is a Docker Compose configuration for deploying Ossi to a
 # virtual machine from the main branch. Requires correct setup work to be done
 # on the VM. Documentation for deployment is available in the aalto wiki.
 
@@ -16,8 +16,8 @@ services:
       - 443:443
       - 80:80
     volumes:
-      - ${CERT_FILE}:/etc/ssl/certs/aalto-grades.cs.aalto.fi.crt
-      - ${CERT_KEY_FILE}:/etc/ssl/private/aalto-grades.cs.aalto.fi.key
+      - ${CERT_FILE}:/etc/ssl/certs/ossi.cs.aalto.fi.crt
+      - ${CERT_KEY_FILE}:/etc/ssl/private/ossi.cs.aalto.fi.key
       # We use the /templates/ folder because we need to be able to use
       # ${SERVER_NAME} in the nginx.conf
       - ./reverse-proxy.conf:/etc/nginx/templates/nginx.conf.template

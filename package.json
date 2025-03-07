@@ -2,7 +2,7 @@
   "name": "aalto-grades",
   "version": "1.0.3",
   "license": "Expat (MIT)",
-  "author": "The Aalto Grades Developers",
+  "author": "The Ossi Developers",
   "scripts": {
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "lint-common": "eslint common --ext ts --report-unused-disable-directives",

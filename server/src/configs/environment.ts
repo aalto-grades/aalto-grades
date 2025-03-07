@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2023 The Ossi Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -101,7 +101,7 @@ const defaults = {
   jwtSecret: 'TOP_SECRET',
   frontendCorsOrigin: 'http://localhost:3005',
   // TODO: Fix SAML callback url to include /api/ (#848)
-  samlCallback: 'https://aalto-grades.cs.aalto.fi/v1/auth/login-idp/callback',
+  samlCallback: 'https://ossi.cs.aalto.fi/v1/auth/login-idp/callback',
   samlEntrypoint: 'https://devel.idp.aalto.fi/idp/profile/SAML2/Redirect/SSO',
   samlIssuer: 'https://aalto-grades.cs.aalto.fi',
   samlMetadataUrl: 'https://devel.idp.aalto.fi/idp/shibboleth',

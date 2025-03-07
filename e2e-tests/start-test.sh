@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+# SPDX-FileCopyrightText: 2024 The Ossi Developers
 #
 # SPDX-License-Identifier: MIT
 

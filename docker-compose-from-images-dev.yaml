@@ -1,8 +1,8 @@
-# SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+# SPDX-FileCopyrightText: 2024 The Ossi Developers
 #
 # SPDX-License-Identifier: MIT
 
-# This is a Docker Compose configuration for deploying Aalto Grades to a
+# This is a Docker Compose configuration for deploying Ossi to a
 # virtual machine from the dev branch. Requires correct setup work to be done
 # on the VM. Documentation for deployment is available in the aalto wiki.
 

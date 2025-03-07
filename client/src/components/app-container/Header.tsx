@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 The Aalto Grades Developers
+// SPDX-FileCopyrightText: 2024 The Ossi Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -42,7 +42,7 @@ const Header = (): JSX.Element => {
         data-testid="a-grades-header-link"
         viewTransition
       >
-        A{logoVariant} Grades
+        {logoVariant}Ossi
       </Typography>
       {course.data !== undefined && (
         <>
