@@ -8,8 +8,8 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  Tooltip,
 } from '@mui/material';
-import {grey} from '@mui/material/colors';
 import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
@@ -24,13 +24,16 @@ const MissingModelButton = ({part, onClick}: PropsType): JSX.Element => {
 
   return (
     <ListItem
-      sx={{backgroundColor: grey[300]}}
       disablePadding
-      title={t('course.models.missing-part-model-create')}
       secondaryAction={
-        <IconButton onClick={onClick} edge="end">
-          <AddBox />
-        </IconButton>
+        <Tooltip
+          title={t('course.models.missing-part-model-create')}
+          placement="top"
+        >
+          <IconButton onClick={onClick} edge="end">
+            <AddBox />
+          </IconButton>
+        </Tooltip>
       }
     >
       <ListItemButton onClick={onClick}>

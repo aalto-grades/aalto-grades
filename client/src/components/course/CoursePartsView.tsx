@@ -14,12 +14,10 @@ import {
 import {
   Box,
   Button,
-  Chip,
   CircularProgress,
-  Divider,
+  Collapse,
   Grid2 as Grid,
   IconButton,
-  List,
   ListItem,
   ListItemButton,
   ListItemText,
@@ -46,6 +44,7 @@ import {
   SystemRole,
 } from '@/common/types';
 import DataGridBase from '@/components/shared/DataGridBase';
+import ListEntries from '@/components/shared/ListEntries';
 import SaveBar from '@/components/shared/SaveBar';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
@@ -369,7 +368,6 @@ const CoursePartsView = (): JSX.Element => {
   }): JSX.Element => {
     return (
       <ListItem
-        key={coursePart.id}
         sx={{
           backgroundColor: coursePart.archived ? 'primary.light' : '',
           border: selectedPart === coursePart.id ? '1px solid' : 'none',
@@ -633,33 +631,42 @@ const CoursePartsView = (): JSX.Element => {
             <Typography>{t('course.parts.no-course-parts')}</Typography>
           ) : (
             <>
-              <Chip label={t('course.parts.active-parts')} color="success" />
-              <List>
-                {courseParts.data
-                  .filter(part => !part.archived)
-                  .map(coursePart => (
-                    <CoursePartItem
-                      key={coursePart.id}
-                      coursePart={coursePart}
-                    />
-                  ))}
-              </List>
-              {courseParts.data.filter(part => part.archived).length > 0 && (
-                <>
-                  <Divider sx={{my: 1, mb: 2}} />
-                  <Chip label={t('course.parts.archived-parts')} />
-                  <List>
-                    {courseParts.data
-                      .filter(part => part.archived)
-                      .map(coursePart => (
-                        <CoursePartItem
-                          key={coursePart.id}
-                          coursePart={coursePart}
-                        />
-                      ))}
-                  </List>
-                </>
-              )}
+              <Collapse
+                in={courseParts.data.find(mod => !mod.archived) !== undefined}
+              >
+                <ListEntries
+                  label={t('course.parts.active-parts')}
+                  color="success"
+                  listWidth="100%"
+                >
+                  {courseParts.data
+                    .filter(part => !part.archived)
+                    .map(coursePart => (
+                      <CoursePartItem
+                        key={coursePart.id}
+                        coursePart={coursePart}
+                      />
+                    ))}
+                </ListEntries>
+              </Collapse>
+              <Collapse
+                in={courseParts.data.find(mod => mod.archived) !== undefined}
+                sx={{mt: 2}}
+              >
+                <ListEntries
+                  label={t('course.parts.archived-parts')}
+                  listWidth="100%"
+                >
+                  {courseParts.data
+                    .filter(part => part.archived)
+                    .map(coursePart => (
+                      <CoursePartItem
+                        key={coursePart.id}
+                        coursePart={coursePart}
+                      />
+                    ))}
+                </ListEntries>
+              </Collapse>
             </>
           )}
         </Grid>
