@@ -86,9 +86,9 @@ const FinalGradeCell = ({
               right: '1%',
               textAlign: 'right',
               fontSize: '0.7rem',
-              color: `rgba(${theme.vars.palette.primary.mainChannel} / 0.7)`,
+              color: `rgba(${theme.palette.primary.mainChannel} / 0.7)`,
               '&:hover': {
-                color: `rgba(${theme.vars.palette.primary.mainChannel} / 1)`,
+                color: `rgba(${theme.palette.primary.mainChannel} / 1)`,
               },
             }}
           >
