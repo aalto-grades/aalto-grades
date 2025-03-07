@@ -354,9 +354,11 @@ const CoursePartsView = (): JSX.Element => {
             : t('course.parts.delete')
         }
       >
-        <IconButton disabled={disabled} onClick={onClick}>
-          <Delete />
-        </IconButton>
+        <span>
+          <IconButton disabled={disabled} onClick={onClick}>
+            <Delete />
+          </IconButton>
+        </span>
       </Tooltip>
     );
   };
@@ -622,7 +624,8 @@ const CoursePartsView = (): JSX.Element => {
       <Grid
         container
         spacing={2}
-        sx={{mt: 2, flexDirection: {md: 'column', lg: 'row'}, flexWrap: 'wrap'}}
+        direction={{xs: 'column', lg: 'row'}}
+        sx={{mt: 2}}
       >
         <Grid size={{sm: 8, md: 6, lg: 4}}>
           {courseParts.data === undefined ? (

@@ -275,7 +275,7 @@
       "no-models": "Ei malleja",
       "active-models": "Aktiiviset arviointimallit",
       "archived-models": "Arkistoidut arviointimallit",
-      "missing-models": "Puuttuvat arviointimallit"
+      "missing-models": "Arviointimalli ei määritelty"
     },
     "results": {
       "calculate-final": "Laske lopullinen arvosana",

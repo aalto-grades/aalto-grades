@@ -275,7 +275,7 @@
       "no-models": "No grading models. Please add grading models in order to calculate the grades of students.",
       "active-models": "Active grading models",
       "archived-models": "Archived grading models",
-      "missing-models": "Missing grading models"
+      "missing-models": "Grading model not defined"
     },
     "results": {
       "calculate-final": "Calculate final grades",
