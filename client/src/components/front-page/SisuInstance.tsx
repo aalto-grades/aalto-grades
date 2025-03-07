@@ -13,6 +13,7 @@ import {
   Divider,
   Typography,
   styled,
+  useTheme,
 } from '@mui/material';
 import MuiAccordion, {type AccordionProps} from '@mui/material/Accordion';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
@@ -37,13 +38,6 @@ const StyledCard = styled(Card)(({theme}) => ({
   minHeight: '170px',
   display: 'flex',
   flexDirection: 'column',
-  '&:hover': {
-    boxShadow: `0 4px 8px ${
-      theme.palette.mode === 'dark'
-        ? 'rgba(137, 130, 130, 0.2)'
-        : 'rgba(0,0,0,0.2)'
-    }`,
-  },
 }));
 
 const Accordion = styled((props: AccordionProps) => (
@@ -70,13 +64,18 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
           border: '1px solid black',
         }}
       >
-        <ArrowForwardIosSharpIcon sx={{fontSize: '0.9rem'}} />
+        <ArrowForwardIosSharpIcon
+          sx={theme => ({
+            fontSize: '0.9rem',
+            color: theme.palette.primary.dark,
+          })}
+        />
       </Box>
     }
     {...props}
   />
 ))(({theme}) => ({
-  backgroundColor: 'rgba(0, 0, 0, .03)',
+  backgroundColor: theme.palette.grey[300],
   flexDirection: 'row-reverse',
   [`& .${accordionSummaryClasses.expandIconWrapper}.${accordionSummaryClasses.expanded}`]:
     {
@@ -86,7 +85,7 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
     marginLeft: theme.spacing(1),
   },
   ...theme.applyStyles('dark', {
-    backgroundColor: 'rgba(255, 255, 255, .05)',
+    backgroundColor: theme.palette.grey[700],
   }),
 }));
 
@@ -96,7 +95,11 @@ const AccordionDetails = styled(MuiAccordionDetails)(({theme}) => ({
 }));
 
 // Highlights matching parts of the course code based on the search query
-const HighlightedText = (query: string, text: string): JSX.Element => {
+const HighlightedText = (
+  query: string = '',
+  text: string = ''
+): JSX.Element => {
+  const theme = useTheme();
   const regex = new RegExp(`(${query})`, 'gi');
   const parts = text.split(regex);
 
@@ -107,9 +110,15 @@ const HighlightedText = (query: string, text: string): JSX.Element => {
           <span
             key={index}
             style={{
-              backgroundColor: '#dbedff',
+              backgroundColor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.16)'
+                  : '#dbedff',
               borderRadius: '1.5px',
-              border: '1.5px dotted #484848',
+              border:
+                theme.palette.mode === 'dark'
+                  ? '1.5px dotted rgba(255, 255, 255, 0.7)'
+                  : '1.5px dotted #484848',
               padding: '1px 0',
             }}
           >
@@ -186,8 +195,16 @@ const SisuInstance = ({
     }
   };
 
+  const toggleExpandAll = (): void => {
+    setExpandAll(prev => {
+      if (prev) setExpanded(false);
+      return !prev;
+    });
+  };
+
   const handleChange =
     (panel: string) => (_event: React.SyntheticEvent, newExpanded: boolean) => {
+      if (expandAll) return;
       setExpanded(newExpanded ? panel : false);
     };
 
@@ -209,9 +226,8 @@ const SisuInstance = ({
             sx={{display: 'flex', gap: 1}}
           >
             <Typography>{HighlightedText(queryString, course.code)}</Typography>
-            {' - '}
             <Typography sx={{color: 'text.secondary'}}>
-              {course.organizationName[uiLang]}
+              - {course.organizationName[uiLang]}
             </Typography>
           </Typography>
           <Typography
@@ -298,11 +314,7 @@ const SisuInstance = ({
           </Box>
         </Box>
         <Box>
-          <Button
-            size="small"
-            onClick={() => setExpandAll(prev => !prev)}
-            sx={{mb: -1, mt: 1}}
-          >
+          <Button size="small" onClick={toggleExpandAll} sx={{mb: -1, mt: 1}}>
             {expandAll
               ? t('course.edit.sisu-search-accrodion-hide')
               : t('course.edit.sisu-search-accrodion-collapse')}
