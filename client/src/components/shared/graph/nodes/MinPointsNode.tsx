@@ -7,6 +7,7 @@ import {useTranslation} from 'react-i18next';
 import {Handle, type NodeProps, Position} from 'reactflow';
 
 import type {MinPointsNodeSettings, MinPointsNodeValue} from '@/common/types';
+import OutputValue from '@/components/shared/graph/nodes/parts/OutputValue';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
@@ -94,13 +95,7 @@ const MinPointsNode = (props: NodeProps): JSX.Element => {
           <option value="fail">{t('shared.graph.output-fail')}</option>
         </select>
       </div>
-      <p className="output-value">
-        {t('shared.graph.output')}:{' '}
-        {nodeValue.value === 'fail'
-          ? 'fail'
-          : Math.round(nodeValue.value * 100) / 100}
-      </p>
-
+      <OutputValue text={t('shared.graph.output')} value={nodeValue.value} />
       <Handle
         type="source"
         id={`${id}-source`}

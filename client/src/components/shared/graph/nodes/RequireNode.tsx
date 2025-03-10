@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {useTheme} from '@mui/material';
 import {type ChangeEvent, type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
@@ -21,6 +22,7 @@ const rowHeight = 33.9;
 
 const RequireNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {id, isConnectable} = props;
   const updateNodeInternals = useUpdateNodeInternals();
@@ -155,7 +157,13 @@ const RequireNode = (props: NodeProps): JSX.Element => {
           value={localSettings.numFail}
         />
       </div>
-      <table style={{width: '200px', margin: '5px 0px'}}>
+      <table
+        style={{
+          width: '200px',
+          margin: '5px 0px',
+          backgroundColor: theme.palette.graph.light,
+        }}
+      >
         <tbody>
           <tr>
             <th style={{width: '50%'}}>{t('shared.graph.in')}</th>

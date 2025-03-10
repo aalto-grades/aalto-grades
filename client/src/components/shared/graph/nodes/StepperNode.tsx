@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {useTheme} from '@mui/material';
 import {type ChangeEvent, type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Handle, type NodeProps, Position} from 'reactflow';
@@ -42,6 +43,7 @@ const checkError = (settings: LocalSettings): boolean => {
 
 const StepperNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {id, isConnectable} = props;
   const nodeValues = useContext(NodeValuesContext);
@@ -144,7 +146,13 @@ const StepperNode = (props: NodeProps): JSX.Element => {
         isConnectable={isConnectable}
       />
 
-      <table style={{width: '100%', margin: '5px 0px'}}>
+      <table
+        style={{
+          width: '100%',
+          margin: '5px 0px',
+          backgroundColor: theme.palette.graph.light,
+        }}
+      >
         <tbody>
           <tr>
             <th>{t('shared.graph.range')}</th>
@@ -154,7 +162,10 @@ const StepperNode = (props: NodeProps): JSX.Element => {
             <tr
               key={index}
               style={{
-                background: !error && isCurrentSlot(index) ? '#ccf' : '',
+                background:
+                  !error && isCurrentSlot(index)
+                    ? theme.palette.graph.dark
+                    : '',
               }}
             >
               <td>

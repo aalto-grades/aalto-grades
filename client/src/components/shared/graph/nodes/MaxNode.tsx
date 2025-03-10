@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {useTheme} from '@mui/material';
 import {type ChangeEvent, type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
@@ -21,6 +22,7 @@ const rowHeight = 33.9;
 
 const MaxNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {id, isConnectable} = props;
   const updateNodeInternals = useUpdateNodeInternals();
@@ -116,7 +118,13 @@ const MaxNode = (props: NodeProps): JSX.Element => {
         isConnectable={isConnectable}
       />
 
-      <table style={{width: '100%', margin: '5px 0px'}}>
+      <table
+        style={{
+          width: '100%',
+          margin: '5px 0px',
+          backgroundColor: theme.palette.graph.light,
+        }}
+      >
         <tbody>
           <tr>
             <th>{t('shared.graph.value')}</th>
@@ -124,7 +132,7 @@ const MaxNode = (props: NodeProps): JSX.Element => {
           <tr
             style={{
               height: rowHeight,
-              background: selectedIndex === -1 ? '#ccf' : '',
+              background: selectedIndex === -1 ? theme.palette.graph.dark : '',
             }}
           >
             <td>
@@ -144,7 +152,8 @@ const MaxNode = (props: NodeProps): JSX.Element => {
                 key={key}
                 style={{
                   height: rowHeight,
-                  backgroundColor: index === selectedIndex ? '#ccf' : '',
+                  backgroundColor:
+                    index === selectedIndex ? theme.palette.graph.dark : '',
                 }}
               >
                 <td>{Math.round(source.value * 100) / 100}</td>

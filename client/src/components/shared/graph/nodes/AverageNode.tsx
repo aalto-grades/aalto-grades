@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {useTheme} from '@mui/material';
 import {
   type ChangeEvent,
   type JSX,
@@ -18,6 +19,7 @@ import {
 } from 'reactflow';
 
 import type {AverageNodeSettings, AverageNodeValue} from '@/common/types';
+import OutputValue from '@/components/shared/graph/nodes/parts/OutputValue';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
@@ -60,6 +62,7 @@ const checkError = (settings: LocalSettings): boolean => {
 
 const AverageNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {id, isConnectable} = props;
   const updateNodeInternals = useUpdateNodeInternals();
@@ -196,7 +199,13 @@ const AverageNode = (props: NodeProps): JSX.Element => {
         {t('shared.graph.percentage-mode')}
       </label>
 
-      <table style={{width: '100%', margin: '5px 0px 0px 0px'}}>
+      <table
+        style={{
+          width: '100%',
+          margin: '5px 0px 0px 0px',
+          backgroundColor: theme.palette.graph.light,
+        }}
+      >
         <tbody>
           <tr>
             <th>{t('shared.graph.weight')}</th>
@@ -245,11 +254,10 @@ const AverageNode = (props: NodeProps): JSX.Element => {
           Sum {Math.round(percentageSum * 10) / 10} %
         </p>
       )}
-      <p className="output-value" style={{marginTop: '5px'}}>
-        {t('shared.graph.node.average')}:{' '}
-        {Math.round(nodeValue.value * 100) / 100}
-      </p>
-
+      <OutputValue
+        text={t('shared.graph.node.average')}
+        value={nodeValue.value}
+      />
       <Handle
         type="source"
         id={`${id}-source`}
