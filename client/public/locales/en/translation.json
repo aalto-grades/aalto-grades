@@ -93,7 +93,9 @@
       "substitution-num": "Number of substitutions",
       "substitutes": "Substitutes",
       "substitution-value": "sub val",
-      "set-test-values": "Set test source values"
+      "set-test-values": "Set test source values",
+      "show-map": "Show minimap",
+      "hide-map": "Hide minimap"
     },
     "unsaved-changes": {
       "body": "You have unsaved changes. Data you have entered will not be saved.",

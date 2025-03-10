@@ -93,7 +93,9 @@
       "substitution-num": "UNTRANSLATED",
       "substitutes": "UNTRANSLATED",
       "substitution-value": "UNTRANSLATED",
-      "set-test-values": "UNTRANSLATED"
+      "set-test-values": "UNTRANSLATED",
+      "show-map": "UNTRANSLATED",
+      "hide-map": "UNTRANSLATED"
     },
     "unsaved-changes": {
       "body": "UNTRANSLATED",

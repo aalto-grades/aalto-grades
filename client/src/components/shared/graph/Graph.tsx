@@ -5,7 +5,14 @@
 import 'reactflow/dist/style.css';
 import './flow.scss';
 
-import {Alert, Button, Divider, Tooltip, Typography} from '@mui/material';
+import {
+  Alert,
+  Button,
+  Divider,
+  Tooltip,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import type {TFunction} from 'i18next';
 import {enqueueSnackbar} from 'notistack';
 import {
@@ -154,6 +161,7 @@ type GraphProps = {
   readOnly?: boolean;
   modelHasFinalGrades?: boolean;
 };
+
 const Graph = ({
   initGraph,
   sources,
@@ -163,6 +171,7 @@ const Graph = ({
   modelHasFinalGrades = false,
 }: GraphProps): JSX.Element => {
   const {t} = useTranslation();
+  const theme = useTheme();
 
   const {initNodeValues, extraNodeData} = useMemo(
     () => initGraphFn(initGraph, sources, sourceValues, t),
@@ -186,6 +195,18 @@ const Graph = ({
   } | null>(null);
 
   const [selected, setSelected] = useState<TypedNode[]>([]);
+
+  // Save state to localStorage to persist the map viewing
+  const [showMinimap, setShowMinimap] = useState<boolean>(() => {
+    return JSON.parse(
+      localStorage.getItem('show-minimap') || 'false'
+    ) as boolean;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('show-minimap', JSON.stringify(showMinimap));
+  }, [showMinimap]);
+
   const [sourcesSelectOpen, setSourcesSelectOpen] = useState<boolean>(false);
   const [sourceValuesOpen, setSourceValuesOpen] = useState<boolean>(false);
   const [originalGraphStructure, setOriginalGraphStructure] =
@@ -583,7 +604,7 @@ const Graph = ({
                 deleteKeyCode={['Backspace', 'Delete']}
               >
                 {!readOnly && <Controls />}
-                <MiniMap />
+                {showMinimap && <MiniMap />}
                 <Background
                   variant={BackgroundVariant.Dots}
                   gap={12}
@@ -593,24 +614,47 @@ const Graph = ({
             </div>
             {!readOnly && onParentSave !== undefined && (
               <>
-                <div style={{marginBottom: '5px'}}>
-                  {dragAndDropNodes.map(dragAndDropNode => (
-                    <Tooltip
-                      key={dragAndDropNode.type}
-                      title={dragAndDropNode.tooltip}
-                      placement="top"
-                    >
-                      <div
-                        className="dnd-node"
-                        onDragStart={event =>
-                          onDragStart(event, dragAndDropNode.type)
-                        }
-                        draggable
+                <div
+                  style={{
+                    marginBottom: '5px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>
+                    {dragAndDropNodes.map(dragAndDropNode => (
+                      <Tooltip
+                        key={dragAndDropNode.type}
+                        title={dragAndDropNode.tooltip}
+                        placement="top"
                       >
-                        {dragAndDropNode.title}
-                      </div>
-                    </Tooltip>
-                  ))}
+                        <div
+                          className="dnd-node"
+                          onDragStart={event =>
+                            onDragStart(event, dragAndDropNode.type)
+                          }
+                          style={{
+                            backgroundColor: theme.palette.primary.main,
+                            color: theme.palette.primary.contrastText,
+                          }}
+                          draggable
+                        >
+                          {dragAndDropNode.title}
+                        </div>
+                      </Tooltip>
+                    ))}
+                  </div>
+                  <div style={{alignItems: 'center', display: 'flex'}}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => setShowMinimap(!showMinimap)}
+                    >
+                      {showMinimap
+                        ? t('shared.graph.hide-map')
+                        : t('shared.graph.show-map')}
+                    </Button>
+                  </div>
                 </div>
                 <Divider sx={{my: 1}} />
                 <div style={{float: 'left'}}>

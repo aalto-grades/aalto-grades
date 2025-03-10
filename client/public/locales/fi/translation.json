@@ -93,7 +93,9 @@
       "substitution-num": "Korvausten määrä",
       "substitutes": "Korvaavat arvot",
       "substitution-value": "Korvausarvo",
-      "set-test-values": "Aseta testiarvot"
+      "set-test-values": "Aseta testiarvot",
+      "show-map": "Näytä kartta",
+      "hide-map": "Piilota kartta"
     },
     "unsaved-changes": {
       "body": "Sinulla on tallentamattomia muutoksia. Syöttämäsi tiedot eivät tallennu.",
