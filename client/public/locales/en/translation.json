@@ -367,7 +367,10 @@
         "download-csv-template": "Download CSV template",
         "download-excel-template": "Download Excel template",
         "add-manually": "Or add them manually",
-        "student-number-empty": "Student number cannot be empty"
+        "student-number-empty": "Student number cannot be empty",
+        "modify-selected": "Modify selected",
+        "select-at-least-one-info": "Select at least one value for bulk edit",
+        "bulk-edit-dialog-title": "Set date to selected course parts"
       },
       "final-grade-preview": "Final grade preview",
       "course-part-value-preview": "Course part value",

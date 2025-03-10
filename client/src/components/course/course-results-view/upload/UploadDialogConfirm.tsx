@@ -10,8 +10,12 @@ import {
   AccordionDetails,
   AccordionSummary,
   Alert,
+  Button,
+  Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
+  Checkbox as MuiCheckbox,
   Table,
   TableBody,
   TableCell,
@@ -26,6 +30,8 @@ import type {
   GridValidRowModel,
 } from '@mui/x-data-grid';
 import type {Dayjs} from 'dayjs';
+import dayjs from 'dayjs';
+import {enqueueSnackbar} from 'notistack';
 import {
   type Dispatch,
   type JSX,
@@ -46,6 +52,45 @@ export type DateType = {
   expirationDate: Dayjs | null;
 };
 
+type CoursePartDate = 'expiration' | 'completion';
+
+const CheckAllCheckbox = ({type}: {type: CoursePartDate}): JSX.Element => (
+  <MuiCheckbox
+    id={`${type}DateSelectAllCheckbox`}
+    inputRef={el => el && el.setAttribute('data-select-all', 'true')}
+    onChange={event => {
+      const checked = event.target.checked;
+      document
+        .querySelectorAll(`input[data-${type}-date-checkbox]`)
+        .forEach(checkbox => {
+          const inputElement = checkbox as HTMLInputElement;
+          const muiInput = inputElement
+            .closest('.MuiCheckbox-root')
+            ?.querySelector(
+              'input[type="checkbox"]'
+            ) as HTMLInputElement | null;
+
+          if (muiInput && muiInput.checked !== checked) {
+            muiInput.click();
+          }
+        });
+    }}
+  />
+);
+
+const Checkbox = ({
+  type,
+  id,
+}: {
+  type: CoursePartDate;
+  id: string;
+}): JSX.Element => (
+  <MuiCheckbox
+    id={id}
+    inputRef={el => el && el.setAttribute(`data-${type}-date-checkbox`, 'true')}
+  />
+);
+
 type PropsType = {
   columns: GridColDef[];
   rows: GridRowsProp<GradeUploadColTypes>;
@@ -57,6 +102,7 @@ type PropsType = {
   setExpanded: Dispatch<SetStateAction<'' | 'date' | 'confirm'>>;
   invalidValues: boolean;
 };
+
 const UploadDialogConfirm = ({
   columns,
   rows,
@@ -70,6 +116,11 @@ const UploadDialogConfirm = ({
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const [error, setError] = useState<boolean>(false);
+  const [bulkDate, setBulkDate] = useState<Dayjs>(dayjs());
+  const [bulkEdit, setBulkEdit] = useState<null | {
+    type: CoursePartDate;
+    courseTaskNames: string[];
+  }>(null);
 
   const nonEmptyCols = useMemo(() => {
     const newNonEmptyCols: string[] = [];
@@ -135,79 +186,186 @@ const UploadDialogConfirm = ({
     return hasInvalid ? 'invalid-value-data-grid' : '';
   };
 
+  const closeBulkEdit = (): void => {
+    setBulkEdit(null);
+  };
+
+  const selectAllInputs = (select: string): HTMLInputElement[] => {
+    return Array.from(document.querySelectorAll<HTMLInputElement>(select));
+  };
+
+  const handleClick = (type: CoursePartDate): void => {
+    const checkedBoxes = Array.from(
+      selectAllInputs(`input[data-${type}-date-checkbox]:checked`)
+    ).map(checkbox => checkbox.id);
+
+    if (checkedBoxes.length === 0) {
+      enqueueSnackbar(t('course.results.upload.select-at-least-one-info'), {
+        variant: 'info',
+      });
+    } else {
+      setBulkEdit({type, courseTaskNames: checkedBoxes});
+    }
+  };
+
+  const handleDateChange = (): void => {
+    closeBulkEdit();
+    if (bulkEdit === null) return;
+
+    if (bulkEdit.type === 'completion') {
+      bulkEdit.courseTaskNames.forEach(data =>
+        handleCompletionDateChange(bulkDate, data)
+      );
+    } else {
+      bulkEdit.courseTaskNames.forEach(data => {
+        setDates(oldDates =>
+          oldDates.map(oldDate =>
+            oldDate.courseTaskName === data
+              ? {
+                  ...oldDate,
+                  expirationDate: bulkDate,
+                }
+              : oldDate
+          )
+        );
+      });
+    }
+
+    setBulkDate(dayjs());
+  };
+
   const DateTable = (): JSX.Element => (
-    <TableContainer>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>{t('general.course-part')}</TableCell>
-            <TableCell>{t('course.results.upload.completion-date')}</TableCell>
-            <TableCell>{t('course.results.upload.expiration-date')}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {dates
-            .filter(date => nonEmptyCols.includes(date.courseTaskName))
-            .map(date => (
-              <TableRow key={date.courseTaskName}>
-                <TableCell>{date.courseTaskName}</TableCell>
-                <TableCell>
-                  <LocalizedDatePicker
-                    slotProps={{textField: {size: 'small'}}}
-                    value={date.completionDate}
-                    onChange={value =>
-                      handleCompletionDateChange(value, date.courseTaskName)
-                    }
-                  />
-                </TableCell>
-                <TableCell>
-                  <LocalizedDatePicker
-                    disabled={date.expirationDate === null}
-                    slotProps={{
-                      textField: {
-                        size: 'small',
-                        error:
-                          date.expirationDate !== null &&
-                          date.expirationDate <= date.completionDate,
-                        helperText:
-                          date.expirationDate !== null &&
-                          date.expirationDate <= date.completionDate
-                            ? t(
-                                'course.results.upload.expiration-after-completion'
-                              )
-                            : '',
-                      },
-                    }}
-                    value={date.expirationDate}
-                    onChange={e =>
-                      setDates(oldDates =>
-                        oldDates.map(oldDate =>
-                          oldDate.courseTaskName === date.courseTaskName &&
-                          e !== null
-                            ? {...oldDate, expirationDate: e}
-                            : oldDate
+    <>
+      <Dialog open={bulkEdit !== null} onClose={closeBulkEdit} maxWidth="sm">
+        <DialogTitle>
+          {t('course.results.upload.bulk-edit-dialog-title')}
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <LocalizedDatePicker
+            value={bulkDate}
+            onChange={value => {
+              if (value === null) return;
+              setBulkDate(value);
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={closeBulkEdit}
+              sx={{mr: 'auto'}}
+            >
+              {t('general.cancel')}
+            </Button>
+            <Button onClick={handleDateChange} variant="contained">
+              {t('general.done')}
+            </Button>
+          </DialogActions>
+        </DialogActions>
+      </Dialog>
+      <TableContainer>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>{t('general.course-part')}</TableCell>
+              <TableCell>
+                <CheckAllCheckbox type="completion" />
+                {t('course.results.upload.completion-date')}
+                <Button
+                  sx={{ml: 2}}
+                  size="small"
+                  variant="outlined"
+                  onClick={() => handleClick('completion')}
+                >
+                  {t('course.results.upload.modify-selected')}
+                </Button>
+              </TableCell>
+              <TableCell>
+                <CheckAllCheckbox type="expiration" />
+                {t('course.results.upload.expiration-date')}
+                <Button
+                  sx={{ml: 2}}
+                  size="small"
+                  variant="outlined"
+                  onClick={() => handleClick('expiration')}
+                >
+                  {t('course.results.upload.modify-selected')}
+                </Button>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {dates
+              .filter(date => nonEmptyCols.includes(date.courseTaskName))
+              .map(date => (
+                <TableRow key={date.courseTaskName}>
+                  <TableCell>{date.courseTaskName}</TableCell>
+                  <TableCell>
+                    <Checkbox id={date.courseTaskName} type="completion" />
+                    <LocalizedDatePicker
+                      slotProps={{textField: {size: 'small'}}}
+                      value={date.completionDate}
+                      onChange={value =>
+                        handleCompletionDateChange(value, date.courseTaskName)
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Checkbox id={date.courseTaskName} type="expiration" />
+                    <LocalizedDatePicker
+                      disabled={date.expirationDate === null && false}
+                      slotProps={{
+                        textField: {
+                          size: 'small',
+                          error:
+                            date.expirationDate !== null &&
+                            date.expirationDate <= date.completionDate,
+                          helperText:
+                            date.expirationDate !== null &&
+                            date.expirationDate <= date.completionDate
+                              ? t(
+                                  'course.results.upload.expiration-after-completion'
+                                )
+                              : '',
+                        },
+                      }}
+                      value={date.expirationDate}
+                      onChange={e =>
+                        setDates(oldDates =>
+                          oldDates.map(oldDate =>
+                            oldDate.courseTaskName === date.courseTaskName &&
+                            e !== null
+                              ? {...oldDate, expirationDate: e}
+                              : oldDate
+                          )
                         )
-                      )
-                    }
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                      }
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   );
 
   return (
     <>
-      <DialogTitle>Confirm</DialogTitle>
+      <DialogTitle>{t('general.confirm')}</DialogTitle>
       <DialogContent>
         {invalidValues && (
           <Alert severity="warning" sx={{mb: 2}}>
             {t('course.results.upload.higher-than-max')}
           </Alert>
         )}
-
         <Accordion
           expanded={expanded === 'date'}
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'date' : '')}
@@ -224,7 +382,6 @@ const UploadDialogConfirm = ({
             <DateTable />
           </AccordionDetails>
         </Accordion>
-
         <Accordion
           expanded={expanded === 'confirm'}
           onChange={(_, newExpanded) =>
