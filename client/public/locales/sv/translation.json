@@ -39,10 +39,10 @@
     },
     "graph": {
       "node": {
-        "add": "UNTRANSLATED",
+        "addition": "UNTRANSLATED",
         "average": "UNTRANSLATED",
         "max": "UNTRANSLATED",
-        "add-tooltip": "UNTRANSLATED",
+        "addition-tooltip": "UNTRANSLATED",
         "average-tooltip": "UNTRANSLATED",
         "stepper": "UNTRANSLATED",
         "stepper-tooltip": "UNTRANSLATED",
@@ -55,7 +55,9 @@
         "round-tooltip": "UNTRANSLATED",
         "substitute": "UNTRANSLATED",
         "substitute-tooltip": "UNTRANSLATED",
-        "value": "UNTRANSLATED"
+        "value": "UNTRANSLATED",
+        "sink": "UNTRANSLATED",
+        "source": "UNTRANSLATED"
       },
       "source-deleted": "UNTRANSLATED",
       "source-archived": "UNTRANSLATED",
@@ -171,6 +173,8 @@
     "course-part": "UNTRANSLATED",
     "add-row": "UNTRANSLATED",
     "edit": "UNTRANSLATED",
+    "archived": "UNTRANSLATED",
+    "active": "UNTRANSLATED",
     "course-parts": "UNTRANSLATED",
     "organizing-department": "UNTRANSLATED",
     "add": "UNTRANSLATED",
@@ -243,7 +247,8 @@
       "add-new-part": "UNTRANSLATED",
       "no-course-parts": "UNTRANSLATED",
       "active-parts": "UNTRANSLATED",
-      "archived-parts": "UNTRANSLATED"
+      "archived-parts": "UNTRANSLATED",
+      "not-found" :"UNTRANSLATED"
     },
     "models": {
       "has-multiple-warnings": "UNTRANSLATED",

@@ -6,9 +6,11 @@ import {
   Add,
   AddCircle,
   Archive,
+  CheckCircle,
   Delete,
   Edit,
   FontDownload,
+  Inventory,
   Unarchive,
 } from '@mui/icons-material';
 import {
@@ -639,6 +641,7 @@ const CoursePartsView = (): JSX.Element => {
               >
                 <ListEntries
                   label={t('course.parts.active-parts')}
+                  icon={<CheckCircle />}
                   color="success"
                   listWidth="100%"
                 >
@@ -658,6 +661,7 @@ const CoursePartsView = (): JSX.Element => {
               >
                 <ListEntries
                   label={t('course.parts.archived-parts')}
+                  icon={<Inventory />}
                   listWidth="100%"
                 >
                   {courseParts.data

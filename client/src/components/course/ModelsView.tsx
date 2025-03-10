@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {CheckCircle, Inventory, Warning} from '@mui/icons-material';
 import {Box, Button, Collapse, Tooltip, Typography} from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useCallback, useEffect, useMemo, useState} from 'react';
@@ -388,6 +389,7 @@ const ModelsView = (): JSX.Element => {
             <Collapse in={models.find(mod => !mod.archived) !== undefined}>
               <ListEntries
                 label={t('course.models.active-models')}
+                icon={<CheckCircle />}
                 color="success"
               >
                 {models
@@ -396,7 +398,10 @@ const ModelsView = (): JSX.Element => {
               </ListEntries>
             </Collapse>
             <Collapse in={models.find(mod => mod.archived) !== undefined}>
-              <ListEntries label={t('course.models.archived-models')}>
+              <ListEntries
+                label={t('course.models.archived-models')}
+                icon={<Inventory />}
+              >
                 {models
                   .filter(mod => mod.archived)
                   .map(model => getModelButton(model))}
@@ -405,6 +410,7 @@ const ModelsView = (): JSX.Element => {
             <Collapse in={editRights && coursePartsWithoutModels.length > 0}>
               <ListEntries
                 label={t('course.models.missing-models')}
+                icon={<Warning />}
                 color="warning"
               >
                 {coursePartsWithoutModels.map(part => (

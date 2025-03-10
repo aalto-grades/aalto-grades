@@ -39,14 +39,14 @@
     },
     "graph": {
       "node": {
-        "add": "Yhteenlasku",
+        "addition": "Yhteenlasku",
         "average": "Keskiarvo",
         "max": "Maksimi",
-        "add-tooltip": "Laske useita arvoja yhteen",
+        "addition-tooltip": "Laske useita arvoja yhteen",
         "average-tooltip": "Laske useiden arvojen (painotettu) keskiarvo",
         "stepper": "Askellin",
         "stepper-tooltip": "Muuta arvoalueet tietyiksi arvoiksi",
-        "min": "Vähimmäispistemäärä",
+        "minpoints": "Vähimmäispistemäärä",
         "min-tooltip": "Vaadi vähimmäisarvo, muuten tulos on hylätty tai täysin hylätty",
         "max-tooltip": "Valitse useiden arvojen ja yhden mukautetun arvon maksimi",
         "require": "Vaadi hyväksytyt arvot",
@@ -55,7 +55,9 @@
         "round-tooltip": "Pyöristä arvo",
         "substitute": "Korvaa",
         "substitute-tooltip": "Korvaa hylätyt arvot",
-        "value": "Arvo"
+        "value": "Arvo",
+        "sink": "Kohde",
+        "source": "Lähde"
       },
       "source-deleted": "Solmun lähde on poistettu",
       "source-archived": "Solmun lähde on arkistoitu",
@@ -171,6 +173,8 @@
     "course-part": "Kurssin osa",
     "add-row": "Lisää rivi",
     "edit": "Muokkaa",
+    "archived": "Arkistoitu",
+    "active": "Aktiivinen",
     "course-parts": "Kurssin osat",
     "organizing-department": "Järjestävä laitos",
     "add": "Lisää",
@@ -243,7 +247,8 @@
       "add-new-part": "Lisää uusi kurssin osa",
       "no-course-parts": "Ei kurssin osia",
       "active-parts": "Aktiiviset kurssin osat",
-      "archived-parts": "Arkistoidut kurssin osat"
+      "archived-parts": "Arkistoidut kurssin osat",
+      "not-found" :"Kurssin osia ei löytynyt"
     },
     "models": {
       "has-multiple-warnings": "Sisältää useita varoituksia",

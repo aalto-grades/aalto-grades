@@ -7,8 +7,16 @@ import type {ReactNode} from 'react';
 
 type EntriesProps = {
   label: string;
-  color?: 'success' | 'warning' | 'default';
+  icon: ReactNode;
   children: ReactNode;
+  color?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'error'
+    | 'info'
+    | 'success'
+    | 'warning';
   alignItems?: 'start' | 'center' | 'end';
   chipWidth?: string | number;
   listWidth?: string | number;
@@ -16,8 +24,9 @@ type EntriesProps = {
 
 const ListEntries = ({
   label,
-  color = 'default',
+  icon,
   children,
+  color = 'default',
   alignItems = 'start',
   chipWidth = 'auto',
   listWidth = 400,
@@ -34,7 +43,18 @@ const ListEntries = ({
         alignItems: alignItems,
       }}
     >
-      <Chip label={label} color={color} sx={{width: chipWidth}} />
+      <Chip
+        label={
+          <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+            {icon}
+            {label}
+          </Box>
+        }
+        color={color}
+        sx={{
+          width: chipWidth,
+        }}
+      />
       <List sx={{width: listWidth}} disablePadding>
         {children}
       </List>

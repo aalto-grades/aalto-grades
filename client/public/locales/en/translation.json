@@ -39,14 +39,14 @@
     },
     "graph": {
       "node": {
-        "add": "Addition",
+        "addition": "Addition",
         "average": "Average",
         "max": "Maximum",
-        "add-tooltip": "Add multiple values together",
+        "addition-tooltip": "Add multiple values together",
         "average-tooltip": "Take the (weighted) average of multiple values",
         "stepper": "Stepper",
         "stepper-tooltip": "Map ranges of values into specific values",
-        "min": "Require minimum points",
+        "minpoints": "Require minimum points",
         "min-tooltip": "Require minimum value and otherwise output fail or fullfail",
         "max-tooltip": "Take the maximum of multiple values and one custom value",
         "require": "Require passing values",
@@ -55,7 +55,9 @@
         "round-tooltip": "Round value",
         "substitute": "Substitute",
         "substitute-tooltip": "Substitute failing values",
-        "value": "Value"
+        "value": "Value",
+        "sink": "Sink",
+        "source": "Source"
       },
       "source-deleted": "Node source has been deleted",
       "source-archived": "Node source has been archived",
@@ -171,6 +173,8 @@
     "course-part": "Course part",
     "add-row": "Add row",
     "edit": "Edit",
+    "archived": "Archived",
+    "active": "Active",
     "course-parts": "Course parts",
     "organizing-department": "Organizing department",
     "add": "Add",
@@ -243,7 +247,8 @@
       "add-new-part": "Add new course part",
       "no-course-parts": "No course parts. Please add course parts to get started.",
       "active-parts": "Active course parts",
-      "archived-parts": "Archived course parts"
+      "archived-parts": "Archived course parts",
+      "not-found" :"No course parts found"
     },
     "models": {
       "has-multiple-warnings": "Model has multiple warnings",
@@ -472,7 +477,7 @@
       "body": "Log in with your Aalto University user account by clicking on the button below.",
       "button": "Log in with Aalto account"
     },
-    "title": "Log in to Aalto Grades",
+    "title": "Log in to Ossi",
     "local": {
       "title": "Local users",
       "body": "If you have been provided with credentials specifically for Ossi, use this login.",

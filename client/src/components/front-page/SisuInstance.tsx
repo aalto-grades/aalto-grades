@@ -235,7 +235,7 @@ const SisuInstance = ({
             gutterBottom
             sx={{color: 'text.secondary'}}
           >
-            id: {course.id}
+            Sisu id: {course.id}
           </Typography>
         </Box>
         <Typography variant="h6" component="div">
