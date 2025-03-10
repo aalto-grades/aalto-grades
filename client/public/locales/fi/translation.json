@@ -55,9 +55,9 @@
         "round-tooltip": "Pyöristä arvo",
         "substitute": "Korvaa",
         "substitute-tooltip": "Korvaa hylätyt arvot",
-        "value": "Arvo",
         "sink": "Kohde",
-        "source": "Lähde"
+        "source": "Lähde",
+        "value": "Arvo"
       },
       "source-deleted": "Solmun lähde on poistettu",
       "source-archived": "Solmun lähde on arkistoitu",
@@ -69,6 +69,8 @@
       "course-failed": "Kurssi hylätty",
       "delete-node_one": "Poista solmu",
       "delete-node_other": "Poista solmut",
+      "hide-map": "Piilota kartta",
+      "show-map": "Näytä kartta",
       "select-sources": "Valitse lähteet",
       "test-values": "Testiarvot",
       "format": "Palauta asettelu",
@@ -93,9 +95,7 @@
       "substitution-num": "Korvausten määrä",
       "substitutes": "Korvaavat arvot",
       "substitution-value": "Korvausarvo",
-      "set-test-values": "Aseta testiarvot",
-      "show-map": "Näytä kartta",
-      "hide-map": "Piilota kartta"
+      "set-test-values": "Aseta testiarvot"
     },
     "unsaved-changes": {
       "body": "Sinulla on tallentamattomia muutoksia. Syöttämäsi tiedot eivät tallennu.",
@@ -173,10 +173,10 @@
     "grades-saved": "Arvosanat tallennettu",
     "import": "Tuo",
     "course-part": "Kurssin osa",
-    "add-row": "Lisää rivi",
-    "edit": "Muokkaa",
     "archived": "Arkistoitu",
     "active": "Aktiivinen",
+    "add-row": "Lisää rivi",
+    "edit": "Muokkaa",
     "course-parts": "Kurssin osat",
     "organizing-department": "Järjestävä laitos",
     "add": "Lisää",
@@ -227,6 +227,8 @@
       "select-for-fetching": "Valitse haettavaksi",
       "fetching-grades": "Haetaan arvosanoja",
       "fetching-grades-wait": "Odota, haetaan arvosanoja...",
+      "not-found": "Kurssin osia ei löytynyt",
+      "no-expiry-date": "Ei voimassaolopäivää",
       "delete-with-model-message": "Tämä sisältää arviointimallin, poistetaanko?",
       "delete-with-task-message": "Tämä sisältää tehtäviä, poistetaanko?",
       "delete-message": "Haluatko varmasti poistaa?",
@@ -239,7 +241,6 @@
       "archive": "Arkistoi",
       "cannot-delete-with-grades": "Ei voi poistaa, koska sisältää arvosanoja",
       "edit-part": "Muokkaa osaa",
-      "no-expiry-date": "Ei voimassaolopäivää",
       "delete-task": "Poista tehtävä",
       "delete-task-message": "Haluatko varmasti poistaa tämän tehtävän?",
       "archived": "Arkistoitu",
@@ -249,8 +250,7 @@
       "add-new-part": "Lisää uusi kurssin osa",
       "no-course-parts": "Ei kurssin osia",
       "active-parts": "Aktiiviset kurssin osat",
-      "archived-parts": "Arkistoidut kurssin osat",
-      "not-found" :"Kurssin osia ei löytynyt"
+      "archived-parts": "Arkistoidut kurssin osat"
     },
     "models": {
       "has-multiple-warnings": "Sisältää useita varoituksia",

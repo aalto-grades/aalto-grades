@@ -55,9 +55,9 @@
         "round-tooltip": "Round value",
         "substitute": "Substitute",
         "substitute-tooltip": "Substitute failing values",
-        "value": "Value",
         "sink": "Sink",
-        "source": "Source"
+        "source": "Source",
+        "value": "Value"
       },
       "source-deleted": "Node source has been deleted",
       "source-archived": "Node source has been archived",
@@ -69,6 +69,8 @@
       "course-failed": "Course failed",
       "delete-node_one": "Delete node",
       "delete-node_other": "Delete nodes",
+      "hide-map": "Hide minimap",
+      "show-map": "Show minimap",
       "select-sources": "Select sources",
       "test-values": "Test values",
       "format": "Format",
@@ -93,9 +95,7 @@
       "substitution-num": "Number of substitutions",
       "substitutes": "Substitutes",
       "substitution-value": "sub val",
-      "set-test-values": "Set test source values",
-      "show-map": "Show minimap",
-      "hide-map": "Hide minimap"
+      "set-test-values": "Set test source values"
     },
     "unsaved-changes": {
       "body": "You have unsaved changes. Data you have entered will not be saved.",
@@ -173,10 +173,10 @@
     "grades-saved": "Grades saved",
     "import": "Import",
     "course-part": "Course part",
-    "add-row": "Add row",
-    "edit": "Edit",
     "archived": "Archived",
     "active": "Active",
+    "add-row": "Add row",
+    "edit": "Edit",
     "course-parts": "Course parts",
     "organizing-department": "Organizing department",
     "add": "Add",
@@ -227,6 +227,8 @@
       "select-for-fetching": "Select the course parts you want to fetch grades for from A+.",
       "fetching-grades": "Fetching grades",
       "fetching-grades-wait": "Fetching grades from A+, this may take a few minutes...",
+      "not-found": "No course parts found",
+      "no-expiry-date": "No expiry date",
       "delete-with-model-message": "Are you sure want to delete this course part and all included course tasks that are used by some models?",
       "delete-with-task-message": "Are you sure want to delete this course part and all included course tasks?",
       "delete-message": "Are you sure want to delete this course part?",
@@ -239,7 +241,6 @@
       "archive": "Archive course part",
       "cannot-delete-with-grades": "Cannot delete a course part with grades",
       "edit-part": "Edit course part",
-      "no-expiry-date": "No expiry date",
       "delete-task": "Delete course task",
       "delete-task-message": "Some models are using this course task. Are you sure you want to delete it?",
       "archived": "Archived",
@@ -249,8 +250,7 @@
       "add-new-part": "Add new course part",
       "no-course-parts": "No course parts. Please add course parts to get started.",
       "active-parts": "Active course parts",
-      "archived-parts": "Archived course parts",
-      "not-found" :"No course parts found"
+      "archived-parts": "Archived course parts"
     },
     "models": {
       "has-multiple-warnings": "Model has multiple warnings",

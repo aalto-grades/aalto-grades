@@ -46,7 +46,7 @@
         "average-tooltip": "UNTRANSLATED",
         "stepper": "UNTRANSLATED",
         "stepper-tooltip": "UNTRANSLATED",
-        "min": "UNTRANSLATED",
+        "minpoints": "UNTRANSLATED",
         "min-tooltip": "UNTRANSLATED",
         "max-tooltip": "UNTRANSLATED",
         "require": "UNTRANSLATED",
@@ -55,9 +55,9 @@
         "round-tooltip": "UNTRANSLATED",
         "substitute": "UNTRANSLATED",
         "substitute-tooltip": "UNTRANSLATED",
-        "value": "UNTRANSLATED",
         "sink": "UNTRANSLATED",
-        "source": "UNTRANSLATED"
+        "source": "UNTRANSLATED",
+        "value": "UNTRANSLATED"
       },
       "source-deleted": "UNTRANSLATED",
       "source-archived": "UNTRANSLATED",
@@ -69,6 +69,8 @@
       "course-failed": "UNTRANSLATED",
       "delete-node_one": "UNTRANSLATED",
       "delete-node_other": "UNTRANSLATED",
+      "hide-map": "UNTRANSLATED",
+      "show-map": "UNTRANSLATED",
       "select-sources": "UNTRANSLATED",
       "test-values": "UNTRANSLATED",
       "format": "UNTRANSLATED",
@@ -93,9 +95,7 @@
       "substitution-num": "UNTRANSLATED",
       "substitutes": "UNTRANSLATED",
       "substitution-value": "UNTRANSLATED",
-      "set-test-values": "UNTRANSLATED",
-      "show-map": "UNTRANSLATED",
-      "hide-map": "UNTRANSLATED"
+      "set-test-values": "UNTRANSLATED"
     },
     "unsaved-changes": {
       "body": "UNTRANSLATED",
@@ -173,10 +173,10 @@
     "grades-saved": "UNTRANSLATED",
     "import": "UNTRANSLATED",
     "course-part": "UNTRANSLATED",
-    "add-row": "UNTRANSLATED",
-    "edit": "UNTRANSLATED",
     "archived": "UNTRANSLATED",
     "active": "UNTRANSLATED",
+    "add-row": "UNTRANSLATED",
+    "edit": "UNTRANSLATED",
     "course-parts": "UNTRANSLATED",
     "organizing-department": "UNTRANSLATED",
     "add": "UNTRANSLATED",
@@ -227,6 +227,8 @@
       "select-for-fetching": "UNTRANSLATED",
       "fetching-grades": "UNTRANSLATED",
       "fetching-grades-wait": "UNTRANSLATED",
+      "not-found": "UNTRANSLATED",
+      "no-expiry-date": "UNTRANSLATED",
       "delete-with-model-message": "UNTRANSLATED",
       "delete-with-task-message": "UNTRANSLATED",
       "delete-message": "UNTRANSLATED",
@@ -239,7 +241,6 @@
       "archive": "UNTRANSLATED",
       "cannot-delete-with-grades": "UNTRANSLATED",
       "edit-part": "UNTRANSLATED",
-      "no-expiry-date": "UNTRANSLATED",
       "delete-task": "UNTRANSLATED",
       "delete-task-message": "UNTRANSLATED",
       "archived": "UNTRANSLATED",
@@ -249,8 +250,7 @@
       "add-new-part": "UNTRANSLATED",
       "no-course-parts": "UNTRANSLATED",
       "active-parts": "UNTRANSLATED",
-      "archived-parts": "UNTRANSLATED",
-      "not-found" :"UNTRANSLATED"
+      "archived-parts": "UNTRANSLATED"
     },
     "models": {
       "has-multiple-warnings": "UNTRANSLATED",
