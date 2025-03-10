@@ -7,7 +7,11 @@ import {
   ThemeProvider as MuiThemeProvider,
   createTheme,
 } from '@mui/material/styles';
-import type {ThemeOptions} from '@mui/material/styles';
+import type {
+  PaletteColor,
+  SimplePaletteColorOptions,
+  ThemeOptions,
+} from '@mui/material/styles';
 import type {JSX} from 'react';
 
 import {components} from '@/theme/components';
@@ -17,6 +21,16 @@ declare module '@mui/material/Button' {
   export interface ButtonPropsVariantOverrides {
     elevated: true;
     tonal: true;
+  }
+}
+
+declare module '@mui/material/styles' {
+  interface Palette {
+    graph: PaletteColor;
+  }
+
+  interface PaletteOptions {
+    graph?: SimplePaletteColorOptions;
   }
 }
 

@@ -24,6 +24,11 @@ export const colorSchemes = {
         dark: '#519657',
         contrastText: '#000',
       },
+      graph: {
+        light: '#FFFFFF',
+        main: '#dbdbf0',
+        dark: '#ccccff',
+      },
     },
   },
   dark: {
@@ -36,17 +41,22 @@ export const colorSchemes = {
         contrastText: '#FFF',
         staticBg: '#121212',
       },
+      graph: {
+        light: '#777',
+        main: '#504f4f',
+        dark: '#292828',
+      },
     },
   },
 };
 
-const h = {
+const font1 = {
   fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
   fontWeight: 400,
   lineHeight: 1.2,
 };
 
-const t = {
+const font2 = {
   fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
   fontWeight: 400,
 };
@@ -54,55 +64,55 @@ const t = {
 export const typography = {
   h1: {
     fontSize: defaultTheme.typography.pxToRem(32),
-    ...h,
+    ...font1,
   },
   h2: {
     fontSize: defaultTheme.typography.pxToRem(28),
-    ...h,
+    ...font1,
   },
   h3: {
     fontSize: defaultTheme.typography.pxToRem(24),
-    ...h,
+    ...font1,
   },
   h4: {
     fontSize: defaultTheme.typography.pxToRem(24),
-    ...h,
+    ...font1,
   },
   h5: {
     fontSize: defaultTheme.typography.pxToRem(20),
-    ...h,
+    ...font1,
   },
   h6: {
     fontSize: defaultTheme.typography.pxToRem(20),
-    ...h,
+    ...font1,
   },
   subtitle1: {
     fontSize: defaultTheme.typography.pxToRem(18),
-    ...t,
+    ...font2,
   },
   subtitle2: {
     fontSize: defaultTheme.typography.pxToRem(14),
-    ...t,
+    ...font2,
   },
   body1: {
     fontSize: defaultTheme.typography.pxToRem(16),
-    ...t,
+    ...font2,
   },
   body2: {
     fontSize: defaultTheme.typography.pxToRem(14),
-    ...t,
+    ...font2,
   },
   textInput: {
     fontSize: defaultTheme.typography.pxToRem(16),
-    ...t,
+    ...font2,
   },
   button: {
     fontSize: defaultTheme.typography.pxToRem(14),
-    ...t,
+    ...font2,
   },
   caption: {
     fontSize: defaultTheme.typography.pxToRem(12),
-    ...t,
+    ...font2,
   },
 };
 

@@ -27,8 +27,8 @@ export const getDragAndDropNodes = (
 }[] => [
   {
     type: 'addition',
-    title: t('shared.graph.node.add'),
-    tooltip: t('shared.graph.node.add-tooltip'),
+    title: t('shared.graph.node.addition'),
+    tooltip: t('shared.graph.node.addition-tooltip'),
   },
   {
     type: 'average',
@@ -42,7 +42,7 @@ export const getDragAndDropNodes = (
   },
   {
     type: 'minpoints',
-    title: t('shared.graph.node.min'),
+    title: t('shared.graph.node.minpoints'),
     tooltip: t('shared.graph.node.min-tooltip'),
   },
   {
