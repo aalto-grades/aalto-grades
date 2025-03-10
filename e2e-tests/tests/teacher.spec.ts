@@ -12,7 +12,7 @@ import {
   downloadCSVTemplate,
   downloadExcelTemplate,
   editCourse,
-  importFromSisu,
+  importCourseDataFromSisu,
   importGradesWithCSV,
   importGradesWithExcel,
   importGradesWithText,
@@ -87,7 +87,7 @@ test.describe('Test courses as teacher', () => {
   });
 
   test('Import course from Sisu', async ({page}) => {
-    await importFromSisu(page, 'teacher@aalto.fi');
+    await importCourseDataFromSisu(page, 'teacher@aalto.fi');
   });
 });
 
