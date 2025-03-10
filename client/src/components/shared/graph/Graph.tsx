@@ -569,6 +569,7 @@ const Graph = ({
               <ReactFlow
                 nodes={nodes}
                 edges={edges}
+                proOptions={{hideAttribution: true}}
                 onNodesChange={changes =>
                   onNodesChange(
                     changes.filter(
