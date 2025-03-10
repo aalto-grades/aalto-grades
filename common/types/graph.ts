@@ -5,6 +5,8 @@
 import type {Node} from 'reactflow';
 import {z} from 'zod';
 
+export type NumberOrFail = number | 'fail';
+
 // Types without schemas (not in API)
 export type AdditionNodeValue = {
   type: 'addition';
@@ -24,13 +26,13 @@ export type MaxNodeValue = {
 export type MinPointsNodeValue = {
   type: 'minpoints';
   source: number;
-  value: number | 'fail';
+  value: NumberOrFail;
   fullFail: boolean;
 };
 export type RequireNodeValue = {
   type: 'require';
-  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
-  values: {[key: string]: number | 'fail'};
+  sources: {[key: string]: {isConnected: boolean; value: NumberOrFail}};
+  values: {[key: string]: NumberOrFail};
   fullFail: boolean;
 };
 export type RoundNodeValue = {
@@ -47,7 +49,7 @@ export type SinkNodeValue = {
 export type SourceNodeValue = {
   type: 'source';
   source: number;
-  value: number | 'fail';
+  value: NumberOrFail;
   fullFail: boolean;
 };
 export type StepperNodeValue = {
@@ -57,8 +59,8 @@ export type StepperNodeValue = {
 };
 export type SubstituteNodeValue = {
   type: 'substitute';
-  sources: {[key: string]: {isConnected: boolean; value: number | 'fail'}};
-  values: {[key: string]: number | 'fail'};
+  sources: {[key: string]: {isConnected: boolean; value: NumberOrFail}};
+  values: {[key: string]: NumberOrFail};
 };
 
 export type NodeValue =
