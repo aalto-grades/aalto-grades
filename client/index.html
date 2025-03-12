@@ -10,8 +10,8 @@ SPDX-License-Identifier: MIT
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Matomo -->
     <script>
+      // Matomo
       var _paq = (window._paq = window._paq || []);
       /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
       _paq.push(['trackPageView']);
@@ -27,12 +27,35 @@ SPDX-License-Identifier: MIT
         g.src = u + 'matomo.js';
         s.parentNode.insertBefore(g, s);
       })();
+      // End Matomo Code
+
+      // Browser Warning, current E2E testing covers only firefox and chromium
+      document.addEventListener("DOMContentLoaded", function () {
+        function detectUnsupportedBrowser() {
+          if (localStorage.getItem("dismissCompatibilityWarning")) return;
+          var match = navigator.userAgent.toLowerCase().match(/(chrome|firefox|chromium)\/?\s*(\d+)/i);
+          if (!match || !/(chrome|firefox|chromium)/.test(match[1])) {
+            document.getElementById("browser-warning").style.display = "flex";
+          }
+        }
+        function dismissWarning() {
+          document.getElementById("browser-warning").style.display = "none";
+          localStorage.setItem("dismissCompatibilityWarning", "true");
+        }
+        detectUnsupportedBrowser();
+        window.dismissWarning = dismissWarning;
+      });
     </script>
-    <!-- End Matomo Code -->
     <title>Ossi</title>
   </head>
 
   <body>
+    <div id="browser-warning" style="display: none; padding: 20px; text-align: center;">
+      ⚠️ Unsupported Browser Detected!
+      This site may not function properly in your browser.
+      Ossi is tested only with Firefox and Chromium-based browsers.
+      <button onclick="dismissWarning()">Dismiss</button>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/index.tsx"></script>
   </body>
