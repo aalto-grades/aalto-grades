@@ -7,6 +7,7 @@ import {useTranslation} from 'react-i18next';
 import {Handle, type NodeProps, Position} from 'reactflow';
 
 import type {RoundNodeSettings, RoundNodeValue} from '@/common/types';
+import OutputValue from '@/components/shared/graph/nodes/parts/OutputValue';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
@@ -55,10 +56,7 @@ const RoundNode = (props: NodeProps): JSX.Element => {
         <option value="round-closest">{t('shared.graph.round-closest')}</option>
         <option value="round-down">{t('shared.graph.round-down')}</option>
       </select>
-      <p className="output-value">
-        {t('shared.graph.output')}: {Math.round(nodeValue.value * 100) / 100}
-      </p>
-
+      <OutputValue text={t('shared.graph.output')} value={nodeValue.value} />
       <Handle
         type="source"
         id={`${id}-source`}

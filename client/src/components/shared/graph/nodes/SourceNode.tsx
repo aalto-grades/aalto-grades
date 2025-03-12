@@ -7,6 +7,7 @@ import {useTranslation} from 'react-i18next';
 import {Handle, type NodeProps, Position} from 'reactflow';
 
 import type {SourceNodeSettings, SourceNodeValue} from '@/common/types';
+import OutputValue from '@/components/shared/graph/nodes/parts/OutputValue';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
@@ -98,15 +99,8 @@ const SourceNode = (props: NodeProps): JSX.Element => {
       )}
 
       <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
-        <p className="output-value" style={{margin: '5px 0px 0px 0px'}}>
-          {t('shared.graph.value')}: {Math.round(nodeValue.source * 100) / 100}
-        </p>
-        <p className="output-value" style={{margin: '5px 0px 0px 0px'}}>
-          {t('shared.graph.output')}:{' '}
-          {nodeValue.value === 'fail'
-            ? 'fail'
-            : Math.round(nodeValue.value * 100) / 100}
-        </p>
+        <OutputValue text={t('shared.graph.value')} value={nodeValue.source} />
+        <OutputValue text={t('shared.graph.output')} value={nodeValue.value} />
       </div>
 
       <Handle

@@ -12,7 +12,7 @@ import {
   downloadCSVTemplate,
   downloadExcelTemplate,
   editCourse,
-  importFromSisu,
+  importCourseDataFromSisu,
   importGradesWithCSV,
   importGradesWithExcel,
   importGradesWithText,
@@ -108,7 +108,7 @@ test.describe('Test courses as admin', () => {
   });
 
   test('Import course from Sisu', async ({page}) => {
-    await importFromSisu(page);
+    await importCourseDataFromSisu(page);
   });
 });
 

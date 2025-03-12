@@ -39,14 +39,14 @@
     },
     "graph": {
       "node": {
-        "add": "UNTRANSLATED",
+        "addition": "UNTRANSLATED",
         "average": "UNTRANSLATED",
         "max": "UNTRANSLATED",
-        "add-tooltip": "UNTRANSLATED",
+        "addition-tooltip": "UNTRANSLATED",
         "average-tooltip": "UNTRANSLATED",
         "stepper": "UNTRANSLATED",
         "stepper-tooltip": "UNTRANSLATED",
-        "min": "UNTRANSLATED",
+        "minpoints": "UNTRANSLATED",
         "min-tooltip": "UNTRANSLATED",
         "max-tooltip": "UNTRANSLATED",
         "require": "UNTRANSLATED",
@@ -55,6 +55,8 @@
         "round-tooltip": "UNTRANSLATED",
         "substitute": "UNTRANSLATED",
         "substitute-tooltip": "UNTRANSLATED",
+        "sink": "UNTRANSLATED",
+        "source": "UNTRANSLATED",
         "value": "UNTRANSLATED"
       },
       "source-deleted": "UNTRANSLATED",
@@ -67,6 +69,8 @@
       "course-failed": "UNTRANSLATED",
       "delete-node_one": "UNTRANSLATED",
       "delete-node_other": "UNTRANSLATED",
+      "hide-map": "UNTRANSLATED",
+      "show-map": "UNTRANSLATED",
       "select-sources": "UNTRANSLATED",
       "test-values": "UNTRANSLATED",
       "format": "UNTRANSLATED",
@@ -99,20 +103,19 @@
       "discard": "UNTRANSLATED"
     }
   },
+  "color-mode": {
+    "system": "UNTRANSLATED",
+    "light": "UNTRANSLATED",
+    "dark": "UNTRANSLATED"
+  },
   "app": {
     "footer": {
       "privacy": "UNTRANSLATED",
       "accessibility": "UNTRANSLATED",
       "support": "UNTRANSLATED",
       "licenses": "UNTRANSLATED",
-      "source": {
-        "tooltip": "UNTRANSLATED",
-        "text": "UNTRANSLATED"
-      },
-      "feedback": {
-        "tooltip": "UNTRANSLATED",
-        "text": "UNTRANSLATED"
-      }
+      "source-text": "UNTRANSLATED",
+      "feedback-text": "UNTRANSLATED"
     }
   },
   "language": "Svenska (sv)",
@@ -145,6 +148,7 @@
     "source-name": "UNTRANSLATED",
     "date": "UNTRANSLATED",
     "manage": "UNTRANSLATED",
+    "close": "UNTRANSLATED",
     "confirm": "UNTRANSLATED",
     "student-number": "UNTRANSLATED",
     "course-task": "UNTRANSLATED",
@@ -160,7 +164,6 @@
         "title": "UNTRANSLATED"
       }
     },
-    "close": "UNTRANSLATED",
     "download": "UNTRANSLATED",
     "grader": "UNTRANSLATED",
     "export-date": "UNTRANSLATED",
@@ -170,6 +173,8 @@
     "grades-saved": "UNTRANSLATED",
     "import": "UNTRANSLATED",
     "course-part": "UNTRANSLATED",
+    "archived": "UNTRANSLATED",
+    "active": "UNTRANSLATED",
     "add-row": "UNTRANSLATED",
     "edit": "UNTRANSLATED",
     "course-parts": "UNTRANSLATED",
@@ -196,10 +201,12 @@
     "courses": "UNTRANSLATED",
     "password": "UNTRANSLATED",
     "unsaved-changes": "UNTRANSLATED",
+    "close-window": "UNTRANSLATED",
     "in-english": "UNTRANSLATED",
     "in-finnish": "UNTRANSLATED",
     "in-swedish": "UNTRANSLATED",
     "done": "UNTRANSLATED",
+    "search": "UNTRANSLATED",
     "final-grades": "UNTRANSLATED",
     "course-part-grade": "UNTRANSLATED",
     "not-int": "UNTRANSLATED"
@@ -220,6 +227,8 @@
       "select-for-fetching": "UNTRANSLATED",
       "fetching-grades": "UNTRANSLATED",
       "fetching-grades-wait": "UNTRANSLATED",
+      "not-found": "UNTRANSLATED",
+      "no-expiry-date": "UNTRANSLATED",
       "delete-with-model-message": "UNTRANSLATED",
       "delete-with-task-message": "UNTRANSLATED",
       "delete-message": "UNTRANSLATED",
@@ -230,16 +239,18 @@
       "view-a+-sources": "UNTRANSLATED",
       "unarchive": "UNTRANSLATED",
       "archive": "UNTRANSLATED",
+      "cannot-delete-with-grades": "UNTRANSLATED",
+      "edit-part": "UNTRANSLATED",
       "delete-task": "UNTRANSLATED",
       "delete-task-message": "UNTRANSLATED",
       "archived": "UNTRANSLATED",
+      "actions": "UNTRANSLATED",
       "add-new-task": "UNTRANSLATED",
       "add-from-a+": "UNTRANSLATED",
       "add-new-part": "UNTRANSLATED",
       "no-course-parts": "UNTRANSLATED",
-      "edit-part": "UNTRANSLATED",
-      "cannot-delete-with-grades": "UNTRANSLATED",
-      "no-expiry-date": "UNTRANSLATED"
+      "active-parts": "UNTRANSLATED",
+      "archived-parts": "UNTRANSLATED"
     },
     "models": {
       "has-multiple-warnings": "UNTRANSLATED",
@@ -268,7 +279,10 @@
       "save-null": "UNTRANSLATED",
       "create-final-grade-model": "UNTRANSLATED",
       "back": "UNTRANSLATED",
-      "no-models": "UNTRANSLATED"
+      "no-models": "UNTRANSLATED",
+      "active-models": "UNTRANSLATED",
+      "archived-models": "UNTRANSLATED",
+      "missing-models": "UNTRANSLATED"
     },
     "results": {
       "calculate-final": "UNTRANSLATED",
@@ -303,7 +317,6 @@
       "download-sisu-csv": "UNTRANSLATED",
       "group-columns": "UNTRANSLATED",
       "show-model-parts": "UNTRANSLATED",
-      "search-bar-placeholder": "UNTRANSLATED",
       "showing-n-rows": "UNTRANSLATED",
       "n-errors": "UNTRANSLATED",
       "final-downloaded": "UNTRANSLATED",
@@ -411,21 +424,22 @@
       "sisu-search-button-helper": "UNTRANSLATED",
       "input-at-least-one-assistant": "UNTRANSLATED",
       "assistant-expiry-date-info": "UNTRANSLATED",
-      "sisu-search-title": "UNTRANSLATED",
+      "sisu-search-title_one": "UNTRANSLATED",
+      "sisu-search-title_other": "UNTRANSLATED",
       "sisu-search-basic-information": "UNTRANSLATED",
       "start-date": "UNTRANSLATED",
       "end-date": "UNTRANSLATED",
+      "sisu-search-accrodion-hide": "UNTRANSLATED",
+      "sisu-search-accrodion-collapse": "UNTRANSLATED",
       "sisu-search-content": "UNTRANSLATED",
       "sisu-search-additional-information": "UNTRANSLATED",
-      "sisu-search-assessment-methods": "UNTRANSLATED",
-      "sisu-search-accrodion-collapse": "UNTRANSLATED",
-      "sisu-search-accrodion-hide": "UNTRANSLATED"
+      "sisu-search-assessment-methods": "UNTRANSLATED"
     },
     "list": "UNTRANSLATED"
   },
   "front-page": {
     "not-logged-in": "UNTRANSLATED",
-    "search": "UNTRANSLATED",
+    "no-results": "UNTRANSLATED",
     "create-new-course": "UNTRANSLATED",
     "user-added": "UNTRANSLATED",
     "email-help": "UNTRANSLATED",
@@ -465,6 +479,7 @@
       "body": "UNTRANSLATED",
       "button": "UNTRANSLATED"
     },
+    "title": "UNTRANSLATED",
     "local": {
       "title": "UNTRANSLATED",
       "body": "UNTRANSLATED",

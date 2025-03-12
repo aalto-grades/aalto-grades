@@ -128,7 +128,9 @@ const CreateGradingModelDialog = ({
             <MenuItem value="none">
               {t('course.models.create-model.none')}
             </MenuItem>
-            <MenuItem value="addition">{t('shared.graph.node.add')}</MenuItem>
+            <MenuItem value="addition">
+              {t('shared.graph.node.addition')}
+            </MenuItem>
             <MenuItem value="average">
               {t('shared.graph.node.average')}
             </MenuItem>

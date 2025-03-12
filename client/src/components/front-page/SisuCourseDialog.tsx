@@ -37,7 +37,10 @@ const SisuCourseDialog = ({
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
       <DialogTitle>
-        {t('course.edit.sisu-search-title')}: <b>{queryString}</b>
+        {t('course.edit.sisu-search-title', {
+          count: courses.length,
+          code: queryString,
+        })}
       </DialogTitle>
       <DialogContent>
         <Divider />

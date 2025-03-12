@@ -70,11 +70,11 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
         color: hasInvalidGrade || isGradeExpired ? 'error.main' : 'inherit',
         bgcolor:
           hasInvalidGrade || isGradeExpired
-            ? `rgba(${theme.vars.palette.error.mainChannel} / 0.1)`
+            ? `rgba(${theme.palette.error.mainChannel} / 0.1)`
             : 'inherit',
         borderLeft:
           hasInvalidGrade || isGradeExpired
-            ? `1px solid rgba(${theme.vars.palette.error.mainChannel} / 0.3)`
+            ? `1px solid rgba(${theme.palette.error.mainChannel} / 0.3)`
             : 'inherit',
         fontSize: '0.85rem',
 
@@ -129,9 +129,9 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
                   top: '-5%',
                   left: '1%',
                   width: '15px',
-                  color: `rgba(${theme.vars.palette.error.mainChannel} / 0.7)`,
+                  color: `rgba(${theme.palette.error.mainChannel} / 0.7)`,
                   '&:hover': {
-                    color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
+                    color: `rgba(${theme.palette.error.mainChannel} / 1)`,
                   },
                 }}
               />
@@ -152,9 +152,9 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
                   top: '-5%',
                   left: '1%',
                   width: '15px',
-                  color: `rgba(${theme.vars.palette.error.mainChannel} / 0.7)`,
+                  color: `rgba(${theme.palette.error.mainChannel} / 0.7)`,
                   '&:hover': {
-                    color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
+                    color: `rgba(${theme.palette.error.mainChannel} / 1)`,
                   },
                 }}
               />
@@ -171,7 +171,7 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
                   top: '-5%',
                   left: '1%',
                   width: '15px',
-                  color: `rgba(${theme.vars.palette.info.mainChannel} / 0.3)`,
+                  color: `rgba(${theme.palette.info.mainChannel} / 0.3)`,
                 }}
               />
             )}
@@ -185,7 +185,7 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
                 right: '1%',
                 textAlign: 'right',
                 fontSize: '0.7rem',
-                color: `rgba(${theme.vars.palette.primary.mainChannel} / 0.7)`,
+                color: `rgba(${theme.palette.primary.mainChannel} / 0.7)`,
               }}
             >
               {bestGrade.date.toLocaleDateString()}
@@ -204,9 +204,9 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
                   top: '-5%',
                   left: '1%',
                   width: '15px',
-                  color: `rgba(${theme.vars.palette.error.mainChannel} / 0.7)`,
+                  color: `rgba(${theme.palette.error.mainChannel} / 0.7)`,
                   '&:hover': {
-                    color: `rgba(${theme.vars.palette.error.mainChannel} / 1)`,
+                    color: `rgba(${theme.palette.error.mainChannel} / 1)`,
                   },
                 }}
               />

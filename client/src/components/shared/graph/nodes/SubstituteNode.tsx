@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {useTheme} from '@mui/material';
 import {
   type ChangeEvent,
   type JSX,
@@ -53,6 +54,7 @@ const convertFromLocalSettings = (
 
 const SubstituteNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const {nodeData, setNodeSettings} = useContext(NodeDataContext);
   const {id, isConnectable} = props;
   const updateNodeInternals = useUpdateNodeInternals();
@@ -223,8 +225,13 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
         value={localSettings.maxSubstitutions}
       />
       <label>{t('shared.graph.substitutes')}</label>
-
-      <table style={{width: '200px', margin: '5px 0px'}}>
+      <table
+        style={{
+          width: '200px',
+          margin: '5px 0px',
+          backgroundColor: theme.palette.graph.light,
+        }}
+      >
         <tbody>
           <tr>
             <th style={{width: '50%'}}>{t('shared.graph.in')}</th>
@@ -266,7 +273,13 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
         </tbody>
       </table>
       <label>{t('general.exercises')}</label>
-      <table style={{width: '200px', margin: '5px 0px'}}>
+      <table
+        style={{
+          width: '200px',
+          margin: '5px 0px',
+          backgroundColor: theme.palette.graph.light,
+        }}
+      >
         <tbody>
           <tr>
             <th style={{width: '50%'}}>{t('shared.graph.in')}</th>

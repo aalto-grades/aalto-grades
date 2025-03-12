@@ -2,14 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {CheckCircle, Inventory} from '@mui/icons-material';
 import {
+  Chip,
   DialogContent,
   DialogTitle,
-  Divider,
   List,
   ListItemButton,
   ListItemText,
   Paper,
+  Typography,
+  styled,
 } from '@mui/material';
 import {Fragment, type JSX} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -18,9 +21,16 @@ import {useParams} from 'react-router-dom';
 import type {CoursePartData} from '@/common/types';
 import {useGetCourseParts} from '@/hooks/useApi';
 
+const StyledListItemButton = styled(ListItemButton)(({theme}) => ({
+  '&:not(:last-child)': {
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  },
+}));
+
 type PropsType = {
   setCoursePart: (coursePart: CoursePartData) => void;
 };
+
 const UploadDialogSelectCoursePart = ({
   setCoursePart,
 }: PropsType): JSX.Element => {
@@ -32,16 +42,35 @@ const UploadDialogSelectCoursePart = ({
     <>
       <DialogTitle>{t('course.results.upload.select-course-part')}</DialogTitle>
       <DialogContent>
-        <List component={Paper}>
-          {courseParts.data?.map((part, index) => (
-            <Fragment key={part.id}>
-              <ListItemButton onClick={() => setCoursePart(part)}>
-                <ListItemText primary={part.name} />
-              </ListItemButton>
-              {courseParts.data.length - 1 !== index && <Divider />}
-            </Fragment>
-          ))}
-        </List>
+        {courseParts.data === undefined || courseParts.data.length === 0 ? (
+          <Typography>{t('course.parts.not-found')}</Typography>
+        ) : (
+          <List component={Paper}>
+            {courseParts.data.map(part => (
+              <Fragment key={part.id}>
+                <StyledListItemButton onClick={() => setCoursePart(part)}>
+                  <ListItemText
+                    primary={part.name}
+                    secondary={
+                      part.expiryDate?.toLocaleDateString() ??
+                      t('course.parts.no-expiry-date')
+                    }
+                  />
+                  <Chip
+                    label={
+                      part.archived
+                        ? t('general.archived')
+                        : t('general.active')
+                    }
+                    sx={{minWidth: 100, ml: 2}}
+                    icon={part.archived ? <Inventory /> : <CheckCircle />}
+                    color={part.archived ? undefined : 'success'}
+                  />
+                </StyledListItemButton>
+              </Fragment>
+            ))}
+          </List>
+        )}
       </DialogContent>
     </>
   );

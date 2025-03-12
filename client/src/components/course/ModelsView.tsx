@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Button, Collapse, List, Tooltip, Typography} from '@mui/material';
+import {CheckCircle, Inventory, Warning} from '@mui/icons-material';
+import {Box, Button, Collapse, Tooltip, Typography} from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useCallback, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
@@ -18,6 +19,7 @@ import {
   SystemRole,
 } from '@/common/types';
 import {batchCalculateCourseParts} from '@/common/util';
+import ListEntries from '@/components/shared/ListEntries';
 import Graph from '@/components/shared/graph/Graph';
 import {simplifyNode} from '@/components/shared/graph/graphUtil';
 import {
@@ -38,6 +40,7 @@ import ModelButton from './models-view/ModelButton';
 import RenameGradingModelDialog from './models-view/RenameGradingModelDialog';
 
 type ParamsType = {courseId: string; modelId?: string; userId?: string};
+
 const ModelsView = (): JSX.Element => {
   const {t} = useTranslation();
   const {auth, isTeacherInCharge} = useAuth();
@@ -266,6 +269,28 @@ const ModelsView = (): JSX.Element => {
     }
   };
 
+  const getModelButton = (model: GradingModelData): JSX.Element => {
+    return (
+      <ModelButton
+        key={model.id}
+        model={model}
+        editRights={editRights}
+        modelsWithFinalGrades={modelsWithFinalGrades}
+        onEdit={() => {
+          setEditDialogModel(model);
+          setEditDialogOpen(true);
+        }}
+        onArchive={() => handleArchiveModel(model.id, !model.archived)}
+        onDelete={async () => handleDelModel(model.id)}
+        onClick={() => {
+          if (userId !== undefined)
+            navigate(`/${courseId}/models/${model.id}/${userId}`);
+          else navigate(`/${courseId}/models/${model.id}`);
+        }}
+      />
+    );
+  };
+
   const onSave = async (graphStructure: GraphStructure): Promise<void> => {
     if (currentModel === null) throw new Error(t('course.models.save-null'));
 
@@ -352,37 +377,54 @@ const ModelsView = (): JSX.Element => {
             {t('course.models.no-models')}
           </Typography>
         ) : (
-          <List sx={{width: 400}} disablePadding>
-            {models.map(model => (
-              <ModelButton
-                key={model.id}
-                model={model}
-                editRights={editRights}
-                modelsWithFinalGrades={modelsWithFinalGrades}
-                onEdit={() => {
-                  setEditDialogModel(model);
-                  setEditDialogOpen(true);
-                }}
-                onArchive={() => handleArchiveModel(model.id, !model.archived)}
-                onDelete={async () => handleDelModel(model.id)}
-                onClick={() => {
-                  if (userId !== undefined)
-                    navigate(`/${courseId}/models/${model.id}/${userId}`);
-                  else navigate(`/${courseId}/models/${model.id}`);
-                }}
-              />
-            ))}
-            {editRights &&
-              coursePartsWithoutModels.map(part => (
-                <MissingModelButton
-                  key={part.id}
-                  part={part}
-                  onClick={() =>
-                    setCreateDialogOpen({open: true, coursePart: part})
-                  }
-                />
-              ))}
-          </List>
+          <Box
+            sx={{
+              mt: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'start',
+              gap: 2,
+            }}
+          >
+            <Collapse in={models.find(mod => !mod.archived) !== undefined}>
+              <ListEntries
+                label={t('course.models.active-models')}
+                icon={<CheckCircle />}
+                color="success"
+              >
+                {models
+                  .filter(mod => !mod.archived)
+                  .map(model => getModelButton(model))}
+              </ListEntries>
+            </Collapse>
+            <Collapse in={models.find(mod => mod.archived) !== undefined}>
+              <ListEntries
+                label={t('course.models.archived-models')}
+                icon={<Inventory />}
+              >
+                {models
+                  .filter(mod => mod.archived)
+                  .map(model => getModelButton(model))}
+              </ListEntries>
+            </Collapse>
+            <Collapse in={editRights && coursePartsWithoutModels.length > 0}>
+              <ListEntries
+                label={t('course.models.missing-models')}
+                icon={<Warning />}
+                color="warning"
+              >
+                {coursePartsWithoutModels.map(part => (
+                  <MissingModelButton
+                    key={part.id}
+                    part={part}
+                    onClick={() =>
+                      setCreateDialogOpen({open: true, coursePart: part})
+                    }
+                  />
+                ))}
+              </ListEntries>
+            </Collapse>
+          </Box>
         )}
       </Collapse>
 

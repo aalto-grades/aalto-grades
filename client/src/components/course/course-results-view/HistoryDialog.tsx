@@ -23,6 +23,7 @@ type PropsType = {
   studentUser?: StudentData;
   courseTaskId?: number;
 };
+
 const GradesHistoryDialog = ({
   open,
   onClose,

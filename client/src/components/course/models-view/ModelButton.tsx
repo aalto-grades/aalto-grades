@@ -11,7 +11,6 @@ import {
   ListItemText,
   Tooltip,
 } from '@mui/material';
-import {grey} from '@mui/material/colors';
 import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
@@ -26,6 +25,7 @@ type PropsType = {
   onDelete: () => void;
   onClick: () => void;
 };
+
 const ModelButton = ({
   model,
   editRights,
@@ -42,6 +42,7 @@ const ModelButton = ({
     Number(model.hasExpiredSources) +
     Number(model.hasArchivedSources) +
     Number(model.hasDeletedSources);
+
   if (numErrors > 1) warning = t('course.models.has-multiple-warnings');
   else if (model.hasExpiredSources) warning = t('course.models.has-expired');
   else if (model.hasArchivedSources) warning = t('course.models.has-archived');
@@ -49,7 +50,7 @@ const ModelButton = ({
 
   return (
     <ListItem
-      sx={{backgroundColor: model.archived ? grey[200] : ''}}
+      sx={{backgroundColor: model.archived ? 'primary.light' : ''}}
       disablePadding
       secondaryAction={
         editRights ? (
@@ -79,15 +80,13 @@ const ModelButton = ({
                   : t('course.models.delete-grading-model')
               }
             >
-              <span>
-                <IconButton
-                  disabled={modelsWithFinalGrades.has(model.id)}
-                  edge="end"
-                  onClick={onDelete}
-                >
-                  <Delete />
-                </IconButton>
-              </span>
+              <IconButton
+                disabled={modelsWithFinalGrades.has(model.id)}
+                edge="end"
+                onClick={onDelete}
+              >
+                <Delete />
+              </IconButton>
             </Tooltip>
           </>
         ) : null

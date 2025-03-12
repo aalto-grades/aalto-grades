@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {useTheme} from '@mui/material';
 import {type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
@@ -20,6 +21,7 @@ const rowHeight = 30;
 
 const AdditionNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const {id, isConnectable} = props;
   const updateNodeInternals = useUpdateNodeInternals();
   const nodeValues = useContext(NodeValuesContext);
@@ -82,7 +84,13 @@ const AdditionNode = (props: NodeProps): JSX.Element => {
         isConnectable={isConnectable}
       />
 
-      <table style={{width: '100%', minWidth: '60px'}}>
+      <table
+        style={{
+          width: '100%',
+          minWidth: '60px',
+          backgroundColor: theme.palette.graph.light,
+        }}
+      >
         <tbody>
           <tr>
             <th>{t('shared.graph.inputs')}</th>
@@ -97,7 +105,11 @@ const AdditionNode = (props: NodeProps): JSX.Element => {
           <tr>
             <td style={{height: '20px'}} />
           </tr>
-          <tr style={{background: '#ccf'}}>
+          <tr
+            style={{
+              background: theme.palette.graph.light,
+            }}
+          >
             <td style={{height: '20px'}}>
               = {Math.round(nodeValue.value * 100) / 100}
             </td>

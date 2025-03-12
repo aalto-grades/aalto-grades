@@ -2,10 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Link, Tooltip, Typography} from '@mui/material';
+import {Box, Link, Typography} from '@mui/material';
 import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Link as RouterLink} from 'react-router-dom';
+
+import ExternalLink from '@/components/shared/ExternalLink';
 
 const Footer = (): JSX.Element => {
   const {t} = useTranslation();
@@ -14,59 +16,41 @@ const Footer = (): JSX.Element => {
     <Box
       component="footer"
       sx={{
-        backgroundColor: 'primary.light',
         display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
         alignItems: 'center',
         padding: 2,
-        textAlign: 'left',
+        gap: 3,
+        textAlign: 'center',
         marginTop: 'auto',
+        width: '100%',
+        overflowX: 'hidden',
       }}
     >
-      <Link
-        component={RouterLink}
-        to="/privacy-notice"
-        underline="none"
-        sx={{mx: 3}}
-      >
+      <Link component={RouterLink} to="/privacy-notice">
         {t('app.footer.privacy')}
       </Link>
-      <Link
-        component={RouterLink}
-        to="/accessibility-statement"
-        underline="none"
-        sx={{mr: 3}}
-      >
+      <Link component={RouterLink} to="/accessibility-statement">
         {t('app.footer.accessibility')}
       </Link>
-      <Link component={RouterLink} to="/support" underline="none" sx={{mr: 3}}>
+      <Link component={RouterLink} to="/support">
         {t('app.footer.support')}
       </Link>
-      <Link component={RouterLink} to="/licenses" underline="none" sx={{mr: 3}}>
+      <Link component={RouterLink} to="/licenses">
         {t('app.footer.licenses')}
       </Link>
-      <Tooltip title={t('app.footer.source.tooltip')}>
-        <Link
-          href={`https://github.com/aalto-grades/aalto-grades/tree/v${AALTO_GRADES_VERSION}`}
-          target="_blank"
-          rel="noreferrer"
-          underline="none"
-          sx={{mr: 3}}
-        >
-          {t('app.footer.source.text')}
-        </Link>
-      </Tooltip>
-      <Tooltip title={t('app.footer.feedback.tooltip')}>
-        <Link
-          href="https://link.webropol.com/s/ossi-feedback"
-          target="_blank"
-          rel="noreferrer"
-          underline="none"
-          sx={{mr: 3}}
-        >
-          {t('app.footer.feedback.text')}
-        </Link>
-      </Tooltip>
-      <Typography>Ossi {AALTO_GRADES_VERSION}</Typography>
+      <ExternalLink
+        href={`https://github.com/aalto-grades/aalto-grades/tree/v${AALTO_GRADES_VERSION}`}
+      >
+        {t('app.footer.source-text')}
+      </ExternalLink>
+      <ExternalLink href="https://link.webropolsurveys.com/S/E358C6E5E7690C72">
+        {t('app.footer.feedback-text')}
+      </ExternalLink>
+      <Typography sx={{color: 'text.secondary'}}>
+        Ossi v{AALTO_GRADES_VERSION}
+      </Typography>
     </Box>
   );
 };

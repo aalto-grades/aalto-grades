@@ -39,14 +39,14 @@
     },
     "graph": {
       "node": {
-        "add": "Yhteenlasku",
+        "addition": "Yhteenlasku",
         "average": "Keskiarvo",
         "max": "Maksimi",
-        "add-tooltip": "Laske useita arvoja yhteen",
+        "addition-tooltip": "Laske useita arvoja yhteen",
         "average-tooltip": "Laske useiden arvojen (painotettu) keskiarvo",
         "stepper": "Askellin",
         "stepper-tooltip": "Muuta arvoalueet tietyiksi arvoiksi",
-        "min": "Vähimmäispistemäärä",
+        "minpoints": "Vähimmäispistemäärä",
         "min-tooltip": "Vaadi vähimmäisarvo, muuten tulos on hylätty tai täysin hylätty",
         "max-tooltip": "Valitse useiden arvojen ja yhden mukautetun arvon maksimi",
         "require": "Vaadi hyväksytyt arvot",
@@ -55,6 +55,8 @@
         "round-tooltip": "Pyöristä arvo",
         "substitute": "Korvaa",
         "substitute-tooltip": "Korvaa hylätyt arvot",
+        "sink": "Kohde",
+        "source": "Lähde",
         "value": "Arvo"
       },
       "source-deleted": "Solmun lähde on poistettu",
@@ -67,6 +69,8 @@
       "course-failed": "Kurssi hylätty",
       "delete-node_one": "Poista solmu",
       "delete-node_other": "Poista solmut",
+      "hide-map": "Piilota kartta",
+      "show-map": "Näytä kartta",
       "select-sources": "Valitse lähteet",
       "test-values": "Testiarvot",
       "format": "Palauta asettelu",
@@ -99,20 +103,19 @@
       "discard": "Hylkää muutokset"
     }
   },
+  "color-mode": {
+    "system": "Järjestelmä",
+    "light": "Vaalea",
+    "dark": "Tumma"
+  },
   "app": {
     "footer": {
       "privacy": "Tietosuojailmoitus",
       "accessibility": "Saavutettavuusseloste",
       "support": "Tuki",
       "licenses": "Lisenssit",
-      "source": {
-        "tooltip": "Lähdekoodi avautuu uuteen välilehteen",
-        "text": "Lähdekoodi"
-      },
-      "feedback": {
-        "tooltip": "Palaute-lomake avautuu uuteen välilehteen",
-        "text": "Palaute"
-      }
+      "source-text": "Lähdekoodi",
+      "feedback-text": "Palaute"
     }
   },
   "language": "Suomi (fi)",
@@ -145,6 +148,7 @@
     "source-name": "Lähteen nimi",
     "date": "Päivämäärä",
     "manage": "Hallinnoi",
+    "close": "Sulje",
     "confirm": "Vahvista",
     "student-number": "Opiskelijanumero",
     "course-task": "Kurssitehtävä",
@@ -160,7 +164,6 @@
         "title": "Historia"
       }
     },
-    "close": "Sulje",
     "download": "Lataa",
     "grader": "Arvioija",
     "export-date": "Vientipäivämäärä",
@@ -170,6 +173,8 @@
     "grades-saved": "Arvosanat tallennettu",
     "import": "Tuo",
     "course-part": "Kurssin osa",
+    "archived": "Arkistoitu",
+    "active": "Aktiivinen",
     "add-row": "Lisää rivi",
     "edit": "Muokkaa",
     "course-parts": "Kurssin osat",
@@ -196,10 +201,12 @@
     "courses": "Kurssit",
     "password": "Salasana",
     "unsaved-changes": "Tallentamattomia muutoksia",
+    "close-window": "Sulje ikkuna",
     "in-english": "englanniksi",
     "in-finnish": "suomeksi",
     "in-swedish": "ruotsiksi",
     "done": "Valmis",
+    "search": "Haku",
     "final-grades": "Lopulliset arvosanat",
     "course-part-grade": "Kurssin osan arvosana",
     "not-int": "Arvon on oltava validi kokonaisluku"
@@ -220,6 +227,8 @@
       "select-for-fetching": "Valitse haettavaksi",
       "fetching-grades": "Haetaan arvosanoja",
       "fetching-grades-wait": "Odota, haetaan arvosanoja...",
+      "not-found": "Kurssin osia ei löytynyt",
+      "no-expiry-date": "Ei voimassaolopäivää",
       "delete-with-model-message": "Tämä sisältää arviointimallin, poistetaanko?",
       "delete-with-task-message": "Tämä sisältää tehtäviä, poistetaanko?",
       "delete-message": "Haluatko varmasti poistaa?",
@@ -230,16 +239,18 @@
       "view-a+-sources": "Näytä A+ lähteet",
       "unarchive": "Palauta arkistosta",
       "archive": "Arkistoi",
+      "cannot-delete-with-grades": "Ei voi poistaa, koska sisältää arvosanoja",
+      "edit-part": "Muokkaa osaa",
       "delete-task": "Poista tehtävä",
       "delete-task-message": "Haluatko varmasti poistaa tämän tehtävän?",
       "archived": "Arkistoitu",
+      "actions": "Toiminnot",
       "add-new-task": "Lisää uusi tehtävä",
       "add-from-a+": "Lisää A+:sta",
       "add-new-part": "Lisää uusi kurssin osa",
       "no-course-parts": "Ei kurssin osia",
-      "edit-part": "Muokkaa osaa",
-      "cannot-delete-with-grades": "Ei voi poistaa, koska sisältää arvosanoja",
-      "no-expiry-date": "Ei voimassaolopäivää"
+      "active-parts": "Aktiiviset kurssin osat",
+      "archived-parts": "Arkistoidut kurssin osat"
     },
     "models": {
       "has-multiple-warnings": "Sisältää useita varoituksia",
@@ -268,7 +279,10 @@
       "save-null": "Tallennusvirhe",
       "create-final-grade-model": "Luo lopullinen arviointimalli",
       "back": "Takaisin",
-      "no-models": "Ei malleja"
+      "no-models": "Ei malleja",
+      "active-models": "Aktiiviset arviointimallit",
+      "archived-models": "Arkistoidut arviointimallit",
+      "missing-models": "Arviointimalli ei määritelty"
     },
     "results": {
       "calculate-final": "Laske lopullinen arvosana",
@@ -303,7 +317,6 @@
       "download-sisu-csv": "Lataa Sisu CSV",
       "group-columns": "Ryhmittele sarakkeet",
       "show-model-parts": "Näytä mallin osat",
-      "search-bar-placeholder": "Etsi...",
       "showing-n-rows": "Näytetään {{n}} riviä",
       "n-errors": "{{n}} virhettä",
       "final-downloaded": "Lopullinen arvosana ladattu",
@@ -411,21 +424,22 @@
       "sisu-search-button-helper": "Hae kurssin tiedot Sisusta kurssikoodin perusteella",
       "input-at-least-one-assistant": "Syötä vähintään yhden kurssiavustajan sähköpostiosoite",
       "assistant-expiry-date-info": "Päättymispäivä: {{expiryDate}}",
-      "sisu-search-title": "Seuraavat kurssi instanssit löydetty Sisusta kurssikoodilla",
+      "sisu-search-title_one": "Kurssikoodilla {{code}} löytyi 1 instanssi Sisusta:",
+      "sisu-search-title_other": "Kurssikoodilla {{code}} löytyi {{count}} instanssia Sisusta:",
       "sisu-search-basic-information": "Perustiedot",
       "start-date": "Aloitus päivämäärä",
       "end-date": "Lopetus päivämäärä",
+      "sisu-search-accrodion-hide": "Piilota kaikki",
+      "sisu-search-accrodion-collapse": "Laajenna kaikki",
       "sisu-search-content": "Sisältö",
       "sisu-search-additional-information": "Lisätiedot",
-      "sisu-search-assessment-methods": "Arviointitapa",
-      "sisu-search-accrodion-collapse": "Laajenna kaikki",
-      "sisu-search-accrodion-hide": "Piilota kaikki"
+      "sisu-search-assessment-methods": "Arviointitapa"
     },
     "list": "Kurssilista"
   },
   "front-page": {
     "not-logged-in": "Et ole kirjautunut sisään",
-    "search": "haku",
+    "no-results": "Kursseja ei löytynyt",
     "create-new-course": "Luo uusi kurssi",
     "user-added": "Käyttäjä lisätty onnistuneesti",
     "email-help": "Aalto-sähköposti esim. etunimi.sukunimi@aalto.fi.",
@@ -465,8 +479,9 @@
       "body": "Kirjaudu sisään Aalto-yliopiston käyttäjätunnuksellasi painamalla alla olevaa painiketta.",
       "button": "Kirjaudu sisään Aalto-tunnuksella"
     },
+    "title": "Kirjaudu sisään Ossiin",
     "local": {
-      "title": "Kirjaudu sisään Ossiin",
+      "title": "Paikalliset käyttäjät",
       "body": "Jos sinulle on annettu erilliset tunnukset Ossia varten, käytä tätä kirjautumista.",
       "mfa-code": "MFA-koodi",
       "button": "Kirjaudu sisään"

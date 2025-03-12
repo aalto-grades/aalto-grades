@@ -12,7 +12,6 @@ import {
   Button,
   ButtonGroup,
   Collapse,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -35,6 +34,7 @@ import {useTranslation} from 'react-i18next';
 import {read, set_fs, utils, writeFile} from 'xlsx';
 
 import type {CoursePartData} from '@/common/types';
+import Dialog from '@/components/shared/Dialog';
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import MismatchDialog, {type MismatchData} from './MismatchDialog';
 import type {GradeUploadColTypes} from './UploadDialog';
@@ -323,7 +323,7 @@ const UploadDialogUpload = ({
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Box sx={{display: 'flex', gap: 3}}>
+            <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 2}}>
               <Box>
                 <Typography variant="body1">
                   {t('course.results.upload.upload-button-group-title')}

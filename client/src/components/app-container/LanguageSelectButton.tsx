@@ -53,7 +53,11 @@ const LanguageSelectButton = (): JSX.Element => {
             }}
           >
             <Box sx={{width: 24, display: 'flex', justifyContent: 'center'}}>
-              {i18n.language === 'en' && (
+              {/**
+               * Use startsWith in stead of strict comparison to match all ISO 639-1 standard
+               * language codes for en (en-us, en-ca, en-au, etc.).
+               */}
+              {i18n.language.startsWith('en') && (
                 <Check color="inherit" fontSize="small" />
               )}
             </Box>
@@ -87,7 +91,7 @@ const LanguageSelectButton = (): JSX.Element => {
             }}
           >
             <Box sx={{width: 24, display: 'flex', justifyContent: 'center'}}>
-              {i18n.language === 'sv' && (
+              {i18n.language.startsWith('sv') && (
                 <Check color="inherit" fontSize="small" />
               )}
             </Box>
