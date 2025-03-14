@@ -383,7 +383,8 @@
         "student-number-empty": "Student number cannot be empty",
         "modify-selected": "Modify selected",
         "select-at-least-one-info": "Select at least one value for bulk edit",
-        "bulk-edit-dialog-title": "Set date to selected course parts"
+        "bulk-edit-dialog-title": "Set date to selected course parts",
+        "resolve-errors": "Resolve errors to continue"
       },
       "final-grade-preview": "Final grade preview",
       "course-part-value-preview": "Course part value",

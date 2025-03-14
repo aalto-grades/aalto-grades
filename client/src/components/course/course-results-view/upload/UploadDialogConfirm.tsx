@@ -22,6 +22,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
 } from '@mui/material';
 import type {
   GridColDef,
@@ -371,7 +372,9 @@ const UploadDialogConfirm = ({
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'date' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            {t('course.results.upload.dates')}
+            <Typography variant="h6">
+              {t('course.results.upload.dates')}
+            </Typography>
           </AccordionSummary>
           <AccordionDetails>
             {dates.length > nonEmptyCols.length && (
@@ -390,18 +393,23 @@ const UploadDialogConfirm = ({
           disabled={error}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            {t('course.results.upload.confirm-data')}
+            <Typography color={error ? 'error' : undefined} variant="h6">
+              {t('course.results.upload.confirm-data')}{' '}
+              {error && `(${t('course.results.upload.resolve-errors')})`}
+            </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <div style={{height: '70vh'}}>
-              <StyledDataGrid
-                rows={rows}
-                columns={columns}
-                rowHeight={25}
-                rowSelection={false}
-                disableColumnSelector
-                getRowClassName={getRowClassName}
-              />
+              {!error && (
+                <StyledDataGrid
+                  rows={rows}
+                  columns={columns}
+                  rowHeight={25}
+                  rowSelection={false}
+                  disableColumnSelector
+                  getRowClassName={getRowClassName}
+                />
+              )}
             </div>
           </AccordionDetails>
         </Accordion>
