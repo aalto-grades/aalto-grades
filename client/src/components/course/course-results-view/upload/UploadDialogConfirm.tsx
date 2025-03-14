@@ -10,6 +10,8 @@ import {
   AccordionDetails,
   AccordionSummary,
   Alert,
+  Button,
+  Checkbox,
   DialogContent,
   DialogTitle,
   Table,
@@ -18,6 +20,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
 } from '@mui/material';
 import type {
   GridColDef,
@@ -38,6 +41,7 @@ import {useTranslation} from 'react-i18next';
 
 import LocalizedDatePicker from '@/components/shared/LocalizedDatePicker';
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
+import DateDialog from './DateDialog';
 import type {GradeUploadColTypes} from './UploadDialog';
 
 export type DateType = {
@@ -45,6 +49,8 @@ export type DateType = {
   completionDate: Dayjs;
   expirationDate: Dayjs | null;
 };
+
+type CoursePartDate = 'expiration' | 'completion';
 
 type PropsType = {
   columns: GridColDef[];
@@ -57,6 +63,7 @@ type PropsType = {
   setExpanded: Dispatch<SetStateAction<'' | 'date' | 'confirm'>>;
   invalidValues: boolean;
 };
+
 const UploadDialogConfirm = ({
   columns,
   rows,
@@ -70,6 +77,12 @@ const UploadDialogConfirm = ({
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const [error, setError] = useState<boolean>(false);
+  const [editCompletionDates, setEditCompletionDates] = useState<string[]>([]);
+  const [editExpirationDates, setEditExpirationDates] = useState<string[]>([]);
+  const [bulkEdit, setBulkEdit] = useState<null | {
+    type: CoursePartDate;
+    courseTaskNames: string[];
+  }>(null);
 
   const nonEmptyCols = useMemo(() => {
     const newNonEmptyCols: string[] = [];
@@ -135,23 +148,132 @@ const UploadDialogConfirm = ({
     return hasInvalid ? 'invalid-value-data-grid' : '';
   };
 
+  const closeBulkEdit = (): void => {
+    setBulkEdit(null);
+  };
+
+  const handleClick = (type: CoursePartDate): void => {
+    setBulkEdit({
+      type,
+      courseTaskNames:
+        type === 'completion' ? editCompletionDates : editExpirationDates,
+    });
+  };
+
+  const handleDateChange = (date: Dayjs): void => {
+    if (bulkEdit === null) return;
+
+    if (bulkEdit.type === 'completion') {
+      bulkEdit.courseTaskNames.forEach(data =>
+        handleCompletionDateChange(date, data)
+      );
+    } else {
+      bulkEdit.courseTaskNames.forEach(data => {
+        setDates(oldDates =>
+          oldDates.map(oldDate =>
+            oldDate.courseTaskName === data
+              ? {
+                  ...oldDate,
+                  expirationDate: date,
+                }
+              : oldDate
+          )
+        );
+      });
+    }
+
+    closeBulkEdit();
+  };
+
+  const colDates = dates.filter(date =>
+    nonEmptyCols.includes(date.courseTaskName)
+  );
+
+  const selectAll = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setValues: (value: SetStateAction<string[]>) => void
+  ): void => {
+    if (event.target.checked) {
+      setValues(colDates.map(val => val.courseTaskName));
+    } else {
+      setValues([]);
+    }
+  };
+
+  const handleCheckboxClick = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    values: string[],
+    setValues: (value: SetStateAction<string[]>) => void
+  ): void => {
+    if (values.includes(event.target.value)) {
+      setValues(prev => prev.filter(val => val !== event.target.value));
+    } else {
+      setValues(prev => [event.target.value, ...prev]);
+    }
+  };
+
   const DateTable = (): JSX.Element => (
-    <TableContainer>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>{t('general.course-part')}</TableCell>
-            <TableCell>{t('course.results.upload.completion-date')}</TableCell>
-            <TableCell>{t('course.results.upload.expiration-date')}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {dates
-            .filter(date => nonEmptyCols.includes(date.courseTaskName))
-            .map(date => (
+    <>
+      <DateDialog
+        open={bulkEdit !== null}
+        close={closeBulkEdit}
+        submit={handleDateChange}
+      />
+      <TableContainer>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>{t('general.course-part')}</TableCell>
+              <TableCell>
+                <Checkbox
+                  onChange={e => selectAll(e, setEditCompletionDates)}
+                  checked={colDates.length === editCompletionDates.length}
+                />
+                {t('course.results.upload.completion-date')}
+                <Button
+                  disabled={editCompletionDates.length === 0}
+                  sx={{ml: 2}}
+                  size="small"
+                  variant="outlined"
+                  onClick={() => handleClick('completion')}
+                >
+                  {t('course.results.upload.modify-selected')}
+                </Button>
+              </TableCell>
+              <TableCell>
+                <Checkbox
+                  onChange={e => selectAll(e, setEditExpirationDates)}
+                  checked={colDates.length === editExpirationDates.length}
+                />
+                {t('course.results.upload.expiration-date')}
+                <Button
+                  disabled={editExpirationDates.length === 0}
+                  sx={{ml: 2}}
+                  size="small"
+                  variant="outlined"
+                  onClick={() => handleClick('expiration')}
+                >
+                  {t('course.results.upload.modify-selected')}
+                </Button>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {colDates.map(date => (
               <TableRow key={date.courseTaskName}>
                 <TableCell>{date.courseTaskName}</TableCell>
                 <TableCell>
+                  <Checkbox
+                    value={date.courseTaskName}
+                    onChange={e =>
+                      handleCheckboxClick(
+                        e,
+                        editCompletionDates,
+                        setEditCompletionDates
+                      )
+                    }
+                    checked={editCompletionDates.includes(date.courseTaskName)}
+                  />
                   <LocalizedDatePicker
                     slotProps={{textField: {size: 'small'}}}
                     value={date.completionDate}
@@ -161,8 +283,19 @@ const UploadDialogConfirm = ({
                   />
                 </TableCell>
                 <TableCell>
+                  <Checkbox
+                    value={date.courseTaskName}
+                    onChange={e =>
+                      handleCheckboxClick(
+                        e,
+                        editExpirationDates,
+                        setEditExpirationDates
+                      )
+                    }
+                    checked={editExpirationDates.includes(date.courseTaskName)}
+                  />
                   <LocalizedDatePicker
-                    disabled={date.expirationDate === null}
+                    disabled={date.expirationDate === null && false}
                     slotProps={{
                       textField: {
                         size: 'small',
@@ -193,9 +326,10 @@ const UploadDialogConfirm = ({
                 </TableCell>
               </TableRow>
             ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   );
 
   return (
@@ -207,13 +341,14 @@ const UploadDialogConfirm = ({
             {t('course.results.upload.higher-than-max')}
           </Alert>
         )}
-
         <Accordion
           expanded={expanded === 'date'}
           onChange={(_, newExpanded) => setExpanded(newExpanded ? 'date' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            {t('course.results.upload.dates')}
+            <Typography variant="h6">
+              {t('course.results.upload.dates')}
+            </Typography>
           </AccordionSummary>
           <AccordionDetails>
             {dates.length > nonEmptyCols.length && (
@@ -224,7 +359,6 @@ const UploadDialogConfirm = ({
             <DateTable />
           </AccordionDetails>
         </Accordion>
-
         <Accordion
           expanded={expanded === 'confirm'}
           onChange={(_, newExpanded) =>
@@ -233,18 +367,23 @@ const UploadDialogConfirm = ({
           disabled={error}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
-            {t('course.results.upload.confirm-data')}
+            <Typography color={error ? 'error' : undefined} variant="h6">
+              {t('course.results.upload.confirm-data')}{' '}
+              {error && `(${t('course.results.upload.resolve-errors')})`}
+            </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <div style={{height: '70vh'}}>
-              <StyledDataGrid
-                rows={rows}
-                columns={columns}
-                rowHeight={25}
-                rowSelection={false}
-                disableColumnSelector
-                getRowClassName={getRowClassName}
-              />
+              {!error && (
+                <StyledDataGrid
+                  rows={rows}
+                  columns={columns}
+                  rowHeight={25}
+                  rowSelection={false}
+                  disableColumnSelector
+                  getRowClassName={getRowClassName}
+                />
+              )}
             </div>
           </AccordionDetails>
         </Accordion>

@@ -380,7 +380,10 @@
         "download-csv-template": "UNTRANSLATED",
         "download-excel-template": "UNTRANSLATED",
         "add-manually": "UNTRANSLATED",
-        "student-number-empty": "UNTRANSLATED"
+        "student-number-empty": "UNTRANSLATED",
+        "modify-selected": "UNTRANSLATED",
+        "bulk-edit-dialog-title": "UNTRANSLATED",
+        "resolve-errors": "UNTRANSLATED"
       },
       "final-grade-preview": "UNTRANSLATED",
       "course-part-value-preview": "UNTRANSLATED",

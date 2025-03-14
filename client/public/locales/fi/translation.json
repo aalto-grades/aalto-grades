@@ -380,7 +380,10 @@
         "download-csv-template": "Lataa CSV-pohja",
         "download-excel-template": "Lataa Excel-pohja",
         "add-manually": "Tai lisää ne manuaalisesti",
-        "student-number-empty": "Opiskelijanumero ei voi olla tyhjä"
+        "student-number-empty": "Opiskelijanumero ei voi olla tyhjä",
+        "modify-selected": "Muokkaa valittuja",
+        "bulk-edit-dialog-title": "Aseta päivämäärä valituille kurssin osille",
+        "resolve-errors": "Korjaa virheet jatkaaksesi"
       },
       "final-grade-preview": "Lopullisen arvosanan esikatselu",
       "course-part-value-preview": "Kurssin osan arvo",

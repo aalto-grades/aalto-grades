@@ -24,11 +24,16 @@ const CloseButton = styled(IconButton)(({theme}) => ({
   },
 }));
 
-type PropsType = {open: boolean; onClose: () => void} & DialogProps;
+type PropsType = {
+  open: boolean;
+  onClose: () => void;
+  disableCloseButton?: boolean;
+} & DialogProps;
 
 const Dialog = ({
   open,
   onClose,
+  disableCloseButton = false,
   children,
   ...props
 }: PropsType): JSX.Element => {
@@ -37,7 +42,11 @@ const Dialog = ({
   return (
     <MuiDialog open={open} onClose={onClose} {...props}>
       <Tooltip title={t('general.close-window')} placement="top">
-        <CloseButton onClick={onClose} aria-label="close-dialog">
+        <CloseButton
+          disabled={disableCloseButton}
+          onClick={onClose}
+          aria-label="close-dialog"
+        >
           <CloseIcon />
         </CloseButton>
       </Tooltip>
