@@ -11,11 +11,11 @@ import {
   AccordionSummary,
   Alert,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Checkbox as MuiCheckbox,
   Table,
   TableBody,
   TableCell,
@@ -32,7 +32,6 @@ import type {
 } from '@mui/x-data-grid';
 import type {Dayjs} from 'dayjs';
 import dayjs from 'dayjs';
-import {enqueueSnackbar} from 'notistack';
 import {
   type Dispatch,
   type JSX,
@@ -54,43 +53,6 @@ export type DateType = {
 };
 
 type CoursePartDate = 'expiration' | 'completion';
-
-const CheckAllCheckbox = ({type}: {type: CoursePartDate}): JSX.Element => (
-  <MuiCheckbox
-    id={`${type}DateSelectAllCheckbox`}
-    inputRef={el => el && el.setAttribute('data-select-all', 'true')}
-    onChange={event => {
-      const checked = event.target.checked;
-      document
-        .querySelectorAll(`input[data-${type}-date-checkbox]`)
-        .forEach(checkbox => {
-          const inputElement = checkbox as HTMLInputElement;
-          const muiInput = inputElement
-            .closest('.MuiCheckbox-root')
-            ?.querySelector(
-              'input[type="checkbox"]'
-            ) as HTMLInputElement | null;
-
-          if (muiInput && muiInput.checked !== checked) {
-            muiInput.click();
-          }
-        });
-    }}
-  />
-);
-
-const Checkbox = ({
-  type,
-  id,
-}: {
-  type: CoursePartDate;
-  id: string;
-}): JSX.Element => (
-  <MuiCheckbox
-    id={id}
-    inputRef={el => el && el.setAttribute(`data-${type}-date-checkbox`, 'true')}
-  />
-);
 
 type PropsType = {
   columns: GridColDef[];
@@ -122,6 +84,9 @@ const UploadDialogConfirm = ({
     type: CoursePartDate;
     courseTaskNames: string[];
   }>(null);
+
+  const [editCompletionDates, setEditCompletionDates] = useState<string[]>([]);
+  const [editExpirationDates, setEditExpirationDates] = useState<string[]>([]);
 
   const nonEmptyCols = useMemo(() => {
     const newNonEmptyCols: string[] = [];
@@ -191,26 +156,15 @@ const UploadDialogConfirm = ({
     setBulkEdit(null);
   };
 
-  const selectAllInputs = (select: string): HTMLInputElement[] => {
-    return Array.from(document.querySelectorAll<HTMLInputElement>(select));
-  };
-
   const handleClick = (type: CoursePartDate): void => {
-    const checkedBoxes = Array.from(
-      selectAllInputs(`input[data-${type}-date-checkbox]:checked`)
-    ).map(checkbox => checkbox.id);
-
-    if (checkedBoxes.length === 0) {
-      enqueueSnackbar(t('course.results.upload.select-at-least-one-info'), {
-        variant: 'info',
-      });
-    } else {
-      setBulkEdit({type, courseTaskNames: checkedBoxes});
-    }
+    setBulkEdit({
+      type,
+      courseTaskNames:
+        type === 'completion' ? editCompletionDates : editExpirationDates,
+    });
   };
 
   const handleDateChange = (): void => {
-    closeBulkEdit();
     if (bulkEdit === null) return;
 
     if (bulkEdit.type === 'completion') {
@@ -232,7 +186,35 @@ const UploadDialogConfirm = ({
       });
     }
 
+    closeBulkEdit();
     setBulkDate(dayjs());
+  };
+
+  const colDates = dates.filter(date =>
+    nonEmptyCols.includes(date.courseTaskName)
+  );
+
+  const selectAll = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setValues: (value: SetStateAction<string[]>) => void
+  ): void => {
+    if (event.target.checked) {
+      setValues(colDates.map(val => val.courseTaskName));
+    } else {
+      setValues([]);
+    }
+  };
+
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    values: string[],
+    setValues: (value: SetStateAction<string[]>) => void
+  ): void => {
+    if (values.includes(event.target.value)) {
+      setValues(prev => prev.filter(val => val !== event.target.value));
+    } else {
+      setValues(prev => [event.target.value, ...prev]);
+    }
   };
 
   const DateTable = (): JSX.Element => (
@@ -277,9 +259,13 @@ const UploadDialogConfirm = ({
             <TableRow>
               <TableCell>{t('general.course-part')}</TableCell>
               <TableCell>
-                <CheckAllCheckbox type="completion" />
+                <Checkbox
+                  onChange={e => selectAll(e, setEditCompletionDates)}
+                  checked={colDates.length === editCompletionDates.length}
+                />
                 {t('course.results.upload.completion-date')}
                 <Button
+                  disabled={editCompletionDates.length === 0}
                   sx={{ml: 2}}
                   size="small"
                   variant="outlined"
@@ -289,9 +275,13 @@ const UploadDialogConfirm = ({
                 </Button>
               </TableCell>
               <TableCell>
-                <CheckAllCheckbox type="expiration" />
+                <Checkbox
+                  onChange={e => selectAll(e, setEditExpirationDates)}
+                  checked={colDates.length === editExpirationDates.length}
+                />
                 {t('course.results.upload.expiration-date')}
                 <Button
+                  disabled={editExpirationDates.length === 0}
                   sx={{ml: 2}}
                   size="small"
                   variant="outlined"
@@ -303,55 +293,73 @@ const UploadDialogConfirm = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {dates
-              .filter(date => nonEmptyCols.includes(date.courseTaskName))
-              .map(date => (
-                <TableRow key={date.courseTaskName}>
-                  <TableCell>{date.courseTaskName}</TableCell>
-                  <TableCell>
-                    <Checkbox id={date.courseTaskName} type="completion" />
-                    <LocalizedDatePicker
-                      slotProps={{textField: {size: 'small'}}}
-                      value={date.completionDate}
-                      onChange={value =>
-                        handleCompletionDateChange(value, date.courseTaskName)
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Checkbox id={date.courseTaskName} type="expiration" />
-                    <LocalizedDatePicker
-                      disabled={date.expirationDate === null && false}
-                      slotProps={{
-                        textField: {
-                          size: 'small',
-                          error:
-                            date.expirationDate !== null &&
-                            date.expirationDate <= date.completionDate,
-                          helperText:
-                            date.expirationDate !== null &&
-                            date.expirationDate <= date.completionDate
-                              ? t(
-                                  'course.results.upload.expiration-after-completion'
-                                )
-                              : '',
-                        },
-                      }}
-                      value={date.expirationDate}
-                      onChange={e =>
-                        setDates(oldDates =>
-                          oldDates.map(oldDate =>
-                            oldDate.courseTaskName === date.courseTaskName &&
-                            e !== null
-                              ? {...oldDate, expirationDate: e}
-                              : oldDate
-                          )
+            {colDates.map(date => (
+              <TableRow key={date.courseTaskName}>
+                <TableCell>{date.courseTaskName}</TableCell>
+                <TableCell>
+                  <Checkbox
+                    value={date.courseTaskName}
+                    onChange={e =>
+                      handleChange(
+                        e,
+                        editCompletionDates,
+                        setEditCompletionDates
+                      )
+                    }
+                    checked={editCompletionDates.includes(date.courseTaskName)}
+                  />
+                  <LocalizedDatePicker
+                    slotProps={{textField: {size: 'small'}}}
+                    value={date.completionDate}
+                    onChange={value =>
+                      handleCompletionDateChange(value, date.courseTaskName)
+                    }
+                  />
+                </TableCell>
+                <TableCell>
+                  <Checkbox
+                    value={date.courseTaskName}
+                    onChange={e =>
+                      handleChange(
+                        e,
+                        editExpirationDates,
+                        setEditExpirationDates
+                      )
+                    }
+                    checked={editExpirationDates.includes(date.courseTaskName)}
+                  />
+                  <LocalizedDatePicker
+                    disabled={date.expirationDate === null && false}
+                    slotProps={{
+                      textField: {
+                        size: 'small',
+                        error:
+                          date.expirationDate !== null &&
+                          date.expirationDate <= date.completionDate,
+                        helperText:
+                          date.expirationDate !== null &&
+                          date.expirationDate <= date.completionDate
+                            ? t(
+                                'course.results.upload.expiration-after-completion'
+                              )
+                            : '',
+                      },
+                    }}
+                    value={date.expirationDate}
+                    onChange={e =>
+                      setDates(oldDates =>
+                        oldDates.map(oldDate =>
+                          oldDate.courseTaskName === date.courseTaskName &&
+                          e !== null
+                            ? {...oldDate, expirationDate: e}
+                            : oldDate
                         )
-                      }
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
+                      )
+                    }
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
