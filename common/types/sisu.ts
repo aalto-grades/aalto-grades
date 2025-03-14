@@ -29,7 +29,7 @@ export const SisuCourseInstanceSchema = z.object({
     workload: LocalizedStringSchema,
     prerequisites: LocalizedStringSchema,
     learningOutcomes: LocalizedStringSchema,
-    literature: z.union([LocalizedStringSchema, z.null()]),
+    literature: z.union([LocalizedStringSchema.partial(), z.null()]),
     languageOfInstruction: LocalizedStringSchema,
     registration: LocalizedStringSchema,
     content: LocalizedStringSchema,
@@ -55,8 +55,8 @@ export const SisuCourseInstanceSchema = z.object({
   courseUnitId: z.string(),
   languageOfInstructionCodes: z.array(z.string()),
   teachers: z.array(z.string()),
-  enrolmentStartDate: z.string(),
-  enrolmentEndDate: z.string(),
+  enrolmentStartDate: z.union([z.string(), z.null()]),
+  enrolmentEndDate: z.union([z.string(), z.null()]),
   mincredits: z.string(),
 });
 

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Box, Typography} from '@mui/material';
-import DOMPurify from 'dompurify';
+import {default as DOMPurify} from 'dompurify';
 import {type JSX, useEffect, useState} from 'react';
 
 type PropsType = {url: string; title?: string};

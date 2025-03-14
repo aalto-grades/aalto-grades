@@ -21,7 +21,7 @@ import MuiAccordionSummary, {
   type AccordionSummaryProps,
   accordionSummaryClasses,
 } from '@mui/material/AccordionSummary';
-import DOMPurify from 'dompurify';
+import {default as DOMPurify} from 'dompurify';
 import {Fragment, type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 

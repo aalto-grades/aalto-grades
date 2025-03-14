@@ -35,7 +35,7 @@ const SisuCourseDialog = ({
   const {t} = useTranslation();
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg">
       <DialogTitle>
         {t('course.edit.sisu-search-title', {
           count: courses.length,
