@@ -21,7 +21,7 @@ import MuiAccordionSummary, {
   type AccordionSummaryProps,
   accordionSummaryClasses,
 } from '@mui/material/AccordionSummary';
-// eslint-disable-next-line import/no-named-as-default
+import {default as DOMPurify} from 'dompurify';
 import DOMPurify from 'dompurify';
 import {Fragment, type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
