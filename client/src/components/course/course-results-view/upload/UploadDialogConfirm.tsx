@@ -12,8 +12,6 @@ import {
   Alert,
   Button,
   Checkbox,
-  Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
   Table,
@@ -31,7 +29,6 @@ import type {
   GridValidRowModel,
 } from '@mui/x-data-grid';
 import type {Dayjs} from 'dayjs';
-import dayjs from 'dayjs';
 import {
   type Dispatch,
   type JSX,
@@ -44,6 +41,7 @@ import {useTranslation} from 'react-i18next';
 
 import LocalizedDatePicker from '@/components/shared/LocalizedDatePicker';
 import StyledDataGrid from '@/components/shared/StyledDataGrid';
+import DateDialog from './DateDialog';
 import type {GradeUploadColTypes} from './UploadDialog';
 
 export type DateType = {
@@ -79,14 +77,12 @@ const UploadDialogConfirm = ({
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const [error, setError] = useState<boolean>(false);
-  const [bulkDate, setBulkDate] = useState<Dayjs>(dayjs());
+  const [editCompletionDates, setEditCompletionDates] = useState<string[]>([]);
+  const [editExpirationDates, setEditExpirationDates] = useState<string[]>([]);
   const [bulkEdit, setBulkEdit] = useState<null | {
     type: CoursePartDate;
     courseTaskNames: string[];
   }>(null);
-
-  const [editCompletionDates, setEditCompletionDates] = useState<string[]>([]);
-  const [editExpirationDates, setEditExpirationDates] = useState<string[]>([]);
 
   const nonEmptyCols = useMemo(() => {
     const newNonEmptyCols: string[] = [];
@@ -164,12 +160,12 @@ const UploadDialogConfirm = ({
     });
   };
 
-  const handleDateChange = (): void => {
+  const handleDateChange = (date: Dayjs): void => {
     if (bulkEdit === null) return;
 
     if (bulkEdit.type === 'completion') {
       bulkEdit.courseTaskNames.forEach(data =>
-        handleCompletionDateChange(bulkDate, data)
+        handleCompletionDateChange(date, data)
       );
     } else {
       bulkEdit.courseTaskNames.forEach(data => {
@@ -178,7 +174,7 @@ const UploadDialogConfirm = ({
             oldDate.courseTaskName === data
               ? {
                   ...oldDate,
-                  expirationDate: bulkDate,
+                  expirationDate: date,
                 }
               : oldDate
           )
@@ -187,7 +183,6 @@ const UploadDialogConfirm = ({
     }
 
     closeBulkEdit();
-    setBulkDate(dayjs());
   };
 
   const colDates = dates.filter(date =>
@@ -205,7 +200,7 @@ const UploadDialogConfirm = ({
     }
   };
 
-  const handleChange = (
+  const handleCheckboxClick = (
     event: React.ChangeEvent<HTMLInputElement>,
     values: string[],
     setValues: (value: SetStateAction<string[]>) => void
@@ -219,40 +214,11 @@ const UploadDialogConfirm = ({
 
   const DateTable = (): JSX.Element => (
     <>
-      <Dialog open={bulkEdit !== null} onClose={closeBulkEdit} maxWidth="sm">
-        <DialogTitle>
-          {t('course.results.upload.bulk-edit-dialog-title')}
-        </DialogTitle>
-        <DialogContent
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <LocalizedDatePicker
-            value={bulkDate}
-            onChange={value => {
-              if (value === null) return;
-              setBulkDate(value);
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <DialogActions>
-            <Button
-              variant="outlined"
-              onClick={closeBulkEdit}
-              sx={{mr: 'auto'}}
-            >
-              {t('general.cancel')}
-            </Button>
-            <Button onClick={handleDateChange} variant="contained">
-              {t('general.done')}
-            </Button>
-          </DialogActions>
-        </DialogActions>
-      </Dialog>
+      <DateDialog
+        open={bulkEdit !== null}
+        close={closeBulkEdit}
+        submit={handleDateChange}
+      />
       <TableContainer>
         <Table size="small">
           <TableHead>
@@ -300,7 +266,7 @@ const UploadDialogConfirm = ({
                   <Checkbox
                     value={date.courseTaskName}
                     onChange={e =>
-                      handleChange(
+                      handleCheckboxClick(
                         e,
                         editCompletionDates,
                         setEditCompletionDates
@@ -320,7 +286,7 @@ const UploadDialogConfirm = ({
                   <Checkbox
                     value={date.courseTaskName}
                     onChange={e =>
-                      handleChange(
+                      handleCheckboxClick(
                         e,
                         editExpirationDates,
                         setEditExpirationDates
