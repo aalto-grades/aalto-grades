@@ -28,8 +28,7 @@ const SaveBar = ({
     <Fade in={show}>
       <Box
         sx={{
-          background: theme.vars.palette.secondary.light,
-          p: 0.5,
+          background: theme.palette.primary.light,
           px: 2,
           py: 0.5,
           borderRadius: 3,

@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import WarningIcon from '@mui/icons-material/Warning';
-import {Tooltip} from '@mui/material';
+import {Tooltip, useTheme} from '@mui/material';
 import {type JSX, type PropsWithChildren, useContext} from 'react';
+import {useTranslation} from 'react-i18next';
 import type {NodeProps} from 'reactflow';
 
 import {ExtraNodeDataContext, NodeDataContext} from '@/context/GraphProvider';
@@ -21,6 +22,9 @@ const BaseNode = ({
   fullFail = false,
   children,
 }: PropsType): JSX.Element => {
+  const theme = useTheme();
+  const {t} = useTranslation();
+  const darkMode = theme.palette.mode === 'dark';
   const {nodeData, setNodeTitle} = useContext(NodeDataContext);
   const extraNodeData = useContext(ExtraNodeDataContext);
 
@@ -28,15 +32,29 @@ const BaseNode = ({
   const extraData = extraNodeData[id];
 
   const getBorderColor = (): string => {
-    if (fullFail) return '2px solid #e00';
-    if (error) return '1px dashed #e00';
-    if (extraData?.warning) return '1px solid #ffb833';
-    return '1px solid #eee';
+    if (fullFail) return '3px solid #ee0000';
+    if (error) return `1px dashed ${theme.palette.warning.dark}`;
+    if (extraData?.warning) return theme.palette.warning.main;
+    return '1px solid #eeeeee';
   };
+
   const getBackgroundColor = (): string => {
-    if (error) return '#fffafa';
-    if (extraData?.warning) return '#fff6e5';
-    return 'white';
+    if (error) return darkMode ? theme.palette.warning.main : '#fffafa';
+    if (extraData?.warning)
+      return darkMode ? theme.palette.warning.dark : '#fff6e5';
+    return theme.palette.graph.light;
+  };
+
+  const getTranslation = (): string => {
+    // Check separately for sink and source so the
+    // trans-parse will not clean these automatically
+    if (type === 'sink') {
+      return t('shared.graph.node.sink');
+    }
+    if (type === 'source') {
+      return t('shared.graph.node.source');
+    }
+    return t(`shared.graph.node.${type}`);
   };
 
   return (
@@ -53,7 +71,10 @@ const BaseNode = ({
     >
       <div>
         <h4
-          style={{margin: 0}}
+          style={{
+            margin: 0,
+            color: theme.palette.text.primary,
+          }}
           contentEditable={type !== 'coursepart'}
           suppressContentEditableWarning
           onBlur={e => setNodeTitle(id, e.target.textContent!)}
@@ -76,11 +97,11 @@ const BaseNode = ({
           marginBottom: '-5px',
           padding: 0,
           textAlign: 'left',
-          color: 'gray',
-          fontSize: '9px',
+          color: theme.palette.text.secondary,
+          fontSize: '12px',
         }}
       >
-        {type}
+        {getTranslation()}
       </p>
     </div>
   );

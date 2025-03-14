@@ -5,17 +5,17 @@
 import {
   Box,
   Button,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Link,
   TextField,
   Typography,
 } from '@mui/material';
 import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
+import Dialog from '@/components/shared/Dialog';
+import ExternalLink from '@/components/shared/ExternalLink';
 import {getToken, setToken} from '@/utils';
 
 type PropsType = {
@@ -61,14 +61,12 @@ const TokenDialog = ({
     : currentToken?.slice(0, 12) + '...';
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm">
       <DialogTitle>{t('general.a+-api-token')}</DialogTitle>
       <DialogContent>
         <Typography sx={{mb: 2}}>
           {t('shared.auth.token.body')}:{' '}
-          <Link href={link} target="_blank">
-            {link}
-          </Link>
+          <ExternalLink href={link}>{link}</ExternalLink>
         </Typography>
         {currentToken && (
           <Typography>
@@ -84,7 +82,7 @@ const TokenDialog = ({
               <Box
                 component="span"
                 sx={{
-                  bgcolor: 'grey.200',
+                  bgcolor: 'primary.light',
                   alignContent: 'center',
                   px: 1,
                   py: 0.5,

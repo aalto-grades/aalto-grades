@@ -251,6 +251,7 @@ const CreateCourseDialog = ({
         onSuccess: newCourseId => {
           navigate(`/${newCourseId}`);
         },
+        onError: () => form.setSubmitting(false),
       });
     },
   });
@@ -308,6 +309,8 @@ const CreateCourseDialog = ({
     }
   };
 
+  const loading = form.isSubmitting || isLoading || isFetching;
+
   const formDirty =
     form.dirty || teachersInCharge.length > 0 || assistants.length > 0;
 
@@ -339,7 +342,7 @@ const CreateCourseDialog = ({
                   value="courseCode"
                   label={`${t('general.course-code')}*`}
                   helperText={t('course.edit.course-code-help')}
-                  disabled={form.isSubmitting || isLoading || isFetching}
+                  disabled={loading}
                 />
               </Box>
               <Box
@@ -356,7 +359,7 @@ const CreateCourseDialog = ({
                   <LoadingButton
                     loading={isLoading || isFetching}
                     onClick={() => fetchSisu(form.values.courseCode)}
-                    disabled={form.values.courseCode.length === 0}
+                    disabled={form.values.courseCode.length === 0 || loading}
                     variant="outlined"
                     startIcon={<SearchIcon />}
                   >
@@ -375,7 +378,7 @@ const CreateCourseDialog = ({
               valueFormat="name%"
               labelFormat={`${t('course.edit.course-name-in-format')}*`}
               helperTextFormat={t('course.edit.course-name-in-help-format')}
-              disabled={form.isSubmitting || isLoading || isFetching}
+              disabled={loading}
             />
             <Box
               sx={{
@@ -399,7 +402,7 @@ const CreateCourseDialog = ({
                   value="department"
                   label={`${t('general.organizing-department')}*`}
                   helperText={t('course.edit.organizing-department-help')}
-                  disabled={form.isSubmitting || isLoading || isFetching}
+                  disabled={loading}
                   select
                 >
                   {sortedDepartments.map(department => (
@@ -415,7 +418,7 @@ const CreateCourseDialog = ({
                   value="gradingScale"
                   label={`${t('course.edit.grading-scale')}*`}
                   helperText={t('course.edit.grading-scale-help')}
-                  disabled={form.isSubmitting || isLoading || isFetching}
+                  disabled={loading}
                   select
                 >
                   {Object.values(GradingScale).map(value => (
@@ -431,7 +434,7 @@ const CreateCourseDialog = ({
                   value="languageOfInstruction"
                   label={`${t('course.edit.language')}*`}
                   helperText={t('course.edit.language-help')}
-                  disabled={form.isSubmitting || isLoading || isFetching}
+                  disabled={loading}
                   select
                 >
                   {sisuLanguageOptions.map(option => (
@@ -456,7 +459,7 @@ const CreateCourseDialog = ({
                   value="minCredits"
                   label={`${t('course.edit.min-credits')}*`}
                   helperText={t('course.edit.min-credits-help')}
-                  disabled={form.isSubmitting || isLoading || isFetching}
+                  disabled={loading}
                   type="number"
                 />
                 <FormField
@@ -466,7 +469,7 @@ const CreateCourseDialog = ({
                   value="maxCredits"
                   label={`${t('course.edit.max-credits')}*`}
                   helperText={t('course.edit.max-credits-help')}
-                  disabled={form.isSubmitting || isLoading || isFetching}
+                  disabled={loading}
                   type="number"
                 />
               </Box>
@@ -476,7 +479,7 @@ const CreateCourseDialog = ({
               type="text"
               fullWidth
               value={form.values.teacherEmail}
-              disabled={form.isSubmitting || isLoading || isFetching}
+              disabled={loading}
               label={t('course.edit.teachers-in-charge')}
               margin="normal"
               slotProps={{inputLabel: {shrink: true}}}
@@ -571,7 +574,7 @@ const CreateCourseDialog = ({
               type="text"
               fullWidth
               value={form.values.assistantEmail}
-              disabled={form.isSubmitting || isLoading || isFetching}
+              disabled={loading}
               label={t('general.assistants')}
               margin="normal"
               slotProps={{inputLabel: {shrink: true}}}
@@ -596,7 +599,7 @@ const CreateCourseDialog = ({
               value="assistantExpiryDate"
               label={t('course.edit.assistant-expiry-date')}
               helperText={t('course.edit.assistant-expiry-date-helper')}
-              disabled={form.isSubmitting || isLoading || isFetching}
+              disabled={loading}
               type="date"
               InputProps={{
                 inputProps: {min: new Date().toISOString().slice(0, 10)},
@@ -743,7 +746,7 @@ const CreateCourseDialog = ({
                 variant="outlined"
                 color="error"
                 onClick={resetForm}
-                disabled={form.isSubmitting || isLoading || isFetching}
+                disabled={loading}
               >
                 {t('general.clear')}
               </Button>
@@ -751,7 +754,7 @@ const CreateCourseDialog = ({
                 <Button
                   variant="outlined"
                   color={formDirty ? 'error' : 'primary'}
-                  disabled={form.isSubmitting || isLoading || isFetching}
+                  disabled={loading}
                   onClick={() => {
                     if (formDirty) {
                       confirmDiscard();
@@ -766,7 +769,7 @@ const CreateCourseDialog = ({
                   loading={form.isSubmitting}
                   variant="contained"
                   onClick={form.submitForm}
-                  disabled={form.isSubmitting || isLoading || isFetching}
+                  disabled={loading}
                 >
                   {t('general.submit')}
                 </LoadingButton>

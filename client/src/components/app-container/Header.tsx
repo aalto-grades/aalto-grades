@@ -2,12 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {AppBar, Box, Typography, useTheme} from '@mui/material';
+import {AppBar, Box, Tooltip, Typography, useTheme} from '@mui/material';
 import {useMemo} from 'react';
 import {NavLink, useParams} from 'react-router-dom';
 
 import {useGetCourse} from '@/hooks/useApi';
 import {useLocalize} from '@/hooks/useLocalize';
+import ColorModeSelectButton from './ColorModeSelectButton';
 import LanguageSelectButton from './LanguageSelectButton';
 import UserButton from './UserButton';
 
@@ -25,19 +26,7 @@ const Header = (): JSX.Element => {
   );
 
   return (
-    <AppBar
-      position="static"
-      sx={{
-        backgroundColor: theme.vars.palette.primary.light,
-        boxShadow: 'none',
-        color: 'black',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        flexDirection: 'row',
-        px: 3,
-      }}
-    >
+    <AppBar position="static" sx={{px: 3}}>
       <Typography
         variant="h2"
         component={NavLink}
@@ -48,18 +37,21 @@ const Header = (): JSX.Element => {
           minWidth: '184px',
           cursor: 'pointer',
           fontWeight: 'bold',
-          color: 'primary.main',
+          color:
+            theme.palette.mode === 'light'
+              ? 'primary.dark'
+              : 'primary.contrastText',
         }}
-        data-testid="a-grades-header-link" // For e2e tests
+        data-testid="a-grades-header-link"
         viewTransition
       >
-        {logoVariant}Ossi
+        Ossi{logoVariant}
       </Typography>
       {course.data !== undefined && (
         <>
           <Box
             sx={{
-              backgroundColor: theme.vars.palette.background.paper,
+              backgroundColor: theme.palette.background.paper,
               px: 2,
               py: 0,
               mr: 1,
@@ -71,7 +63,7 @@ const Header = (): JSX.Element => {
           >
             <Typography
               align="left"
-              variant="body1"
+              variant="h6"
               fontWeight="bold"
               sx={{
                 color: 'primary.main',
@@ -86,38 +78,41 @@ const Header = (): JSX.Element => {
           <Typography variant="h2" sx={{mr: 1}}>
             {' - '}
           </Typography>
-          <Box
-            sx={{
-              backgroundColor: theme.vars.palette.background.paper,
-              px: 2,
-              py: 0,
-              mr: 1,
-              minWidth: '10px',
-              maxWidth: 'fit-content',
-              borderRadius: '15px',
-              height: '40px',
-              alignItems: 'center',
-              flex: '1 1 fit-content',
-            }}
-          >
-            <Typography
-              variant="h6"
-              align="left"
+          <Tooltip title={localize(course.data.name)}>
+            <Box
               sx={{
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                lineHeight: '40px',
+                backgroundColor: theme.palette.background.paper,
+                px: 2,
+                py: 0,
+                mr: 1,
+                minWidth: '10px',
+                maxWidth: 'fit-content',
+                borderRadius: '15px',
+                height: '40px',
                 alignItems: 'center',
-                height: '100%',
+                flex: '1 1 fit-content',
               }}
             >
-              {localize(course.data.name)}
-            </Typography>
-          </Box>
+              <Typography
+                variant="h6"
+                align="left"
+                sx={{
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  lineHeight: '40px',
+                  alignItems: 'center',
+                  height: '100%',
+                }}
+              >
+                {localize(course.data.name)}
+              </Typography>
+            </Box>
+          </Tooltip>
         </>
       )}
       <Box sx={{flexGrow: 1}} />
+      <ColorModeSelectButton />
       <LanguageSelectButton />
       <UserButton />
     </AppBar>

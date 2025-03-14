@@ -211,7 +211,7 @@ export const importGradesWithText = async (page: Page): Promise<void> => {
   await expect(page.getByRole('row', {name: '423896'})).toBeVisible();
 };
 
-export const importFromSisu = async (
+export const importCourseDataFromSisu = async (
   page: Page,
   teacherEmail?: string
 ): Promise<void> => {
@@ -227,7 +227,7 @@ export const importFromSisu = async (
   await page.getByRole('button', {name: 'Search from Sisu'}).click();
 
   await expect(
-    page.getByText(`Sisu instances found for course code: ${courseCode}`)
+    page.getByText(`2 course instances found with course code ${courseCode}:`)
   ).toBeVisible();
 
   await page.getByRole('button', {name: 'Select'}).nth(1).click();

@@ -7,7 +7,7 @@ import {
   type AplusExerciseData,
   AplusGradeSourceType,
   type NewAplusGradeSourceData,
-} from '../../../common/types';
+} from '@/common/types';
 
 export const setToken = (token: string): void =>
   localStorage.setItem('a+', token);

@@ -39,14 +39,14 @@
     },
     "graph": {
       "node": {
-        "add": "Addition",
+        "addition": "Addition",
         "average": "Average",
         "max": "Maximum",
-        "add-tooltip": "Add multiple values together",
+        "addition-tooltip": "Add multiple values together",
         "average-tooltip": "Take the (weighted) average of multiple values",
         "stepper": "Stepper",
         "stepper-tooltip": "Map ranges of values into specific values",
-        "min": "Require minimum points",
+        "minpoints": "Require minimum points",
         "min-tooltip": "Require minimum value and otherwise output fail or fullfail",
         "max-tooltip": "Take the maximum of multiple values and one custom value",
         "require": "Require passing values",
@@ -55,6 +55,8 @@
         "round-tooltip": "Round value",
         "substitute": "Substitute",
         "substitute-tooltip": "Substitute failing values",
+        "sink": "Sink",
+        "source": "Source",
         "value": "Value"
       },
       "source-deleted": "Node source has been deleted",
@@ -67,6 +69,8 @@
       "course-failed": "Course failed",
       "delete-node_one": "Delete node",
       "delete-node_other": "Delete nodes",
+      "hide-map": "Hide minimap",
+      "show-map": "Show minimap",
       "select-sources": "Select sources",
       "test-values": "Test values",
       "format": "Format",
@@ -99,20 +103,19 @@
       "discard": "Discard changes"
     }
   },
+  "color-mode": {
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
   "app": {
     "footer": {
       "privacy": "Privacy notice",
       "accessibility": "Accessibility statement",
       "support": "Support",
       "licenses": "Licenses",
-      "source": {
-        "tooltip": "Source code opens in a new tab",
-        "text": "Source code"
-      },
-      "feedback": {
-        "tooltip": "Feedback form opens in a new tab",
-        "text": "Feedback"
-      }
+      "source-text": "Source code",
+      "feedback-text": "Feedback"
     }
   },
   "language": "English (en)",
@@ -145,6 +148,7 @@
     "source-name": "Source name",
     "date": "Date",
     "manage": "Manage",
+    "close": "Close",
     "confirm": "Confirm",
     "student-number": "Student number",
     "course-task": "Course task",
@@ -160,7 +164,6 @@
         "title": "History"
       }
     },
-    "close": "Close",
     "download": "Download",
     "grader": "Grader",
     "export-date": "Export date",
@@ -170,6 +173,8 @@
     "grades-saved": "Grades saved",
     "import": "Import",
     "course-part": "Course part",
+    "archived": "Archived",
+    "active": "Active",
     "add-row": "Add row",
     "edit": "Edit",
     "course-parts": "Course parts",
@@ -196,10 +201,12 @@
     "courses": "Courses",
     "password": "Password",
     "unsaved-changes": "Unsaved changes",
+    "close-window": "Close window",
     "in-english": "in English",
     "in-finnish": "in Finnish",
     "in-swedish": "in Swedish",
     "done": "Done",
+    "search": "search",
     "final-grades": "Final grades",
     "course-part-grade": "Course Part Grade",
     "not-int": "Value must be a valid integer"
@@ -220,6 +227,8 @@
       "select-for-fetching": "Select the course parts you want to fetch grades for from A+.",
       "fetching-grades": "Fetching grades",
       "fetching-grades-wait": "Fetching grades from A+, this may take a few minutes...",
+      "not-found": "No course parts found",
+      "no-expiry-date": "No expiry date",
       "delete-with-model-message": "Are you sure want to delete this course part and all included course tasks that are used by some models?",
       "delete-with-task-message": "Are you sure want to delete this course part and all included course tasks?",
       "delete-message": "Are you sure want to delete this course part?",
@@ -230,16 +239,18 @@
       "view-a+-sources": "View A+ grade sources",
       "unarchive": "Unarchive course part",
       "archive": "Archive course part",
+      "cannot-delete-with-grades": "Cannot delete a course part with grades",
+      "edit-part": "Edit course part",
       "delete-task": "Delete course task",
       "delete-task-message": "Some models are using this course task. Are you sure you want to delete it?",
       "archived": "Archived",
+      "actions": "Actions",
       "add-new-task": "Add new course task",
       "add-from-a+": "Add course tasks from A+",
       "add-new-part": "Add new course part",
       "no-course-parts": "No course parts. Please add course parts to get started.",
-      "edit-part": "Edit course part",
-      "cannot-delete-with-grades": "Cannot delete a course part with grades",
-      "no-expiry-date": "No expiry date"
+      "active-parts": "Active course parts",
+      "archived-parts": "Archived course parts"
     },
     "models": {
       "has-multiple-warnings": "Model has multiple warnings",
@@ -268,7 +279,10 @@
       "save-null": "Tried to save null model",
       "create-final-grade-model": "Create new final grade model",
       "back": "Back to models",
-      "no-models": "No grading models. Please add grading models in order to calculate the grades of students."
+      "no-models": "No grading models. Please add grading models in order to calculate the grades of students.",
+      "active-models": "Active grading models",
+      "archived-models": "Archived grading models",
+      "missing-models": "Grading model not defined"
     },
     "results": {
       "calculate-final": "Calculate final grades",
@@ -303,7 +317,6 @@
       "download-sisu-csv": "Download Sisu CSV",
       "group-columns": "Group rows based on other columns",
       "show-model-parts": "Show only course parts used in the model",
-      "search-bar-placeholder": "Search...",
       "showing-n-rows": "Showing {{n}} rows",
       "n-errors": "{{n}} errors",
       "final-downloaded": "Final grades downloaded in the Sisu CSV format successfully.",
@@ -414,21 +427,22 @@
       "sisu-search-button-helper": "Try to find course data from Sisu based on course code",
       "input-at-least-one-assistant": "Input the email address of at least one assistant of the course",
       "assistant-expiry-date-info": "Expiry date: {{expiryDate}}",
-      "sisu-search-title": "Sisu instances found for course code",
+      "sisu-search-title_one": "1 course instance found with course code {{code}}:",
+      "sisu-search-title_other": "{{count}} course instances found with course code {{code}}:",
       "sisu-search-basic-information": "Basic Information",
       "start-date": "Start date",
       "end-date": "End date",
+      "sisu-search-accrodion-hide": "Hide All",
+      "sisu-search-accrodion-collapse": "Collapse All",
       "sisu-search-content": "Content",
       "sisu-search-additional-information": "Additional Information",
-      "sisu-search-assessment-methods": "Assesment Methods",
-      "sisu-search-accrodion-collapse": "Collapse All",
-      "sisu-search-accrodion-hide": "Hide All"
+      "sisu-search-assessment-methods": "Assesment Methods"
     },
     "list": "Course list"
   },
   "front-page": {
     "not-logged-in": "Not logged in",
-    "search": "search",
+    "no-results": "No courses found",
     "create-new-course": "Create new course",
     "user-added": "User added successfully",
     "email-help": "Aalto email e.g. firstname.lastname@aalto.fi.",
@@ -468,8 +482,9 @@
       "body": "Log in with your Aalto University user account by clicking on the button below.",
       "button": "Log in with Aalto account"
     },
+    "title": "Log in to Ossi",
     "local": {
-      "title": "Log in to Ossi",
+      "title": "Local users",
       "body": "If you have been provided with credentials specifically for Ossi, use this login.",
       "mfa-code": "MFA code",
       "button": "Log in"

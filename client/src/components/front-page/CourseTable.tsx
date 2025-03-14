@@ -11,18 +11,26 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
-  TextField,
   Typography,
 } from '@mui/material';
-import {type JSX, useCallback, useMemo, useState} from 'react';
+import {
+  type ChangeEvent,
+  type JSX,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
 import {type CourseData, CourseRoleType, SystemRole} from '@/common/types';
+import Search from '@/components/shared/Search';
 import useAuth from '@/hooks/useAuth';
 import {useLocalize} from '@/hooks/useLocalize';
 import type {HeadCellData} from '@/types';
 import {departments, getCourseRole} from '@/utils';
+
+const coursesPerPage = 10;
 
 type PropsType = {courses: CourseData[]};
 
@@ -76,6 +84,7 @@ const CourseTable = ({courses}: PropsType): JSX.Element => {
       }),
     [courses, getCourseDepartment, getCourseRoleString, searchText]
   );
+
   const sortedCourses = useMemo(
     () =>
       filteredCourses.sort((a, b) => {
@@ -87,20 +96,27 @@ const CourseTable = ({courses}: PropsType): JSX.Element => {
       }),
     [filteredCourses]
   );
-  const coursePage = sortedCourses.slice((page - 1) * 10, page * 10);
+
+  const coursePage = sortedCourses.slice(
+    (page - 1) * coursesPerPage,
+    page * coursesPerPage
+  );
+
+  const onChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ): void => {
+    setSearchText(e.target.value);
+    if (page > 1) setPage(1);
+  };
 
   return (
     <>
       <Grid container justifyContent="flex-start" sx={{mt: 1}}>
-        <TextField
-          sx={{minWidth: 300}}
-          size="small"
-          label={t('front-page.search')}
+        <Search
           value={searchText}
-          onChange={e => {
-            setSearchText(e.target.value);
-            if (page > 1) setPage(1);
-          }}
+          onChange={onChange}
+          reset={() => setSearchText('')}
+          sx={{minWidth: 300}}
         />
       </Grid>
       <Table>
@@ -126,40 +142,52 @@ const CourseTable = ({courses}: PropsType): JSX.Element => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {coursePage.map(course => (
-            <TableRow
-              key={course.id}
-              hover
-              sx={{
-                cursor: 'pointer',
-                '&:focus': {backgroundColor: 'rgba(0, 0, 0, 0.04)'},
-              }}
-              role="button"
-              onClick={() =>
-                navigate(`/${course.id}`, {
-                  viewTransition: true,
-                })
-              }
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
+          {sortedCourses.length === 0 ? (
+            <TableRow>
+              <TableCell align="center" colSpan={4}>
+                {t('front-page.no-results')}
+              </TableCell>
+            </TableRow>
+          ) : (
+            coursePage.map(course => (
+              <TableRow
+                key={course.id}
+                hover
+                sx={{
+                  cursor: 'pointer',
+                  '&:focus': {backgroundColor: 'rgba(0, 0, 0, 0.04)'},
+                }}
+                role="button"
+                onClick={() =>
                   navigate(`/${course.id}`, {
                     viewTransition: true,
-                  });
+                  })
                 }
-              }}
-              tabIndex={0}
-            >
-              <TableCell>{course.courseCode}</TableCell>
-              <TableCell>{localize(course.name)}</TableCell>
-              <TableCell>{getCourseDepartment(course)}</TableCell>
-              <TableCell>{getCourseRoleString(course)}</TableCell>
-            </TableRow>
-          ))}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    navigate(`/${course.id}`, {
+                      viewTransition: true,
+                    });
+                  }
+                }}
+                tabIndex={0}
+              >
+                <TableCell>{course.courseCode}</TableCell>
+                <TableCell>{localize(course.name)}</TableCell>
+                <TableCell>{getCourseDepartment(course)}</TableCell>
+                <TableCell>{getCourseRoleString(course)}</TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
-      {courses.length > 10 && (
+      {sortedCourses.length > coursesPerPage && (
         <Pagination
-          count={Math.ceil(courses.length / 10)}
+          count={
+            sortedCourses.length === courses.length
+              ? Math.ceil(courses.length / coursesPerPage)
+              : Math.ceil(sortedCourses.length / coursesPerPage)
+          }
           page={page}
           onChange={(_, newPage) => setPage(newPage)}
           sx={{mt: 1}}

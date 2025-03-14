@@ -9,6 +9,7 @@ import {initNodeValues, updateNodeValue} from './graphCalculationUtil';
 import type {
   FullNodeData,
   NodeValues,
+  NumberOrFail,
   SinkNodeValue,
   TypedNode,
 } from '../types/graph';
@@ -87,7 +88,7 @@ export const calculateNodeValues = (
 
     // Go through all targets and update their sources
     for (const edge of nodeTargets[sourceNodeId]) {
-      let sourceValue: number | 'fail' = 0;
+      let sourceValue: NumberOrFail = 0;
 
       // Handle nodes with multiple sources
       if (

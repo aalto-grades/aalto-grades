@@ -25,6 +25,7 @@ import {z} from 'zod';
 
 import {type StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateFinalGrades} from '@/common/util';
+import Search from '@/components/shared/Search';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 import {
@@ -111,7 +112,7 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
             position: 'relative',
             backgroundColor: 'transparent',
             ...(isActive && {
-              backgroundColor: theme.vars.palette.info.light,
+              backgroundColor: theme.palette.info.light,
               border: 'none',
               borderRadius: '8px 0px 0px 8px',
             }),
@@ -154,7 +155,7 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
               lineHeight: '20px',
               cursor: 'pointer',
               position: 'relative',
-              backgroundColor: theme.vars.palette.info.light,
+              backgroundColor: theme.palette.info.light,
               border: 'none',
             }}
             onClick={() => table.setGrouping([])}
@@ -201,6 +202,7 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
     </>
   );
 });
+
 GroupByButton.displayName = 'GroupByButton';
 
 const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
@@ -251,7 +253,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
               position: 'relative',
               backgroundColor: 'transparent',
               ...(modelSelected && {
-                backgroundColor: theme.vars.palette.info.light,
+                backgroundColor: theme.palette.info.light,
                 border: 'none',
                 borderRadius: '8px 0px 0px 8px',
               }),
@@ -289,7 +291,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
                 lineHeight: '20px',
                 cursor: 'pointer',
                 position: 'relative',
-                backgroundColor: theme.vars.palette.info.light,
+                backgroundColor: theme.palette.info.light,
                 border: 'none',
               }}
               onClick={() => setSelectedGradingModel('any')}
@@ -482,7 +484,7 @@ const GradesTableToolbar = (): JSX.Element => {
             backgroundColor:
               table.getSelectedRowModel().rows.length === 0
                 ? 'none'
-                : theme.vars.palette.primary.light,
+                : theme.palette.primary.light,
             width: '700px',
           }}
         >
@@ -524,7 +526,7 @@ const GradesTableToolbar = (): JSX.Element => {
               backgroundColor:
                 table.getSelectedRowModel().rows.length === 0
                   ? 'none'
-                  : theme.vars.palette.primary.light,
+                  : theme.palette.primary.light,
               width: '700px',
             }}
           >
@@ -637,14 +639,7 @@ const GradesTableToolbar = (): JSX.Element => {
             <AssessmentFilterButton />
           </Tooltip>
         )}
-        <input
-          style={{
-            borderRadius: '200px',
-            border: '0px solid black',
-            background: 'lightgrey',
-            padding: '0px 15px',
-          }}
-          type="text"
+        <Search
           value={
             (table.getColumn('user_studentNumber')?.getFilterValue() ??
               '') as string
@@ -654,8 +649,9 @@ const GradesTableToolbar = (): JSX.Element => {
               .getColumn('user_studentNumber')
               ?.setFilterValue(e.target.value);
           }}
-          placeholder={t('course.results.search-bar-placeholder')}
-          className="w-36 border shadow rounded"
+          reset={() =>
+            table.getColumn('user_studentNumber')?.setFilterValue('')
+          }
         />
         <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
           {t('course.results.showing-n-rows', {
@@ -671,8 +667,8 @@ const GradesTableToolbar = (): JSX.Element => {
           >
             <Button
               sx={{
-                background: theme.vars.palette.Alert.errorStandardBg,
-                color: theme.vars.palette.error.main,
+                background: theme.palette.error.light,
+                color: theme.palette.error.main,
                 fontWeight: '500',
                 p: 0.5,
                 px: 2,
@@ -685,7 +681,7 @@ const GradesTableToolbar = (): JSX.Element => {
                 boxSizing: 'border-box',
                 border:
                   table.getColumn('errors')?.getFilterValue() === 'errorsFilter'
-                    ? `1px solid ${theme.vars.palette.error.main}`
+                    ? `1px solid ${theme.palette.error.main}`
                     : 'none',
               }}
               onClick={() => {

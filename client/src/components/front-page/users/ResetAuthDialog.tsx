@@ -5,7 +5,6 @@
 import {ContentCopy, Done} from '@mui/icons-material';
 import {
   Button,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
@@ -23,6 +22,7 @@ import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import type {UserData} from '@/common/types';
+import Dialog from '@/components/shared/Dialog';
 import {useResetAuth} from '@/hooks/useApi';
 
 type PropsType = {

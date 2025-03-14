@@ -12,7 +12,7 @@ const ExternalAuth = (): JSX.Element => {
   return (
     <Box
       sx={{
-        width: 1 / 2,
+        width: {xs: '80%', sm: '60%', md: '40%'},
         border: 1,
         borderRadius: '8px',
         borderColor: 'gray',
