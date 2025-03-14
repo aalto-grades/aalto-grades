@@ -39,7 +39,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   const courseTasks = useGetCourseTasks(courseId!, {
     enabled: Boolean(courseId),
   });
-  const addGrades = useAddGrades(courseId!);
+  const {mutateAsync: addGrades, isPending} = useAddGrades(courseId!);
 
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [uploadExpanded, setUploadExpanded] = useState<'' | 'upload' | 'edit'>(
@@ -183,7 +183,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       }
     }
 
-    await addGrades.mutateAsync(gradeData);
+    await addGrades(gradeData);
 
     enqueueSnackbar(t('course.results.upload.grades-added'), {
       variant: 'success',
@@ -194,7 +194,13 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xl">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="xl"
+      disableCloseButton={isPending}
+    >
       {currentStep === 0 && (
         <UploadDialogSelectCoursePart
           setCoursePart={newCoursePart => {
@@ -261,13 +267,15 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
         {currentStep === 2 && confirmExpanded === 'date' && (
           <Button
             onClick={() => setConfirmExpanded('confirm')}
-            disabled={!ready}
+            disabled={!ready || isPending}
           >
             {t('general.confirm')}
           </Button>
         )}
         {currentStep === 2 && confirmExpanded === 'confirm' && (
-          <Button onClick={onSubmit}>{t('general.submit')}</Button>
+          <Button disabled={isPending} onClick={onSubmit}>
+            {t('general.submit')}
+          </Button>
         )}
       </DialogActions>
     </Dialog>
