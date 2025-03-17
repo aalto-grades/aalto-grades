@@ -80,13 +80,15 @@ const ModelButton = ({
                   : t('course.models.delete-grading-model')
               }
             >
-              <IconButton
-                disabled={modelsWithFinalGrades.has(model.id)}
-                edge="end"
-                onClick={onDelete}
-              >
-                <Delete />
-              </IconButton>
+              <span>
+                <IconButton
+                  disabled={modelsWithFinalGrades.has(model.id)}
+                  edge="end"
+                  onClick={onDelete}
+                >
+                  <Delete />
+                </IconButton>
+              </span>
             </Tooltip>
           </>
         ) : null
