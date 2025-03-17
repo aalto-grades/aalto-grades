@@ -410,7 +410,7 @@ export const GradesTableProvider = ({
           (findBestFinalGrade(b.original.finalGrades)?.grade ?? -1),
         cell: ({getValue, row}) => (
           <FinalGradeCell
-            userId={row.original.user.id}
+            user={row.original.user}
             studentNumber={row.original.user.studentNumber}
             finalGrades={getValue()}
             gradingScale={course.data?.gradingScale ?? GradingScale.Numerical}
@@ -591,6 +591,11 @@ export const GradesTableProvider = ({
     columnHelper.accessor('user.studentNumber', {
       header: t('general.student-number'),
       meta: {PrettyChipPosition: 'first'},
+      size: 100,
+    }),
+    columnHelper.accessor(row => row.user.name ?? '-', {
+      header: t('general.name'),
+      size: 120,
     }),
     ...modelColumns,
     ...sourceColumns,
