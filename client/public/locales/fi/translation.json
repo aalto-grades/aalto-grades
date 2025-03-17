@@ -342,6 +342,8 @@
       "expiry-before": "Vanhentumispäivä ennen suoritusta",
       "edit-final": "Muokkaa lopullista arvosanaa",
       "multiple-final": "Useita lopullisia arvosanoja",
+      "final-of": "Lopulliset arvosanat opiskelijanumerolle <bold>{{studentNumber}}</bold> (nimeä ei löytynyt)",
+      "final-of-full": "Lopulliset arvosanat opiskelijalle <bold>{{name}}</bold> (opiskelijanumero: <bold>{{studentNumber}}</bold>)",
       "final-on-date": "Lopullinen arvosana annettu {{date}}",
       "not-participated": "Ei osallistunut",
       "edit-grade": "Muokkaa arvosanaa",

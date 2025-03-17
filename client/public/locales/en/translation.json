@@ -342,6 +342,8 @@
       "expiry-before": "Expiry date cannot be before date",
       "edit-final": "Edit final grades",
       "multiple-final": "Multiple final grades, click to show",
+      "final-of": "Final grades for student number <bold>{{studentNumber}}</bold> (name not found)",
+      "final-of-full": "Final grades for student <bold>{{name}}</bold> (student number: <bold>{{studentNumber}}</bold>)",
       "final-on-date": "Final grade obtained on {{date}}",
       "not-participated": "Not participated",
       "edit-grade": "Edit grades",
