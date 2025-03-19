@@ -14,7 +14,7 @@ import {
   Select,
 } from '@mui/material';
 import {type JSX, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import {Trans, useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import type {
@@ -113,6 +113,23 @@ const UserGraphDialog = ({
         {data?.gradingModel
           ? t('course.results.final-grade-preview')
           : t('course.results.course-part-value-preview')}
+        {data?.row.user && (
+          <>
+            {', '}
+            <Trans
+              i18nKey={
+                data.row.user.name
+                  ? 'course.results.number-and-name'
+                  : 'course.results.number-no-name'
+              }
+              components={{bold: <strong />}}
+              values={{
+                studentNumber: data.row.user.studentNumber,
+                name: data.row.user.name,
+              }}
+            />
+          </>
+        )}
       </DialogTitle>
       <DialogContent>
         {data === null ? (

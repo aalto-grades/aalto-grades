@@ -68,18 +68,21 @@ const FinalGradeCell = ({
           userId={user.id}
           finalGrades={finalGrades}
           title={
-            <Trans
-              i18nKey={
-                user.name
-                  ? 'course.results.final-of-full'
-                  : 'course.results.final-of'
-              }
-              components={{bold: <strong />}}
-              values={{
-                studentNumber,
-                name: user.name,
-              }}
-            />
+            <>
+              {`${t('course.results.final-for')}, `}
+              <Trans
+                i18nKey={
+                  user.name
+                    ? 'course.results.number-and-name'
+                    : 'course.results.number-no-name'
+                }
+                components={{bold: <strong />}}
+                values={{
+                  studentNumber,
+                  name: user.name,
+                }}
+              />
+            </>
           }
         />
       )}
