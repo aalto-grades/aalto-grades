@@ -519,6 +519,20 @@ export const GradesTableProvider = ({
           {
             header: source.name,
             meta: {PrettyChipPosition: 'alone', coursePart: true},
+            getGroupingValue: row => {
+              if (finalGradeModelSelected) {
+                // case coursePart, one grade only
+                return coursePartValues[row.user.id][source.id];
+              }
+              // case courseTask, multiple grades
+              const task = row.courseTasks.find(
+                rowCourseTask => rowCourseTask.courseTaskId === source.id
+              )!;
+              return findBestGrade(
+                task.grades,
+                getCoursePartExpiryDateFromTaskId(task.courseTaskId)
+              )?.grade;
+            },
             sortingFn: (rowA, rowB, colId) => {
               const a = rowA.getValue<GradeCellSourceValue>(colId);
               const b = rowB.getValue<GradeCellSourceValue>(colId);
