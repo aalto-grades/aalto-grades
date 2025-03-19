@@ -209,7 +209,8 @@
     "search": "UNTRANSLATED",
     "final-grades": "UNTRANSLATED",
     "course-part-grade": "UNTRANSLATED",
-    "not-int": "UNTRANSLATED"
+    "not-int": "UNTRANSLATED",
+    "backdrop-dismiss-disabled": "UNTRANSLATED"
   },
   "course": {
     "parts": {
@@ -360,6 +361,8 @@
         "csv-column": "UNTRANSLATED",
         "import-as": "UNTRANSLATED",
         "ignore-column": "UNTRANSLATED",
+        "ignored": "UNTRANSLATED",
+        "ignore": "UNTRANSLATED?",
         "grades-added": "UNTRANSLATED",
         "completion-date": "UNTRANSLATED",
         "expiration-date": "UNTRANSLATED",

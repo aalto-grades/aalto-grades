@@ -209,7 +209,8 @@
     "search": "search",
     "final-grades": "Final grades",
     "course-part-grade": "Course Part Grade",
-    "not-int": "Value must be a valid integer"
+    "not-int": "Value must be a valid integer",
+    "backdrop-dismiss-disabled": "Backdrop click disabled, use close buttons!"
   },
   "course": {
     "parts": {
@@ -360,6 +361,8 @@
         "csv-column": "CSV column",
         "import-as": "Import as",
         "ignore-column": "Ignore column",
+        "ignored": "Ignored",
+        "ignore": "Ignore",
         "grades-added": "Grades added successfully",
         "completion-date": "Completion date",
         "expiration-date": "Expiration date",

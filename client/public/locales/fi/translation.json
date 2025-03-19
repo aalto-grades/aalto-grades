@@ -209,7 +209,8 @@
     "search": "Haku",
     "final-grades": "Lopulliset arvosanat",
     "course-part-grade": "Kurssin osan arvosana",
-    "not-int": "Arvon on oltava validi kokonaisluku"
+    "not-int": "Arvon on oltava validi kokonaisluku",
+    "backdrop-dismiss-disabled": "Taustaklikkaus pois käytöstä, käytä sulkemispainikkeita!"
   },
   "course": {
     "parts": {
@@ -360,6 +361,8 @@
         "csv-column": "CSV-sarake",
         "import-as": "Tuo nimellä",
         "ignore-column": "Ohita sarake",
+        "ignored": "Ohitettu",
+        "ignore": "Ohita",
         "grades-added": "Arvosanat lisätty onnistuneesti",
         "completion-date": "Suorituspäivämäärä",
         "expiration-date": "Vanhentumispäivämäärä",
