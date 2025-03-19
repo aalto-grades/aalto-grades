@@ -198,6 +198,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       open={open}
       onClose={onClose}
       fullWidth
+      disableBackdropClick
       maxWidth="xl"
       disableCloseButton={isPending}
     >
