@@ -37,11 +37,11 @@ const FormLanguagesField = ({
         <FormField
           key={language.value}
           form={form}
-          value={DOMPurify.sanitize(valueFormat.replace('%', language.value))}
+          value={DOMPurify.sanitize(valueFormat.replace(/%/g, language.value))}
           disabled={disabled || form.isSubmitting}
-          label={DOMPurify.sanitize(labelFormat.replace('%', language.name))}
+          label={DOMPurify.sanitize(labelFormat.replace(/%/g, language.name))}
           helperText={DOMPurify.sanitize(
-            helperTextFormat.replace('%', language.name)
+            helperTextFormat.replace(/%/g, language.name)
           )}
         />
       ))}
