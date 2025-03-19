@@ -117,6 +117,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     {
       field: 'actions',
       type: 'actions',
+      headerName: t('general.delete'),
       getActions: params => [
         <GridActionsCellItem
           key={params.id}
