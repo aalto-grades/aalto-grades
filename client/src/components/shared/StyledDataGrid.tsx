@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {darken, lighten, styled} from '@mui/material';
+import {type Theme, darken, lighten, styled} from '@mui/material';
 import type {GridRowClassNameParams, GridValidRowModel} from '@mui/x-data-grid';
 
 import DataGridBase from '@/components/shared/DataGridBase';
@@ -17,42 +17,54 @@ export type GetRowClassName = (
   params: GridRowClassNameParams<GridValidRowModel>
 ) => string;
 
-const getBackgroundColor = (color: string, mode: string): string =>
-  mode === 'dark' ? darken(color, 0.7) : lighten(color, 0.7);
+const coefficients = {
+  default: 0.4,
+  hover: 0.2,
+  selected: 0.6,
+  selectedHover: 0.5,
+};
 
-const getHoverBackgroundColor = (color: string, mode: string): string =>
-  mode === 'dark' ? darken(color, 0.6) : lighten(color, 0.6);
-
-const getSelectedBackgroundColor = (color: string, mode: string): string =>
-  mode === 'dark' ? darken(color, 0.5) : lighten(color, 0.5);
-
-const getSelectedHoverBackgroundColor = (
+const getBackgroundColor = (
   color: string,
-  mode: string
-): string => (mode === 'dark' ? darken(color, 0.4) : lighten(color, 0.4));
+  theme: Theme,
+  state: 'default' | 'hover' | 'selected' | 'selectedHover'
+) => {
+  const coefficient = coefficients[state];
+
+  return {
+    backgroundColor: darken(color, coefficient),
+    ...theme.applyStyles('light', {
+      backgroundColor: lighten(color, coefficient),
+    }),
+  };
+};
 
 const StyledDataGrid = styled(DataGridBase)(({theme}) => ({
-  '& .invalid-value-data-grid': {
-    backgroundColor: getBackgroundColor(
-      theme.palette.error.main,
-      theme.palette.mode
-    ),
+  '& .row-selected': {
+    ...getBackgroundColor(theme.palette.success.light, theme, 'default'),
     '&:hover': {
-      backgroundColor: getHoverBackgroundColor(
-        theme.palette.error.main,
-        theme.palette.mode
-      ),
+      ...getBackgroundColor(theme.palette.success.light, theme, 'hover'),
     },
     '&.Mui-selected': {
-      backgroundColor: getSelectedBackgroundColor(
-        theme.palette.error.main,
-        theme.palette.mode
-      ),
+      ...getBackgroundColor(theme.palette.success.main, theme, 'selected'),
       '&:hover': {
-        backgroundColor: getSelectedHoverBackgroundColor(
-          theme.palette.error.main,
-          theme.palette.mode
+        ...getBackgroundColor(
+          theme.palette.success.main,
+          theme,
+          'selectedHover'
         ),
+      },
+    },
+  },
+  '& .invalid-value-data-grid': {
+    ...getBackgroundColor(theme.palette.error.main, theme, 'default'),
+    '&:hover': {
+      ...getBackgroundColor(theme.palette.error.main, theme, 'hover'),
+    },
+    '&.Mui-selected': {
+      ...getBackgroundColor(theme.palette.error.main, theme, 'selected'),
+      '&:hover': {
+        ...getBackgroundColor(theme.palette.error.main, theme, 'selectedHover'),
       },
     },
   },

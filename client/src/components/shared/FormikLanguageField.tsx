@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {default as DOMPurify} from 'dompurify';
 import type {FormikProps} from 'formik';
 import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -36,10 +37,12 @@ const FormLanguagesField = ({
         <FormField
           key={language.value}
           form={form}
-          value={valueFormat.replace('%', language.value)}
+          value={DOMPurify.sanitize(valueFormat.replace(/%/g, language.value))}
           disabled={disabled || form.isSubmitting}
-          label={labelFormat.replace('%', language.name)}
-          helperText={helperTextFormat.replace('%', language.name)}
+          label={DOMPurify.sanitize(labelFormat.replace(/%/g, language.name))}
+          helperText={DOMPurify.sanitize(
+            helperTextFormat.replace(/%/g, language.name)
+          )}
         />
       ))}
     </>
