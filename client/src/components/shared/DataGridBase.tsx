@@ -12,9 +12,10 @@ import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
 // Load correct translations to the x-data-grid.
+// Note, MUI X DataGrid `pageSize` cannot exceed 100 in the MIT version of the DataGrid.
 // ref. https://mui.com/x/react-data-grid/localization/
 const DataGridBase = (props: DataGridProps): JSX.Element => {
-  const {i18n} = useTranslation();
+  const {t, i18n} = useTranslation();
 
   const getLocales = (): Partial<GridLocaleText> => {
     switch (i18n.language) {
@@ -27,7 +28,13 @@ const DataGridBase = (props: DataGridProps): JSX.Element => {
     }
   };
 
-  return <DataGrid localeText={getLocales()} {...props} />;
+  return (
+    <DataGrid
+      localeText={getLocales()}
+      pageSizeOptions={[25, 50, 100, {value: -1, label: t('general.all')}]}
+      {...props}
+    />
+  );
 };
 
 export default DataGridBase;

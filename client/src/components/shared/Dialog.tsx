@@ -11,7 +11,8 @@ import {
   styled,
 } from '@mui/material';
 import type {DialogProps} from '@mui/material/Dialog';
-import type {JSX} from 'react';
+import {enqueueSnackbar} from 'notistack';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 const CloseButton = styled(IconButton)(({theme}) => ({
@@ -28,21 +29,43 @@ type PropsType = {
   open: boolean;
   onClose: () => void;
   disableCloseButton?: boolean;
+  disableBackdropClick?: boolean;
 } & DialogProps;
 
 const Dialog = ({
   open,
   onClose,
   disableCloseButton = false,
+  disableBackdropClick = false,
   children,
   ...props
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
+  const [backdropClickCount, setBackdropClickCount] = useState<number>(0);
+
+  const handleClose = (
+    _event?: object,
+    reason?: 'backdropClick' | 'escapeKeyDown'
+  ): void => {
+    if (reason === 'backdropClick' && disableBackdropClick) {
+      if (backdropClickCount >= 2) {
+        setBackdropClickCount(0);
+        enqueueSnackbar(t('general.backdrop-dismiss-disabled'), {
+          variant: 'warning',
+        });
+      } else {
+        setBackdropClickCount(prev => ++prev);
+      }
+      return;
+    }
+    onClose();
+  };
 
   return (
-    <MuiDialog open={open} onClose={onClose} {...props}>
+    <MuiDialog open={open} onClose={handleClose} {...props}>
       <Tooltip title={t('general.close-window')} placement="top">
         <CloseButton
+          data-testid="dialog-close-button"
           disabled={disableCloseButton}
           onClick={onClose}
           aria-label="close-dialog"

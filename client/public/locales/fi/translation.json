@@ -122,6 +122,7 @@
   "general": {
     "a+-api-token": "A+ API-käyttöoikeustietue",
     "a+-courses": "A+ kurssit",
+    "all": "Kaikki",
     "next": "Seuraava",
     "back": "Takaisin",
     "name": "Nimi",
@@ -209,15 +210,18 @@
     "search": "Haku",
     "final-grades": "Lopulliset arvosanat",
     "course-part-grade": "Kurssin osan arvosana",
-    "not-int": "Arvon on oltava validi kokonaisluku"
+    "not-int": "Arvon on oltava validi kokonaisluku",
+    "backdrop-dismiss-disabled": "Taustaklikkaus pois käytöstä, käytä sulkemispainikkeita!"
   },
   "course": {
     "parts": {
       "select-grade-source": "Valitse arvosanalähde",
       "create": {
-        "title": "Luo kurssin osa",
+        "edit-title": "Muokkaa kurssin osa - {{name}}",
+        "create-title": "Luo kurssin osa",
         "name-help": "Syötä kurssin osan nimi",
-        "expiry-date-valid-help": "Syötä validi voimassaolopäivä"
+        "expiry-date-valid-help": "Syötä validi voimassaoloaika",
+        "previously-used-dates": "Viimeksi käytetyt päivämäärät:"
       },
       "select-grade-sources": "Valitse arvosanalähteet",
       "create-tasks": "Luo tehtäviä",
@@ -228,7 +232,7 @@
       "fetching-grades": "Haetaan arvosanoja",
       "fetching-grades-wait": "Odota, haetaan arvosanoja...",
       "not-found": "Kurssin osia ei löytynyt",
-      "no-expiry-date": "Ei voimassaolopäivää",
+      "no-expiry-date": "Ei voimassaoloaikaa",
       "delete-with-model-message": "Tämä sisältää arviointimallin, poistetaanko?",
       "delete-with-task-message": "Tämä sisältää tehtäviä, poistetaanko?",
       "delete-message": "Haluatko varmasti poistaa?",
@@ -360,6 +364,8 @@
         "csv-column": "CSV-sarake",
         "import-as": "Tuo nimellä",
         "ignore-column": "Ohita sarake",
+        "ignored": "Ohitettu",
+        "ignore": "Ohita",
         "grades-added": "Arvosanat lisätty onnistuneesti",
         "completion-date": "Suorituspäivämäärä",
         "expiration-date": "Vanhentumispäivämäärä",
@@ -381,7 +387,8 @@
         "download-excel-template": "Lataa Excel-pohja",
         "add-manually": "Tai lisää ne manuaalisesti",
         "student-number-empty": "Opiskelijanumero ei voi olla tyhjä",
-        "modify-selected": "Muokkaa valittuja",
+        "modify-completion": "Muokkaa Suorituspäivämäärä",
+        "modify-expiration": "Muokkaa vanhentumispäivämäärä",
         "bulk-edit-dialog-title": "Aseta päivämäärä valituille kurssin osille",
         "resolve-errors": "Korjaa virheet jatkaaksesi"
       },

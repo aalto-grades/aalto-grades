@@ -117,6 +117,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     {
       field: 'actions',
       type: 'actions',
+      headerName: t('general.delete'),
       getActions: params => [
         <GridActionsCellItem
           key={params.id}
@@ -198,6 +199,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
       open={open}
       onClose={onClose}
       fullWidth
+      disableBackdropClick
       maxWidth="xl"
       disableCloseButton={isPending}
     >

@@ -124,6 +124,9 @@ const MismatchDialog = ({
               <TableRow>
                 <TableCell>{t('course.results.upload.csv-column')}</TableCell>
                 <TableCell>{t('course.results.upload.import-as')}</TableCell>
+                <TableCell>
+                  {t('course.results.upload.ignore-column')}
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -176,6 +179,21 @@ const MismatchDialog = ({
                         </MenuItem>
                       </Select>
                     </FormControl>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      disabled={selections[key] === 'ignoreColumn'}
+                      onClick={() =>
+                        setSelections(oldSelections => ({
+                          ...oldSelections,
+                          [key]: 'ignoreColumn',
+                        }))
+                      }
+                    >
+                      {selections[key] === 'ignoreColumn'
+                        ? t('course.results.upload.ignored')
+                        : t('course.results.upload.ignore')}
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

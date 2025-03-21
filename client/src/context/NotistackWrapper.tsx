@@ -19,7 +19,10 @@ const NotistackWrapper = (): JSX.Element => {
       anchorOrigin={POSITION}
       preventDuplicate
       action={key => (
-        <IconButton onClick={() => closeSnackbar(key)}>
+        <IconButton
+          data-testid="snackbar-close-button"
+          onClick={() => closeSnackbar(key)}
+        >
           <CloseIcon />
         </IconButton>
       )}
