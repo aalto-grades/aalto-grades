@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import {type Page, expect} from '@playwright/test';
-import path from 'path';
 
 import {randomEmail} from './user';
 
@@ -132,16 +131,10 @@ export const viewCourseParts = async (page: Page): Promise<void> => {
   await expect(page.getByText('Exercises 2024')).toBeVisible();
 };
 
-export const addCoursePart = async (page: Page): Promise<void> => {
-  const coursePartName = randomName();
-
-  await page.getByRole('cell', {name: 'O1'}).click();
-  await page
-    .getByRole('link', {name: 'Course parts'})
-    .getByRole('button')
-    .click();
-  await expect(page.getByText('Days valid')).toBeVisible();
-  await expect(page.getByText('Exercises 2024')).toBeVisible();
+export const addOneCoursePart = async (
+  page: Page,
+  coursePartName: string
+): Promise<string> => {
   await page.getByRole('button', {name: 'Add new course part'}).click();
   await page.getByLabel('Name*').click();
   await page.getByLabel('Name*').fill(coursePartName);
@@ -149,88 +142,47 @@ export const addCoursePart = async (page: Page): Promise<void> => {
   await expect(
     page.getByRole('button', {name: `${coursePartName} No expiry date`})
   ).toBeVisible();
+  return coursePartName;
 };
 
-export const downloadCSVTemplate = async (page: Page): Promise<void> => {
+export const addCoursePart = async (page: Page): Promise<void> => {
   await page.getByRole('cell', {name: 'O1'}).click();
-  const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', {name: 'Add grades manually'}).click();
-  await page.getByRole('button', {name: 'Exercises 2024'}).click();
-  await page.getByText('Download CSV template').click();
-  const download = await downloadPromise;
-  expect(download.suggestedFilename()).toBe('template.csv');
+  await page
+    .getByRole('link', {name: 'Course parts'})
+    .getByRole('button')
+    .click();
+  await expect(page.getByText('Days valid')).toBeVisible();
+  await expect(page.getByText('Exercises 2024')).toBeVisible();
+  const coursePartName = await addOneCoursePart(page, randomName());
+  await expect(
+    page.getByRole('button', {name: `${coursePartName} No expiry date`})
+  ).toBeVisible();
 };
 
-export const downloadExcelTemplate = async (page: Page): Promise<void> => {
+export const editCoursePart = async (page: Page): Promise<void> => {
   await page.getByRole('cell', {name: 'O1'}).click();
-  const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', {name: 'Add grades manually'}).click();
-  await page.getByRole('button', {name: 'Exercises 2024'}).click();
-  await page.getByRole('button', {name: 'Download Excel template'}).click();
-  const download = await downloadPromise;
-  expect(download.suggestedFilename()).toBe('template.xlsx');
-};
-
-const testConfirmGradeUpload = async (
-  page: Page,
-  studentNumbers: string[]
-): Promise<void> => {
-  const testBulkModify = async (
-    type: 'completion' | 'expiration',
-    day: string
-  ): Promise<void> => {
-    await page.getByRole('button', {name: `Modify ${type}`}).isDisabled();
-    await page.getByLabel(`${type} date`).check();
-    await page.getByRole('button', {name: `Modify ${type}`}).isEnabled();
-    await page.getByLabel(`${type} date`).uncheck();
-    await page.getByRole('button', {name: `Modify ${type}`}).isDisabled();
-    await page.getByTestId(`${type}Date-checkbox-Tier B`).click();
-    await page.getByRole('button', {name: `Modify ${type}`}).click();
-    await page.getByRole('gridcell', {name: day}).click();
-    await page.getByRole('button', {name: 'done'}).click();
-  };
-  for (const name of studentNumbers) {
-    await expect(page.getByRole('row', {name})).toBeVisible();
-  }
-  await page.getByRole('button', {name: 'Next'}).nth(1).click();
-  await testBulkModify('completion', '23');
-  await testBulkModify('expiration', '24');
-  await page.getByRole('button', {name: 'confirm'}).nth(1).click();
-  await page.getByRole('button', {name: 'submit'}).click();
-  await page.waitForTimeout(1000);
-  await page.getByTestId('snackbar-close-button').click();
-  for (const name of studentNumbers) {
-    await expect(page.getByRole('row', {name})).toBeVisible();
-  }
-};
-
-export const importGradesWithFile = async (
-  page: Page,
-  type: 'xlsx' | 'csv'
-): Promise<void> => {
-  await page.getByRole('cell', {name: 'O1'}).click();
-  const fileChooserPromise = page.waitForEvent('filechooser');
-  await page.getByRole('button', {name: 'Add grades manually'}).click();
-  await page.getByRole('button', {name: 'Exercises 2024'}).click();
-  await page.getByRole('button', {name: 'Upload CSV or Excel file'}).click();
-  const fileChooser = await fileChooserPromise;
-  await fileChooser.setFiles(path.join(__dirname, `../files/grades.${type}`));
-  await testConfirmGradeUpload(page, ['131433', '487458', '487258', '497458']);
-};
-
-export const importGradesWithText = async (page: Page): Promise<void> => {
-  const input = `studentNo,Tier A,Tier B,Tier C
-  177756,1,1,1
-  423896,1,1,1
-  643456,1,1,1`;
-
-  await page.getByRole('cell', {name: 'O1'}).click();
-  await page.getByRole('button', {name: 'Add grades manually'}).click();
-  await page.getByRole('button', {name: 'Exercises 2024'}).click();
-  await page.getByRole('button', {name: 'Paste text'}).click();
-  await page.getByPlaceholder('Input raw text here').fill(input);
-  await page.getByRole('button', {name: 'Import'}).click();
-  await testConfirmGradeUpload(page, ['177756', '423896', '643456']);
+  await page
+    .getByRole('link', {name: 'Course parts'})
+    .getByRole('button')
+    .click();
+  await expect(page.getByText('Days valid')).toBeVisible();
+  const coursePartName = await addOneCoursePart(page, randomName());
+  const newCoursePartName = randomName();
+  await page.getByTestId(`edit-course-part-${coursePartName}`).click();
+  await page.getByLabel('Name*').click();
+  await page.getByLabel('Name*').fill(newCoursePartName);
+  await page.getByLabel('Expiry date').click();
+  await page.keyboard.type('01012025');
+  await page.getByRole('button', {name: 'Save'}).click();
+  await page.getByTestId(`edit-course-part-${newCoursePartName}`).click();
+  await expect(page.getByText('Previously used dates:')).toBeVisible();
+  await expect(page.getByText('1.1.2025')).toBeVisible();
+  await page.getByRole('button', {name: 'no expiry date'}).click();
+  await page.getByRole('button', {name: 'Save'}).click();
+  await expect(
+    page.getByRole('button', {name: `${newCoursePartName} No expiry date`})
+  ).toBeVisible();
+  await expect(page.getByText(coursePartName)).not.toBeVisible();
 };
 
 export const warnDialogIfBackdropClickDisabled = async (

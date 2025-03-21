@@ -9,16 +9,19 @@ import {
   checkCourse,
   createCourse,
   createGradingModel,
-  downloadCSVTemplate,
-  downloadExcelTemplate,
   editCourse,
+  editCoursePart,
   importCourseDataFromSisu,
-  importGradesWithFile,
-  importGradesWithText,
   viewCourseParts,
   viewGradingModel,
   warnDialogIfBackdropClickDisabled,
 } from './common/course';
+import {
+  downloadCSVGradeTemplate,
+  downloadExcelGradeTemplate,
+  importGradesWithFile,
+  importGradesWithText,
+} from './common/grades';
 import {aPlusToken} from './common/token';
 import {logOut} from './common/user';
 import {setupDb} from './helper';
@@ -55,11 +58,11 @@ test.describe('Test courses as teacher', () => {
   });
 
   test('Download grades CSV template', async ({page}) => {
-    await downloadCSVTemplate(page);
+    await downloadCSVGradeTemplate(page);
   });
 
   test('Download grades excel template', async ({page}) => {
-    await downloadExcelTemplate(page);
+    await downloadExcelGradeTemplate(page);
   });
 
   test('Import grades using CSV file', async ({page}) => {
@@ -88,6 +91,10 @@ test.describe('Test courses as teacher', () => {
 
   test('Add Course Part', async ({page}) => {
     await addCoursePart(page);
+  });
+
+  test('Edit Course Part', async ({page}) => {
+    await editCoursePart(page);
   });
 
   test('Import course from Sisu', async ({page}) => {

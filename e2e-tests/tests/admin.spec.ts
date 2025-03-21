@@ -9,15 +9,19 @@ import {
   checkCourse,
   createCourse,
   createGradingModel,
-  downloadCSVTemplate,
-  downloadExcelTemplate,
   editCourse,
+  editCoursePart,
   importCourseDataFromSisu,
-  importGradesWithFile,
-  importGradesWithText,
   viewCourseParts,
   viewGradingModel,
+  warnDialogIfBackdropClickDisabled,
 } from './common/course';
+import {
+  downloadCSVGradeTemplate,
+  downloadExcelGradeTemplate,
+  importGradesWithFile,
+  importGradesWithText,
+} from './common/grades';
 import {aPlusToken} from './common/token';
 import {addUser, logOut} from './common/user';
 import {setupDb} from './helper';
@@ -78,6 +82,10 @@ test.describe('Test courses as admin', () => {
     await addCoursePart(page);
   });
 
+  test('Edit Course Part', async ({page}) => {
+    await editCoursePart(page);
+  });
+
   test('View grading model', async ({page}) => {
     await viewGradingModel(page);
   });
@@ -87,11 +95,11 @@ test.describe('Test courses as admin', () => {
   });
 
   test('Download grades CSV template', async ({page}) => {
-    await downloadCSVTemplate(page);
+    await downloadCSVGradeTemplate(page);
   });
 
   test('Download grades excel template', async ({page}) => {
-    await downloadExcelTemplate(page);
+    await downloadExcelGradeTemplate(page);
   });
 
   test('Import grades using CSV file', async ({page}) => {
@@ -104,6 +112,10 @@ test.describe('Test courses as admin', () => {
 
   test('Import grades by pasting text', async ({page}) => {
     await importGradesWithText(page);
+  });
+
+  test('Show warn dialog if backdrop click disabled', async ({page}) => {
+    await warnDialogIfBackdropClickDisabled(page);
   });
 
   test('Import course from Sisu', async ({page}) => {
