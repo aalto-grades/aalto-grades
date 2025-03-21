@@ -171,28 +171,51 @@ export const downloadExcelTemplate = async (page: Page): Promise<void> => {
   expect(download.suggestedFilename()).toBe('template.xlsx');
 };
 
-export const importGradesWithCSV = async (page: Page): Promise<void> => {
-  await page.getByRole('cell', {name: 'O1'}).click();
-  const fileChooserPromise = page.waitForEvent('filechooser');
-  await page.getByRole('button', {name: 'Add grades manually'}).click();
-  await page.getByRole('button', {name: 'Exercises 2024'}).click();
-  await page.getByRole('button', {name: 'Upload CSV or Excel file'}).click();
-  const fileChooser = await fileChooserPromise;
-  await fileChooser.setFiles(path.join(__dirname, '../files/grades.csv'));
-  // Check that student number from grades example CSV is loaded to the edit table
-  await expect(page.getByRole('row', {name: '993456'})).toBeVisible();
+const testConfirmGradeUpload = async (
+  page: Page,
+  studentNumbers: string[]
+): Promise<void> => {
+  const testBulkModify = async (
+    type: 'completion' | 'expiration',
+    day: string
+  ): Promise<void> => {
+    await page.getByRole('button', {name: `Modify ${type}`}).isDisabled();
+    await page.getByLabel(`${type} date`).check();
+    await page.getByRole('button', {name: `Modify ${type}`}).isEnabled();
+    await page.getByLabel(`${type} date`).uncheck();
+    await page.getByRole('button', {name: `Modify ${type}`}).isDisabled();
+    await page.getByTestId(`${type}Date-checkbox-Tier B`).click();
+    await page.getByRole('button', {name: `Modify ${type}`}).click();
+    await page.getByRole('gridcell', {name: day}).click();
+    await page.getByRole('button', {name: 'done'}).click();
+  };
+  for (const name of studentNumbers) {
+    await expect(page.getByRole('row', {name})).toBeVisible();
+  }
+  await page.getByRole('button', {name: 'Next'}).nth(1).click();
+  await testBulkModify('completion', '23');
+  await testBulkModify('expiration', '24');
+  await page.getByRole('button', {name: 'confirm'}).nth(1).click();
+  await page.getByRole('button', {name: 'submit'}).click();
+  await page.waitForTimeout(1000);
+  await page.getByTestId('snackbar-close-button').click();
+  for (const name of studentNumbers) {
+    await expect(page.getByRole('row', {name})).toBeVisible();
+  }
 };
 
-export const importGradesWithExcel = async (page: Page): Promise<void> => {
+export const importGradesWithFile = async (
+  page: Page,
+  type: 'xlsx' | 'csv'
+): Promise<void> => {
   await page.getByRole('cell', {name: 'O1'}).click();
   const fileChooserPromise = page.waitForEvent('filechooser');
   await page.getByRole('button', {name: 'Add grades manually'}).click();
   await page.getByRole('button', {name: 'Exercises 2024'}).click();
   await page.getByRole('button', {name: 'Upload CSV or Excel file'}).click();
   const fileChooser = await fileChooserPromise;
-  await fileChooser.setFiles(path.join(__dirname, '../files/grades.xlsx'));
-  // Check that student number from grades example Excel file is loaded to the edit table
-  await expect(page.getByRole('row', {name: '487258'})).toBeVisible();
+  await fileChooser.setFiles(path.join(__dirname, `../files/grades.${type}`));
+  await testConfirmGradeUpload(page, ['131433', '487458', '487258', '497458']);
 };
 
 export const importGradesWithText = async (page: Page): Promise<void> => {
@@ -207,8 +230,26 @@ export const importGradesWithText = async (page: Page): Promise<void> => {
   await page.getByRole('button', {name: 'Paste text'}).click();
   await page.getByPlaceholder('Input raw text here').fill(input);
   await page.getByRole('button', {name: 'Import'}).click();
-  // Check that student number from pasted text is loaded to the edit table
-  await expect(page.getByRole('row', {name: '423896'})).toBeVisible();
+  await testConfirmGradeUpload(page, ['177756', '423896', '643456']);
+};
+
+export const warnDialogIfBackdropClickDisabled = async (
+  page: Page
+): Promise<void> => {
+  await page.getByRole('cell', {name: 'O1'}).click();
+  await page.getByRole('button', {name: 'Add grades manually'}).click();
+  await page.getByRole('button', {name: 'Exercises 2024'}).click();
+
+  // Simulate user trying to click outside the dialog window in order to close the dialog box
+  await page.mouse.click(1, 1);
+  await page.mouse.click(1, 1);
+  await page.mouse.click(1, 1);
+
+  await expect(
+    page.getByText('Backdrop click disabled, use close buttons!')
+  ).toBeVisible();
+  await page.getByTestId('snackbar-close-button').click();
+  await page.getByTestId('dialog-close-button').click();
 };
 
 export const importCourseDataFromSisu = async (

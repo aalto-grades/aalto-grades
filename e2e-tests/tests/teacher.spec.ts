@@ -17,6 +17,7 @@ import {
   importGradesWithText,
   viewCourseParts,
   viewGradingModel,
+  warnDialogIfBackdropClickDisabled,
 } from './common/course';
 import {aPlusToken} from './common/token';
 import {logOut} from './common/user';
@@ -71,6 +72,10 @@ test.describe('Test courses as teacher', () => {
 
   test('Import grades by pasting text', async ({page}) => {
     await importGradesWithText(page);
+  });
+
+  test('Show warn dialog if backdrop click disabled', async ({page}) => {
+    await warnDialogIfBackdropClickDisabled(page);
   });
 
   test('View grading model', async ({page}) => {
