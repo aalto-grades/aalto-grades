@@ -217,7 +217,8 @@
     "parts": {
       "select-grade-source": "Select grade source",
       "create": {
-        "title": "Create new course part",
+        "edit-title": "Edit course part - {{name}}",
+        "create-title": "Create new course part",
         "name-help": "Course part name",
         "expiry-date-valid-help": "Course part expiration date"
       },

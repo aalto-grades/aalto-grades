@@ -217,7 +217,8 @@
     "parts": {
       "select-grade-source": "UNTRANSLATED",
       "create": {
-        "title": "UNTRANSLATED",
+        "edit-title": "UNTRANSLATED",
+        "create-title": "UNTRANSLATED",
         "name-help": "UNTRANSLATED",
         "expiry-date-valid-help": "UNTRANSLATED"
       },

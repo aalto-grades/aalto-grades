@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 The Ossi Developers
+// SPDX-FileCopyrightText: 2025 The Ossi Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -14,22 +14,34 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 
+import type {CoursePartData} from '@/common/types';
 import FormField from '@/components/shared/FormikField';
-import {useAddCoursePart} from '@/hooks/useApi';
+import {useAddCoursePart, useEditCoursePart} from '@/hooks/useApi';
 import {nullableDateSchema} from '@/types';
 
 type FormData = {name: string; expiryDate: string | null};
-const initialValues: FormData = {name: '', expiryDate: null};
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
+  type: 'edit' | 'new';
+  coursePart?: CoursePartData | null;
 };
-const NewCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
+const CoursePartDialog = ({
+  open,
+  onClose,
+  type,
+  coursePart = null,
+}: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const addCoursePart = useAddCoursePart(courseId);
+  const editCoursePart = useEditCoursePart(courseId);
 
+  const initialValues: FormData = {
+    name: coursePart?.name ?? '',
+    expiryDate: coursePart?.expiryDate?.toISOString().split('T')[0] ?? null,
+  };
   const ValidationSchema = z.strictObject({
     name: z.string().min(1),
     expiryDate: nullableDateSchema(t),
@@ -41,10 +53,20 @@ const NewCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
   ): Promise<void> => {
     const parsedValues = ValidationSchema.parse(values);
     try {
-      await addCoursePart.mutateAsync({
-        name: parsedValues.name,
-        expiryDate: parsedValues.expiryDate,
-      });
+      if (type === 'edit') {
+        await editCoursePart.mutateAsync({
+          coursePartId: coursePart!.id,
+          coursePart: {
+            name: parsedValues.name,
+            expiryDate: parsedValues.expiryDate,
+          },
+        });
+      } else {
+        await addCoursePart.mutateAsync({
+          name: parsedValues.name,
+          expiryDate: parsedValues.expiryDate,
+        });
+      }
     } catch {
       setSubmitting(false);
       return;
@@ -73,6 +95,7 @@ const NewCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
       initialValues={initialValues}
       validate={validateForm}
       onSubmit={onSubmit}
+      enableReinitialize={type === 'edit'}
     >
       {form => (
         <Dialog
@@ -84,7 +107,11 @@ const NewCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
           fullWidth
           maxWidth="xs"
         >
-          <DialogTitle>{t('course.parts.create.title')}</DialogTitle>
+          <DialogTitle>
+            {type === 'edit'
+              ? t('course.parts.create.edit-title', {name: coursePart?.name})
+              : t('course.parts.create.create-title')}
+          </DialogTitle>
           <DialogContent>
             <FormField
               form={form as unknown as FormikProps<{[key: string]: unknown}>}
@@ -126,4 +153,4 @@ const NewCoursePartDialog = ({open, onClose}: PropsType): JSX.Element => {
   );
 };
 
-export default NewCoursePartDialog;
+export default CoursePartDialog;

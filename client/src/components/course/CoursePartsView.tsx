@@ -60,9 +60,8 @@ import {
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import AddAplusGradeSourceDialog from './course-parts-view/AddAplusGradeSourceDialog';
-import EditCoursePartDialog from './course-parts-view/EditCoursePartDialog';
+import CoursePartDialog from './course-parts-view/CoursePartDialog';
 import NewAplusCourseTasksDialog from './course-parts-view/NewAplusCourseTasksDialog';
-import NewCoursePartDialog from './course-parts-view/NewCoursePartDialog';
 import ViewAplusGradeSourcesDialog from './course-parts-view/ViewAplusGradeSourcesDialog';
 
 type ColTypes = {
@@ -572,11 +571,13 @@ const CoursePartsView = (): JSX.Element => {
 
   return (
     <>
-      <NewCoursePartDialog
+      <CoursePartDialog
+        type="new"
         open={addPartDialogOpen}
         onClose={() => setAddPartDialogOpen(false)}
       />
-      <EditCoursePartDialog
+      <CoursePartDialog
+        type="edit"
         open={editPartDialogOpen}
         onClose={() => setEditPartDialogOpen(false)}
         coursePart={editPart}

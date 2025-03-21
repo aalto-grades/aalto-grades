@@ -217,7 +217,8 @@
     "parts": {
       "select-grade-source": "Valitse arvosanalähde",
       "create": {
-        "title": "Luo kurssin osa",
+        "edit-title": "Luo kurssin osa",
+        "create-title": "Muokkaa kurssin osa - {{name}}",
         "name-help": "Syötä kurssin osan nimi",
         "expiry-date-valid-help": "Syötä validi voimassaolopäivä"
       },
