@@ -320,9 +320,11 @@ const CoursePartsView = (): JSX.Element => {
 
   const ArchivalButton = ({
     archived,
+    name,
     onClick,
   }: {
     archived: boolean;
+    name: string;
     onClick?: () => void;
   }): JSX.Element => {
     return (
@@ -332,7 +334,10 @@ const CoursePartsView = (): JSX.Element => {
           archived ? t('course.parts.unarchive') : t('course.parts.archive')
         }
       >
-        <IconButton onClick={onClick}>
+        <IconButton
+          data-testid={`archive-course-part-${name}`}
+          onClick={onClick}
+        >
           {archived ? <Unarchive /> : <Archive />}
         </IconButton>
       </Tooltip>
@@ -383,6 +388,7 @@ const CoursePartsView = (): JSX.Element => {
             <>
               <Tooltip placement="top" title={t('course.parts.edit-part')}>
                 <IconButton
+                  data-testid={`edit-course-part-${coursePart.name}`}
                   onClick={() => {
                     setEditPart(coursePart);
                     setEditPartDialogOpen(true);
@@ -392,6 +398,7 @@ const CoursePartsView = (): JSX.Element => {
                 </IconButton>
               </Tooltip>
               <ArchivalButton
+                name={coursePart.name}
                 archived={coursePart.archived}
                 onClick={() => {
                   editCoursePart.mutate({
@@ -433,7 +440,12 @@ const CoursePartsView = (): JSX.Element => {
     if (params.row.coursePartId !== -1) {
       elements.push(
         <GridActionsCellItem
-          icon={<ArchivalButton archived={params.row.archived} />}
+          icon={
+            <ArchivalButton
+              name={params.row.name}
+              archived={params.row.archived}
+            />
+          }
           label={
             params.row.archived
               ? t('course.parts.unarchive')
