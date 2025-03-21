@@ -387,7 +387,8 @@
         "download-excel-template": "Download Excel template",
         "add-manually": "Or add them manually",
         "student-number-empty": "Student number cannot be empty",
-        "modify-selected": "Modify selected",
+        "modify-completion": "Modify completion",
+        "modify-expiration": "Modify expiration",
         "bulk-edit-dialog-title": "Set date to selected course parts",
         "resolve-errors": "Resolve errors to continue"
       },

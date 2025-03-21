@@ -14,6 +14,7 @@ import {
   Checkbox,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   Table,
   TableBody,
   TableCell,
@@ -226,12 +227,16 @@ const UploadDialogConfirm = ({
               <TableCell>{t('general.course-part')}</TableCell>
               <TableCell>
                 {colDates.length > 1 && (
-                  <Checkbox
-                    onChange={e => selectAll(e, setEditCompletionDates)}
-                    checked={colDates.length === editCompletionDates.length}
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        onChange={e => selectAll(e, setEditCompletionDates)}
+                        checked={colDates.length === editCompletionDates.length}
+                      />
+                    }
+                    label={t('course.results.upload.completion-date')}
                   />
                 )}
-                {t('course.results.upload.completion-date')}
                 {colDates.length > 1 && (
                   <Button
                     disabled={editCompletionDates.length === 0}
@@ -240,18 +245,22 @@ const UploadDialogConfirm = ({
                     variant="outlined"
                     onClick={() => handleClick('completion')}
                   >
-                    {t('course.results.upload.modify-selected')}
+                    {t('course.results.upload.modify-completion')}
                   </Button>
                 )}
               </TableCell>
               <TableCell>
                 {colDates.length > 1 && (
-                  <Checkbox
-                    onChange={e => selectAll(e, setEditExpirationDates)}
-                    checked={colDates.length === editExpirationDates.length}
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        onChange={e => selectAll(e, setEditExpirationDates)}
+                        checked={colDates.length === editExpirationDates.length}
+                      />
+                    }
+                    label={t('course.results.upload.expiration-date')}
                   />
                 )}
-                {t('course.results.upload.expiration-date')}
                 {colDates.length > 1 && (
                   <Button
                     disabled={editExpirationDates.length === 0}
@@ -260,7 +269,7 @@ const UploadDialogConfirm = ({
                     variant="outlined"
                     onClick={() => handleClick('expiration')}
                   >
-                    {t('course.results.upload.modify-selected')}
+                    {t('course.results.upload.modify-expiration')}
                   </Button>
                 )}
               </TableCell>
@@ -273,6 +282,7 @@ const UploadDialogConfirm = ({
                 <TableCell>
                   {colDates.length > 1 && (
                     <Checkbox
+                      data-testid={`completionDate-checkbox-${date.courseTaskName}`}
                       value={date.courseTaskName}
                       onChange={e =>
                         handleCheckboxClick(
@@ -297,6 +307,7 @@ const UploadDialogConfirm = ({
                 <TableCell>
                   {colDates.length > 1 && (
                     <Checkbox
+                      data-testid={`expirationDate-checkbox-${date.courseTaskName}`}
                       value={date.courseTaskName}
                       onChange={e =>
                         handleCheckboxClick(

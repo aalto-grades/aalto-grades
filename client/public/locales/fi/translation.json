@@ -387,7 +387,8 @@
         "download-excel-template": "Lataa Excel-pohja",
         "add-manually": "Tai lisää ne manuaalisesti",
         "student-number-empty": "Opiskelijanumero ei voi olla tyhjä",
-        "modify-selected": "Muokkaa valittuja",
+        "modify-completion": "Muokkaa Suorituspäivämäärä",
+        "modify-expiration": "Muokkaa vanhentumispäivämäärä",
         "bulk-edit-dialog-title": "Aseta päivämäärä valituille kurssin osille",
         "resolve-errors": "Korjaa virheet jatkaaksesi"
       },

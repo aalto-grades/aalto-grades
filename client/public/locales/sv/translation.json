@@ -387,7 +387,8 @@
         "download-excel-template": "UNTRANSLATED",
         "add-manually": "UNTRANSLATED",
         "student-number-empty": "UNTRANSLATED",
-        "modify-selected": "UNTRANSLATED",
+        "modify-completion": "UNTRANSLATED",
+        "modify-expiration": "UNTRANSLATED",
         "bulk-edit-dialog-title": "UNTRANSLATED",
         "resolve-errors": "UNTRANSLATED"
       },
