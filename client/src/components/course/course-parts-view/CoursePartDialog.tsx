@@ -199,7 +199,7 @@ const CoursePartDialog = ({
                       size="small"
                       color="primary"
                       variant="outlined"
-                      label={new Date(date).toLocaleDateString()}
+                      label={new Date(date).toLocaleDateString('fi')}
                       onClick={() => setDate(form, date)}
                     />
                   ))}
