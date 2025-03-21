@@ -3,11 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  Box,
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  Typography,
 } from '@mui/material';
 import {Formik, type FormikHelpers, type FormikProps} from 'formik';
 import {useTranslation} from 'react-i18next';
@@ -18,6 +21,23 @@ import type {CoursePartData} from '@/common/types';
 import FormField from '@/components/shared/FormikField';
 import {useAddCoursePart, useEditCoursePart} from '@/hooks/useApi';
 import {nullableDateSchema} from '@/types';
+
+const getDates = (): string[] => {
+  try {
+    const data = localStorage.getItem('lastDates');
+    const parsed = data ? (JSON.parse(data) as string[]) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter(item => typeof item === 'string')
+      : [];
+  } catch {
+    return [];
+  }
+};
+
+const addDate = (newDate: string): void => {
+  const uniqueDates = [newDate, ...getDates().filter(date => date !== newDate)];
+  localStorage.setItem('lastDates', JSON.stringify(uniqueDates.slice(0, 5)));
+};
 
 type FormData = {name: string; expiryDate: string | null};
 
@@ -37,6 +57,7 @@ const CoursePartDialog = ({
   const {courseId} = useParams() as {courseId: string};
   const addCoursePart = useAddCoursePart(courseId);
   const editCoursePart = useEditCoursePart(courseId);
+  const lastUsedDates = getDates();
 
   const initialValues: FormData = {
     name: coursePart?.name ?? '',
@@ -70,9 +91,13 @@ const CoursePartDialog = ({
     } catch {
       setSubmitting(false);
       return;
+    } finally {
+      onClose();
+      resetForm();
+      if (values.expiryDate !== null) {
+        addDate(values.expiryDate);
+      }
     }
-    onClose();
-    resetForm();
   };
 
   const validateForm = (
@@ -90,6 +115,10 @@ const CoursePartDialog = ({
     );
   };
 
+  const setDate = (form: FormikProps<FormData>, date: string | null): void => {
+    form.setFieldValue('expiryDate', date);
+  };
+
   return (
     <Formik
       initialValues={initialValues}
@@ -105,7 +134,7 @@ const CoursePartDialog = ({
             form.resetForm();
           }}
           fullWidth
-          maxWidth="xs"
+          maxWidth="sm"
         >
           <DialogTitle>
             {type === 'edit'
@@ -120,13 +149,63 @@ const CoursePartDialog = ({
               helperText={t('course.parts.create.name-help')}
               type="string"
             />
-            <FormField
-              form={form as unknown as FormikProps<{[key: string]: unknown}>}
-              value="expiryDate"
-              label={t('general.expiry-date')}
-              helperText={t('course.parts.create.expiry-date-valid-help')}
-              type="date"
-            />
+            <Box
+              sx={{
+                width: '100%',
+                alignContent: 'center',
+                alignItems: 'center',
+                gap: {xs: 0, sm: 2},
+                display: 'flex',
+                flexWrap: 'wrap',
+              }}
+            >
+              <Box sx={{width: {xs: '100%', sm: '60%'}}}>
+                <FormField
+                  form={
+                    form as unknown as FormikProps<{[key: string]: unknown}>
+                  }
+                  value="expiryDate"
+                  label={t('general.expiry-date')}
+                  helperText={t('course.parts.create.expiry-date-valid-help')}
+                  type="date"
+                />
+              </Box>
+              <Box>
+                <Button
+                  type="button"
+                  onClick={() => setDate(form, null)}
+                  variant="outlined"
+                >
+                  {t('course.parts.no-expiry-date')}
+                </Button>
+              </Box>
+            </Box>
+            {lastUsedDates.length > 0 && (
+              <>
+                <Typography variant="subtitle2">
+                  {t('course.parts.create.previously-used-dates')}
+                </Typography>
+                <Box
+                  sx={{
+                    gap: 1,
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  {lastUsedDates.map(date => (
+                    <Chip
+                      key={date}
+                      clickable
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      label={new Date(date).toLocaleDateString()}
+                      onClick={() => setDate(form, date)}
+                    />
+                  ))}
+                </Box>
+              </>
+            )}
           </DialogContent>
           <DialogActions>
             <Button

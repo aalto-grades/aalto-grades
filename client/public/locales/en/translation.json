@@ -220,7 +220,8 @@
         "edit-title": "Edit course part - {{name}}",
         "create-title": "Create new course part",
         "name-help": "Course part name",
-        "expiry-date-valid-help": "Course part expiration date"
+        "expiry-date-valid-help": "Course part expiration date",
+        "previously-used-dates": "Previously used dates:"
       },
       "select-grade-sources": "Select grade sources",
       "create-tasks": "Create course tasks",

@@ -217,10 +217,11 @@
     "parts": {
       "select-grade-source": "Valitse arvosanalähde",
       "create": {
-        "edit-title": "Luo kurssin osa",
-        "create-title": "Muokkaa kurssin osa - {{name}}",
+        "edit-title": "Muokkaa kurssin osa - {{name}}",
+        "create-title": "Luo kurssin osa",
         "name-help": "Syötä kurssin osan nimi",
-        "expiry-date-valid-help": "Syötä validi voimassaolopäivä"
+        "expiry-date-valid-help": "Syötä validi voimassaoloaika",
+        "previously-used-dates": "Viimeksi käytetyt päivämäärät:"
       },
       "select-grade-sources": "Valitse arvosanalähteet",
       "create-tasks": "Luo tehtäviä",
@@ -231,7 +232,7 @@
       "fetching-grades": "Haetaan arvosanoja",
       "fetching-grades-wait": "Odota, haetaan arvosanoja...",
       "not-found": "Kurssin osia ei löytynyt",
-      "no-expiry-date": "Ei voimassaolopäivää",
+      "no-expiry-date": "Ei voimassaoloaikaa",
       "delete-with-model-message": "Tämä sisältää arviointimallin, poistetaanko?",
       "delete-with-task-message": "Tämä sisältää tehtäviä, poistetaanko?",
       "delete-message": "Haluatko varmasti poistaa?",
