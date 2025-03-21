@@ -13,8 +13,7 @@ import {
   downloadExcelTemplate,
   editCourse,
   importCourseDataFromSisu,
-  importGradesWithCSV,
-  importGradesWithExcel,
+  importGradesWithFile,
   importGradesWithText,
   viewCourseParts,
   viewGradingModel,
@@ -63,11 +62,11 @@ test.describe('Test courses as teacher', () => {
   });
 
   test('Import grades using CSV file', async ({page}) => {
-    await importGradesWithCSV(page);
+    await importGradesWithFile(page, 'csv');
   });
 
   test('Import grades using Excel file', async ({page}) => {
-    await importGradesWithExcel(page);
+    await importGradesWithFile(page, 'xlsx');
   });
 
   test('Import grades by pasting text', async ({page}) => {
