@@ -65,6 +65,7 @@ const Dialog = ({
     <MuiDialog open={open} onClose={handleClose} {...props}>
       <Tooltip title={t('general.close-window')} placement="top">
         <CloseButton
+          data-testid="dialog-close-button"
           disabled={disableCloseButton}
           onClick={onClose}
           aria-label="close-dialog"
