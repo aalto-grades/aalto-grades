@@ -713,14 +713,11 @@ const CoursePartsView = (): JSX.Element => {
         <Grid size={{sm: 8, md: 6, lg: 4}}>
           <Collapse in={hasError}>
             <Alert severity="warning" sx={{mb: 1, textAlign: 'left'}}>
-              <Typography>
-                Error in the table values. Fix all rows with errors (cells
-                marked with red):
-              </Typography>
+              <Typography>{t('course.parts.table-error')}</Typography>
               <ul>
-                <li>Task name must be unique and between 1-255 characters.</li>
-                <li>Days valid must be empty, zero, or a positive number.</li>
-                <li>Max grade must be empty, zero, or a positive number.</li>
+                <li>{t('course.parts.name-error')}</li>
+                <li>{t('course.parts.days-valid-error')}</li>
+                <li>{t('course.parts.max-grade-error')}</li>
               </ul>
             </Alert>
           </Collapse>
