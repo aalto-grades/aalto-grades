@@ -14,6 +14,7 @@ import {
   Checkbox,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   Table,
   TableBody,
   TableCell,
@@ -225,36 +226,52 @@ const UploadDialogConfirm = ({
             <TableRow>
               <TableCell>{t('general.course-part')}</TableCell>
               <TableCell>
-                <Checkbox
-                  onChange={e => selectAll(e, setEditCompletionDates)}
-                  checked={colDates.length === editCompletionDates.length}
-                />
-                {t('course.results.upload.completion-date')}
-                <Button
-                  disabled={editCompletionDates.length === 0}
-                  sx={{ml: 2}}
-                  size="small"
-                  variant="outlined"
-                  onClick={() => handleClick('completion')}
-                >
-                  {t('course.results.upload.modify-selected')}
-                </Button>
+                {colDates.length > 1 && (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        onChange={e => selectAll(e, setEditCompletionDates)}
+                        checked={colDates.length === editCompletionDates.length}
+                      />
+                    }
+                    label={t('course.results.upload.completion-date')}
+                  />
+                )}
+                {colDates.length > 1 && (
+                  <Button
+                    disabled={editCompletionDates.length === 0}
+                    sx={{ml: 2}}
+                    size="small"
+                    variant="outlined"
+                    onClick={() => handleClick('completion')}
+                  >
+                    {t('course.results.upload.modify-completion')}
+                  </Button>
+                )}
               </TableCell>
               <TableCell>
-                <Checkbox
-                  onChange={e => selectAll(e, setEditExpirationDates)}
-                  checked={colDates.length === editExpirationDates.length}
-                />
-                {t('course.results.upload.expiration-date')}
-                <Button
-                  disabled={editExpirationDates.length === 0}
-                  sx={{ml: 2}}
-                  size="small"
-                  variant="outlined"
-                  onClick={() => handleClick('expiration')}
-                >
-                  {t('course.results.upload.modify-selected')}
-                </Button>
+                {colDates.length > 1 && (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        onChange={e => selectAll(e, setEditExpirationDates)}
+                        checked={colDates.length === editExpirationDates.length}
+                      />
+                    }
+                    label={t('course.results.upload.expiration-date')}
+                  />
+                )}
+                {colDates.length > 1 && (
+                  <Button
+                    disabled={editExpirationDates.length === 0}
+                    sx={{ml: 2}}
+                    size="small"
+                    variant="outlined"
+                    onClick={() => handleClick('expiration')}
+                  >
+                    {t('course.results.upload.modify-expiration')}
+                  </Button>
+                )}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -263,17 +280,22 @@ const UploadDialogConfirm = ({
               <TableRow key={date.courseTaskName}>
                 <TableCell>{date.courseTaskName}</TableCell>
                 <TableCell>
-                  <Checkbox
-                    value={date.courseTaskName}
-                    onChange={e =>
-                      handleCheckboxClick(
-                        e,
-                        editCompletionDates,
-                        setEditCompletionDates
-                      )
-                    }
-                    checked={editCompletionDates.includes(date.courseTaskName)}
-                  />
+                  {colDates.length > 1 && (
+                    <Checkbox
+                      data-testid={`completionDate-checkbox-${date.courseTaskName}`}
+                      value={date.courseTaskName}
+                      onChange={e =>
+                        handleCheckboxClick(
+                          e,
+                          editCompletionDates,
+                          setEditCompletionDates
+                        )
+                      }
+                      checked={editCompletionDates.includes(
+                        date.courseTaskName
+                      )}
+                    />
+                  )}
                   <LocalizedDatePicker
                     slotProps={{textField: {size: 'small'}}}
                     value={date.completionDate}
@@ -283,18 +305,24 @@ const UploadDialogConfirm = ({
                   />
                 </TableCell>
                 <TableCell>
-                  <Checkbox
-                    value={date.courseTaskName}
-                    onChange={e =>
-                      handleCheckboxClick(
-                        e,
-                        editExpirationDates,
-                        setEditExpirationDates
-                      )
-                    }
-                    checked={editExpirationDates.includes(date.courseTaskName)}
-                  />
+                  {colDates.length > 1 && (
+                    <Checkbox
+                      data-testid={`expirationDate-checkbox-${date.courseTaskName}`}
+                      value={date.courseTaskName}
+                      onChange={e =>
+                        handleCheckboxClick(
+                          e,
+                          editExpirationDates,
+                          setEditExpirationDates
+                        )
+                      }
+                      checked={editExpirationDates.includes(
+                        date.courseTaskName
+                      )}
+                    />
+                  )}
                   <LocalizedDatePicker
+                    minDate={date.completionDate}
                     disabled={date.expirationDate === null && false}
                     slotProps={{
                       textField: {

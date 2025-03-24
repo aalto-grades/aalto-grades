@@ -122,6 +122,7 @@
   "general": {
     "a+-api-token": "UNTRANSLATED",
     "a+-courses": "UNTRANSLATED",
+    "all": "UNTRANSLATED",
     "next": "UNTRANSLATED",
     "back": "UNTRANSLATED",
     "name": "UNTRANSLATED",
@@ -210,15 +211,18 @@
     "search": "UNTRANSLATED",
     "final-grades": "UNTRANSLATED",
     "course-part-grade": "UNTRANSLATED",
-    "not-int": "UNTRANSLATED"
+    "not-int": "UNTRANSLATED",
+    "backdrop-dismiss-disabled": "UNTRANSLATED"
   },
   "course": {
     "parts": {
       "select-grade-source": "UNTRANSLATED",
       "create": {
-        "title": "UNTRANSLATED",
+        "edit-title": "UNTRANSLATED",
+        "create-title": "UNTRANSLATED",
         "name-help": "UNTRANSLATED",
-        "expiry-date-valid-help": "UNTRANSLATED"
+        "expiry-date-valid-help": "UNTRANSLATED",
+        "previously-used-dates": "UNTRANSLATED"
       },
       "select-grade-sources": "UNTRANSLATED",
       "create-tasks": "UNTRANSLATED",
@@ -363,6 +367,8 @@
         "csv-column": "UNTRANSLATED",
         "import-as": "UNTRANSLATED",
         "ignore-column": "UNTRANSLATED",
+        "ignored": "UNTRANSLATED",
+        "ignore": "UNTRANSLATED?",
         "grades-added": "UNTRANSLATED",
         "completion-date": "UNTRANSLATED",
         "modify-selected": "UNTRANSLATED",
@@ -385,7 +391,11 @@
         "download-csv-template": "UNTRANSLATED",
         "download-excel-template": "UNTRANSLATED",
         "add-manually": "UNTRANSLATED",
-        "student-number-empty": "UNTRANSLATED"
+        "student-number-empty": "UNTRANSLATED",
+        "modify-completion": "UNTRANSLATED",
+        "modify-expiration": "UNTRANSLATED",
+        "bulk-edit-dialog-title": "UNTRANSLATED",
+        "resolve-errors": "UNTRANSLATED"
       },
       "final-grade-preview": "UNTRANSLATED",
       "course-part-value-preview": "UNTRANSLATED",
