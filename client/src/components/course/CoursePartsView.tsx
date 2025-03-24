@@ -14,6 +14,7 @@ import {
   Unarchive,
 } from '@mui/icons-material';
 import {
+  Alert,
   Box,
   Button,
   CircularProgress,
@@ -29,6 +30,7 @@ import {
 import {
   GridActionsCellItem,
   type GridColDef,
+  type GridPreProcessEditCellProps,
   GridRowModes,
   type GridRowModesModel,
   type GridRowParams,
@@ -47,9 +49,9 @@ import {
   type ModifyCourseTasks,
   SystemRole,
 } from '@/common/types';
-import DataGridBase from '@/components/shared/DataGridBase';
 import ListEntries from '@/components/shared/ListEntries';
 import SaveBar from '@/components/shared/SaveBar';
+import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
   useDeleteCoursePart,
@@ -100,6 +102,14 @@ const CoursePartsView = (): JSX.Element => {
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const [editing, setEditing] = useState<boolean>(false);
+  const [rowErrors, setRowErrors] = useState<{
+    [key: number]: {daysValid: boolean; name: boolean; maxGrade: boolean};
+  }>({});
+  const hasError =
+    Object.keys(rowErrors).length > 0 &&
+    Object.values(rowErrors).some(errorObj =>
+      Object.values(errorObj).some(value => value === true)
+    );
 
   const [aplusDialogOpen, setAplusDialogOpen] = useState<boolean>(false);
   const [addAplusSourcesTo, setAddAplusSourcesTo] = useState<{
@@ -497,6 +507,24 @@ const CoursePartsView = (): JSX.Element => {
       headerName: t('general.name'),
       type: 'string',
       editable: editRights,
+      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+        const id = params.id as number;
+        const input = (params.props.value as string).toLowerCase();
+        const error =
+          rows
+            .filter(row => row.id !== id)
+            .map(row => row.name.toLowerCase())
+            .includes(input) || input.length > 255;
+
+        setRowErrors(prev => ({
+          ...prev,
+          [id]: {
+            ...prev[id],
+            name: error,
+          },
+        }));
+        return {...params.props, error};
+      },
     },
     {
       field: 'daysValid',
@@ -504,6 +532,18 @@ const CoursePartsView = (): JSX.Element => {
       type: 'number',
       editable: editRights,
       width: 150,
+      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+        const id = params.id as number;
+        const error = params.props.value < 0;
+        setRowErrors(prev => ({
+          ...prev,
+          [id]: {
+            ...prev[id],
+            daysValid: error,
+          },
+        }));
+        return {...params.props, error};
+      },
     },
     {
       field: 'maxGrade',
@@ -511,6 +551,18 @@ const CoursePartsView = (): JSX.Element => {
       type: 'number',
       editable: editRights,
       width: 150,
+      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+        const id = params.id as number;
+        const error = params.props.value < 0;
+        setRowErrors(prev => ({
+          ...prev,
+          [id]: {
+            ...prev[id],
+            maxGrade: error,
+          },
+        }));
+        return {...params.props, error};
+      },
     },
     {
       field: 'aplusGradeSources',
@@ -640,7 +692,7 @@ const CoursePartsView = (): JSX.Element => {
           show={editRights && unsavedChanges}
           handleDiscard={confirmDiscard}
           handleSave={handleSubmit}
-          disabled={editing}
+          disabled={editing || hasError}
         />
       </div>
 
@@ -659,6 +711,19 @@ const CoursePartsView = (): JSX.Element => {
         sx={{mt: 2}}
       >
         <Grid size={{sm: 8, md: 6, lg: 4}}>
+          <Collapse in={hasError}>
+            <Alert severity="warning" sx={{mb: 1, textAlign: 'left'}}>
+              <Typography>
+                Error in the table values. Fix all rows with errors (cells
+                marked with red):
+              </Typography>
+              <ul>
+                <li>Task name must be unique and between 1-255 characters.</li>
+                <li>Days valid must be empty, zero, or a positive number.</li>
+                <li>Max grade must be empty, zero, or a positive number.</li>
+              </ul>
+            </Alert>
+          </Collapse>
           {courseParts.data === undefined ? (
             <CircularProgress />
           ) : courseParts.data.length === 0 ? (
@@ -708,7 +773,7 @@ const CoursePartsView = (): JSX.Element => {
         </Grid>
         <Grid size={{md: 12, lg: 8}}>
           <div style={{height: '100%', maxHeight: '70vh'}}>
-            <DataGridBase
+            <StyledDataGrid
               rows={rows}
               columns={columns}
               rowHeight={25}
