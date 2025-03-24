@@ -60,9 +60,8 @@ import {
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import AddAplusGradeSourceDialog from './course-parts-view/AddAplusGradeSourceDialog';
-import EditCoursePartDialog from './course-parts-view/EditCoursePartDialog';
+import CoursePartDialog from './course-parts-view/CoursePartDialog';
 import NewAplusCourseTasksDialog from './course-parts-view/NewAplusCourseTasksDialog';
-import NewCoursePartDialog from './course-parts-view/NewCoursePartDialog';
 import ViewAplusGradeSourcesDialog from './course-parts-view/ViewAplusGradeSourcesDialog';
 
 type ColTypes = {
@@ -321,9 +320,11 @@ const CoursePartsView = (): JSX.Element => {
 
   const ArchivalButton = ({
     archived,
+    name,
     onClick,
   }: {
     archived: boolean;
+    name: string;
     onClick?: () => void;
   }): JSX.Element => {
     return (
@@ -333,7 +334,10 @@ const CoursePartsView = (): JSX.Element => {
           archived ? t('course.parts.unarchive') : t('course.parts.archive')
         }
       >
-        <IconButton onClick={onClick}>
+        <IconButton
+          data-testid={`archive-course-part-${name}`}
+          onClick={onClick}
+        >
           {archived ? <Unarchive /> : <Archive />}
         </IconButton>
       </Tooltip>
@@ -384,6 +388,7 @@ const CoursePartsView = (): JSX.Element => {
             <>
               <Tooltip placement="top" title={t('course.parts.edit-part')}>
                 <IconButton
+                  data-testid={`edit-course-part-${coursePart.name}`}
                   onClick={() => {
                     setEditPart(coursePart);
                     setEditPartDialogOpen(true);
@@ -393,6 +398,7 @@ const CoursePartsView = (): JSX.Element => {
                 </IconButton>
               </Tooltip>
               <ArchivalButton
+                name={coursePart.name}
                 archived={coursePart.archived}
                 onClick={() => {
                   editCoursePart.mutate({
@@ -434,7 +440,12 @@ const CoursePartsView = (): JSX.Element => {
     if (params.row.coursePartId !== -1) {
       elements.push(
         <GridActionsCellItem
-          icon={<ArchivalButton archived={params.row.archived} />}
+          icon={
+            <ArchivalButton
+              name={params.row.name}
+              archived={params.row.archived}
+            />
+          }
           label={
             params.row.archived
               ? t('course.parts.unarchive')
@@ -572,11 +583,13 @@ const CoursePartsView = (): JSX.Element => {
 
   return (
     <>
-      <NewCoursePartDialog
+      <CoursePartDialog
+        type="new"
         open={addPartDialogOpen}
         onClose={() => setAddPartDialogOpen(false)}
       />
-      <EditCoursePartDialog
+      <CoursePartDialog
+        type="edit"
         open={editPartDialogOpen}
         onClose={() => setEditPartDialogOpen(false)}
         coursePart={editPart}
