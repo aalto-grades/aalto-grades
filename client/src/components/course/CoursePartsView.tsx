@@ -29,6 +29,8 @@ import {
 import {
   GridActionsCellItem,
   type GridColDef,
+  GridRowModes,
+  type GridRowModesModel,
   type GridRowParams,
   type GridRowsProp,
   GridToolbarContainer,
@@ -97,6 +99,7 @@ const CoursePartsView = (): JSX.Element => {
 
   const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
+  const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const [editing, setEditing] = useState<boolean>(false);
 
   const [aplusDialogOpen, setAplusDialogOpen] = useState<boolean>(false);
@@ -525,10 +528,10 @@ const CoursePartsView = (): JSX.Element => {
 
   const DataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
+      const id = Math.max(0, ...rows.map(row => row.id)) + 1;
       setRows(oldRows => {
-        const freeId = Math.max(0, ...oldRows.map(row => row.id)) + 1;
         const newRow: ColTypes = {
-          id: freeId,
+          id,
           coursePartId: selectedPart!,
           daysValid: null,
           maxGrade: null,
@@ -539,7 +542,14 @@ const CoursePartsView = (): JSX.Element => {
         };
         return oldRows.concat(newRow);
       });
+
+      // Set the new row into edit mode and focus on the 'name' field
+      setRowModesModel(oldModel => ({
+        ...oldModel,
+        [id]: {mode: GridRowModes.Edit, fieldToFocus: 'name'},
+      }));
     };
+
     return (
       <GridToolbarContainer>
         <Button
@@ -568,6 +578,12 @@ const CoursePartsView = (): JSX.Element => {
     if (await AsyncConfirmationModal({confirmDiscard: true})) {
       setRows(structuredClone(initRows));
     }
+  };
+
+  const handleRowModesModelChange = (
+    newRowModesModel: GridRowModesModel
+  ): void => {
+    setRowModesModel(newRowModesModel);
   };
 
   return (
@@ -685,6 +701,8 @@ const CoursePartsView = (): JSX.Element => {
               rowHeight={25}
               editMode="row"
               rowSelection={false}
+              rowModesModel={rowModesModel}
+              onRowModesModelChange={handleRowModesModelChange}
               disableColumnSelector
               slots={editRights ? {toolbar: DataGridToolbar} : {}}
               onRowEditStart={() => setEditing(true)}
