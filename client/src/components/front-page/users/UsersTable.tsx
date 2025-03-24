@@ -35,6 +35,7 @@ const UsersTable = (): JSX.Element => {
 
   const headCells: HeadCellData[] = [
     {id: 'email', label: t('general.email')},
+    {id: 'name', label: t('general.name')},
     {id: 'actions', label: ''},
   ];
 
@@ -94,7 +95,8 @@ const UsersTable = (): JSX.Element => {
           <TableBody>
             {shownUsers.map(user => (
               <TableRow key={user.email} hover>
-                <TableCell sx={{width: '75%'}}>{user.email}</TableCell>
+                <TableCell sx={{width: '30%'}}>{user.email}</TableCell>
+                <TableCell sx={{width: '40%'}}>{user.name || '-'}</TableCell>
                 <TableCell>
                   <Tooltip
                     title={t('front-page.reset-password-mfa')}

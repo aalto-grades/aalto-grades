@@ -81,17 +81,20 @@ const HistoryButton = forwardRef<HTMLSpanElement, HistoryButtonProps>(
 );
 HistoryButton.displayName = 'HistoryButton';
 
-type ColTypes = {
+export type ColTypeBase = {
   id: number;
-  gradeId: number;
   grader: string;
+  selected: string;
   grade: number;
   date: Date;
+};
+
+type ColTypes = {
+  gradeId: number;
   expiryDate: Date | null;
   comment: string;
-  selected: string;
   aplusGrade: boolean;
-};
+} & ColTypeBase;
 
 type PropsType = {
   open: boolean;
@@ -99,7 +102,7 @@ type PropsType = {
   studentUser: StudentData;
   courseTaskId: number;
   maxGrade: number | null;
-  title: string;
+  title: string | JSX.Element;
   grades: TaskGradeData[];
 };
 const EditGradesDialog = ({

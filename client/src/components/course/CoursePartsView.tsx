@@ -529,7 +529,7 @@ const CoursePartsView = (): JSX.Element => {
       ? [
           {
             field: 'actions',
-            headerName: t('course.parts.actions'),
+            headerName: t('general.actions'),
             type: 'actions',
             getActions: getActions,
           } as GridColDef,

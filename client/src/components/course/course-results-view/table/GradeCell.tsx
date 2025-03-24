@@ -11,7 +11,7 @@ import {
 import {Box, Tooltip, Typography, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import {type JSX, useMemo, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import {Trans, useTranslation} from 'react-i18next';
 
 import type {CourseTaskGradesData, StudentData} from '@/common/types';
 import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
@@ -110,10 +110,16 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
               studentUser={studentUser}
               courseTaskId={sourceValue.task.courseTaskId}
               maxGrade={sourceValue.maxGrade}
-              title={t('course.results.grade-of-for', {
-                user: studentUser.studentNumber,
-                part: sourceValue.task.courseTaskName,
-              })}
+              title={
+                <Trans
+                  i18nKey="course.results.grade-of-for"
+                  components={{bold: <strong />}}
+                  values={{
+                    user: studentUser.studentNumber,
+                    part: sourceValue.task.courseTaskName,
+                  }}
+                />
+              }
               grades={sourceValue.task.grades}
             />
           )}
