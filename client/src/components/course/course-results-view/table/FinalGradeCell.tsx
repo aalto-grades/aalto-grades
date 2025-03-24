@@ -6,21 +6,21 @@ import {MoreVert} from '@mui/icons-material';
 import {Box, Tooltip, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import {type JSX, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import {Trans, useTranslation} from 'react-i18next';
 
-import type {FinalGradeData, GradingScale} from '@/common/types';
+import type {FinalGradeData, GradingScale, UserData} from '@/common/types';
 import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
 import {findBestFinalGrade, getGradeString} from '@/utils';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
 
 type PropsType = {
-  userId: number;
+  user: UserData;
   studentNumber: string;
   finalGrades: FinalGradeData[];
   gradingScale: GradingScale;
 };
 const FinalGradeCell = ({
-  userId,
+  user,
   studentNumber,
   finalGrades,
   gradingScale,
@@ -65,9 +65,25 @@ const FinalGradeCell = ({
         <EditFinalGradesDialog
           open={editDialogOpen}
           onClose={() => setEditDialogOpen(false)}
-          userId={userId}
+          userId={user.id}
           finalGrades={finalGrades}
-          title={t('course.results.final-of', {user: studentNumber})}
+          title={
+            <>
+              {`${t('course.results.final-for')}, `}
+              <Trans
+                i18nKey={
+                  user.name
+                    ? 'course.results.number-and-name'
+                    : 'course.results.number-no-name'
+                }
+                components={{bold: <strong />}}
+                values={{
+                  studentNumber,
+                  name: user.name,
+                }}
+              />
+            </>
+          }
         />
       )}
       {bestFinalGrade?.date !== undefined && (

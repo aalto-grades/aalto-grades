@@ -101,6 +101,7 @@ const ManageStudentsView = (): JSX.Element => {
       type: 'string',
       editable: false,
       width: 200,
+      valueGetter: (params: string | null) => params ?? '-',
     },
     {
       field: 'studentNumber',
@@ -115,6 +116,7 @@ const ManageStudentsView = (): JSX.Element => {
       type: 'string',
       editable: false,
       width: 250,
+      valueGetter: (params: string | null) => params ?? '-',
     },
     {
       field: 'latestGrade',

@@ -32,7 +32,7 @@ import {
   type NewFinalGrade,
   SystemRole,
 } from '@/common/types';
-import DataGridBase from '@/components/shared/DataGridBase';
+import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
   useAddFinalGrades,
@@ -43,24 +43,20 @@ import {
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import {findBestFinalGrade, getMaxFinalGrade} from '@/utils';
+import type {ColTypeBase} from './EditGradesDialog';
 
 type ColTypes = {
-  id: number;
   finalGradeId: number;
-  grader: string;
-  grade: number;
-  date: Date;
   gradingModel: string | null;
   exportDate: Date | null;
   comment: string | null;
-  selected: string;
-};
+} & ColTypeBase;
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
   userId: number;
-  title: string;
+  title: string | JSX.Element;
   finalGrades: FinalGradeData[];
 };
 const EditFinalGradesDialog = ({
@@ -159,12 +155,14 @@ const EditFinalGradesDialog = ({
       field: 'grade',
       headerName: t('general.grade'),
       type: 'number',
+      headerAlign: 'center',
       editable: editRights,
     },
     {
       field: 'date',
       headerName: t('general.date'),
       type: 'date',
+      headerAlign: 'center',
       editable: editRights,
       width: 110, // Enough width to fit the calendar icon
     },
@@ -172,12 +170,15 @@ const EditFinalGradesDialog = ({
       field: 'gradingModel',
       headerName: t('general.grading-model'),
       type: 'string',
+      headerAlign: 'center',
       editable: false,
+      width: 120,
     },
     {
       field: 'exportDate',
       headerName: t('general.export-date'),
       type: 'date',
+      headerAlign: 'center',
       editable: editRights,
       width: 110, // Enough width to fit the calendar icon
     },
@@ -185,6 +186,7 @@ const EditFinalGradesDialog = ({
       field: 'comment',
       headerName: t('general.comment'),
       type: 'string',
+      headerAlign: 'center',
       editable: editRights,
     },
     ...(editRights
@@ -192,6 +194,7 @@ const EditFinalGradesDialog = ({
           {
             field: 'actions',
             type: 'actions',
+            headerName: t('general.actions'),
             getActions: params => [
               <GridActionsCellItem
                 key={params.id}
@@ -317,11 +320,14 @@ const EditFinalGradesDialog = ({
       >
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
-          <div style={{height: '30vh'}}>
-            <DataGridBase
+          <div style={{height: '35vh'}}>
+            <StyledDataGrid
               rows={rows}
               columns={columns}
               rowHeight={25}
+              getRowClassName={({row}: {row: ColTypes}) =>
+                `row-${row.selected}`
+              }
               editMode="row"
               rowSelection={false}
               disableColumnSelector
