@@ -68,6 +68,14 @@ const StyledDataGrid = styled(DataGridBase)(({theme}) => ({
       },
     },
   },
+  '& .Mui-error': {
+    backgroundColor: 'rgb(126,10,15, 0.1)',
+    color: '#750f0f',
+    ...theme.applyStyles('dark', {
+      backgroundColor: 'rgb(126,10,15, 0.5)',
+      color: '#ff4343',
+    }),
+  },
 }));
 
 export default StyledDataGrid;
