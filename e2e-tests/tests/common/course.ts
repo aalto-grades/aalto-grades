@@ -126,8 +126,7 @@ export const viewCourseParts = async (page: Page): Promise<void> => {
     .getByRole('link', {name: 'Course parts'})
     .getByRole('button')
     .click();
-  await expect(page.getByText('Days valid')).toBeVisible();
-
+  await expect(page.getByText(/^Days valid$/)).toBeVisible();
   await expect(page.getByText('Exercises 2024')).toBeVisible();
 };
 
@@ -146,13 +145,7 @@ export const addOneCoursePart = async (
 };
 
 export const addCoursePart = async (page: Page): Promise<void> => {
-  await page.getByRole('cell', {name: 'O1'}).click();
-  await page
-    .getByRole('link', {name: 'Course parts'})
-    .getByRole('button')
-    .click();
-  await expect(page.getByText('Days valid')).toBeVisible();
-  await expect(page.getByText('Exercises 2024')).toBeVisible();
+  await viewCourseParts(page);
   const coursePartName = await addOneCoursePart(page, randomName());
   await expect(
     page.getByRole('button', {name: `${coursePartName} No expiry date`})
@@ -160,12 +153,7 @@ export const addCoursePart = async (page: Page): Promise<void> => {
 };
 
 export const editCoursePart = async (page: Page): Promise<void> => {
-  await page.getByRole('cell', {name: 'O1'}).click();
-  await page
-    .getByRole('link', {name: 'Course parts'})
-    .getByRole('button')
-    .click();
-  await expect(page.getByText('Days valid')).toBeVisible();
+  await viewCourseParts(page);
   const coursePartName = await addOneCoursePart(page, randomName());
   const newCoursePartName = randomName();
   await page.getByTestId(`edit-course-part-${coursePartName}`).click();
