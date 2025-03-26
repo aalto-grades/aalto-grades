@@ -256,7 +256,7 @@
       "active-parts": "Aktiiviset kurssin osat",
       "archived-parts": "Arkistoidut kurssin osat",
       "table-error": "Virheitä taulukon arvoissa. Korjaa kaikki virheelliset rivit (solut merkitty punaisella)",
-      "name-error": "Tehtävän nimen on oltava yksilöllinen ja 1–255 merkkiä pitkä",
+      "name-error": "Tehtävän nimen on oltava yksilöllinen",
       "days-valid-error": "Voimassaolopäivien on oltava tyhjä, nolla tai positiivinen numero",
       "max-grade-error": "Enimmäispisteiden on oltava tyhjä, nolla tai positiivinen numero"
     },

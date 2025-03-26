@@ -256,7 +256,7 @@
       "active-parts": "Active course parts",
       "archived-parts": "Archived course parts",
       "table-error": "Errors in the table values. Fix all rows with errors (cells marked with red)",
-      "name-error": "Task name must be unique and between 1-255 characters",
+      "name-error": "Task name must be unique",
       "days-valid-error": "Days valid must be empty, zero, or a positive number",
       "max-grade-error": "Max grade must be empty, zero, or a positive number"
     },

@@ -520,18 +520,15 @@ const CoursePartsView = (): JSX.Element => {
       type: 'string',
       editable: editRights,
       preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-        const id = params.id;
-        const input = (params.props.value as string).toLowerCase();
-        const error =
-          rows
-            .filter(row => row.id !== id)
-            .map(row => row.name.toLowerCase())
-            .includes(input) || input.length > 255;
+        const error = rows
+          .filter(row => row.id !== params.id)
+          .map(row => row.name.toLowerCase())
+          .includes((params.props.value as string).toLowerCase());
 
         setRowErrors(prev => ({
           ...prev,
-          [id]: {
-            ...prev[id],
+          [params.id]: {
+            ...prev[params.id],
             name: error,
           },
         }));
@@ -545,12 +542,11 @@ const CoursePartsView = (): JSX.Element => {
       editable: editRights,
       width: 150,
       preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-        const id = params.id;
         const error = params.props.value < 0;
         setRowErrors(prev => ({
           ...prev,
-          [id]: {
-            ...prev[id],
+          [params.id]: {
+            ...prev[params.id],
             daysValid: error,
           },
         }));
@@ -564,12 +560,11 @@ const CoursePartsView = (): JSX.Element => {
       editable: editRights,
       width: 150,
       preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-        const id = params.id;
         const error = params.props.value < 0;
         setRowErrors(prev => ({
           ...prev,
-          [id]: {
-            ...prev[id],
+          [params.id]: {
+            ...prev[params.id],
             maxGrade: error,
           },
         }));
