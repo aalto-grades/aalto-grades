@@ -6,6 +6,7 @@ import {expect, test} from '@playwright/test';
 
 import {
   addCoursePart,
+  archiveCoursePart,
   checkCourse,
   createCourse,
   createGradingModel,
@@ -78,12 +79,16 @@ test.describe('Test courses as admin', () => {
     await viewCourseParts(page);
   });
 
-  test('Add Course Part', async ({page}) => {
+  test('Add course part', async ({page}) => {
     await addCoursePart(page);
   });
 
-  test('Edit Course Part', async ({page}) => {
+  test('Edit course part', async ({page}) => {
     await editCoursePart(page);
+  });
+
+  test('Archive and unarchive course part', async ({page}) => {
+    await archiveCoursePart(page);
   });
 
   test('View grading model', async ({page}) => {

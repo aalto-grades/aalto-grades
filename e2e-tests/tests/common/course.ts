@@ -152,19 +152,67 @@ export const addCoursePart = async (page: Page): Promise<void> => {
   ).toBeVisible();
 };
 
+export const archiveCoursePart = async (page: Page): Promise<void> => {
+  await viewCourseParts(page);
+  await expect(page.getByText('Archived course parts')).not.toBeVisible();
+  const coursePartName = await addOneCoursePart(page, randomName());
+  await expect(
+    page.getByRole('button', {name: `${coursePartName} No expiry date`})
+  ).toBeVisible();
+
+  await page.getByTestId(`archive-course-part-${coursePartName}`).click();
+  await expect(page.getByText('Archived course parts')).toBeVisible();
+
+  // Make sure the archived course part is in archived container
+  await expect(
+    page
+      .getByTestId('archived-course-parts')
+      .getByTestId(`archive-course-part-${coursePartName}`)
+  ).toBeVisible();
+
+  await page.getByTestId(`archive-course-part-${coursePartName}`).click();
+  await expect(page.getByText('Archived course parts')).not.toBeVisible();
+  await expect(
+    page
+      .getByTestId('active-course-parts')
+      .getByTestId(`archive-course-part-${coursePartName}`)
+  ).toBeVisible();
+};
+
 export const editCoursePart = async (page: Page): Promise<void> => {
   await viewCourseParts(page);
   const coursePartName = await addOneCoursePart(page, randomName());
   const newCoursePartName = randomName();
+
+  // 1. First time creating, previous dates should not show
   await page.getByTestId(`edit-course-part-${coursePartName}`).click();
+  await expect(page.getByText('Previously used dates:')).not.toBeVisible();
   await page.getByLabel('Name*').click();
   await page.getByLabel('Name*').fill(newCoursePartName);
   await page.getByLabel('Expiry date').click();
   await page.keyboard.type('01012025');
   await page.getByRole('button', {name: 'Save'}).click();
+
+  // 2. When editing and previously set date should show up in the dates list
   await page.getByTestId(`edit-course-part-${newCoursePartName}`).click();
   await expect(page.getByText('Previously used dates:')).toBeVisible();
   await expect(page.getByText('1.1.2025')).toBeVisible();
+  await page.getByLabel('Expiry date').click();
+  await page.keyboard.type('12122025');
+  await page.getByRole('button', {name: 'Save'}).click();
+
+  // 3. Multiple dates should show up in the list
+  await page.getByTestId(`edit-course-part-${newCoursePartName}`).click();
+  await expect(page.getByText('1.1.2025')).toBeVisible();
+  await expect(page.getByText('12.12.2025')).toBeVisible();
+  await page.getByText('1.1.2025').click();
+  await page.getByRole('button', {name: 'Save'}).click();
+  await expect(
+    page.getByRole('button', {name: `${newCoursePartName} 1/1/2025`})
+  ).toBeVisible();
+
+  // 4. No expiry date button should overwrite the date if clicked
+  await page.getByTestId(`edit-course-part-${newCoursePartName}`).click();
   await page.getByRole('button', {name: 'no expiry date'}).click();
   await page.getByRole('button', {name: 'Save'}).click();
   await expect(
