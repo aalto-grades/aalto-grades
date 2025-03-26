@@ -23,7 +23,7 @@ import {
   importGradesWithFile,
   importGradesWithText,
 } from './common/grades';
-import {addCoursePartTask} from './common/task';
+import {addCoursePartTaskFail, addCoursePartTaskSuccess} from './common/task';
 import {aPlusToken} from './common/token';
 import {addUser, logOut} from './common/user';
 import {setupDb} from './helper';
@@ -92,8 +92,14 @@ test.describe('Test courses as admin', () => {
     await archiveCoursePart(page);
   });
 
-  test('Add course part task', async ({page}) => {
-    await addCoursePartTask(page);
+  test.describe('Add course part task', () => {
+    test('Success', async ({page}) => {
+      await addCoursePartTaskSuccess(page);
+    });
+
+    test('Fail (duplicate name)', async ({page}) => {
+      await addCoursePartTaskFail(page);
+    });
   });
 
   test('View grading model', async ({page}) => {
