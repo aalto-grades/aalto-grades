@@ -397,9 +397,7 @@
         "add-manually": "Tai lisää ne manuaalisesti",
         "student-number-empty": "Opiskelijanumero ei voi olla tyhjä",
         "modify-completion": "Muokkaa Suorituspäivämäärä",
-        "modify-expiration": "Muokkaa vanhentumispäivämäärä",
-        "bulk-edit-dialog-title": "Aseta päivämäärä valituille kurssin osille",
-        "resolve-errors": "Korjaa virheet jatkaaksesi"
+        "modify-expiration": "Muokkaa vanhentumispäivämäärä"
       },
       "final-grade-preview": "Lopullisen arvosanan esikatselu",
       "course-part-value-preview": "Kurssin osan arvo",
