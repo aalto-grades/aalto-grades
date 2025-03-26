@@ -31,6 +31,7 @@ import {
   GridActionsCellItem,
   type GridColDef,
   type GridPreProcessEditCellProps,
+  type GridRowId,
   GridRowModes,
   type GridRowModesModel,
   type GridRowParams,
@@ -103,7 +104,7 @@ const CoursePartsView = (): JSX.Element => {
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const [editing, setEditing] = useState<boolean>(false);
   const [rowErrors, setRowErrors] = useState<{
-    [key: number]: {daysValid: boolean; name: boolean; maxGrade: boolean};
+    [key: GridRowId]: {daysValid: boolean; name: boolean; maxGrade: boolean};
   }>({});
   const hasError =
     Object.keys(rowErrors).length > 0 &&
@@ -291,6 +292,14 @@ const CoursePartsView = (): JSX.Element => {
     setInitRows(structuredClone(rows));
   };
 
+  const removeError = (key: GridRowId): void => {
+    setRowErrors(prevErrors => {
+      const newErrors = {...prevErrors};
+      delete newErrors[key];
+      return newErrors;
+    });
+  };
+
   const getAplusActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
     const elements = [];
 
@@ -453,6 +462,7 @@ const CoursePartsView = (): JSX.Element => {
     if (params.row.coursePartId !== -1) {
       elements.push(
         <GridActionsCellItem
+          data-testId={`archive-row-${params.row.id}`}
           icon={
             <ArchivalButton
               name={params.row.name}
@@ -479,6 +489,7 @@ const CoursePartsView = (): JSX.Element => {
     if (!courseTasksWithGrades.has(params.row.id)) {
       elements.push(
         <GridActionsCellItem
+          data-testId={`delete-row-${params.row.id}`}
           icon={<DeleteButton />}
           label={t('general.delete')}
           onClick={async () => {
@@ -491,6 +502,7 @@ const CoursePartsView = (): JSX.Element => {
               });
             }
             if (confirmation) {
+              removeError(params.id);
               setRows(oldRows => oldRows.filter(row => row.id !== params.id));
             }
           }}
@@ -508,7 +520,7 @@ const CoursePartsView = (): JSX.Element => {
       type: 'string',
       editable: editRights,
       preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-        const id = params.id as number;
+        const id = params.id;
         const input = (params.props.value as string).toLowerCase();
         const error =
           rows
@@ -533,7 +545,7 @@ const CoursePartsView = (): JSX.Element => {
       editable: editRights,
       width: 150,
       preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-        const id = params.id as number;
+        const id = params.id;
         const error = params.props.value < 0;
         setRowErrors(prev => ({
           ...prev,
@@ -552,7 +564,7 @@ const CoursePartsView = (): JSX.Element => {
       editable: editRights,
       width: 150,
       preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-        const id = params.id as number;
+        const id = params.id;
         const error = params.props.value < 0;
         setRowErrors(prev => ({
           ...prev,
