@@ -23,6 +23,7 @@ import {
   importGradesWithFile,
   importGradesWithText,
 } from './common/grades';
+import {addCoursePartTask} from './common/task';
 import {aPlusToken} from './common/token';
 import {addUser, logOut} from './common/user';
 import {setupDb} from './helper';
@@ -89,6 +90,10 @@ test.describe('Test courses as admin', () => {
 
   test('Archive and unarchive course part', async ({page}) => {
     await archiveCoursePart(page);
+  });
+
+  test('Add course part task', async ({page}) => {
+    await addCoursePartTask(page);
   });
 
   test('View grading model', async ({page}) => {
