@@ -728,6 +728,7 @@ const CoursePartsView = (): JSX.Element => {
           ) : (
             <>
               <Collapse
+                data-testid="active-course-parts"
                 in={courseParts.data.find(mod => !mod.archived) !== undefined}
               >
                 <ListEntries
@@ -747,6 +748,7 @@ const CoursePartsView = (): JSX.Element => {
                 </ListEntries>
               </Collapse>
               <Collapse
+                data-testid="archived-course-parts"
                 in={courseParts.data.find(mod => mod.archived) !== undefined}
                 sx={{mt: 2}}
               >
