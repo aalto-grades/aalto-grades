@@ -155,6 +155,7 @@ export const GradesTableProvider = ({
   const [rowSelection, setRowSelection] = useState({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [grouping, setGrouping] = useState<GroupingState>([]);
+  const [globalFilter, setGlobalFilter] = useState<string>('');
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     errors: false,
   });
@@ -631,6 +632,7 @@ export const GradesTableProvider = ({
     onExpandedChange: setExpanded,
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
+    onGlobalFilterChange: setGlobalFilter,
     enableGrouping: true,
     enableSorting: true,
     autoResetExpanded: false,
@@ -640,6 +642,7 @@ export const GradesTableProvider = ({
       expanded,
       grouping,
       sorting,
+      globalFilter,
     },
 
     getExpandedRowModel: getExpandedRowModel(),
