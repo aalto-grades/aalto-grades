@@ -105,3 +105,26 @@ export const warnDialogIfBackdropClickDisabled = async (
   await page.getByTestId('snackbar-close-button').click();
   await page.getByTestId('dialog-close-button').click();
 };
+
+export const filterGradesTable = async (page: Page): Promise<void> => {
+  await page.getByRole('cell', {name: 'example & grades'}).click();
+  await expect(page.getByText('showing 50 rows')).toBeVisible();
+
+  // Filter by name
+  await page.getByPlaceholder('search').fill('wi');
+  await expect(page.getByRole('row', {name: 'William Thomas'})).toBeVisible();
+  await expect(page.getByRole('row', {name: 'Philip Lewis'})).toBeVisible();
+  await expect(page.getByText('showing 2 rows')).toBeVisible();
+  await expect(page.getByRole('row')).toHaveCount(3); // Count header row also
+  await page.getByLabel('reset-search').click();
+  await expect(page.getByText('showing 50 rows')).toBeVisible();
+
+  // Filter by student number
+  await page.getByPlaceholder('search').fill('68');
+  await expect(page.getByRole('row', {name: 'William Thomas'})).toBeVisible();
+  await expect(page.getByRole('row', {name: 'Patricia Stevens'})).toBeVisible();
+  await expect(page.getByText('showing 2 rows')).toBeVisible();
+  await expect(page.getByRole('row')).toHaveCount(3);
+  await page.getByLabel('reset-search').click();
+  await expect(page.getByText('showing 50 rows')).toBeVisible();
+};

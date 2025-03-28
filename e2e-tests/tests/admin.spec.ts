@@ -20,6 +20,7 @@ import {
 import {
   downloadCSVGradeTemplate,
   downloadExcelGradeTemplate,
+  filterGradesTable,
   importGradesWithFile,
   importGradesWithText,
 } from './common/grades';
@@ -141,6 +142,12 @@ test.describe('Test courses as admin', () => {
 
     test('Show warn dialog when backdrop click disabled', async ({page}) => {
       await warnDialogIfBackdropClickDisabled(page);
+    });
+  });
+
+  test.describe('Grades table', () => {
+    test('Filter results', async ({page}) => {
+      await filterGradesTable(page);
     });
   });
 
