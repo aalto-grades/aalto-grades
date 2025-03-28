@@ -254,7 +254,11 @@
       "add-new-part": "UNTRANSLATED",
       "no-course-parts": "UNTRANSLATED",
       "active-parts": "UNTRANSLATED",
-      "archived-parts": "UNTRANSLATED"
+      "archived-parts": "UNTRANSLATED",
+      "table-error": "UNTRANSLATED",
+      "name-error": "UNTRANSLATED",
+      "days-valid-error": "UNTRANSLATED",
+      "max-grade-error": "UNTRANSLATED"
     },
     "models": {
       "has-multiple-warnings": "UNTRANSLATED",
@@ -393,9 +397,7 @@
         "add-manually": "UNTRANSLATED",
         "student-number-empty": "UNTRANSLATED",
         "modify-completion": "UNTRANSLATED",
-        "modify-expiration": "UNTRANSLATED",
-        "bulk-edit-dialog-title": "UNTRANSLATED",
-        "resolve-errors": "UNTRANSLATED"
+        "modify-expiration": "UNTRANSLATED"
       },
       "final-grade-preview": "UNTRANSLATED",
       "course-part-value-preview": "UNTRANSLATED",

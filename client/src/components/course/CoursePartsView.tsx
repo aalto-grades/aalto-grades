@@ -14,6 +14,7 @@ import {
   Unarchive,
 } from '@mui/icons-material';
 import {
+  Alert,
   Box,
   Button,
   CircularProgress,
@@ -29,6 +30,10 @@ import {
 import {
   GridActionsCellItem,
   type GridColDef,
+  type GridPreProcessEditCellProps,
+  type GridRowId,
+  GridRowModes,
+  type GridRowModesModel,
   type GridRowParams,
   type GridRowsProp,
   GridToolbarContainer,
@@ -45,9 +50,9 @@ import {
   type ModifyCourseTasks,
   SystemRole,
 } from '@/common/types';
-import DataGridBase from '@/components/shared/DataGridBase';
 import ListEntries from '@/components/shared/ListEntries';
 import SaveBar from '@/components/shared/SaveBar';
+import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
   useDeleteCoursePart,
@@ -96,7 +101,16 @@ const CoursePartsView = (): JSX.Element => {
 
   const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
+  const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const [editing, setEditing] = useState<boolean>(false);
+  const [rowErrors, setRowErrors] = useState<{
+    [key: GridRowId]: {daysValid: boolean; name: boolean; maxGrade: boolean};
+  }>({});
+  const hasError =
+    Object.keys(rowErrors).length > 0 &&
+    Object.values(rowErrors).some(errorObj =>
+      Object.values(errorObj).some(value => value === true)
+    );
 
   const [aplusDialogOpen, setAplusDialogOpen] = useState<boolean>(false);
   const [addAplusSourcesTo, setAddAplusSourcesTo] = useState<{
@@ -278,6 +292,14 @@ const CoursePartsView = (): JSX.Element => {
     setInitRows(structuredClone(rows));
   };
 
+  const removeError = (key: GridRowId): void => {
+    setRowErrors(prevErrors => {
+      const newErrors = {...prevErrors};
+      delete newErrors[key];
+      return newErrors;
+    });
+  };
+
   const getAplusActions = (params: GridRowParams<ColTypes>): JSX.Element[] => {
     const elements = [];
 
@@ -440,6 +462,7 @@ const CoursePartsView = (): JSX.Element => {
     if (params.row.coursePartId !== -1) {
       elements.push(
         <GridActionsCellItem
+          data-testId={`archive-row-${params.row.id}`}
           icon={
             <ArchivalButton
               name={params.row.name}
@@ -466,6 +489,7 @@ const CoursePartsView = (): JSX.Element => {
     if (!courseTasksWithGrades.has(params.row.id)) {
       elements.push(
         <GridActionsCellItem
+          data-testId={`delete-row-${params.row.id}`}
           icon={<DeleteButton />}
           label={t('general.delete')}
           onClick={async () => {
@@ -478,6 +502,7 @@ const CoursePartsView = (): JSX.Element => {
               });
             }
             if (confirmation) {
+              removeError(params.id);
               setRows(oldRows => oldRows.filter(row => row.id !== params.id));
             }
           }}
@@ -494,6 +519,21 @@ const CoursePartsView = (): JSX.Element => {
       headerName: t('general.name'),
       type: 'string',
       editable: editRights,
+      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+        const error = rows
+          .filter(row => row.id !== params.id)
+          .map(row => row.name.toLowerCase())
+          .includes((params.props.value as string).toLowerCase());
+
+        setRowErrors(prev => ({
+          ...prev,
+          [params.id]: {
+            ...prev[params.id],
+            name: error,
+          },
+        }));
+        return {...params.props, error};
+      },
     },
     {
       field: 'daysValid',
@@ -501,6 +541,17 @@ const CoursePartsView = (): JSX.Element => {
       type: 'number',
       editable: editRights,
       width: 150,
+      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+        const error = params.props.value < 0;
+        setRowErrors(prev => ({
+          ...prev,
+          [params.id]: {
+            ...prev[params.id],
+            daysValid: error,
+          },
+        }));
+        return {...params.props, error};
+      },
     },
     {
       field: 'maxGrade',
@@ -508,6 +559,17 @@ const CoursePartsView = (): JSX.Element => {
       type: 'number',
       editable: editRights,
       width: 150,
+      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+        const error = params.props.value < 0;
+        setRowErrors(prev => ({
+          ...prev,
+          [params.id]: {
+            ...prev[params.id],
+            maxGrade: error,
+          },
+        }));
+        return {...params.props, error};
+      },
     },
     {
       field: 'aplusGradeSources',
@@ -536,10 +598,10 @@ const CoursePartsView = (): JSX.Element => {
 
   const DataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
+      const id = Math.max(0, ...rows.map(row => row.id)) + 1;
       setRows(oldRows => {
-        const freeId = Math.max(0, ...oldRows.map(row => row.id)) + 1;
         const newRow: ColTypes = {
-          id: freeId,
+          id,
           coursePartId: selectedPart!,
           daysValid: null,
           maxGrade: null,
@@ -550,7 +612,14 @@ const CoursePartsView = (): JSX.Element => {
         };
         return oldRows.concat(newRow);
       });
+
+      // Set the new row into edit mode and focus on the 'name' field
+      setRowModesModel(oldModel => ({
+        ...oldModel,
+        [id]: {mode: GridRowModes.Edit, fieldToFocus: 'name'},
+      }));
     };
+
     return (
       <GridToolbarContainer>
         <Button
@@ -579,6 +648,12 @@ const CoursePartsView = (): JSX.Element => {
     if (await AsyncConfirmationModal({confirmDiscard: true})) {
       setRows(structuredClone(initRows));
     }
+  };
+
+  const handleRowModesModelChange = (
+    newRowModesModel: GridRowModesModel
+  ): void => {
+    setRowModesModel(newRowModesModel);
   };
 
   return (
@@ -624,7 +699,7 @@ const CoursePartsView = (): JSX.Element => {
           show={editRights && unsavedChanges}
           handleDiscard={confirmDiscard}
           handleSave={handleSubmit}
-          disabled={editing}
+          disabled={editing || hasError}
         />
       </div>
 
@@ -643,6 +718,16 @@ const CoursePartsView = (): JSX.Element => {
         sx={{mt: 2}}
       >
         <Grid size={{sm: 8, md: 6, lg: 4}}>
+          <Collapse in={hasError}>
+            <Alert severity="warning" sx={{mb: 1, textAlign: 'left'}}>
+              <Typography>{t('course.parts.table-error')}</Typography>
+              <ul>
+                <li>{t('course.parts.name-error')}</li>
+                <li>{t('course.parts.days-valid-error')}</li>
+                <li>{t('course.parts.max-grade-error')}</li>
+              </ul>
+            </Alert>
+          </Collapse>
           {courseParts.data === undefined ? (
             <CircularProgress />
           ) : courseParts.data.length === 0 ? (
@@ -650,6 +735,7 @@ const CoursePartsView = (): JSX.Element => {
           ) : (
             <>
               <Collapse
+                data-testid="active-course-parts"
                 in={courseParts.data.find(mod => !mod.archived) !== undefined}
               >
                 <ListEntries
@@ -669,6 +755,7 @@ const CoursePartsView = (): JSX.Element => {
                 </ListEntries>
               </Collapse>
               <Collapse
+                data-testid="archived-course-parts"
                 in={courseParts.data.find(mod => mod.archived) !== undefined}
                 sx={{mt: 2}}
               >
@@ -692,12 +779,14 @@ const CoursePartsView = (): JSX.Element => {
         </Grid>
         <Grid size={{md: 12, lg: 8}}>
           <div style={{height: '100%', maxHeight: '70vh'}}>
-            <DataGridBase
+            <StyledDataGrid
               rows={rows}
               columns={columns}
               rowHeight={25}
               editMode="row"
               rowSelection={false}
+              rowModesModel={rowModesModel}
+              onRowModesModelChange={handleRowModesModelChange}
               disableColumnSelector
               slots={editRights ? {toolbar: DataGridToolbar} : {}}
               onRowEditStart={() => setEditing(true)}

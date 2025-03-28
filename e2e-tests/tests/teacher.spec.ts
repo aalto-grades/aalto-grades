@@ -6,6 +6,7 @@ import {test} from '@playwright/test';
 
 import {
   addCoursePart,
+  archiveCoursePart,
   checkCourse,
   createCourse,
   createGradingModel,
@@ -22,6 +23,7 @@ import {
   importGradesWithFile,
   importGradesWithText,
 } from './common/grades';
+import {addCoursePartTaskFail, addCoursePartTaskSuccess} from './common/task';
 import {aPlusToken} from './common/token';
 import {logOut} from './common/user';
 import {setupDb} from './helper';
@@ -57,6 +59,28 @@ test.describe('Test courses as teacher', () => {
     await viewCourseParts(page);
   });
 
+  test('Add course part', async ({page}) => {
+    await addCoursePart(page);
+  });
+
+  test('Edit course part', async ({page}) => {
+    await editCoursePart(page);
+  });
+
+  test('Archive and unarchive course part', async ({page}) => {
+    await archiveCoursePart(page);
+  });
+
+  test.describe('Add course part task', () => {
+    test('Success', async ({page}) => {
+      await addCoursePartTaskSuccess(page);
+    });
+
+    test('Fail (duplicate name)', async ({page}) => {
+      await addCoursePartTaskFail(page);
+    });
+  });
+
   test('Download grades CSV template', async ({page}) => {
     await downloadCSVGradeTemplate(page);
   });
@@ -87,14 +111,6 @@ test.describe('Test courses as teacher', () => {
 
   test('Create grading model', async ({page}) => {
     await createGradingModel(page);
-  });
-
-  test('Add Course Part', async ({page}) => {
-    await addCoursePart(page);
-  });
-
-  test('Edit Course Part', async ({page}) => {
-    await editCoursePart(page);
   });
 
   test('Import course from Sisu', async ({page}) => {

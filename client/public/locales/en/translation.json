@@ -254,7 +254,11 @@
       "add-new-part": "Add new course part",
       "no-course-parts": "No course parts. Please add course parts to get started.",
       "active-parts": "Active course parts",
-      "archived-parts": "Archived course parts"
+      "archived-parts": "Archived course parts",
+      "table-error": "Errors in the table values. Fix all rows with errors (cells marked with red)",
+      "name-error": "Task name must be unique",
+      "days-valid-error": "Days valid must be empty, zero, or a positive number",
+      "max-grade-error": "Max grade must be empty, zero, or a positive number"
     },
     "models": {
       "has-multiple-warnings": "Model has multiple warnings",
@@ -393,9 +397,7 @@
         "add-manually": "Or add them manually",
         "student-number-empty": "Student number cannot be empty",
         "modify-completion": "Modify completion",
-        "modify-expiration": "Modify expiration",
-        "bulk-edit-dialog-title": "Set date to selected course parts",
-        "resolve-errors": "Resolve errors to continue"
+        "modify-expiration": "Modify expiration"
       },
       "final-grade-preview": "Final grade preview",
       "course-part-value-preview": "Course part value",

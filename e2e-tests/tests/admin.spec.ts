@@ -6,6 +6,7 @@ import {expect, test} from '@playwright/test';
 
 import {
   addCoursePart,
+  archiveCoursePart,
   checkCourse,
   createCourse,
   createGradingModel,
@@ -22,6 +23,7 @@ import {
   importGradesWithFile,
   importGradesWithText,
 } from './common/grades';
+import {addCoursePartTaskFail, addCoursePartTaskSuccess} from './common/task';
 import {aPlusToken} from './common/token';
 import {addUser, logOut} from './common/user';
 import {setupDb} from './helper';
@@ -78,12 +80,26 @@ test.describe('Test courses as admin', () => {
     await viewCourseParts(page);
   });
 
-  test('Add Course Part', async ({page}) => {
+  test('Add course part', async ({page}) => {
     await addCoursePart(page);
   });
 
-  test('Edit Course Part', async ({page}) => {
+  test('Edit course part', async ({page}) => {
     await editCoursePart(page);
+  });
+
+  test('Archive and unarchive course part', async ({page}) => {
+    await archiveCoursePart(page);
+  });
+
+  test.describe('Add course part task', () => {
+    test('Success', async ({page}) => {
+      await addCoursePartTaskSuccess(page);
+    });
+
+    test('Fail (duplicate name)', async ({page}) => {
+      await addCoursePartTaskFail(page);
+    });
   });
 
   test('View grading model', async ({page}) => {
