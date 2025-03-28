@@ -18,7 +18,14 @@ import {
 } from '@mui/material';
 import type {Row} from '@tanstack/react-table';
 import {enqueueSnackbar} from 'notistack';
-import {type JSX, type MouseEvent, forwardRef, useMemo, useState} from 'react';
+import {
+  type ChangeEvent,
+  type JSX,
+  type MouseEvent,
+  forwardRef,
+  useMemo,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {z} from 'zod';
@@ -453,6 +460,30 @@ const GradesTableToolbar = (): JSX.Element => {
     return true;
   };
 
+  const resetSearch = (): void => {
+    table.getColumn('user_studentNumber')?.setFilterValue('');
+    table.getColumn('Name')?.setFilterValue('');
+  };
+
+  const handleSearch = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ): void => {
+    // Are all student numbers always numeric?
+    if (isNaN(Number(e.target.value))) {
+      table.getColumn('user_studentNumber')?.setFilterValue('');
+      table.getColumn('Name')?.setFilterValue(e.target.value);
+    } else {
+      table.getColumn('Name')?.setFilterValue('');
+      table.getColumn('user_studentNumber')?.setFilterValue(e.target.value);
+    }
+  };
+
+  const searchValue = (table
+    .getColumn('user_studentNumber')
+    ?.getFilterValue() ??
+    table.getColumn('Name')?.getFilterValue() ??
+    '') as string;
+
   return (
     <>
       <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} />
@@ -640,18 +671,9 @@ const GradesTableToolbar = (): JSX.Element => {
           </Tooltip>
         )}
         <Search
-          value={
-            (table.getColumn('user_studentNumber')?.getFilterValue() ??
-              '') as string
-          }
-          onChange={e => {
-            table
-              .getColumn('user_studentNumber')
-              ?.setFilterValue(e.target.value);
-          }}
-          reset={() =>
-            table.getColumn('user_studentNumber')?.setFilterValue('')
-          }
+          value={searchValue}
+          onChange={handleSearch}
+          reset={resetSearch}
         />
         <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
           {t('course.results.showing-n-rows', {
