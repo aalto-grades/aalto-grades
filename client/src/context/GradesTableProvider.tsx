@@ -155,9 +155,7 @@ export const GradesTableProvider = ({
   const [rowSelection, setRowSelection] = useState({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [grouping, setGrouping] = useState<GroupingState>([]);
-  const [globalFilter, setGlobalFilter] = useState<{globalFilter: string}>({
-    globalFilter: '',
-  });
+  const [globalFilter, setGlobalFilter] = useState<string>('');
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     errors: false,
   });
