@@ -461,28 +461,17 @@ const GradesTableToolbar = (): JSX.Element => {
   };
 
   const resetSearch = (): void => {
-    table.getColumn('user_studentNumber')?.setFilterValue('');
-    table.getColumn('Name')?.setFilterValue('');
+    table.setGlobalFilter('');
   };
 
   const handleSearch = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ): void => {
-    // Are all student numbers always numeric?
-    if (isNaN(Number(e.target.value))) {
-      table.getColumn('user_studentNumber')?.setFilterValue('');
-      table.getColumn('Name')?.setFilterValue(e.target.value);
-    } else {
-      table.getColumn('Name')?.setFilterValue('');
-      table.getColumn('user_studentNumber')?.setFilterValue(e.target.value);
-    }
+    table.setGlobalFilter(e.target.value);
+    return;
   };
 
-  const searchValue = (table
-    .getColumn('user_studentNumber')
-    ?.getFilterValue() ??
-    table.getColumn('Name')?.getFilterValue() ??
-    '') as string;
+  const searchValue = table.getState().globalFilter as string;
 
   return (
     <>
