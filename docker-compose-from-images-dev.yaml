@@ -41,7 +41,7 @@ services:
     environment:
       WATCHTOWER_NOTIFICATIONS: email
       WATCHTOWER_NOTIFICATION_EMAIL_FROM: root@aalto-grades-test.cs.aalto.fi
-      WATCHTOWER_NOTIFICATION_EMAIL_TO: trong.d.vu@aalto.fi,guido.bordonaro@aalto.fi
+      WATCHTOWER_NOTIFICATION_EMAIL_TO: guido.bordonaro@aalto.fi
       # Using local smtp server of aalto vm
       WATCHTOWER_NOTIFICATION_EMAIL_SERVER: localhost
       WATCHTOWER_NOTIFICATION_EMAIL_DELAY: 2
