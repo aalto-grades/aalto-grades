@@ -19,7 +19,7 @@ import {
   Button,
   CircularProgress,
   Collapse,
-  Grid2 as Grid,
+  Grid,
   IconButton,
   ListItem,
   ListItemButton,
