@@ -242,8 +242,9 @@ export const fetchAplusGrades: Endpoint<void, NewTaskGrade[]> = async (
   try {
     courseTaskIds = z
       .array(IdSchema)
-      // .parse(JSON.parse(String(req.query['course-tasks']))); // This line was giving a typescript error
-      .parse(JSON.parse(JSON.stringify(req.query['course-tasks'])));
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      .parse(JSON.parse(String(req.query['course-tasks']))); // This line was giving a typescript error
+    // .parse(JSON.parse(JSON.stringify(req.query['course-tasks'])));
   } catch (error) {
     if (error instanceof Error) {
       throw new ApiError(error.message, HttpCode.BadRequest);
