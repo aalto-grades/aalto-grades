@@ -16,15 +16,15 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  Toolbar,
   Typography,
 } from '@mui/material';
-import {
-  type GridColDef,
-  type GridRowClassNameParams,
-  type GridRowModel,
-  type GridRowsProp,
-  GridToolbarContainer,
-  type GridValidRowModel,
+import type {
+  GridColDef,
+  GridRowClassNameParams,
+  GridRowModel,
+  GridRowsProp,
+  GridValidRowModel,
 } from '@mui/x-data-grid';
 import * as fs from 'fs';
 import {enqueueSnackbar} from 'notistack';
@@ -109,11 +109,11 @@ const UploadDialogUpload = ({
       });
     };
     return (
-      <GridToolbarContainer>
+      <Toolbar>
         <Button startIcon={<Add />} onClick={handleClick}>
           {t('general.add-row')}
         </Button>
-      </GridToolbarContainer>
+      </Toolbar>
     );
   };
 
@@ -391,6 +391,7 @@ const UploadDialogUpload = ({
                 editMode="row"
                 rowSelection={false}
                 disableColumnSelector
+                showToolbar
                 slots={{toolbar: DataGridToolbar}}
                 onRowEditStart={() => {
                   setEditing(true);

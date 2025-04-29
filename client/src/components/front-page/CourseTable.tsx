@@ -158,7 +158,7 @@ const CourseTable = ({courses}: PropsType): JSX.Element => {
                   '&:focus': {backgroundColor: 'rgba(0, 0, 0, 0.04)'},
                 }}
                 role="button"
-                onClick={() =>
+                onClick={async () =>
                   navigate(`/${course.id}`, {
                     viewTransition: true,
                   })

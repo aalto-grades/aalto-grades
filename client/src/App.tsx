@@ -66,7 +66,9 @@ const Root = (): JSX.Element => {
       <NotistackWrapper />
       <GlobalModalWrapper
         customModal={ConfirmDialog}
-        ref={el => (globalModalRef = el)}
+        ref={el => {
+          globalModalRef = el;
+        }}
       />
       <QueryClientProvider client={queryClient}>
         <AppContainer />

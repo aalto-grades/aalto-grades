@@ -19,8 +19,8 @@ import {
   type GridRowClassNameParams,
   type GridRowModel,
   type GridRowsProp,
-  GridToolbarContainer,
   type GridValidRowModel,
+  Toolbar,
   useGridApiRef,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
@@ -189,6 +189,7 @@ const EditGradesDialog = ({
     if (JSON.stringify(rows) !== JSON.stringify(newRows)) setRows(newRows);
     // Autosize if table is already rendered
     setTimeout(() => {
+      if (apiRef.current === null) return;
       if (Object.keys(apiRef.current).length !== 0) {
         apiRef.current.autosizeColumns();
       }
@@ -274,11 +275,11 @@ const EditGradesDialog = ({
       });
     };
     return (
-      <GridToolbarContainer>
+      <Toolbar>
         <Button startIcon={<Add />} onClick={handleClick}>
           {t('course.results.add-grade')}
         </Button>
-      </GridToolbarContainer>
+      </Toolbar>
     );
   };
 
@@ -428,6 +429,7 @@ const EditGradesDialog = ({
               rowSelection={false}
               disableColumnSelector
               autosizeOnMount
+              showToolbar
               slots={{toolbar: dataGridToolbar}}
               sx={{maxHeight: '70vh', minHeight: '20vh'}}
               initialState={{
