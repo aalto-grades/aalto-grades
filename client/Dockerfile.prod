@@ -16,7 +16,6 @@ RUN npm ci
 
 WORKDIR /app/client
 COPY client/package.json client/package-lock.json ./
-COPY client/patches patches
 RUN npm ci
 
 # Copy only necessary files

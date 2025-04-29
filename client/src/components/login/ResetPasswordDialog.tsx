@@ -9,7 +9,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid2 as Grid,
+  Grid,
   Link,
 } from '@mui/material';
 import {Formik, type FormikHelpers, type FormikProps} from 'formik';

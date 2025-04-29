@@ -40,9 +40,9 @@ export const nullableDateSchema = (
   z.string().date().pipe(z.coerce.date()).nullable();
 
 export class CustomError extends Error {
-  action?: React.FC | null;
+  action?: () => JSX.Element;
 
-  constructor({message, action}: {message: string; action: React.FC}) {
+  constructor({message, action}: {message: string; action: () => JSX.Element}) {
     super();
     this.message = message;
     this.action = action;

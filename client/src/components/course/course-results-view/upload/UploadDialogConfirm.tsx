@@ -161,7 +161,7 @@ const UploadDialogConfirm = ({
     });
   };
 
-  const handleDateChange = (date: Dayjs): void => {
+  const handleDateChange = (date: Dayjs | null): void => {
     if (bulkEdit === null) return;
 
     if (bulkEdit.type === 'completion') {
@@ -226,7 +226,7 @@ const UploadDialogConfirm = ({
             <TableRow>
               <TableCell>{t('general.course-part')}</TableCell>
               <TableCell>
-                {colDates.length > 1 && (
+                {colDates.length > 0 && (
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -240,7 +240,7 @@ const UploadDialogConfirm = ({
                 {colDates.length > 1 && (
                   <Button
                     disabled={editCompletionDates.length === 0}
-                    sx={{ml: 2}}
+                    sx={{ml: 1}}
                     size="small"
                     variant="outlined"
                     onClick={() => handleClick('completion')}
@@ -250,7 +250,7 @@ const UploadDialogConfirm = ({
                 )}
               </TableCell>
               <TableCell>
-                {colDates.length > 1 && (
+                {colDates.length > 0 && (
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -264,7 +264,7 @@ const UploadDialogConfirm = ({
                 {colDates.length > 1 && (
                   <Button
                     disabled={editExpirationDates.length === 0}
-                    sx={{ml: 2}}
+                    sx={{ml: 1}}
                     size="small"
                     variant="outlined"
                     onClick={() => handleClick('expiration')}
@@ -325,6 +325,10 @@ const UploadDialogConfirm = ({
                     minDate={date.completionDate}
                     disabled={date.expirationDate === null && false}
                     slotProps={{
+                      field: {
+                        clearable: true,
+                        onClear: () => (date.expirationDate = null),
+                      },
                       textField: {
                         size: 'small',
                         error:

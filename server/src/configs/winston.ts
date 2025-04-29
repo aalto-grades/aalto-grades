@@ -21,7 +21,7 @@ const baseFormat = winston.format.combine(
   winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss'}),
   winston.format.printf(
     (http: winston.Logform.TransformableInfo) =>
-      `${http.timestamp} ${http.level}: ${http.message}`
+      `${http.timestamp as string} ${http.level}: ${http.message as string}`
   )
 );
 const format =

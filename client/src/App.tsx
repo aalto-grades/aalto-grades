@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import 'react-global-modal/dist/style.css';
+import 'react-global-modal/dist/react-global-modal.css';
 
 import {
   MutationCache,
@@ -66,7 +66,9 @@ const Root = (): JSX.Element => {
       <NotistackWrapper />
       <GlobalModalWrapper
         customModal={ConfirmDialog}
-        ref={el => (globalModalRef = el)}
+        ref={el => {
+          globalModalRef = el;
+        }}
       />
       <QueryClientProvider client={queryClient}>
         <AppContainer />

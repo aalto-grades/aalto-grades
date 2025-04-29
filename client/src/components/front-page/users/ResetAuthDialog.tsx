@@ -11,7 +11,7 @@ import {
   DialogTitle,
   FormControlLabel,
   FormGroup,
-  Grid2 as Grid,
+  Grid,
   IconButton,
   Switch,
   Tooltip,

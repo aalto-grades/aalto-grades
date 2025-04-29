@@ -4,6 +4,7 @@
 
 import 'dayjs/locale/en-gb';
 
+import {Clear} from '@mui/icons-material';
 import {
   Button,
   Dialog,
@@ -20,13 +21,13 @@ import {useTranslation} from 'react-i18next';
 
 type PropsType = {
   open: boolean;
-  submit: (date: Dayjs) => void;
+  submit: (date: Dayjs | null) => void;
   close: () => void;
 };
 
 const DateDialog = ({open, submit, close}: PropsType): JSX.Element => {
   const {t, i18n} = useTranslation();
-  const [date, setDate] = useState<Dayjs>(dayjs());
+  const [date, setDate] = useState<Dayjs | null>(dayjs());
 
   return (
     <Dialog open={open} onClose={close} maxWidth="sm">
@@ -36,10 +37,18 @@ const DateDialog = ({open, submit, close}: PropsType): JSX.Element => {
       <DialogContent
         sx={{
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           justifyContent: 'center',
+          flexDirection: 'column',
         }}
       >
+        <Button
+          onClick={() => setDate(null)}
+          variant="text"
+          startIcon={<Clear />}
+        >
+          {t('general.clear')}
+        </Button>
         <LocalizationProvider
           dateAdapter={AdapterDayjs}
           adapterLocale={i18n.language}

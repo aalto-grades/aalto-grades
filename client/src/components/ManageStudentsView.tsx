@@ -2,14 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {Box, Button, Typography} from '@mui/material';
-import {
-  type GridColDef,
-  type GridRowSelectionModel,
-  type GridRowsProp,
-  GridToolbarColumnsButton,
-  GridToolbarContainer,
-  GridToolbarFilterButton,
+import {Button, Typography} from '@mui/material';
+import type {
+  GridColDef,
+  GridRowSelectionModel,
+  GridRowsProp,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useEffect, useMemo, useState} from 'react';
@@ -42,13 +39,13 @@ const ManageStudentsView = (): JSX.Element => {
   const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rowSelectionModel, setRowSelectionModel] =
-    useState<GridRowSelectionModel>([]);
+    useState<GridRowSelectionModel>({type: 'include', ids: new Set()});
 
   const changes = useMemo(
     () =>
-      rowSelectionModel.length > 0 ||
+      rowSelectionModel.ids.size > 0 ||
       JSON.stringify(rows) !== JSON.stringify(initRows),
-    [initRows, rowSelectionModel.length, rows]
+    [initRows, rowSelectionModel.ids.size, rows]
   );
 
   const blocker = useBlocker(
@@ -129,19 +126,23 @@ const ManageStudentsView = (): JSX.Element => {
 
   const handleDelete = async (): Promise<void> => {
     const confirmation = await AsyncConfirmationModal({
-      title: t('manage-students.delete', {count: rowSelectionModel.length}),
+      title: t('manage-students.delete', {count: rowSelectionModel.ids.size}),
       message: t('manage-students.delete-message', {
-        count: rowSelectionModel.length,
+        count: rowSelectionModel.ids.size,
       }),
       confirmDelete: true,
     });
     if (confirmation) {
-      await deleteUsers.mutateAsync(rowSelectionModel.map(row => Number(row)));
+      await deleteUsers.mutateAsync(
+        Array.from(rowSelectionModel.ids).map(id => Number(id))
+      );
       enqueueSnackbar(
-        t('manage-students.delete-success', {count: rowSelectionModel.length}),
+        t('manage-students.delete-success', {
+          count: rowSelectionModel.ids.size,
+        }),
         {variant: 'success'}
       );
-      setRowSelectionModel([]);
+      setRowSelectionModel({type: 'include', ids: new Set()});
     }
   };
 
@@ -152,6 +153,17 @@ const ManageStudentsView = (): JSX.Element => {
         {t('manage-students.title')}
       </Typography>
       <div style={{height: '90%'}}>
+        <Button
+          onClick={handleDelete}
+          disabled={rowSelectionModel.ids.size === 0}
+          variant="contained"
+          color="error"
+          size="small"
+        >
+          {t('manage-students.delete', {
+            count: rowSelectionModel.ids.size,
+          })}
+        </Button>
         <DataGridBase
           rows={rows}
           columns={columns}
@@ -162,28 +174,7 @@ const ManageStudentsView = (): JSX.Element => {
           }}
           rowSelectionModel={rowSelectionModel}
           disableRowSelectionOnClick
-          slots={{
-            toolbar: () => {
-              return (
-                <GridToolbarContainer sx={{mb: 1}}>
-                  <GridToolbarColumnsButton />
-                  <GridToolbarFilterButton />
-                  <Box sx={{flexGrow: 1}} />
-                  <Button
-                    onClick={handleDelete}
-                    disabled={rowSelectionModel.length === 0}
-                    variant="contained"
-                    color="error"
-                    size="small"
-                  >
-                    {t('manage-students.delete', {
-                      count: rowSelectionModel.length,
-                    })}
-                  </Button>
-                </GridToolbarContainer>
-              );
-            },
-          }}
+          showToolbar
         />
       </div>
     </>

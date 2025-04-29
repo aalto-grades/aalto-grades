@@ -16,7 +16,7 @@ import {
   type GridColDef,
   type GridRowModel,
   type GridRowsProp,
-  GridToolbarContainer,
+  Toolbar,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useEffect, useMemo, useState} from 'react';
@@ -237,11 +237,11 @@ const EditFinalGradesDialog = ({
       });
     };
     return (
-      <GridToolbarContainer>
+      <Toolbar>
         <Button startIcon={<Add />} onClick={addFinalGrade}>
           {t('course.results.add-final')}
         </Button>
-      </GridToolbarContainer>
+      </Toolbar>
     );
   };
 
@@ -331,6 +331,7 @@ const EditFinalGradesDialog = ({
               editMode="row"
               rowSelection={false}
               disableColumnSelector
+              showToolbar
               slots={editRights ? {toolbar: dataGridToolbar} : {}}
               initialState={{
                 sorting: {sortModel: [{field: 'date', sort: 'desc'}]},

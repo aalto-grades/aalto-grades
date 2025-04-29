@@ -12,15 +12,27 @@ import {
   LocalizationProvider,
 } from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
-import type {Dayjs} from 'dayjs';
 import type {JSX} from 'react';
+import {useTranslation} from 'react-i18next';
 
 // Load correct translations to the x-date-pickers.
 // ref. https://mui.com/x/react-date-pickers/adapters-locale/
-const LocalizedDatePicker = (props: DatePickerProps<Dayjs>): JSX.Element => (
-  <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="fi">
-    <DatePicker {...props} />
-  </LocalizationProvider>
-);
+const LocalizedDatePicker = (props: DatePickerProps): JSX.Element => {
+  const {i18n} = useTranslation();
+  return (
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      adapterLocale={i18n.language}
+      dateFormats={{
+        month: 'MMM',
+        fullDate: 'DD MMM YYYY',
+        year: 'YYYY',
+        normalDate: 'DD.MM.YYYY',
+      }}
+    >
+      <DatePicker {...props} format="DD.MM.YYYY" />
+    </LocalizationProvider>
+  );
+};
 
 export default LocalizedDatePicker;
