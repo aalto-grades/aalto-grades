@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import 'react-global-modal/dist/style.css';
+import 'react-global-modal/dist/react-global-modal.css';
 
 import {
   MutationCache,
