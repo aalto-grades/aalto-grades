@@ -37,7 +37,7 @@ const Users = (): JSX.Element => {
             sx={{mr: 1.5}}
             size="large"
             variant="contained"
-            onClick={() => navigate('/manage-students')}
+            onClick={async () => navigate('/manage-students')}
           >
             {t('front-page.manage-students')}
           </Button>

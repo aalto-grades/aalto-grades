@@ -19,7 +19,7 @@ import {
   Button,
   CircularProgress,
   Collapse,
-  Grid2 as Grid,
+  Grid,
   IconButton,
   ListItem,
   ListItemButton,
@@ -36,7 +36,7 @@ import {
   type GridRowModesModel,
   type GridRowParams,
   type GridRowsProp,
-  GridToolbarContainer,
+  Toolbar,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useEffect, useMemo, useState} from 'react';
@@ -621,7 +621,7 @@ const CoursePartsView = (): JSX.Element => {
     };
 
     return (
-      <GridToolbarContainer>
+      <Toolbar>
         <Button
           startIcon={<Add />}
           onClick={handleClick}
@@ -640,7 +640,7 @@ const CoursePartsView = (): JSX.Element => {
             </Button>
           </span>
         </Tooltip>
-      </GridToolbarContainer>
+      </Toolbar>
     );
   };
 
@@ -791,6 +791,7 @@ const CoursePartsView = (): JSX.Element => {
               slots={editRights ? {toolbar: DataGridToolbar} : {}}
               onRowEditStart={() => setEditing(true)}
               onRowEditStop={() => setEditing(false)}
+              showToolbar
               processRowUpdate={(updatedRow: ColTypes) => {
                 setRows(oldRows =>
                   oldRows.map(row =>
