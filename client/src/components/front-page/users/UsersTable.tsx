@@ -119,6 +119,7 @@ const UsersTable = (): JSX.Element => {
                     <span>
                       <IconButton
                         aria-label="remove role"
+                        data-testid="PersonRemoveIcon"
                         onClick={async () => handleRemoveUserRole(user)}
                       >
                         <PersonRemove />
