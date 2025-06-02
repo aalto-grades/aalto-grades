@@ -11,6 +11,17 @@ import {DateSchema} from '@/common/types';
 // This file contains validation schemas and types for data returned by the A+
 // API.
 
+// General Pagination Schema
+export const createAplusPaginationSchema = <T extends z.ZodTypeAny>(
+  resultSchema: T
+) =>
+  z.object({
+    count: z.number().int(),
+    next: z.string().nullable(),
+    previous: z.string().nullable(),
+    results: z.array(resultSchema), // Changed from 'result' to 'results' and use the generic schema
+  });
+
 // GET /users/me
 export const AplusCoursesResSchema = z.object({
   staff_courses: z.array(
@@ -62,9 +73,7 @@ const AplusStudentPointsSchema = z.object({
 });
 
 // GET /courses/<course_id>/points
-export const AplusPointsResSchema = z.object({
-  results: z.array(AplusStudentPointsSchema),
-});
+export const AplusPointsResSchema = z.array(AplusStudentPointsSchema);
 
 export type AplusCoursesRes = z.infer<typeof AplusCoursesResSchema>;
 export type AplusExercisesRes = z.infer<typeof AplusExercisesResSchema>;

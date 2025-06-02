@@ -13,7 +13,11 @@ import {AXIOS_TIMEOUT} from '../../configs/constants';
 import httpLogger from '../../configs/winston';
 import AplusGradeSource from '../../database/models/aplusGradeSource';
 import type Course from '../../database/models/course';
-import {ApiError, stringToIdSchema} from '../../types';
+import {
+  ApiError,
+  createAplusPaginationSchema,
+  stringToIdSchema,
+} from '../../types';
 
 /**
  * Validates A+ course ID url param and returns it as a number.
@@ -179,4 +183,43 @@ export const fetchFromAplus = async <T>(
   }
 
   return result.data;
+};
+
+/**
+ * Fetches paginated data from A+ using the given URL.
+ *
+ * @throws AxiosError if fetching fails.
+ */
+export const fetchFromAplusPaginated = async <T>(
+  url: string,
+  aplusToken: string,
+  schema: ZodSchema<T>
+): Promise<T[]> => {
+  httpLogger.http(`Calling A+ With "GET ${url}"`);
+
+  const paginatedSchema = createAplusPaginationSchema(schema);
+  const resultArray: T[] = [];
+  let currentUrl: string | null = url;
+
+  do {
+    const response = await axios.get(currentUrl, {
+      timeout: AXIOS_TIMEOUT,
+      validateStatus: (status: number) => status === 200,
+      headers: {Authorization: `Token ${aplusToken}`},
+    });
+
+    const result = paginatedSchema.safeParse(response.data);
+
+    if (!result.success) {
+      throw new ApiError(
+        `Validating data from A+ failed: ${result.error.toString()}`,
+        HttpCode.BadGateway
+      );
+    }
+
+    resultArray.push(...result.data.results);
+    currentUrl = result.data.next;
+  } while (currentUrl);
+
+  return resultArray;
 };

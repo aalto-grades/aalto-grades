@@ -89,28 +89,26 @@ beforeAll(async () => {
   // eslint-disable-next-line @typescript-eslint/require-await
   mockedAxios.get.mockImplementation(async url => {
     if (url.endsWith('/points?format=json')) {
-      const data: AplusPointsRes = {
-        results: [
-          {
-            student_id: '123456',
-            points: 50,
-            points_by_difficulty: {A: 30},
-            modules: [
-              {id: 1, points: 10, exercises: [{id: 1, points: 5}]},
-              {id: 2, points: 40, exercises: []},
-            ],
-          },
-          {
-            student_id: '654321',
-            points: 40,
-            points_by_difficulty: {A: 25},
-            modules: [
-              {id: 1, points: 7, exercises: [{id: 1, points: 5}]},
-              {id: 2, points: 33, exercises: []},
-            ],
-          },
-        ],
-      };
+      const data: AplusPointsRes = [
+        {
+          student_id: '123456',
+          points: 50,
+          points_by_difficulty: {A: 30},
+          modules: [
+            {id: 1, points: 10, exercises: [{id: 1, points: 5}]},
+            {id: 2, points: 40, exercises: []},
+          ],
+        },
+        {
+          student_id: '654321',
+          points: 40,
+          points_by_difficulty: {A: 25},
+          modules: [
+            {id: 1, points: 7, exercises: [{id: 1, points: 5}]},
+            {id: 2, points: 33, exercises: []},
+          ],
+        },
+      ];
 
       return {data};
     }

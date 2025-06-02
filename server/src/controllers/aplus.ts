@@ -287,7 +287,7 @@ export const fetchAplusGrades: Endpoint<void, NewTaskGrade[]> = async (
           AplusPointsResSchema
         );
 
-        pointsResCache[aplusCourseId] = pointsRes.results;
+        pointsResCache[aplusCourseId] = pointsRes;
       }
 
       const points = pointsResCache[aplusCourseId];
