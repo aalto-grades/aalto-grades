@@ -21,6 +21,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import {useQueryClient} from '@tanstack/react-query';
 import {enqueueSnackbar} from 'notistack';
 import {
   type ChangeEvent,
@@ -44,6 +45,7 @@ import {getToken} from '@/utils';
 type PropsType = {open: boolean; onClose: () => void};
 const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
   const {t} = useTranslation();
+  const queryClient = useQueryClient();
   const {courseId} = useParams() as {courseId: string};
   const courseParts = useGetCourseParts(courseId);
   const courseTasks = useGetCourseTasks(courseId);
@@ -63,14 +65,22 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
     setCourseTaskIds([]);
     setAplusTokenDialogOpen(false);
     onClose();
-  }, [onClose]);
+    queryClient.invalidateQueries({
+      queryKey: ['a+-grades', courseId, courseTaskIds],
+    });
+  }, [courseId, courseTaskIds, onClose, queryClient]);
 
   // Must be a useEffect to be able to call enqueueSnackbar & onClose :/
   useEffect(() => {
     if (step !== 1) return;
 
     if (!aplusGrades.data) {
-      setAplusTokenDialogOpen(!getToken() || aplusGrades.isError);
+      setAplusTokenDialogOpen(
+        !getToken() ||
+          (aplusGrades.isError &&
+            aplusGrades.error.message.includes('502') &&
+            aplusGrades.error.message.includes('401'))
+      );
     } else if (aplusGrades.data.length === 0) {
       enqueueSnackbar(t('course.parts.no-aplus-grades'), {
         variant: 'warning',
@@ -79,7 +89,14 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
     } else {
       setStep(2);
     }
-  }, [aplusGrades.data, aplusGrades.isError, handleResetAndClose, step, t]);
+  }, [
+    aplusGrades.data,
+    aplusGrades.error,
+    aplusGrades.isError,
+    handleResetAndClose,
+    step,
+    t,
+  ]);
 
   const handleSelect = (
     event: ChangeEvent<HTMLInputElement>,
@@ -161,7 +178,11 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
 
         {step === 2 && (
           <>
-            <DialogTitle>{t('general.confirm')}</DialogTitle>
+            <DialogTitle>
+              {t('course.parts.a+-confirm-grades', {
+                count: aplusGrades.data?.length,
+              })}
+            </DialogTitle>
             <DialogContent>
               <TableContainer component={Paper}>
                 <Table>
@@ -178,7 +199,9 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
                   </TableHead>
                   <TableBody>
                     {aplusGrades.data?.map(row => (
-                      <TableRow key={row.studentNumber}>
+                      <TableRow
+                        key={`${row.studentNumber}-${row.courseTaskId}`}
+                      >
                         <TableCell>{row.studentNumber}</TableCell>
                         <TableCell>
                           {

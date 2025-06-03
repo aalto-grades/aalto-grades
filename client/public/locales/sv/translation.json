@@ -228,6 +228,7 @@
       "create-tasks": "UNTRANSLATED",
       "delete-a+": "UNTRANSLATED",
       "no-aplus-grades": "UNTRANSLATED",
+      "a+-confirm-grades": "Bekräfta {{count}} betyg",
       "select-course-tasks": "UNTRANSLATED",
       "select-for-fetching": "UNTRANSLATED",
       "fetching-grades": "UNTRANSLATED",
