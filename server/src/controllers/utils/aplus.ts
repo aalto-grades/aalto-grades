@@ -190,15 +190,15 @@ export const fetchFromAplus = async <T>(
  *
  * @throws AxiosError if fetching fails.
  */
-export const fetchFromAplusPaginated = async <T>(
+export const fetchFromAplusPaginated = async <T extends readonly unknown[]>(
   url: string,
   aplusToken: string,
   schema: ZodSchema<T>
-): Promise<T[]> => {
+): Promise<T> => {
   httpLogger.http(`Calling A+ With "GET ${url}"`);
 
   const paginatedSchema = createAplusPaginationSchema(schema);
-  const resultArray: T[] = [];
+  const resultArray: T[number][] = [];
   let currentUrl: string | null = url;
 
   do {
@@ -217,9 +217,10 @@ export const fetchFromAplusPaginated = async <T>(
       );
     }
 
-    resultArray.push(...result.data.results);
+    // result.data.results is of type T (the full array), so we spread it
+    resultArray.push(...(result.data.results as T));
     currentUrl = result.data.next;
   } while (currentUrl);
 
-  return resultArray;
+  return resultArray as unknown as T;
 };

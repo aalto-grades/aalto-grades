@@ -11,15 +11,20 @@ import {DateSchema} from '@/common/types';
 // This file contains validation schemas and types for data returned by the A+
 // API.
 
-// General Pagination Schema
+/** Create a A+ Pagination Schema, the resultSchema need to be an array */
 export const createAplusPaginationSchema = <T extends z.ZodTypeAny>(
   resultSchema: T
-) =>
+): z.ZodObject<{
+  count: z.ZodNumber;
+  next: z.ZodNullable<z.ZodString>;
+  previous: z.ZodNullable<z.ZodString>;
+  results: T;
+}> =>
   z.object({
     count: z.number().int(),
     next: z.string().nullable(),
     previous: z.string().nullable(),
-    results: z.array(resultSchema), // Changed from 'result' to 'results' and use the generic schema
+    results: resultSchema, // Changed from 'result' to 'results' and use the generic schema
   });
 
 // GET /users/me
