@@ -28,6 +28,7 @@ import {
 } from '../types';
 import {
   fetchFromAplus,
+  fetchFromAplusPaginated,
   parseAplusGradeSource,
   parseAplusToken,
   validateAplusCourseId,
@@ -281,13 +282,14 @@ export const fetchAplusGrades: Endpoint<void, NewTaskGrade[]> = async (
       const aplusCourseId = gradeSource.aplusCourse.id;
 
       if (!(aplusCourseId in pointsResCache)) {
-        const pointsRes = await fetchFromAplus(
+        // const pointsRes = await fetchFromAplusPaginated(
+        const pointsRes = await fetchFromAplusPaginated(
           `${APLUS_API_URL}/courses/${aplusCourseId}/points?format=json`,
           aplusToken,
           AplusPointsResSchema
         );
 
-        pointsResCache[aplusCourseId] = pointsRes.results;
+        pointsResCache[aplusCourseId] = pointsRes;
       }
 
       const points = pointsResCache[aplusCourseId];

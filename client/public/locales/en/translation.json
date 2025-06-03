@@ -228,6 +228,7 @@
       "create-tasks": "Create course tasks",
       "delete-a+": "Delete A+ grade source",
       "no-aplus-grades": "No aplus grades found for selected course tasks",
+      "a+-confirm-grades": "Confirm {{count}} grades",
       "select-course-tasks": "Select course tasks",
       "select-for-fetching": "Select the course parts you want to fetch grades for from A+.",
       "fetching-grades": "Fetching grades",

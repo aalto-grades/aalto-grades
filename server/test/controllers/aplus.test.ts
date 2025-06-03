@@ -89,7 +89,10 @@ beforeAll(async () => {
   // eslint-disable-next-line @typescript-eslint/require-await
   mockedAxios.get.mockImplementation(async url => {
     if (url.endsWith('/points?format=json')) {
-      const data: AplusPointsRes = {
+      const data = {
+        count: 2,
+        next: null,
+        previous: null,
         results: [
           {
             student_id: '123456',

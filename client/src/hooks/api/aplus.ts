@@ -106,7 +106,7 @@ export const useFetchAplusGrades = (
   options?: Partial<UseQueryOptions<NewTaskGrade[]>>
 ): UseQueryResult<NewTaskGrade[]> =>
   useQuery({
-    queryKey: ['a+-grades', courseId],
+    queryKey: ['a+-grades', courseId, courseTaskIds],
     queryFn: async () =>
       NewTaskGradeArraySchema.parse(
         (

@@ -228,6 +228,7 @@
       "create-tasks": "Luo tehtäviä",
       "delete-a+": "Poista A+",
       "no-aplus-grades": "Ei A+ arvosanoja",
+      "a+-confirm-grades": "Vahvista {{count}} arvosanaa",
       "select-course-tasks": "Valitse kurssitehtävät",
       "select-for-fetching": "Valitse haettavaksi",
       "fetching-grades": "Haetaan arvosanoja",
