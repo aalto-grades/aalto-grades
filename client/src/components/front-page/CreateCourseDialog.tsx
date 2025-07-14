@@ -176,34 +176,34 @@ const CreateCourseDialog = ({
   });
 
   const validationSchema = z
-    .object({
+    .strictObject({
       courseCode: z
         .string({
-          required_error: t('course.edit.course-code-required'),
+          error: t('course.edit.course-code-required'),
         })
         .min(1, t('course.edit.course-code-required')),
       minCredits: z
         .number({
-          required_error: t('course.edit.min-credits-required'),
+          error: t('course.edit.min-credits-required'),
         })
         .min(0, t('course.edit.min-credits-negative')),
       maxCredits: z.number({
-        required_error: t('course.edit.max-credits-required'),
+        error: t('course.edit.max-credits-required'),
       }),
       gradingScale: GradingScaleSchema,
       languageOfInstruction: LanguageSchema,
       teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
       assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
       assistantExpiryDate: z.string().or(z.date().nullable()),
-      department: z.nativeEnum(Department),
+      department: z.enum(Department),
       nameEn: z
-        .string({required_error: t('course.edit.name-english')})
+        .string({error: t('course.edit.name-english')})
         .min(1, t('course.edit.name-english')),
       nameFi: z
-        .string({required_error: t('course.edit.name-finnish')})
+        .string({error: t('course.edit.name-finnish')})
         .min(1, t('course.edit.name-finnish')),
       nameSv: z
-        .string({required_error: t('course.edit.name-swedish')})
+        .string({error: t('course.edit.name-swedish')})
         .min(1, t('course.edit.name-swedish')),
     })
     .refine(val => val.maxCredits >= val.minCredits, {
@@ -212,7 +212,7 @@ const CreateCourseDialog = ({
     });
 
   const AssistantValidationSchema = z.strictObject({
-    email: z.string().email(),
+    email: z.email(),
     expiryDate: nullableDateSchema(t),
   });
 

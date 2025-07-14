@@ -9,13 +9,13 @@ import {AaltoEmailSchema, DateSchema, IdSchema} from './general';
 export const UserDataSchema = z.strictObject({
   id: IdSchema,
   name: z.string().nullable(),
-  email: z.string().email().nullable(),
+  email: z.email().nullable(),
   studentNumber: z.string().nullable(),
 });
 export const FullUserDataSchema = z.strictObject({
   id: IdSchema,
   name: z.string().nullable(),
-  email: z.string().email().nullable(),
+  email: z.email().nullable(),
   studentNumber: z.string().nullable(),
   idpUser: z.boolean(),
   admin: z.boolean(),
@@ -23,20 +23,20 @@ export const FullUserDataSchema = z.strictObject({
 export const StudentDataSchema = z.strictObject({
   id: IdSchema,
   name: z.string().nullable(),
-  email: z.string().email().nullable(),
+  email: z.email().nullable(),
   studentNumber: z.string(),
 });
 export const TeacherDataSchema = z.strictObject({
   id: IdSchema,
   name: z.string().nullable(),
-  email: z.string().email(),
+  email: z.email(),
   studentNumber: z.string().nullable(),
 });
 export const AssistantDataSchema = TeacherDataSchema.extend({
   expiryDate: z.string().nullable(),
 });
 export const NewAssistantDataSchema = z.strictObject({
-  email: z.string().email(),
+  email: z.email(),
   expiryDate: DateSchema.nullable(),
 });
 
@@ -63,7 +63,7 @@ export const UserIdArraySchema = z
   .refine(items => new Set(items).size === items.length);
 
 export const VerifyEmailSchema = z.strictObject({
-  email: z.string().email(),
+  email: z.email(),
 });
 
 export const VerifyEmailResponseSchema = z.strictObject({

@@ -48,7 +48,7 @@
     "reactflow": "^11.11.4",
     "styled-components": "^6.1.17",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
-    "zod": "^3.24.3"
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/dompurify": "^3.2.0",
@@ -60,7 +60,7 @@
     "@vitejs/plugin-react": "^4.4.1",
     "eslint-plugin-no-relative-import-paths": "^1.5.5",
     "eslint-plugin-react": "^7.35.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "i18next-parser": "^9.3.0",
     "license-checker-rseidelsohn": "^4.4.2",

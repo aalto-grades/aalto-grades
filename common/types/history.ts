@@ -26,10 +26,10 @@ export const PreviousStateSchema = BaseGradeDataSchema.omit({
   updatedAt: DateSchema,
 });
 
-export const TaskGradeHistorySchema = z.object({
+export const TaskGradeHistorySchema = z.strictObject({
   id: z.number(),
   courseTaskId: z.number(),
-  actionType: z.nativeEnum(ActionType),
+  actionType: z.enum(ActionType),
   updatedAt: DateSchema,
   createdAt: DateSchema,
   user: TeacherDataSchema.nullable(),

@@ -208,7 +208,7 @@ export const authResetOwnPassword: SyncEndpoint<ResetOwnPasswordData, void> = (
       const passwordResult = PasswordSchema.safeParse(req.body.newPassword);
       if (!passwordResult.success) {
         return res.status(HttpCode.BadRequest).send({
-          errors: [passwordResult.error.errors[0].message],
+          errors: [passwordResult.error.issues[0].message],
         });
       }
 

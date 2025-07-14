@@ -44,8 +44,7 @@
     "swagger-ui-express": "^5.0.0",
     "winston": "^3.10.0",
     "xpath": "^0.0.34",
-    "zod": "^3.24.1",
-    "zod-express-middleware": "^1.4.0",
+    "zod": "^4.0.0",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {

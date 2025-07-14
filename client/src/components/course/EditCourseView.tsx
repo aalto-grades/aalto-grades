@@ -183,7 +183,7 @@ const EditCourseView = (): JSX.Element => {
   };
 
   const AssistantValidationSchema = z.strictObject({
-    email: z.string().email(),
+    email: z.email(),
     expiryDate: nullableDateSchema(t),
   });
 
@@ -234,19 +234,19 @@ const EditCourseView = (): JSX.Element => {
   };
 
   const ValidationSchema = z
-    .object({
+    .strictObject({
       courseCode: z
         .string({
-          required_error: t('course.edit.course-code-required'),
+          error: t('course.edit.course-code-required'),
         })
         .min(1, t('course.edit.course-code-required')),
       minCredits: z
         .number({
-          required_error: t('course.edit.min-credits-required'),
+          error: t('course.edit.min-credits-required'),
         })
         .min(0, t('course.edit.min-credits-negative')),
       maxCredits: z.number({
-        required_error: t('course.edit.max-credits-required'),
+        error: t('course.edit.max-credits-required'),
       }),
       gradingScale: GradingScaleSchema,
       languageOfInstruction: LanguageSchema,
@@ -254,13 +254,13 @@ const EditCourseView = (): JSX.Element => {
       assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
       department: DepartmentSchema,
       nameEn: z
-        .string({required_error: t('course.edit.name-english')})
+        .string({error: t('course.edit.name-english')})
         .min(1, t('course.edit.name-english')),
       nameFi: z
-        .string({required_error: t('course.edit.name-finnish')})
+        .string({error: t('course.edit.name-finnish')})
         .min(1, t('course.edit.name-finnish')),
       nameSv: z
-        .string({required_error: t('course.edit.name-swedish')})
+        .string({error: t('course.edit.name-swedish')})
         .min(1, t('course.edit.name-swedish')),
     })
     .refine(val => val.maxCredits >= val.minCredits, {
@@ -280,9 +280,10 @@ const EditCourseView = (): JSX.Element => {
     const result = ValidationSchema.safeParse(values);
     if (result.success) return;
 
-    const fieldErrors = result.error.formErrors.fieldErrors;
+    const treeifiedError = z.treeifyError(result.error);
+    const fieldErrors = treeifiedError.properties || {};
     return Object.fromEntries(
-      Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
+      Object.entries(fieldErrors).map(([key, val]) => [key, val?.errors[0]]) // Only the first error
     );
   };
 

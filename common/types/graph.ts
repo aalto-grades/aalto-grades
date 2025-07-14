@@ -94,7 +94,7 @@ const CustomNodeTypesSchema = z.enum([
 const DropInNodesSchema = CustomNodeTypesSchema.exclude(['sink', 'source']);
 
 const AverageNodeSettingsSchema = z.strictObject({
-  weights: z.record(z.number()),
+  weights: z.record(z.string(), z.number()),
   percentageMode: z.boolean(),
 });
 const MaxNodeSettingsSchema = z.strictObject({
@@ -147,7 +147,7 @@ export const GraphStructureSchema = z.strictObject({
     z.object({
       id: z.string(),
       position: z.object({x: z.number(), y: z.number()}),
-      data: z.object({}),
+      data: z.record(z.string(), z.any()),
       type: CustomNodeTypesSchema.optional(),
 
       // Will be removed in api

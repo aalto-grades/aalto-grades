@@ -6,26 +6,26 @@ import {z} from 'zod';
 
 import {LocalizedStringSchema} from './general';
 
-const CourseUnitSchema = z.object({
+const CourseUnitSchema = z.strictObject({
   courseUnitGroupId: z.string(),
   credits: z.union([z.string(), z.number(), z.null()]),
 });
 
-const OrganizationSchema = z.object({
+const OrganizationSchema = z.strictObject({
   organisationId: z.string(),
   educationalInstitutionUrn: z.union([z.string(), z.null()]),
   roleUrn: z.string(),
   share: z.number(),
 });
 
-export const SisuCourseInstanceSchema = z.object({
+export const SisuCourseInstanceSchema = z.strictObject({
   id: z.string(),
   code: z.string(),
   startDate: z.string(),
   endDate: z.string(),
   type: z.string(),
   name: LocalizedStringSchema,
-  summary: z.object({
+  summary: z.strictObject({
     workload: LocalizedStringSchema,
     prerequisites: LocalizedStringSchema,
     learningOutcomes: LocalizedStringSchema,
@@ -48,7 +48,7 @@ export const SisuCourseInstanceSchema = z.object({
   organizations: z.array(OrganizationSchema),
   organizationId: z.string(),
   organizationName: LocalizedStringSchema,
-  credits: z.object({
+  credits: z.strictObject({
     min: z.number(),
     max: z.number(),
   }),
@@ -60,7 +60,7 @@ export const SisuCourseInstanceSchema = z.object({
   mincredits: z.string(),
 });
 
-export const SisuErrorSchema = z.object({
+export const SisuErrorSchema = z.strictObject({
   error: z.strictObject({
     code: z.number(),
     message: z.string(),

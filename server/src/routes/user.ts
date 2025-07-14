@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import express, {Router} from 'express';
-import {processRequestBody, validateRequestBody} from 'zod-express-middleware';
 
 import {
   NewUserSchema,
@@ -25,6 +24,7 @@ import {handleInvalidRequestJson} from '../middleware';
 import {jwtAuthentication} from '../middleware/authentication';
 import {authorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
+import {processRequestBody, validateRequestBody} from '../middleware/zodValidation';
 
 export const router = Router();
 
