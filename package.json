@@ -3,12 +3,7 @@
   "version": "1.0.8",
   "license": "Expat (MIT)",
   "author": "The Ossi Developers",
-  "workspaces": [
-    "client",
-    "server",
-    "common",
-    "e2e-tests"
-  ],
+
   "scripts": {
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "lint-common": "eslint common --ext ts --report-unused-disable-directives",
