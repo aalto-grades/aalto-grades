@@ -405,7 +405,7 @@ passport.use(
       usernameField: 'email',
       passwordField: 'password',
     },
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+     
     async (
       email: string,
       password: string,
@@ -447,4 +447,4 @@ const useSamlStrategy = async (): Promise<void> => {
 };
 
 // Cannot use top level await so must call separately...
-useSamlStrategy(); // eslint-disable-line @typescript-eslint/no-floating-promises
+useSamlStrategy();  

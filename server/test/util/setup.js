@@ -4,7 +4,7 @@
 
 /** Not sure how to make this work as a typescript file :/ */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const pg = require('pg');
 
 const pgHost = process.env.POSTGRES_URL || 'localhost';
@@ -24,7 +24,7 @@ const dbConfig = {
 };
 
 /** Creates a copy of the current database. */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+ 
 const setup = async () => {
   const client = new pg.Client(dbConfig);
   await client.connect();

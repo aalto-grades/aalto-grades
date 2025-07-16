@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import type {NextFunction, Request, Response} from 'express';
-import type {ZodSchema, ZodError} from 'zod';
+import type {ParsedQs} from 'qs';
+import type {ZodError, ZodSchema} from 'zod';
 
 import {HttpCode} from '@/common/types';
 
@@ -29,7 +30,7 @@ export const processRequestBody = <T>(schema: ZodSchema<T>) => {
       // Replace the request body with the parsed and validated data
       req.body = result.data;
       next();
-    } catch (error) {
+    } catch {
       res.status(HttpCode.InternalServerError).json([
         {
           type: 'Body',
@@ -67,9 +68,9 @@ export const processRequestQuery = <T>(schema: ZodSchema<T>) => {
         return;
       }
       
-      req.query = result.data as any;
+      req.query = result.data as ParsedQs;
       next();
-    } catch (error) {
+    } catch {
       res.status(HttpCode.InternalServerError).json([
         {
           type: 'Query',
@@ -101,9 +102,9 @@ export const processRequestParams = <T>(schema: ZodSchema<T>) => {
         return;
       }
       
-      req.params = result.data as any;
+      req.params = result.data as Record<string, string>;
       next();
-    } catch (error) {
+    } catch {
       res.status(HttpCode.InternalServerError).json([
         {
           type: 'Params',
@@ -120,7 +121,7 @@ export const processRequestParams = <T>(schema: ZodSchema<T>) => {
 /**
  * Validates request body, query, and params using the provided schemas.
  */
-export const processRequest = <T extends Record<string, ZodSchema>>(schemas: T) => {
+export const processRequest = <T extends Partial<Record<'body' | 'query' | 'params', ZodSchema>>>(schemas: T) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {
       const errors: Array<{type: string; errors: ZodError}> = [];
@@ -141,7 +142,7 @@ export const processRequest = <T extends Record<string, ZodSchema>>(schemas: T) 
         if (!queryResult.success) {
           errors.push({ type: 'Query', errors: queryResult.error });
         } else {
-          req.query = queryResult.data as any;
+          req.query = queryResult.data as ParsedQs;
         }
       }
 
@@ -151,7 +152,7 @@ export const processRequest = <T extends Record<string, ZodSchema>>(schemas: T) 
         if (!paramsResult.success) {
           errors.push({ type: 'Params', errors: paramsResult.error });
         } else {
-          req.params = paramsResult.data as any;
+          req.params = paramsResult.data as Record<string, string>;
         }
       }
 
@@ -161,7 +162,7 @@ export const processRequest = <T extends Record<string, ZodSchema>>(schemas: T) 
       }
 
       next();
-    } catch (error) {
+    } catch {
       res.status(HttpCode.InternalServerError).json([
         {
           type: 'Internal',

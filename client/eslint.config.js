@@ -110,11 +110,6 @@ export default tseslint.config(
       'spaced-comment': ['warn', 'always', {markers: ['/']}],
 
       // Import plugin rules
-      'import/extensions': [
-        'error',
-        'ignorePackages',
-        {ts: 'never', tsx: 'never'},
-      ],
       'import/newline-after-import': 'warn',
       'import/no-named-as-default-member': 'off',
       'import/no-unresolved': ['warn', { 

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import type {TFunction} from 'i18next';
+import type { JSX } from 'react';
 import {z} from 'zod';
 
 import type {Department, Language, LocalizedString} from '@/common/types';
@@ -25,19 +26,19 @@ export type LanguageOption = {
 };
 
 // For formik
-export const nullableIntSchema = (
-  t: TFunction
-): z.ZodNullable<z.ZodPipeline<z.ZodString, z.ZodNumber>> =>
-  z
-    .string()
-    .regex(/^[1-9]+\d*$/, t('general.not-int'))
-    .pipe(z.coerce.number().int().nonnegative())
-    .nullable();
+// export const nullableIntSchema = (
+//   t: TFunction
+// ) =>
+//   z
+//     .string()
+//     .regex(/^[1-9]+\d*$/, t('general.not-int'))
+//     .pipe(z.coerce.number().int().nonnegative())
+//     .nullable();
 
 export const nullableDateSchema = (
   _t: TFunction
-): z.ZodNullable<z.ZodPipeline<z.ZodString, z.ZodDate>> =>
-  z.string().date().pipe(z.coerce.date()).nullable();
+) =>
+  z.iso.date().pipe(z.coerce.date()).nullable();
 
 export class CustomError extends Error {
   action?: () => JSX.Element;

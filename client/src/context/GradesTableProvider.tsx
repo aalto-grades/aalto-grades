@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-/* eslint-disable no-restricted-imports */
+ 
 
 import {Badge, Checkbox} from '@mui/material';
 import {
@@ -582,7 +582,7 @@ export const GradesTableProvider = ({
         id: 'latestBestGrade',
         meta: {PrettyChipPosition: 'first'},
         header: () => {
-          return t('course.results.table.latest-grade') as string; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+          return t('course.results.table.latest-grade');  
         },
         cell: ({getValue}) => getValue(),
       }),

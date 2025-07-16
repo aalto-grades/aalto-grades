@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-/* eslint-disable n/no-process-exit */
-
 import fs from 'fs';
 import path from 'node:path';
 import * as readlineSync from 'readline-sync';

@@ -104,7 +104,7 @@ const StudentsView = (): JSX.Element => {
                   <TableRow
                     key={course.id}
                     hover
-                    onClick={() => navigate(`/${course.id}/course-results`)}
+                    onClick={async () => navigate(`/${course.id}/course-results`)}
                   >
                     <TableCell>{localize(course.name)}</TableCell>
                     <TableCell align="right">

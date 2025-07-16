@@ -42,7 +42,7 @@ afterAll(async () => {
 });
 
 // Required to fix saml test?
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+ 
 jest.mock('fs', () => ({__esModule: true, ...jest.requireActual('fs')}));
 
 const getToken = async (userId: number): Promise<string> => {

@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import {Formik, type FormikHelpers, type FormikProps} from 'formik';
-import {type JSX} from 'react';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {z} from 'zod';

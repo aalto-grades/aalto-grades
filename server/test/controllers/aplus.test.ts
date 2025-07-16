@@ -21,7 +21,6 @@ import AplusGradeSource from '../../src/database/models/aplusGradeSource';
 import type {
   AplusCoursesRes,
   AplusExercisesRes,
-  AplusPointsRes,
 } from '../../src/types/aplus';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
@@ -86,7 +85,6 @@ beforeAll(async () => {
   [[, differentGradeSourceId]] =
     await createData.createAplusGradeSources(noRoleCourseId);
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   mockedAxios.get.mockImplementation(async url => {
     if (url.endsWith('/points?format=json')) {
       const data = {

@@ -2,16 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import type {ParseParams, ZodSchema} from 'zod';
+import type {ZodType} from 'zod';
 
 /** Allows use of Zod schemas with the Formik `validate` prop. */
 // eslint-disable-next-line func-style
 export function withZodSchema<T>(
-  schema: ZodSchema<T>,
-  params?: Partial<ParseParams>
+  schema: ZodType<T>
 ) {
   return (values: T): Partial<T> => {
-    const result = schema.safeParse(values, params);
+    const result = schema.safeParse(values);
 
     if (result.success) return {};
 

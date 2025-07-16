@@ -7,7 +7,7 @@ import {BACKEND_PORT} from './configs/environment';
 import httpLogger from './configs/winston';
 import {connectToDatabase} from './database/index';
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
+ 
 app.listen(BACKEND_PORT, async () => {
   try {
     await connectToDatabase();

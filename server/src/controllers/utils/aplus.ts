@@ -176,7 +176,6 @@ export const fetchFromAplus = async <T>(
 
   if (!result.success) {
     throw new ApiError(
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       `Validating data from A+ failed: ${result.error}`,
       HttpCode.BadGateway
     );

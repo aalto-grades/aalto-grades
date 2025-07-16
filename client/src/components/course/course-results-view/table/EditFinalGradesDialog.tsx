@@ -357,7 +357,7 @@ const EditFinalGradesDialog = ({
                 const GradeSchema = z.number().int().min(0).max(maxFinalGrade);
                 const result = GradeSchema.safeParse(updatedRow.grade);
                 if (!result.success)
-                  throw new Error(result.error.errors[0].message);
+                  throw new Error(result.error.issues[0].message);
 
                 setError(false);
                 return updatedRow;

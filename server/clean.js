@@ -18,9 +18,9 @@ for (let i = 0; i < process.argv.length; i++) {
 }
 
 
-function deleteFolderRecursive(folderPath) {
+var deleteFolderRecursive = function deleteFolderRecursive(folderPath) {
     if (fs.existsSync(folderPath) && fs.lstatSync(folderPath).isDirectory()) {
-        fs.readdirSync(folderPath).forEach(function (file, index) {
+        fs.readdirSync(folderPath).forEach(function processFile(file) {
             var curPath = path.join(folderPath, file);
 
             if (fs.lstatSync(curPath).isDirectory()) { // recurse
@@ -41,7 +41,8 @@ function deleteFolderRecursive(folderPath) {
             fs.rmdirSync(folderPath);
         }
     }
-}
+};
+
 if (isDryRun) {
     console.log('Dry run enabled. ');
 } else {
