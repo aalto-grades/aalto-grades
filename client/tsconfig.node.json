@@ -10,7 +10,8 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
@@ -21,5 +22,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["vite.config.mts", "translation-utils.ts","libre-js-plugin.ts", "eslint.config.js"]
+  "include": ["vite.config.mts", "translation-utils.ts","libre-js-plugin.ts"]
 }
