@@ -4,10 +4,10 @@
   "license": "Expat (MIT)",
   "author": "The Ossi Developers",
   "scripts": {
-    "lint": "eslint . --report-unused-disable-directives",
-    "lint-common": "eslint common --report-unused-disable-directives",
-    "lint-common:fix": "eslint common --report-unused-disable-directives --fix",
-    "lint:fix": "eslint . --report-unused-disable-directives --fix"
+    "lint": "eslint . --report-unused-disable-directives --flag v10_config_lookup_from_file",
+    "lint-common": "eslint common --report-unused-disable-directives --flag v10_config_lookup_from_file",
+    "lint-common:fix": "eslint common --report-unused-disable-directives --fix --flag v10_config_lookup_from_file",
+    "lint:fix": "eslint . --report-unused-disable-directives --fix --flag v10_config_lookup_from_file"
   },
   "devDependencies": {
     "@eslint/compat": "^1.3.1",
