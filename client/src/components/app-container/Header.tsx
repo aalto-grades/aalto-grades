@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {AppBar, Box, Tooltip, Typography, useTheme} from '@mui/material';
-import {useMemo} from 'react';
+import {JSX, useMemo} from 'react';
 import {NavLink, useParams} from 'react-router-dom';
 
 import {useGetCourse} from '@/hooks/useApi';

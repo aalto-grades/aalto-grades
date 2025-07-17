@@ -31,7 +31,7 @@ export default tseslint.config(
   
   // React plugin flat configs
   react.configs.flat.recommended,
-  react.configs.flat['jsx-runtime'], // For React 17+ JSX transform
+  react.configs.flat['jsx-runtime'], // For React 17+
   
   // React Hooks recommended config
   reactHooks.configs['recommended-latest'],

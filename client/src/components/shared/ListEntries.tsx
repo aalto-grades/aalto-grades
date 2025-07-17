@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Box, Chip, List} from '@mui/material';
-import type {ReactNode} from 'react';
+import type {JSX, ReactNode} from 'react';
 
 type EntriesProps = {
   label: string;

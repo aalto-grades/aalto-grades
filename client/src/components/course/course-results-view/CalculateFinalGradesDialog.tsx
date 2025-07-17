@@ -21,7 +21,7 @@ import {
   Typography,
 } from '@mui/material';
 import dayjs, {type Dayjs} from 'dayjs';
-import {useEffect, useMemo, useState} from 'react';
+import {JSX, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
