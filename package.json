@@ -1,7 +1,6 @@
 {
   "name": "aalto-grades",
   "version": "1.0.8",
-  "type": "module",
   "license": "Expat (MIT)",
   "author": "The Ossi Developers",
   "scripts": {
