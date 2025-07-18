@@ -1,7 +1,7 @@
 {
   "name": "aalto-grades",
   "version": "1.0.8",
-  "license": "Expat (MIT)",
+  "license": "MIT",
   "author": "The Ossi Developers",
   "scripts": {
     "lint": "eslint . --report-unused-disable-directives --flag v10_config_lookup_from_file",

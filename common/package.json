@@ -1,6 +1,6 @@
 {
   "name": "ossi-common",
-  "license": "Expat (MIT)",
+  "license": "MIT",
   "author": "The Ossi Developers",
   "scripts": {
     "lint": "eslint . --report-unused-disable-directives"
