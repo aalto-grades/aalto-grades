@@ -16,7 +16,16 @@ RUN npm ci
 
 WORKDIR /app/client
 COPY client/package.json client/package-lock.json ./
-RUN npm ci
+
+### Fixes added for a weird missing package during build instead of npm ci
+# Install git for GitHub dependencies
+RUN apk add --no-cache git
+# Clear npm cache and remove any platform-specific issues
+RUN rm -rf node_modules package-lock.json
+RUN npm install
+# Ensure all optional dependencies are installed for the current platform
+RUN npm rebuild
+###
 
 # Copy only necessary files
 WORKDIR /app/common
