@@ -36,22 +36,6 @@ export default tseslint.config(
   // React Hooks recommended config
   reactHooks.configs['recommended-latest'],
   
-  // Configuration for JS config files
-  {
-    files: ['**/*.js', '**/*.mjs'],
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      globals: {
-        ...globals.node,
-      },
-    },
-    rules: {
-      // Disable some rules that don't apply to config files
-      '@typescript-eslint/no-require-imports': 'off',
-    }
-  },
-  
   // Main configuration for TypeScript/React files with type checking
   {
     files: ['**/*.{ts,tsx}'],
@@ -211,9 +195,10 @@ export default tseslint.config(
     },
   },
   
-  // Configuration for JavaScript files
+  // Configuration for JavaScript files (excluding config files)
   {
     files: ['**/*.{js,mjs}'],
+    ignores: ['**/eslint.config.js'],
     extends: [importPlugin.flatConfigs.recommended],
     languageOptions: {
       ecmaVersion: 'latest',
@@ -247,6 +232,28 @@ export default tseslint.config(
           alphabetize: {order: 'asc'},
         },
       ],
+    },
+  },
+  
+  // Configuration for ESLint config files only (without import plugin)
+  {
+    files: ['**/eslint.config.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      // Only basic rules for config files
+      camelcase: 'warn',
+      eqeqeq: 'warn',
+      'func-names': 'warn',
+      'func-style': ['warn', 'expression'],
+      'no-constant-condition': ['warn', {checkLoops: false}],
+      'sort-imports': ['warn', {ignoreDeclarationSort: true}],
+      'spaced-comment': ['warn', 'always', {markers: ['/']}],
     },
   },
 );
