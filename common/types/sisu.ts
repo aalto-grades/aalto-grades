@@ -6,38 +6,46 @@ import {z} from 'zod';
 
 import {LocalizedStringSchema} from './general';
 
-const CourseUnitSchema = z.strictObject({
+const CourseUnitSchema = z.object({
   courseUnitGroupId: z.string(),
   credits: z.union([z.string(), z.number(), z.null()]),
 });
 
-const OrganizationSchema = z.strictObject({
+const StudySubGroupSchema = z.object({
+  id: z.string(),
+  name: LocalizedStringSchema,
+  type: LocalizedStringSchema,
+});
+
+const OrganizationSchema = z.object({
   organisationId: z.string(),
   educationalInstitutionUrn: z.union([z.string(), z.null()]),
   roleUrn: z.string(),
   share: z.number(),
+  validityPeriod: z.record(z.string(), z.unknown()),
 });
 
-export const SisuCourseInstanceSchema = z.strictObject({
+export const SisuCourseInstanceSchema = z.object({
   id: z.string(),
   code: z.string(),
   startDate: z.string(),
   endDate: z.string(),
   type: z.string(),
   name: LocalizedStringSchema,
-  summary: z.strictObject({
+  summary: z.object({
     workload: LocalizedStringSchema,
     prerequisites: LocalizedStringSchema,
     learningOutcomes: LocalizedStringSchema,
     literature: z.union([LocalizedStringSchema.partial(), z.null()]),
     languageOfInstruction: LocalizedStringSchema,
     registration: LocalizedStringSchema,
+    homepage: z.record(z.string(), z.unknown()),
     content: LocalizedStringSchema,
     cefrLevel: z.string(),
     level: LocalizedStringSchema,
     teacherInCharge: z.array(z.string()),
     assesmentMethods: LocalizedStringSchema,
-    substitutes: z.strictObject({
+    substitutes: z.object({
       ...LocalizedStringSchema.shape,
       courseUnits: z.union([z.array(z.array(CourseUnitSchema)), z.null()]),
     }),
@@ -48,7 +56,7 @@ export const SisuCourseInstanceSchema = z.strictObject({
   organizations: z.array(OrganizationSchema),
   organizationId: z.string(),
   organizationName: LocalizedStringSchema,
-  credits: z.strictObject({
+  credits: z.object({
     min: z.number(),
     max: z.number(),
   }),
@@ -58,10 +66,11 @@ export const SisuCourseInstanceSchema = z.strictObject({
   enrolmentStartDate: z.union([z.string(), z.null()]),
   enrolmentEndDate: z.union([z.string(), z.null()]),
   mincredits: z.string(),
+  studySubGroups: z.array(StudySubGroupSchema),
 });
 
-export const SisuErrorSchema = z.strictObject({
-  error: z.strictObject({
+export const SisuErrorSchema = z.object({
+  error: z.object({
     code: z.number(),
     message: z.string(),
   }),
