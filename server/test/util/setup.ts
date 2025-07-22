@@ -26,7 +26,6 @@ const dbConfig = {
   password: pgPass,
   database: pgDb,
 };
-console.log('Database config:', dbConfig);
 
 /**
  * Creates the checkpoint for the database, will be needed to restore the db
