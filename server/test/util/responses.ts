@@ -29,7 +29,7 @@ export class ResponseTests {
   private next(
     call: (request: Test) => Promise<void>,
     url: string,
-    headers: Header[] = []
+    headers: Header[] = [],
   ): ReturnType {
     // .set() cannot be called before .get(), .post(), .put(), or .delete()
     const setHeaders = (request: Test, toSet: Header[] = headers): Test =>
@@ -59,6 +59,7 @@ export class ResponseTests {
 
       const Schema = z.union([ErrorSchema, ZodErrorSchema]);
       const result = Schema.safeParse(res.body);
+
       expect(result.success).toBeTruthy();
     };
 
@@ -68,7 +69,7 @@ export class ResponseTests {
   /** Send a request and expect a 401 unauthorized */
   testUnauthorized(
     url: string,
-    expected: string = '{"errors":["Error"]}'
+    expected: string = '{"errors":["Error"]}',
   ): ReturnType {
     const call = async (request: Test): Promise<void> => {
       const res = await request

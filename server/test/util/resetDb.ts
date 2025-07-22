@@ -25,15 +25,28 @@ export const resetDb = async (): Promise<void> => {
   const client = new Client(dbConfigClean);
   await client.connect();
 
-  // Remove current database and replace with copy
-  const dbQuery = await client.query(
-    `SELECT FROM pg_database WHERE datname = '${pgDb}'`
-  );
-  if (dbQuery.rowCount !== 0) {
-    await client.query(`DROP DATABASE ${pgDb} WITH (FORCE)`);
+  try {
+    // Check if the target database exists
+    const dbQuery = await client.query(
+      `SELECT FROM pg_database WHERE datname = '${pgDb}'`
+    );
+    
+    if (dbQuery.rowCount !== 0) {
+      // Create the new database first with a temporary name
+      const tempDbName = `${pgDb}_temp_${Date.now()}`;
+      await client.query(
+        `CREATE DATABASE "${tempDbName}" WITH TEMPLATE postgres_copy OWNER "${pgUser}"`
+      );
+      // Only after successful creation, drop the old database and rename
+      await client.query(`DROP DATABASE "${pgDb}" WITH (FORCE)`);
+      await client.query(`ALTER DATABASE "${tempDbName}" RENAME TO "${pgDb}"`);
+    } else {
+      // Database doesn't exist, just create it directly
+      await client.query(
+        `CREATE DATABASE "${pgDb}" WITH TEMPLATE postgres_copy OWNER "${pgUser}"`
+      );
+    }
+  } finally {
+    await client.end();
   }
-  await client.query(
-    `CREATE DATABASE ${pgDb} WITH TEMPLATE postgres_copy OWNER ${pgUser}`
-  );
-  await client.end();
 };
