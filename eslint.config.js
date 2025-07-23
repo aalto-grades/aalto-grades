@@ -143,6 +143,7 @@ export default tseslint.config(
       '@typescript-eslint/promise-function-async': 'warn',
       '@typescript-eslint/return-await': 'warn',
       '@typescript-eslint/switch-exhaustiveness-check': 'warn',
+      '@typescript-eslint/no-deprecated': 'warn',
     },
   },
   

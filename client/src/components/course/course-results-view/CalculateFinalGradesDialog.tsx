@@ -21,7 +21,7 @@ import {
   Typography,
 } from '@mui/material';
 import dayjs, {type Dayjs} from 'dayjs';
-import {JSX, useEffect, useMemo, useState} from 'react';
+import {type JSX, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
@@ -40,7 +40,7 @@ type PropsType = {
     selectedRows: StudentRow[],
     modelId: number,
     dateOverride: boolean,
-    gradingDate: Date
+    gradingDate: Date,
   ) => Promise<boolean>;
 };
 
@@ -58,7 +58,7 @@ const CalculateFinalGradesDialog = ({
   const [dateOverride, setDateOverride] = useState<boolean>(false);
   const [gradingDate, setGradingDate] = useState<Dayjs>(dayjs());
   const [selectedModel, setSelectedModel] = useState<GradingModelData | null>(
-    null
+    null,
   );
 
   // Filter out archived models
@@ -66,15 +66,15 @@ const CalculateFinalGradesDialog = ({
     () =>
       allGradingModels.data !== undefined
         ? allGradingModels.data.filter(
-            model => model.coursePartId === null && !model.archived
+            model => model.coursePartId === null && !model.archived,
           )
         : [],
-    [allGradingModels.data]
+    [allGradingModels.data],
   );
 
   const errors = useMemo(
     () => getErrorTypes(selectedRows, selectedModel?.id ?? 'any'),
-    [selectedRows, selectedModel]
+    [selectedRows, selectedModel],
   );
 
   useEffect(() => {
@@ -102,7 +102,7 @@ const CalculateFinalGradesDialog = ({
       selectedRows,
       selectedModel.id,
       dateOverride,
-      gradingDate.toDate()
+      gradingDate.toDate(),
     );
     if (success) onClose();
   };
@@ -164,7 +164,7 @@ const CalculateFinalGradesDialog = ({
             value={selectedModel?.name ?? ''}
             onChange={e => {
               setSelectedModel(
-                modelList.find(model => model.name === e.target.value)!
+                modelList.find(model => model.name === e.target.value)!,
               );
             }}
             label={t('general.grading-model')}

@@ -166,7 +166,7 @@ describe('Test GET /v1/users/students - get all students from courses where the 
   }).strict();
 
   it('should get students', async () => {
-    const testCookies: [string[], z.ZodSchema][] = [
+    const testCookies: [string[], z.ZodType][] = [
       [cookies.adminCookie, UserDataSchema],
       [cookies.teacherCookie, UserDataSchema],
       [cookies.assistantCookie, AssistantUserSchema],

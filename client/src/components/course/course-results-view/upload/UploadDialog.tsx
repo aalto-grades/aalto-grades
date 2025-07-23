@@ -11,7 +11,7 @@ import {
 } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import {enqueueSnackbar} from 'notistack';
-import {JSX, useMemo, useState} from 'react';
+import {type JSX, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';

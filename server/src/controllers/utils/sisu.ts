@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import axios from 'axios';
-import type {ZodSchema} from 'zod';
+import type {z} from 'zod';
 
 import {HttpCode, type SisuError, SisuErrorSchema} from '@/common/types';
 import {AXIOS_TIMEOUT} from '../../configs/constants';
@@ -19,7 +19,7 @@ import {ApiError, nonEmptyStringSchema} from '../../types';
 export const fetchFromSisu = async <T>(
   path: string,
   params: Record<string, string>,
-  schema: ZodSchema<T>
+  schema: z.ZodType<T>
 ): Promise<T> => {
   const url = `${SISU_API_URL}/${path}`;
   httpLogger.http(`Calling Sisu With "GET ${url}"`);

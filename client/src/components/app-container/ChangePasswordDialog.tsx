@@ -77,7 +77,7 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
     const treeifiedError = z.treeifyError(result.error);
     const fieldErrors = treeifiedError.properties || {};
     return Object.fromEntries(
-      Object.entries(fieldErrors).map(([key, val]) => [key, val?.errors[0]]) // Only the first error
+      Object.entries(fieldErrors).map(([key, val]) => [key, val.errors[0]]) // Only the first error
     );
   };
 

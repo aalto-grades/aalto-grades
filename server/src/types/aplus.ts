@@ -12,7 +12,7 @@ import {DateSchema} from '@/common/types';
 // API.
 
 /** Create a A+ Pagination Schema, the resultSchema need to be an array */
-export const createAplusPaginationSchema = <T extends z.ZodTypeAny>(
+export const createAplusPaginationSchema = <T extends z.ZodType>(
   resultSchema: T
 ): z.ZodObject<{
   count: z.ZodNumber;

@@ -4,7 +4,7 @@
 
 import axios from 'axios';
 import type {Request} from 'express';
-import {type ZodSchema, z} from 'zod';
+import { z} from 'zod';
 
 import {type AplusGradeSourceData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
@@ -160,7 +160,7 @@ export const parseAplusToken = (req: Request): string => {
 export const fetchFromAplus = async <T>(
   url: string,
   aplusToken: string,
-  schema: ZodSchema<T>
+  schema: z.ZodType<T>
 ): Promise<T> => {
   httpLogger.http(`Calling A+ With "GET ${url}"`);
 
@@ -192,7 +192,7 @@ export const fetchFromAplus = async <T>(
 export const fetchFromAplusPaginated = async <T extends readonly unknown[]>(
   url: string,
   aplusToken: string,
-  schema: ZodSchema<T>
+  schema: z.ZodType<T>
 ): Promise<T> => {
   httpLogger.http(`Calling A+ With "GET ${url}"`);
 
