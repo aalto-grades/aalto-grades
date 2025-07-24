@@ -68,10 +68,9 @@ export const getDragAndDropNodes = (
 ];
 
 export const isValidConnection = (
-  connection: Connection,
+  connection: Edge | Connection,
   edges: Edge[]
 ): boolean => {
-  if (connection.source === null || connection.target === null) return false;
 
   // Check for conflicting edges
   for (const edge of edges) {

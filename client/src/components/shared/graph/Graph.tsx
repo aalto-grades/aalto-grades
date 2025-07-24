@@ -144,7 +144,7 @@ const initGraphFn = (
   const initNodeValues = Object.fromEntries(
     initGraph.nodes.map(node => [
       node.id,
-      initNode(node.type!, node.id, initGraph.edges).value,
+      initNode(node.type, node.id, initGraph.edges).value,
     ])
   );
 
@@ -192,7 +192,7 @@ const Graph = ({
   const [nodeData, setNodeData] = useState<FullNodeData>(initGraph.nodeData);
   const [nodeValues, setNodeValues] = useState<NodeValues>(initNodeValues);
   const [reactFlowInstance, setReactFlowInstance] =
-    useState<ReactFlowInstance | null>(null);
+    useState<ReactFlowInstance<TypedNode> | null>(null);
 
   // Used to check for changes
   const [lastState, setLastState] = useState<{
@@ -595,11 +595,11 @@ const Graph = ({
                 minZoom={0.25}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
-                isValidConnection={(connection: Connection) =>
+                isValidConnection={(connection) =>
                   isValidConnection(connection, edges)
                 }
                 nodeTypes={nodeTypesMap}
-                onInit={(flowInstance: ReactFlowInstance) => {
+                onInit={(flowInstance) => {
                   setReactFlowInstance(flowInstance);
                   reactFlowInstance?.fitView();
                 }}
