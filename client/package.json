@@ -28,6 +28,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.6",
     "@types/spdx-expression-parse": "^3.0.5",
+    "@xyflow/react": "^12.8.2",
     "axios": "^1.9.0",
     "cheerio": "^1.0.0",
     "dayjs": "^1.11.13",
@@ -46,7 +47,6 @@
     "react-i18next": "^15.5.1",
     "react-qr-code": "^2.0.15",
     "react-router-dom": "^7.5.2",
-    "reactflow": "^11.11.4",
     "styled-components": "^6.1.17",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "^4.0.0"
