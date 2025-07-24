@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import 'reactflow/dist/style.css';
+import '@xyflow/react/dist/style.css';
 import './flow.scss';
 
 import {
@@ -13,6 +13,23 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
+import {
+  Background,
+  BackgroundVariant,
+  type Connection,
+  Controls,
+  type Edge,
+  type EdgeChange,
+  MiniMap,
+  type NodeChange,
+  type NodeProps,
+  type OnSelectionChangeParams,
+  ReactFlow,
+  type ReactFlowInstance,
+  addEdge,
+  useEdgesState,
+  useNodesState,
+} from '@xyflow/react';
 import type {TFunction} from 'i18next';
 import {enqueueSnackbar} from 'notistack';
 import {
@@ -29,21 +46,6 @@ import {
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker} from 'react-router-dom';
-import {
-  Background,
-  BackgroundVariant,
-  type Connection,
-  Controls,
-  type Edge,
-  MiniMap,
-  type NodeChange,
-  type NodeProps,
-  ReactFlow,
-  type ReactFlowInstance,
-  addEdge,
-  useEdgesState,
-  useNodesState,
-} from 'reactflow';
 
 import type {
   CustomNodeTypes,
@@ -93,6 +95,12 @@ type NodeState = [
   TypedNode[],
   Dispatch<SetStateAction<TypedNode[]>>,
   (changes: NodeChange[]) => void,
+];
+
+type EdgeState = [
+  Edge[],
+  Dispatch<SetStateAction<Edge[]>>,
+  (changes: EdgeChange[]) => void,
 ];
 
 const nodeTypesMap: {
@@ -180,7 +188,7 @@ const Graph = ({
   const [nodes, setNodes, onNodesChange] = useNodesState(
     initGraph.nodes
   ) as NodeState;
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initGraph.edges);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initGraph.edges) as EdgeState;
   const [nodeData, setNodeData] = useState<FullNodeData>(initGraph.nodeData);
   const [nodeValues, setNodeValues] = useState<NodeValues>(initNodeValues);
   const [reactFlowInstance, setReactFlowInstance] =
@@ -213,7 +221,7 @@ const Graph = ({
     useState<GraphStructure>(initGraph);
 
   const unsaved =
-    JSON.stringify(originalGraphStructure.nodes.map(simplifyNode)) !==
+    JSON.stringify((originalGraphStructure.nodes as TypedNode[]).map(simplifyNode)) !==
       JSON.stringify(nodes.map(simplifyNode)) ||
     JSON.stringify(originalGraphStructure.edges) !== JSON.stringify(edges) ||
     JSON.stringify(originalGraphStructure.nodeData) !==
@@ -332,7 +340,7 @@ const Graph = ({
 
   const onConnect = useCallback(
     (params: Connection) => {
-      setEdges(oldEdges => addEdge(params, oldEdges));
+      setEdges((oldEdges: Edge[]) => addEdge(params, oldEdges));
       updateValues(addEdge(params, edges));
     },
     [edges, setEdges, updateValues]
@@ -570,10 +578,10 @@ const Graph = ({
                 nodes={nodes}
                 edges={edges}
                 proOptions={{hideAttribution: true}}
-                onNodesChange={changes =>
+                onNodesChange={(changes: NodeChange[]) =>
                   onNodesChange(
                     changes.filter(
-                      change =>
+                      (change: NodeChange) =>
                         change.type !== 'remove' ||
                         delSources.includes(change.id) ||
                         (nodeTypeMap[change.id] !== 'source' &&
@@ -581,23 +589,23 @@ const Graph = ({
                     )
                   )
                 }
-                onSelectionChange={changes =>
+                onSelectionChange={(changes: OnSelectionChangeParams) =>
                   setSelected(changes.nodes as TypedNode[])
                 }
                 minZoom={0.25}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
-                isValidConnection={connection =>
+                isValidConnection={(connection: Connection) =>
                   isValidConnection(connection, edges)
                 }
                 nodeTypes={nodeTypesMap}
-                onInit={flowInstance => {
+                onInit={(flowInstance: ReactFlowInstance) => {
                   setReactFlowInstance(flowInstance);
                   reactFlowInstance?.fitView();
                 }}
                 onDrop={onDrop}
                 onDragOver={onDragOver}
-                onError={(i, m) => i !== '008' && console.warn(m)} // Ignore "couldn't create edge" warnings
+                onError={(i: string, m: string) => i !== '008' && console.warn(m)} // Ignore "couldn't create edge" warnings
                 fitView
                 elementsSelectable={!readOnly}
                 nodesConnectable={!readOnly}

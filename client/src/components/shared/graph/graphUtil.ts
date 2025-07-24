@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+import type {Connection, Edge} from '@xyflow/react';
 import ElkConstructor from 'elkjs/lib/elk.bundled';
 import type {TFunction} from 'i18next';
-import type {Connection, Edge} from 'reactflow';
 
 import type {DropInNodes, NodeValues, TypedNode} from '@/common/types';
 

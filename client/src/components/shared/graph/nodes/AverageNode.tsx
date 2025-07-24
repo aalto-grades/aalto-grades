@@ -4,6 +4,12 @@
 
 import {useTheme} from '@mui/material';
 import {
+  Handle,
+  type NodeProps,
+  Position,
+  useUpdateNodeInternals,
+} from '@xyflow/react';
+import {
   type ChangeEvent,
   type JSX,
   useContext,
@@ -11,12 +17,6 @@ import {
   useState,
 } from 'react';
 import {useTranslation} from 'react-i18next';
-import {
-  Handle,
-  type NodeProps,
-  Position,
-  useUpdateNodeInternals,
-} from 'reactflow';
 
 import type {AverageNodeSettings, AverageNodeValue} from '@/common/types';
 import OutputValue from '@/components/shared/graph/nodes/parts/OutputValue';

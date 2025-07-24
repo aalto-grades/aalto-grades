@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import type {Edge} from 'reactflow';
+import type {Edge} from '@xyflow/react';
 
 import type {GradingModelData} from '../types';
 import {initNodeValues, updateNodeValue} from './graphCalculationUtil';

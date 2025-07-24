@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import type {Node} from 'reactflow';
+import type {Node} from '@xyflow/react';
 import {z} from 'zod';
 
 export type NumberOrFail = number | 'fail';
@@ -192,7 +192,7 @@ export type FullNodeData = z.infer<typeof FullNodeDataSchema>;
 export type GraphStructure = z.infer<typeof GraphStructureSchema>;
 
 // Types without schemas
-export type TypedNode = Node<object, CustomNodeTypes>;
+export type TypedNode = Node<Record<string, unknown>, CustomNodeTypes>;
 export type GraphSource = {
   id: number;
   name: string;

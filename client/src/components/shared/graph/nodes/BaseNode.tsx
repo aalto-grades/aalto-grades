@@ -4,9 +4,9 @@
 
 import WarningIcon from '@mui/icons-material/Warning';
 import {Tooltip, useTheme} from '@mui/material';
+import type {NodeProps} from '@xyflow/react';
 import {type JSX, type PropsWithChildren, useContext} from 'react';
 import {useTranslation} from 'react-i18next';
-import type {NodeProps} from 'reactflow';
 
 import {ExtraNodeDataContext, NodeDataContext} from '@/context/GraphProvider';
 

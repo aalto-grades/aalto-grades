@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 import {useTheme} from '@mui/material';
-import {type ChangeEvent, type JSX, useContext, useState} from 'react';
-import {useTranslation} from 'react-i18next';
 import {
   Handle,
   type NodeProps,
   Position,
   useUpdateNodeInternals,
-} from 'reactflow';
+} from '@xyflow/react';
+import {type ChangeEvent, type JSX, useContext, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 
 import type {MaxNodeSettings, MaxNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';

@@ -16,7 +16,6 @@
     "lib": ["es2022"],
     "strict": true,
     "target": "es6",
-    "skipLibCheck": true //express-zod-api
   },
   "exclude": ["node_modules"],
   "include": ["src/**/*", "test/**/*", "jest.config.ts"]
