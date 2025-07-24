@@ -148,7 +148,7 @@ export const GraphStructureSchema = z.strictObject({
       id: z.string(),
       position: z.object({x: z.number(), y: z.number()}),
       data: z.record(z.string(), z.any()),
-      type: CustomNodeTypesSchema.optional(),
+      type: CustomNodeTypesSchema,
 
       // Will be removed in api
       dragging: z.any().optional(),
@@ -192,7 +192,10 @@ export type FullNodeData = z.infer<typeof FullNodeDataSchema>;
 export type GraphStructure = z.infer<typeof GraphStructureSchema>;
 
 // Types without schemas
-export type TypedNode = Node<Record<string, unknown>, CustomNodeTypes>;
+// export type TypedNode = Node<NodeData, CustomNodeTypes>;
+export type TypedNode = Node<Record<string, unknown>, CustomNodeTypes> & {
+  type: CustomNodeTypes;
+};
 export type GraphSource = {
   id: number;
   name: string;
