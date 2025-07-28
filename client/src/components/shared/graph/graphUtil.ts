@@ -185,8 +185,8 @@ export const formatGraph = async (
   const nodesForElk = nodes.map(node => ({
     type: node.type,
     id: node.id,
-    width: node.width!,
-    height: node.height!,
+    width: node.measured?.width ?? 0,
+    height: node.measured?.height ?? 0,
   }));
   const graph = {
     id: 'root',
@@ -277,7 +277,7 @@ export const formatGraph = async (
       targets: [edge.targetHandle!],
     })),
   };
-
+  console.log('ELK graph:', graph);
   // Return nodes with updated positions
   const newNodes = (await elk.layout(graph)).children!;
   return newNodes.map(newNode => ({
