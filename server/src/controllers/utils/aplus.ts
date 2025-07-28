@@ -116,7 +116,7 @@ export const validateAplusGradeSourceBelongsToCourseTask = async (
 export const parseAplusGradeSource = (
   aplusGradeSource: AplusGradeSource
 ): AplusGradeSourceData =>
-  ({
+  (({
     id: aplusGradeSource.id,
     courseTaskId: aplusGradeSource.courseTaskId,
     aplusCourse: aplusGradeSource.aplusCourse,
@@ -126,8 +126,8 @@ export const parseAplusGradeSource = (
     exerciseId: aplusGradeSource.exerciseId ?? undefined,
     exerciseName: aplusGradeSource.exerciseName ?? undefined,
     difficulty: aplusGradeSource.difficulty ?? undefined,
-    date: new Date(aplusGradeSource.date),
-  }) as AplusGradeSourceData;
+    date: new Date(aplusGradeSource.date)
+  }) as AplusGradeSourceData);
 
 /**
  * Validates that an A+ API token was provided and parses it from the request
