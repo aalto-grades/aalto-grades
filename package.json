@@ -3,6 +3,7 @@
   "version": "1.0.8",
   "license": "MIT",
   "author": "The Ossi Developers",
+  "type": "module",
   "workspaces": [
     "client",
     "server",

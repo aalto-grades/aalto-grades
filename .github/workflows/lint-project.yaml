@@ -17,14 +17,14 @@ jobs:
           node-version: 24
       - name: Install linter packages
         run: npm ci
-      - name: Install client packages
-        run: npm --prefix ./client ci
-      - name: Install server packages
-        run: npm --prefix ./server ci
-      - name: Install e2e-tests packages
-        run: npm --prefix ./e2e-tests ci
-      - name: Install common packages
-        run: npm --prefix ./common ci
+      # - name: Install client packages
+      #   run: npm --prefix ./client ci
+      # - name: Install server packages
+      #   run: npm --prefix ./server ci
+      # - name: Install e2e-tests packages
+      #   run: npm --prefix ./e2e-tests ci
+      # - name: Install common packages
+      #   run: npm --prefix ./common ci
       - name: Run linter
         run: npm run lint
 
