@@ -1,0 +1,111 @@
+# SPDX-FileCopyrightText: 2024 The Ossi Developers
+#
+# SPDX-License-Identifier: MIT
+---
+name: E2E Tests - Chrome
+on: # yamllint disable-line rule:truthy
+  workflow_call:
+    inputs:
+      cache-key:
+        description: "Cache key for built images"
+        required: true
+        type: string
+
+jobs:
+  e2e-chrome:
+    name: Run e2e tests with Chrome
+    runs-on: ubuntu-latest
+    env:
+      LOCALHOST_URL: http://localhost:8080
+    defaults:
+      run:
+        working-directory: ./e2e-tests
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Cache Docker images
+        uses: actions/cache@v3
+        with:
+          path: /tmp/docker-images
+          key: ${{ inputs.cache-key }}
+      
+      - name: Load Docker images from cache
+        run: |
+          if [ -f /tmp/docker-images/images.tar ]; then
+            echo "Loading cached Docker images..."
+            docker load -i /tmp/docker-images/images.tar
+            echo "Cached images loaded successfully"
+            docker images
+          else
+            echo "No cached images found, will build from scratch"
+          fi
+        working-directory: ./
+      
+      - uses: actions/cache@v3
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      
+      - name: Install dependencies
+        working-directory: ./
+        run: npm ci
+      
+      - name: Build images if not cached
+        working-directory: ./
+        run: |
+          if [ ! -f /tmp/docker-images/images.tar ]; then
+            docker compose down --volumes --remove-orphans
+            docker compose build --no-cache
+          fi
+      
+      - name: Run app
+        working-directory: ./
+        run: docker compose up -d
+      
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+      
+      - name: Wait for app to be ready
+        run: |
+          url="${LOCALHOST_URL}/login"
+          echo "Trying to connect to ${url}"
+          until curl -s -o /dev/null -w "%{http_code}" ${url} | grep "200" 2>&1 >/dev/null; do
+              echo >&2 "Waiting for ${url}"
+              sleep 5
+          done
+          echo "URL reached, sleeping for extra 10 seconds to make sure everything is loaded"
+          sleep 10
+        working-directory: ./
+      
+      - name: Run Chrome Playwright tests
+        run: |
+          rm -rf ./blob-reporter
+          rm -rf ./playwright-report
+          rm -rf ./blob-report
+          mkdir -p ./blob-reporter
+          npx playwright test --project chromium --reporter=list,blob
+          if [ -f ./blob-report/report-chromium.zip ]; then
+            mv ./blob-report/report-chromium.zip ./blob-reporter/chrome-report.zip
+          fi
+          npx playwright merge-reports --reporter=html ./blob-reporter
+      
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-chrome
+          path: e2e-tests/playwright-report/
+          retention-days: 1
+      
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-blob-chrome
+          path: e2e-tests/blob-reporter/
+          retention-days: 1
