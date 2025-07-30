@@ -6,12 +6,9 @@
 FROM node:24-alpine AS build
 
 WORKDIR /app
-RUN mkdir common client
-
 COPY package.json package-lock.json ./
-COPY common/package.json ./common
-COPY client/package.json ./client
-
+COPY common/package.json ./common/
+COPY client/package.json ./client/
 RUN npm ci
 
 # ### Fixes added for a weird missing package during build instead of npm ci

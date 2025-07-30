@@ -3,18 +3,12 @@
 # SPDX-License-Identifier: MIT
 
 # Build stage
-FROM node:20-alpine AS build
+FROM node:24-alpine AS build
 
 WORKDIR /app
-RUN mkdir common server
-
-# Install packages first to make following builds faster
-WORKDIR /app/common
-COPY common/package.json common/package-lock.json ./
-RUN npm ci
-
-WORKDIR /app/server
-COPY server/package.json server/package-lock.json ./
+COPY package.json package-lock.json ./
+COPY common/package.json ./common/
+COPY server/package.json ./server/
 RUN npm ci
 
 # Copy only necessary files
@@ -30,12 +24,14 @@ COPY server/src ./src
 RUN npm run build
 
 # Run stage
-FROM node:20-alpine AS run
+FROM node:24-alpine AS run
 
-WORKDIR /app
+WORKDIR /app/server/
 RUN mkdir logs && chown node:node logs
 
-COPY server/package.json server/package-lock.json ./
+COPY package.json package-lock.json /app/
+
+COPY server/package.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY server/.sequelizerc ./
