@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: 24
       - name: Install dependencies
+        working-directory: ./
         run: npm ci
       - name: Docker compose down
         working-directory: ./
