@@ -25,9 +25,9 @@ jobs:
       - name: Run database
         run: docker-compose up -d database
       - name: Install dependencies
-        run: npm ci
-      - name: Install common dependencies
-        run: npm --prefix ../common ci
+        run: npm --prefix ../ ci
+      # - name: Install common dependencies
+      #   run: npm --prefix ../common ci
       - name: Build server
         run: npm run build
       - name: Migrate and seed database
