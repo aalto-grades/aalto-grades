@@ -32,7 +32,7 @@ export type Endpoint<ReqType, ResType> = (
 export const stringToIdSchema = z
   .string()
   .regex(/^\d+$/)
-  .transform((val) => parseInt(val, 10))
+  .transform(val => parseInt(val, 10))
   .pipe(z.number().int().min(1));
 
 export const nonEmptyStringSchema = z.string().min(1).max(25);

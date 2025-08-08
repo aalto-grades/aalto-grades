@@ -30,9 +30,9 @@ export const handleInvalidRequestJson = (
   next: NextFunction
 ): void => {
   if (
-    err instanceof SyntaxError &&
-    err.status === 400 &&
-    err.body !== undefined
+    err instanceof SyntaxError
+    && err.status === 400
+    && err.body !== undefined
   ) {
     res.status(400).send({
       errors: [`SyntaxError: ${err.message}: ${err.body}`],

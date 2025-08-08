@@ -117,8 +117,8 @@ CourseRole.updateCourseRoles = async (
 
       const existingUserIndex = roles.findIndex(
         newRole =>
-          newRole.userId === oldRole.userId &&
-          newRole.expiryDate === oldRole.expiryDate
+          newRole.userId === oldRole.userId
+          && newRole.expiryDate === oldRole.expiryDate
       );
       if (existingUserIndex >= 0) roles.splice(existingUserIndex, 1);
       else await oldRole.destroy();

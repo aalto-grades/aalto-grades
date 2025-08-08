@@ -4,7 +4,7 @@
 
 import axios from 'axios';
 import type {Request} from 'express';
-import { z} from 'zod';
+import {z} from 'zod';
 
 import {type AplusGradeSourceData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
@@ -106,8 +106,8 @@ export const validateAplusGradeSourceBelongsToCourseTask = async (
   const aplusGradeSource = await findAplusGradeSourceById(aplusGradeSourceId);
   if (aplusGradeSource.courseTaskId !== courseTaskId) {
     throw new ApiError(
-      `A+ grade source with ID ${aplusGradeSource.id} ` +
-        `does not belong to the course task with ID ${courseTaskId}`,
+      `A+ grade source with ID ${aplusGradeSource.id} `
+      + `does not belong to the course task with ID ${courseTaskId}`,
       HttpCode.Conflict
     );
   }

@@ -30,7 +30,7 @@ export const resetDb = async (): Promise<void> => {
     const dbQuery = await client.query(
       `SELECT FROM pg_database WHERE datname = '${pgDb}'`
     );
-    
+
     if (dbQuery.rowCount !== 0) {
       // Create the new database first with a temporary name
       const tempDbName = `${pgDb}_temp_${Date.now()}`;

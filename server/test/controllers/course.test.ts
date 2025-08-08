@@ -364,12 +364,12 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       ...edit1,
       id: courseId,
       teachersInCharge:
-        (findUsers(edit1.teachersInCharge) as TeacherData[] | undefined) ??
-        initState.teachersInCharge,
+        (findUsers(edit1.teachersInCharge) as TeacherData[] | undefined)
+        ?? initState.teachersInCharge,
       assistants:
         (findUsers(edit1.assistants?.map(assistant => assistant.email)) as
-          | AssistantData[]
-          | undefined) ?? initState.assistants,
+        | AssistantData[]
+        | undefined) ?? initState.assistants,
     };
 
     const courseEdit2: CourseData = {
@@ -378,13 +378,13 @@ describe('Test PUT /v1/courses/:courseId - edit course', () => {
       ...edit2,
       id: courseId,
       teachersInCharge:
-        findUsers(edit2.teachersInCharge) ??
-        findUsers(edit1.teachersInCharge) ??
-        initState.teachersInCharge,
+        findUsers(edit2.teachersInCharge)
+        ?? findUsers(edit1.teachersInCharge)
+        ?? initState.teachersInCharge,
       assistants:
-        findUsers(edit2.assistants?.map(assistant => assistant.email)) ??
-        findUsers(edit1.assistants?.map(assistant => assistant.email)) ??
-        initState.assistants,
+        findUsers(edit2.assistants?.map(assistant => assistant.email))
+        ?? findUsers(edit1.assistants?.map(assistant => assistant.email))
+        ?? initState.assistants,
     } as unknown as CourseData;
 
     await request

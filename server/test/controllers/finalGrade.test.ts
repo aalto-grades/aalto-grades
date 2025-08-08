@@ -126,8 +126,8 @@ beforeAll(async () => {
         student.id,
         gradingModelId,
         TEACHER_ID,
-        student.finalGrade -
-          Math.floor(Math.random() * (student.finalGrade + 1))
+        student.finalGrade
+        - Math.floor(Math.random() * (student.finalGrade + 1))
       );
     }
 
@@ -146,8 +146,8 @@ beforeAll(async () => {
         student.id,
         gradingModelId,
         TEACHER_ID,
-        student.finalGrade -
-          Math.floor(Math.random() * (student.finalGrade + 1))
+        student.finalGrade
+        - Math.floor(Math.random() * (student.finalGrade + 1))
       );
     }
   }
@@ -594,8 +594,8 @@ describe('Test POST /v1/courses/:courseId/final-grades/csv/sisu - export Sisu co
         .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
 ${createCSVString(students, today, 'en').join(',\n')},\n`);
       expect(res.headers['content-disposition']).toBe(
-        'attachment; filename="final_grades_course_CS-84389_' +
-          `${new Date().toLocaleDateString('fi-FI')}.csv"`
+        'attachment; filename="final_grades_course_CS-84389_'
+        + `${new Date().toLocaleDateString('fi-FI')}.csv"`
       );
     }
   });
@@ -617,8 +617,8 @@ ${createCSVString(students, today, 'en').join(',\n')},\n`);
       .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
 ${createCSVString(selectedStudents, today, 'en').join(',\n')},\n`);
     expect(res.headers['content-disposition']).toBe(
-      'attachment; filename="final_grades_course_CS-84389_' +
-        `${new Date().toLocaleDateString('fi-FI')}.csv"`
+      'attachment; filename="final_grades_course_CS-84389_'
+      + `${new Date().toLocaleDateString('fi-FI')}.csv"`
     );
   });
 
@@ -638,8 +638,8 @@ ${createCSVString(selectedStudents, today, 'en').join(',\n')},\n`);
       .toBe(`studentNumber,grade,credits,assessmentDate,completionLanguage,comment
 ${createCSVString(students, '12.5.2023', 'ja').join(',\n')},\n`);
     expect(res.headers['content-disposition']).toBe(
-      'attachment; filename="final_grades_course_CS-84389_' +
-        `${new Date().toLocaleDateString('fi-FI')}.csv"`
+      'attachment; filename="final_grades_course_CS-84389_'
+      + `${new Date().toLocaleDateString('fi-FI')}.csv"`
     );
   });
 
@@ -671,8 +671,8 @@ ${createCSVString(students, '12.5.2023', 'ja').join(',\n')},\n`);
 ${students[0].studentNumber},fail,5,${today},en,
 ${students[1].studentNumber},pass,5,${today},en,\n`);
     expect(res.headers['content-disposition']).toBe(
-      'attachment; filename="final_grades_course_CS-A9542_' +
-        `${new Date().toLocaleDateString('fi-FI')}.csv"`
+      'attachment; filename="final_grades_course_CS-A9542_'
+      + `${new Date().toLocaleDateString('fi-FI')}.csv"`
     );
   });
 
@@ -705,8 +705,8 @@ ${students[0].studentNumber},Fail,5,${today},en,
 ${students[1].studentNumber},SAT,5,${today},en,
 ${students[2].studentNumber},G,5,${today},en,\n`);
     expect(res.headers['content-disposition']).toBe(
-      'attachment; filename="final_grades_course_CS-A8341_' +
-        `${new Date().toLocaleDateString('fi-FI')}.csv"`
+      'attachment; filename="final_grades_course_CS-A8341_'
+      + `${new Date().toLocaleDateString('fi-FI')}.csv"`
     );
   });
 

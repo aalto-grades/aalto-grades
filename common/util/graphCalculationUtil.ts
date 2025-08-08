@@ -143,8 +143,8 @@ export const updateNodeValue = (
       nodeValue.value = nodeValue.source;
       nodeValue.fullFail = false;
       if (
-        settings.minPoints !== null &&
-        nodeValue.source < settings.minPoints
+        settings.minPoints !== null
+        && nodeValue.source < settings.minPoints
       ) {
         switch (settings.onFailSetting) {
           case 'fullfail':
@@ -161,8 +161,8 @@ export const updateNodeValue = (
       const settings = nodeData[nodeId].settings as StepperNodeSettings;
       for (let i = 0; i < settings.numSteps; i++) {
         if (
-          i + 1 !== settings.numSteps &&
-          nodeValue.source > settings.middlePoints[i]
+          i + 1 !== settings.numSteps
+          && nodeValue.source > settings.middlePoints[i]
         )
           continue;
 
@@ -182,15 +182,15 @@ export const updateNodeValue = (
 
       for (const [key, source] of Object.entries(nodeValue.sources)) {
         if (
-          getKeyType(key) === 'substitute' &&
-          source.isConnected &&
-          source.value !== 'fail'
+          getKeyType(key) === 'substitute'
+          && source.isConnected
+          && source.value !== 'fail'
         )
           substitutesToUse += 1;
         else if (
-          getKeyType(key) === 'exercise' &&
-          source.isConnected &&
-          source.value === 'fail'
+          getKeyType(key) === 'exercise'
+          && source.isConnected
+          && source.value === 'fail'
         )
           valuesToSubstitute += 1;
       }
@@ -206,9 +206,9 @@ export const updateNodeValue = (
       for (const [key, source] of Object.entries(nodeValue.sources)) {
         if (getKeyType(key) === 'substitute') {
           if (
-            source.isConnected &&
-            source.value !== 'fail' &&
-            substitutesToUse > 0
+            source.isConnected
+            && source.value !== 'fail'
+            && substitutesToUse > 0
           ) {
             substitutesToUse -= 1;
             nodeValue.values[key] = 'fail';
@@ -218,9 +218,9 @@ export const updateNodeValue = (
         } else {
           exerciseIndex++;
           if (
-            source.isConnected &&
-            source.value === 'fail' &&
-            valuesToSubstitute > 0
+            source.isConnected
+            && source.value === 'fail'
+            && valuesToSubstitute > 0
           ) {
             valuesToSubstitute -= 1;
             nodeValue.values[key] = settings.substituteValues[exerciseIndex];

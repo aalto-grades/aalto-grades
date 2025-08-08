@@ -26,6 +26,7 @@ export default class FinalGrade extends Model<
   declare gradingModelId: CreationOptional<ForeignKey<
     GradingModel['id']
   > | null>;
+
   declare graderId: ForeignKey<User['id']>;
   declare grade: number;
   // Date when grade part is completed (e.g., deadline or exam date)

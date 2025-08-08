@@ -39,10 +39,9 @@ export default tseslint.config(
       }).rules,
       '@stylistic/comma-dangle': ['off', 'always-multiline'], // To be changed in the future, TODO
       '@stylistic/object-curly-spacing': ['error', 'never'], // more compact, legacy rule
-      '@stylistic/operator-linebreak': ['error', 'before', {overrides: {'=': 'after',}}], // default in old eslint
+      '@stylistic/operator-linebreak': ['error', 'before', {overrides: {'=': 'after',}}], // "=" before is ugly
       '@stylistic/spaced-comment': ['warn', 'always', {markers: ['/']}], // Fix some weird issues
-      // '@stylistic/indent-binary-ops': ['off'], // WTF NEED TO FIX
-      '@stylistic/quotes': ['error', 'single', {allowTemplateLiterals: 'always', avoidEscape: true}],
+      '@stylistic/quotes': ['error', 'single', {allowTemplateLiterals: 'always', avoidEscape: true}], // as it was before
     }
 
   },

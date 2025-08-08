@@ -25,9 +25,9 @@ export const rateLimiterMemoryMiddleware: SyncEndpoint<
 > = (req, res, next) => {
   // Override res.send
   const originalSend = res.send;
-  res.send = body => {
+  res.send = (body) => {
     if (res.statusCode === 200) {
-      rateLimiter.delete(req.ip ?? '').catch(error => {
+      rateLimiter.delete(req.ip ?? '').catch((error) => {
         logger.error(error);
       });
     }

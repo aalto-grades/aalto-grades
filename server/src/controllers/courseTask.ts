@@ -86,7 +86,7 @@ export const modifyCourseTasks: Endpoint<ModifyCourseTasks, number[]> = async (
   };
 
   let newIds: number[] = [];
-  await sequelize.transaction(async t => {
+  await sequelize.transaction(async (t) => {
     // Add tasks
     for (const {coursePartId} of addTasks) {
       await validateCoursePartBelongsToCourse(courseId, coursePartId);
@@ -139,8 +139,8 @@ export const modifyCourseTasks: Endpoint<ModifyCourseTasks, number[]> = async (
       } catch (error) {
         // Catch deletion of course task with grades
         if (
-          error instanceof ForeignKeyConstraintError &&
-          error.index === 'task_grade_course_task_id_fkey'
+          error instanceof ForeignKeyConstraintError
+          && error.index === 'task_grade_course_task_id_fkey'
         ) {
           throw new ApiError(
             'Tried to delete a course task with grades',

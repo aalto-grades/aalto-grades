@@ -125,7 +125,7 @@ export const addCourse: Endpoint<NewCourseData, number> = async (req, res) => {
       userId: teacher.id,
       role: CourseRoleType.Teacher,
     }));
-    const assistantRoles: NewDbCourseRole[] = assistants.map(assistant => {
+    const assistantRoles: NewDbCourseRole[] = assistants.map((assistant) => {
       const assistantExpiryDate = req.body.assistants.find(
         reqAssistant => reqAssistant.email === assistant.email
       )?.expiryDate;
@@ -191,23 +191,23 @@ export const editCourse: Endpoint<EditCourseData, void> = async (req, res) => {
       : null;
 
   if (
-    minCredits !== undefined &&
-    maxCredits === undefined &&
-    minCredits > course.maxCredits
+    minCredits !== undefined
+    && maxCredits === undefined
+    && minCredits > course.maxCredits
   ) {
     throw new ApiError(
-      `without updating max credits, new min credits (${minCredits}) can't be` +
-        ` larger than existing max credits (${course.maxCredits})`,
+      `without updating max credits, new min credits (${minCredits}) can't be`
+      + ` larger than existing max credits (${course.maxCredits})`,
       HttpCode.BadRequest
     );
   } else if (
-    maxCredits !== undefined &&
-    minCredits === undefined &&
-    maxCredits < course.minCredits
+    maxCredits !== undefined
+    && minCredits === undefined
+    && maxCredits < course.minCredits
   ) {
     throw new ApiError(
-      `without updating min credits, new max credits (${maxCredits}) can't be` +
-        ` smaller than existing min credits (${course.minCredits})`,
+      `without updating min credits, new max credits (${maxCredits}) can't be`
+      + ` smaller than existing min credits (${course.minCredits})`,
       HttpCode.BadRequest
     );
   }
@@ -275,7 +275,7 @@ export const editCourse: Endpoint<EditCourseData, void> = async (req, res) => {
         : null;
     const assistantRoles: NewDbCourseRole[] | null =
       newAssistants !== null
-        ? newAssistants.map(assistant => {
+        ? newAssistants.map((assistant) => {
             const assistantExpiryDate = assistants?.find(
               reqAssistant => reqAssistant.email === assistant.email
             )?.expiryDate;

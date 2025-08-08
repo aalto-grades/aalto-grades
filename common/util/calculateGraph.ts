@@ -92,8 +92,8 @@ export const calculateNodeValues = (
 
       // Handle nodes with multiple sources
       if (
-        sourceNodeValue.type === 'require' ||
-        sourceNodeValue.type === 'substitute'
+        sourceNodeValue.type === 'require'
+        || sourceNodeValue.type === 'substitute'
       ) {
         const sourceHandleId = edge
           .sourceHandle!.replace('-substitute-source', '')
@@ -107,8 +107,8 @@ export const calculateNodeValues = (
       // Remove parent from target and check if all parents have been covered
       nodeSources[edge.target].delete(sourceNodeId);
       if (
-        nodeSources[edge.target].size === 0 &&
-        !alreadyAdded.has(edge.target)
+        nodeSources[edge.target].size === 0
+        && !alreadyAdded.has(edge.target)
       ) {
         noSources.push(edge.target);
         alreadyAdded.add(edge.target);

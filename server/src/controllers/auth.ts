@@ -114,8 +114,8 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
 
     // Show MFA
     if (
-      user.mfaSecret === null ||
-      (!user.mfaConfirmed && req.body.otp === null)
+      user.mfaSecret === null
+      || (!user.mfaConfirmed && req.body.otp === null)
     ) {
       return res.json({status: 'showMfa', otpAuth});
     }
@@ -126,8 +126,8 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
     }
 
     if (
-      NODE_ENV !== 'development' &&
-      !authenticator.verify({
+      NODE_ENV !== 'development'
+      && !authenticator.verify({
         token: req.body.otp,
         secret: user.mfaSecret as string,
       })
@@ -333,8 +333,8 @@ export const confirmMfa: Endpoint<ConfirmMfaData, void> = async (req, res) => {
   }
 
   if (
-    NODE_ENV !== 'development' &&
-    !authenticator.verify({
+    NODE_ENV !== 'development'
+    && !authenticator.verify({
       token: req.body.otp,
       secret: dbUser.mfaSecret as string,
     })
@@ -405,7 +405,7 @@ passport.use(
       usernameField: 'email',
       passwordField: 'password',
     },
-     
+
     async (
       email: string,
       password: string,
@@ -447,4 +447,4 @@ const useSamlStrategy = async (): Promise<void> => {
 };
 
 // Cannot use top level await so must call separately...
-useSamlStrategy();  
+useSamlStrategy();

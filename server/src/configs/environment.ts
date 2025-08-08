@@ -121,8 +121,8 @@ const defaults = {
 dotenv.config();
 
 type NodeEnv = 'test' | 'development' | 'production';
-export const NODE_ENV: NodeEnv = (process.env.NODE_ENV ||
-  defaults.nodeEnv) as NodeEnv;
+export const NODE_ENV: NodeEnv = (process.env.NODE_ENV
+  || defaults.nodeEnv) as NodeEnv;
 if (!['test', 'development', 'production'].includes(NODE_ENV)) {
   throw new Error(
     `Invalid NODE_ENV '${NODE_ENV}'. Possible values are 'test', 'development', and 'production'`

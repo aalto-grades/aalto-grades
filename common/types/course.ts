@@ -100,9 +100,9 @@ export const EditCourseDataSchema = BaseCourseDataSchema.omit({id: true})
   .partial()
   .refine(
     val =>
-      val.maxCredits === undefined ||
-      val.minCredits === undefined ||
-      val.maxCredits >= val.minCredits,
+      val.maxCredits === undefined
+      || val.minCredits === undefined
+      || val.maxCredits >= val.minCredits,
     {path: ['maxCredits']}
   );
 

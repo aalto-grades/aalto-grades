@@ -85,7 +85,7 @@ beforeAll(async () => {
   [[, differentGradeSourceId]] =
     await createData.createAplusGradeSources(noRoleCourseId);
 
-  mockedAxios.get.mockImplementation(async url => {
+  mockedAxios.get.mockImplementation(async (url) => {
     if (url.endsWith('/points?format=json')) {
       const data = {
         count: 2,
@@ -426,8 +426,8 @@ describe('Test POST /v1/courses/:courseId/aplus-sources - add A+ grade sources',
     // prettier-ignore
     const valid: [AplusGradeSourceType, boolean, boolean, boolean][] = [
       [AplusGradeSourceType.FullPoints, false, false, false],
-      [AplusGradeSourceType.Module,     true,  false, false],
-      [AplusGradeSourceType.Exercise,   false, true,  false],
+      [AplusGradeSourceType.Module, true, false, false],
+      [AplusGradeSourceType.Exercise, false, true, false],
       [AplusGradeSourceType.Difficulty, false, false, true],
     ];
 

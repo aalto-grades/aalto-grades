@@ -12,10 +12,10 @@ import {
 } from '@/common/types';
 import httpLogger from '../configs/winston';
 
-morgan.token('remote-addr', req => {
-  return (req.headers['x-real-ip'] ||
-    req.headers['x-forwarded-for'] ||
-    req.socket.remoteAddress) as string;
+morgan.token('remote-addr', (req) => {
+  return (req.headers['x-real-ip']
+    || req.headers['x-forwarded-for']
+    || req.socket.remoteAddress) as string;
 });
 morgan.token('user', (req: Request) => JSON.stringify(req.user));
 morgan.token('params', (req: Request) => JSON.stringify(req.params));
@@ -57,8 +57,8 @@ morgan.token('body', (req: Request) => {
  * configurations (like file logging) made in winston.
  */
 export const requestLogger: RequestHandler = morgan(
-  ':remote-addr :remote-user ":method :url HTTP/:http-version"' +
-    ' :status :res[content-length] ":referrer" ":user-agent" ":user" ":params" ":body"',
+  ':remote-addr :remote-user ":method :url HTTP/:http-version"'
+  + ' :status :res[content-length] ":referrer" ":user-agent" ":user" ":params" ":body"',
   {
     stream: {
       write: (message: string) => httpLogger.http(message.trim()),
