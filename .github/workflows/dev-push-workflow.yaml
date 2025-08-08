@@ -5,7 +5,7 @@
 name: Dev Push Workflow
 run-name: Dev push workflow (${{ github.actor }})
 
-on: # yamllint disable-line rule:truthy
+on:
   push:
     branches:
       - dev

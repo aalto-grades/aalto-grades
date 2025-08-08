@@ -3,11 +3,11 @@
 # SPDX-License-Identifier: MIT
 ---
 name: Build E2E Images
-on: # yamllint disable-line rule:truthy
+on:
   workflow_call:
     outputs:
       cache-key:
-        description: "Cache key for built images"
+        description: Cache key for built images
         value: ${{ jobs.build-images.outputs.cache-key }}
 
 jobs:
@@ -18,32 +18,32 @@ jobs:
       cache-key: ${{ steps.cache-key.outputs.key }}
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Generate cache key
         id: cache-key
         run: |
           # Create a cache key based on relevant files
           echo "key=docker-images-${{ runner.os }}-${{ hashFiles('**/Dockerfile*', '**/package*.json', 'docker-compose*.yaml') }}-${{ github.sha }}" >> $GITHUB_OUTPUT
-      
+
       - name: Cache Docker images
         id: cache-images
         uses: actions/cache@v3
         with:
           path: /tmp/docker-images
           key: ${{ steps.cache-key.outputs.key }}
-      
+
       - name: Install dependencies
         if: steps.cache-images.outputs.cache-hit != 'true'
         run: npm ci
-      
+
       - name: Docker compose down
         if: steps.cache-images.outputs.cache-hit != 'true'
         run: docker compose down --volumes --remove-orphans
-      
+
       - name: Docker compose build
         if: steps.cache-images.outputs.cache-hit != 'true'
         run: docker compose build --no-cache
-      
+
       - name: Save Docker images to cache
         if: steps.cache-images.outputs.cache-hit != 'true'
         run: |
@@ -51,18 +51,18 @@ jobs:
           # List all docker images and filter for our project
           echo "Available Docker images:"
           docker images
-          
+
           # Get images that were built by docker compose (exclude base images)
           IMAGES=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep -E "aalto-grades|frontend|backend" | grep -v "nginx\|postgres" | tail -n +2 | tr '\n' ' ')
-          
+
           if [ -z "$IMAGES" ]; then
             # Fallback: try to get images by project name
             PROJECT_NAME=$(basename $(pwd) | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]//g')
             IMAGES=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep "$PROJECT_NAME" | grep -v "nginx\|postgres" | tail -n +2 | tr '\n' ' ')
           fi
-          
+
           echo "Images to save: $IMAGES"
-          
+
           if [ -n "$IMAGES" ]; then
             docker save $IMAGES -o /tmp/docker-images/images.tar
             echo "Images saved successfully"

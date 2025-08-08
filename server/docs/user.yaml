@@ -46,13 +46,13 @@ definitions:
     type: object
     properties:
       id:
-        $ref: '#/definitions/UserId'
+        $ref: "#/definitions/UserId"
       name:
-        $ref: '#/definitions/NullableUserName'
+        $ref: "#/definitions/NullableUserName"
       email:
-        $ref: '#/definitions/NullableUserEmail'
+        $ref: "#/definitions/NullableUserEmail"
       studentNumber:
-        $ref: '#/definitions/NullableStudentNumber'
+        $ref: "#/definitions/NullableStudentNumber"
     required:
       - id
       - name
@@ -63,15 +63,15 @@ definitions:
     type: object
     properties:
       id:
-        $ref: '#/definitions/UserId'
+        $ref: "#/definitions/UserId"
       name:
-        $ref: '#/definitions/NullableUserName'
+        $ref: "#/definitions/NullableUserName"
       email:
-        $ref: '#/definitions/NullableUserEmail'
+        $ref: "#/definitions/NullableUserEmail"
       studentNumber:
-        $ref: '#/definitions/NullableStudentNumber'
+        $ref: "#/definitions/NullableStudentNumber"
       role:
-        $ref: '#/definitions/SystemRole'
+        $ref: "#/definitions/SystemRole"
       idpUser:
         type: boolean
         description: If the user is an IDP user.
@@ -88,13 +88,13 @@ definitions:
     type: object
     properties:
       id:
-        $ref: '#/definitions/UserId'
+        $ref: "#/definitions/UserId"
       name:
-        $ref: '#/definitions/NullableUserName'
+        $ref: "#/definitions/NullableUserName"
       email:
-        $ref: '#/definitions/NullableUserEmail'
+        $ref: "#/definitions/NullableUserEmail"
       studentNumber:
-        $ref: '#/definitions/StudentNumber'
+        $ref: "#/definitions/StudentNumber"
     required:
       - id
       - name
@@ -105,13 +105,13 @@ definitions:
     type: object
     properties:
       id:
-        $ref: '#/definitions/UserId'
+        $ref: "#/definitions/UserId"
       name:
-        $ref: '#/definitions/NullableUserName'
+        $ref: "#/definitions/NullableUserName"
       email:
-        $ref: '#/definitions/UserEmail'
+        $ref: "#/definitions/UserEmail"
       studentNumber:
-        $ref: '#/definitions/NullableStudentNumber'
+        $ref: "#/definitions/NullableStudentNumber"
     required:
       - id
       - name
@@ -122,15 +122,15 @@ definitions:
     type: object
     properties:
       id:
-        $ref: '#/definitions/UserId'
+        $ref: "#/definitions/UserId"
       name:
-        $ref: '#/definitions/NullableUserName'
+        $ref: "#/definitions/NullableUserName"
       email:
-        $ref: '#/definitions/UserEmail'
+        $ref: "#/definitions/UserEmail"
       studentNumber:
-        $ref: '#/definitions/NullableStudentNumber'
+        $ref: "#/definitions/NullableStudentNumber"
       expiryDate:
-        $ref: '#/definitions/NullableAssistantExpiryDate'
+        $ref: "#/definitions/NullableAssistantExpiryDate"
     required:
       - id
       - name
@@ -147,9 +147,9 @@ definitions:
         description: If the new user should be an admin.
         example: true
       email:
-        $ref: '#/definitions/UserEmail'
+        $ref: "#/definitions/UserEmail"
       name:
-        $ref: '#/definitions/UserName'
+        $ref: "#/definitions/UserName"
     required:
       - admin
       - email
@@ -159,7 +159,7 @@ definitions:
     type: object
     properties:
       temporaryPassword:
-        $ref: '#/definitions/NullableTemporaryPassword'
+        $ref: "#/definitions/NullableTemporaryPassword"
     required:
       - temporaryPassword
 
@@ -192,9 +192,9 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/CourseData'
+                $ref: "#/definitions/CourseData"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
     security:
       - cookieAuth: []
 
@@ -212,13 +212,13 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/CourseDataWithFinalGrades'
+                $ref: "#/definitions/CourseDataWithFinalGrades"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []
 
@@ -237,13 +237,13 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/UserData'
+                $ref: "#/definitions/UserData"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []
 
@@ -259,11 +259,11 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/FullUserData'
+                $ref: "#/definitions/FullUserData"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
     security:
       - cookieAuth: []
   post:
@@ -275,20 +275,20 @@ definitions:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/NewUser'
+            $ref: "#/definitions/NewUser"
     responses:
       201:
         description: User Created.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/NewUserResponse'
+              $ref: "#/definitions/NewUserResponse"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
 
@@ -299,18 +299,18 @@ definitions:
       delete an idp user or an admin user.
       Available only to admin users.
     parameters:
-      - $ref: '#/parameters/userId'
+      - $ref: "#/parameters/userId"
     responses:
       200:
         description: User deleted.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []
 
@@ -325,18 +325,18 @@ definitions:
             type: array
             description: List of user IDs to delete.
             items:
-              $ref: '#/definitions/UserId'
+              $ref: "#/definitions/UserId"
     responses:
       200:
         description: Users deleted.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []
 
@@ -349,21 +349,21 @@ definitions:
         application/json:
           schema:
             type: object
-            $ref: '#/definitions/VerifyEmail'
+            $ref: "#/definitions/VerifyEmail"
     responses:
       200:
         description: Result to indicate whether the email exists or not.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/VerifyEmailResponse'
+              $ref: "#/definitions/VerifyEmailResponse"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []

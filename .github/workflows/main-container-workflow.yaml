@@ -5,7 +5,7 @@
 name: Main Image Creation Workflow
 run-name: Main image creation (${{ github.actor }})
 
-on: # yamllint disable-line rule:truthy
+on:
   push:
     branches:
       - main

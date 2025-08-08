@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 ---
 name: E2E Tests - Sequential (Original)
-on: # yamllint disable-line rule:truthy
+on:
   workflow_call:
+    inputs: {}
 
 jobs:
   e2e-tests-sequential:

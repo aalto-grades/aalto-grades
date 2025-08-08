@@ -15,10 +15,10 @@ services:
     ports:
       - 3000:3000
     environment:
-      POSTGRES_URL: 'database'
-      POSTGRES_USER: 'postgres'
-      POSTGRES_DATABASE: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_URL: database
+      POSTGRES_USER: postgres
+      POSTGRES_DATABASE: postgres
+      POSTGRES_PASSWORD: postgres
     depends_on:
       - database
 
@@ -28,13 +28,13 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_PASSWORD: postgres
 
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: aalto-grades-pgadmin-dev-backend-only
     ports:
-      - '5050:80'
+      - "5050:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@aalto.fi
       PGADMIN_DEFAULT_PASSWORD: password

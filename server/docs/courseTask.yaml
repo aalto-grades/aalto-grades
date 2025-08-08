@@ -35,22 +35,22 @@ definitions:
     type: object
     properties:
       id:
-        $ref: '#/definitions/CourseTaskId'
+        $ref: "#/definitions/CourseTaskId"
       coursePartId:
-        $ref: '#/definitions/CoursePartId'
+        $ref: "#/definitions/CoursePartId"
       name:
-        $ref: '#/definitions/CourseTaskName'
+        $ref: "#/definitions/CourseTaskName"
       daysValid:
-        $ref: '#/definitions/NullableCourseTaskDaysValid'
+        $ref: "#/definitions/NullableCourseTaskDaysValid"
       maxGrade:
-        $ref: '#/definitions/NullableCourseTaskMaxGrade'
+        $ref: "#/definitions/NullableCourseTaskMaxGrade"
       archived:
-        $ref: '#/definitions/CourseTaskArchived'
+        $ref: "#/definitions/CourseTaskArchived"
       aplusGradeSources:
         type: array
         description: A+ grade sources connected to the course task.
         items:
-          $ref: '#/definitions/AplusGradeSourceData'
+          $ref: "#/definitions/AplusGradeSourceData"
     required:
       - id
       - coursePartId
@@ -64,13 +64,13 @@ definitions:
     type: object
     properties:
       coursePartId:
-        $ref: '#/definitions/CoursePartId'
+        $ref: "#/definitions/CoursePartId"
       name:
-        $ref: '#/definitions/CourseTaskName'
+        $ref: "#/definitions/CourseTaskName"
       daysValid:
-        $ref: '#/definitions/NullableCourseTaskDaysValid'
+        $ref: "#/definitions/NullableCourseTaskDaysValid"
       maxGrade:
-        $ref: '#/definitions/NullableCourseTaskMaxGrade'
+        $ref: "#/definitions/NullableCourseTaskMaxGrade"
     required:
       - coursePartId
       - name
@@ -81,15 +81,15 @@ definitions:
     type: object
     properties:
       id:
-        $ref: '#/definitions/CourseTaskId'
+        $ref: "#/definitions/CourseTaskId"
       name:
-        $ref: '#/definitions/CourseTaskName'
+        $ref: "#/definitions/CourseTaskName"
       daysValid:
-        $ref: '#/definitions/NullableCourseTaskDaysValid'
+        $ref: "#/definitions/NullableCourseTaskDaysValid"
       maxGrade:
-        $ref: '#/definitions/NullableCourseTaskMaxGrade'
+        $ref: "#/definitions/NullableCourseTaskMaxGrade"
       archived:
-        $ref: '#/definitions/CourseTaskArchived'
+        $ref: "#/definitions/CourseTaskArchived"
     required:
       - id
 
@@ -101,24 +101,24 @@ definitions:
         type: array
         description: Course tasks to be added.
         items:
-          $ref: '#/definitions/NewCourseTaskData'
+          $ref: "#/definitions/NewCourseTaskData"
       edit:
         type: array
         description: Course tasks to be edited.
         items:
-          $ref: '#/definitions/EditCourseTaskData'
+          $ref: "#/definitions/EditCourseTaskData"
       delete:
         type: array
         description: Course tasks to be deleted.
         items:
-          $ref: '#/definitions/CourseTaskId'
+          $ref: "#/definitions/CourseTaskId"
 
 /v1/courses/{courseId}/tasks:
   get:
     tags: [Course Task]
     description: Get all the course tasks of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     responses:
       200:
         description: Returns all course tasks of the course.
@@ -127,25 +127,25 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/CourseTaskData'
+                $ref: "#/definitions/CourseTaskData"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
   post:
     tags: [Course Task]
     description: Add, edit, and delete course tasks.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/ModifyCourseTasks'
+            $ref: "#/definitions/ModifyCourseTasks"
     responses:
       200:
         description: Course tasks added, edited, or deleted.
@@ -156,14 +156,14 @@ definitions:
               description: >
                 Potentially empty list of the new IDs of the added course parts.
               items:
-                $ref: '#/definitions/CoursePartId'
+                $ref: "#/definitions/CoursePartId"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"

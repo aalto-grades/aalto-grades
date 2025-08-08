@@ -25,7 +25,7 @@ definitions:
   GraphStructure:
     type: object
     description: Graph structure.
-    example: {'nodes': [], 'edges': [], 'nodeData': {}}
+    example: {nodes: [], edges: [], nodeData: {}}
   GradingModelArchived:
     type: boolean
     description: If grading model has been archived.
@@ -37,15 +37,15 @@ definitions:
     description: Grading model information.
     properties:
       id:
-        $ref: '#/definitions/GradingModelId'
+        $ref: "#/definitions/GradingModelId"
       courseId:
-        $ref: '#/definitions/CourseId'
+        $ref: "#/definitions/CourseId"
       name:
-        $ref: '#/definitions/GradingModelName'
+        $ref: "#/definitions/GradingModelName"
       graphStructure:
-        $ref: '#/definitions/GraphStructure'
+        $ref: "#/definitions/GraphStructure"
       archived:
-        $ref: '#/definitions/GradingModelArchived'
+        $ref: "#/definitions/GradingModelArchived"
       hasArchivedSources:
         type: boolean
         description: If grading model has archived course parts.
@@ -68,9 +68,9 @@ definitions:
     description: Grading model information.
     properties:
       name:
-        $ref: '#/definitions/GradingModelName'
+        $ref: "#/definitions/GradingModelName"
       graphStructure:
-        $ref: '#/definitions/GraphStructure'
+        $ref: "#/definitions/GraphStructure"
     required:
       - name
       - graphStructure
@@ -80,36 +80,36 @@ definitions:
     description: Grading model information.
     properties:
       name:
-        $ref: '#/definitions/GradingModelName'
+        $ref: "#/definitions/GradingModelName"
       graphStructure:
-        $ref: '#/definitions/GraphStructure'
+        $ref: "#/definitions/GraphStructure"
       archived:
-        $ref: '#/definitions/GradingModelArchived'
+        $ref: "#/definitions/GradingModelArchived"
 
 /v1/courses/{courseId}/grading-models/{gradingModelId}:
   get:
     tags: [Grading Model]
     description: Get information about a grading model.
     parameters:
-      - $ref: '#/parameters/courseId'
-      - $ref: '#/parameters/gradingModelId'
+      - $ref: "#/parameters/courseId"
+      - $ref: "#/parameters/gradingModelId"
     responses:
       200:
         description: Returns grading model with given ID.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/GradingModelData'
+              $ref: "#/definitions/GradingModelData"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
   put:
@@ -118,26 +118,26 @@ definitions:
       Edit specified grading model.
       Available only to admin users and teachers of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
-      - $ref: '#/parameters/gradingModelId'
+      - $ref: "#/parameters/courseId"
+      - $ref: "#/parameters/gradingModelId"
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/EditGradingModelData'
+            $ref: "#/definitions/EditGradingModelData"
     responses:
       200:
         description: Grading model updated.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
   delete:
@@ -146,21 +146,21 @@ definitions:
       Deletes specified grading model.
       Available only to admin users and teachers of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
-      - $ref: '#/parameters/gradingModelId'
+      - $ref: "#/parameters/courseId"
+      - $ref: "#/parameters/gradingModelId"
     responses:
       200:
         description: Grading model deleted.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
 
@@ -171,7 +171,7 @@ definitions:
       Get all the grading models of a course.
       Available only to admin users and teachers and assistants of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     responses:
       200:
         description: Returns all grading models of the course.
@@ -180,15 +180,15 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/GradingModelData'
+                $ref: "#/definitions/GradingModelData"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []
   post:
@@ -197,28 +197,28 @@ definitions:
       Add a grading model to a course.
       Available only to admin users and teachers of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/NewGradingModelData'
+            $ref: "#/definitions/NewGradingModelData"
     responses:
       201:
         description: Grading model created.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/GradingModelId'
+              $ref: "#/definitions/GradingModelId"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []

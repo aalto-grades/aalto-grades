@@ -18,12 +18,12 @@ definitions:
   OTP:
     type: string
     description: TOTP token.
-    example: '523801'
+    example: "523801"
   NullableOTP:
     type: string
     nullable: true
     description: TOTP token.
-    example: '523801'
+    example: "523801"
 
   OTPAuth:
     type: string
@@ -63,11 +63,11 @@ definitions:
     type: object
     properties:
       id:
-        $ref: '#/definitions/UserId'
+        $ref: "#/definitions/UserId"
       name:
-        $ref: '#/definitions/UserName'
+        $ref: "#/definitions/UserName"
       role:
-        $ref: '#/definitions/SystemRole'
+        $ref: "#/definitions/SystemRole"
     required:
       - id
       - name
@@ -77,11 +77,11 @@ definitions:
     type: object
     properties:
       email:
-        $ref: '#/definitions/UserEmail'
+        $ref: "#/definitions/UserEmail"
       password:
-        $ref: '#/definitions/Password'
+        $ref: "#/definitions/Password"
       otp:
-        $ref: '#/definitions/NullableOTP'
+        $ref: "#/definitions/NullableOTP"
     required:
       - email
       - password
@@ -97,15 +97,15 @@ definitions:
         description: A+ grade source type.
         example: ok
       otpAuth:
-        $ref: '#/definitions/OTPAuth'
+        $ref: "#/definitions/OTPAuth"
       otp:
-        $ref: '#/definitions/NullableOTP'
+        $ref: "#/definitions/NullableOTP"
       id:
-        $ref: '#/definitions/UserId'
+        $ref: "#/definitions/UserId"
       name:
-        $ref: '#/definitions/UserName'
+        $ref: "#/definitions/UserName"
       role:
-        $ref: '#/definitions/SystemRole'
+        $ref: "#/definitions/SystemRole"
     required:
       - status
 
@@ -113,11 +113,11 @@ definitions:
     type: object
     properties:
       email:
-        $ref: '#/definitions/UserEmail'
+        $ref: "#/definitions/UserEmail"
       password:
-        $ref: '#/definitions/Password'
+        $ref: "#/definitions/Password"
       newPassword:
-        $ref: '#/definitions/Password'
+        $ref: "#/definitions/Password"
     required:
       - email
       - password
@@ -127,9 +127,9 @@ definitions:
     type: object
     properties:
       resetPassword:
-        $ref: '#/definitions/ResetPassword'
+        $ref: "#/definitions/ResetPassword"
       resetMfa:
-        $ref: '#/definitions/ResetMfa'
+        $ref: "#/definitions/ResetMfa"
     required:
       - resetPassword
       - resetMfa
@@ -138,7 +138,7 @@ definitions:
     type: object
     properties:
       temporaryPassword:
-        $ref: '#/definitions/NullableTemporaryPassword'
+        $ref: "#/definitions/NullableTemporaryPassword"
     required:
       - temporaryPassword
 
@@ -147,11 +147,11 @@ definitions:
     type: object
     properties:
       resetPassword:
-        $ref: '#/definitions/ResetPassword'
+        $ref: "#/definitions/ResetPassword"
       resetMfa:
-        $ref: '#/definitions/ResetMfa'
+        $ref: "#/definitions/ResetMfa"
       newPassword:
-        $ref: '#/definitions/Password'
+        $ref: "#/definitions/Password"
     required:
       - resetPassword
       - resetMfa
@@ -160,7 +160,7 @@ definitions:
     type: object
     properties:
       otpAuth:
-        $ref: '#/definitions/NullableOTPAuth'
+        $ref: "#/definitions/NullableOTPAuth"
     required:
       - otpAuth
 
@@ -168,7 +168,7 @@ definitions:
     type: object
     properties:
       otp:
-        $ref: '#/definitions/OTP'
+        $ref: "#/definitions/OTP"
     required:
       - otp
 
@@ -182,11 +182,11 @@ definitions:
         content:
           application/json:
             schema:
-              $ref: '#/definitions/AuthData'
+              $ref: "#/definitions/AuthData"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []
 
@@ -199,14 +199,14 @@ definitions:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/LoginData'
+            $ref: "#/definitions/LoginData"
     responses:
       200:
         description: The login has succeeded, and an access token is return in a cookie.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/LoginResult'
+              $ref: "#/definitions/LoginResult"
         headers:
           Set-Cookie:
             description: JWT token, storing an access token to allow using the API.
@@ -214,7 +214,7 @@ definitions:
               type: string
               example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
 
 /v1/auth/logout:
   post:
@@ -229,7 +229,7 @@ definitions:
       200:
         description: The user has successfully logged out.
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
     security:
       - cookieAuth: []
 
@@ -242,44 +242,44 @@ definitions:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/ResetOwnPasswordData'
+            $ref: "#/definitions/ResetOwnPasswordData"
     responses:
       200:
         description: Password reset successfully.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
 
 /v1/auth/reset-auth/{userId}:
   post:
     tags: [Auth]
     description: Reset other admin's password. Only available to admins.
     parameters:
-      - $ref: '#/definitions/UserId'
+      - $ref: "#/definitions/UserId"
     requestBody:
       description: If MFA and/or password should be reset.
       content:
         application/json:
           schema:
-            $ref: '#/definitions/ResetAuthData'
+            $ref: "#/definitions/ResetAuthData"
     responses:
       200:
         description: Temporary password for the admin whose password was reset.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/ResetAuthResult'
+              $ref: "#/definitions/ResetAuthResult"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []
 
@@ -292,18 +292,18 @@ definitions:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/ChangeOwnAuthData'
+            $ref: "#/definitions/ChangeOwnAuthData"
     responses:
       200:
         description: Password / MFA reset successfully.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/ChangeOwnAuthResponse'
+              $ref: "#/definitions/ChangeOwnAuthResponse"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
     security:
       - cookieAuth: []
 
@@ -316,14 +316,14 @@ definitions:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/ConfirmMfaData'
+            $ref: "#/definitions/ConfirmMfaData"
     responses:
       200:
         description: Mfa confirmed.
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
     security:
       - cookieAuth: []
 
@@ -346,7 +346,7 @@ definitions:
         content:
           application/json:
             schema:
-              $ref: '#/definitions/LoginResult'
+              $ref: "#/definitions/LoginResult"
         headers:
           Set-Cookie:
             description: JWT token, storing an access token to allow using the API.
@@ -354,7 +354,7 @@ definitions:
               type: string
               example: jwt=wliuerhlwieurh; Secure; HttpOnly; SameSite=None
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
 
 /v1/auth/saml/metadata:
   get:
@@ -365,4 +365,4 @@ definitions:
       200:
         description: Xml read successfully.
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"

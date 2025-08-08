@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import js from '@eslint/js';
 import importPlugin from 'eslint-plugin-import';
 import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
 import react from 'eslint-plugin-react';
@@ -14,6 +13,7 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
   // Global ignores
   {
+    name: 'Ossi Client ESLint Configuration',
     ignores: [
       '**/node_modules/',
       '**/dist/',
@@ -22,26 +22,20 @@ export default tseslint.config(
       'vite-env.d.ts',
     ]
   },
-  
-  // Base ESLint recommended rules for all files
-  js.configs.recommended,
-  
-  // TypeScript ESLint recommended for TS files without type checking first
-  ...tseslint.configs.recommended,
-  
+
   // React plugin flat configs
   react.configs.flat.recommended,
   react.configs.flat['jsx-runtime'], // For React 17+
-  
+
   // React Hooks recommended config
   reactHooks.configs['recommended-latest'],
-  
+
   // Main configuration for TypeScript/React files with type checking
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
       ...tseslint.configs.recommendedTypeChecked,
-      importPlugin.flatConfigs.recommended, 
+      importPlugin.flatConfigs.recommended,
       importPlugin.flatConfigs.typescript
     ],
     languageOptions: {
@@ -84,19 +78,19 @@ export default tseslint.config(
       'n/no-missing-import': 'off',
 
       // Extra rules on top of base config
-      camelcase: ['warn', {allow: ['required_error', 'unstable_viewTransition']}],
+      camelcase: ['warn', { allow: ['required_error', 'unstable_viewTransition'] }],
       eqeqeq: 'warn',
       'func-names': 'warn',
       'func-style': ['warn', 'expression'],
-      'no-constant-condition': ['warn', {checkLoops: false}],
+      'no-constant-condition': ['warn', { checkLoops: false }],
       'no-unused-vars': 'off', // Replaced by @typescript-eslint rule
-      'sort-imports': ['warn', {ignoreDeclarationSort: true}],
-      'spaced-comment': ['warn', 'always', {markers: ['/']}],
+      'sort-imports': ['warn', { ignoreDeclarationSort: true }],
+      'spaced-comment': ['warn', 'always', { markers: ['/'] }],
 
       // Import plugin rules
       'import/newline-after-import': 'warn',
       'import/no-named-as-default-member': 'off',
-      'import/no-unresolved': ['warn', { 
+      'import/no-unresolved': ['warn', {
         ignore: ['^@/'] // Ignore path alias resolution issues
       }],
       'import/order': [
@@ -107,7 +101,7 @@ export default tseslint.config(
             ['internal', 'parent', 'sibling', 'index'],
           ],
           'newlines-between': 'always',
-          alphabetize: {order: 'asc'},
+          alphabetize: { order: 'asc' },
           pathGroups: [
             {
               pattern: '@/**',
@@ -138,12 +132,12 @@ export default tseslint.config(
       'react/destructuring-assignment': 'warn',
       'react/function-component-definition': [
         'warn',
-        {namedComponents: 'arrow-function', unnamedComponents: 'arrow-function'},
+        { namedComponents: 'arrow-function', unnamedComponents: 'arrow-function' },
       ],
       'react/hook-use-state': 'warn',
       'react/jsx-boolean-value': 'warn',
       'react/jsx-curly-brace-presence': 'warn',
-      'react/jsx-filename-extension': ['warn', {extensions: ['.tsx']}],
+      'react/jsx-filename-extension': ['warn', { extensions: ['.tsx'] }],
       'react/jsx-no-constructed-context-values': 'warn',
       'react/jsx-no-useless-fragment': 'warn',
       'react/no-danger': 'error',
@@ -153,38 +147,38 @@ export default tseslint.config(
       // React Refresh rules
       'react-refresh/only-export-components': [
         'warn',
-        {allowConstantExport: true},
+        { allowConstantExport: true },
       ],
 
       // No relative import paths plugin
       'no-relative-import-paths/no-relative-import-paths': [
         'warn',
-        {allowSameFolder: true, rootDir: 'src', prefix: '@'},
+        { allowSameFolder: true, rootDir: 'src', prefix: '@' },
       ],
 
       // TypeScript specific rules
       '@typescript-eslint/consistent-type-imports': [
         'warn',
-        {fixStyle: 'inline-type-imports'},
+        { fixStyle: 'inline-type-imports' },
       ],
       '@typescript-eslint/dot-notation': 'warn',
       '@typescript-eslint/explicit-function-return-type': [
         'warn',
-        {allowExpressions: true},
+        { allowExpressions: true },
       ],
       '@typescript-eslint/no-floating-promises': 'off',
       '@typescript-eslint/no-import-type-side-effects': 'warn',
       '@typescript-eslint/no-misused-promises': [
         'warn',
-        {checksVoidReturn: {attributes: false}}, // To allow async onClick
+        { checksVoidReturn: { attributes: false } }, // To allow async onClick
       ],
-      '@typescript-eslint/no-shadow': ['warn', {allow: ['_']}],
+      '@typescript-eslint/no-shadow': ['warn', { allow: ['_'] }],
       '@typescript-eslint/no-unnecessary-condition': 'warn',
       '@typescript-eslint/no-unnecessary-template-expression': 'warn',
       '@typescript-eslint/no-unnecessary-type-arguments': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',
-        {argsIgnorePattern: '^_', varsIgnorePattern: '^_'},
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
       '@typescript-eslint/no-use-before-define': 'warn',
       '@typescript-eslint/prefer-find': 'warn',
@@ -192,68 +186,6 @@ export default tseslint.config(
       '@typescript-eslint/promise-function-async': 'warn',
       '@typescript-eslint/return-await': 'warn',
       '@typescript-eslint/switch-exhaustiveness-check': 'warn',
-    },
-  },
-  
-  // Configuration for JavaScript files (excluding config files)
-  {
-    files: ['**/*.{js,mjs}'],
-    ignores: ['**/eslint.config.js'],
-    extends: [importPlugin.flatConfigs.recommended],
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-    },
-    rules: {
-      // Only basic rules for JS files
-      camelcase: 'warn',
-      eqeqeq: 'warn',
-      'func-names': 'warn',
-      'func-style': ['warn', 'expression'],
-      'no-constant-condition': ['warn', {checkLoops: false}],
-      'sort-imports': ['warn', {ignoreDeclarationSort: true}],
-      'spaced-comment': ['warn', 'always', {markers: ['/']}],
-      
-      'import/extensions': ['error', 'ignorePackages'],
-      'import/newline-after-import': 'warn',
-      'import/no-named-as-default-member': 'off',
-      'import/order': [
-        'warn',
-        {
-          groups: [
-            ['builtin', 'external'],
-            ['internal', 'parent', 'sibling', 'index'],
-          ],
-          'newlines-between': 'always',
-          alphabetize: {order: 'asc'},
-        },
-      ],
-    },
-  },
-  
-  // Configuration for ESLint config files only (without import plugin)
-  {
-    files: ['**/eslint.config.js'],
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      globals: {
-        ...globals.node,
-      },
-    },
-    rules: {
-      // Only basic rules for config files
-      camelcase: 'warn',
-      eqeqeq: 'warn',
-      'func-names': 'warn',
-      'func-style': ['warn', 'expression'],
-      'no-constant-condition': ['warn', {checkLoops: false}],
-      'sort-imports': ['warn', {ignoreDeclarationSort: true}],
-      'spaced-comment': ['warn', 'always', {markers: ['/']}],
     },
   },
 );
