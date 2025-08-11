@@ -45,7 +45,7 @@ const SaveBar = ({
           size="small"
           startIcon={<SaveOutlined />}
           disabled={loading || disabled}
-          onClick={e => {
+          onClick={(e) => {
             if (handleSave) {
               e.preventDefault();
               handleSave();

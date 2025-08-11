@@ -57,8 +57,8 @@ const SourceNode = (props: NodeProps): JSX.Element => {
 
     // Check if is not valid float
     if (
-      newLocalSettings.minPoints !== '' &&
-      !/^\d+(?:\.\d+?)?$/.test(newLocalSettings.minPoints)
+      newLocalSettings.minPoints !== ''
+      && !/^\d+(?:\.\d+?)?$/.test(newLocalSettings.minPoints)
     ) {
       setError(true);
       return;
@@ -77,7 +77,11 @@ const SourceNode = (props: NodeProps): JSX.Element => {
   return (
     <BaseNode {...props} error={error} fullFail={nodeValue.fullFail}>
       <div>
-        <label>{t('shared.graph.min-points')}: </label>
+        <label>
+          {t('shared.graph.min-points')}
+          :
+          {' '}
+        </label>
         <input
           style={{width: '70px'}}
           onChange={handleChange}
@@ -87,7 +91,11 @@ const SourceNode = (props: NodeProps): JSX.Element => {
       </div>
       {settings.minPoints !== null && (
         <div style={{textAlign: 'left'}}>
-          <label>{t('shared.graph.on-fail')}: </label>
+          <label>
+            {t('shared.graph.on-fail')}
+            :
+            {' '}
+          </label>
           <select
             onChange={handleSelectChange}
             value={localSettings.onFailSetting}

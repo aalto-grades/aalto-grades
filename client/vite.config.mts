@@ -36,13 +36,13 @@ export default defineConfig({
   define: {
     // The build will contain a syntax error if we don't manually insert quotes
     AALTO_GRADES_VERSION:
-      '"' +
-      (
+      '"'
+      + (
         JSON.parse(fs.readFileSync('../package.json').toString()) as {
           version: string;
         }
-      ).version +
-      '"',
+      ).version
+      + '"',
   },
   esbuild: {
     loader: 'tsx',

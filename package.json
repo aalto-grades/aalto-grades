@@ -26,8 +26,6 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^52.0.4",
     "eslint-plugin-yml": "^1.18.0",
-    "gts": "^6.0.2",
-
     "typescript-eslint": "^8.37.0"
   },
   "engines": {

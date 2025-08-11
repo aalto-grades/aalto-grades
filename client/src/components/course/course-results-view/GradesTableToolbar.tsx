@@ -494,147 +494,149 @@ const GradesTableToolbar = (): JSX.Element => {
         selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
       />
 
-      {table.getSelectedRowModel().rows.length === 0 ? (
-        <Box
-          sx={{
-            p: 0.5,
-            gap: 2,
-            borderRadius: 3,
-            display: 'flex',
-            backgroundColor:
+      {table.getSelectedRowModel().rows.length === 0
+        ? (
+            <Box
+              sx={{
+                p: 0.5,
+                gap: 2,
+                borderRadius: 3,
+                display: 'flex',
+                backgroundColor:
               table.getSelectedRowModel().rows.length === 0
                 ? 'none'
                 : theme.palette.primary.light,
-            width: '700px',
-          }}
-        >
-          <Button
-            variant="tonal"
-            onClick={() => setUploadOpen(true)}
-            startIcon={<Add />}
-            color="primary"
-          >
-            {t('course.results.add-grades-manually')}
-          </Button>
-          <Tooltip
-            title={
-              hasAplusSources
-                ? t('course.results.import-from-aplus')
-                : t('course.results.no-aplus-sources')
-            }
-          >
-            <span>
+                width: '700px',
+              }}
+            >
               <Button
                 variant="tonal"
-                disabled={!hasAplusSources}
-                onClick={() => setAplusImportDialogOpen(true)}
+                onClick={() => setUploadOpen(true)}
                 startIcon={<Add />}
                 color="primary"
               >
-                {t('course.results.import-from-aplus')}
+                {t('course.results.add-grades-manually')}
               </Button>
-            </span>
-          </Tooltip>
-        </Box>
-      ) : (
-        <Fade in={table.getSelectedRowModel().rows.length > 0}>
-          <Box
-            sx={{
-              p: 0.5,
-              borderRadius: 3,
-              display: 'flex',
-              backgroundColor:
+              <Tooltip
+                title={
+                  hasAplusSources
+                    ? t('course.results.import-from-aplus')
+                    : t('course.results.no-aplus-sources')
+                }
+              >
+                <span>
+                  <Button
+                    variant="tonal"
+                    disabled={!hasAplusSources}
+                    onClick={() => setAplusImportDialogOpen(true)}
+                    startIcon={<Add />}
+                    color="primary"
+                  >
+                    {t('course.results.import-from-aplus')}
+                  </Button>
+                </span>
+              </Tooltip>
+            </Box>
+          )
+        : (
+            <Fade in={table.getSelectedRowModel().rows.length > 0}>
+              <Box
+                sx={{
+                  p: 0.5,
+                  borderRadius: 3,
+                  display: 'flex',
+                  backgroundColor:
                 table.getSelectedRowModel().rows.length === 0
                   ? 'none'
                   : theme.palette.primary.light,
-              width: '700px',
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                flexWrap: 'nowrap',
-                alignItems: 'center',
-                gap: 1,
-                px: 1,
-                borderRadius: 200,
-              }}
-            >
-              <div style={{alignContent: 'center'}}>
-                {t('course.results.selected-student', {
-                  count: table.getSelectedRowModel().rows.length,
-                })}
-              </div>
-              {editRights && (
+                  width: '700px',
+                }}
+              >
                 <Box
                   sx={{
                     display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'flex-start',
+                    flexWrap: 'nowrap',
                     alignItems: 'center',
                     gap: 1,
+                    px: 1,
+                    borderRadius: 200,
                   }}
                 >
-                  <Tooltip
-                    title={
-                      table.getSelectedRowModel().rows.length === 0
-                        ? t('course.results.select-one-student-calculation')
-                        : t('course.results.calculate-final-for-selected')
-                    }
-                    placement="top"
-                  >
-                    <span>
-                      <Button
-                        variant={
+                  <div style={{alignContent: 'center'}}>
+                    {t('course.results.selected-student', {
+                      count: table.getSelectedRowModel().rows.length,
+                    })}
+                  </div>
+                  {editRights && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        gap: 1,
+                      }}
+                    >
+                      <Tooltip
+                        title={
                           table.getSelectedRowModel().rows.length === 0
-                            ? 'outlined'
-                            : !missingFinalGrades
-                              ? 'outlined'
-                              : 'contained'
+                            ? t('course.results.select-one-student-calculation')
+                            : t('course.results.calculate-final-for-selected')
                         }
-                        onClick={() => setShowCalculateDialog(true)}
-                        disabled={table.getSelectedRowModel().rows.length === 0}
+                        placement="top"
                       >
-                        {missingFinalGrades
-                          ? t('course.results.calculate-final')
-                          : t('course.results.recalculate-final')}
-                      </Button>
-                    </span>
-                  </Tooltip>
-                  <Tooltip
-                    title={
-                      table.getSelectedRowModel().rows.length === 0
-                        ? t('course.results.select-one-student-download')
-                        : missingFinalGrades
-                          ? t('course.results.sisu-csv-missing-final-grades')
-                          : t('course.results.download-as-sisu-compat-csv')
-                    }
-                    placement="top"
-                  >
-                    <span>
-                      <Button
-                        variant="contained"
-                        color={missingFinalGrades ? 'error' : 'primary'}
-                        onClick={(): void => {
-                          if (!missingFinalGrades) {
-                            setShowSisuDialog(true);
-                          }
-                        }}
-                        disabled={
-                          table.getSelectedRowModel().rows.length > 0 &&
-                          missingFinalGrades
+                        <span>
+                          <Button
+                            variant={
+                              table.getSelectedRowModel().rows.length === 0
+                                ? 'outlined'
+                                : !missingFinalGrades
+                                    ? 'outlined'
+                                    : 'contained'
+                            }
+                            onClick={() => setShowCalculateDialog(true)}
+                            disabled={table.getSelectedRowModel().rows.length === 0}
+                          >
+                            {missingFinalGrades
+                              ? t('course.results.calculate-final')
+                              : t('course.results.recalculate-final')}
+                          </Button>
+                        </span>
+                      </Tooltip>
+                      <Tooltip
+                        title={
+                          table.getSelectedRowModel().rows.length === 0
+                            ? t('course.results.select-one-student-download')
+                            : missingFinalGrades
+                              ? t('course.results.sisu-csv-missing-final-grades')
+                              : t('course.results.download-as-sisu-compat-csv')
                         }
+                        placement="top"
                       >
-                        {t('course.results.download-sisu-csv')}
-                      </Button>
-                    </span>
-                  </Tooltip>
+                        <span>
+                          <Button
+                            variant="contained"
+                            color={missingFinalGrades ? 'error' : 'primary'}
+                            onClick={(): void => {
+                              if (!missingFinalGrades) {
+                                setShowSisuDialog(true);
+                              }
+                            }}
+                            disabled={
+                              table.getSelectedRowModel().rows.length > 0
+                              && missingFinalGrades
+                            }
+                          >
+                            {t('course.results.download-sisu-csv')}
+                          </Button>
+                        </span>
+                      </Tooltip>
+                    </Box>
+                  )}
                 </Box>
-              )}
-            </Box>
-          </Box>
-        </Fade>
-      )}
+              </Box>
+            </Fade>
+          )}
       <Box
         sx={{
           py: 1,

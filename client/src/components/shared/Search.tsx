@@ -24,11 +24,11 @@ const Search = ({value, onChange, reset, ...props}: PropsType): JSX.Element => {
       placeholder={t('general.search')}
       value={value}
       onChange={onChange}
-      startAdornment={
+      startAdornment={(
         <InputAdornment position="start" sx={{color: 'text.primary'}}>
           <SearchRoundedIcon fontSize="small" />
         </InputAdornment>
-      }
+      )}
       endAdornment={
         value.length > 0 && (
           <IconButton

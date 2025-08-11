@@ -40,9 +40,9 @@ const PredictedGradeCell = ({
 
   const gradeErrors = row.errors?.filter(
     e =>
-      (e.type === 'InvalidPredictedGrade' ||
-        e.type === 'OutOfRangePredictedGrade') &&
-      gradingModelIds.includes(Number(e.info.modelId))
+      (e.type === 'InvalidPredictedGrade'
+        || e.type === 'OutOfRangePredictedGrade')
+      && gradingModelIds.includes(Number(e.info.modelId))
   );
 
   let previewValue = 'N/A';

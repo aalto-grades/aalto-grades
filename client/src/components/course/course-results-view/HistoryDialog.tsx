@@ -34,8 +34,8 @@ const GradesHistoryDialog = ({
   const gradesHistory = useGetGradesHistory(courseTaskId);
   const gradesHistoryFiltered = gradesHistory.data?.filter(
     entry =>
-      entry.previousState?.userId === studentUser?.id ||
-      entry.taskGrade?.user.id === studentUser?.id
+      entry.previousState?.userId === studentUser?.id
+      || entry.taskGrade?.user.id === studentUser?.id
   );
 
   const rows =

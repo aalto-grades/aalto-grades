@@ -80,12 +80,12 @@ const SelectSourcesDialog = ({
             .map(source => (
               <FormControlLabel
                 key={source.id}
-                control={
+                control={(
                   <Checkbox
                     checked={selected[source.id]}
                     onChange={() => onSelect(source.id)}
                   />
-                }
+                )}
                 label={source.name}
               />
             ))}

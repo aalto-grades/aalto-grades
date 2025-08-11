@@ -105,8 +105,8 @@ const EditFinalGradesDialog = ({
 
   const changes = useMemo(
     () =>
-      JSON.stringify(rows.map(row => ({...row, selected: ''}))) !==
-      JSON.stringify(initRows),
+      JSON.stringify(rows.map(row => ({...row, selected: ''})))
+      !== JSON.stringify(initRows),
     [initRows, rows]
   );
 
@@ -203,8 +203,7 @@ const EditFinalGradesDialog = ({
                 onClick={() =>
                   setRows(oldRows =>
                     oldRows.filter(row => row.id !== params.id)
-                  )
-                }
+                  )}
               />,
             ],
           } as GridColDef<ColTypes>,
@@ -220,7 +219,7 @@ const EditFinalGradesDialog = ({
 
   const dataGridToolbar = (): JSX.Element => {
     const addFinalGrade = (): void => {
-      setRows(oldRows => {
+      setRows((oldRows) => {
         const freeId = Math.max(0, ...oldRows.map(row => row.id)) + 1;
         const newRow: ColTypes = {
           id: freeId,
@@ -326,8 +325,7 @@ const EditFinalGradesDialog = ({
               columns={columns}
               rowHeight={25}
               getRowClassName={({row}: {row: ColTypes}) =>
-                `row-${row.selected}`
-              }
+                `row-${row.selected}`}
               editMode="row"
               rowSelection={false}
               disableColumnSelector
@@ -337,10 +335,9 @@ const EditFinalGradesDialog = ({
                 sorting: {sortModel: [{field: 'date', sort: 'desc'}]},
               }}
               isCellEditable={(params: GridCellParams<ColTypes>) =>
-                params.row.gradingModel === null ||
-                params.field === 'exportDate' ||
-                params.field === 'comment'
-              }
+                params.row.gradingModel === null
+                || params.field === 'exportDate'
+                || params.field === 'comment'}
               onRowEditStart={() => setEditing(true)}
               onRowEditStop={() => setEditing(false)}
               processRowUpdate={(updatedRow: GridRowModel<ColTypes>) => {

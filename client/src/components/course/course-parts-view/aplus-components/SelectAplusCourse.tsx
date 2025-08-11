@@ -98,8 +98,7 @@ const SelectAplusCourse = ({
           <TextField {...params} label={t('general.course')} />
         )}
         isOptionEqualToValue={(option, value) =>
-          option.courseCode === value.courseCode
-        }
+          option.courseCode === value.courseCode}
       />
       <Autocomplete
         sx={{width: '30%', ml: 1}}
@@ -107,16 +106,14 @@ const SelectAplusCourse = ({
         onChange={(_, value) =>
           setInstance(
             aplusCourses.find(aplusCourse => aplusCourse.id === value?.courseId)
-          )
-        }
+          )}
         disabled={!selectedCourse}
         options={instanceOptions}
         renderInput={params => (
           <TextField {...params} label={t('general.instance')} />
         )}
         isOptionEqualToValue={(option, value) =>
-          option.courseId === value.courseId
-        }
+          option.courseId === value.courseId}
       />
     </Box>
   );

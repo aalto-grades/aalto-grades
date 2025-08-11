@@ -21,11 +21,11 @@ import EditGradesDialog from './EditGradesDialog';
 
 export type GradeCellSourceValue =
   | {
-      type: 'courseTask';
-      task: CourseTaskGradesData;
-      maxGrade: number | null;
-      coursePartExpiryDate: Date | null | undefined;
-    }
+    type: 'courseTask';
+    task: CourseTaskGradesData;
+    maxGrade: number | null;
+    coursePartExpiryDate: Date | null | undefined;
+  }
   | {type: 'coursePart'; grade: number | null};
 
 type GradeCellProps = {
@@ -110,7 +110,7 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
               studentUser={studentUser}
               courseTaskId={sourceValue.task.courseTaskId}
               maxGrade={sourceValue.maxGrade}
-              title={
+              title={(
                 <Trans
                   i18nKey="course.results.grade-of-for"
                   components={{bold: <strong />}}
@@ -119,7 +119,7 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
                     part: sourceValue.task.courseTaskName,
                   }}
                 />
-              }
+              )}
               grades={sourceValue.task.grades}
             />
           )}
@@ -167,20 +167,20 @@ const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
             </Tooltip>
           )}
           {/* Multiple grades */}
-          {!hasInvalidGrade &&
-            !isGradeExpired &&
-            sourceValue.task.grades.length > 1 && (
-              <InfoOutlined
-                sx={{
-                  position: 'absolute',
-                  float: 'left',
-                  top: '-5%',
-                  left: '1%',
-                  width: '15px',
-                  color: `rgba(${theme.palette.info.mainChannel} / 0.3)`,
-                }}
-              />
-            )}
+          {!hasInvalidGrade
+            && !isGradeExpired
+            && sourceValue.task.grades.length > 1 && (
+            <InfoOutlined
+              sx={{
+                position: 'absolute',
+                float: 'left',
+                top: '-5%',
+                left: '1%',
+                width: '15px',
+                color: `rgba(${theme.palette.info.mainChannel} / 0.3)`,
+              }}
+            />
+          )}
 
           {bestGrade?.date && (
             <Typography

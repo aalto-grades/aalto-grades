@@ -42,35 +42,37 @@ const UploadDialogSelectCoursePart = ({
     <>
       <DialogTitle>{t('course.results.upload.select-course-part')}</DialogTitle>
       <DialogContent>
-        {courseParts.data === undefined || courseParts.data.length === 0 ? (
-          <Typography>{t('course.parts.not-found')}</Typography>
-        ) : (
-          <List component={Paper}>
-            {courseParts.data.map(part => (
-              <Fragment key={part.id}>
-                <StyledListItemButton onClick={() => setCoursePart(part)}>
-                  <ListItemText
-                    primary={part.name}
-                    secondary={
-                      part.expiryDate?.toLocaleDateString() ??
-                      t('course.parts.no-expiry-date')
-                    }
-                  />
-                  <Chip
-                    label={
-                      part.archived
-                        ? t('general.archived')
-                        : t('general.active')
-                    }
-                    sx={{minWidth: 100, ml: 2}}
-                    icon={part.archived ? <Inventory /> : <CheckCircle />}
-                    color={part.archived ? undefined : 'success'}
-                  />
-                </StyledListItemButton>
-              </Fragment>
-            ))}
-          </List>
-        )}
+        {courseParts.data === undefined || courseParts.data.length === 0
+          ? (
+              <Typography>{t('course.parts.not-found')}</Typography>
+            )
+          : (
+              <List component={Paper}>
+                {courseParts.data.map(part => (
+                  <Fragment key={part.id}>
+                    <StyledListItemButton onClick={() => setCoursePart(part)}>
+                      <ListItemText
+                        primary={part.name}
+                        secondary={
+                          part.expiryDate?.toLocaleDateString()
+                          ?? t('course.parts.no-expiry-date')
+                        }
+                      />
+                      <Chip
+                        label={
+                          part.archived
+                            ? t('general.archived')
+                            : t('general.active')
+                        }
+                        sx={{minWidth: 100, ml: 2}}
+                        icon={part.archived ? <Inventory /> : <CheckCircle />}
+                        color={part.archived ? undefined : 'success'}
+                      />
+                    </StyledListItemButton>
+                  </Fragment>
+                ))}
+              </List>
+            )}
       </DialogContent>
     </>
   );

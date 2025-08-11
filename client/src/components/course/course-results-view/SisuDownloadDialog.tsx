@@ -65,7 +65,7 @@ const SisuDownloadDialog = ({
     useState<DownloadOption>('unexported');
 
   const downloadSisuGradeCsv = useDownloadSisuGradeCsv({
-    onSuccess: gradeCsv => {
+    onSuccess: (gradeCsv) => {
       const blob = new Blob([gradeCsv], {type: 'text/csv'});
       const date = new Date();
       const dateFormat = `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}`;
@@ -158,7 +158,7 @@ const SisuDownloadDialog = ({
           margin="normal"
           label={t('course.results.completion-language')}
           value={completionLanguage ?? 'default'}
-          onChange={e => {
+          onChange={(e) => {
             if (e.target.value === 'default') {
               setCompletionLanguage(undefined);
             } else {
@@ -176,12 +176,12 @@ const SisuDownloadDialog = ({
           ))}
         </TextField>
         <FormControlLabel
-          control={
+          control={(
             <Switch
               checked={dateOverride}
               onChange={e => setDateOverride(e.target.checked)}
             />
-          }
+          )}
           label={t('course.results.override-date')}
         />
         <Collapse in={dateOverride}>
@@ -206,8 +206,7 @@ const SisuDownloadDialog = ({
               defaultValue="all"
               value={downloadOption}
               onChange={e =>
-                setDownloadOption(e.target.value as DownloadOption)
-              }
+                setDownloadOption(e.target.value as DownloadOption)}
             >
               <MenuItem value="all">
                 {t('course.results.download-all-selected')}

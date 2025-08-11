@@ -142,8 +142,8 @@ const MismatchDialog = ({
                     <FormControl
                       sx={{background: 'white'}}
                       error={
-                        (error === 'empty' && target === null) ||
-                        (error === 'duplicate' && target === duplicate)
+                        (error === 'empty' && target === null)
+                        || (error === 'duplicate' && target === duplicate)
                       }
                     >
                       <InputLabel id={`mismatch-select-${key}`}>
@@ -158,8 +158,7 @@ const MismatchDialog = ({
                           setSelections(oldSelections => ({
                             ...oldSelections,
                             [key]: e.target.value,
-                          }))
-                        }
+                          }))}
                         sx={{minWidth: 200}}
                       >
                         {mismatchData.courseTasks.map((task, index) => (
@@ -167,8 +166,8 @@ const MismatchDialog = ({
                             key={task}
                             value={task}
                             divider={
-                              index === 0 ||
-                              index === mismatchData.courseTasks.length - 1
+                              index === 0
+                              || index === mismatchData.courseTasks.length - 1
                             }
                           >
                             {task}
@@ -187,8 +186,7 @@ const MismatchDialog = ({
                         setSelections(oldSelections => ({
                           ...oldSelections,
                           [key]: 'ignoreColumn',
-                        }))
-                      }
+                        }))}
                     >
                       {selections[key] === 'ignoreColumn'
                         ? t('course.results.upload.ignored')
@@ -205,8 +203,7 @@ const MismatchDialog = ({
         <Button onClick={onClose}>{t('general.cancel')}</Button>
         <Button
           onClick={() =>
-            mismatchData.onImport(selections as {[key: string]: string})
-          }
+            mismatchData.onImport(selections as {[key: string]: string})}
           variant="contained"
           disabled={error !== ''}
         >

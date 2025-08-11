@@ -25,7 +25,7 @@ const MissingModelButton = ({part, onClick}: PropsType): JSX.Element => {
   return (
     <ListItem
       disablePadding
-      secondaryAction={
+      secondaryAction={(
         <Tooltip
           title={t('course.models.missing-part-model-create')}
           placement="top"
@@ -34,7 +34,7 @@ const MissingModelButton = ({part, onClick}: PropsType): JSX.Element => {
             <AddBox />
           </IconButton>
         </Tooltip>
-      }
+      )}
     >
       <ListItemButton onClick={onClick}>
         <ListItemText primary={part.name} />

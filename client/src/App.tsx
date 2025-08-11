@@ -66,7 +66,7 @@ const Root = (): JSX.Element => {
       <NotistackWrapper />
       <GlobalModalWrapper
         customModal={ConfirmDialog}
-        ref={el => {
+        ref={(el) => {
           globalModalRef = el;
         }}
       />

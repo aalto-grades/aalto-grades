@@ -126,9 +126,9 @@ export const invalidGradesCheck = (
   for (const courseTask of row.courseTasks) {
     const maxGrade = maxGrades[courseTask.courseTaskId];
     if (
-      courseTask.courseTaskId in maxGrades &&
-      maxGrade !== null &&
-      courseTask.grades.some(grade => grade.grade > maxGrade)
+      courseTask.courseTaskId in maxGrades
+      && maxGrade !== null
+      && courseTask.grades.some(grade => grade.grade > maxGrade)
     )
       errors.push({
         message: t('utils.grade-higher-than-max'),
@@ -161,12 +161,12 @@ export const predictedGradesErrorCheck = (
     }
     // If grade is out of range
     if (
-      (courseScale === GradingScale.Numerical &&
-        !(grade.finalGrade >= 0 && grade.finalGrade <= 5)) ||
-      (courseScale === GradingScale.PassFail &&
-        !(grade.finalGrade >= 0 && grade.finalGrade <= 1)) ||
-      (courseScale === GradingScale.SecondNationalLanguage &&
-        !(grade.finalGrade >= 0 && grade.finalGrade <= 2))
+      (courseScale === GradingScale.Numerical
+        && !(grade.finalGrade >= 0 && grade.finalGrade <= 5))
+      || (courseScale === GradingScale.PassFail
+        && !(grade.finalGrade >= 0 && grade.finalGrade <= 1))
+      || (courseScale === GradingScale.SecondNationalLanguage
+        && !(grade.finalGrade >= 0 && grade.finalGrade <= 2))
     ) {
       errors.push({
         message: t('utils.grade-out-of-range'),
@@ -220,8 +220,8 @@ export const getErrorTypes = (
           case 'OutOfRangePredictedGrade':
           case 'InvalidPredictedGrade':
             if (
-              selectedGradingModel === 'any' ||
-              selectedGradingModel === Number(error.info.modelId)
+              selectedGradingModel === 'any'
+              || selectedGradingModel === Number(error.info.modelId)
             ) {
               errorTypes[error.type] = true;
             }
@@ -259,8 +259,8 @@ export const getErrorCount = (
           case 'OutOfRangePredictedGrade':
           case 'InvalidPredictedGrade':
             if (
-              selectedGradingModel === 'any' ||
-              error.info.modelId === selectedGradingModel.id
+              selectedGradingModel === 'any'
+              || error.info.modelId === selectedGradingModel.id
             ) {
               totalErrors += 1;
             }

@@ -110,9 +110,9 @@ const CalculateFinalGradesDialog = ({
   let warning = '';
   if (selectedModel !== null) {
     const numErrors =
-      Number(selectedModel.hasExpiredSources) +
-      Number(selectedModel.hasArchivedSources) +
-      Number(selectedModel.hasDeletedSources);
+      Number(selectedModel.hasExpiredSources)
+      + Number(selectedModel.hasArchivedSources)
+      + Number(selectedModel.hasDeletedSources);
     if (numErrors > 1) warning = t('course.models.has-multiple-warnings');
     else if (selectedModel.hasExpiredSources)
       warning = t('course.models.has-expired');
@@ -162,7 +162,7 @@ const CalculateFinalGradesDialog = ({
             labelId="calculate-grades-select"
             sx={{width: '100%'}}
             value={selectedModel?.name ?? ''}
-            onChange={e => {
+            onChange={(e) => {
               setSelectedModel(
                 modelList.find(model => model.name === e.target.value)!,
               );
@@ -178,12 +178,12 @@ const CalculateFinalGradesDialog = ({
         </FormControl>
         <FormControlLabel
           sx={{mt: 1}}
-          control={
+          control={(
             <Switch
               checked={dateOverride}
               onChange={e => setDateOverride(e.target.checked)}
             />
-          }
+          )}
           label={t('course.results.override-date')}
         />
         <Collapse in={dateOverride}>

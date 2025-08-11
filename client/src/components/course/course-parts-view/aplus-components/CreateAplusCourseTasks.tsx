@@ -59,8 +59,7 @@ const CreateAplusCourseTasks = ({
                   daysValid: !/^[1-9]+\d*$/.test(e.target.value)
                     ? null
                     : Number(e.target.value),
-                })
-              }
+                })}
             />
             <Box
               sx={{
@@ -71,7 +70,7 @@ const CreateAplusCourseTasks = ({
               }}
             >
               <Typography>
-                {t('general.max-grade')}: {courseTask.maxGrade}
+                {t('general.max-grade') + ':' + courseTask.maxGrade}
               </Typography>
               {/* In case the teacher changes the course task's name, this is intended
                   to show which source the course task was initially created from. */}

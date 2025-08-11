@@ -120,8 +120,7 @@ const ResetPasswordDialog = ({
         setShowPassword(oldShowPassword => ({
           ...oldShowPassword,
           [type]: !oldShowPassword[type],
-        }))
-      }
+        }))}
     />
   );
 

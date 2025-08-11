@@ -90,8 +90,7 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
         setShowPassword(oldShowPassword => ({
           ...oldShowPassword,
           [type]: !oldShowPassword[type],
-        }))
-      }
+        }))}
     />
   );
 

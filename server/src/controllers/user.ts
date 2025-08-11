@@ -265,7 +265,7 @@ export const addUser: Endpoint<NewUser, NewUserResponse> = async (req, res) => {
   }
 
   // Admin user
-  if (existingUser !== null && existingUser.admin) {
+  if (existingUser?.admin) {
     throw new ApiError(
       `Admin user with email ${email} already exists`,
       HttpCode.Conflict

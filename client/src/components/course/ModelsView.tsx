@@ -55,10 +55,10 @@ const ModelsView = (): JSX.Element => {
   const courseTasks = useGetCourseTasks(courseId);
   const finalGrades = useGetFinalGrades(courseId, {
     enabled:
-      auth !== null &&
-      (auth.role === SystemRole.Admin ||
-        (course.data &&
-          getCourseRole(course.data, auth) === CourseRoleType.Teacher)),
+      auth !== null
+      && (auth.role === SystemRole.Admin
+        || (course.data
+          && getCourseRole(course.data, auth) === CourseRoleType.Teacher)),
   });
   const grades = useGetGrades(courseId);
 
@@ -90,8 +90,8 @@ const ModelsView = (): JSX.Element => {
             .filter(
               // Filter out models from archived course parts
               model =>
-                !(model.coursePartId && courseParts.data) ||
-                !courseParts.data.some(
+                !(model.coursePartId && courseParts.data)
+                || !courseParts.data.some(
                   part => part.id === model.coursePartId && part.archived
                 )
             ),
@@ -102,8 +102,8 @@ const ModelsView = (): JSX.Element => {
     () =>
       courseParts.data?.filter(
         part =>
-          !part.archived &&
-          !models?.some(model => model.coursePartId === part.id)
+          !part.archived
+          && !models?.some(model => model.coursePartId === part.id)
       ) ?? [],
     [courseParts.data, models]
   );
@@ -317,9 +317,9 @@ const ModelsView = (): JSX.Element => {
   };
 
   if (
-    courseParts.data === undefined ||
-    courseTasks.data === undefined ||
-    models === null
+    courseParts.data === undefined
+    || courseTasks.data === undefined
+    || models === null
   )
     return <>{t('general.loading')}</>;
 
@@ -328,7 +328,7 @@ const ModelsView = (): JSX.Element => {
       <CreateGradingModelDialog
         open={createDialogOpen.open}
         onClose={() => setCreateDialogOpen({open: false})}
-        onSubmit={id => {
+        onSubmit={(id) => {
           allGradingModels.refetch();
           setLoadGraphId(id);
         }}
@@ -345,21 +345,21 @@ const ModelsView = (): JSX.Element => {
         {t('general.grading-models')}
       </Typography>
       <Box sx={{display: 'flex', mb: 1}}>
-        {(auth?.role === SystemRole.Admin || isTeacherInCharge) &&
-          !graphOpen && (
-            <Tooltip
-              title={t('course.models.create-final-grade-model')}
-              placement="top"
+        {(auth?.role === SystemRole.Admin || isTeacherInCharge)
+          && !graphOpen && (
+          <Tooltip
+            title={t('course.models.create-final-grade-model')}
+            placement="top"
+          >
+            <Button
+              sx={{mt: 1}}
+              variant="outlined"
+              onClick={() => setCreateDialogOpen({open: true})}
             >
-              <Button
-                sx={{mt: 1}}
-                variant="outlined"
-                onClick={() => setCreateDialogOpen({open: true})}
-              >
-                {t('course.models.create-final-grade-model')}
-              </Button>
-            </Tooltip>
-          )}
+              {t('course.models.create-final-grade-model')}
+            </Button>
+          </Tooltip>
+        )}
         {graphOpen && (
           <Button
             sx={{mt: 1}}
@@ -372,60 +372,61 @@ const ModelsView = (): JSX.Element => {
       </Box>
 
       <Collapse in={!graphOpen}>
-        {models.length + coursePartsWithoutModels.length === 0 ? (
-          <Typography textAlign="left" sx={{p: 2}}>
-            {t('course.models.no-models')}
-          </Typography>
-        ) : (
-          <Box
-            sx={{
-              mt: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'start',
-              gap: 2,
-            }}
-          >
-            <Collapse in={models.find(mod => !mod.archived) !== undefined}>
-              <ListEntries
-                label={t('course.models.active-models')}
-                icon={<CheckCircle />}
-                color="success"
+        {models.length + coursePartsWithoutModels.length === 0
+          ? (
+              <Typography textAlign="left" sx={{p: 2}}>
+                {t('course.models.no-models')}
+              </Typography>
+            )
+          : (
+              <Box
+                sx={{
+                  mt: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'start',
+                  gap: 2,
+                }}
               >
-                {models
-                  .filter(mod => !mod.archived)
-                  .map(model => getModelButton(model))}
-              </ListEntries>
-            </Collapse>
-            <Collapse in={models.find(mod => mod.archived) !== undefined}>
-              <ListEntries
-                label={t('course.models.archived-models')}
-                icon={<Inventory />}
-              >
-                {models
-                  .filter(mod => mod.archived)
-                  .map(model => getModelButton(model))}
-              </ListEntries>
-            </Collapse>
-            <Collapse in={editRights && coursePartsWithoutModels.length > 0}>
-              <ListEntries
-                label={t('course.models.missing-models')}
-                icon={<Warning />}
-                color="warning"
-              >
-                {coursePartsWithoutModels.map(part => (
-                  <MissingModelButton
-                    key={part.id}
-                    part={part}
-                    onClick={() =>
-                      setCreateDialogOpen({open: true, coursePart: part})
-                    }
-                  />
-                ))}
-              </ListEntries>
-            </Collapse>
-          </Box>
-        )}
+                <Collapse in={models.find(mod => !mod.archived) !== undefined}>
+                  <ListEntries
+                    label={t('course.models.active-models')}
+                    icon={<CheckCircle />}
+                    color="success"
+                  >
+                    {models
+                      .filter(mod => !mod.archived)
+                      .map(model => getModelButton(model))}
+                  </ListEntries>
+                </Collapse>
+                <Collapse in={models.find(mod => mod.archived) !== undefined}>
+                  <ListEntries
+                    label={t('course.models.archived-models')}
+                    icon={<Inventory />}
+                  >
+                    {models
+                      .filter(mod => mod.archived)
+                      .map(model => getModelButton(model))}
+                  </ListEntries>
+                </Collapse>
+                <Collapse in={editRights && coursePartsWithoutModels.length > 0}>
+                  <ListEntries
+                    label={t('course.models.missing-models')}
+                    icon={<Warning />}
+                    color="warning"
+                  >
+                    {coursePartsWithoutModels.map(part => (
+                      <MissingModelButton
+                        key={part.id}
+                        part={part}
+                        onClick={() =>
+                          setCreateDialogOpen({open: true, coursePart: part})}
+                      />
+                    ))}
+                  </ListEntries>
+                </Collapse>
+              </Box>
+            )}
       </Collapse>
 
       {graphOpen && currentModel !== null && (

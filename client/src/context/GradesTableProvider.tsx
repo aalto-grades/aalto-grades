@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
- 
-
 import {Badge, Checkbox} from '@mui/material';
 import {
   type ExpandedState,
@@ -84,20 +82,20 @@ declare module '@tanstack/table-core' {
 
 export type RowError =
   | {
-      type: 'Error';
-      message: string;
-      info: {columnId: string};
-    }
+    type: 'Error';
+    message: string;
+    info: {columnId: string};
+  }
   | {
-      type: 'InvalidGrade';
-      message: string;
-      info: {columnId: string};
-    }
+    type: 'InvalidGrade';
+    message: string;
+    info: {columnId: string};
+  }
   | {
-      type: 'InvalidPredictedGrade' | 'OutOfRangePredictedGrade';
-      message: string;
-      info: {modelId: number};
-    };
+    type: 'InvalidPredictedGrade' | 'OutOfRangePredictedGrade';
+    message: string;
+    info: {modelId: number};
+  };
 export type RowErrorType = RowError['type'];
 
 export type PredictedGraphValues = {
@@ -174,8 +172,8 @@ export const GradesTableProvider = ({
   >('any');
 
   const finalGradeModelSelected =
-    selectedGradingModel === 'any' ||
-    selectedGradingModel.coursePartId === null;
+    selectedGradingModel === 'any'
+    || selectedGradingModel.coursePartId === null;
 
   // Filter out archived models
   const gradingModels = useMemo(
@@ -214,9 +212,9 @@ export const GradesTableProvider = ({
                 getCoursePartExpiryDateFromTaskId(task.courseTaskId)
               )
                 ? findBestGrade(
-                    task.grades,
-                    getCoursePartExpiryDateFromTaskId(task.courseTaskId)
-                  )!.grade
+                  task.grades,
+                  getCoursePartExpiryDateFromTaskId(task.courseTaskId)
+                )!.grade
                 : 0,
             })),
         }))
@@ -241,7 +239,7 @@ export const GradesTableProvider = ({
     // Add all auxiliary columns to the data
     return groupByLatestBestGrade(
       // Creating the extended rows
-      data.map(row => {
+      data.map((row) => {
         const studentPredictedGrades = Object.fromEntries(
           Object.entries(predictedGrades).map(([key, value]) => [
             key,
@@ -304,7 +302,7 @@ export const GradesTableProvider = ({
             onChange={() => {
               if (row.getIsSomeSelected()) {
                 // If some rows are selected, select all
-                row.subRows.forEach(subRow => {
+                row.subRows.forEach((subRow) => {
                   if (!subRow.getIsSelected())
                     subRow.getToggleSelectedHandler()(subRow);
                 });
@@ -319,8 +317,8 @@ export const GradesTableProvider = ({
           <span style={{marginLeft: '4px', marginRight: '15px'}}>
             <Badge
               badgeContent={
-                row.subRows.filter(subRow => subRow.getIsSelected()).length ||
-                undefined
+                row.subRows.filter(subRow => subRow.getIsSelected()).length
+                || undefined
               }
               max={999}
               color="secondary"
@@ -407,8 +405,8 @@ export const GradesTableProvider = ({
         id: 'finalGrade',
         getGroupingValue: row => findBestFinalGrade(row.finalGrades)?.grade,
         sortingFn: (a, b) =>
-          (findBestFinalGrade(a.original.finalGrades)?.grade ?? -1) -
-          (findBestFinalGrade(b.original.finalGrades)?.grade ?? -1),
+          (findBestFinalGrade(a.original.finalGrades)?.grade ?? -1)
+          - (findBestFinalGrade(b.original.finalGrades)?.grade ?? -1),
         cell: ({getValue, row}) => (
           <FinalGradeCell
             user={row.original.user}
@@ -424,7 +422,7 @@ export const GradesTableProvider = ({
 
       // Exported to Sisu column
       columnHelper.accessor(
-        row => {
+        (row) => {
           // ATTENTION this function needs to have the same parameters of the one inside the grade cell
           // Clearly can be done in a better way
           const bestFinalGrade = findBestFinalGrade(row.finalGrades);
@@ -520,7 +518,7 @@ export const GradesTableProvider = ({
           {
             header: source.name,
             meta: {PrettyChipPosition: 'alone', coursePart: true},
-            getGroupingValue: row => {
+            getGroupingValue: (row) => {
               if (finalGradeModelSelected) {
                 // case coursePart, one grade only
                 return coursePartValues[row.user.id][source.id];
@@ -544,8 +542,8 @@ export const GradesTableProvider = ({
                   (findBestGrade(
                     a.task.grades,
                     getCoursePartExpiryDateFromTaskId(a.task.courseTaskId)
-                  )?.grade ?? -1) -
-                  (findBestGrade(
+                  )?.grade ?? -1)
+                  - (findBestGrade(
                     b.task.grades,
                     getCoursePartExpiryDateFromTaskId(b.task.courseTaskId)
                   )?.grade ?? -1)
@@ -582,7 +580,7 @@ export const GradesTableProvider = ({
         id: 'latestBestGrade',
         meta: {PrettyChipPosition: 'first'},
         header: () => {
-          return t('course.results.table.latest-grade');  
+          return t('course.results.table.latest-grade');
         },
         cell: ({getValue}) => getValue(),
       }),
@@ -597,7 +595,7 @@ export const GradesTableProvider = ({
       header: t('course.results.table.errors'),
       id: 'errors',
       enableHiding: true,
-      filterFn: row => {
+      filterFn: (row) => {
         // Not sure which solution is the best one, for now we keep both
         // return getErrorCount([row.original], selectedGradingModel) > 0;
         return (row.original.errors?.length ?? 0) > 0;
@@ -622,7 +620,7 @@ export const GradesTableProvider = ({
     defaultColumn: {size: 100},
     getCoreRowModel: getCoreRowModel(),
     // Selection
-    onRowSelectionChange: selection => {
+    onRowSelectionChange: (selection) => {
       setRowSelection(selection);
       table.options.state.rowSelection = rowSelection;
     },

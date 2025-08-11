@@ -192,9 +192,9 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
             height: '12px',
             width: '12px',
             top: `${
-              handleStartHeight +
-              handleMiddleHeight +
-              (index + substituteHandles.length) * rowHeight
+              handleStartHeight
+              + handleMiddleHeight
+              + (index + substituteHandles.length) * rowHeight
             }px`,
           }}
           position={Position.Left}
@@ -208,9 +208,9 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
           height: '12px',
           width: '12px',
           top: `${
-            handleStartHeight +
-            handleMiddleHeight +
-            (substituteHandles.length + exerciseHandles.length) * rowHeight
+            handleStartHeight
+            + handleMiddleHeight
+            + (substituteHandles.length + exerciseHandles.length) * rowHeight
           }px`,
         }}
         position={Position.Left}
@@ -254,15 +254,15 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
                   {nodeValue.sources[key].value === 'fail'
                     ? nodeValue.sources[key].value
                     : Math.round(
-                        nodeValue.sources[key].value * 100  
-                      ) / 100}
+                      nodeValue.sources[key].value * 100
+                    ) / 100}
                 </td>
                 <td>
                   {nodeValue.values[key] === 'fail'
                     ? nodeValue.values[key]
                     : Math.round(
-                        nodeValue.values[key] * 100  
-                      ) / 100}
+                      nodeValue.values[key] * 100
+                    ) / 100}
                 </td>
               </tr>
             ))}
@@ -293,11 +293,11 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
                 style={{
                   height: rowHeight,
                   backgroundColor:
-                    nodeValue.sources[key].value === 'fail' &&
-                    nodeValue.values[key] === 'fail'
+                    nodeValue.sources[key].value === 'fail'
+                    && nodeValue.values[key] === 'fail'
                       ? '#fcc'
-                      : nodeValue.sources[key].value === 'fail' &&
-                          nodeValue.values[key] !== 'fail'
+                      : nodeValue.sources[key].value === 'fail'
+                        && nodeValue.values[key] !== 'fail'
                         ? '#cfc'
                         : '',
                 }}
@@ -306,8 +306,8 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
                   {nodeValue.sources[key].value === 'fail'
                     ? nodeValue.sources[key].value
                     : Math.round(
-                        (nodeValue.sources[key].value) * 100  
-                      ) / 100}
+                      (nodeValue.sources[key].value) * 100
+                    ) / 100}
                 </td>
                 <td>
                   <input
@@ -348,9 +348,9 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
             height: '12px',
             width: '12px',
             top: `${
-              handleStartHeight +
-              handleMiddleHeight +
-              (index + substituteHandles.length) * rowHeight
+              handleStartHeight
+              + handleMiddleHeight
+              + (index + substituteHandles.length) * rowHeight
             }px`,
           }}
           position={Position.Right}

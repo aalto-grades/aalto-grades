@@ -73,13 +73,11 @@ const SideMenuButton = ({
           }}
         >
           <ListItemIcon>
-            {isPending || isTransitioning ? (
-              <CircularProgress />
-            ) : isActive ? (
-              <Icon />
-            ) : (
-              <IconOutlined />
-            )}
+            {(isPending || isTransitioning)
+              ? <CircularProgress />
+              : (isActive
+                  ? <Icon />
+                  : <IconOutlined />)}
           </ListItemIcon>
           <ListItemText primary={text} />
         </ListItemButton>
@@ -136,8 +134,8 @@ const SideMenu = (): JSX.Element => {
           Icon={Widgets}
           IconOutlined={WidgetsOutlined}
         />
-        {(auth?.role === SystemRole.Admin ||
-          courseRole === CourseRoleType.Teacher) && (
+        {(auth?.role === SystemRole.Admin
+          || courseRole === CourseRoleType.Teacher) && (
           <>
             <Divider sx={{my: 2}} />
             <SideMenuButton

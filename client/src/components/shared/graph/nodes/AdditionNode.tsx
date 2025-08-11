@@ -111,7 +111,7 @@ const AdditionNode = (props: NodeProps): JSX.Element => {
             }}
           >
             <td style={{height: '20px'}}>
-              = {Math.round(nodeValue.value * 100) / 100}
+              {'=' + Math.round(nodeValue.value * 100) / 100}
             </td>
           </tr>
         </tbody>

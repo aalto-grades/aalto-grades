@@ -43,8 +43,7 @@ const StudentsView = (): JSX.Element => {
   const urlStudent = useMemo(
     () =>
       userId
-        ? (students.data?.find(student => student.id.toString() === userId) ??
-          null)
+        ? (students.data?.find(student => student.id.toString() === userId) ?? null)
         : null,
     [students.data, userId]
   );

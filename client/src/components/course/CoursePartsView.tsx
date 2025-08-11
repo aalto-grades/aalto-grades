@@ -107,8 +107,8 @@ const CoursePartsView = (): JSX.Element => {
     [key: GridRowId]: {daysValid: boolean; name: boolean; maxGrade: boolean};
   }>({});
   const hasError =
-    Object.keys(rowErrors).length > 0 &&
-    Object.values(rowErrors).some(errorObj =>
+    Object.keys(rowErrors).length > 0
+    && Object.values(rowErrors).some(errorObj =>
       Object.values(errorObj).some(value => value === true)
     );
 
@@ -293,7 +293,7 @@ const CoursePartsView = (): JSX.Element => {
   };
 
   const removeError = (key: GridRowId): void => {
-    setRowErrors(prevErrors => {
+    setRowErrors((prevErrors) => {
       const newErrors = {...prevErrors};
       delete newErrors[key];
       return newErrors;
@@ -315,8 +315,7 @@ const CoursePartsView = (): JSX.Element => {
                 setAddAplusSourcesTo({
                   courseTaskId: params.row.id,
                   aplusGradeSources: params.row.aplusGradeSources,
-                })
-              }
+                })}
             />
           </span>
         </Tooltip>
@@ -406,37 +405,39 @@ const CoursePartsView = (): JSX.Element => {
         }}
         disablePadding
         secondaryAction={
-          editRights ? (
-            <>
-              <Tooltip placement="top" title={t('course.parts.edit-part')}>
-                <IconButton
-                  data-testid={`edit-course-part-${coursePart.name}`}
-                  onClick={() => {
-                    setEditPart(coursePart);
-                    setEditPartDialogOpen(true);
-                  }}
-                >
-                  <Edit />
-                </IconButton>
-              </Tooltip>
-              <ArchivalButton
-                name={coursePart.name}
-                archived={coursePart.archived}
-                onClick={() => {
-                  editCoursePart.mutate({
-                    coursePartId: coursePart.id,
-                    coursePart: {
-                      archived: !coursePart.archived,
-                    },
-                  });
-                }}
-              />
-              <DeleteButton
-                disabled={isCoursePartDeletable(coursePart.id)}
-                onClick={async () => handleDeleteCoursePart(coursePart.id)}
-              />
-            </>
-          ) : null
+          editRights
+            ? (
+                <>
+                  <Tooltip placement="top" title={t('course.parts.edit-part')}>
+                    <IconButton
+                      data-testid={`edit-course-part-${coursePart.name}`}
+                      onClick={() => {
+                        setEditPart(coursePart);
+                        setEditPartDialogOpen(true);
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                  </Tooltip>
+                  <ArchivalButton
+                    name={coursePart.name}
+                    archived={coursePart.archived}
+                    onClick={() => {
+                      editCoursePart.mutate({
+                        coursePartId: coursePart.id,
+                        coursePart: {
+                          archived: !coursePart.archived,
+                        },
+                      });
+                    }}
+                  />
+                  <DeleteButton
+                    disabled={isCoursePartDeletable(coursePart.id)}
+                    onClick={async () => handleDeleteCoursePart(coursePart.id)}
+                  />
+                </>
+              )
+            : null
         }
       >
         <ListItemButton
@@ -447,8 +448,8 @@ const CoursePartsView = (): JSX.Element => {
           <ListItemText
             primary={coursePart.name}
             secondary={
-              coursePart.expiryDate?.toLocaleDateString() ??
-              t('course.parts.no-expiry-date')
+              coursePart.expiryDate?.toLocaleDateString()
+              ?? t('course.parts.no-expiry-date')
             }
           />
         </ListItemButton>
@@ -463,12 +464,12 @@ const CoursePartsView = (): JSX.Element => {
       elements.push(
         <GridActionsCellItem
           data-testId={`archive-row-${params.row.id}`}
-          icon={
+          icon={(
             <ArchivalButton
               name={params.row.name}
               archived={params.row.archived}
             />
-          }
+          )}
           label={
             params.row.archived
               ? t('course.parts.unarchive')
@@ -481,8 +482,7 @@ const CoursePartsView = (): JSX.Element => {
                   ? row
                   : {...row, archived: !params.row.archived}
               )
-            )
-          }
+            )}
         />
       );
     }
@@ -599,7 +599,7 @@ const CoursePartsView = (): JSX.Element => {
   const DataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
       const id = Math.max(0, ...rows.map(row => row.id)) + 1;
-      setRows(oldRows => {
+      setRows((oldRows) => {
         const newRow: ColTypes = {
           id,
           coursePartId: selectedPart!,
@@ -676,8 +676,7 @@ const CoursePartsView = (): JSX.Element => {
       />
       <AddAplusGradeSourceDialog
         onClose={() =>
-          setAddAplusSourcesTo({courseTaskId: null, aplusGradeSources: []})
-        }
+          setAddAplusSourcesTo({courseTaskId: null, aplusGradeSources: []})}
         courseTaskId={addAplusSourcesTo.courseTaskId}
         aplusGradeSources={addAplusSourcesTo.aplusGradeSources}
       />
@@ -728,54 +727,58 @@ const CoursePartsView = (): JSX.Element => {
               </ul>
             </Alert>
           </Collapse>
-          {courseParts.data === undefined ? (
-            <CircularProgress />
-          ) : courseParts.data.length === 0 ? (
-            <Typography>{t('course.parts.no-course-parts')}</Typography>
-          ) : (
-            <>
-              <Collapse
-                data-testid="active-course-parts"
-                in={courseParts.data.find(mod => !mod.archived) !== undefined}
-              >
-                <ListEntries
-                  label={t('course.parts.active-parts')}
-                  icon={<CheckCircle />}
-                  color="success"
-                  listWidth="100%"
-                >
-                  {courseParts.data
-                    .filter(part => !part.archived)
-                    .map(coursePart => (
-                      <CoursePartItem
-                        key={coursePart.id}
-                        coursePart={coursePart}
-                      />
-                    ))}
-                </ListEntries>
-              </Collapse>
-              <Collapse
-                data-testid="archived-course-parts"
-                in={courseParts.data.find(mod => mod.archived) !== undefined}
-                sx={{mt: 2}}
-              >
-                <ListEntries
-                  label={t('course.parts.archived-parts')}
-                  icon={<Inventory />}
-                  listWidth="100%"
-                >
-                  {courseParts.data
-                    .filter(part => part.archived)
-                    .map(coursePart => (
-                      <CoursePartItem
-                        key={coursePart.id}
-                        coursePart={coursePart}
-                      />
-                    ))}
-                </ListEntries>
-              </Collapse>
-            </>
-          )}
+          {courseParts.data === undefined
+            ? (
+                <CircularProgress />
+              )
+            : courseParts.data.length === 0
+              ? (
+                  <Typography>{t('course.parts.no-course-parts')}</Typography>
+                )
+              : (
+                  <>
+                    <Collapse
+                      data-testid="active-course-parts"
+                      in={courseParts.data.find(mod => !mod.archived) !== undefined}
+                    >
+                      <ListEntries
+                        label={t('course.parts.active-parts')}
+                        icon={<CheckCircle />}
+                        color="success"
+                        listWidth="100%"
+                      >
+                        {courseParts.data
+                          .filter(part => !part.archived)
+                          .map(coursePart => (
+                            <CoursePartItem
+                              key={coursePart.id}
+                              coursePart={coursePart}
+                            />
+                          ))}
+                      </ListEntries>
+                    </Collapse>
+                    <Collapse
+                      data-testid="archived-course-parts"
+                      in={courseParts.data.find(mod => mod.archived) !== undefined}
+                      sx={{mt: 2}}
+                    >
+                      <ListEntries
+                        label={t('course.parts.archived-parts')}
+                        icon={<Inventory />}
+                        listWidth="100%"
+                      >
+                        {courseParts.data
+                          .filter(part => part.archived)
+                          .map(coursePart => (
+                            <CoursePartItem
+                              key={coursePart.id}
+                              coursePart={coursePart}
+                            />
+                          ))}
+                      </ListEntries>
+                    </Collapse>
+                  </>
+                )}
         </Grid>
         <Grid size={{md: 12, lg: 8}}>
           <div style={{height: '100%', maxHeight: '70vh'}}>

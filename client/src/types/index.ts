@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import type {TFunction} from 'i18next';
-import type { JSX } from 'react';
+import type {JSX} from 'react';
 import {z} from 'zod';
 
 import type {Department, Language, LocalizedString} from '@/common/types';

@@ -102,13 +102,13 @@ const EditCourseView = (): JSX.Element => {
   const [formChanges, setFormChanges] = useState<boolean>(false);
 
   const changes =
-    JSON.stringify(initTeachersInCharge) !== JSON.stringify(teachersInCharge) ||
-    JSON.stringify(initAssistants) !== JSON.stringify(assistants);
+    JSON.stringify(initTeachersInCharge) !== JSON.stringify(teachersInCharge)
+    || JSON.stringify(initAssistants) !== JSON.stringify(assistants);
 
   const blocker = useBlocker(
     ({currentLocation, nextLocation}) =>
-      (changes || formChanges) &&
-      currentLocation.pathname !== nextLocation.pathname
+      (changes || formChanges)
+      && currentLocation.pathname !== nextLocation.pathname
   );
 
   // Warning if leaving with unsaved
@@ -177,8 +177,8 @@ const EditCourseView = (): JSX.Element => {
       .filter(key => key !== 'teacherEmail' && key !== 'assistantEmail')
       .every(
         key =>
-          JSON.stringify(initialValues[key as keyof FormData]) ===
-          JSON.stringify(formData[key as keyof FormData])
+          JSON.stringify(initialValues[key as keyof FormData])
+          === JSON.stringify(formData[key as keyof FormData])
       );
   };
 
@@ -429,16 +429,16 @@ const EditCourseView = (): JSX.Element => {
                 margin="normal"
                 slotProps={{inputLabel: {shrink: true}}}
                 helperText={
-                  form.errors.teacherEmail ??
-                  (teachersInCharge.length === 0
+                  form.errors.teacherEmail
+                  ?? (teachersInCharge.length === 0
                     ? t('course.edit.input-at-least-one-teacher')
                     : teachersInCharge.includes(form.values.teacherEmail)
                       ? t('course.edit.email-in-list')
                       : t('course.edit.add-teacher-emails'))
                 }
                 error={
-                  form.touched.teacherEmail &&
-                  form.errors.teacherEmail !== undefined
+                  form.touched.teacherEmail
+                  && form.errors.teacherEmail !== undefined
                 }
                 onChange={form.handleChange}
               />
@@ -446,11 +446,11 @@ const EditCourseView = (): JSX.Element => {
                 variant="outlined"
                 startIcon={<PersonAddAlt1Icon />}
                 disabled={
-                  isDisabled() ||
-                  form.errors.teacherEmail !== undefined ||
-                  form.values.teacherEmail.length === 0 ||
-                  teachersInCharge.includes(form.values.teacherEmail) ||
-                  form.isSubmitting
+                  isDisabled()
+                  || form.errors.teacherEmail !== undefined
+                  || form.values.teacherEmail.length === 0
+                  || teachersInCharge.includes(form.values.teacherEmail)
+                  || form.isSubmitting
                 }
                 onClick={async () => {
                   const teacherEmail = form.values.teacherEmail;
@@ -472,41 +472,43 @@ const EditCourseView = (): JSX.Element => {
                 {t('general.add')}
               </Button>
               <Box sx={{mt: 8, mb: 2}}>
-                {teachersInCharge.length === 0 ? (
-                  t('course.edit.add-at-least-one-teacher')
-                ) : (
-                  <List dense>
-                    {teachersInCharge.map(teacherEmail => (
-                      <ListItem
-                        key={teacherEmail}
-                        secondaryAction={
-                          auth?.role === SystemRole.Admin && (
-                            <IconButton
-                              edge="end"
-                              disabled={form.isSubmitting}
-                              aria-label="delete"
-                              onClick={() => removeTeacher(teacherEmail)}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          )
-                        }
-                      >
-                        <ListItemAvatar>
-                          <Avatar>
-                            <PersonIcon />
-                          </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText primary={teacherEmail} />
-                        {nonExistingEmails.has(teacherEmail) && (
-                          <Alert severity="warning">
-                            {t('course.edit.user-not-exist')}
-                          </Alert>
-                        )}
-                      </ListItem>
-                    ))}
-                  </List>
-                )}
+                {teachersInCharge.length === 0
+                  ? (
+                      t('course.edit.add-at-least-one-teacher')
+                    )
+                  : (
+                      <List dense>
+                        {teachersInCharge.map(teacherEmail => (
+                          <ListItem
+                            key={teacherEmail}
+                            secondaryAction={
+                              auth?.role === SystemRole.Admin && (
+                                <IconButton
+                                  edge="end"
+                                  disabled={form.isSubmitting}
+                                  aria-label="delete"
+                                  onClick={() => removeTeacher(teacherEmail)}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              )
+                            }
+                          >
+                            <ListItemAvatar>
+                              <Avatar>
+                                <PersonIcon />
+                              </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText primary={teacherEmail} />
+                            {nonExistingEmails.has(teacherEmail) && (
+                              <Alert severity="warning">
+                                {t('course.edit.user-not-exist')}
+                              </Alert>
+                            )}
+                          </ListItem>
+                        ))}
+                      </List>
+                    )}
               </Box>
               <TextField
                 id="assistantEmail" // Must be in camelCase to match data
@@ -518,16 +520,16 @@ const EditCourseView = (): JSX.Element => {
                 margin="normal"
                 slotProps={{inputLabel: {shrink: true}}}
                 helperText={
-                  form.errors.assistantEmail ??
-                  (assistants
+                  form.errors.assistantEmail
+                  ?? (assistants
                     .map(assistant => assistant.email)
                     .includes(form.values.assistantEmail)
                     ? t('course.edit.email-in-list')
                     : t('course.edit.add-assistant-emails'))
                 }
                 error={
-                  form.touched.assistantEmail &&
-                  form.errors.assistantEmail !== undefined
+                  form.touched.assistantEmail
+                  && form.errors.assistantEmail !== undefined
                 }
                 onChange={form.handleChange}
               />
@@ -546,12 +548,12 @@ const EditCourseView = (): JSX.Element => {
                 startIcon={<PersonAddAlt1Icon />}
                 disabled={
                   // Allow submit of email only if validation passes and not on list.
-                  form.errors.assistantEmail !== undefined ||
-                  form.values.assistantEmail.length === 0 ||
-                  assistants
+                  form.errors.assistantEmail !== undefined
+                  || form.values.assistantEmail.length === 0
+                  || assistants
                     .map(assistant => assistant.email)
-                    .includes(form.values.assistantEmail) ||
-                  form.isSubmitting
+                    .includes(form.values.assistantEmail)
+                    || form.isSubmitting
                 }
                 onClick={async () => {
                   const assistantEmail = form.values.assistantEmail;
@@ -583,73 +585,75 @@ const EditCourseView = (): JSX.Element => {
                 {t('general.add')}
               </Button>
               <Box sx={{mt: 8, mb: 2}}>
-                {assistants.length === 0 ? (
-                  t('course.edit.no-assistants')
-                ) : (
-                  <List dense>
-                    {assistants.map(assistant => (
-                      <ListItem
-                        key={assistant.email}
-                        secondaryAction={
-                          <IconButton
-                            edge="end"
-                            disabled={form.isSubmitting}
-                            aria-label="delete"
-                            onClick={() => removeAssistant(assistant.email)}
+                {assistants.length === 0
+                  ? (
+                      t('course.edit.no-assistants')
+                    )
+                  : (
+                      <List dense>
+                        {assistants.map(assistant => (
+                          <ListItem
+                            key={assistant.email}
+                            secondaryAction={(
+                              <IconButton
+                                edge="end"
+                                disabled={form.isSubmitting}
+                                aria-label="delete"
+                                onClick={() => removeAssistant(assistant.email)}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            )}
                           >
-                            <DeleteIcon />
-                          </IconButton>
-                        }
-                      >
-                        <ListItemAvatar>
-                          <Avatar>
-                            <PersonIcon />
-                          </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText primary={assistant.email} />
-                        {assistant.expiryDate && (
-                          <div style={{display: 'flex', marginLeft: '0.5em'}}>
-                            <ListItemText
-                              secondary={t(
-                                assistant.expiryDate.getDate() >=
-                                  new Date().getDate()
-                                  ? 'course.edit.assistant-expiry-date-info'
-                                  : 'course.edit.assistant-expired-at',
-                                {
-                                  expiryDate: assistant.expiryDate
-                                    .toISOString()
-                                    .slice(0, 10),
-                                }
-                              )}
-                              sx={{
-                                marginRight: '0.5em',
-                              }}
-                            />
-                            <Tooltip
-                              placement="top"
-                              title={t(
-                                'course.edit.assistant-expiry-date-change'
-                              )}
-                            >
-                              <ListItemIcon>
-                                <HelpOutlined
+                            <ListItemAvatar>
+                              <Avatar>
+                                <PersonIcon />
+                              </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText primary={assistant.email} />
+                            {assistant.expiryDate && (
+                              <div style={{display: 'flex', marginLeft: '0.5em'}}>
+                                <ListItemText
+                                  secondary={t(
+                                    assistant.expiryDate.getDate()
+                                    >= new Date().getDate()
+                                      ? 'course.edit.assistant-expiry-date-info'
+                                      : 'course.edit.assistant-expired-at',
+                                    {
+                                      expiryDate: assistant.expiryDate
+                                        .toISOString()
+                                        .slice(0, 10),
+                                    }
+                                  )}
                                   sx={{
-                                    width: '0.6em',
+                                    marginRight: '0.5em',
                                   }}
                                 />
-                              </ListItemIcon>
-                            </Tooltip>
-                          </div>
-                        )}
-                        {nonExistingEmails.has(assistant.email) && (
-                          <Alert severity="warning">
-                            {t('course.edit.user-not-exist')}
-                          </Alert>
-                        )}
-                      </ListItem>
-                    ))}
-                  </List>
-                )}
+                                <Tooltip
+                                  placement="top"
+                                  title={t(
+                                    'course.edit.assistant-expiry-date-change'
+                                  )}
+                                >
+                                  <ListItemIcon>
+                                    <HelpOutlined
+                                      sx={{
+                                        width: '0.6em',
+                                      }}
+                                    />
+                                  </ListItemIcon>
+                                </Tooltip>
+                              </div>
+                            )}
+                            {nonExistingEmails.has(assistant.email) && (
+                              <Alert severity="warning">
+                                {t('course.edit.user-not-exist')}
+                              </Alert>
+                            )}
+                          </ListItem>
+                        ))}
+                      </List>
+                    )}
               </Box>
             </Grid>
           </Grid>

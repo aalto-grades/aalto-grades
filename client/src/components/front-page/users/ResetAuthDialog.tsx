@@ -70,81 +70,81 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
     >
       <DialogTitle>{t('front-page.reset-auth')}</DialogTitle>
       <DialogContent>
-        {temporaryPassword === null ? (
-          <>
-            <DialogContentText>
-              {t('front-page.resetting-password-for', {user: user?.name})}
-            </DialogContentText>
-            <FormGroup sx={{mt: 1}}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={resetPassword}
-                    onClick={() => setResetPassword(oldVal => !oldVal)}
+        {temporaryPassword === null
+          ? (
+              <>
+                <DialogContentText>
+                  {t('front-page.resetting-password-for', {user: user?.name})}
+                </DialogContentText>
+                <FormGroup sx={{mt: 1}}>
+                  <FormControlLabel
+                    control={(
+                      <Switch
+                        checked={resetPassword}
+                        onClick={() => setResetPassword(oldVal => !oldVal)}
+                      />
+                    )}
+                    label={t('shared.auth.password.reset')}
                   />
-                }
-                label={t('shared.auth.password.reset')}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={resetMfa}
-                    onClick={() => setResetMfa(oldVal => !oldVal)}
+                  <FormControlLabel
+                    control={(
+                      <Switch
+                        checked={resetMfa}
+                        onClick={() => setResetMfa(oldVal => !oldVal)}
+                      />
+                    )}
+                    label={t('shared.auth.reset-mfa')}
                   />
-                }
-                label={t('shared.auth.reset-mfa')}
-              />
-            </FormGroup>
-          </>
-        ) : (
-          <Grid container spacing={2}>
-            <Grid size={6}>
-              <Typography>{t('general.email')}</Typography>
-            </Grid>
-            <Grid size={6}>
-              <Typography>{user?.email}</Typography>
-            </Grid>
+                </FormGroup>
+              </>
+            )
+          : (
+              <Grid container spacing={2}>
+                <Grid size={6}>
+                  <Typography>{t('general.email')}</Typography>
+                </Grid>
+                <Grid size={6}>
+                  <Typography>{user?.email}</Typography>
+                </Grid>
 
-            <Grid size={6}>
-              <Typography>{t('general.name')}</Typography>
-            </Grid>
-            <Grid size={6}>
-              <Typography>{user?.name}</Typography>
-            </Grid>
+                <Grid size={6}>
+                  <Typography>{t('general.name')}</Typography>
+                </Grid>
+                <Grid size={6}>
+                  <Typography>{user?.name}</Typography>
+                </Grid>
 
-            <Grid size={6}>
-              <Typography>{t('front-page.temporary-password')}</Typography>
-            </Grid>
-            <Grid size={6}>
-              <Typography sx={{display: 'inline'}}>
-                {temporaryPassword}
-              </Typography>
-              <Tooltip
-                title={t('general.copy')}
-                placement="top"
-                sx={{my: -1, ml: 1, mr: -2}}
-              >
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    navigator.clipboard.writeText(temporaryPassword);
-                    setCopied(true);
-                    enqueueSnackbar(t('front-page.password-copied'), {
-                      variant: 'success',
-                    });
-                    setTimeout(() => setCopied(false), 1500);
-                  }}
-                >
-                  {!copied ? (
-                    <ContentCopy fontSize="small" />
-                  ) : (
-                    <Done fontSize="small" />
-                  )}
-                </IconButton>
-              </Tooltip>
-            </Grid>
-          </Grid>
-        )}
+                <Grid size={6}>
+                  <Typography>{t('front-page.temporary-password')}</Typography>
+                </Grid>
+                <Grid size={6}>
+                  <Typography sx={{display: 'inline'}}>
+                    {temporaryPassword}
+                  </Typography>
+                  <Tooltip
+                    title={t('general.copy')}
+                    placement="top"
+                    sx={{my: -1, ml: 1, mr: -2}}
+                  >
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        navigator.clipboard.writeText(temporaryPassword);
+                        setCopied(true);
+                        enqueueSnackbar(t('front-page.password-copied'), {
+                          variant: 'success',
+                        });
+                        setTimeout(() => setCopied(false), 1500);
+                      }}
+                    >
+                      {!copied
+                        ? <ContentCopy fontSize="small" />
+                        : <Done fontSize="small" />}
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+              </Grid>
+            )}
       </DialogContent>
       <DialogActions>
         {temporaryPassword === null && (

@@ -124,8 +124,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
           icon={<Delete />}
           label={t('general.delete')}
           onClick={() =>
-            setRows(oldRows => oldRows.filter(row => row.id !== params.id))
-          }
+            setRows(oldRows => oldRows.filter(row => row.id !== params.id))}
         />,
       ],
     },
@@ -205,7 +204,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     >
       {currentStep === 0 && (
         <UploadDialogSelectCoursePart
-          setCoursePart={newCoursePart => {
+          setCoursePart={(newCoursePart) => {
             setCoursePart(newCoursePart);
             setCurrentStep(1);
             setReady(true);

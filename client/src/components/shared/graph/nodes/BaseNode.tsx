@@ -77,7 +77,7 @@ const BaseNode = ({
           }}
           contentEditable={type !== 'coursepart'}
           suppressContentEditableWarning
-          onBlur={e => setNodeTitle(id, e.target.textContent!)}
+          onBlur={e => setNodeTitle(id, e.target.textContent)}
         >
           {title}
         </h4>

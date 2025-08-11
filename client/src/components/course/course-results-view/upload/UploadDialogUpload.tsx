@@ -31,7 +31,7 @@ import {enqueueSnackbar} from 'notistack';
 import {type ParseResult, parse, unparse} from 'papaparse';
 import {type Dispatch, type JSX, type SetStateAction, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {read, set_fs, utils, writeFile} from 'xlsx';
+import {read, set_fs as setFs, utils, writeFile} from 'xlsx';
 
 import type {CoursePartData} from '@/common/types';
 import Dialog from '@/components/shared/Dialog';
@@ -40,13 +40,13 @@ import MismatchDialog, {type MismatchData} from './MismatchDialog';
 import type {GradeUploadColTypes} from './UploadDialog';
 
 // Set internal fs instance for xlsx
-set_fs(fs);
+setFs(fs);
 
 type ParsedImportData = ParseResult<string[]>;
 
 // Wrap parse into an async function to be able to await
 const parseCsv = async (csvData: string | File): Promise<ParsedImportData> =>
-  new Promise(resolve => {
+  new Promise((resolve) => {
     parse(csvData, {
       skipEmptyLines: true,
       complete: resolve,
@@ -98,7 +98,7 @@ const UploadDialogUpload = ({
 
   const DataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
-      setRows(oldRows => {
+      setRows((oldRows) => {
         const freeId = Math.max(0, ...oldRows.map(row => row.id)) + 1;
         const newRow = {id: freeId} as GradeUploadColTypes;
         for (const column of columns) {
@@ -223,7 +223,7 @@ const UploadDialogUpload = ({
       setMismatchData({
         columnKeys,
         courseTasks,
-        onImport: keyMap => {
+        onImport: (keyMap) => {
           setMismatchDialogOpen(false);
           setRows(readData(dataRows.data, columnKeys, keyMap));
           setEditText(true);
@@ -244,10 +244,10 @@ const UploadDialogUpload = ({
     const hasInvalid = Object.entries(params.row).some(([key, value]) => {
       const maxGrade = maxGrades[key] as number | undefined | null;
       return (
-        maxGrade !== undefined &&
-        maxGrade !== null &&
-        value &&
-        (value as number) > maxGrade
+        maxGrade !== undefined
+        && maxGrade !== null
+        && value
+        && (value as number) > maxGrade
       );
     });
     return hasInvalid ? 'invalid-value-data-grid' : '';
@@ -314,8 +314,7 @@ const UploadDialogUpload = ({
         <Accordion
           expanded={expanded === 'upload'}
           onChange={(_, newExpanded) =>
-            setExpanded(newExpanded ? 'upload' : '')
-          }
+            setExpanded(newExpanded ? 'upload' : '')}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Typography variant="h6">
@@ -335,7 +334,7 @@ const UploadDialogUpload = ({
                       type="file"
                       accept=".csv,.xlsx"
                       hidden
-                      onChange={e => {
+                      onChange={(e) => {
                         if (e.target.files !== null)
                           loadFile(e.target.files[0]);
                       }}

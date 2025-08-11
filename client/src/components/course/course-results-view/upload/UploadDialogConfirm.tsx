@@ -140,10 +140,10 @@ const UploadDialogConfirm = ({
     const hasInvalid = Object.entries(params.row).some(([key, value]) => {
       const maxGrade = maxGrades[key] as number | undefined | null;
       return (
-        maxGrade !== undefined &&
-        maxGrade !== null &&
-        value &&
-        (value as number) > maxGrade
+        maxGrade !== undefined
+        && maxGrade !== null
+        && value
+        && (value as number) > maxGrade
       );
     });
     return hasInvalid ? 'invalid-value-data-grid' : '';
@@ -169,7 +169,7 @@ const UploadDialogConfirm = ({
         handleCompletionDateChange(date, data)
       );
     } else {
-      bulkEdit.courseTaskNames.forEach(data => {
+      bulkEdit.courseTaskNames.forEach((data) => {
         setDates(oldDates =>
           oldDates.map(oldDate =>
             oldDate.courseTaskName === data
@@ -228,12 +228,12 @@ const UploadDialogConfirm = ({
               <TableCell>
                 {colDates.length > 0 && (
                   <FormControlLabel
-                    control={
+                    control={(
                       <Checkbox
                         onChange={e => selectAll(e, setEditCompletionDates)}
                         checked={colDates.length === editCompletionDates.length}
                       />
-                    }
+                    )}
                     label={t('course.results.upload.completion-date')}
                   />
                 )}
@@ -252,12 +252,12 @@ const UploadDialogConfirm = ({
               <TableCell>
                 {colDates.length > 0 && (
                   <FormControlLabel
-                    control={
+                    control={(
                       <Checkbox
                         onChange={e => selectAll(e, setEditExpirationDates)}
                         checked={colDates.length === editExpirationDates.length}
                       />
-                    }
+                    )}
                     label={t('course.results.upload.expiration-date')}
                   />
                 )}
@@ -289,8 +289,7 @@ const UploadDialogConfirm = ({
                           e,
                           editCompletionDates,
                           setEditCompletionDates
-                        )
-                      }
+                        )}
                       checked={editCompletionDates.includes(
                         date.courseTaskName
                       )}
@@ -300,8 +299,7 @@ const UploadDialogConfirm = ({
                     slotProps={{textField: {size: 'small'}}}
                     value={date.completionDate}
                     onChange={value =>
-                      handleCompletionDateChange(value, date.courseTaskName)
-                    }
+                      handleCompletionDateChange(value, date.courseTaskName)}
                   />
                 </TableCell>
                 <TableCell>
@@ -314,8 +312,7 @@ const UploadDialogConfirm = ({
                           e,
                           editExpirationDates,
                           setEditExpirationDates
-                        )
-                      }
+                        )}
                       checked={editExpirationDates.includes(
                         date.courseTaskName
                       )}
@@ -332,11 +329,11 @@ const UploadDialogConfirm = ({
                       textField: {
                         size: 'small',
                         error:
-                          date.expirationDate !== null &&
-                          date.expirationDate <= date.completionDate,
+                          date.expirationDate !== null
+                          && date.expirationDate <= date.completionDate,
                         helperText:
-                          date.expirationDate !== null &&
-                          date.expirationDate <= date.completionDate
+                          date.expirationDate !== null
+                          && date.expirationDate <= date.completionDate
                             ? t(
                                 'course.results.upload.expiration-after-completion'
                               )
@@ -347,13 +344,12 @@ const UploadDialogConfirm = ({
                     onChange={e =>
                       setDates(oldDates =>
                         oldDates.map(oldDate =>
-                          oldDate.courseTaskName === date.courseTaskName &&
-                          e !== null
+                          oldDate.courseTaskName === date.courseTaskName
+                          && e !== null
                             ? {...oldDate, expirationDate: e}
                             : oldDate
                         )
-                      )
-                    }
+                      )}
                   />
                 </TableCell>
               </TableRow>
@@ -394,13 +390,13 @@ const UploadDialogConfirm = ({
         <Accordion
           expanded={expanded === 'confirm'}
           onChange={(_, newExpanded) =>
-            setExpanded(newExpanded ? 'confirm' : '')
-          }
+            setExpanded(newExpanded ? 'confirm' : '')}
           disabled={error}
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Typography color={error ? 'error' : undefined} variant="h6">
-              {t('course.results.upload.confirm-data')}{' '}
+              {t('course.results.upload.confirm-data')}
+              {' '}
               {error && `(${t('course.results.upload.resolve-errors')})`}
             </Typography>
           </AccordionSummary>

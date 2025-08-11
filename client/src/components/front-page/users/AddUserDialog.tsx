@@ -90,14 +90,14 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
   const FormContent = ({form}: {form: FormikProps<FormData>}): JSX.Element => (
     <>
       <FormControlLabel
-        control={
+        control={(
           <Switch
             name="admin"
             checked={form.values.admin}
             disabled={form.isSubmitting}
             onChange={form.handleChange}
           />
-        }
+        )}
         label={t('general.admin')}
       />
       <FormField
@@ -157,11 +157,13 @@ const AddUserDialog = ({open, onClose}: PropsType): JSX.Element => {
               setTimeout(() => setCopied(false), 1500);
             }}
           >
-            {!copied ? (
-              <ContentCopy fontSize="small" />
-            ) : (
-              <Done fontSize="small" />
-            )}
+            {!copied
+              ? (
+                  <ContentCopy fontSize="small" />
+                )
+              : (
+                  <Done fontSize="small" />
+                )}
           </IconButton>
         </Tooltip>
       </Grid>

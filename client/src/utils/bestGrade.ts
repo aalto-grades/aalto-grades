@@ -21,9 +21,9 @@ export const gradeIsExpired = (
   coursePartExpiryDate?: Date | null
 ): boolean => {
   if (
-    grade?.expiryDate &&
-    !isDateExpired(grade.expiryDate) &&
-    isDateExpired(coursePartExpiryDate)
+    grade?.expiryDate
+    && !isDateExpired(grade.expiryDate)
+    && isDateExpired(coursePartExpiryDate)
   ) {
     return false;
   }
@@ -87,8 +87,8 @@ export const findBestGrade = <T extends BaseType>(
     searchOptions.gradeSelectOption === 'latest' ? gradeIsNewer : gradeIsBetter;
   for (const grade of grades) {
     if (
-      searchOptions.expiredOption !== 'any' &&
-      gradeIsExpired(grade, coursePartExpiryDate)
+      searchOptions.expiredOption !== 'any'
+      && gradeIsExpired(grade, coursePartExpiryDate)
     ) {
       if (isBetter(grade, bestSoFarExpired)) bestSoFarExpired = grade;
     } else {
@@ -153,8 +153,8 @@ export const getCoursePartExpiryDate = (
 ): Date | null | undefined => {
   const coursePart = courseParts?.find(
     part =>
-      part.id ===
-      courseTasks?.find(taskData => taskData.id === courseTaskId)?.coursePartId
+      part.id
+      === courseTasks?.find(taskData => taskData.id === courseTaskId)?.coursePartId
   );
   return coursePart?.expiryDate;
 };

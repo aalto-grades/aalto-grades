@@ -181,8 +181,8 @@ const AverageNode = (props: NodeProps): JSX.Element => {
           height: '12px',
           width: '12px',
           top: `${
-            handleStartHeight +
-            Object.keys(localSettings.weights).length * rowHeight
+            handleStartHeight
+            + Object.keys(localSettings.weights).length * rowHeight
           }px`,
         }}
         position={Position.Left}
@@ -223,15 +223,15 @@ const AverageNode = (props: NodeProps): JSX.Element => {
                 {localSettings.percentageMode && ' %'}
               </td>
               <td>
-                {!(key in sources) ||
-                !(key in settings.weights) ||
-                weightSum === 0
+                {!(key in sources)
+                  || !(key in settings.weights)
+                  || weightSum === 0
                   ? 0
                   : Math.round(
-                      ((sources[key].value * settings.weights[key]) /
-                        weightSum) *
-                        100
-                    ) / 100}
+                    ((sources[key].value * settings.weights[key])
+                      / weightSum)
+                    * 100
+                  ) / 100}
               </td>
             </tr>
           ))}
@@ -251,7 +251,7 @@ const AverageNode = (props: NodeProps): JSX.Element => {
             color: Math.abs(percentageSum - 100) >= 1 ? 'red' : '',
           }}
         >
-          Sum {Math.round(percentageSum * 10) / 10} %
+          {`Sum ${Math.round(percentageSum * 10) / 10} %`}
         </p>
       )}
       <OutputValue

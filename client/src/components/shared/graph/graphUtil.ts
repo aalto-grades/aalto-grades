@@ -71,7 +71,6 @@ export const isValidConnection = (
   connection: Edge | Connection,
   edges: Edge[]
 ): boolean => {
-
   // Check for conflicting edges
   for (const edge of edges) {
     // If connection doesn't have specific target handle and connection to the target already exists
@@ -80,17 +79,17 @@ export const isValidConnection = (
 
     // If connection to target handle already exists
     if (
-      edge.target === connection.target &&
-      edge.targetHandle &&
-      edge.targetHandle === connection.targetHandle
+      edge.target === connection.target
+      && edge.targetHandle
+      && edge.targetHandle === connection.targetHandle
     )
       return false;
 
     // If connection from source handle to target node already exists
     if (
-      edge.source === connection.source &&
-      edge.sourceHandle === connection.sourceHandle &&
-      edge.target === connection.target
+      edge.source === connection.source
+      && edge.sourceHandle === connection.sourceHandle
+      && edge.target === connection.target
     ) {
       return false;
     }
@@ -166,8 +165,8 @@ export const findDisconnectedEdges = (
 
     const sourceHandle = edge.sourceHandle!.replace('-source', '');
     if (
-      !(sourceHandle in nodeValue.sources) ||
-      !nodeValue.sources[sourceHandle].isConnected
+      !(sourceHandle in nodeValue.sources)
+      || !nodeValue.sources[sourceHandle].isConnected
     ) {
       disconnectedEdges.push(edge);
     }
@@ -198,7 +197,7 @@ export const formatGraph = async (
       'elk.spacing.nodeNode': '60',
     },
     // Tell elk the node handle data (order and side)
-    children: nodesForElk.map(node => {
+    children: nodesForElk.map((node) => {
       const nodeValue = nodeValues[node.id];
       if (nodeValue.type === 'source') {
         return {
@@ -211,11 +210,11 @@ export const formatGraph = async (
           ports: [{id: node.id, properties: {side: 'WEST'}}],
         };
       } else if (
-        nodeValue.type !== 'addition' &&
-        nodeValue.type !== 'average' &&
-        nodeValue.type !== 'max' &&
-        nodeValue.type !== 'require' &&
-        nodeValue.type !== 'substitute'
+        nodeValue.type !== 'addition'
+        && nodeValue.type !== 'average'
+        && nodeValue.type !== 'max'
+        && nodeValue.type !== 'require'
+        && nodeValue.type !== 'substitute'
       ) {
         return {
           ...node,
@@ -231,25 +230,25 @@ export const formatGraph = async (
       if (nodeValue.type === 'substitute') {
         sortedKeys.sort((key1, key2) => {
           if (
-            key1.split('-').at(-2) === 'exercise' &&
-            key2.split('-').at(-2) === 'substitute'
+            key1.split('-').at(-2) === 'exercise'
+            && key2.split('-').at(-2) === 'substitute'
           )
             return 1;
           if (
-            key2.split('-').at(-2) === 'exercise' &&
-            key1.split('-').at(-2) === 'substitute'
+            key2.split('-').at(-2) === 'exercise'
+            && key1.split('-').at(-2) === 'substitute'
           )
             return -1;
           return (
-            parseInt(key1.split('-').at(-1)!) -
-            parseInt(key2.split('-').at(-1)!)
+            parseInt(key1.split('-').at(-1)!)
+            - parseInt(key2.split('-').at(-1)!)
           );
         });
       } else {
         sortedKeys.sort(
           (key1, key2) =>
-            parseInt(key1.split('-').at(-1)!) -
-            parseInt(key2.split('-').at(-1)!)
+            parseInt(key1.split('-').at(-1)!)
+            - parseInt(key2.split('-').at(-1)!)
         );
       }
       const sourcePorts = [...sortedKeys].reverse().map(key => ({

@@ -67,7 +67,7 @@ const FinalGradeCell = ({
           onClose={() => setEditDialogOpen(false)}
           userId={user.id}
           finalGrades={finalGrades}
-          title={
+          title={(
             <>
               {`${t('course.results.final-for')}, `}
               <Trans
@@ -83,7 +83,7 @@ const FinalGradeCell = ({
                 }}
               />
             </>
-          }
+          )}
         />
       )}
       {bestFinalGrade?.date !== undefined && (

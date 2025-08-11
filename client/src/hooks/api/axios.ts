@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import axios from 'axios';
-import i18next from 'i18next';
+import {t} from 'i18next';
 import type {ZodError} from 'zod';
 
 import LoginAgainButton from '@/components/shared/LoginAgainButton';
@@ -14,7 +14,7 @@ const axiosInstance = axios.create({
   validateStatus: (status: number) => status < 600 && status >= 100,
 });
 
-axiosInstance.interceptors.response.use(response => {
+axiosInstance.interceptors.response.use((response) => {
   const resData = response.data as
     | {errors: string[]}
     | {errors: ZodError}[]
@@ -24,10 +24,10 @@ axiosInstance.interceptors.response.use(response => {
   if (response.status === 400 && Array.isArray(resData)) {
     const resErrors = resData[0];
     throw new Error(
-      `${response.status} - ${response.statusText}: ` +
-        resErrors.errors.issues
-          .map(issue => `'/${issue.path.join('/')} : ${issue.message}'`)
-          .join(', ')
+      `${response.status} - ${response.statusText}: `
+      + resErrors.errors.issues
+        .map(issue => `'/${issue.path.join('/')} : ${issue.message}'`)
+        .join(', ')
     );
   }
 
@@ -35,17 +35,17 @@ axiosInstance.interceptors.response.use(response => {
   if (resData !== null && typeof resData === 'object' && 'errors' in resData) {
     // Token expired error
     if (
-      resData.errors.includes('TokenExpiredError') ||
-      resData.errors.includes('JsonWebTokenError')
+      resData.errors.includes('TokenExpiredError')
+      || resData.errors.includes('JsonWebTokenError')
     ) {
       throw new CustomError({
-        message: i18next.t('shared.auth.token.expired'),
+        message: t('shared.auth.token.expired'),
         action: LoginAgainButton,
       });
     } else {
       throw new Error(
-        `${response.status} - ${response.statusText}: ` +
-          resData.errors.join(', ')
+        `${response.status} - ${response.statusText}: `
+        + resData.errors.join(', ')
       );
     }
   }

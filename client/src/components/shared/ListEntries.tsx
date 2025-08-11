@@ -44,12 +44,12 @@ const ListEntries = ({
       }}
     >
       <Chip
-        label={
+        label={(
           <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
             {icon}
             {label}
           </Box>
-        }
+        )}
         color={color}
         sx={{
           width: chipWidth,
