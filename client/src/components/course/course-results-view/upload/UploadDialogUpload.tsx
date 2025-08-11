@@ -26,12 +26,12 @@ import type {
   GridRowsProp,
   GridValidRowModel,
 } from '@mui/x-data-grid';
-import * as fs from 'fs';
+// import * as fs from 'fs';
 import {enqueueSnackbar} from 'notistack';
 import {type ParseResult, parse, unparse} from 'papaparse';
 import {type Dispatch, type JSX, type SetStateAction, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {read, set_fs as setFs, utils, writeFile} from 'xlsx';
+import {read, utils, writeFile} from 'xlsx';
 
 import type {CoursePartData} from '@/common/types';
 import Dialog from '@/components/shared/Dialog';
@@ -40,7 +40,7 @@ import MismatchDialog, {type MismatchData} from './MismatchDialog';
 import type {GradeUploadColTypes} from './UploadDialog';
 
 // Set internal fs instance for xlsx
-setFs(fs);
+// setFs(fs);
 
 type ParsedImportData = ParseResult<string[]>;
 

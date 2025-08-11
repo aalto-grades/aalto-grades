@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import bodyParser from 'body-parser';
 import express, {type RequestHandler, Router} from 'express';
 import passport from 'passport';
 
@@ -104,7 +103,7 @@ router.get(
 
 router.post(
   '/v1/auth/login-idp/callback',
-  bodyParser.urlencoded({extended: false}),
+  express.urlencoded({extended: false}),
   authSamlLogin,
   (_req, res) => res.redirect('/')
 );

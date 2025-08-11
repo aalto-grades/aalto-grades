@@ -27,11 +27,6 @@ const dbConfig = {
 };
 console.log('Database config:', dbConfig);
 
-/**
- * Creates the checkpoint for the database, will be needed to restore the db
- * after tests
- */
-
 export const teardown = async () => {
   console.log('Running teardown...');
   resetDb();
