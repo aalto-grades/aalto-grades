@@ -40,7 +40,7 @@ export const fetchIdpMetadata = async (
       saml: 'urn:oasis:names:tc:SAML:2.0:assertion',
       ds: 'http://www.w3.org/2000/09/xmldsig#',
     });
-    return query => select(query, xml);
+    return query => select(query, xml as unknown as Node);
   } catch (error) {
     httpLogger.error(error);
     return null;

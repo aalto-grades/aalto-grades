@@ -443,7 +443,8 @@ passport.use(
 
 /** @throws ApiError(401) */
 const useSamlStrategy = async (): Promise<void> => {
-  passport.use('saml', await getSamlStrategy());
+  // Type assertion needed due to Express type incompatibility in @node-saml/passport-saml, maybe update fixes it
+  passport.use('saml', (await getSamlStrategy()) as unknown as passport.Strategy);
 };
 
 // Cannot use top level await so must call separately...
