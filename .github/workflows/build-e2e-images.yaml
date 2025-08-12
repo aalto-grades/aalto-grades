@@ -49,15 +49,8 @@ jobs:
         run: |
           mkdir -p /tmp/docker-images
 
-          echo "=== All available Docker images ==="
-          docker images
-
           echo "=== Getting all images by name ==="
-          # Save by name to preserve repository:tag information
-          # Just get all images - why filter? Cache can handle it
-          IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}" | tail -n +2)
-
-          echo "Images to save:"
+          IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}")
           echo "$IMAGES"
 
           if [ -n "$IMAGES" ]; then
