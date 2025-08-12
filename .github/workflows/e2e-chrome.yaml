@@ -35,11 +35,24 @@ jobs:
 
       - name: Load Docker images from cache
         run: |
-          echo "Loading pre-built Docker images..."
+          echo "=== Loading pre-built Docker images ==="
+
+          if [ ! -f ${{ env.DOCKER_IMAGES_TAR }} ]; then
+            echo "❌ Images tar file not found at ${{ env.DOCKER_IMAGES_TAR }}"
+            exit 1
+          fi
+
+          echo "📦 Tar file size: $(ls -lh ${{ env.DOCKER_IMAGES_TAR }} | awk '{print $5}')"
+
+          echo "🔄 Loading images..."
           docker load -i ${{ env.DOCKER_IMAGES_TAR }}
-          echo "Docker images loaded successfully"
-          echo "Available images after loading:"
-          docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}"
+
+          echo "✅ Docker images loaded successfully"
+          echo "=== Available images after loading ==="
+          docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}"
+
+          echo "=== Docker Compose will use these images ==="
+          docker compose config --images 2>/dev/null || echo "Could not get compose images, will check during startup"
         working-directory: ./
 
       - name: Setup Playwright browser cache

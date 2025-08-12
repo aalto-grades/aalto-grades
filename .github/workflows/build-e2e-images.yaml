@@ -48,25 +48,46 @@ jobs:
         if: steps.docker-images-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p /tmp/docker-images
-          # List all docker images and filter for our project
-          echo "Available Docker images:"
+
+          echo "=== All available Docker images ==="
           docker images
 
-          # Get images that were built by docker compose (exclude base images)
-          IMAGES=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep -E "aalto-grades|frontend|backend" | grep -v "nginx\|postgres" | tail -n +2 | tr '\n' ' ')
+          echo "=== Getting images built by docker-compose ==="
+          # Use docker-compose to get the exact image names it created
+          IMAGES=$(docker compose images --quiet | tr '\n' ' ')
 
           if [ -z "$IMAGES" ]; then
-            # Fallback: try to get images by project name
-            PROJECT_NAME=$(basename $(pwd) | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]//g')
-            IMAGES=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep "$PROJECT_NAME" | grep -v "nginx\|postgres" | tail -n +2 | tr '\n' ' ')
+            echo "No images found via 'docker compose images', falling back to service-based approach..."
+            # Alternative: get images by service names from docker-compose
+            SERVICES=$(docker compose config --services)
+            echo "Services found: $SERVICES"
+
+            IMAGES=""
+            for service in $SERVICES; do
+              # Get the image name that docker-compose would use for each service
+              IMAGE=$(docker compose images $service --quiet 2>/dev/null || true)
+              if [ -n "$IMAGE" ]; then
+                IMAGES="$IMAGES $IMAGE"
+              fi
+            done
           fi
 
-          echo "Images to save: $IMAGES"
+          # Remove any duplicate spaces and trim
+          IMAGES=$(echo $IMAGES | tr -s ' ' | sed 's/^ *//;s/ *$//')
+
+          echo "=== Images to save ==="
+          echo "Images: '$IMAGES'"
 
           if [ -n "$IMAGES" ]; then
+            echo "Saving images to tar file..."
             docker save $IMAGES -o /tmp/docker-images/images.tar
-            echo "Images saved successfully"
+            echo "✅ Images saved successfully to /tmp/docker-images/images.tar"
+
+            # Verify what we saved
+            echo "=== Tar file contents ==="
+            tar -tf /tmp/docker-images/images.tar | head -10
+            ls -lh /tmp/docker-images/images.tar
           else
-            echo "No custom images found to save, creating empty tar"
+            echo "❌ No images found to save, creating empty tar"
             tar -cf /tmp/docker-images/images.tar --files-from /dev/null
           fi
