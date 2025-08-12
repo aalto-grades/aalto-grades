@@ -52,16 +52,17 @@ jobs:
           echo "=== All available Docker images ==="
           docker images
 
-          echo "=== Getting ALL image IDs ==="
-          # Just get all image IDs and save them all
-          IMAGE_IDS=$(docker images --format "{{.ID}}" | grep -v "^IMAGE" | head -20)
+          echo "=== Getting all images by name ==="
+          # Save by name to preserve repository:tag information
+          # Just get all images - why filter? Cache can handle it
+          IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}" | tail -n +2)
 
-          echo "Image IDs to save:"
-          echo "$IMAGE_IDS"
+          echo "Images to save:"
+          echo "$IMAGES"
 
-          if [ -n "$IMAGE_IDS" ]; then
-            echo "Saving all images..."
-            docker save $IMAGE_IDS -o /tmp/docker-images/images.tar
+          if [ -n "$IMAGES" ]; then
+            echo "Saving all images by name..."
+            docker save $IMAGES -o /tmp/docker-images/images.tar
             echo "✅ All images saved successfully"
             ls -lh /tmp/docker-images/images.tar
           else

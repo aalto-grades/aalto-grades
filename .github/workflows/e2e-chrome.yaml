@@ -49,10 +49,7 @@ jobs:
 
           echo "✅ Docker images loaded successfully"
           echo "=== Available images after loading ==="
-          docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}"
-
-          echo "=== Docker Compose will use these images ==="
-          docker compose config --images 2>/dev/null || echo "Could not get compose images, will check during startup"
+          docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
         working-directory: ./
 
       - name: Setup Playwright browser cache
