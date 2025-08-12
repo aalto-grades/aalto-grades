@@ -17,14 +17,14 @@ jobs:
     needs: build
     uses: ./.github/workflows/e2e-chrome.yaml
     with:
-      cache-key: ${{ needs.build.outputs.cache-key }}
+      docker-images-cache-key: ${{ needs.build.outputs.docker-images-cache-key }}
 
   test-firefox:
     name: Test with Firefox
     needs: build
     uses: ./.github/workflows/e2e-firefox.yaml
     with:
-      cache-key: ${{ needs.build.outputs.cache-key }}
+      docker-images-cache-key: ${{ needs.build.outputs.docker-images-cache-key }}
 
   merge-reports:
     name: Merge test reports
@@ -42,17 +42,17 @@ jobs:
         working-directory: ./e2e-tests
         run: npm ci
 
-      - name: Download Chrome artifacts
+      - name: Download Chrome test artifacts
         uses: actions/download-artifact@v4
         with:
-          name: playwright-blob-chrome
+          name: chrome-blob-test-report
           path: ./e2e-tests/blob-reporter-chrome/
         continue-on-error: true
 
-      - name: Download Firefox artifacts
+      - name: Download Firefox test artifacts
         uses: actions/download-artifact@v4
         with:
-          name: playwright-blob-firefox
+          name: firefox-blob-test-report
           path: ./e2e-tests/blob-reporter-firefox/
         continue-on-error: true
 
