@@ -52,42 +52,19 @@ jobs:
           echo "=== All available Docker images ==="
           docker images
 
-          echo "=== Getting images built by docker-compose ==="
-          # Use docker-compose to get the exact image names it created
-          IMAGES=$(docker compose images --quiet | tr '\n' ' ')
+          echo "=== Getting ALL image IDs ==="
+          # Just get all image IDs and save them all
+          IMAGE_IDS=$(docker images --format "{{.ID}}" | grep -v "^IMAGE" | head -20)
 
-          if [ -z "$IMAGES" ]; then
-            echo "No images found via 'docker compose images', falling back to service-based approach..."
-            # Alternative: get images by service names from docker-compose
-            SERVICES=$(docker compose config --services)
-            echo "Services found: $SERVICES"
+          echo "Image IDs to save:"
+          echo "$IMAGE_IDS"
 
-            IMAGES=""
-            for service in $SERVICES; do
-              # Get the image name that docker-compose would use for each service
-              IMAGE=$(docker compose images $service --quiet 2>/dev/null || true)
-              if [ -n "$IMAGE" ]; then
-                IMAGES="$IMAGES $IMAGE"
-              fi
-            done
-          fi
-
-          # Remove any duplicate spaces and trim
-          IMAGES=$(echo $IMAGES | tr -s ' ' | sed 's/^ *//;s/ *$//')
-
-          echo "=== Images to save ==="
-          echo "Images: '$IMAGES'"
-
-          if [ -n "$IMAGES" ]; then
-            echo "Saving images to tar file..."
-            docker save $IMAGES -o /tmp/docker-images/images.tar
-            echo "✅ Images saved successfully to /tmp/docker-images/images.tar"
-
-            # Verify what we saved
-            echo "=== Tar file contents ==="
-            tar -tf /tmp/docker-images/images.tar | head -10
+          if [ -n "$IMAGE_IDS" ]; then
+            echo "Saving all images..."
+            docker save $IMAGE_IDS -o /tmp/docker-images/images.tar
+            echo "✅ All images saved successfully"
             ls -lh /tmp/docker-images/images.tar
           else
-            echo "❌ No images found to save, creating empty tar"
+            echo "❌ No images found"
             tar -cf /tmp/docker-images/images.tar --files-from /dev/null
           fi
