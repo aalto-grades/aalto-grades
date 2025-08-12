@@ -38,7 +38,8 @@ jobs:
           echo "Loading pre-built Docker images..."
           docker load -i ${{ env.DOCKER_IMAGES_TAR }}
           echo "Docker images loaded successfully"
-          docker images
+          echo "Available images after loading:"
+          docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}"
         working-directory: ./
 
       - name: Setup Playwright browser cache
@@ -58,7 +59,15 @@ jobs:
 
       - name: Start application services
         working-directory: ./
-        run: docker compose up -d
+        run: |
+          echo "Starting services with cached images (no rebuild)..."
+          echo "Checking what docker-compose expects vs what we have:"
+          docker compose config --services
+          echo "Available images:"
+          docker images --format "table {{.Repository}}\t{{.Tag}}"
+          # Use --no-build to prevent rebuilding and force using cached images
+          docker compose up -d --no-build
+          echo "Services started successfully"
 
       - name: Install Firefox browser for Playwright
         if: steps.playwright-browser-cache.outputs.cache-hit != 'true'
