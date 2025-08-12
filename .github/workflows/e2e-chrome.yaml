@@ -57,15 +57,14 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-playwright-browsers
 
       - uses: actions/setup-node@v4
         with:
           node-version: 24
 
       - name: Install NPM dependencies
-        working-directory: ./
-        run: npm ci
+        run: npm i
 
       - name: Start application services
         working-directory: ./
@@ -80,7 +79,6 @@ jobs:
           echo "Services started successfully"
 
       - name: Install Chrome browser for Playwright
-        if: steps.playwright-browser-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium --with-deps
 
       - name: Wait for application to be ready
