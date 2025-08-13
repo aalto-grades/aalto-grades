@@ -25,6 +25,13 @@ jobs:
           # Create a cache key based on relevant files
           echo "key=docker-images-${{ runner.os }}-${{ hashFiles('**/Dockerfile*', '**/package*.json', 'docker-compose*.yaml') }}-${{ github.sha }}" >> $GITHUB_OUTPUT
 
+      - name: Activate caches
+        id: docker-images-cache
+        uses: actions/cache@v3
+        with:
+          path: /tmp/docker-images
+          key: ${{ steps.generate-cache-key.outputs.key }}
+
       - name: Clean up existing Docker containers
         run: docker compose down --volumes --remove-orphans
 
