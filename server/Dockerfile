@@ -27,14 +27,14 @@ RUN npm run build
 # Run stage
 FROM node:24-alpine AS run
 
-WORKDIR /app/server/
+WORKDIR /app
 RUN mkdir logs && chown node:node logs
 
 COPY package.json package-lock.json /app/
-
-COPY server/package.json ./
+COPY server/package.json /app/server
 RUN npm ci --omit=dev && npm cache clean --force
 
+WORKDIR /app/server
 COPY server/.sequelizerc ./
 COPY server/mock-data ./mock-data
 COPY server/docs ./docs
