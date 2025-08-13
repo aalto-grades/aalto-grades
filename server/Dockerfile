@@ -31,10 +31,10 @@ WORKDIR /app
 RUN mkdir logs && chown node:node logs
 
 COPY package.json package-lock.json /app/
-COPY server/package.json /app/server
+COPY server/package.json /app/server/
 RUN npm ci --omit=dev && npm cache clean --force
 
-WORKDIR /app/server
+WORKDIR /app/server/
 COPY server/.sequelizerc ./
 COPY server/mock-data ./mock-data
 COPY server/docs ./docs
