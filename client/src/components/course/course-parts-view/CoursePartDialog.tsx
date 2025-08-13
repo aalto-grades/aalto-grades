@@ -13,6 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import {Formik, type FormikHelpers, type FormikProps} from 'formik';
+import type {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {z} from 'zod';
@@ -109,9 +110,10 @@ const CoursePartDialog = ({
     const result = ValidationSchema.safeParse(values);
     if (result.success) return;
 
-    const fieldErrors = result.error.formErrors.fieldErrors;
+    const treeifiedError = z.treeifyError(result.error);
+    const fieldErrors = treeifiedError.properties || {};
     return Object.fromEntries(
-      Object.entries(fieldErrors).map(([key, val]) => [key, val[0]]) // Only the first error
+      Object.entries(fieldErrors).map(([key, val]) => [key, val.errors[0]]) // Only the first error
     );
   };
 

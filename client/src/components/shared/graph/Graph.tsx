@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import 'reactflow/dist/style.css';
+import '@xyflow/react/dist/style.css';
 import './flow.scss';
 
 import {
@@ -13,6 +13,23 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
+import {
+  Background,
+  BackgroundVariant,
+  type Connection,
+  Controls,
+  type Edge,
+  type EdgeChange,
+  MiniMap,
+  type NodeChange,
+  type NodeProps,
+  type OnSelectionChangeParams,
+  ReactFlow,
+  type ReactFlowInstance,
+  addEdge,
+  useEdgesState,
+  useNodesState,
+} from '@xyflow/react';
 import type {TFunction} from 'i18next';
 import {enqueueSnackbar} from 'notistack';
 import {
@@ -29,21 +46,6 @@ import {
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useBlocker} from 'react-router-dom';
-import {
-  Background,
-  BackgroundVariant,
-  type Connection,
-  Controls,
-  type Edge,
-  MiniMap,
-  type NodeChange,
-  type NodeProps,
-  ReactFlow,
-  type ReactFlowInstance,
-  addEdge,
-  useEdgesState,
-  useNodesState,
-} from 'reactflow';
 
 import type {
   CustomNodeTypes,
@@ -95,6 +97,12 @@ type NodeState = [
   (changes: NodeChange[]) => void,
 ];
 
+type EdgeState = [
+  Edge[],
+  Dispatch<SetStateAction<Edge[]>>,
+  (changes: EdgeChange[]) => void,
+];
+
 const nodeTypesMap: {
   [key in CustomNodeTypes]: (props: NodeProps) => JSX.Element;
 } = {
@@ -136,7 +144,7 @@ const initGraphFn = (
   const initNodeValues = Object.fromEntries(
     initGraph.nodes.map(node => [
       node.id,
-      initNode(node.type!, node.id, initGraph.edges).value,
+      initNode(node.type, node.id, initGraph.edges).value,
     ])
   );
 
@@ -180,11 +188,11 @@ const Graph = ({
   const [nodes, setNodes, onNodesChange] = useNodesState(
     initGraph.nodes
   ) as NodeState;
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initGraph.edges);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initGraph.edges) as EdgeState;
   const [nodeData, setNodeData] = useState<FullNodeData>(initGraph.nodeData);
   const [nodeValues, setNodeValues] = useState<NodeValues>(initNodeValues);
   const [reactFlowInstance, setReactFlowInstance] =
-    useState<ReactFlowInstance | null>(null);
+    useState<ReactFlowInstance<TypedNode> | null>(null);
 
   // Used to check for changes
   const [lastState, setLastState] = useState<{
@@ -213,17 +221,17 @@ const Graph = ({
     useState<GraphStructure>(initGraph);
 
   const unsaved =
-    JSON.stringify(originalGraphStructure.nodes.map(simplifyNode)) !==
-      JSON.stringify(nodes.map(simplifyNode)) ||
-    JSON.stringify(originalGraphStructure.edges) !== JSON.stringify(edges) ||
-    JSON.stringify(originalGraphStructure.nodeData) !==
-      JSON.stringify(nodeData);
+    JSON.stringify((originalGraphStructure.nodes as TypedNode[]).map(simplifyNode))
+    !== JSON.stringify(nodes.map(simplifyNode))
+    || JSON.stringify(originalGraphStructure.edges) !== JSON.stringify(edges)
+    || JSON.stringify(originalGraphStructure.nodeData)
+    !== JSON.stringify(nodeData);
 
   // Source nodes that the user is allowed to delete
   const delSources = useMemo(
     () =>
       initGraph.nodes
-        .filter(node => {
+        .filter((node) => {
           if (node.type !== 'source') return false;
           const sourceId = parseInt(node.id.split('-')[1]);
 
@@ -292,11 +300,11 @@ const Graph = ({
     );
 
     if (
-      lastState === null ||
-      lastState.nodes.length !== nodes.length ||
-      lastState.edges.length !== edges.length ||
-      JSON.stringify(lastState.nodeValues) !== JSON.stringify(nodeValues) ||
-      JSON.stringify(lastState.nodeSettings) !== JSON.stringify(nodeSettings)
+      lastState === null
+      || lastState.nodes.length !== nodes.length
+      || lastState.edges.length !== edges.length
+      || JSON.stringify(lastState.nodeValues) !== JSON.stringify(nodeValues)
+      || JSON.stringify(lastState.nodeSettings) !== JSON.stringify(nodeSettings)
     ) {
       setLastState(structuredClone({nodes, edges, nodeValues, nodeSettings}));
       updateValues();
@@ -332,7 +340,7 @@ const Graph = ({
 
   const onConnect = useCallback(
     (params: Connection) => {
-      setEdges(oldEdges => addEdge(params, oldEdges));
+      setEdges((oldEdges: Edge[]) => addEdge(params, oldEdges));
       updateValues(addEdge(params, edges));
     },
     [edges, setEdges, updateValues]
@@ -407,14 +415,14 @@ const Graph = ({
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
-  const onDragOver: DragEventHandler<HTMLDivElement> = useCallback(event => {
+  const onDragOver: DragEventHandler<HTMLDivElement> = useCallback((event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   }, []);
   let id = 0;
   const getId = useCallback(() => `dndnode-${id++}`, [id]);
   const onDrop: DragEventHandler<HTMLDivElement> = useCallback(
-    event => {
+    (event) => {
       event.preventDefault();
 
       const type = event.dataTransfer.getData('application/reactflow') as
@@ -506,9 +514,9 @@ const Graph = ({
             sx={{
               position: 'absolute',
               top:
-                Number(unsaved) * 60 +
-                Number(unsaved && modelHasFinalGrades) * 60 +
-                10,
+                Number(unsaved) * 60
+                + Number(unsaved && modelHasFinalGrades) * 60
+                + 10,
               right: 10,
               zIndex: 1,
             }}
@@ -526,8 +534,8 @@ const Graph = ({
                 selected
                   .filter(
                     node =>
-                      delSources.includes(node.id) ||
-                      (node.type !== 'source' && node.type !== 'sink')
+                      delSources.includes(node.id)
+                      || (node.type !== 'source' && node.type !== 'sink')
                   )
                   .map(node => ({type: 'remove', id: node.id}))
               );
@@ -538,8 +546,8 @@ const Graph = ({
                 edges
                   .filter(
                     edge =>
-                      selectedIds.includes(edge.target) ||
-                      selectedIds.includes(edge.source)
+                      selectedIds.includes(edge.target)
+                      || selectedIds.includes(edge.source)
                   )
                   .map(edge => ({type: 'remove', id: edge.id}))
               );
@@ -570,34 +578,31 @@ const Graph = ({
                 nodes={nodes}
                 edges={edges}
                 proOptions={{hideAttribution: true}}
-                onNodesChange={changes =>
+                onNodesChange={(changes: NodeChange[]) =>
                   onNodesChange(
                     changes.filter(
-                      change =>
-                        change.type !== 'remove' ||
-                        delSources.includes(change.id) ||
-                        (nodeTypeMap[change.id] !== 'source' &&
-                          nodeTypeMap[change.id] !== 'sink')
+                      (change: NodeChange) =>
+                        change.type !== 'remove'
+                        || delSources.includes(change.id)
+                        || (nodeTypeMap[change.id] !== 'source'
+                          && nodeTypeMap[change.id] !== 'sink')
                     )
-                  )
-                }
-                onSelectionChange={changes =>
-                  setSelected(changes.nodes as TypedNode[])
-                }
+                  )}
+                onSelectionChange={(changes: OnSelectionChangeParams) =>
+                  setSelected(changes.nodes as TypedNode[])}
                 minZoom={0.25}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
                 isValidConnection={connection =>
-                  isValidConnection(connection, edges)
-                }
+                  isValidConnection(connection, edges)}
                 nodeTypes={nodeTypesMap}
-                onInit={flowInstance => {
+                onInit={(flowInstance) => {
                   setReactFlowInstance(flowInstance);
                   reactFlowInstance?.fitView();
                 }}
                 onDrop={onDrop}
                 onDragOver={onDragOver}
-                onError={(i, m) => i !== '008' && console.warn(m)} // Ignore "couldn't create edge" warnings
+                onError={(i: string, m: string) => i !== '008' && console.warn(m)} // Ignore "couldn't create edge" warnings
                 fitView
                 elementsSelectable={!readOnly}
                 nodesConnectable={!readOnly}
@@ -632,8 +637,7 @@ const Graph = ({
                         <div
                           className="dnd-node"
                           onDragStart={event =>
-                            onDragStart(event, dragAndDropNode.type)
-                          }
+                            onDragStart(event, dragAndDropNode.type)}
                           style={{
                             backgroundColor: theme.palette.primary.main,
                             color: theme.palette.primary.contrastText,

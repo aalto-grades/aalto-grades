@@ -26,32 +26,32 @@ describe('Test behavior to unknown endpoints', () => {
         .put('/v1/auth/login')
         .set('Content-Type', 'application/json')
         .expect(HttpCode.NotFound),
-      'Cannot PUT /v1/auth/login. Please refer to the API documentation at ' +
-        'https://ossi.cs.aalto.fi/api-docs/ for a list of available endpoints.'
+      'Cannot PUT /v1/auth/login. Please refer to the API documentation at '
+      + 'https://ossi.cs.aalto.fi/api-docs/ for a list of available endpoints.'
     );
 
     evaluateResponse(
       await request
         .get('/v1/course/all')
         .set('Content-Type', 'application/json'),
-      'Cannot GET /v1/course/all. Please refer to the API documentation at ' +
-        'https://ossi.cs.aalto.fi/api-docs/ for a list of available endpoints.'
+      'Cannot GET /v1/course/all. Please refer to the API documentation at '
+      + 'https://ossi.cs.aalto.fi/api-docs/ for a list of available endpoints.'
     );
 
     evaluateResponse(
       await request
         .post('/v1/sisu/courses/CS-A1110')
         .set('Content-Type', 'application/json'),
-      'Cannot POST /v1/sisu/courses/CS-A1110. Please refer to the API documentation at ' +
-        'https://ossi.cs.aalto.fi/api-docs/ for a list of available endpoints.'
+      'Cannot POST /v1/sisu/courses/CS-A1110. Please refer to the API documentation at '
+      + 'https://ossi.cs.aalto.fi/api-docs/ for a list of available endpoints.'
     );
 
     evaluateResponse(
       await request
         .delete('/v1/user/1')
         .set('Content-Type', 'application/json'),
-      'Cannot DELETE /v1/user/1. Please refer to the API documentation at ' +
-        'https://ossi.cs.aalto.fi/api-docs/ for a list of available endpoints.'
+      'Cannot DELETE /v1/user/1. Please refer to the API documentation at '
+      + 'https://ossi.cs.aalto.fi/api-docs/ for a list of available endpoints.'
     );
   });
 });

@@ -1,0 +1,88 @@
+# SPDX-FileCopyrightText: 2024 The Ossi Developers
+#
+# SPDX-License-Identifier: MIT
+---
+name: E2E Tests - Parallel
+on:
+  workflow_call:
+    inputs: {}
+
+jobs:
+  build:
+    name: Build images
+    uses: ./.github/workflows/build-e2e-images.yaml
+
+  test-chrome:
+    name: Test with Chrome
+    needs: build
+    uses: ./.github/workflows/e2e-chrome.yaml
+    with:
+      docker-images-cache-key: ${{ needs.build.outputs.docker-images-cache-key }}
+
+  test-firefox:
+    name: Test with Firefox
+    needs: build
+    uses: ./.github/workflows/e2e-firefox.yaml
+    with:
+      docker-images-cache-key: ${{ needs.build.outputs.docker-images-cache-key }}
+
+  merge-reports:
+    name: Merge test reports
+    runs-on: ubuntu-latest
+    needs: [test-chrome, test-firefox]
+    if: always() && (needs.test-chrome.result == 'success' || needs.test-firefox.result == 'success')
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        working-directory: ./e2e-tests
+        run: npm ci
+
+      - name: Download Chrome test artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: chrome-blob-test-report
+          path: ./e2e-tests/blob-reporter-chrome/
+        continue-on-error: true
+
+      - name: Download Firefox test artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: firefox-blob-test-report
+          path: ./e2e-tests/blob-reporter-firefox/
+        continue-on-error: true
+
+      - name: Merge reports
+        working-directory: ./e2e-tests
+        run: |
+          rm -rf ./blob-reporter
+          rm -rf ./playwright-report
+          mkdir -p ./blob-reporter
+
+          # Copy Chrome report if it exists
+          if [ -f ./blob-reporter-chrome/chrome-report.zip ]; then
+            cp ./blob-reporter-chrome/chrome-report.zip ./blob-reporter/shard-1.zip
+          fi
+
+          # Copy Firefox report if it exists
+          if [ -f ./blob-reporter-firefox/firefox-report.zip ]; then
+            cp ./blob-reporter-firefox/firefox-report.zip ./blob-reporter/shard-2.zip
+          fi
+
+          # Merge reports if we have any
+          if [ -n "$(ls -A ./blob-reporter/)" ]; then
+            npx playwright merge-reports --reporter=html ./blob-reporter
+          else
+            echo "No reports to merge"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-merged
+          path: e2e-tests/playwright-report/
+          retention-days: 7

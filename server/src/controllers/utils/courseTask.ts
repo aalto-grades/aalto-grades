@@ -62,8 +62,8 @@ export const validateCourseTaskBelongsToCourse = async (
   // Check that course task belongs to the course.
   if (coursePart.courseId !== courseId) {
     throw new ApiError(
-      `Course task ID ${courseTask.id} ` +
-        `does not belong to the course with ID ${courseId}`,
+      `Course task ID ${courseTask.id} `
+      + `does not belong to the course with ID ${courseId}`,
       HttpCode.Conflict
     );
   }
@@ -87,8 +87,8 @@ export const validateCourseTaskPath = async (
   // Check that the course part belongs to the course.
   if (coursePart.courseId !== course.id) {
     throw new ApiError(
-      `Course task ID ${courseTask.id} ` +
-        `does not belong to the course with ID ${course.id}`,
+      `Course task ID ${courseTask.id} `
+      + `does not belong to the course with ID ${course.id}`,
       HttpCode.Conflict
     );
   }

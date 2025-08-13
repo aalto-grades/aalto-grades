@@ -14,9 +14,12 @@ export const ErrorSchema = z.strictObject({
 });
 
 export const ZodErrorSchema = z.array(
-  z.object({
+  z.strictObject({
     type: z.literal('Body'),
-    errors: z.object({issues: z.array(z.any()).nonempty()}),
+    errors: z.strictObject({
+      name: z.literal('ZodError'),
+      message: z.string()
+    }),
   })
 );
 

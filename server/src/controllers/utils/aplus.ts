@@ -4,7 +4,7 @@
 
 import axios from 'axios';
 import type {Request} from 'express';
-import {type ZodSchema, z} from 'zod';
+import {z} from 'zod';
 
 import {type AplusGradeSourceData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
@@ -106,8 +106,8 @@ export const validateAplusGradeSourceBelongsToCourseTask = async (
   const aplusGradeSource = await findAplusGradeSourceById(aplusGradeSourceId);
   if (aplusGradeSource.courseTaskId !== courseTaskId) {
     throw new ApiError(
-      `A+ grade source with ID ${aplusGradeSource.id} ` +
-        `does not belong to the course task with ID ${courseTaskId}`,
+      `A+ grade source with ID ${aplusGradeSource.id} `
+      + `does not belong to the course task with ID ${courseTaskId}`,
       HttpCode.Conflict
     );
   }
@@ -116,7 +116,7 @@ export const validateAplusGradeSourceBelongsToCourseTask = async (
 export const parseAplusGradeSource = (
   aplusGradeSource: AplusGradeSource
 ): AplusGradeSourceData =>
-  ({
+  (({
     id: aplusGradeSource.id,
     courseTaskId: aplusGradeSource.courseTaskId,
     aplusCourse: aplusGradeSource.aplusCourse,
@@ -126,8 +126,8 @@ export const parseAplusGradeSource = (
     exerciseId: aplusGradeSource.exerciseId ?? undefined,
     exerciseName: aplusGradeSource.exerciseName ?? undefined,
     difficulty: aplusGradeSource.difficulty ?? undefined,
-    date: new Date(aplusGradeSource.date),
-  }) as AplusGradeSourceData;
+    date: new Date(aplusGradeSource.date)
+  }) as AplusGradeSourceData);
 
 /**
  * Validates that an A+ API token was provided and parses it from the request
@@ -160,7 +160,7 @@ export const parseAplusToken = (req: Request): string => {
 export const fetchFromAplus = async <T>(
   url: string,
   aplusToken: string,
-  schema: ZodSchema<T>
+  schema: z.ZodType<T>
 ): Promise<T> => {
   httpLogger.http(`Calling A+ With "GET ${url}"`);
 
@@ -176,7 +176,6 @@ export const fetchFromAplus = async <T>(
 
   if (!result.success) {
     throw new ApiError(
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       `Validating data from A+ failed: ${result.error}`,
       HttpCode.BadGateway
     );
@@ -193,7 +192,7 @@ export const fetchFromAplus = async <T>(
 export const fetchFromAplusPaginated = async <T extends readonly unknown[]>(
   url: string,
   aplusToken: string,
-  schema: ZodSchema<T>
+  schema: z.ZodType<T>
 ): Promise<T> => {
   httpLogger.http(`Calling A+ With "GET ${url}"`);
 

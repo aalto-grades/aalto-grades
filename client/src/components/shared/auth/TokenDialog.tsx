@@ -65,12 +65,12 @@ const TokenDialog = ({
       <DialogTitle>{t('general.a+-api-token')}</DialogTitle>
       <DialogContent>
         <Typography sx={{mb: 2}}>
-          {t('shared.auth.token.body')}:{' '}
+          {t('shared.auth.token.intro') + ': '}
           <ExternalLink href={link}>{link}</ExternalLink>
         </Typography>
         {currentToken && (
           <Typography>
-            {t('shared.auth.token.current')}:
+            {t('shared.auth.token.current') + ': '}
             <Box
               sx={{
                 display: 'flex',

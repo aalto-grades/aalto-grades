@@ -84,7 +84,7 @@ const LoginView = (): JSX.Element => {
           setEmail('');
           setPassword('');
         }}
-        onReset={newPassword => {
+        onReset={(newPassword) => {
           setShowResetPasswordDialog(false);
           setPassword(newPassword);
           handleSubmit(null, null, newPassword);

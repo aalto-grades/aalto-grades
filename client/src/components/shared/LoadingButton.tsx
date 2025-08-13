@@ -23,11 +23,9 @@ const LoadingButton = ({
       variant="contained"
       disabled={disabled || loading}
       startIcon={
-        loading ? (
-          <CircularProgress color="primary" size={20} thickness={6} />
-        ) : startIcon ? (
-          startIcon
-        ) : undefined
+        loading
+          ? <CircularProgress color="primary" size={20} thickness={6} />
+          : (startIcon ? (startIcon) : undefined)
       }
       {...props}
     >

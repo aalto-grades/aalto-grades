@@ -146,9 +146,9 @@ export const getGradeLogs: Endpoint<void, TaskGradeHistoryArray> = async (
 
   const isConvertibleToInteger = (value: string | undefined): boolean => {
     return (
-      value !== undefined &&
-      !isNaN(Number(value)) &&
-      Number.isInteger(Number(value))
+      value !== undefined
+      && !isNaN(Number(value))
+      && Number.isInteger(Number(value))
     );
   };
 
@@ -217,7 +217,7 @@ export const getGradeLogs: Endpoint<void, TaskGradeHistoryArray> = async (
     attributes: {exclude: ['userId', 'UserId', 'taskGradeId', 'TaskGradeId']},
   });
 
-  const parsedGradeLogs: TaskGradeHistoryArray = gradeLogs.map(log => {
+  const parsedGradeLogs: TaskGradeHistoryArray = gradeLogs.map((log) => {
     return {
       id: log.id,
       courseTaskId: log.courseTaskId,
@@ -256,8 +256,8 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
 
     // Validate A+ course task id
     if (
-      grade.aplusGradeSourceId !== null &&
-      !validAPlusCourseTaskIds.has(grade.aplusGradeSourceId)
+      grade.aplusGradeSourceId !== null
+      && !validAPlusCourseTaskIds.has(grade.aplusGradeSourceId)
     ) {
       await validateAplusGradeSourceBelongsToCourseTask(
         grade.courseTaskId,
@@ -288,7 +288,7 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
 
   // Create missing users
   if (nonExistingStudents.length > 0) {
-    await sequelize.transaction(async t => {
+    await sequelize.transaction(async (t) => {
       await User.bulkCreate(
         nonExistingStudents.map(studentNumber => ({
           studentNumber: studentNumber,
@@ -308,7 +308,7 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
     students.map(student => [student.studentNumber, student.id])
   );
 
-  await sequelize.transaction(async t => {
+  await sequelize.transaction(async (t) => {
     const preparedBulkCreate: NewDbTaskGradeData[] = [];
 
     for (const gradeEntry of req.body) {
@@ -414,24 +414,24 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
   const {grade, date, expiryDate, comment} = req.body;
 
   if (
-    date !== undefined &&
-    expiryDate === undefined &&
-    gradeData.expiryDate !== null &&
-    date > new Date(gradeData.expiryDate)
+    date !== undefined
+    && expiryDate === undefined
+    && gradeData.expiryDate !== null
+    && date > new Date(gradeData.expiryDate)
   ) {
     throw new ApiError(
-      `New date (${date.toString()}) can't be later than` +
-        ` existing expiration date (${gradeData.expiryDate.toString()})`,
+      `New date (${date.toString()}) can't be later than`
+      + ` existing expiration date (${gradeData.expiryDate.toString()})`,
       HttpCode.BadRequest
     );
   } else if (
-    expiryDate &&
-    date === undefined &&
-    new Date(gradeData.date) > expiryDate
+    expiryDate
+    && date === undefined
+    && new Date(gradeData.date) > expiryDate
   ) {
     throw new ApiError(
-      `New expiration date (${expiryDate.toString()}) can't be before` +
-        ` existing date (${gradeData.date.toString()})`,
+      `New expiration date (${expiryDate.toString()}) can't be before`
+      + ` existing date (${gradeData.date.toString()})`,
       HttpCode.BadRequest
     );
   }

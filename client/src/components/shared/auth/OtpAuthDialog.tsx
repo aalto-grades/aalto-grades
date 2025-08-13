@@ -86,7 +86,7 @@ const OtpAuthDialog = ({
           autoFocus
           onChange={newOtp => setOtp(newOtp)}
           validateChar={(c: string) => /\d/.test(c)}
-          onComplete={async fullOtp => {
+          onComplete={async (fullOtp) => {
             const res = await onSubmit(fullOtp);
             if (res) setOtp('');
           }}

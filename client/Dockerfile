@@ -3,20 +3,24 @@
 # SPDX-License-Identifier: MIT
 
 # Build stage
-FROM node:20-alpine AS build
-
-WORKDIR /app
-COPY package.json ./
-RUN mkdir common client
+FROM node:24-alpine AS build
 
 # Install packages first to make following builds faster
-WORKDIR /app/common
-COPY common/package.json common/package-lock.json ./
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY common/package.json ./common/
+COPY client/package.json ./client/
 RUN npm ci
 
-WORKDIR /app/client
-COPY client/package.json client/package-lock.json ./
-RUN npm ci
+# ### Fixes added for a weird missing package during build instead of npm ci
+# # Install git for GitHub dependencies
+# RUN apk add --no-cache git
+# # Clear npm cache and remove any platform-specific issues
+# RUN rm -rf node_modules package-lock.json
+# RUN npm install
+# # Ensure all optional dependencies are installed for the current platform
+# RUN npm rebuild
+# ###
 
 # Copy only necessary files
 WORKDIR /app/common
@@ -33,7 +37,7 @@ COPY client/src ./src
 RUN npm run build
 
 # Run stage
-FROM nginx:1.27-alpine AS run
+FROM nginx:1.28-alpine AS run
 
 COPY --from=build /app/client/build /user/share/nginx/html
 COPY client/nginx.conf /etc/nginx/conf.d/default.conf

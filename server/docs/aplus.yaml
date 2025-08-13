@@ -58,9 +58,9 @@ definitions:
     type: object
     properties:
       id:
-        $ref: '#/definitions/AplusCourseId'
+        $ref: "#/definitions/AplusCourseId"
       courseCode:
-        $ref: '#/definitions/CourseCode'
+        $ref: "#/definitions/CourseCode"
       name:
         type: string
         description: The name of the course.
@@ -94,9 +94,9 @@ definitions:
           type: object
           properties:
             id:
-              $ref: '#/definitions/AplusModuleId'
+              $ref: "#/definitions/AplusModuleId"
             name:
-              $ref: '#/definitions/AplusModuleName'
+              $ref: "#/definitions/AplusModuleName"
             closingDate:
               type: string
               format: date
@@ -113,9 +113,9 @@ definitions:
                 type: object
                 properties:
                   id:
-                    $ref: '#/definitions/AplusExerciseId'
+                    $ref: "#/definitions/AplusExerciseId"
                   name:
-                    $ref: '#/definitions/AplusExerciseName'
+                    $ref: "#/definitions/AplusExerciseName"
                   maxGrade:
                     type: number
                     format: int32
@@ -137,7 +137,7 @@ definitions:
           type: object
           properties:
             difficulty:
-              $ref: '#/definitions/AplusDifficulty'
+              $ref: "#/definitions/AplusDifficulty"
             maxGrade:
               type: number
               format: int32
@@ -157,25 +157,25 @@ definitions:
     description: Information about an A+ grade source.
     properties:
       id:
-        $ref: '#/definitions/AplusGradeSourceId'
+        $ref: "#/definitions/AplusGradeSourceId"
       courseTaskId:
-        $ref: '#/definitions/CourseTaskId'
+        $ref: "#/definitions/CourseTaskId"
       aplusCourse:
-        $ref: '#/definitions/AplusCourseData'
+        $ref: "#/definitions/AplusCourseData"
       date:
-        $ref: '#/definitions/AplusDate'
+        $ref: "#/definitions/AplusDate"
       sourceType:
-        $ref: '#/definitions/AplusGradeSourceType'
+        $ref: "#/definitions/AplusGradeSourceType"
       moduleId:
-        $ref: '#/definitions/AplusModuleId'
+        $ref: "#/definitions/AplusModuleId"
       moduleName:
-        $ref: '#/definitions/AplusModuleName'
+        $ref: "#/definitions/AplusModuleName"
       exerciseId:
-        $ref: '#/definitions/AplusExerciseId'
+        $ref: "#/definitions/AplusExerciseId"
       exerciseName:
-        $ref: '#/definitions/AplusExerciseName'
+        $ref: "#/definitions/AplusExerciseName"
       difficulty:
-        $ref: '#/definitions/AplusDifficulty'
+        $ref: "#/definitions/AplusDifficulty"
     required:
       - id
       - courseTaskId
@@ -189,23 +189,23 @@ definitions:
     description: Information to add a new A+ grade source to a course part.
     properties:
       courseTaskId:
-        $ref: '#/definitions/CourseTaskId'
+        $ref: "#/definitions/CourseTaskId"
       aplusCourse:
-        $ref: '#/definitions/AplusCourseData'
+        $ref: "#/definitions/AplusCourseData"
       date:
-        $ref: '#/definitions/AplusDate'
+        $ref: "#/definitions/AplusDate"
       sourceType:
-        $ref: '#/definitions/AplusGradeSourceType'
+        $ref: "#/definitions/AplusGradeSourceType"
       moduleId:
-        $ref: '#/definitions/AplusModuleId'
+        $ref: "#/definitions/AplusModuleId"
       moduleName:
-        $ref: '#/definitions/AplusModuleName'
+        $ref: "#/definitions/AplusModuleName"
       exerciseId:
-        $ref: '#/definitions/AplusExerciseId'
+        $ref: "#/definitions/AplusExerciseId"
       exerciseName:
-        $ref: '#/definitions/AplusExerciseName'
+        $ref: "#/definitions/AplusExerciseName"
       difficulty:
-        $ref: '#/definitions/AplusDifficulty'
+        $ref: "#/definitions/AplusDifficulty"
     required:
       - courseTaskId
       - aplusCourse
@@ -217,7 +217,7 @@ definitions:
     tags: [A+]
     description: Gets a list of courses the requester is staff in.
     parameters:
-      - $ref: '#/parameters/aplusToken'
+      - $ref: "#/parameters/aplusToken"
     responses:
       200:
         description: >
@@ -227,13 +227,13 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/AplusCourseData'
+                $ref: "#/definitions/AplusCourseData"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       502:
-        $ref: '#/responses/BadGateway'
+        $ref: "#/responses/BadGateway"
     security:
       - cookieAuth: []
 
@@ -244,8 +244,8 @@ definitions:
       Get information about the exercises of an A+ course, namely, which
       modules and difficulties exist in the course.
     parameters:
-      - $ref: '#/parameters/aplusCourseId'
-      - $ref: '#/parameters/aplusToken'
+      - $ref: "#/parameters/aplusCourseId"
+      - $ref: "#/parameters/aplusToken"
     responses:
       200:
         description: >
@@ -254,13 +254,13 @@ definitions:
         content:
           application/json:
             schema:
-              $ref: '#/definitions/AplusExerciseData'
+              $ref: "#/definitions/AplusExerciseData"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       502:
-        $ref: '#/responses/BadGateway'
+        $ref: "#/responses/BadGateway"
     security:
       - cookieAuth: []
 
@@ -269,27 +269,27 @@ definitions:
     tags: [A+]
     description: Add A+ grade sources to course parts.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     requestBody:
       content:
         application/json:
           schema:
             type: array
             items:
-              $ref: '#/definitions/NewAplusGradeSourceData'
+              $ref: "#/definitions/NewAplusGradeSourceData"
     responses:
       201:
         description: A+ grade sources created.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
 
@@ -298,21 +298,21 @@ definitions:
     tags: [A+]
     description: Delete A+ grade source.
     parameters:
-      - $ref: '#/parameters/courseId'
-      - $ref: '#/parameters/aplusGradeSourceId'
+      - $ref: "#/parameters/courseId"
+      - $ref: "#/parameters/aplusGradeSourceId"
     responses:
       200:
         description: A+ grade source deleted.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
 
@@ -321,7 +321,7 @@ definitions:
     tags: [A+]
     description: Fetch grades from A+ for the given course parts.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
       - in: query
         name: course parts
         schema:
@@ -329,8 +329,8 @@ definitions:
           description: List of course part IDs.
           example: [1, 2, 3]
           items:
-            $ref: '#/definitions/CoursePartId'
-      - $ref: '#/parameters/aplusToken'
+            $ref: "#/definitions/CoursePartId"
+      - $ref: "#/parameters/aplusToken"
     responses:
       200:
         description: >
@@ -342,18 +342,18 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/NewGrade'
+                $ref: "#/definitions/NewGrade"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
       502:
-        $ref: '#/responses/BadGateway'
+        $ref: "#/responses/BadGateway"
     security:
       - cookieAuth: []

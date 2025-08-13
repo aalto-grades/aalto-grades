@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-/* eslint-disable n/no-process-exit */
-
 import fs from 'fs';
 import path from 'node:path';
 import * as readlineSync from 'readline-sync';
@@ -252,8 +250,8 @@ const merge = (): void => {
   }
 
   console.log(
-    'The following keys have the same values. Please enter the index of the key to ' +
-      'use for the values or enter a new key.'
+    'The following keys have the same values. Please enter the index of the key to '
+    + 'use for the values or enter a new key.'
   );
 
   const changes: Change[] = [];

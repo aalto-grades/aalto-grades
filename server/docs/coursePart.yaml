@@ -29,15 +29,15 @@ definitions:
     type: object
     properties:
       id:
-        $ref: '#/definitions/CoursePartId'
+        $ref: "#/definitions/CoursePartId"
       courseId:
-        $ref: '#/definitions/CourseId'
+        $ref: "#/definitions/CourseId"
       name:
-        $ref: '#/definitions/CoursePartName'
+        $ref: "#/definitions/CoursePartName"
       expiryDate:
-        $ref: '#/definitions/CoursePartExpiryDate'
+        $ref: "#/definitions/CoursePartExpiryDate"
       archived:
-        $ref: '#/definitions/CoursePartArchived'
+        $ref: "#/definitions/CoursePartArchived"
     required:
       - id
       - courseId
@@ -49,9 +49,9 @@ definitions:
     type: object
     properties:
       name:
-        $ref: '#/definitions/CoursePartName'
+        $ref: "#/definitions/CoursePartName"
       expiryDate:
-        $ref: '#/definitions/CoursePartExpiryDate'
+        $ref: "#/definitions/CoursePartExpiryDate"
     required:
       - name
       - expiryDate
@@ -60,18 +60,18 @@ definitions:
     type: object
     properties:
       name:
-        $ref: '#/definitions/CoursePartName'
+        $ref: "#/definitions/CoursePartName"
       expiryDate:
-        $ref: '#/definitions/CoursePartExpiryDate'
+        $ref: "#/definitions/CoursePartExpiryDate"
       archived:
-        $ref: '#/definitions/CoursePartArchived'
+        $ref: "#/definitions/CoursePartArchived"
 
 /v1/courses/{courseId}/parts:
   get:
     tags: [Course Part]
     description: Get all the course parts of a course.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     responses:
       200:
         description: Returns all course parts of the course.
@@ -80,15 +80,15 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/CoursePart'
+                $ref: "#/definitions/CoursePart"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []
   post:
@@ -97,29 +97,29 @@ definitions:
       Add a course part to the course.
       Available only to admin users and teachers in charge of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/NewCoursePart'
+            $ref: "#/definitions/NewCoursePart"
     responses:
       201:
         description: Course part created.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/CoursePartId'
+              $ref: "#/definitions/CoursePartId"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
 
@@ -130,26 +130,26 @@ definitions:
       Edit specified course part.
       Available only to admin users and teachers in charge of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
-      - $ref: '#/parameters/coursePartId'
+      - $ref: "#/parameters/courseId"
+      - $ref: "#/parameters/coursePartId"
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/EditCoursePart'
+            $ref: "#/definitions/EditCoursePart"
     responses:
       200:
         description: CoursePart updated.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
   delete:
@@ -158,20 +158,20 @@ definitions:
       Delete specified course part.
       Available only to admin users and teachers in charge of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
-      - $ref: '#/parameters/coursePartId'
+      - $ref: "#/parameters/courseId"
+      - $ref: "#/parameters/coursePartId"
     responses:
       200:
         description: Course part deleted.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []

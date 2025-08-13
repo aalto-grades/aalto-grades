@@ -27,6 +27,7 @@ export default class TaskGrade extends Model<
   declare aplusGradeSourceId: CreationOptional<ForeignKey<
     AplusGradeSource['id']
   > | null>;
+
   declare grade: number;
   // Date when course part is completed (e.g., deadline or exam date)
   declare date: Date | string; // Database outputs 'yyyy-mm-dd' but inserting date is allowed

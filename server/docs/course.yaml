@@ -66,29 +66,29 @@ definitions:
     description: Course general information with translations.
     properties:
       id:
-        $ref: '#/definitions/CourseId'
+        $ref: "#/definitions/CourseId"
       courseCode:
-        $ref: '#/definitions/CourseCode'
+        $ref: "#/definitions/CourseCode"
       minCredits:
-        $ref: '#/definitions/MinCredits'
+        $ref: "#/definitions/MinCredits"
       maxCredits:
-        $ref: '#/definitions/MaxCredits'
+        $ref: "#/definitions/MaxCredits"
       department:
-        $ref: '#/definitions/LocalizedString'
+        $ref: "#/definitions/LocalizedString"
       name:
-        $ref: '#/definitions/LocalizedString'
+        $ref: "#/definitions/LocalizedString"
       gradingScale:
-        $ref: '#/definitions/GradingScale'
+        $ref: "#/definitions/GradingScale"
       languageOfInstruction:
-        $ref: '#/definitions/LanguageOfInstruction'
+        $ref: "#/definitions/LanguageOfInstruction"
       teachersInCharge:
         type: array
         items:
-          $ref: '#/definitions/TeacherData'
+          $ref: "#/definitions/TeacherData"
       assistants:
         type: array
         items:
-          $ref: '#/definitions/AssistantData'
+          $ref: "#/definitions/AssistantData"
     required:
       - id
       - courseCode
@@ -106,32 +106,32 @@ definitions:
     description: Course general information with translations.
     properties:
       courseCode:
-        $ref: '#/definitions/CourseCode'
+        $ref: "#/definitions/CourseCode"
       minCredits:
-        $ref: '#/definitions/MinCredits'
+        $ref: "#/definitions/MinCredits"
       maxCredits:
-        $ref: '#/definitions/MaxCredits'
+        $ref: "#/definitions/MaxCredits"
       department:
-        $ref: '#/definitions/LocalizedString'
+        $ref: "#/definitions/LocalizedString"
       name:
-        $ref: '#/definitions/LocalizedString'
+        $ref: "#/definitions/LocalizedString"
       gradingScale:
-        $ref: '#/definitions/GradingScale'
+        $ref: "#/definitions/GradingScale"
       languageOfInstruction:
-        $ref: '#/definitions/LanguageOfInstruction'
+        $ref: "#/definitions/LanguageOfInstruction"
       teachersInCharge:
         type: array
         items:
-          $ref: '#/definitions/UserEmail'
+          $ref: "#/definitions/UserEmail"
       assistants:
         type: array
         items:
           type: object
           properties:
             email:
-              $ref: '#/definitions/UserEmail'
+              $ref: "#/definitions/UserEmail"
             expiryDate:
-              $ref: '#/definitions/NullableAssistantExpiryDate'
+              $ref: "#/definitions/NullableAssistantExpiryDate"
     required:
       - courseCode
       - minCredits
@@ -148,65 +148,65 @@ definitions:
     description: Course general information with translations.
     properties:
       courseCode:
-        $ref: '#/definitions/CourseCode'
+        $ref: "#/definitions/CourseCode"
       minCredits:
-        $ref: '#/definitions/MinCredits'
+        $ref: "#/definitions/MinCredits"
       maxCredits:
-        $ref: '#/definitions/MaxCredits'
+        $ref: "#/definitions/MaxCredits"
       department:
-        $ref: '#/definitions/LocalizedString'
+        $ref: "#/definitions/LocalizedString"
       name:
-        $ref: '#/definitions/LocalizedString'
+        $ref: "#/definitions/LocalizedString"
       gradingScale:
-        $ref: '#/definitions/GradingScale'
+        $ref: "#/definitions/GradingScale"
       languageOfInstruction:
-        $ref: '#/definitions/LanguageOfInstruction'
+        $ref: "#/definitions/LanguageOfInstruction"
       teachersInCharge:
         type: array
         items:
-          $ref: '#/definitions/UserEmail'
+          $ref: "#/definitions/UserEmail"
       assistants:
         type: array
         items:
           type: object
           properties:
             email:
-              $ref: '#/definitions/UserEmail'
+              $ref: "#/definitions/UserEmail"
             expiryDate:
-              $ref: '#/definitions/NullableAssistantExpiryDate'
+              $ref: "#/definitions/NullableAssistantExpiryDate"
 
   CourseDataWithFinalGrades:
     type: object
     description: Course general information with translations and final grades of a user.
     properties:
       id:
-        $ref: '#/definitions/CourseId'
+        $ref: "#/definitions/CourseId"
       courseCode:
-        $ref: '#/definitions/CourseCode'
+        $ref: "#/definitions/CourseCode"
       minCredits:
-        $ref: '#/definitions/MinCredits'
+        $ref: "#/definitions/MinCredits"
       maxCredits:
-        $ref: '#/definitions/MaxCredits'
+        $ref: "#/definitions/MaxCredits"
       department:
-        $ref: '#/definitions/LocalizedString'
+        $ref: "#/definitions/LocalizedString"
       name:
-        $ref: '#/definitions/LocalizedString'
+        $ref: "#/definitions/LocalizedString"
       gradingScale:
-        $ref: '#/definitions/GradingScale'
+        $ref: "#/definitions/GradingScale"
       languageOfInstruction:
-        $ref: '#/definitions/LanguageOfInstruction'
+        $ref: "#/definitions/LanguageOfInstruction"
       teachersInCharge:
         type: array
         items:
-          $ref: '#/definitions/TeacherData'
+          $ref: "#/definitions/TeacherData"
       assistants:
         type: array
         items:
-          $ref: '#/definitions/TeacherData'
+          $ref: "#/definitions/TeacherData"
       finalGrades:
         type: array
         items:
-          $ref: '#/definitions/FinalGradeData'
+          $ref: "#/definitions/FinalGradeData"
     required:
       - id
       - courseCode
@@ -234,11 +234,11 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/CourseData'
+                $ref: "#/definitions/CourseData"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
     security:
       - cookieAuth: []
   post:
@@ -250,30 +250,30 @@ definitions:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/NewCourseData'
+            $ref: "#/definitions/NewCourseData"
     responses:
       201:
         description: Course created.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/CourseId'
+              $ref: "#/definitions/CourseId"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
       422:
         description: Duplicate emails found.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/Error'
+              $ref: "#/definitions/Error"
     security:
       - cookieAuth: []
 
@@ -282,7 +282,7 @@ definitions:
     tags: [Course]
     description: Get course information.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     responses:
       200:
         description: >
@@ -291,15 +291,15 @@ definitions:
         content:
           application/json:
             schema:
-              $ref: '#/definitions/CourseData'
+              $ref: "#/definitions/CourseData"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []
   put:
@@ -308,30 +308,30 @@ definitions:
       Edit an existing course.
       Available only to admin users.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/EditCourseData'
+            $ref: "#/definitions/EditCourseData"
     responses:
       200:
         description: Course Edited.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
       422:
         description: Duplicate emails found.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/Error'
+              $ref: "#/definitions/Error"
     security:
       - cookieAuth: []

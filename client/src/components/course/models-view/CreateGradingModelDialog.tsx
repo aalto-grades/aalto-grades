@@ -69,7 +69,7 @@ const CreateGradingModelDialog = ({
         },
       },
       {
-        onSuccess: id => {
+        onSuccess: (id) => {
           onClose();
           onSubmit(id);
           setName('');

@@ -76,10 +76,10 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
 
     if (!aplusGrades.data) {
       setAplusTokenDialogOpen(
-        !getToken() ||
-          (aplusGrades.isError &&
-            aplusGrades.error.message.includes('502') &&
-            aplusGrades.error.message.includes('401'))
+        !getToken()
+        || (aplusGrades.isError
+          && aplusGrades.error.message.includes('502')
+          && aplusGrades.error.message.includes('401'))
       );
     } else if (aplusGrades.data.length === 0) {
       enqueueSnackbar(t('course.parts.no-aplus-grades'), {
@@ -136,7 +136,7 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
               <FormGroup>
                 {courseTasks.data
                   ?.filter(task => task.aplusGradeSources.length > 0)
-                  .map(task => {
+                  .map((task) => {
                     const partName = coursePartNames[task.coursePartId];
                     const coursePartString = partName ? `${partName} -> ` : '';
                     return (

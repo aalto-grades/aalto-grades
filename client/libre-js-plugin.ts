@@ -8475,10 +8475,10 @@ type LicenseInfo = {
 
 type DependencyLicenseInfo =
   | {
-      left: DependencyLicenseInfo;
-      conjunction: 'and' | 'or';
-      right: DependencyLicenseInfo;
-    }
+    left: DependencyLicenseInfo;
+    conjunction: 'and' | 'or';
+    right: DependencyLicenseInfo;
+  }
   | LicenseInfo
   | undefined;
 
@@ -8525,9 +8525,9 @@ const transform = (
   const spdxToLibreJsId: {[key: string]: string | undefined} = {
     'AGPL-3.0-only': 'AGPL-3.0',
     'AGPL-3.0-or-later': 'AGPL-3.0',
-    'MIT': 'Expat', // prettier-ignore
+    MIT: 'Expat',
     'BSD-2-Clause-FreeBSD': 'FreeBSD',
-    'FSFAP': 'GNU-All-Permissive', // prettier-ignore
+    FSFAP: 'GNU-All-Permissive',
     'GPL-2.0-only': 'GPL-2.0',
     'GPL-2.0-or-later': 'GPL-2.0',
     'GPL-3.0-only': 'GPL-3.0',
@@ -8596,7 +8596,7 @@ const makeLicenseList = async (
   ).data;
 
   const spdxInfoList: LicenseInfo[] = spdxList.licenses
-    .map(val => {
+    .map((val) => {
       const type =
         val.isFsfLibre === undefined
           ? val.isOsiApproved
@@ -8674,9 +8674,9 @@ const validateLicense = (
 
     if (!expr) {
       return raiseError(
-        `Dependency ${dependency.name} has an unrecognized license: ${dependency.license}. ` +
-          'If this is a free software license, add it as an alias to the licenseAliases property, ' +
-          'otherwise this dependency MUST be removed.'
+        `Dependency ${dependency.name} has an unrecognized license: ${dependency.license}. `
+        + 'If this is a free software license, add it as an alias to the licenseAliases property, '
+        + 'otherwise this dependency MUST be removed.'
       );
     }
 
@@ -8686,20 +8686,20 @@ const validateLicense = (
           return [expr];
         case LicenseType.NonFree:
           return raiseError(
-            `Dependency ${dependency.name} has a NON-FREE license: ${expr.id}. ` +
-              'This dependency MUST be removed.'
+            `Dependency ${dependency.name} has a NON-FREE license: ${expr.id}. `
+            + 'This dependency MUST be removed.'
           );
         case LicenseType.OpenSource:
           return raiseError(
-            `Dependency ${dependency.name} has an open source license: ${expr.id}. ` +
-              'If this is a free software license, add it as exception to the licenseExceptions property, ' +
-              'otherwise this dependency MUST be removed.'
+            `Dependency ${dependency.name} has an open source license: ${expr.id}. `
+            + 'If this is a free software license, add it as exception to the licenseExceptions property, '
+            + 'otherwise this dependency MUST be removed.'
           );
         case LicenseType.Unknown:
           return raiseError(
-            `Dependency ${dependency.name} has an unknown license: ${expr.id}. ` +
-              'If this is a free software license, add it as exception to the licenseExceptions property, ' +
-              'otherwise this dependency MUST be removed.'
+            `Dependency ${dependency.name} has an unknown license: ${expr.id}. `
+            + 'If this is a free software license, add it as exception to the licenseExceptions property, '
+            + 'otherwise this dependency MUST be removed.'
           );
       }
     }
@@ -8773,8 +8773,8 @@ const libreJs = ({
 
           for (const info of infoList) {
             if (
-              !webLabelsList.find(val => val.id === info.id) &&
-              info.id !== transform(licenseAliases, projectLicense)
+              !webLabelsList.find(val => val.id === info.id)
+              && info.id !== transform(licenseAliases, projectLicense)
             ) {
               webLabelsList.push(info);
             }

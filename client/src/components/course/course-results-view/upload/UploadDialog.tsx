@@ -11,7 +11,7 @@ import {
 } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import {enqueueSnackbar} from 'notistack';
-import {useMemo, useState} from 'react';
+import {type JSX, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
@@ -124,8 +124,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
           icon={<Delete />}
           label={t('general.delete')}
           onClick={() =>
-            setRows(oldRows => oldRows.filter(row => row.id !== params.id))
-          }
+            setRows(oldRows => oldRows.filter(row => row.id !== params.id))}
         />,
       ],
     },
@@ -205,7 +204,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     >
       {currentStep === 0 && (
         <UploadDialogSelectCoursePart
-          setCoursePart={newCoursePart => {
+          setCoursePart={(newCoursePart) => {
             setCoursePart(newCoursePart);
             setCurrentStep(1);
             setReady(true);

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import type {Node} from 'reactflow';
+import type {Node} from '@xyflow/react';
 import {z} from 'zod';
 
 export type NumberOrFail = number | 'fail';
@@ -94,7 +94,7 @@ const CustomNodeTypesSchema = z.enum([
 const DropInNodesSchema = CustomNodeTypesSchema.exclude(['sink', 'source']);
 
 const AverageNodeSettingsSchema = z.strictObject({
-  weights: z.record(z.number()),
+  weights: z.record(z.string(), z.number()),
   percentageMode: z.boolean(),
 });
 const MaxNodeSettingsSchema = z.strictObject({
@@ -147,8 +147,8 @@ export const GraphStructureSchema = z.strictObject({
     z.object({
       id: z.string(),
       position: z.object({x: z.number(), y: z.number()}),
-      data: z.object({}),
-      type: CustomNodeTypesSchema.optional(),
+      data: z.record(z.string(), z.any()),
+      type: CustomNodeTypesSchema,
 
       // Will be removed in api
       dragging: z.any().optional(),
@@ -192,7 +192,10 @@ export type FullNodeData = z.infer<typeof FullNodeDataSchema>;
 export type GraphStructure = z.infer<typeof GraphStructureSchema>;
 
 // Types without schemas
-export type TypedNode = Node<object, CustomNodeTypes>;
+// export type TypedNode = Node<NodeData, CustomNodeTypes>;
+export type TypedNode = Node<Record<string, unknown>, CustomNodeTypes> & {
+  type: CustomNodeTypes;
+};
 export type GraphSource = {
   id: number;
   name: string;

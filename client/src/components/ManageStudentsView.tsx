@@ -43,8 +43,8 @@ const ManageStudentsView = (): JSX.Element => {
 
   const changes = useMemo(
     () =>
-      rowSelectionModel.ids.size > 0 ||
-      JSON.stringify(rows) !== JSON.stringify(initRows),
+      rowSelectionModel.ids.size > 0
+      || JSON.stringify(rows) !== JSON.stringify(initRows),
     [initRows, rowSelectionModel.ids.size, rows]
   );
 
@@ -169,7 +169,7 @@ const ManageStudentsView = (): JSX.Element => {
           columns={columns}
           rowHeight={25}
           checkboxSelection
-          onRowSelectionModelChange={newRowSelectionModel => {
+          onRowSelectionModelChange={(newRowSelectionModel) => {
             setRowSelectionModel(newRowSelectionModel);
           }}
           rowSelectionModel={rowSelectionModel}

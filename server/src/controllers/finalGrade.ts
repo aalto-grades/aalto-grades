@@ -150,10 +150,10 @@ export const editFinalGrade: Endpoint<EditFinalGrade, void> = async (
 
   // If final grade is not manual don't allow editing grade/date
   if (
-    finalGrade.gradingModelId !== null &&
-    ((grade !== undefined && grade !== finalGrade.grade) ||
-      (date !== undefined &&
-        date.getTime() !== new Date(finalGrade.date).getTime()))
+    finalGrade.gradingModelId !== null
+    && ((grade !== undefined && grade !== finalGrade.grade)
+      || (date !== undefined
+        && date.getTime() !== new Date(finalGrade.date).getTime()))
   ) {
     throw new ApiError(
       'Cannot edit grade or date of a non-manual final grade',

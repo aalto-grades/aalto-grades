@@ -20,16 +20,16 @@ const CourseRedirect = (): JSX.Element => {
   const gradingModels = useGetAllGradingModels(courseId);
 
   if (
-    courseParts.data === undefined ||
-    courseTasks.data === undefined ||
-    gradingModels.data === undefined
+    courseParts.data === undefined
+    || courseTasks.data === undefined
+    || gradingModels.data === undefined
   )
     return <>{t('general.loading')}</>;
 
   if (
-    courseParts.data.length > 0 &&
-    courseTasks.data.length > 0 &&
-    gradingModels.data.length > 0
+    courseParts.data.length > 0
+    && courseTasks.data.length > 0
+    && gradingModels.data.length > 0
   )
     return <Navigate to={`/${courseId}/course-results`} />;
 

@@ -51,7 +51,7 @@ const Accordion = styled((props: AccordionProps) => (
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary
-    expandIcon={
+    expandIcon={(
       <Box
         sx={{
           width: 24,
@@ -71,7 +71,7 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
           })}
         />
       </Box>
-    }
+    )}
     {...props}
   />
 ))(({theme}) => ({
@@ -106,27 +106,29 @@ const HighlightedText = (
   return (
     <>
       {parts.map((part, index) =>
-        part.toLowerCase() === query.toLowerCase() ? (
-          <span
-            key={index}
-            style={{
-              backgroundColor:
+        part.toLowerCase() === query.toLowerCase()
+          ? (
+              <span
+                key={index}
+                style={{
+                  backgroundColor:
                 theme.palette.mode === 'dark'
                   ? 'rgba(255, 255, 255, 0.16)'
                   : '#dbedff',
-              borderRadius: '1.5px',
-              border:
+                  borderRadius: '1.5px',
+                  border:
                 theme.palette.mode === 'dark'
                   ? '1.5px dotted rgba(255, 255, 255, 0.7)'
                   : '1.5px dotted #484848',
-              padding: '1px 0',
-            }}
-          >
-            {part}
-          </span>
-        ) : (
-          part
-        )
+                  padding: '1px 0',
+                }}
+              >
+                {part}
+              </span>
+            )
+          : (
+              part
+            )
       )}
     </>
   );
@@ -164,10 +166,10 @@ const SisuInstance = ({
 
   const getContent = (content: string | null | undefined): JSX.Element => {
     if (
-      content === null ||
-      !content ||
-      content.length === 0 ||
-      content === '-'
+      content === null
+      || !content
+      || content.length === 0
+      || content === '-'
     ) {
       return <>{t('general.no-content')}</>;
     }
@@ -196,7 +198,7 @@ const SisuInstance = ({
   };
 
   const toggleExpandAll = (): void => {
-    setExpandAll(prev => {
+    setExpandAll((prev) => {
       if (prev) setExpanded(false);
       return !prev;
     });
@@ -227,7 +229,9 @@ const SisuInstance = ({
           >
             <Typography>{HighlightedText(queryString, course.code)}</Typography>
             <Typography sx={{color: 'text.secondary'}}>
-              - {course.organizationName[uiLang]}
+              -
+              {' '}
+              {course.organizationName[uiLang]}
             </Typography>
           </Typography>
           <Typography
@@ -235,7 +239,9 @@ const SisuInstance = ({
             gutterBottom
             sx={{color: 'text.secondary'}}
           >
-            Sisu id: {course.id}
+            Sisu id:
+            {' '}
+            {course.id}
           </Typography>
         </Box>
         <Typography variant="h6" component="div">
@@ -244,14 +250,19 @@ const SisuInstance = ({
         <Typography variant="subtitle2" sx={{color: 'text.secondary', mb: 1}}>
           {otherLanguages.map(lang => (
             <Fragment key={lang}>
-              {lang}: {course.name[lang as keyof LocalizedString]}
+              {lang}
+              :
+              {course.name[lang as keyof LocalizedString]}
               <br />
             </Fragment>
           ))}
         </Typography>
         <Box>
           <Typography variant="h6">
-            <b>{t('course.edit.sisu-search-basic-information')}:</b>
+            <b>
+              {t('course.edit.sisu-search-basic-information')}
+              :
+            </b>
           </Typography>
         </Box>
         <Box
@@ -264,7 +275,8 @@ const SisuInstance = ({
         >
           <Box>
             <Typography variant="subtitle2">
-              {t('course.edit.teachers-in-charge')}:
+              {t('course.edit.teachers-in-charge')}
+              :
             </Typography>
           </Box>
           <Box
@@ -290,26 +302,38 @@ const SisuInstance = ({
         >
           <Box>
             <Typography variant="subtitle2">
-              {t('course.edit.language')}: {getCourseLanguage()}
+              {t('course.edit.language')}
+              :
+              {getCourseLanguage()}
               <br />
-              {t('course.edit.grading-scale')}:{' '}
+              {t('course.edit.grading-scale')}
+              :
+              {' '}
               {getGrading(course.summary.gradingScale[uiLang])}
             </Typography>
           </Box>
           <Divider orientation="vertical" flexItem />
           <Box>
             <Typography variant="subtitle2">
-              {t('course.edit.start-date')}: {course.startDate}
+              {t('course.edit.start-date')}
+              :
+              {course.startDate}
               <br />
-              {t('course.edit.end-date')}: {course.endDate}
+              {t('course.edit.end-date')}
+              :
+              {course.endDate}
             </Typography>
           </Box>
           <Divider orientation="vertical" flexItem />
           <Box>
             <Typography variant="subtitle2">
-              {t('course.edit.min-credits')}: {course.credits.min}
+              {t('course.edit.min-credits')}
+              :
+              {course.credits.min}
               <br />
-              {t('course.edit.max-credits')}: {course.credits.max}
+              {t('course.edit.max-credits')}
+              :
+              {course.credits.max}
             </Typography>
           </Box>
         </Box>

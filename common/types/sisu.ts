@@ -11,11 +11,18 @@ const CourseUnitSchema = z.object({
   credits: z.union([z.string(), z.number(), z.null()]),
 });
 
+const StudySubGroupSchema = z.object({
+  id: z.string(),
+  name: LocalizedStringSchema,
+  type: LocalizedStringSchema,
+});
+
 const OrganizationSchema = z.object({
   organisationId: z.string(),
   educationalInstitutionUrn: z.union([z.string(), z.null()]),
   roleUrn: z.string(),
   share: z.number(),
+  validityPeriod: z.record(z.string(), z.unknown()),
 });
 
 export const SisuCourseInstanceSchema = z.object({
@@ -32,12 +39,13 @@ export const SisuCourseInstanceSchema = z.object({
     literature: z.union([LocalizedStringSchema.partial(), z.null()]),
     languageOfInstruction: LocalizedStringSchema,
     registration: LocalizedStringSchema,
+    homepage: z.record(z.string(), z.unknown()),
     content: LocalizedStringSchema,
     cefrLevel: z.string(),
     level: LocalizedStringSchema,
     teacherInCharge: z.array(z.string()),
     assesmentMethods: LocalizedStringSchema,
-    substitutes: z.strictObject({
+    substitutes: z.object({
       ...LocalizedStringSchema.shape,
       courseUnits: z.union([z.array(z.array(CourseUnitSchema)), z.null()]),
     }),
@@ -58,10 +66,11 @@ export const SisuCourseInstanceSchema = z.object({
   enrolmentStartDate: z.union([z.string(), z.null()]),
   enrolmentEndDate: z.union([z.string(), z.null()]),
   mincredits: z.string(),
+  studySubGroups: z.array(StudySubGroupSchema),
 });
 
 export const SisuErrorSchema = z.object({
-  error: z.strictObject({
+  error: z.object({
     code: z.number(),
     message: z.string(),
   }),

@@ -22,5 +22,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["vite.config.mts", "translation-utils.ts"]
+  "include": ["vite.config.mts", "translation-utils.ts","libre-js-plugin.ts"]
 }

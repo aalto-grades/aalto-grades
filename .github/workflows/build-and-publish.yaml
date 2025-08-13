@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 ---
 name: Image Creation
-on: # yamllint disable-line rule:truthy
+on:
   workflow_call:
     inputs:
       registry:

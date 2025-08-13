@@ -88,7 +88,7 @@ const SelectAplusGradeSources = ({
         <AccordionDetails>
           <FormControlLabel
             label={t('general.full-points')}
-            control={
+            control={(
               <Checkbox
                 checked={isChecked(fullPoints)}
                 onChange={e =>
@@ -97,10 +97,9 @@ const SelectAplusGradeSources = ({
                     `[${aplusCourse.name}] ${t('general.full-points')}`,
                     aplusExerciseData.data.maxGrade,
                     fullPoints
-                  )
-                }
+                  )}
               />
-            }
+            )}
           />
         </AccordionDetails>
       </Accordion>
@@ -114,7 +113,7 @@ const SelectAplusGradeSources = ({
               <FormControlLabel
                 key={module.id}
                 label={module.name}
-                control={
+                control={(
                   <Checkbox
                     checked={isChecked(moduleSource)}
                     onChange={e =>
@@ -123,10 +122,9 @@ const SelectAplusGradeSources = ({
                         `[${aplusCourse.name}] ${t('general.module')}: ${module.name}`,
                         module.maxGrade,
                         moduleSource
-                      )
-                    }
+                      )}
                   />
-                }
+                )}
               />
             ))}
           </FormGroup>
@@ -142,7 +140,7 @@ const SelectAplusGradeSources = ({
               <FormControlLabel
                 key={exercise.id}
                 label={exercise.name}
-                control={
+                control={(
                   <Checkbox
                     checked={isChecked(exerciseSource)}
                     onChange={e =>
@@ -151,10 +149,9 @@ const SelectAplusGradeSources = ({
                         `[${aplusCourse.name}] ${t('general.exercise')}: ${exercise.name}`,
                         exercise.maxGrade,
                         exerciseSource
-                      )
-                    }
+                      )}
                   />
-                }
+                )}
               />
             ))}
           </FormGroup>
@@ -171,7 +168,7 @@ const SelectAplusGradeSources = ({
                 <FormControlLabel
                   key={difficulty.difficulty}
                   label={difficulty.difficulty}
-                  control={
+                  control={(
                     <Checkbox
                       checked={isChecked(difficultySource)}
                       onChange={e =>
@@ -180,10 +177,9 @@ const SelectAplusGradeSources = ({
                           `[${aplusCourse.name}] ${t('general.difficulty')}: ${difficulty.difficulty}`,
                           difficulty.maxGrade,
                           difficultySource
-                        )
-                      }
+                        )}
                     />
-                  }
+                  )}
                 />
               ))}
             </FormGroup>

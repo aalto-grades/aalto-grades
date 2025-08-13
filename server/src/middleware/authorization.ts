@@ -61,8 +61,8 @@ export const courseAuthorization = (
         req.user as JwtClaims
       );
       if (
-        courseRole.role === CourseRoleType.Assistant &&
-        courseRole.expiryDate
+        courseRole.role === CourseRoleType.Assistant
+        && courseRole.expiryDate
       ) {
         const currentDate = new Date();
         const expiryDate = new Date(courseRole.expiryDate);

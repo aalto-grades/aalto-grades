@@ -176,34 +176,34 @@ const CreateCourseDialog = ({
   });
 
   const validationSchema = z
-    .object({
+    .strictObject({
       courseCode: z
         .string({
-          required_error: t('course.edit.course-code-required'),
+          error: t('course.edit.course-code-required'),
         })
         .min(1, t('course.edit.course-code-required')),
       minCredits: z
         .number({
-          required_error: t('course.edit.min-credits-required'),
+          error: t('course.edit.min-credits-required'),
         })
         .min(0, t('course.edit.min-credits-negative')),
       maxCredits: z.number({
-        required_error: t('course.edit.max-credits-required'),
+        error: t('course.edit.max-credits-required'),
       }),
       gradingScale: GradingScaleSchema,
       languageOfInstruction: LanguageSchema,
       teacherEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
       assistantEmail: z.union([z.literal(''), AaltoEmailSchema.optional()]),
       assistantExpiryDate: z.string().or(z.date().nullable()),
-      department: z.nativeEnum(Department),
+      department: z.enum(Department),
       nameEn: z
-        .string({required_error: t('course.edit.name-english')})
+        .string({error: t('course.edit.name-english')})
         .min(1, t('course.edit.name-english')),
       nameFi: z
-        .string({required_error: t('course.edit.name-finnish')})
+        .string({error: t('course.edit.name-finnish')})
         .min(1, t('course.edit.name-finnish')),
       nameSv: z
-        .string({required_error: t('course.edit.name-swedish')})
+        .string({error: t('course.edit.name-swedish')})
         .min(1, t('course.edit.name-swedish')),
     })
     .refine(val => val.maxCredits >= val.minCredits, {
@@ -212,7 +212,7 @@ const CreateCourseDialog = ({
     });
 
   const AssistantValidationSchema = z.strictObject({
-    email: z.string().email(),
+    email: z.email(),
     expiryDate: nullableDateSchema(t),
   });
 
@@ -230,7 +230,7 @@ const CreateCourseDialog = ({
     validateOnChange: true,
     initialValues,
     validate: withZodSchema(validationSchema),
-    onSubmit: values => {
+    onSubmit: (values) => {
       const courseData: NewCourseData = {
         courseCode: values.courseCode,
         minCredits: values.minCredits,
@@ -248,7 +248,7 @@ const CreateCourseDialog = ({
       };
 
       addCourse.mutate(courseData, {
-        onSuccess: newCourseId => {
+        onSuccess: (newCourseId) => {
           navigate(`/${newCourseId}`);
         },
         onError: () => form.setSubmitting(false),
@@ -484,16 +484,16 @@ const CreateCourseDialog = ({
               margin="normal"
               slotProps={{inputLabel: {shrink: true}}}
               helperText={
-                form.errors.teacherEmail ??
-                (teachersInCharge.length === 0
+                form.errors.teacherEmail
+                ?? (teachersInCharge.length === 0
                   ? t('course.edit.input-at-least-one-teacher')
                   : teachersInCharge.includes(form.values.teacherEmail)
                     ? t('course.edit.email-in-list')
                     : t('course.edit.add-teacher-emails'))
               }
               error={
-                form.touched.teacherEmail &&
-                form.errors.teacherEmail !== undefined
+                form.touched.teacherEmail
+                && form.errors.teacherEmail !== undefined
               }
               onChange={form.handleChange}
             />
@@ -501,12 +501,12 @@ const CreateCourseDialog = ({
               variant="outlined"
               startIcon={<PersonAddAlt1Icon />}
               disabled={
-                form.errors.teacherEmail !== undefined ||
-                form.values.teacherEmail.length === 0 ||
-                teachersInCharge.includes(form.values.teacherEmail) ||
-                form.isSubmitting ||
-                isLoading ||
-                isFetching
+                form.errors.teacherEmail !== undefined
+                || form.values.teacherEmail.length === 0
+                || teachersInCharge.includes(form.values.teacherEmail)
+                || form.isSubmitting
+                || isLoading
+                || isFetching
               }
               onClick={async () => validateTeacher(form.values.teacherEmail)}
               sx={{mt: 1}}
@@ -514,60 +514,62 @@ const CreateCourseDialog = ({
               {t('general.add')}
             </Button>
             <Box sx={{mt: 3, mb: 2}}>
-              {teachersInCharge.length === 0 ? (
-                t('course.edit.add-at-least-one-teacher')
-              ) : (
-                <List dense>
-                  {teachersInCharge.map(teacherEmail => (
-                    <ListItem
-                      key={teacherEmail}
-                      sx={{
-                        display: 'flex',
-                        gap: 2,
-                        justifyContent: 'space-between',
-                        justifyItems: 'start',
-                        flexDirection: {xs: 'column', sm: 'row'},
-                      }}
-                      secondaryAction={
-                        teacherEmail !== auth?.email && (
-                          <IconButton
-                            edge="end"
-                            disabled={
-                              form.isSubmitting || teacherEmail === auth?.email
-                            }
-                            aria-label="delete"
-                            onClick={() => removeTeacher(teacherEmail)}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        )
-                      }
-                    >
-                      <Box sx={{display: 'flex'}}>
-                        <ListItemAvatar>
-                          <Avatar>
-                            <PersonIcon />
-                          </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText primary={teacherEmail} />
-                      </Box>
-                      <Box>
-                        {nonExistingEmails.has(teacherEmail) && (
-                          <Alert
-                            severity="warning"
-                            sx={{width: {xs: '90%', sm: '80%'}}}
-                          >
-                            {t('course.edit.user-not-exist')}
-                          </Alert>
-                        )}
-                        <Divider
-                          sx={{my: 1, display: {xs: 'block', sm: 'none'}}}
-                        />
-                      </Box>
-                    </ListItem>
-                  ))}
-                </List>
-              )}
+              {teachersInCharge.length === 0
+                ? (
+                    t('course.edit.add-at-least-one-teacher')
+                  )
+                : (
+                    <List dense>
+                      {teachersInCharge.map(teacherEmail => (
+                        <ListItem
+                          key={teacherEmail}
+                          sx={{
+                            display: 'flex',
+                            gap: 2,
+                            justifyContent: 'space-between',
+                            justifyItems: 'start',
+                            flexDirection: {xs: 'column', sm: 'row'},
+                          }}
+                          secondaryAction={
+                            teacherEmail !== auth?.email && (
+                              <IconButton
+                                edge="end"
+                                disabled={
+                                  form.isSubmitting || teacherEmail === auth?.email
+                                }
+                                aria-label="delete"
+                                onClick={() => removeTeacher(teacherEmail)}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            )
+                          }
+                        >
+                          <Box sx={{display: 'flex'}}>
+                            <ListItemAvatar>
+                              <Avatar>
+                                <PersonIcon />
+                              </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText primary={teacherEmail} />
+                          </Box>
+                          <Box>
+                            {nonExistingEmails.has(teacherEmail) && (
+                              <Alert
+                                severity="warning"
+                                sx={{width: {xs: '90%', sm: '80%'}}}
+                              >
+                                {t('course.edit.user-not-exist')}
+                              </Alert>
+                            )}
+                            <Divider
+                              sx={{my: 1, display: {xs: 'block', sm: 'none'}}}
+                            />
+                          </Box>
+                        </ListItem>
+                      ))}
+                    </List>
+                  )}
             </Box>
             <TextField
               id="assistantEmail" // Must be in camelCase to match data
@@ -579,18 +581,18 @@ const CreateCourseDialog = ({
               margin="normal"
               slotProps={{inputLabel: {shrink: true}}}
               helperText={
-                form.errors.assistantEmail ??
-                (assistants.length === 0
+                form.errors.assistantEmail
+                ?? (assistants.length === 0
                   ? t('course.edit.input-at-least-one-assistant')
                   : assistants
-                        .map(assistant => assistant.email)
-                        .includes(form.values.assistantEmail)
+                    .map(assistant => assistant.email)
+                    .includes(form.values.assistantEmail)
                     ? t('course.edit.email-in-list')
                     : t('course.edit.add-assistant-emails'))
               }
               error={
-                form.touched.assistantEmail &&
-                form.errors.assistantEmail !== undefined
+                form.touched.assistantEmail
+                && form.errors.assistantEmail !== undefined
               }
               onChange={form.handleChange}
             />
@@ -609,14 +611,14 @@ const CreateCourseDialog = ({
               variant="outlined"
               startIcon={<PersonAddAlt1Icon />}
               disabled={
-                form.errors.assistantEmail !== undefined ||
-                form.values.assistantEmail.length === 0 ||
-                assistants
+                form.errors.assistantEmail !== undefined
+                || form.values.assistantEmail.length === 0
+                || assistants
                   .map(assistant => assistant.email)
-                  .includes(form.values.assistantEmail) ||
-                form.isSubmitting ||
-                isLoading ||
-                isFetching
+                  .includes(form.values.assistantEmail)
+                  || form.isSubmitting
+                  || isLoading
+                  || isFetching
               }
               onClick={async () => {
                 const assistantEmail = form.values.assistantEmail;
@@ -648,90 +650,92 @@ const CreateCourseDialog = ({
               {t('general.add')}
             </Button>
             <Box sx={{mt: 3, mb: 2}}>
-              {assistants.length === 0 ? (
-                t('course.edit.no-assistants')
-              ) : (
-                <List dense>
-                  {assistants.map((assistant: AssistantData) => (
-                    <ListItem
-                      key={assistant.email}
-                      sx={{
-                        display: 'flex',
-                        gap: 2,
-                        justifyContent: 'space-between',
-                        justifyItems: 'start',
-                        flexDirection: {xs: 'column', sm: 'row'},
-                      }}
-                      secondaryAction={
-                        <IconButton
-                          edge="end"
-                          disabled={form.isSubmitting}
-                          aria-label="delete"
-                          onClick={(): void => {
-                            removeAssistant(assistant);
+              {assistants.length === 0
+                ? (
+                    t('course.edit.no-assistants')
+                  )
+                : (
+                    <List dense>
+                      {assistants.map((assistant: AssistantData) => (
+                        <ListItem
+                          key={assistant.email}
+                          sx={{
+                            display: 'flex',
+                            gap: 2,
+                            justifyContent: 'space-between',
+                            justifyItems: 'start',
+                            flexDirection: {xs: 'column', sm: 'row'},
                           }}
+                          secondaryAction={(
+                            <IconButton
+                              edge="end"
+                              disabled={form.isSubmitting}
+                              aria-label="delete"
+                              onClick={(): void => {
+                                removeAssistant(assistant);
+                              }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          )}
                         >
-                          <DeleteIcon />
-                        </IconButton>
-                      }
-                    >
-                      <Box sx={{display: 'flex'}}>
-                        <ListItemAvatar>
-                          <Avatar>
-                            <PersonIcon />
-                          </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText primary={assistant.email} />
-                      </Box>
-                      <Box>
-                        {assistant.expiryDate && (
-                          <Box sx={{display: 'flex', justifyContent: 'start'}}>
-                            <Box>
-                              <ListItemText
-                                secondary={t(
-                                  'course.edit.assistant-expiry-date-info',
-                                  {
-                                    expiryDate: assistant.expiryDate
-                                      .toISOString()
-                                      .slice(0, 10),
-                                  }
-                                )}
-                                sx={{
-                                  marginRight: '0.5em',
-                                }}
-                              />
-                            </Box>
-                            <Box>
-                              <Tooltip
-                                placement="top"
-                                title={t(
-                                  'course.edit.assistant-expiry-date-change'
-                                )}
-                              >
-                                <ListItemIcon>
-                                  <HelpOutlined
+                          <Box sx={{display: 'flex'}}>
+                            <ListItemAvatar>
+                              <Avatar>
+                                <PersonIcon />
+                              </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText primary={assistant.email} />
+                          </Box>
+                          <Box>
+                            {assistant.expiryDate && (
+                              <Box sx={{display: 'flex', justifyContent: 'start'}}>
+                                <Box>
+                                  <ListItemText
+                                    secondary={t(
+                                      'course.edit.assistant-expiry-date-info',
+                                      {
+                                        expiryDate: assistant.expiryDate
+                                          .toISOString()
+                                          .slice(0, 10),
+                                      }
+                                    )}
                                     sx={{
-                                      width: '0.6em',
+                                      marginRight: '0.5em',
                                     }}
                                   />
-                                </ListItemIcon>
-                              </Tooltip>
-                            </Box>
+                                </Box>
+                                <Box>
+                                  <Tooltip
+                                    placement="top"
+                                    title={t(
+                                      'course.edit.assistant-expiry-date-change'
+                                    )}
+                                  >
+                                    <ListItemIcon>
+                                      <HelpOutlined
+                                        sx={{
+                                          width: '0.6em',
+                                        }}
+                                      />
+                                    </ListItemIcon>
+                                  </Tooltip>
+                                </Box>
+                              </Box>
+                            )}
+                            {nonExistingEmails.has(assistant.email) && (
+                              <Alert severity="warning">
+                                {t('course.edit.user-not-exist')}
+                              </Alert>
+                            )}
+                            <Divider
+                              sx={{my: 1, display: {xs: 'block', sm: 'none'}}}
+                            />
                           </Box>
-                        )}
-                        {nonExistingEmails.has(assistant.email) && (
-                          <Alert severity="warning">
-                            {t('course.edit.user-not-exist')}
-                          </Alert>
-                        )}
-                        <Divider
-                          sx={{my: 1, display: {xs: 'block', sm: 'none'}}}
-                        />
-                      </Box>
-                    </ListItem>
-                  ))}
-                </List>
-              )}
+                        </ListItem>
+                      ))}
+                    </List>
+                  )}
             </Box>
           </DialogContent>
           <DialogActions>

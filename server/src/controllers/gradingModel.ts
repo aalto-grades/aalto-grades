@@ -196,8 +196,8 @@ export const deleteGradingModel: Endpoint<void, void> = async (req, res) => {
   } catch (error) {
     // Catch deletion of grading model with final grades
     if (
-      error instanceof ForeignKeyConstraintError &&
-      error.index === 'final_grade_grading_model_id_fkey'
+      error instanceof ForeignKeyConstraintError
+      && error.index === 'final_grade_grading_model_id_fkey'
     ) {
       throw new ApiError(
         'Tried to delete grading model with final grades',

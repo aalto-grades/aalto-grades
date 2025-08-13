@@ -15,7 +15,8 @@
     "esModuleInterop": true,
     "lib": ["es2022"],
     "strict": true,
-    "target": "es6"
+    "target": "es6",
+    "skipLibCheck": true, // Avoid error with old dependency saml-passport, hoepfully will be fixed in the future
   },
   "exclude": ["node_modules"],
   "include": ["src/**/*", "test/**/*", "jest.config.ts"]

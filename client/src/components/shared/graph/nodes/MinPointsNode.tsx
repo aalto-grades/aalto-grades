@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {Handle, type NodeProps, Position} from '@xyflow/react';
 import {type ChangeEvent, type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Handle, type NodeProps, Position} from 'reactflow';
 
 import type {MinPointsNodeSettings, MinPointsNodeValue} from '@/common/types';
 import OutputValue from '@/components/shared/graph/nodes/parts/OutputValue';
@@ -77,7 +77,7 @@ const MinPointsNode = (props: NodeProps): JSX.Element => {
       />
 
       <div>
-        <label>{t('shared.graph.min-points')}: </label>
+        <label>{t('shared.graph.min-points') + ':'}</label>
         <input
           style={{width: '70px'}}
           onChange={handleChange}
@@ -86,7 +86,7 @@ const MinPointsNode = (props: NodeProps): JSX.Element => {
         />
       </div>
       <div style={{textAlign: 'left'}}>
-        <label>{t('shared.graph.on-fail')}: </label>
+        <label>{t('shared.graph.on-fail') + ':'}</label>
         <select
           onChange={handleSelectChange}
           value={localSettings.onFailSetting}

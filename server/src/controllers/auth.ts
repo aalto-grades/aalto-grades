@@ -114,8 +114,8 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
 
     // Show MFA
     if (
-      user.mfaSecret === null ||
-      (!user.mfaConfirmed && req.body.otp === null)
+      user.mfaSecret === null
+      || (!user.mfaConfirmed && req.body.otp === null)
     ) {
       return res.json({status: 'showMfa', otpAuth});
     }
@@ -126,8 +126,8 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
     }
 
     if (
-      NODE_ENV !== 'development' &&
-      !authenticator.verify({
+      NODE_ENV !== 'development'
+      && !authenticator.verify({
         token: req.body.otp,
         secret: user.mfaSecret as string,
       })
@@ -208,7 +208,7 @@ export const authResetOwnPassword: SyncEndpoint<ResetOwnPasswordData, void> = (
       const passwordResult = PasswordSchema.safeParse(req.body.newPassword);
       if (!passwordResult.success) {
         return res.status(HttpCode.BadRequest).send({
-          errors: [passwordResult.error.errors[0].message],
+          errors: [passwordResult.error.issues[0].message],
         });
       }
 
@@ -333,8 +333,8 @@ export const confirmMfa: Endpoint<ConfirmMfaData, void> = async (req, res) => {
   }
 
   if (
-    NODE_ENV !== 'development' &&
-    !authenticator.verify({
+    NODE_ENV !== 'development'
+    && !authenticator.verify({
       token: req.body.otp,
       secret: dbUser.mfaSecret as string,
     })
@@ -405,7 +405,7 @@ passport.use(
       usernameField: 'email',
       passwordField: 'password',
     },
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+
     async (
       email: string,
       password: string,
@@ -443,8 +443,9 @@ passport.use(
 
 /** @throws ApiError(401) */
 const useSamlStrategy = async (): Promise<void> => {
-  passport.use('saml', await getSamlStrategy());
+  // Type assertion needed due to Express type incompatibility in @node-saml/passport-saml, maybe update fixes it
+  passport.use('saml', (await getSamlStrategy()) as unknown as passport.Strategy);
 };
 
 // Cannot use top level await so must call separately...
-useSamlStrategy(); // eslint-disable-line @typescript-eslint/no-floating-promises
+useSamlStrategy();

@@ -57,8 +57,8 @@ export const validateCoursePartBelongsToCourse = async (
   // Check that course part belongs to the course.
   if (coursePart.courseId !== courseId) {
     throw new ApiError(
-      `Course part ID ${coursePart.id} ` +
-        `does not belong to the course with ID ${courseId}`,
+      `Course part ID ${coursePart.id} `
+      + `does not belong to the course with ID ${courseId}`,
       HttpCode.Conflict
     );
   }
@@ -81,8 +81,8 @@ export const validateCoursePartPath = async (
   // Check that course part belongs to the course.
   if (coursePart.courseId !== course.id) {
     throw new ApiError(
-      `Course part ID ${coursePart.id} ` +
-        `does not belong to the course with ID ${course.id}`,
+      `Course part ID ${coursePart.id} `
+      + `does not belong to the course with ID ${course.id}`,
       HttpCode.Conflict
     );
   }

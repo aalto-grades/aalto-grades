@@ -159,8 +159,8 @@ export const addAplusGradeSources: Endpoint<
 
     const duplicate = newGradeSources.some(
       source =>
-        source !== newGradeSource &&
-        aplusGradeSourcesEqual(newGradeSource, source)
+        source !== newGradeSource
+        && aplusGradeSourcesEqual(newGradeSource, source)
     );
     if (duplicate) {
       throw new ApiError(
@@ -183,8 +183,8 @@ export const addAplusGradeSources: Endpoint<
     );
     if (existing !== undefined) {
       throw new ApiError(
-        `course task with ID ${existing.courseTaskId} ` +
-          `already has the A+ grade source ${JSON.stringify(existing)}`,
+        `course task with ID ${existing.courseTaskId} `
+        + `already has the A+ grade source ${JSON.stringify(existing)}`,
         HttpCode.Conflict
       );
     }
@@ -213,8 +213,8 @@ export const deleteAplusGradeSource: Endpoint<void, void> = async (
     await aplusGradeSource.destroy();
   } catch (error) {
     if (
-      error instanceof ForeignKeyConstraintError &&
-      error.index === 'task_grade_aplus_grade_source_id_fkey'
+      error instanceof ForeignKeyConstraintError
+      && error.index === 'task_grade_aplus_grade_source_id_fkey'
     ) {
       throw new ApiError(
         'Tried to delete an A+ grade source with grades',
@@ -243,7 +243,7 @@ export const fetchAplusGrades: Endpoint<void, NewTaskGrade[]> = async (
   try {
     courseTaskIds = z
       .array(IdSchema)
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+
       .parse(JSON.parse(String(req.query['course-tasks']))); // This line was giving a typescript error
     // .parse(JSON.parse(JSON.stringify(req.query['course-tasks'])));
   } catch (error) {

@@ -12,28 +12,32 @@ export enum SystemRole {
   Admin = 'ADMIN',
 }
 
-export const SystemRoleSchema = z.nativeEnum(SystemRole);
-export const PasswordSchema = z.string().superRefine((password, ctx) => {
+export const SystemRoleSchema = z.enum(SystemRole);
+export const PasswordSchema = z.string().check((ctx) => {
+  const password = ctx.value;
   const result = zxcvbn(password);
   if (password.length < 12) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+    ctx.issues.push({
+      code: 'custom',
       message: 'Password must be at least 12 characters long',
+      input: ctx.value
     });
   }
 
   if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/.test(password)) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+    ctx.issues.push({
+      code: 'custom',
       message:
         'A password must include at least one upper case character, one lower case character and one numeric',
+      input: ctx.value
     });
   }
 
   if (result.score < 4) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+    ctx.issues.push({
+      code: 'custom',
       message: `Password too weak. (estimated 10^${Math.floor(10 * result.guesses_log10) / 10} <= 10^10 guesses)`,
+      input: ctx.value
     });
   }
 });

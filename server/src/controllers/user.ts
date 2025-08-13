@@ -136,7 +136,7 @@ export const getCoursesOfUser: Endpoint<void, CourseWithFinalGrades[]> = async (
 
     userGrades.push({
       ...parseCourseFull(course),
-      finalGrades: course.FinalGrades.map(finalGrade => {
+      finalGrades: course.FinalGrades.map((finalGrade) => {
         const [finalGradeUser, grader] = validateUserAndGrader(finalGrade);
         return {
           id: finalGrade.id,
@@ -195,8 +195,8 @@ export const getStudents: Endpoint<void, UserData[]> = async (req, res) => {
   const users = new Map<number, UserData>();
   for (const course of courses) {
     const isTeacher =
-      requester.role === SystemRole.Admin ||
-      course.CourseRoles[0].role === CourseRoleType.Teacher;
+      requester.role === SystemRole.Admin
+      || course.CourseRoles[0].role === CourseRoleType.Teacher;
 
     for (const user of course.Users) {
       if (user.CourseRole.role !== CourseRoleType.Student) continue;
@@ -265,7 +265,7 @@ export const addUser: Endpoint<NewUser, NewUserResponse> = async (req, res) => {
   }
 
   // Admin user
-  if (existingUser !== null && existingUser.admin) {
+  if (existingUser?.admin) {
     throw new ApiError(
       `Admin user with email ${email} already exists`,
       HttpCode.Conflict

@@ -49,21 +49,21 @@ definitions:
     description: Grade data.
     properties:
       gradeId:
-        $ref: '#/definitions/TaskGradeId'
+        $ref: "#/definitions/TaskGradeId"
       grader:
-        $ref: '#/definitions/TeacherData'
+        $ref: "#/definitions/TeacherData"
       aplusGradeSource:
         oneOf:
-          - $ref: '#/definitions/AplusGradeSourceData'
-          - type: 'null'
+          - $ref: "#/definitions/AplusGradeSourceData"
+          - type: "null"
       grade:
-        $ref: '#/definitions/TaskGradeGrade'
+        $ref: "#/definitions/TaskGradeGrade"
       date:
-        $ref: '#/definitions/TaskGradeDate'
+        $ref: "#/definitions/TaskGradeDate"
       expiryDate:
-        $ref: '#/definitions/NullableTaskGradeExpiryDate'
+        $ref: "#/definitions/NullableTaskGradeExpiryDate"
       comment:
-        $ref: '#/definitions/NullableTaskGradeComment'
+        $ref: "#/definitions/NullableTaskGradeComment"
     required:
       - gradeId
       - grader
@@ -78,19 +78,19 @@ definitions:
     description: Grade data.
     properties:
       studentNumber:
-        $ref: '#/definitions/StudentNumber'
+        $ref: "#/definitions/StudentNumber"
       courseTaskId:
-        $ref: '#/definitions/CourseTaskId'
+        $ref: "#/definitions/CourseTaskId"
       aplusGradeSourceId:
-        $ref: '#/definitions/NullableAplusGradeSourceId'
+        $ref: "#/definitions/NullableAplusGradeSourceId"
       grade:
-        $ref: '#/definitions/TaskGradeGrade'
+        $ref: "#/definitions/TaskGradeGrade"
       date:
-        $ref: '#/definitions/TaskGradeDate'
+        $ref: "#/definitions/TaskGradeDate"
       expiryDate:
-        $ref: '#/definitions/NullableTaskGradeExpiryDate'
+        $ref: "#/definitions/NullableTaskGradeExpiryDate"
       comment:
-        $ref: '#/definitions/NullableTaskGradeComment'
+        $ref: "#/definitions/NullableTaskGradeComment"
     required:
       - studentNumber
       - courseTaskId
@@ -105,37 +105,37 @@ definitions:
     description: Grade data.
     properties:
       grade:
-        $ref: '#/definitions/TaskGradeGrade'
+        $ref: "#/definitions/TaskGradeGrade"
       date:
-        $ref: '#/definitions/TaskGradeDate'
+        $ref: "#/definitions/TaskGradeDate"
       expiryDate:
-        $ref: '#/definitions/NullableTaskGradeExpiryDate'
+        $ref: "#/definitions/NullableTaskGradeExpiryDate"
       comment:
-        $ref: '#/definitions/NullableTaskGradeComment'
+        $ref: "#/definitions/NullableTaskGradeComment"
 
   StudentRow:
     type: object
-    description:
+    description: Student row
     properties:
       user:
-        $ref: '#/definitions/StudentData'
+        $ref: "#/definitions/StudentData"
       finalGrades:
         type: array
         items:
-          $ref: '#/definitions/FinalGradeData'
+          $ref: "#/definitions/FinalGradeData"
       courseTasks:
         type: array
         items:
           type: object
           properties:
             courseTaskId:
-              $ref: '#/definitions/CourseTaskId'
+              $ref: "#/definitions/CourseTaskId"
             courseTaskName:
-              $ref: '#/definitions/CourseTaskName'
+              $ref: "#/definitions/CourseTaskName"
             grades:
               type: array
               items:
-                $ref: '#/definitions/GradeData'
+                $ref: "#/definitions/GradeData"
 
   LatestGrades:
     type: array
@@ -144,7 +144,7 @@ definitions:
       type: object
       properties:
         userId:
-          $ref: '#/definitions/UserId'
+          $ref: "#/definitions/UserId"
         date:
           type: string
           format: date
@@ -160,40 +160,40 @@ definitions:
     description: Task grade object in task grade database
     properties:
       id:
-        $ref: '#/definitions/TaskGradeId'
+        $ref: "#/definitions/TaskGradeId"
       userId:
-        $ref: '#/definitions/UserId'
+        $ref: "#/definitions/UserId"
       courseTaskId:
-        $ref: '#/definitions/CourseTaskId'
+        $ref: "#/definitions/CourseTaskId"
       graderId:
-        $ref: '#/definitions/UserId'
+        $ref: "#/definitions/UserId"
       aplusGradeSourceId:
-        $ref: '#/definitions/NullableAplusGradeSourceId'
+        $ref: "#/definitions/NullableAplusGradeSourceId"
       grade:
-        $ref: '#/definitions/TaskGradeGrade'
+        $ref: "#/definitions/TaskGradeGrade"
       date:
-        $ref: '#/definitions/TaskGradeDate'
+        $ref: "#/definitions/TaskGradeDate"
       expiryDate:
-        $ref: '#/definitions/NullableTaskGradeExpiryDate'
+        $ref: "#/definitions/NullableTaskGradeExpiryDate"
       comment:
-        $ref: '#/definitions/NullableTaskGradeComment'
+        $ref: "#/definitions/NullableTaskGradeComment"
 
   TaskGradeLog:
     type: object
     description: Log of changes to task grade
     properties:
       id:
-        $ref: '#/definitions/TaskGradeLogId'
+        $ref: "#/definitions/TaskGradeLogId"
       courseTaskId:
-        $ref: '#/definitions/CourseTaskId'
+        $ref: "#/definitions/CourseTaskId"
       actionType:
-        $ref: '#/definitions/ActionType'
+        $ref: "#/definitions/ActionType"
       previousState:
-        $ref: '#/definitions/TaskGrade'
+        $ref: "#/definitions/TaskGrade"
       user:
-        $ref: '#/definitions/StudentData'
+        $ref: "#/definitions/StudentData"
       taskGrade:
-        $ref: '#/definitions/TaskGrade'
+        $ref: "#/definitions/TaskGrade"
     required:
       - id
       - actionType
@@ -206,7 +206,7 @@ definitions:
       Get the grades of all students.
       Available only to admin users and teachers & assistants of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     responses:
       200:
         description: Returns all grades of the course.
@@ -215,15 +215,15 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/StudentRow'
+                $ref: "#/definitions/StudentRow"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []
   post:
@@ -232,27 +232,27 @@ definitions:
       Add new grades to the course.
       Available only to admin users and teachers & assistants of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     requestBody:
       content:
         application/json:
           schema:
             type: array
             items:
-              $ref: '#/definitions/NewGrade'
+              $ref: "#/definitions/NewGrade"
     responses:
       201:
         description: Grades added.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
 
@@ -288,7 +288,7 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/TaskGradeLog'
+                $ref: "#/definitions/TaskGradeLog"
       400:
         description: Invalid user id or task grade id.
         content:
@@ -302,13 +302,11 @@ definitions:
                     type: string
                   description: Error message(s) explaining the error(s).
                   example:
-                    [
-                      "Invalid user id abc"
-                    ]
+                    - Invalid user id abc
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
     security:
       - cookieAuth: []
 
@@ -319,26 +317,26 @@ definitions:
       Edit grade.
       Available only to admin users and teachers & assistants of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
-      - $ref: '#/parameters/gradeId'
+      - $ref: "#/parameters/courseId"
+      - $ref: "#/parameters/gradeId"
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/EditGrade'
+            $ref: "#/definitions/EditGrade"
     responses:
       200:
         description: Grade edited.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
   delete:
@@ -347,21 +345,21 @@ definitions:
       Delete grade.
       Available only to admin users and teachers & assistants of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
-      - $ref: '#/parameters/gradeId'
+      - $ref: "#/parameters/courseId"
+      - $ref: "#/parameters/gradeId"
     responses:
       200:
         description: Grade deleted.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
 
@@ -376,21 +374,21 @@ definitions:
             type: array
             description: User IDs to query.
             items:
-              $ref: '#/definitions/UserId'
+              $ref: "#/definitions/UserId"
     responses:
       200:
         description: The dates of the latest grades for each student.
         content:
           application/json:
             schema:
-              $ref: '#/definitions/LatestGrades'
+              $ref: "#/definitions/LatestGrades"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []

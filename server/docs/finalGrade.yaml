@@ -39,23 +39,23 @@ definitions:
     type: object
     properties:
       finalGradeId:
-        $ref: '#/definitions/FinalGradeId'
+        $ref: "#/definitions/FinalGradeId"
       user:
-        $ref: '#/definitions/StudentData'
+        $ref: "#/definitions/StudentData"
       courseId:
-        $ref: '#/definitions/CourseId'
+        $ref: "#/definitions/CourseId"
       gradingModelId:
-        - $ref: '#/definitions/NullableGradingModelId'
+        - $ref: "#/definitions/NullableGradingModelId"
       grader:
-        $ref: '#/definitions/TeacherData'
+        $ref: "#/definitions/TeacherData"
       grade:
-        $ref: '#/definitions/FinalGrade'
+        $ref: "#/definitions/FinalGrade"
       date:
-        $ref: '#/definitions/FinalGradeDate'
+        $ref: "#/definitions/FinalGradeDate"
       sisuExportDate:
-        $ref: '#/definitions/NullableSisuExportDate'
+        $ref: "#/definitions/NullableSisuExportDate"
       comment:
-        $ref: '#/definitions/NullableFinalGradeComment'
+        $ref: "#/definitions/NullableFinalGradeComment"
     required:
       - finalGradeId
       - user
@@ -71,15 +71,15 @@ definitions:
     type: object
     properties:
       userId:
-        $ref: '#/definitions/UserId'
+        $ref: "#/definitions/UserId"
       gradingModelId:
-        - $ref: '#/definitions/NullableGradingModelId'
+        - $ref: "#/definitions/NullableGradingModelId"
       grade:
-        $ref: '#/definitions/FinalGrade'
+        $ref: "#/definitions/FinalGrade"
       date:
-        $ref: '#/definitions/FinalGradeDate'
+        $ref: "#/definitions/FinalGradeDate"
       comment:
-        $ref: '#/definitions/NullableFinalGradeComment'
+        $ref: "#/definitions/NullableFinalGradeComment"
     required:
       - userId
       - gradingModelId
@@ -91,13 +91,13 @@ definitions:
     type: object
     properties:
       grade:
-        $ref: '#/definitions/FinalGrade'
+        $ref: "#/definitions/FinalGrade"
       date:
-        $ref: '#/definitions/FinalGradeDate'
+        $ref: "#/definitions/FinalGradeDate"
       sisuExportDate:
-        $ref: '#/definitions/NullableSisuExportDate'
+        $ref: "#/definitions/NullableSisuExportDate"
       comment:
-        $ref: '#/definitions/NullableFinalGradeComment'
+        $ref: "#/definitions/NullableFinalGradeComment"
 
   SisuUploadData:
     type: object
@@ -119,7 +119,7 @@ definitions:
         type: array
         description: Student numbers to download csv for.
         items:
-          $ref: '#/definitions/StudentNumber'
+          $ref: "#/definitions/StudentNumber"
     required:
       - assessmentDate
       - completionLanguage
@@ -132,7 +132,7 @@ definitions:
       Get the final grades of all students.
       Available only to admin users and teachers in charge of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     responses:
       200:
         description: Returns all final grades of the course.
@@ -141,15 +141,15 @@ definitions:
             schema:
               type: array
               items:
-                $ref: '#/definitions/FinalGradeData'
+                $ref: "#/definitions/FinalGradeData"
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []
   post:
@@ -158,27 +158,27 @@ definitions:
       Add new final grades to the course.
       Available only to admin users and teachers in charge of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     requestBody:
       content:
         application/json:
           schema:
             type: array
             items:
-              $ref: '#/definitions/NewFinalGrade'
+              $ref: "#/definitions/NewFinalGrade"
     responses:
       201:
         description: Final grades added.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
 
@@ -189,26 +189,26 @@ definitions:
       Edit a final grade.
       Available only to admin users and teachers in charge of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
-      - $ref: '#/parameters/finalGradeId'
+      - $ref: "#/parameters/courseId"
+      - $ref: "#/parameters/finalGradeId"
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/EditFinalGrade'
+            $ref: "#/definitions/EditFinalGrade"
     responses:
       200:
         description: Final grade edited.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
   delete:
@@ -217,21 +217,21 @@ definitions:
       Delete a final grade.
       Available only to admin users and teachers in charge of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
-      - $ref: '#/parameters/finalGradeId'
+      - $ref: "#/parameters/courseId"
+      - $ref: "#/parameters/finalGradeId"
     responses:
       200:
         description: Final grade deleted.
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
       409:
-        $ref: '#/responses/Conflict'
+        $ref: "#/responses/Conflict"
     security:
       - cookieAuth: []
 
@@ -243,12 +243,12 @@ definitions:
       Results can be filtered by student numbers or particular instance ID.
       Available only to admin users and teachers in charge of the course.
     parameters:
-      - $ref: '#/parameters/courseId'
+      - $ref: "#/parameters/courseId"
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '#/definitions/SisuUploadData'
+            $ref: "#/definitions/SisuUploadData"
     responses:
       200:
         description: Sisu formatted CSV.
@@ -264,12 +264,12 @@ definitions:
               545761,5,5,26.5.2023,fi,
               662292,2,5,26.5.2023,fi,
       400:
-        $ref: '#/responses/BadRequest'
+        $ref: "#/responses/BadRequest"
       401:
-        $ref: '#/responses/Unauthorized'
+        $ref: "#/responses/Unauthorized"
       403:
-        $ref: '#/responses/Forbidden'
+        $ref: "#/responses/Forbidden"
       404:
-        $ref: '#/responses/NotFound'
+        $ref: "#/responses/NotFound"
     security:
       - cookieAuth: []

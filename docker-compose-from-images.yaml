@@ -22,7 +22,7 @@ services:
       # ${SERVER_NAME} in the nginx.conf
       - ./reverse-proxy.conf:/etc/nginx/templates/nginx.conf.template
     environment:
-      SERVER_NAME: '${SERVER_NAME}'
+      SERVER_NAME: "${SERVER_NAME}"
     # To automatically recreate proxy container in test server with watchtower
     depends_on:
       - frontend
@@ -40,20 +40,20 @@ services:
     restart: always
     tty: true
     environment:
-      AALTO_GRADES_BACKEND_PORT: '${AALTO_GRADES_BACKEND_PORT}'
-      AALTO_GRADES_FRONTEND_CORS_ORIGIN: '${AALTO_GRADES_FRONTEND_CORS_ORIGIN}'
-      AALTO_GRADES_JWT_SECRET: '${AALTO_GRADES_JWT_SECRET}'
-      APLUS_API_URL: '${APLUS_API_URL}'
-      POSTGRES_URL: 'database'
-      POSTGRES_USER: 'postgres'
-      POSTGRES_DATABASE: 'postgres'
-      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
-      SAML_CALLBACK: '${SAML_CALLBACK}'
-      SAML_ENTRYPOINT: '${SAML_ENTRYPOINT}'
-      SAML_ISSUER: '${SAML_ISSUER}'
-      SAML_METADATA_URL: '${SAML_METADATA_URL}'
-      SISU_API_TOKEN: '${SISU_API_TOKEN}'
-      SISU_API_URL: '${SISU_API_URL}'
+      AALTO_GRADES_BACKEND_PORT: "${AALTO_GRADES_BACKEND_PORT}"
+      AALTO_GRADES_FRONTEND_CORS_ORIGIN: "${AALTO_GRADES_FRONTEND_CORS_ORIGIN}"
+      AALTO_GRADES_JWT_SECRET: "${AALTO_GRADES_JWT_SECRET}"
+      APLUS_API_URL: "${APLUS_API_URL}"
+      POSTGRES_URL: database
+      POSTGRES_USER: postgres
+      POSTGRES_DATABASE: postgres
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      SAML_CALLBACK: "${SAML_CALLBACK}"
+      SAML_ENTRYPOINT: "${SAML_ENTRYPOINT}"
+      SAML_ISSUER: "${SAML_ISSUER}"
+      SAML_METADATA_URL: "${SAML_METADATA_URL}"
+      SISU_API_TOKEN: "${SISU_API_TOKEN}"
+      SISU_API_URL: "${SISU_API_URL}"
     volumes:
       - ${SAML_DECRYPTION_PVK_FILE}:/keys/saml-decryption-key.pem
       - ${SAML_PRIVATE_KEY_FILE}:/keys/saml-private-key.pem
@@ -61,8 +61,8 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: 'tcp://localhost:601'
-        tag: 'aalto-grades'
+        syslog-address: "tcp://localhost:601"
+        tag: aalto-grades
     depends_on:
       - database
 
@@ -71,7 +71,7 @@ services:
     container_name: aalto-grades-database
     restart: always
     environment:
-      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
-      PGDATA: '/var/lib/postgresql/data/pgdata'
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - ${POSTGRES_MOUNTDIR}:/var/lib/postgresql/data

@@ -77,7 +77,7 @@ const CourseTable = ({courses}: PropsType): JSX.Element => {
 
   const filteredCourses = useMemo(
     () =>
-      courses.filter(course => {
+      courses.filter((course) => {
         let courseString = `${course.courseCode} ${course.name.en}`;
         courseString += ` ${getCourseDepartment(course)} ${getCourseRoleString(course)}`;
         return courseString.toLowerCase().includes(searchText.toLowerCase());
@@ -123,62 +123,65 @@ const CourseTable = ({courses}: PropsType): JSX.Element => {
         <TableHead>
           <TableRow>
             {headCells.map(headCell =>
-              headCell.id === 'code' ? (
-                <TableCell key={headCell.id}>
-                  <TableSortLabel active direction="asc">
-                    <Typography sx={{fontWeight: 'bold'}}>
-                      {headCell.label}
-                    </Typography>
-                  </TableSortLabel>
-                </TableCell>
-              ) : (
-                <TableCell key={headCell.id}>
-                  <Typography sx={{fontWeight: 'bold'}}>
-                    {headCell.label}
-                  </Typography>
-                </TableCell>
-              )
+              headCell.id === 'code'
+                ? (
+                    <TableCell key={headCell.id}>
+                      <TableSortLabel active direction="asc">
+                        <Typography sx={{fontWeight: 'bold'}}>
+                          {headCell.label}
+                        </Typography>
+                      </TableSortLabel>
+                    </TableCell>
+                  )
+                : (
+                    <TableCell key={headCell.id}>
+                      <Typography sx={{fontWeight: 'bold'}}>
+                        {headCell.label}
+                      </Typography>
+                    </TableCell>
+                  )
             )}
           </TableRow>
         </TableHead>
         <TableBody>
-          {sortedCourses.length === 0 ? (
-            <TableRow>
-              <TableCell align="center" colSpan={4}>
-                {t('front-page.no-results')}
-              </TableCell>
-            </TableRow>
-          ) : (
-            coursePage.map(course => (
-              <TableRow
-                key={course.id}
-                hover
-                sx={{
-                  cursor: 'pointer',
-                  '&:focus': {backgroundColor: 'rgba(0, 0, 0, 0.04)'},
-                }}
-                role="button"
-                onClick={async () =>
-                  navigate(`/${course.id}`, {
-                    viewTransition: true,
-                  })
-                }
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    navigate(`/${course.id}`, {
-                      viewTransition: true,
-                    });
-                  }
-                }}
-                tabIndex={0}
-              >
-                <TableCell>{course.courseCode}</TableCell>
-                <TableCell>{localize(course.name)}</TableCell>
-                <TableCell>{getCourseDepartment(course)}</TableCell>
-                <TableCell>{getCourseRoleString(course)}</TableCell>
-              </TableRow>
-            ))
-          )}
+          {sortedCourses.length === 0
+            ? (
+                <TableRow>
+                  <TableCell align="center" colSpan={4}>
+                    {t('front-page.no-results')}
+                  </TableCell>
+                </TableRow>
+              )
+            : (
+                coursePage.map(course => (
+                  <TableRow
+                    key={course.id}
+                    hover
+                    sx={{
+                      cursor: 'pointer',
+                      '&:focus': {backgroundColor: 'rgba(0, 0, 0, 0.04)'},
+                    }}
+                    role="button"
+                    onClick={async () =>
+                      navigate(`/${course.id}`, {
+                        viewTransition: true,
+                      })}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        navigate(`/${course.id}`, {
+                          viewTransition: true,
+                        });
+                      }
+                    }}
+                    tabIndex={0}
+                  >
+                    <TableCell>{course.courseCode}</TableCell>
+                    <TableCell>{localize(course.name)}</TableCell>
+                    <TableCell>{getCourseDepartment(course)}</TableCell>
+                    <TableCell>{getCourseRoleString(course)}</TableCell>
+                  </TableRow>
+                ))
+              )}
         </TableBody>
       </Table>
       {sortedCourses.length > coursesPerPage && (

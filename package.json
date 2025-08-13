@@ -1,22 +1,31 @@
 {
-  "name": "aalto-grades",
+  "name": "ossi",
   "version": "1.0.8",
-  "license": "Expat (MIT)",
+  "license": "MIT",
   "author": "The Ossi Developers",
+  "type": "module",
+  "workspaces": [
+    "client",
+    "server",
+    "e2e-tests",
+    "common"
+  ],
   "scripts": {
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
-    "lint-common": "eslint common --ext ts --report-unused-disable-directives",
-    "lint-common:fix": "eslint common --ext ts --report-unused-disable-directives --fix",
-    "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --fix"
+    "lint": "eslint . --report-unused-disable-directives --flag v10_config_lookup_from_file",
+    "lint-common": "eslint common --report-unused-disable-directives --flag v10_config_lookup_from_file",
+    "lint-common:fix": "eslint common --report-unused-disable-directives --fix --flag v10_config_lookup_from_file",
+    "lint:fix": "eslint . --report-unused-disable-directives --fix --flag v10_config_lookup_from_file"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.1.0",
-    "@typescript-eslint/parser": "^8.1.0",
-    "eslint": "^8.57.0",
-    "eslint-import-resolver-typescript": "^3.6.1",
-    "eslint-plugin-import": "^2.29.1",
-    "gts": "^5.2.0",
-    "prettier-plugin-jsdoc": "^1.3.0"
+    "@eslint/compat": "^1.3.2",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.33.0",
+    "@stylistic/eslint-plugin": "^5.2.3",
+    "eslint": "^9.33.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-yml": "^1.18.0",
+    "typescript-eslint": "^8.39.0"
   },
   "engines": {
     "node": ">=20"

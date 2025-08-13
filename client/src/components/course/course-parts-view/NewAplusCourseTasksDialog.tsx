@@ -165,7 +165,7 @@ const NewAplusCourseTasksDialog = ({
                 <SelectAplusCourse
                   aplusCourses={aplusCourses.data}
                   selectedAplusCourse={aplusCourse}
-                  setAplusCourse={course => {
+                  setAplusCourse={(course) => {
                     setAplusCourse(course);
                     if (course) setNewTasks([]);
                   }}

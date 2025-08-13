@@ -39,13 +39,14 @@ const FrontPageView = (): JSX.Element => {
               {t('front-page.your-courses')}
             </Typography>
           </Box>
-          {coursesOfUser.data && coursesOfUser.data.length > 0 ? (
-            <CourseTable courses={coursesOfUser.data} />
-          ) : (
-            <Box sx={{p: 1, mt: 1}}>
-              <Typography>{t('front-page.no-courses')}</Typography>
-            </Box>
-          )}
+          {coursesOfUser.data && coursesOfUser.data.length > 0
+            ? <CourseTable courses={coursesOfUser.data} />
+
+            : (
+                <Box sx={{p: 1, mt: 1}}>
+                  <Typography>{t('front-page.no-courses')}</Typography>
+                </Box>
+              )}
         </>
       )}
 

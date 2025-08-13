@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import express, {Router} from 'express';
-import {processRequestBody} from 'zod-express-middleware';
 
 import {
   CourseRoleType,
@@ -21,6 +20,7 @@ import {handleInvalidRequestJson} from '../middleware';
 import {jwtAuthentication} from '../middleware/authentication';
 import {authorization, courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
+import {processRequestBody} from '../middleware/zodValidation';
 
 export const router = Router();
 

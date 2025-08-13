@@ -144,8 +144,8 @@ const EditGradesDialog = ({
 
   const changes = useMemo(
     () =>
-      JSON.stringify(rows.map(row => ({...row, selected: ''}))) !==
-      JSON.stringify(initRows),
+      JSON.stringify(rows.map(row => ({...row, selected: ''})))
+      !== JSON.stringify(initRows),
     [initRows, rows]
   );
 
@@ -241,8 +241,7 @@ const EditGradesDialog = ({
           icon={<Delete />}
           label={t('general.delete')}
           onClick={() =>
-            setRows(oldRows => oldRows.filter(row => row.id !== params.id))
-          }
+            setRows(oldRows => oldRows.filter(row => row.id !== params.id))}
         />,
       ],
     },
@@ -256,7 +255,7 @@ const EditGradesDialog = ({
 
   const dataGridToolbar = (): JSX.Element => {
     const handleClick = (): void => {
-      setRows(oldRows => {
+      setRows((oldRows) => {
         const freeId = Math.max(0, ...oldRows.map(row => row.id)) + 1;
         const newRow: ColTypes = {
           id: freeId,
@@ -323,8 +322,8 @@ const EditGradesDialog = ({
       } else {
         const newRow = rows.find(row => row.gradeId === initRow.gradeId);
         if (
-          JSON.stringify(newRow, ignoreSelectedColumn) !==
-          JSON.stringify(initRow, ignoreSelectedColumn)
+          JSON.stringify(newRow, ignoreSelectedColumn)
+          !== JSON.stringify(initRow, ignoreSelectedColumn)
         ) {
           editedGrades.push({
             gradeId: newRow!.gradeId,
@@ -361,8 +360,8 @@ const EditGradesDialog = ({
     const diff = newRow.date.getTime() - oldRow.date.getTime(); // Diff to update expiration date with
 
     if (
-      diff !== 0 &&
-      newRow.expiryDate.getTime() === oldRow.expiryDate.getTime()
+      diff !== 0
+      && newRow.expiryDate.getTime() === oldRow.expiryDate.getTime()
     ) {
       newRow.expiryDate = new Date(newRow.expiryDate.getTime() + diff);
     }
@@ -438,8 +437,7 @@ const EditGradesDialog = ({
               onRowEditStart={() => setEditing(true)}
               onRowEditStop={() => setEditing(false)}
               isCellEditable={(params: GridCellParams<ColTypes>) =>
-                !(params.row.aplusGrade && params.field === 'grade')
-              }
+                !(params.row.aplusGrade && params.field === 'grade')}
               processRowUpdate={processRowUpdate as unknown as ProcessRowUpdate}
               onProcessRowUpdateError={(rowError: Error) => {
                 setError(true);

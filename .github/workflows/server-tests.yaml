@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 ---
 name: Server Tests
-on: # yamllint disable-line rule:truthy
+on:
   workflow_call:
+    inputs: {}
 
 jobs:
   server_tests:
@@ -19,15 +20,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
       - name: Docker compose down
         run: docker-compose down --volumes --remove-orphans
       - name: Run database
         run: docker-compose up -d database
       - name: Install dependencies
-        run: npm ci
-      - name: Install common dependencies
-        run: npm --prefix ../common ci
+        run: npm --prefix ../ ci
+      # - name: Install common dependencies
+      #   run: npm --prefix ../common ci
       - name: Build server
         run: npm run build
       - name: Migrate and seed database

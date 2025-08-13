@@ -108,10 +108,8 @@ definitions:
           type: string
         description: Error message(s) explaining the error(s).
         example:
-          [
-            'course with ID 157 not found',
-            'course instance ID must be type of integer',
-          ]
+          - course with ID 157 not found
+          - course instance ID must be type of integer
 
   UnauthorizedError:
     type: object
@@ -131,27 +129,17 @@ definitions:
               type: array
               items: {}
     example:
-      [
-        {
-          'type': 'Body',
-          'errors':
-            {
-              'issues':
-                [
-                  {
-                    'code': 'too_small',
-                    'minimum': 0,
-                    'type': 'number',
-                    'inclusive': true,
-                    'exact': false,
-                    'message': 'Number must be greater than or equal to 0',
-                    'path': ['minCredits'],
-                  },
-                ],
-              'name': 'ZodError',
-            },
-        },
-      ]
+      - type: Body
+        errors:
+          issues:
+            - code: too_small
+              minimum: 0
+              type: number
+              inclusive: true
+              exact: false
+              message: Number must be greater than or equal to 0
+              path: [minCredits]
+          name: ZodError
 
 responses:
   BadRequest:
@@ -160,28 +148,28 @@ responses:
       application/json:
         schema:
           oneOf:
-            - $ref: '#/definitions/Error'
-            - $ref: '#/definitions/ZodError'
+            - $ref: "#/definitions/Error"
+            - $ref: "#/definitions/ZodError"
   Unauthorized:
     description: Cookie missing.
     content:
       application/json:
         schema:
           oneOf:
-            - $ref: '#/definitions/Error'
-            - $ref: '#/definitions/UnauthorizedError'
+            - $ref: "#/definitions/Error"
+            - $ref: "#/definitions/UnauthorizedError"
   Forbidden:
     description: The requester is not authorized to execute actions.
     content:
       application/json:
         schema:
-          $ref: '#/definitions/Error'
+          $ref: "#/definitions/Error"
   NotFound:
     description: Item with id given in the url or request body not found.
     content:
       application/json:
         schema:
-          $ref: '#/definitions/Error'
+          $ref: "#/definitions/Error"
   Conflict:
     description: >
       The ids given in the url params or request body do not belong to each other or
@@ -190,10 +178,10 @@ responses:
     content:
       application/json:
         schema:
-          $ref: '#/definitions/Error'
+          $ref: "#/definitions/Error"
   BadGateway:
     description: An external server returned a response indicating failure.
     content:
       application/json:
         schema:
-          $ref: '#/definitions/Error'
+          $ref: "#/definitions/Error"

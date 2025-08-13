@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {Handle, type NodeProps, Position} from '@xyflow/react';
 import {type JSX, useContext} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Handle, type NodeProps, Position} from 'reactflow';
 
 import type {SinkNodeValue} from '@/common/types';
 import OutputValue from '@/components/shared/graph/nodes/parts/OutputValue';

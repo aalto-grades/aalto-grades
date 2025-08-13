@@ -106,7 +106,7 @@ const UserButton = (): JSX.Element => {
         aria-controls={menuOpen ? 'user-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={menuOpen ? 'true' : undefined}
-        onClick={event => {
+        onClick={(event) => {
           setAnchorEl(event.currentTarget);
         }}
       >

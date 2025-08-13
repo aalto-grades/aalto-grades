@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import {useTheme} from '@mui/material';
+import {Handle, type NodeProps, Position} from '@xyflow/react';
 import {type ChangeEvent, type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Handle, type NodeProps, Position} from 'reactflow';
 
 import type {StepperNodeSettings, StepperNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
@@ -28,12 +28,12 @@ const checkError = (settings: LocalSettings): boolean => {
 
   for (let i = 0; i < settings.numSteps - 1; i++) {
     if (
-      (i + 1 < settings.numSteps - 1 &&
-        parseFloat(settings.middlePoints[i]) >=
-          parseFloat(settings.middlePoints[i + 1])) ||
-      (i > 0 &&
-        parseFloat(settings.middlePoints[i]) <=
-          parseFloat(settings.middlePoints[i - 1]))
+      (i + 1 < settings.numSteps - 1
+        && parseFloat(settings.middlePoints[i])
+        >= parseFloat(settings.middlePoints[i + 1]))
+      || (i > 0
+        && parseFloat(settings.middlePoints[i])
+        <= parseFloat(settings.middlePoints[i - 1]))
     ) {
       return true;
     }
@@ -124,13 +124,13 @@ const StepperNode = (props: NodeProps): JSX.Element => {
 
   const isCurrentSlot = (index: number): boolean => {
     if (
-      index > 0 &&
-      nodeValue.source <= parseFloat(localSettings.middlePoints[index - 1])
+      index > 0
+      && nodeValue.source <= parseFloat(localSettings.middlePoints[index - 1])
     )
       return false;
     if (
-      index < localSettings.numSteps - 1 &&
-      nodeValue.source > parseFloat(localSettings.middlePoints[index])
+      index < localSettings.numSteps - 1
+      && nodeValue.source > parseFloat(localSettings.middlePoints[index])
     )
       return false;
     return true;
@@ -170,23 +170,24 @@ const StepperNode = (props: NodeProps): JSX.Element => {
             >
               <td>
                 <p style={{display: 'inline'}}>≤ </p>
-                {index + 1 === localSettings.numSteps ? (
-                  <input
-                    style={{width: '40px'}}
-                    type="text"
-                    value="∞"
-                    disabled
-                  />
-                ) : (
-                  <input
-                    style={{width: '40px'}}
-                    type="number"
-                    value={localSettings.middlePoints[index]}
-                    onChange={event =>
-                      handleChange('middlePoint', index, event)
-                    }
-                  />
-                )}
+                {index + 1 === localSettings.numSteps
+                  ? (
+                      <input
+                        style={{width: '40px'}}
+                        type="text"
+                        value="∞"
+                        disabled
+                      />
+                    )
+                  : (
+                      <input
+                        style={{width: '40px'}}
+                        type="number"
+                        value={localSettings.middlePoints[index]}
+                        onChange={event =>
+                          handleChange('middlePoint', index, event)}
+                      />
+                    )}
               </td>
               <td>
                 <input

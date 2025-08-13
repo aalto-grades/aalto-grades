@@ -17,13 +17,13 @@ and then start Node server locally in development mode.
 
 Start the database and pgAdmin:
 
-```
+```bash
 docker compose up database pgadmin
 ```
 
 When you are done run the following command to remove the containers:
 
-```
+```bash
 docker compose down --remove-orphans
 ```
 
@@ -32,27 +32,29 @@ docker compose down --remove-orphans
 > If the command `npm i` fails on Apple Silicon, check that there are NO spaces
 > in the folder path
 
-Install the packages:
+Install node modules for the entire repository:
 
-```
+```bash
+# From the root of the repository
 npm i
 ```
+Change directory to the server:
 
-Also install the packages in the common folder
-
-```
-npm i --prefix ../common
+```bash
+cd ./server
 ```
 
 Build the server to be able to run the migrations and seeder:
 
-```
+```bash
+# ./server
 npm run build
 ```
 
 Run the migrations and seeder:
 
-```
+```bash
+# ./server
 npm run migration:up
 npm run seed:up
 ```
@@ -61,7 +63,8 @@ npm run seed:up
 
 Start the server:
 
-```
+```bash
+# ./server
 npm run dev
 ```
 
@@ -99,6 +102,7 @@ is used for testing API functionality.
 You may run the tests by starting the database as described previously and then
 running:
 
-```
+```bash
+# ./server
 npm run test
 ```

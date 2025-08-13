@@ -18,11 +18,11 @@ export const AplusCourseDataSchema = z.strictObject({
   courseCode: z.string(),
   name: z.string(),
   instance: z.string(),
-  url: z.string().url(),
+  url: z.url(),
 });
 export const AplusCourseDataArraySchema = z.array(AplusCourseDataSchema);
 
-export const AplusGradeSourceTypeSchema = z.nativeEnum(AplusGradeSourceType);
+export const AplusGradeSourceTypeSchema = z.enum(AplusGradeSourceType);
 
 const AplusExerciseSchema = z.strictObject({
   id: z.number().int(),
@@ -72,10 +72,16 @@ const GradeSourceBaseSchema = z.strictObject({
   date: DateSchema,
 });
 export const AplusGradeSourceDataSchema = z.discriminatedUnion('sourceType', [
-  GradeSourceBaseSchema.merge(FullPointsBaseSchema).strict(),
-  GradeSourceBaseSchema.merge(ModuleBaseSchema).strict(),
-  GradeSourceBaseSchema.merge(ExerciseBaseSchema).strict(),
-  GradeSourceBaseSchema.merge(DifficultyBaseSchema).strict(),
+  z.strictObject({
+    ...GradeSourceBaseSchema.shape,
+    ...FullPointsBaseSchema.shape,
+  }),
+  z.strictObject({...GradeSourceBaseSchema.shape, ...ModuleBaseSchema.shape}),
+  z.strictObject({...GradeSourceBaseSchema.shape, ...ExerciseBaseSchema.shape}),
+  z.strictObject({
+    ...GradeSourceBaseSchema.shape,
+    ...DifficultyBaseSchema.shape,
+  }),
 ]);
 
 const NewGradeSourceBaseSchema = z.strictObject({
@@ -84,13 +90,25 @@ const NewGradeSourceBaseSchema = z.strictObject({
   date: DateSchema,
 });
 export const NewAplusGradeSourceSchema = z.discriminatedUnion('sourceType', [
-  NewGradeSourceBaseSchema.merge(FullPointsBaseSchema).strict(),
-  NewGradeSourceBaseSchema.merge(ModuleBaseSchema).strict(),
-  NewGradeSourceBaseSchema.merge(ExerciseBaseSchema).strict(),
-  NewGradeSourceBaseSchema.merge(DifficultyBaseSchema).strict(),
+  z.strictObject({
+    ...NewGradeSourceBaseSchema.shape,
+    ...FullPointsBaseSchema.shape,
+  }),
+  z.strictObject({
+    ...NewGradeSourceBaseSchema.shape,
+    ...ModuleBaseSchema.shape,
+  }),
+  z.strictObject({
+    ...NewGradeSourceBaseSchema.shape,
+    ...ExerciseBaseSchema.shape,
+  }),
+  z.strictObject({
+    ...NewGradeSourceBaseSchema.shape,
+    ...DifficultyBaseSchema.shape,
+  }),
 ]);
 export const NewAplusGradeSourceArraySchema = z.array(
-  NewAplusGradeSourceSchema
+  NewAplusGradeSourceSchema,
 );
 
 export type AplusModule = z.infer<typeof AplusModuleSchema>;

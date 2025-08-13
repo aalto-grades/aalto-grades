@@ -52,8 +52,8 @@ export const findAndValidateTaskGradePath = async (
 
   if (coursePart.courseId !== course.id) {
     throw new ApiError(
-      `Grade with ID ${gradeId} ` +
-        `does not belong to the course with ID ${courseId}`,
+      `Grade with ID ${gradeId} `
+      + `does not belong to the course with ID ${courseId}`,
       HttpCode.Conflict
     );
   }

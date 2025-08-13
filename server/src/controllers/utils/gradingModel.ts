@@ -66,8 +66,8 @@ export const validateGradingModelBelongsToCourse = async (
   // Check that grading model belongs to the course.
   if (gradingModel.courseId !== course.id) {
     throw new ApiError(
-      `Grading model with ID ${gradingModel.id} ` +
-        `does not belong to the course with ID ${course.id}`,
+      `Grading model with ID ${gradingModel.id} `
+      + `does not belong to the course with ID ${course.id}`,
       HttpCode.Conflict
     );
   }
@@ -92,8 +92,8 @@ export const validateGradingModelPath = async (
   // Check that grading model belongs to the course.
   if (gradingModel.courseId !== course.id) {
     throw new ApiError(
-      `Grading model with ID ${gradingModel.id} ` +
-        `does not belong to the course with ID ${course.id}`,
+      `Grading model with ID ${gradingModel.id} `
+      + `does not belong to the course with ID ${course.id}`,
       HttpCode.Conflict
     );
   }

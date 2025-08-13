@@ -83,7 +83,7 @@ const ColorModeSelectButton = (): JSX.Element => {
           {t('color-mode.light')}
         </MenuItem>
         <MenuItem selected={mode === 'dark'} onClick={handleMode('dark')}>
-          {t('color-mode.dark')}
+          {t('color-mode.dark') + ' (Beta)'}
         </MenuItem>
       </Menu>
     </>

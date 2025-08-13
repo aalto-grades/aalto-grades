@@ -26,10 +26,10 @@ services:
       dockerfile: ./server/Dockerfile
     container_name: aalto-grades-backend-dev
     environment:
-      POSTGRES_URL: 'database'
-      POSTGRES_USER: 'postgres'
-      POSTGRES_DATABASE: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_URL: database
+      POSTGRES_USER: postgres
+      POSTGRES_DATABASE: postgres
+      POSTGRES_PASSWORD: postgres
     depends_on:
       - database
 
@@ -43,4 +43,4 @@ services:
       - ${E2E_DB_PORT:-5432}:5432 # Exposed for e2e tests to work
       # Set E2E_DB_PORT to avoid conflicts with local Postgres
     environment:
-      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_PASSWORD: postgres

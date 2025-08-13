@@ -49,7 +49,7 @@ const Footer = (): JSX.Element => {
         {t('app.footer.feedback-text')}
       </ExternalLink>
       <Typography sx={{color: 'text.secondary'}}>
-        Ossi v{AALTO_GRADES_VERSION}
+        {'Ossi v' + AALTO_GRADES_VERSION}
       </Typography>
     </Box>
   );

@@ -39,9 +39,9 @@ const ModelButton = ({
 
   let warning = '';
   const numErrors =
-    Number(model.hasExpiredSources) +
-    Number(model.hasArchivedSources) +
-    Number(model.hasDeletedSources);
+    Number(model.hasExpiredSources)
+    + Number(model.hasArchivedSources)
+    + Number(model.hasDeletedSources);
 
   if (numErrors > 1) warning = t('course.models.has-multiple-warnings');
   else if (model.hasExpiredSources) warning = t('course.models.has-expired');
@@ -53,45 +53,47 @@ const ModelButton = ({
       sx={{backgroundColor: model.archived ? 'primary.light' : ''}}
       disablePadding
       secondaryAction={
-        editRights ? (
-          <>
-            <Tooltip placement="top" title={t('course.models.rename.title')}>
-              <IconButton onClick={onEdit}>
-                <Edit />
-              </IconButton>
-            </Tooltip>
-            <Tooltip
-              placement="top"
-              title={
-                model.archived
-                  ? t('course.models.unarchive')
-                  : t('course.models.archive')
-              }
-            >
-              <IconButton onClick={onArchive}>
-                {model.archived ? <Unarchive /> : <Archive />}
-              </IconButton>
-            </Tooltip>
-            <Tooltip
-              placement="top"
-              title={
-                modelsWithFinalGrades.has(model.id)
-                  ? t('course.models.cannot-delete-with-final')
-                  : t('course.models.delete-grading-model')
-              }
-            >
-              <span>
-                <IconButton
-                  disabled={modelsWithFinalGrades.has(model.id)}
-                  edge="end"
-                  onClick={onDelete}
+        editRights
+          ? (
+              <>
+                <Tooltip placement="top" title={t('course.models.rename.title')}>
+                  <IconButton onClick={onEdit}>
+                    <Edit />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip
+                  placement="top"
+                  title={
+                    model.archived
+                      ? t('course.models.unarchive')
+                      : t('course.models.archive')
+                  }
                 >
-                  <Delete />
-                </IconButton>
-              </span>
-            </Tooltip>
-          </>
-        ) : null
+                  <IconButton onClick={onArchive}>
+                    {model.archived ? <Unarchive /> : <Archive />}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip
+                  placement="top"
+                  title={
+                    modelsWithFinalGrades.has(model.id)
+                      ? t('course.models.cannot-delete-with-final')
+                      : t('course.models.delete-grading-model')
+                  }
+                >
+                  <span>
+                    <IconButton
+                      disabled={modelsWithFinalGrades.has(model.id)}
+                      edge="end"
+                      onClick={onDelete}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </>
+            )
+          : null
       }
     >
       <ListItemButton onClick={onClick}>

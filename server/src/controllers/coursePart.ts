@@ -122,8 +122,8 @@ export const deleteCoursePart: Endpoint<void, void> = async (req, res) => {
   } catch (error) {
     // Catch deletion of course part with grades
     if (
-      error instanceof ForeignKeyConstraintError &&
-      error.index === 'task_grade_course_task_id_fkey'
+      error instanceof ForeignKeyConstraintError
+      && error.index === 'task_grade_course_task_id_fkey'
     ) {
       throw new ApiError(
         'Tried to delete a course part with grades',

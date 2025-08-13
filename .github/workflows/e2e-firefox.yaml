@@ -1,0 +1,135 @@
+# SPDX-FileCopyrightText: 2024 The Ossi Developers
+#
+# SPDX-License-Identifier: MIT
+---
+name: E2E Tests - Firefox
+on:
+  workflow_call:
+    inputs:
+      docker-images-cache-key:
+        description: Cache key for pre-built Docker images from build step
+        required: true
+        type: string
+
+jobs:
+  e2e-firefox:
+    name: Run e2e tests with Firefox
+    runs-on: ubuntu-latest
+    env:
+      LOCALHOST_URL: http://localhost:8080
+      DOCKER_IMAGES_PATH: /tmp/docker-images
+      DOCKER_IMAGES_TAR: /tmp/docker-images/images.tar
+    defaults:
+      run:
+        working-directory: ./e2e-tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore pre-built Docker images
+        id: docker-images-cache
+        uses: actions/cache/restore@v3
+        with:
+          path: ${{ env.DOCKER_IMAGES_PATH }}
+          key: ${{ inputs.docker-images-cache-key }}
+          fail-on-cache-miss: true
+
+      - name: Load Docker images from cache
+        working-directory: ./
+        run: |
+          echo "=== Loading pre-built Docker images ==="
+
+          if [ ! -f ${{ env.DOCKER_IMAGES_TAR }} ]; then
+            echo "❌ Images tar file not found at ${{ env.DOCKER_IMAGES_TAR }}"
+            exit 1
+          fi
+
+          echo "📦 Tar file size: $(ls -lh ${{ env.DOCKER_IMAGES_TAR }} | awk '{print $5}')"
+
+          echo "🔄 Loading images..."
+          docker load -i ${{ env.DOCKER_IMAGES_TAR }}
+
+          echo "✅ Docker images loaded successfully"
+          echo "=== Available images after loading ==="
+          docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
+
+      - name: Setup Playwright browser cache
+        id: playwright-browser-cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-browsers
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install NPM dependencies
+        run: npm i
+
+      - name: Start application services
+        working-directory: ./
+        run: |
+          echo "Starting services with cached images (no rebuild)..."
+          echo "Checking what docker-compose expects vs what we have:"
+          docker compose config --services
+          echo "Available images:"
+          docker images --format "table {{.Repository}}\t{{.Tag}}"
+          # Use --no-build to prevent rebuilding and force using cached images
+          docker compose up -d --no-build
+          echo "Services started successfully"
+
+      - name: Install Firefox browser for Playwright
+        run: npx playwright install firefox --with-deps
+
+      - name: Wait for application to be ready
+        run: |
+          url="${{ env.LOCALHOST_URL }}/login"
+          echo "Waiting for application at ${url} to become available..."
+          timeout=300
+          elapsed=0
+          while [ $elapsed -lt $timeout ]; do
+            if curl -s -o /dev/null -w "%{http_code}" "${url}" | grep -q "200"; then
+              echo "Application is ready after ${elapsed} seconds"
+              sleep 10  # Additional grace period
+              exit 0
+            fi
+            echo "Still waiting... (${elapsed}s/${timeout}s)"
+            sleep 5
+            elapsed=$((elapsed + 5))
+          done
+          echo "Timeout waiting for application to be ready"
+          exit 1
+        working-directory: ./
+
+      - name: Clean up previous test artifacts
+        run: |
+          rm -rf ./blob-reporter ./playwright-report ./blob-report
+          mkdir -p ./blob-reporter
+
+      - name: Run Firefox E2E tests
+        run: |
+          npx playwright test --project firefox --reporter=list,blob
+          # Move Firefox-specific report if it exists
+          if [ -f ./blob-report/report-firefox.zip ]; then
+            mv ./blob-report/report-firefox.zip ./blob-reporter/firefox-report.zip
+          fi
+
+      - name: Generate HTML test report
+        if: always()
+        run: npx playwright merge-reports --reporter=html ./blob-reporter
+
+      - name: Upload HTML test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-html-test-report
+          path: e2e-tests/playwright-report/
+          retention-days: 7
+
+      - name: Upload blob test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-blob-test-report
+          path: e2e-tests/blob-reporter/
+          retention-days: 7

@@ -2,10 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import bodyParser from 'body-parser';
 import express, {type RequestHandler, Router} from 'express';
 import passport from 'passport';
-import {processRequestBody} from 'zod-express-middleware';
 
 import {
   ChangeOwnAuthDataSchema,
@@ -31,6 +29,7 @@ import {jwtAuthentication} from '../middleware/authentication';
 import {authorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {rateLimiterMemoryMiddleware} from '../middleware/rateLimiterMemory';
+import {processRequestBody} from '../middleware/zodValidation';
 
 export const router = Router();
 
@@ -104,7 +103,7 @@ router.get(
 
 router.post(
   '/v1/auth/login-idp/callback',
-  bodyParser.urlencoded({extended: false}),
+  express.urlencoded({extended: false}),
   authSamlLogin,
   (_req, res) => res.redirect('/')
 );

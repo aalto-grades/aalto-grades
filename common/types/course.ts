@@ -65,8 +65,8 @@ export enum Department {
   LanguageCentre = 'LANGUAGE_CENTRE',
 }
 
-export const GradingScaleSchema = z.nativeEnum(GradingScale);
-export const DepartmentSchema = z.nativeEnum(Department);
+export const GradingScaleSchema = z.enum(GradingScale);
+export const DepartmentSchema = z.enum(Department);
 
 export const BaseCourseDataSchema = z.strictObject({
   id: IdSchema,
@@ -86,23 +86,23 @@ export const CourseDataSchema = BaseCourseDataSchema.refine(
 );
 export const NewCourseDataSchema = BaseCourseDataSchema.omit({id: true})
   .extend({
-    teachersInCharge: z.array(z.string().email()),
+    teachersInCharge: z.array(z.email()),
     assistants: z.array(NewAssistantDataSchema),
   })
   .strict()
   .refine(val => val.maxCredits >= val.minCredits, {path: ['maxCredits']});
 export const EditCourseDataSchema = BaseCourseDataSchema.omit({id: true})
   .extend({
-    teachersInCharge: z.array(z.string().email()),
+    teachersInCharge: z.array(z.email()),
     assistants: z.array(NewAssistantDataSchema),
   })
   .strict()
   .partial()
   .refine(
     val =>
-      val.maxCredits === undefined ||
-      val.minCredits === undefined ||
-      val.maxCredits >= val.minCredits,
+      val.maxCredits === undefined
+      || val.minCredits === undefined
+      || val.maxCredits >= val.minCredits,
     {path: ['maxCredits']}
   );
 

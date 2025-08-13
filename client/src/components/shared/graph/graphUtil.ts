@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+import type {Connection, Edge} from '@xyflow/react';
 import ElkConstructor from 'elkjs/lib/elk.bundled';
 import type {TFunction} from 'i18next';
-import type {Connection, Edge} from 'reactflow';
 
 import type {DropInNodes, NodeValues, TypedNode} from '@/common/types';
 
@@ -68,11 +68,9 @@ export const getDragAndDropNodes = (
 ];
 
 export const isValidConnection = (
-  connection: Connection,
+  connection: Edge | Connection,
   edges: Edge[]
 ): boolean => {
-  if (connection.source === null || connection.target === null) return false;
-
   // Check for conflicting edges
   for (const edge of edges) {
     // If connection doesn't have specific target handle and connection to the target already exists
@@ -81,17 +79,17 @@ export const isValidConnection = (
 
     // If connection to target handle already exists
     if (
-      edge.target === connection.target &&
-      edge.targetHandle &&
-      edge.targetHandle === connection.targetHandle
+      edge.target === connection.target
+      && edge.targetHandle
+      && edge.targetHandle === connection.targetHandle
     )
       return false;
 
     // If connection from source handle to target node already exists
     if (
-      edge.source === connection.source &&
-      edge.sourceHandle === connection.sourceHandle &&
-      edge.target === connection.target
+      edge.source === connection.source
+      && edge.sourceHandle === connection.sourceHandle
+      && edge.target === connection.target
     ) {
       return false;
     }
@@ -167,8 +165,8 @@ export const findDisconnectedEdges = (
 
     const sourceHandle = edge.sourceHandle!.replace('-source', '');
     if (
-      !(sourceHandle in nodeValue.sources) ||
-      !nodeValue.sources[sourceHandle].isConnected
+      !(sourceHandle in nodeValue.sources)
+      || !nodeValue.sources[sourceHandle].isConnected
     ) {
       disconnectedEdges.push(edge);
     }
@@ -186,8 +184,8 @@ export const formatGraph = async (
   const nodesForElk = nodes.map(node => ({
     type: node.type,
     id: node.id,
-    width: node.width!,
-    height: node.height!,
+    width: node.measured?.width ?? 0,
+    height: node.measured?.height ?? 0,
   }));
   const graph = {
     id: 'root',
@@ -199,7 +197,7 @@ export const formatGraph = async (
       'elk.spacing.nodeNode': '60',
     },
     // Tell elk the node handle data (order and side)
-    children: nodesForElk.map(node => {
+    children: nodesForElk.map((node) => {
       const nodeValue = nodeValues[node.id];
       if (nodeValue.type === 'source') {
         return {
@@ -212,11 +210,11 @@ export const formatGraph = async (
           ports: [{id: node.id, properties: {side: 'WEST'}}],
         };
       } else if (
-        nodeValue.type !== 'addition' &&
-        nodeValue.type !== 'average' &&
-        nodeValue.type !== 'max' &&
-        nodeValue.type !== 'require' &&
-        nodeValue.type !== 'substitute'
+        nodeValue.type !== 'addition'
+        && nodeValue.type !== 'average'
+        && nodeValue.type !== 'max'
+        && nodeValue.type !== 'require'
+        && nodeValue.type !== 'substitute'
       ) {
         return {
           ...node,
@@ -232,25 +230,25 @@ export const formatGraph = async (
       if (nodeValue.type === 'substitute') {
         sortedKeys.sort((key1, key2) => {
           if (
-            key1.split('-').at(-2) === 'exercise' &&
-            key2.split('-').at(-2) === 'substitute'
+            key1.split('-').at(-2) === 'exercise'
+            && key2.split('-').at(-2) === 'substitute'
           )
             return 1;
           if (
-            key2.split('-').at(-2) === 'exercise' &&
-            key1.split('-').at(-2) === 'substitute'
+            key2.split('-').at(-2) === 'exercise'
+            && key1.split('-').at(-2) === 'substitute'
           )
             return -1;
           return (
-            parseInt(key1.split('-').at(-1)!) -
-            parseInt(key2.split('-').at(-1)!)
+            parseInt(key1.split('-').at(-1)!)
+            - parseInt(key2.split('-').at(-1)!)
           );
         });
       } else {
         sortedKeys.sort(
           (key1, key2) =>
-            parseInt(key1.split('-').at(-1)!) -
-            parseInt(key2.split('-').at(-1)!)
+            parseInt(key1.split('-').at(-1)!)
+            - parseInt(key2.split('-').at(-1)!)
         );
       }
       const sourcePorts = [...sortedKeys].reverse().map(key => ({
@@ -278,7 +276,7 @@ export const formatGraph = async (
       targets: [edge.targetHandle!],
     })),
   };
-
+  console.log('ELK graph:', graph);
   // Return nodes with updated positions
   const newNodes = (await elk.layout(graph)).children!;
   return newNodes.map(newNode => ({

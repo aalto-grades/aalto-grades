@@ -51,8 +51,8 @@ export const findAndValidateFinalGradePath = async (
   // Check that final grade belongs to the course.
   if (finalGrade.courseId !== course.id) {
     throw new ApiError(
-      `Final grade ID ${finalGradeId} ` +
-        `does not belong to the course with ID ${courseId}`,
+      `Final grade ID ${finalGradeId} `
+      + `does not belong to the course with ID ${courseId}`,
       HttpCode.Conflict
     );
   }
@@ -139,8 +139,8 @@ export const getFinalGradesFor = async (
 
   if (dbFinalGrades.length === 0) {
     throw new ApiError(
-      'no grades found, make sure grades have been ' +
-        'uploaded/calculated before requesting course results',
+      'no grades found, make sure grades have been '
+      + 'uploaded/calculated before requesting course results',
       HttpCode.NotFound
     );
   }
@@ -161,7 +161,7 @@ export const sisuPreferFinalGrade = (
 
   if (newGrade.grade > oldGrade.grade) return true;
   return (
-    newGrade.grade === oldGrade.grade &&
-    new Date(newGrade.date) >= new Date(oldGrade.date)
+    newGrade.grade === oldGrade.grade
+    && new Date(newGrade.date) >= new Date(oldGrade.date)
   );
 };

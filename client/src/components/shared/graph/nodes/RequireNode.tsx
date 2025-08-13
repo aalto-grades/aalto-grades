@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 import {useTheme} from '@mui/material';
-import {type ChangeEvent, type JSX, useContext, useState} from 'react';
-import {useTranslation} from 'react-i18next';
 import {
   Handle,
   type NodeProps,
   Position,
   useUpdateNodeInternals,
-} from 'reactflow';
+} from '@xyflow/react';
+import {type ChangeEvent, type JSX, useContext, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 
 import type {RequireNodeSettings, RequireNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
@@ -70,8 +70,8 @@ const RequireNode = (props: NodeProps): JSX.Element => {
     setLocalSettings(newLocalSettings);
 
     if (
-      !/^\d+$/.test(event.target.value) ||
-      parseInt(event.target.value) > handles.length
+      !/^\d+$/.test(event.target.value)
+      || parseInt(event.target.value) > handles.length
     ) {
       setError(true);
       return;
@@ -94,8 +94,8 @@ const RequireNode = (props: NodeProps): JSX.Element => {
 
     // Update global settings if local setting are valid
     if (
-      /^\d+$/.test(newLocalSettings.numFail) &&
-      parseInt(newLocalSettings.numFail) <= handles.length
+      /^\d+$/.test(newLocalSettings.numFail)
+      && parseInt(newLocalSettings.numFail) <= handles.length
     ) {
       setNodeSettings(id, {
         ...newLocalSettings,
@@ -139,7 +139,10 @@ const RequireNode = (props: NodeProps): JSX.Element => {
       />
 
       <div>
-        <label>{t('shared.graph.on-fail')} </label>
+        <label>
+          {t('shared.graph.on-fail')}
+          {' '}
+        </label>
         <select
           onChange={handleSelectChange}
           value={localSettings.onFailSetting}
@@ -149,7 +152,10 @@ const RequireNode = (props: NodeProps): JSX.Element => {
         </select>
       </div>
       <div>
-        <label>{t('shared.graph.allowed-fails')} </label>
+        <label>
+          {t('shared.graph.allowed-fails')}
+          {' '}
+        </label>
         <input
           style={{width: '90px'}}
           type="number"
@@ -187,12 +193,12 @@ const RequireNode = (props: NodeProps): JSX.Element => {
                 <td>
                   {!(key in nodeValue.values)
                     ? '' // Happens sometimes when loading graph for the first time
-                    : numFail > settings.numFail ||
-                        nodeValue.values[key] === 'fail'
+                    : numFail > settings.numFail
+                      || nodeValue.values[key] === 'fail'
                       ? nodeValue.values[key]
                       : Math.round(
-                          (nodeValue.values[key] as number) * 100 // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
-                        ) / 100}
+                        (nodeValue.values[key]) * 100
+                      ) / 100}
                 </td>
               </tr>
             ))}

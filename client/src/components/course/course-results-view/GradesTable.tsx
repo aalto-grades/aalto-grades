@@ -148,47 +148,47 @@ const GradesTable = (): JSX.Element => {
                   }}
                   colSpan={header.colSpan}
                 >
-                  {header.isPlaceholder ? null : (
-                    <PrettyChip
-                      position={
-                        header.column.columnDef.meta?.PrettyChipPosition ===
-                        'alone'
-                          ? undefined
-                          : (header.column.columnDef.meta?.PrettyChipPosition ??
-                            'middle')
-                      }
-                      style={{
-                        backgroundColor:
+                  {header.isPlaceholder
+                    ? null
+                    : (
+                        <PrettyChip
+                          position={
+                            header.column.columnDef.meta?.PrettyChipPosition === 'alone'
+                              ? undefined
+                              : (header.column.columnDef.meta?.PrettyChipPosition ?? 'middle')
+                          }
+                          style={{
+                            backgroundColor:
                           theme.palette.mode === 'dark'
                             ? theme.palette.primary.main
                             : theme.palette.primary.light,
-                        fontWeight: 'bold',
-                      }}
-                      onClick={
-                        header.column.getCanSort()
-                          ? header.column.getToggleSortingHandler()
-                          : undefined
-                      }
-                    >
-                      <>
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                        {!header.column.getCanSort() ? null : (
-                          <Icon>
-                            {header.column.getIsSorted() === 'asc' ? (
-                              <ArrowUpward />
-                            ) : header.column.getIsSorted() === 'desc' ? (
-                              <ArrowUpward style={{rotate: '180deg'}} />
-                            ) : (
-                              <Sort />
+                            fontWeight: 'bold',
+                          }}
+                          onClick={
+                            header.column.getCanSort()
+                              ? header.column.getToggleSortingHandler()
+                              : undefined
+                          }
+                        >
+                          <>
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
                             )}
-                          </Icon>
-                        )}
-                      </>
-                    </PrettyChip>
-                  )}
+                            {!header.column.getCanSort()
+                              ? null
+                              : (
+                                  <Icon>
+                                    {header.column.getIsSorted() === 'asc'
+                                      ? <ArrowUpward />
+                                      : header.column.getIsSorted() === 'desc'
+                                        ? <ArrowUpward style={{rotate: '180deg'}} />
+                                        : <Sort />}
+                                  </Icon>
+                                )}
+                          </>
+                        </PrettyChip>
+                      )}
                 </th>
               ))}
             </tr>
@@ -202,7 +202,7 @@ const GradesTable = (): JSX.Element => {
             position: 'relative', // Needed for absolute positioning of rows
           }}
         >
-          {virtualizer.getVirtualItems().map(virtualRow => {
+          {virtualizer.getVirtualItems().map((virtualRow) => {
             const row = table.getRowModel().rows[virtualRow.index];
             return (
               <tr

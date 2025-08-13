@@ -40,7 +40,7 @@ export const fetchIdpMetadata = async (
       saml: 'urn:oasis:names:tc:SAML:2.0:assertion',
       ds: 'http://www.w3.org/2000/09/xmldsig#',
     });
-    return query => select(query, xml);
+    return query => select(query, xml as unknown as Node);
   } catch (error) {
     httpLogger.error(error);
     return null;
@@ -81,7 +81,7 @@ export const getSamlStrategy = async (): Promise<SamlStrategy> =>
       signatureAlgorithm: 'sha256',
       identifierFormat: null,
     },
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+
     async (profile: Profile | null, done: SamlVerifiedCallback) => {
       try {
         const eduUser = profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;

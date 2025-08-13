@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {AppBar, Box, Tooltip, Typography, useTheme} from '@mui/material';
-import {useMemo} from 'react';
+import {type JSX, useMemo} from 'react';
 import {NavLink, useParams} from 'react-router-dom';
 
 import {useGetCourse} from '@/hooks/useApi';
@@ -45,7 +45,7 @@ const Header = (): JSX.Element => {
         data-testid="a-grades-header-link"
         viewTransition
       >
-        Ossi{logoVariant}
+        {'Ossi' + logoVariant}
       </Typography>
       {course.data !== undefined && (
         <>

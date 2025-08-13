@@ -10,19 +10,21 @@ SPDX-License-Identifier: MIT
 
 Install the packages:
 
-```
+```bash
+# From the root of the repository
 npm i
 ```
 
-Also install the packages in the common folder
+Change directory to the client:
 
-```
-npm i --prefix ../common
+```bash
+cd ./client
 ```
 
 Start the client:
 
-```
+```bash
+# ./client
 npm start
 ```
 

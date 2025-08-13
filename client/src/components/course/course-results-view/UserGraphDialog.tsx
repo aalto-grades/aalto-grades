@@ -72,10 +72,10 @@ const UserGraphDialog = ({
   let sources: GraphSource[] = [];
   let sourceValues: GraphSourceValue[] = [];
   if (
-    selectedModel !== null &&
-    courseParts.data !== undefined &&
-    courseTasks.data !== undefined &&
-    data !== null
+    selectedModel !== null
+    && courseParts.data !== undefined
+    && courseTasks.data !== undefined
+    && data !== null
   ) {
     if (selectedModel.coursePartId === null) {
       // Final grade model
@@ -132,49 +132,49 @@ const UserGraphDialog = ({
         )}
       </DialogTitle>
       <DialogContent>
-        {data === null ? (
-          <>{t('course.results.data-undefined')}</>
-        ) : selectedModel === null || courseParts.data === undefined ? (
-          <>{t('general.loading')}</>
-        ) : (
-          <Graph
-            key={selectedModel.id} // Reset graph for each model
-            initGraph={selectedModel.graphStructure}
-            sources={sources}
-            sourceValues={sourceValues}
-            readOnly
-          />
-        )}
+        {data === null
+          ? <>{t('course.results.data-undefined')}</>
+          : selectedModel === null || courseParts.data === undefined
+            ? <>{t('general.loading')}</>
+            : (
+                <Graph
+                  key={selectedModel.id} // Reset graph for each model
+                  initGraph={selectedModel.graphStructure}
+                  sources={sources}
+                  sourceValues={sourceValues}
+                  readOnly
+                />
+              )}
       </DialogContent>
       <DialogActions>
-        {gradingModels !== null &&
-          gradingModels.length > 0 &&
-          !data?.gradingModel && (
-            <FormControl size="small">
-              <InputLabel id="grading-model-select-label">
-                {t('general.grading-model')}
-              </InputLabel>
-              <Select
-                labelId="grading-model-select-label"
-                sx={{minWidth: '150px'}}
-                value={selectedModel?.id ?? gradingModels[0].id}
-                label="Grading model"
-                onChange={event => {
-                  setSelectedModel(
-                    gradingModels.find(
-                      model => model.id === event.target.value
-                    )!
-                  );
-                }}
-              >
-                {gradingModels.map(model => (
-                  <MenuItem key={model.id} value={model.id}>
-                    {model.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
+        {gradingModels !== null
+          && gradingModels.length > 0
+          && !data?.gradingModel && (
+          <FormControl size="small">
+            <InputLabel id="grading-model-select-label">
+              {t('general.grading-model')}
+            </InputLabel>
+            <Select
+              labelId="grading-model-select-label"
+              sx={{minWidth: '150px'}}
+              value={selectedModel?.id ?? gradingModels[0].id}
+              label="Grading model"
+              onChange={(event) => {
+                setSelectedModel(
+                  gradingModels.find(
+                    model => model.id === event.target.value
+                  )!
+                );
+              }}
+            >
+              {gradingModels.map(model => (
+                <MenuItem key={model.id} value={model.id}>
+                  {model.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
         <Button onClick={onClose} variant="contained">
           {t('general.close')}
         </Button>

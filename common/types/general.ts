@@ -32,17 +32,14 @@ export enum Language {
   Russian = 'RU',
 }
 
-export const LanguageSchema = z.nativeEnum(Language);
+export const LanguageSchema = z.enum(Language);
 
 export const IdSchema = z.number().int();
 export const IdArraySchema = z.array(IdSchema);
-export const DateSchema = z
-  .string()
-  .datetime()
+export const DateSchema = z.iso.datetime()
   .pipe(z.coerce.date()) as unknown as z.ZodDate; // To fix ts compatibility with zod-middleware
 export const AaltoEmailSchema = z
-  .string({required_error: 'Email is required'})
-  .email()
+  .email({error: 'Email is required'})
   .regex(/^.*@aalto\.fi$/, 'Email must be a valid aalto email');
 
 export const LocalizedStringSchema = z.strictObject({
