@@ -5,6 +5,7 @@
 # Build stage
 FROM node:24-alpine AS build
 
+# Install packages first to make following builds faster
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY common/package.json ./common/

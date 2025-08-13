@@ -34,6 +34,7 @@ jobs:
           fail-on-cache-miss: true
 
       - name: Load Docker images from cache
+        working-directory: ./
         run: |
           echo "=== Loading pre-built Docker images ==="
 
@@ -50,7 +51,6 @@ jobs:
           echo "✅ Docker images loaded successfully"
           echo "=== Available images after loading ==="
           docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
-        working-directory: ./
 
       - name: Setup Playwright browser cache
         id: playwright-browser-cache

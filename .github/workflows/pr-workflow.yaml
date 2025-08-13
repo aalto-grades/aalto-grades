@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 ---
 name: Pull Request Workflow
-run-name: ${{ github.head_ref }} pull request (${{ github.actor }})
+run-name: PR ${{ github.event.number }} - ${{ github.sha[0] }} ${{ github.sha[1] }} ${{ github.sha[2] }} ${{ github.sha[3] }} (${{ github.actor }})
 
 on:
   pull_request:
