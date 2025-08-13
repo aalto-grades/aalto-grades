@@ -34,10 +34,11 @@ ENV NODE_ENV=production
 WORKDIR /app
 RUN mkdir logs && chown node:node logs
 RUN mkdir keys && chown node:node keys
-
-COPY server/package.json ./package.json ./package-lock.json ./
+COPY package.json package-lock.json /app/
+COPY server/package.json /app/server
 RUN npm ci --omit=dev && npm cache clean --force
 
+WORKDIR /app/server
 COPY server/.sequelizerc ./
 COPY server/docs ./docs
 COPY --from=build /app/server/build ./build
