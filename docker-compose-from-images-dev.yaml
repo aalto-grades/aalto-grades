@@ -33,6 +33,18 @@ services:
       file: ./docker-compose-from-images.yaml
       service: database
 
+  otel-lgtm:
+    image: grafana/otel-lgtm:latest
+    ports:
+      - "3001:3000"
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - "./grafana_volume/data:/data"
+    environment:
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=otel-lgtm
+    restart: unless-stopped
+
   watchtower:
     image: containrrr/watchtower
     # run docker compose with flag '--profile test' to run watchtower
