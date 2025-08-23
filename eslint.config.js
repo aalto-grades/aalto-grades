@@ -23,6 +23,7 @@ export default tseslint.config(
       '**/*.js.map',
       '**/coverage/',
       'vite-env.d.ts',
+      '**/e2e-tests/{test-results,playwright-report}/',
     ]
   },
 
