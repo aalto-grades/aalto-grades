@@ -33,7 +33,9 @@ export default defineConfig({
 
   projects: [
     {name: 'setup', testMatch: /.*\.setup\.ts/},
+    {name: 'setup_F', use: {browserName: 'firefox'}, testMatch: /.*\.setup\.ts/},
     {name: 'cleanDB', testMatch: /.*\.teardown\.ts/},
+    {name: 'cleanDB_F', use: {browserName: 'firefox'}, testMatch: /.*\.teardown\.ts/},
     {
       name: 'chromium',
       use: {...devices['Desktop Chrome']},
@@ -43,8 +45,8 @@ export default defineConfig({
     {
       name: 'firefox',
       use: {...devices['Desktop Firefox']},
-      dependencies: ['setup'],
-      teardown: 'cleanDB',
+      dependencies: ['setup_F'],
+      teardown: 'cleanDB_F',
     },
 
     // Broken, TODO: enable (#594)
