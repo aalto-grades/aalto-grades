@@ -29,6 +29,7 @@ export default tseslint.config(
 
   {
     name: 'Stylistic Configuration',
+    ignores: ['**/*.yml', '**/*.yaml'], // Handled by eslint-plugin-yml
     plugins: {
       '@stylistic': stylistic
     },
