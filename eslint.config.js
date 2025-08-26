@@ -23,11 +23,13 @@ export default tseslint.config(
       '**/*.js.map',
       '**/coverage/',
       'vite-env.d.ts',
+      '**/e2e-tests/{test-results,playwright-report}/',
     ]
   },
 
   {
     name: 'Stylistic Configuration',
+    ignores: ['**/*.yml', '**/*.yaml'], // Handled by eslint-plugin-yml
     plugins: {
       '@stylistic': stylistic
     },

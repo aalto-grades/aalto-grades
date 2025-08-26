@@ -54,7 +54,7 @@
   "devDependencies": {
     "@eslint/js": "^9.31.0",
     "@types/dompurify": "^3.0.5",
-    "@types/node": "^22.17.1",
+    "@types/node": "^24.2.1",
     "@types/papaparse": "^5.3.15",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",

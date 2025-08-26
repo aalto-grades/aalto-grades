@@ -30,6 +30,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DATABASE: postgres
       POSTGRES_PASSWORD: postgres
+      OTEL_SERVICE_NAME: "ossi-test-backend"
+      OTEL_EXPORTER_OTLP_ENDPOINT: >-
+        ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://host.docker.internal:4318}
+      NODE_OPTIONS: >-
+        --require @opentelemetry/auto-instrumentations-node/register
     depends_on:
       - database
 
@@ -40,7 +45,7 @@ services:
       - path: .env
         required: false
     ports:
-      - ${E2E_DB_PORT:-5432}:5432 # Exposed for e2e tests to work
+      - ${E2E_DB_PORT:-5432}:5432  # Exposed for e2e tests to work
       # Set E2E_DB_PORT to avoid conflicts with local Postgres
     environment:
       POSTGRES_PASSWORD: postgres
