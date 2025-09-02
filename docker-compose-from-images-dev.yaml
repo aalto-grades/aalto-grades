@@ -42,9 +42,9 @@ services:
   otel-lgtm:
     image: grafana/otel-lgtm:latest
     ports:
-      - "3001:3000"
-      - "4317:4317"
-      - "4318:4318"
+      - "127.0.0.1:3001:3000"
+      # - "4317:4317" # OTLP gRPC
+      # - "4318:4318" # OTLP HTTP
     volumes:
       - "./grafana_volume/data:/data"
     environment:
