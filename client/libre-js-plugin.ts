@@ -8549,11 +8549,11 @@ const makeLicenseList = async (
   const libreJsList = (
     await axios
       .get<{
-        [key: string]: {
-          identifier: string;
-          canonicalUrl: string[];
-        };
-      }>(
+      [key: string]: {
+        identifier: string;
+        canonicalUrl: string[];
+      };
+    }>(
         'https://git.savannah.gnu.org/cgit/librejs.git/plain/common/license_definitions.json'
       )
       .catch(() => {
@@ -8577,13 +8577,13 @@ const makeLicenseList = async (
   const spdxList = (
     await axios
       .get<{
-        licenses: {
-          licenseId: string;
-          reference: string;
-          isFsfLibre?: boolean;
-          isOsiApproved: boolean;
-        }[];
-      }>(
+      licenses: {
+        licenseId: string;
+        reference: string;
+        isFsfLibre?: boolean;
+        isOsiApproved: boolean;
+      }[];
+    }>(
         'https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json'
       )
       .catch(() => {
