@@ -54,6 +54,12 @@ services:
       SAML_METADATA_URL: "${SAML_METADATA_URL}"
       SISU_API_TOKEN: "${SISU_API_TOKEN}"
       SISU_API_URL: "${SISU_API_URL}"
+      # OTEL settings
+      OTEL_SERVICE_NAME: "ossi-backend"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-lgtm:4317"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      NODE_OPTIONS: >-
+        --require @opentelemetry/auto-instrumentations-node/register
     volumes:
       - ${SAML_DECRYPTION_PVK_FILE}:/keys/saml-decryption-key.pem
       - ${SAML_PRIVATE_KEY_FILE}:/keys/saml-private-key.pem
@@ -75,3 +81,16 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - ${POSTGRES_MOUNTDIR}:/var/lib/postgresql/data
+
+  # Running an internal grafana stack, currently not saving data permanently
+  otel-lgtm:
+    image: grafana/otel-lgtm:latest
+    ports:
+      - "127.0.0.1:3001:3000"
+      # - "4317:4317" # OTLP gRPC
+      # - "4318:4318" # OTLP HTTP
+    # volumes:
+    #   - "./grafana_volume/data:/data"
+    environment:
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=otel-lgtm
+    restart: unless-stopped
