@@ -27,7 +27,7 @@
       "hide-password": "UNTRANSLATED",
       "show-password": "UNTRANSLATED",
       "token": {
-        "body": "UNTRANSLATED",
+        "intro": "UNTRANSLATED",
         "current": "UNTRANSLATED",
         "hide-token-tip": "UNTRANSLATED",
         "show-token-tip": "UNTRANSLATED",
@@ -122,7 +122,6 @@
   "general": {
     "a+-api-token": "UNTRANSLATED",
     "a+-courses": "UNTRANSLATED",
-    "all": "UNTRANSLATED",
     "next": "UNTRANSLATED",
     "back": "UNTRANSLATED",
     "name": "UNTRANSLATED",
@@ -150,12 +149,12 @@
     "date": "UNTRANSLATED",
     "manage": "UNTRANSLATED",
     "close": "UNTRANSLATED",
-    "confirm": "UNTRANSLATED",
     "student-number": "UNTRANSLATED",
     "course-task": "UNTRANSLATED",
     "grade": "UNTRANSLATED",
     "grading-model": "UNTRANSLATED",
     "grading-date": "UNTRANSLATED",
+    "confirm": "UNTRANSLATED",
     "final-grade": "UNTRANSLATED",
     "results": {
       "history": {
@@ -173,6 +172,7 @@
     "delete": "UNTRANSLATED",
     "discard": "UNTRANSLATED",
     "grades-saved": "UNTRANSLATED",
+    "clear": "UNTRANSLATED",
     "done": "UNTRANSLATED",
     "import": "UNTRANSLATED",
     "course-part": "UNTRANSLATED",
@@ -192,7 +192,6 @@
     "teacher": "UNTRANSLATED",
     "assistant": "UNTRANSLATED",
     "student": "UNTRANSLATED",
-    "clear": "UNTRANSLATED",
     "no-content": "UNTRANSLATED",
     "select": "UNTRANSLATED",
     "email": "UNTRANSLATED",
@@ -204,6 +203,8 @@
     "courses": "UNTRANSLATED",
     "password": "UNTRANSLATED",
     "unsaved-changes": "UNTRANSLATED",
+    "all": "UNTRANSLATED",
+    "backdrop-dismiss-disabled": "UNTRANSLATED",
     "close-window": "UNTRANSLATED",
     "in-english": "UNTRANSLATED",
     "in-finnish": "UNTRANSLATED",
@@ -211,8 +212,7 @@
     "search": "UNTRANSLATED",
     "final-grades": "UNTRANSLATED",
     "course-part-grade": "UNTRANSLATED",
-    "not-int": "UNTRANSLATED",
-    "backdrop-dismiss-disabled": "UNTRANSLATED"
+    "not-int": "UNTRANSLATED"
   },
   "course": {
     "parts": {
@@ -224,17 +224,18 @@
         "expiry-date-valid-help": "UNTRANSLATED",
         "previously-used-dates": "UNTRANSLATED"
       },
+      "no-expiry-date": "UNTRANSLATED",
       "select-grade-sources": "UNTRANSLATED",
       "create-tasks": "UNTRANSLATED",
       "delete-a+": "UNTRANSLATED",
       "no-aplus-grades": "UNTRANSLATED",
-      "a+-confirm-grades": "Bekräfta {{count}} betyg",
       "select-course-tasks": "UNTRANSLATED",
       "select-for-fetching": "UNTRANSLATED",
       "fetching-grades": "UNTRANSLATED",
       "fetching-grades-wait": "UNTRANSLATED",
+      "a+-confirm-grades_one": "UNTRANSLATED",
+      "a+-confirm-grades_other": "UNTRANSLATED",
       "not-found": "UNTRANSLATED",
-      "no-expiry-date": "UNTRANSLATED",
       "delete-with-model-message": "UNTRANSLATED",
       "delete-with-task-message": "UNTRANSLATED",
       "delete-message": "UNTRANSLATED",
@@ -253,13 +254,13 @@
       "add-new-task": "UNTRANSLATED",
       "add-from-a+": "UNTRANSLATED",
       "add-new-part": "UNTRANSLATED",
-      "no-course-parts": "UNTRANSLATED",
-      "active-parts": "UNTRANSLATED",
-      "archived-parts": "UNTRANSLATED",
       "table-error": "UNTRANSLATED",
       "name-error": "UNTRANSLATED",
       "days-valid-error": "UNTRANSLATED",
-      "max-grade-error": "UNTRANSLATED"
+      "max-grade-error": "UNTRANSLATED",
+      "no-course-parts": "UNTRANSLATED",
+      "active-parts": "UNTRANSLATED",
+      "archived-parts": "UNTRANSLATED"
     },
     "models": {
       "has-multiple-warnings": "UNTRANSLATED",
@@ -351,8 +352,6 @@
       "expiry-before": "UNTRANSLATED",
       "edit-final": "UNTRANSLATED",
       "multiple-final": "UNTRANSLATED",
-      "number-no-name": "UNTRANSLATED",
-      "number-and-name": "UNTRANSLATED",
       "final-for": "UNTRANSLATED",
       "final-on-date": "UNTRANSLATED",
       "not-participated": "UNTRANSLATED",
@@ -376,8 +375,9 @@
         "ignore": "UNTRANSLATED?",
         "grades-added": "UNTRANSLATED",
         "completion-date": "UNTRANSLATED",
-        "modify-selected": "UNTRANSLATED",
+        "modify-completion": "UNTRANSLATED",
         "expiration-date": "UNTRANSLATED",
+        "modify-expiration": "UNTRANSLATED",
         "expiration-after-completion": "UNTRANSLATED",
         "higher-than-max": "UNTRANSLATED",
         "dates": "UNTRANSLATED",
@@ -396,9 +396,7 @@
         "download-csv-template": "UNTRANSLATED",
         "download-excel-template": "UNTRANSLATED",
         "add-manually": "UNTRANSLATED",
-        "student-number-empty": "UNTRANSLATED",
-        "modify-completion": "UNTRANSLATED",
-        "modify-expiration": "UNTRANSLATED"
+        "student-number-empty": "UNTRANSLATED"
       },
       "final-grade-preview": "UNTRANSLATED",
       "course-part-value-preview": "UNTRANSLATED",
@@ -477,7 +475,8 @@
     "no-users": "UNTRANSLATED",
     "reset-password-mfa": "UNTRANSLATED",
     "your-courses": "UNTRANSLATED",
-    "no-courses": "UNTRANSLATED"
+    "no-courses": "UNTRANSLATED",
+    "search-students": "UNTRANSLATED"
   },
   "utils": {
     "scale-numerical": "UNTRANSLATED",

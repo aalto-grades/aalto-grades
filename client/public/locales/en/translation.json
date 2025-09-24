@@ -27,7 +27,7 @@
       "hide-password": "Click to hide password from view",
       "show-password": "Click to show password",
       "token": {
-        "body": "You can find your API token by logging in to A+ and navigating to",
+        "intro": "You can find your API token by logging in to A+ and navigating to",
         "current": "Your current token",
         "hide-token-tip": "Hide token",
         "show-token-tip": "Show full token",
@@ -122,7 +122,6 @@
   "general": {
     "a+-api-token": "A+ API token",
     "a+-courses": "A+ courses",
-    "all": "All",
     "next": "Next",
     "back": "Back",
     "name": "Name",
@@ -150,12 +149,12 @@
     "date": "Date",
     "manage": "Manage",
     "close": "Close",
-    "confirm": "Confirm",
     "student-number": "Student number",
     "course-task": "Course task",
     "grade": "Grade",
     "grading-model": "Grading model",
     "grading-date": "Grading date",
+    "confirm": "Confirm",
     "final-grade": "Final grade",
     "results": {
       "history": {
@@ -173,6 +172,7 @@
     "delete": "Delete",
     "discard": "Discard",
     "grades-saved": "Grades saved",
+    "clear": "Clear",
     "done": "Done",
     "import": "Import",
     "course-part": "Course part",
@@ -192,7 +192,6 @@
     "teacher": "Teacher",
     "assistant": "Assistant",
     "student": "Student",
-    "clear": "Clear",
     "no-content": "No content",
     "select": "Select",
     "email": "Email",
@@ -204,6 +203,8 @@
     "courses": "Courses",
     "password": "Password",
     "unsaved-changes": "Unsaved changes",
+    "all": "All",
+    "backdrop-dismiss-disabled": "Backdrop click disabled, use close buttons!",
     "close-window": "Close window",
     "in-english": "in English",
     "in-finnish": "in Finnish",
@@ -211,8 +212,7 @@
     "search": "search",
     "final-grades": "Final grades",
     "course-part-grade": "Course Part Grade",
-    "not-int": "Value must be a valid integer",
-    "backdrop-dismiss-disabled": "Backdrop click disabled, use close buttons!"
+    "not-int": "Value must be a valid integer"
   },
   "course": {
     "parts": {
@@ -224,17 +224,18 @@
         "expiry-date-valid-help": "Course part expiration date",
         "previously-used-dates": "Previously used dates:"
       },
+      "no-expiry-date": "No expiry date",
       "select-grade-sources": "Select grade sources",
       "create-tasks": "Create course tasks",
       "delete-a+": "Delete A+ grade source",
       "no-aplus-grades": "No aplus grades found for selected course tasks",
-      "a+-confirm-grades": "Confirm {{count}} grades",
       "select-course-tasks": "Select course tasks",
       "select-for-fetching": "Select the course parts you want to fetch grades for from A+.",
       "fetching-grades": "Fetching grades",
       "fetching-grades-wait": "Fetching grades from A+, this may take a few minutes...",
+      "a+-confirm-grades_one": "Confirm {{count}} grade",
+      "a+-confirm-grades_other": "Confirm {{count}} grades",
       "not-found": "No course parts found",
-      "no-expiry-date": "No expiry date",
       "delete-with-model-message": "Are you sure want to delete this course part and all included course tasks that are used by some models?",
       "delete-with-task-message": "Are you sure want to delete this course part and all included course tasks?",
       "delete-message": "Are you sure want to delete this course part?",
@@ -253,13 +254,13 @@
       "add-new-task": "Add new course task",
       "add-from-a+": "Add course tasks from A+",
       "add-new-part": "Add new course part",
-      "no-course-parts": "No course parts. Please add course parts to get started.",
-      "active-parts": "Active course parts",
-      "archived-parts": "Archived course parts",
       "table-error": "Errors in the table values. Fix all rows with errors (cells marked with red)",
       "name-error": "Task name must be unique",
       "days-valid-error": "Days valid must be empty, zero, or a positive number",
-      "max-grade-error": "Max grade must be empty, zero, or a positive number"
+      "max-grade-error": "Max grade must be empty, zero, or a positive number",
+      "no-course-parts": "No course parts. Please add course parts to get started.",
+      "active-parts": "Active course parts",
+      "archived-parts": "Archived course parts"
     },
     "models": {
       "has-multiple-warnings": "Model has multiple warnings",
@@ -351,8 +352,6 @@
       "expiry-before": "Expiry date cannot be before date",
       "edit-final": "Edit final grades",
       "multiple-final": "Multiple final grades, click to show",
-      "number-no-name": "student number <bold>{{studentNumber}}</bold> (name not found)",
-      "number-and-name": "student <bold>{{name}}</bold> (student number: <bold>{{studentNumber}}</bold>)",
       "final-for": "Final grades for",
       "final-on-date": "Final grade obtained on {{date}}",
       "not-participated": "Not participated",
@@ -376,8 +375,9 @@
         "ignore": "Ignore",
         "grades-added": "Grades added successfully",
         "completion-date": "Completion date",
-        "modify-selected": "Modify selected",
+        "modify-completion": "Modify completion",
         "expiration-date": "Expiration date",
+        "modify-expiration": "Modify expiration",
         "expiration-after-completion": "Expiry date must be after completion date",
         "higher-than-max": "Some grades are higher than the maximum allowed values",
         "dates": "Completion and expiration dates",
@@ -396,9 +396,7 @@
         "download-csv-template": "Download CSV template",
         "download-excel-template": "Download Excel template",
         "add-manually": "Or add them manually",
-        "student-number-empty": "Student number cannot be empty",
-        "modify-completion": "Modify completion",
-        "modify-expiration": "Modify expiration"
+        "student-number-empty": "Student number cannot be empty"
       },
       "final-grade-preview": "Final grade preview",
       "course-part-value-preview": "Course part value",
@@ -477,7 +475,8 @@
     "no-users": "No users found",
     "reset-password-mfa": "Reset password / MFA",
     "your-courses": "Your courses",
-    "no-courses": "You have no courses. Please contact support to have your course added."
+    "no-courses": "You have no courses. Please contact support to have your course added.",
+    "search-students": "Search students"
   },
   "utils": {
     "scale-numerical": "Grading scale, 0-5",

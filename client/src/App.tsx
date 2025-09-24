@@ -102,7 +102,7 @@ const router = createBrowserRouter([
       {
         path: '/support',
         element: (
-          <StaticPageView url="/support.html" title="FAQ, Help and Support" />
+          <StaticPageView url="/support.html" title="Support" />
         ),
       },
       {

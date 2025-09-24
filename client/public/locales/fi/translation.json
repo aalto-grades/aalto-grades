@@ -27,7 +27,7 @@
       "hide-password": "Klikkaa piilottaaksesi salasanan",
       "show-password": "Klikkaa näyttääksesi salasanan",
       "token": {
-        "body": "Löydät API-käyttöoikeustietueesi kirjautumalla A+:aan ja siirtymällä sivulle",
+        "intro": "Löydät API-käyttöoikeustietueesi kirjautumalla A+:aan ja siirtymällä sivulle",
         "current": "Nykyinen käyttöoikeustietueesi",
         "hide-token-tip": "Piilota käyttöoikeustietue",
         "show-token-tip": "Näytä koko käyttöoikeustietue",
@@ -122,7 +122,6 @@
   "general": {
     "a+-api-token": "A+ API-käyttöoikeustietue",
     "a+-courses": "A+ kurssit",
-    "all": "Kaikki",
     "next": "Seuraava",
     "back": "Takaisin",
     "name": "Nimi",
@@ -150,12 +149,12 @@
     "date": "Päivämäärä",
     "manage": "Hallinnoi",
     "close": "Sulje",
-    "confirm": "Vahvista",
     "student-number": "Opiskelijanumero",
     "course-task": "Kurssitehtävä",
     "grade": "Arvosana",
     "grading-model": "Arviointimalli",
     "grading-date": "Arviointipäivämäärä",
+    "confirm": "Vahvista",
     "final-grade": "Lopullinen arvosana",
     "results": {
       "history": {
@@ -173,6 +172,7 @@
     "delete": "Poista",
     "discard": "Hylkää",
     "grades-saved": "Arvosanat tallennettu",
+    "clear": "Tyhjennä",
     "done": "Valmis",
     "import": "Tuo",
     "course-part": "Kurssin osa",
@@ -192,7 +192,6 @@
     "teacher": "Opettaja",
     "assistant": "Assistentti",
     "student": "Opiskelija",
-    "clear": "Tyhjennä",
     "no-content": "Ei sisältöä",
     "select": "Valitse",
     "email": "Sähköposti",
@@ -204,6 +203,8 @@
     "courses": "Kurssit",
     "password": "Salasana",
     "unsaved-changes": "Tallentamattomia muutoksia",
+    "all": "Kaikki",
+    "backdrop-dismiss-disabled": "Taustaklikkaus pois käytöstä, käytä sulkemispainikkeita!",
     "close-window": "Sulje ikkuna",
     "in-english": "englanniksi",
     "in-finnish": "suomeksi",
@@ -211,8 +212,7 @@
     "search": "Haku",
     "final-grades": "Lopulliset arvosanat",
     "course-part-grade": "Kurssin osan arvosana",
-    "not-int": "Arvon on oltava validi kokonaisluku",
-    "backdrop-dismiss-disabled": "Taustaklikkaus pois käytöstä, käytä sulkemispainikkeita!"
+    "not-int": "Arvon on oltava validi kokonaisluku"
   },
   "course": {
     "parts": {
@@ -224,17 +224,18 @@
         "expiry-date-valid-help": "Syötä validi voimassaoloaika",
         "previously-used-dates": "Viimeksi käytetyt päivämäärät:"
       },
+      "no-expiry-date": "Ei voimassaoloaikaa",
       "select-grade-sources": "Valitse arvosanalähteet",
       "create-tasks": "Luo tehtäviä",
       "delete-a+": "Poista A+",
       "no-aplus-grades": "Ei A+ arvosanoja",
-      "a+-confirm-grades": "Vahvista {{count}} arvosanaa",
       "select-course-tasks": "Valitse kurssitehtävät",
       "select-for-fetching": "Valitse haettavaksi",
       "fetching-grades": "Haetaan arvosanoja",
       "fetching-grades-wait": "Odota, haetaan arvosanoja...",
+      "a+-confirm-grades_one": "UNTRANSLATED",
+      "a+-confirm-grades_other": "UNTRANSLATED",
       "not-found": "Kurssin osia ei löytynyt",
-      "no-expiry-date": "Ei voimassaoloaikaa",
       "delete-with-model-message": "Tämä sisältää arviointimallin, poistetaanko?",
       "delete-with-task-message": "Tämä sisältää tehtäviä, poistetaanko?",
       "delete-message": "Haluatko varmasti poistaa?",
@@ -253,13 +254,13 @@
       "add-new-task": "Lisää uusi tehtävä",
       "add-from-a+": "Lisää A+:sta",
       "add-new-part": "Lisää uusi kurssin osa",
-      "no-course-parts": "Ei kurssin osia",
-      "active-parts": "Aktiiviset kurssin osat",
-      "archived-parts": "Arkistoidut kurssin osat",
       "table-error": "Virheitä taulukon arvoissa. Korjaa kaikki virheelliset rivit (solut merkitty punaisella)",
       "name-error": "Tehtävän nimen on oltava yksilöllinen",
       "days-valid-error": "Voimassaolopäivien on oltava tyhjä, nolla tai positiivinen numero",
-      "max-grade-error": "Enimmäispisteiden on oltava tyhjä, nolla tai positiivinen numero"
+      "max-grade-error": "Enimmäispisteiden on oltava tyhjä, nolla tai positiivinen numero",
+      "no-course-parts": "Ei kurssin osia",
+      "active-parts": "Aktiiviset kurssin osat",
+      "archived-parts": "Arkistoidut kurssin osat"
     },
     "models": {
       "has-multiple-warnings": "Sisältää useita varoituksia",
@@ -351,8 +352,6 @@
       "expiry-before": "Vanhentumispäivä ennen suoritusta",
       "edit-final": "Muokkaa lopullista arvosanaa",
       "multiple-final": "Useita lopullisia arvosanoja",
-      "number-no-name": "opiskelijanumero <bold>{{studentNumber}}</bold> (nimeä ei löytynyt)",
-      "number-and-name": "opiskelija <bold>{{name}}</bold> (opiskelijanumero: <bold>{{studentNumber}}</bold>)",
       "final-for": "Lopulliset arvosanat",
       "final-on-date": "Lopullinen arvosana annettu {{date}}",
       "not-participated": "Ei osallistunut",
@@ -376,8 +375,9 @@
         "ignore": "Ohita",
         "grades-added": "Arvosanat lisätty onnistuneesti",
         "completion-date": "Suorituspäivämäärä",
-        "modify-selected": "Muokkaa valittuja",
+        "modify-completion": "Muokkaa Suorituspäivämäärä",
         "expiration-date": "Vanhentumispäivämäärä",
+        "modify-expiration": "Muokkaa vanhentumispäivämäärä",
         "expiration-after-completion": "Vanhentumispäivämäärän on oltava suorituspäivämäärän jälkeen",
         "higher-than-max": "Jotkin arvosanat ylittävät sallitut enimmäisarvot",
         "dates": "Suoritus- ja vanhentumispäivämäärät",
@@ -396,9 +396,7 @@
         "download-csv-template": "Lataa CSV-pohja",
         "download-excel-template": "Lataa Excel-pohja",
         "add-manually": "Tai lisää ne manuaalisesti",
-        "student-number-empty": "Opiskelijanumero ei voi olla tyhjä",
-        "modify-completion": "Muokkaa Suorituspäivämäärä",
-        "modify-expiration": "Muokkaa vanhentumispäivämäärä"
+        "student-number-empty": "Opiskelijanumero ei voi olla tyhjä"
       },
       "final-grade-preview": "Lopullisen arvosanan esikatselu",
       "course-part-value-preview": "Kurssin osan arvo",
@@ -477,7 +475,8 @@
     "no-users": "Käyttäjiä ei löytynyt",
     "reset-password-mfa": "Nollaa salasana / MFA",
     "your-courses": "Kurssisi",
-    "no-courses": "Sinulla ei ole kursseja. Ota yhteyttä tukeen kurssin lisäämiseksi."
+    "no-courses": "Sinulla ei ole kursseja. Ota yhteyttä tukeen kurssin lisäämiseksi.",
+    "search-students": "UNTRANSLATED"
   },
   "utils": {
     "scale-numerical": "Arviointiasteikko, 0-5",

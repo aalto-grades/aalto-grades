@@ -26,8 +26,9 @@ import {
   useMemo,
   useState,
 } from 'react';
+import {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useParams} from 'react-router-dom';
+import {useParams, useSearchParams} from 'react-router-dom';
 import {z} from 'zod';
 
 import {type StudentRow, SystemRole} from '@/common/types';
@@ -339,6 +340,8 @@ const GradesTableToolbar = (): JSX.Element => {
   const {auth, isTeacherInCharge} = useAuth();
   const {courseId} = useParams() as {courseId: string};
   const {table, gradeSelectOption, selectedGradingModel} = useTableContext();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialSearch = searchParams.get('search') ?? '';
   const theme = useTheme();
 
   const course = useGetCourse(courseId);
@@ -348,14 +351,17 @@ const GradesTableToolbar = (): JSX.Element => {
   const getGrades = useGetGrades(courseId);
   const addFinalGrades = useAddFinalGrades(courseId);
 
-  const [showCalculateDialog, setShowCalculateDialog] =
-    useState<boolean>(false);
+  const [showCalculateDialog, setShowCalculateDialog] = useState<boolean>(false);
   const [showSisuDialog, setShowSisuDialog] = useState<boolean>(false);
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
-
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
-  const [aplusImportDialogOpen, setAplusImportDialogOpen] =
-    useState<boolean>(false);
+  const [aplusImportDialogOpen, setAplusImportDialogOpen] = useState<boolean>(false);
+  // Set initial search value from query param (only on first render)
+  const [searchValue, setSearchValue] = useState<string>(initialSearch);
+  // Keep table global filter in sync with searchValue
+  useEffect(() => {
+    table.setGlobalFilter(searchValue);
+  }, [searchValue, table]);
 
   // Filter out archived models
   const gradingModels = useMemo(
@@ -461,17 +467,19 @@ const GradesTableToolbar = (): JSX.Element => {
   };
 
   const resetSearch = (): void => {
-    table.setGlobalFilter('');
+    setSearchValue('');
   };
-
   const handleSearch = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ): void => {
-    table.setGlobalFilter(e.target.value);
-    return;
+    setSearchValue(e.target.value);
+    if (e.target.value) {
+      searchParams.set('search', e.target.value);
+    } else {
+      searchParams.delete('search');
+    }
+    setSearchParams(searchParams, {replace: true});
   };
-
-  const searchValue = table.getState().globalFilter as string;
 
   return (
     <>

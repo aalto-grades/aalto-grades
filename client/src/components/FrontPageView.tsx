@@ -65,6 +65,10 @@ const FrontPageView = (): JSX.Element => {
           >
             {t('front-page.create-new-course')}
           </Button>
+
+          <Button size="large" variant="outlined" href="/students" sx={{mb: -11.25, ml: 1}}>
+            {t('front-page.search-students')}
+          </Button>
         </>
       )}
       {auth?.role === SystemRole.Admin && (
