@@ -28,9 +28,9 @@ export const createAplusPaginationSchema = <T extends z.ZodType>(
   });
 
 // GET /users/me
-export const AplusCoursesResSchema = z.strictObject({
+export const AplusCoursesResSchema = z.object({
   staff_courses: z.array(
-    z.strictObject({
+    z.object({
       id: z.number().int(),
       code: z.string(),
       name: z.string(),

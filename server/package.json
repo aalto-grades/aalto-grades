@@ -22,8 +22,8 @@
   "dependencies": {
     "@node-saml/passport-saml": "^5.0.0",
     "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/auto-instrumentations-node": "^0.62.1",
-    "@opentelemetry/winston-transport": "^0.14.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.64.1",
+    "@opentelemetry/winston-transport": "^0.16.0",
     "@xmldom/xmldom": "^0.9.8",
     "argon2": "^0.44.0",
     "axios": "^1.8.2",
