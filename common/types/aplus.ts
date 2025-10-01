@@ -13,7 +13,7 @@ export enum AplusGradeSourceType {
   Difficulty = 'DIFFICULTY',
 }
 
-export const AplusCourseDataSchema = z.strictObject({
+export const AplusCourseDataSchema = z.object({
   id: z.number().int(),
   courseCode: z.string(),
   name: z.string(),
