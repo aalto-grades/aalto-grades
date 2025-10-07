@@ -13,7 +13,6 @@ import type User from '../database/models/user';
 // Endpoint types
 interface TypedRequestBody<T> extends Request {
   body: T;
-  // user?: JwtClaims;
 }
 
 export type SyncEndpoint<ReqType, ResType> = (

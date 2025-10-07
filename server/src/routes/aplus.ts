@@ -13,7 +13,7 @@ import {
   fetchAplusGrades,
 } from '../controllers/aplus';
 import {handleInvalidRequestJson} from '../middleware';
-import {jwtAuthentication} from '../middleware/authentication';
+import {apiKeyAuthentication, jwtAuthentication} from '../middleware/authentication';
 import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {processRequestBody} from '../middleware/zodValidation';
@@ -22,12 +22,14 @@ export const router = Router();
 
 router.get(
   '/v1/aplus/courses',
+  apiKeyAuthentication,
   jwtAuthentication,
   controllerDispatcher(fetchAplusCourses)
 );
 
 router.get(
   '/v1/aplus/courses/:aplusCourseId',
+  apiKeyAuthentication,
   jwtAuthentication,
   controllerDispatcher(fetchAplusExerciseData)
 );
@@ -51,6 +53,7 @@ router.delete(
 
 router.get(
   '/v1/courses/:courseId/aplus-fetch',
+  apiKeyAuthentication,
   jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(fetchAplusGrades)

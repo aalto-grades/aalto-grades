@@ -21,7 +21,7 @@ import {
   verifyEmail,
 } from '../controllers/user';
 import {handleInvalidRequestJson} from '../middleware';
-import {jwtAuthentication} from '../middleware/authentication';
+import {apiKeyAuthentication, jwtAuthentication} from '../middleware/authentication';
 import {authorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {processRequestBody, validateRequestBody} from '../middleware/zodValidation';
@@ -30,24 +30,28 @@ export const router = Router();
 
 router.get(
   '/v1/users/own-courses',
+  apiKeyAuthentication,
   jwtAuthentication,
   controllerDispatcher(getOwnCourses)
 );
 
 router.get(
   '/v1/users/:userId/courses/',
+  apiKeyAuthentication,
   jwtAuthentication,
   controllerDispatcher(getCoursesOfUser)
 );
 
 router.get(
   '/v1/users/students',
+  apiKeyAuthentication,
   jwtAuthentication,
   controllerDispatcher(getStudents)
 );
 
 router.get(
   '/v1/users',
+  apiKeyAuthentication,
   jwtAuthentication,
   authorization([SystemRole.Admin]),
   controllerDispatcher(getUsers)
