@@ -16,7 +16,7 @@ import {
   getCourseParts,
 } from '../controllers/coursePart';
 import {handleInvalidRequestJson} from '../middleware';
-import {jwtAuthentication} from '../middleware/authentication';
+import {apiKeyAuthentication, jwtAuthentication} from '../middleware/authentication';
 import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {processRequestBody} from '../middleware/zodValidation';
@@ -25,6 +25,7 @@ export const router = Router();
 
 router.get(
   '/v1/courses/:courseId/parts',
+  apiKeyAuthentication,
   jwtAuthentication,
   courseAuthorization([
     CourseRoleType.Teacher,

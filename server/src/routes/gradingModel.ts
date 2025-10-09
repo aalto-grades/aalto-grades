@@ -17,7 +17,7 @@ import {
   getGradingModel,
 } from '../controllers/gradingModel';
 import {handleInvalidRequestJson} from '../middleware';
-import {jwtAuthentication} from '../middleware/authentication';
+import {apiKeyAuthentication, jwtAuthentication} from '../middleware/authentication';
 import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {processRequestBody} from '../middleware/zodValidation';
@@ -26,6 +26,7 @@ export const router = Router();
 
 router.get(
   '/v1/courses/:courseId/grading-models/:gradingModelId',
+  apiKeyAuthentication,
   jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(getGradingModel)
@@ -33,6 +34,7 @@ router.get(
 
 router.get(
   '/v1/courses/:courseId/grading-models',
+  apiKeyAuthentication,
   jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(getAllGradingModels)

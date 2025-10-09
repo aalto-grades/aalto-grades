@@ -5,13 +5,14 @@
 import {Router} from 'express';
 
 import {fetchSisuCoursesByCode} from '../controllers/sisu';
-import {jwtAuthentication} from '../middleware/authentication';
+import {apiKeyAuthentication, jwtAuthentication} from '../middleware/authentication';
 import {controllerDispatcher} from '../middleware/errorHandler';
 
 export const router = Router();
 
 router.get(
   '/v1/sisu/courses/:courseCode',
+  apiKeyAuthentication,
   jwtAuthentication,
   controllerDispatcher(fetchSisuCoursesByCode)
 );

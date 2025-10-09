@@ -20,7 +20,7 @@ import {
   getLatestGrades,
 } from '../controllers/taskGrade';
 import {handleInvalidRequestJson} from '../middleware';
-import {jwtAuthentication} from '../middleware/authentication';
+import {apiKeyAuthentication, jwtAuthentication} from '../middleware/authentication';
 import {authorization, courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {processRequestBody} from '../middleware/zodValidation';
@@ -29,6 +29,7 @@ export const router = Router();
 
 router.get(
   '/v1/courses/:courseId/grades',
+  apiKeyAuthentication,
   jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(getGrades)
@@ -36,6 +37,7 @@ router.get(
 
 router.get(
   '/v1/grade-logs',
+  apiKeyAuthentication,
   jwtAuthentication,
   controllerDispatcher(getGradeLogs)
 );
