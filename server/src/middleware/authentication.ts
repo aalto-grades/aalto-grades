@@ -5,7 +5,7 @@
 import type {NextFunction, Request, RequestHandler, Response} from 'express';
 import passport from 'passport';
 
-import {SystemRole, UserData} from '@/common/types';
+import {SystemRole} from '@/common/types';
 import {HttpCode} from '@/common/types/general';
 import type {JwtClaims} from '../types';
 
