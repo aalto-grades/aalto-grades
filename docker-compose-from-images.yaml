@@ -81,6 +81,8 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - ${POSTGRES_MOUNTDIR}:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
 
   # Running an internal grafana stack, currently not saving data permanently
   otel-lgtm:

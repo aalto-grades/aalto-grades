@@ -40,16 +40,13 @@ services:
       service: database
 
   otel-lgtm:
-    image: grafana/otel-lgtm:latest
-    ports:
-      - "127.0.0.1:3001:3000"
-      # - "4317:4317" # OTLP gRPC
-      # - "4318:4318" # OTLP HTTP
+    extends:
+      file: ./docker-compose-from-images.yaml
+      service: otel-lgtm
     volumes:
       - "./grafana_volume/data:/data"
     environment:
-      - OTEL_RESOURCE_ATTRIBUTES=service.name=otel-lgtm
-    restart: unless-stopped
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=otel-lgtm-dev
 
   watchtower:
     image: containrrr/watchtower
