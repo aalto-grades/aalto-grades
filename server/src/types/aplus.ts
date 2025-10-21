@@ -20,7 +20,7 @@ export const createAplusPaginationSchema = <T extends z.ZodType>(
   previous: z.ZodNullable<z.ZodString>;
   results: T;
 }> =>
-  z.strictObject({
+  z.object({
     count: z.number().int(),
     next: z.string().nullable(),
     previous: z.string().nullable(),
@@ -41,14 +41,14 @@ export const AplusCoursesResSchema = z.object({
 });
 
 // GET /courses/<course_id>/exercises
-export const AplusExercisesResSchema = z.strictObject({
+export const AplusExercisesResSchema = z.object({
   results: z.array(
-    z.strictObject({
+    z.object({
       id: z.number().int(),
       display_name: z.string(),
       closing_time: DateSchema,
       exercises: z.array(
-        z.strictObject({
+        z.object({
           id: z.number().int(),
           display_name: z.string(),
           max_points: z.number().int(),
@@ -59,16 +59,16 @@ export const AplusExercisesResSchema = z.strictObject({
   ),
 });
 
-const AplusStudentPointsSchema = z.strictObject({
+const AplusStudentPointsSchema = z.object({
   student_id: z.string().nullable(),
   points: z.number().int(),
   points_by_difficulty: z.record(z.string(), z.number().int()),
   modules: z.array(
-    z.strictObject({
+    z.object({
       id: z.number().int(),
       points: z.number().int(),
       exercises: z.array(
-        z.strictObject({
+        z.object({
           id: z.number().int(),
           points: z.number().int(),
         })
