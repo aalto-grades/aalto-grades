@@ -54,6 +54,8 @@ services:
       SAML_METADATA_URL: "${SAML_METADATA_URL}"
       SISU_API_TOKEN: "${SISU_API_TOKEN}"
       SISU_API_URL: "${SISU_API_URL}"
+      # Tokens
+      STUDENTS_SERVICE_API_KEY: "${STUDENTS_SERVICE_API_KEY}"
       # OTEL settings
       OTEL_SERVICE_NAME: "ossi-backend"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-lgtm:4317"
