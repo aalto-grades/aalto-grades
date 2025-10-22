@@ -195,3 +195,9 @@ if (ENABLE_SISU_MOCKS) {
     'No SISU_API_TOKEN specified, using default value. Sisu endpoints will return only mock data'
   );
 }
+export const STUDENTS_SERVICE_API_KEY = process.env.STUDENTS_SERVICE_API_KEY || null;
+if (!STUDENTS_SERVICE_API_KEY) {
+  httpLogger.warn(
+    'No STUDENTS_SERVICE_API_KEY specified, API key authentication for the students service will not work'
+  );
+}
