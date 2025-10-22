@@ -7,6 +7,7 @@ import passport from 'passport';
 
 import {SystemRole} from '@/common/types';
 import {HttpCode} from '@/common/types/general';
+import {STUDENTS_SERVICE_API_KEY} from '../configs/environment';
 import type {JwtClaims} from '../types';
 
 export const jwtAuthentication = (
@@ -54,14 +55,14 @@ export const apiKeyAuthentication = (
 ) => {
   const apiKey = req.headers['x-api-key'] as string;
 
-  if (!apiKey) {
+  if (!apiKey || !STUDENTS_SERVICE_API_KEY) {
     // No API key, continue to JWT authentication
     return next();
   }
 
   // Get valid API keys from environment
   const validApiKeys: Record<string, string> = {
-    'students-service': process.env.STUDENTS_SERVICE_API_KEY || '',
+    'students-service': STUDENTS_SERVICE_API_KEY,
     // 'another-service': process.env.ANOTHER_SERVICE_API_KEY || '',
   };
   console.log('Valid API Keys:', validApiKeys); // Debugging line
