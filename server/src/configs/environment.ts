@@ -197,3 +197,10 @@ if (ENABLE_SISU_MOCKS) {
 }
 
 export const STUDENTS_SERVICE_API_KEY = process.env.STUDENTS_SERVICE_API_KEY || null;
+if (!STUDENTS_SERVICE_API_KEY) {
+  httpLogger.warn(
+    'No STUDENTS_SERVICE_API_KEY specified, API key authentication for the students service will not work'
+  );
+} else {
+  httpLogger.info('STUDENTS_SERVICE_API_KEY is: ' + STUDENTS_SERVICE_API_KEY);
+}
