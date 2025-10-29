@@ -15,6 +15,7 @@ type PropsType = {
   form: FormikProps<{[key: string]: unknown}>;
   value: string;
   label: string;
+  autoComplete?: string;
   helperText?: string;
   select?: boolean;
   type?: HTMLInputTypeAttribute;
@@ -29,6 +30,7 @@ const FormField = ({
   form,
   value,
   label,
+  autoComplete,
   helperText,
   select,
   type,
@@ -44,6 +46,7 @@ const FormField = ({
     value={form.values[value] ?? ''} // Convert nulls in to empty values to prevent warnings
     disabled={disabled || form.isSubmitting}
     label={label}
+    {...(autoComplete && {autoComplete})} // Add autoComplete prop only if provided
     slotProps={{
       input: InputProps,
       inputLabel: {shrink: true},
