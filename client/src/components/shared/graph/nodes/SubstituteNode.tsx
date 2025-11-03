@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */ // Refer to UseEffect comment
 // SPDX-FileCopyrightText: 2024 The Ossi Developers
 //
 // SPDX-License-Identifier: MIT
@@ -245,9 +246,9 @@ const SubstituteNode = (props: NodeProps): JSX.Element => {
                 style={{
                   height: rowHeight,
                   backgroundColor:
-                    nodeValue.sources[key].value !== nodeValue.values[key]
-                      ? '#ffc'
-                      : '',
+                    nodeValue.sources[key].value === nodeValue.values[key]
+                      ? ''
+                      : '#ffc',
                 }}
               >
                 <td>

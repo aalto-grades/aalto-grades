@@ -20,7 +20,7 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import {type JSX, useEffect, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 export type MismatchData = {
@@ -43,8 +43,8 @@ const MismatchDialog = ({
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const [selections, setSelections] = useState<Selections>({});
-  const [error, setError] = useState<MismatchError>('');
-  const [duplicate, setDuplicate] = useState<string>('');
+  let error: MismatchError = '';
+  let duplicate = '';
 
   const [oldMismatchData, setOldMismatchData] = useState<MismatchData | null>(
     null
@@ -59,44 +59,33 @@ const MismatchDialog = ({
         task => task.toLowerCase() === key.toLowerCase()
       );
       if (matchingTask) newSelections[key] = matchingTask;
-      else newSelections[key] = null;
+      else newSelections[key] = 'ignoreColumn'; // Ignoring column insted of null
     }
     setSelections(newSelections);
   }
 
   // Find errors
-  useEffect(() => {
-    // Empty target
-    const emptyTarget = Object.values(selections).some(
-      target => target === null
-    );
-    if (emptyTarget) {
-      setError('empty');
-      return;
-    }
-
-    // Duplicate target
+  // Empty target
+  const emptyTarget = Object.values(selections).includes(null);
+  if (emptyTarget) {
+    error = 'empty';
+  } else {
+  // Duplicate target
     const usedSelections: string[] = [];
     for (const target of Object.values(selections)) {
       if (usedSelections.includes(target!) && target !== 'ignoreColumn') {
-        setError('duplicate');
-        setDuplicate(target!);
-        return;
+        error = 'duplicate';
+        duplicate = target!;
       }
       usedSelections.push(target!);
     }
+  }
 
-    // Student number target not found
-    const studentNumberTarget = Object.values(selections).some(
-      target => target === 'studentNo'
-    );
-    if (!studentNumberTarget) {
-      setError('noStudentNo');
-      return;
-    }
-
-    setError('');
-  }, [mismatchData.columnKeys, selections]);
+  // Student number target not found
+  const studentNumberTarget = Object.values(selections).includes('studentNo');
+  if (!studentNumberTarget) {
+    error = 'noStudentNo';
+  }
 
   const getErrorText = (): string => {
     switch (error) {
@@ -115,7 +104,7 @@ const MismatchDialog = ({
     <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle>{t('course.results.upload.mismatch')}</DialogTitle>
       <DialogContent>
-        <Alert severity={error !== '' ? 'error' : 'success'} sx={{mb: 2}}>
+        <Alert severity={error === '' ? 'success' : 'error'} sx={{mb: 2}}>
           {getErrorText()}
         </Alert>
         <TableContainer>

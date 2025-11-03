@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import {type JSX, useEffect, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
@@ -42,16 +42,11 @@ const AddAplusGradeSourceDialog = ({
   });
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
-  const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
-    useState<boolean>(false);
   const [step, setStep] = useState<number>(0);
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
   const open = courseTaskId !== null;
-
-  useEffect(() => {
-    setAplusTokenDialogOpen(!getToken() || aplusCourses.isError);
-  }, [open, aplusCourses]);
+  const aplusTokenDialogOpen = open && (!getToken() || aplusCourses.isError); // Open/close token dialog if token exists or an error occurred while fetching courses
 
   const handleResetAndClose = (): void => {
     setStep(0);
@@ -65,7 +60,6 @@ const AddAplusGradeSourceDialog = ({
         open={aplusTokenDialogOpen && open}
         onClose={onClose}
         onSubmit={() => {
-          setAplusTokenDialogOpen(false);
           aplusCourses.refetch();
         }}
         error={aplusCourses.isError}

@@ -27,7 +27,6 @@ import {
   type ChangeEvent,
   type JSX,
   useCallback,
-  useEffect,
   useState,
 } from 'react';
 import {useTranslation} from 'react-i18next';
@@ -43,7 +42,7 @@ import {
 import {getToken} from '@/utils';
 
 type PropsType = {open: boolean; onClose: () => void};
-const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
+const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element | null => {
   const {t} = useTranslation();
   const queryClient = useQueryClient();
   const {courseId} = useParams() as {courseId: string};
@@ -53,9 +52,7 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
 
   const [step, setStep] = useState<number>(0);
   const [courseTaskIds, setCourseTaskIds] = useState<number[]>([]);
-  const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
-    useState<boolean>(false);
-
+  const [aplusTokenDialogOpen, setAplusTokenDialogOpen] = useState<boolean>(false);
   const aplusGrades = useFetchAplusGrades(courseId, courseTaskIds, {
     enabled: false,
   });
@@ -64,39 +61,24 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
     setStep(0);
     setCourseTaskIds([]);
     setAplusTokenDialogOpen(false);
-    onClose();
-    queryClient.invalidateQueries({
-      queryKey: ['a+-grades', courseId, courseTaskIds],
+    queryClient.removeQueries({
+      queryKey: ['a+-grades'],
     });
-  }, [courseId, courseTaskIds, onClose, queryClient]);
+    onClose();
+  }, [onClose, queryClient]);
 
-  // Must be a useEffect to be able to call enqueueSnackbar & onClose :/
-  useEffect(() => {
-    if (step !== 1) return;
+  if (!open) return null;
+  console.log(!aplusTokenDialogOpen, !getToken(), aplusGrades.isError, !!aplusGrades.error);
+  if (!aplusTokenDialogOpen && (!getToken() || (aplusGrades.isError && aplusGrades.error.message.includes('502') && aplusGrades.error.message.includes('401')))) {
+    setAplusTokenDialogOpen(true);
+  }
 
-    if (!aplusGrades.data) {
-      setAplusTokenDialogOpen(
-        !getToken()
-        || (aplusGrades.isError
-          && aplusGrades.error.message.includes('502')
-          && aplusGrades.error.message.includes('401'))
-      );
-    } else if (aplusGrades.data.length === 0) {
-      enqueueSnackbar(t('course.parts.no-aplus-grades'), {
-        variant: 'warning',
-      });
-      handleResetAndClose();
-    } else {
-      setStep(2);
-    }
-  }, [
-    aplusGrades.data,
-    aplusGrades.error,
-    aplusGrades.isError,
-    handleResetAndClose,
-    step,
-    t,
-  ]);
+  if (aplusGrades.data?.length === 0) {
+    enqueueSnackbar(t('course.parts.no-aplus-grades'), {
+      variant: 'warning',
+    });
+    handleResetAndClose();
+  }
 
   const handleSelect = (
     event: ChangeEvent<HTMLInputElement>,
@@ -118,15 +100,6 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
 
   return (
     <>
-      <TokenDialog
-        open={aplusTokenDialogOpen}
-        onClose={handleResetAndClose}
-        onSubmit={() => {
-          setAplusTokenDialogOpen(false);
-          aplusGrades.refetch();
-        }}
-        error={aplusGrades.isError}
-      />
       <Dialog open={open} onClose={handleResetAndClose} maxWidth="md" fullWidth>
         {step === 0 && (
           <>
@@ -166,7 +139,7 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
           </>
         )}
 
-        {step === 1 && (
+        {step !== 0 && aplusGrades.isFetching && (
           <>
             <DialogTitle>{t('course.parts.fetching-grades')}</DialogTitle>
             <DialogContent>
@@ -176,11 +149,11 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
           </>
         )}
 
-        {step === 2 && (
+        {step !== 0 && !aplusGrades.isFetching && aplusGrades.data && (
           <>
             <DialogTitle>
               {t('course.parts.a+-confirm-grades', {
-                count: aplusGrades.data?.length,
+                count: aplusGrades.data.length,
               })}
             </DialogTitle>
             <DialogContent>
@@ -198,7 +171,7 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {aplusGrades.data?.map(row => (
+                    {aplusGrades.data.map(row => (
                       <TableRow
                         key={`${row.studentNumber}-${row.courseTaskId}`}
                       >
@@ -228,7 +201,7 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
             <DialogActions>
               <Button
                 onClick={() => {
-                  addGrades.mutate(aplusGrades.data!);
+                  addGrades.mutate(aplusGrades.data);
                   handleResetAndClose();
                 }}
               >
@@ -238,6 +211,18 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element => {
           </>
         )}
       </Dialog>
+      <TokenDialog
+        open={aplusTokenDialogOpen}
+        onClose={handleResetAndClose}
+        onSubmit={() => {
+          queryClient.removeQueries({
+            queryKey: ['a+-grades'],
+          });
+          setStep(0);
+          setAplusTokenDialogOpen(false);
+        }}
+        error={aplusGrades.isError}
+      />
     </>
   );
 };

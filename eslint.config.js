@@ -12,8 +12,9 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import eslintPluginYml from 'eslint-plugin-yml';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import {defineConfig} from 'eslint/config';
 
-export default tseslint.config(
+export default defineConfig(
   {
     name: 'Global Ignore',
     ignores: [
@@ -250,7 +251,7 @@ export default tseslint.config(
       importPlugin.flatConfigs.typescript,
       react.configs.flat.recommended,
       react.configs.flat['jsx-runtime'],
-      reactHooks.configs['recommended-latest'],
+      reactHooks.configs.flat['recommended-latest'],
     ],
     languageOptions: {
       ecmaVersion: 'latest',

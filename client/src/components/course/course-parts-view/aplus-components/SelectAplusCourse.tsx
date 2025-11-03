@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {Autocomplete, Box, TextField} from '@mui/material';
-import {type JSX, useCallback, useEffect, useState} from 'react';
+import {type JSX, useCallback, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
@@ -80,10 +80,7 @@ const SelectAplusCourse = ({
     [aplusCourses, setInstance]
   );
 
-  // Try to set course if not selected yet
-  useEffect(() => {
-    if (!selectedAplusCourse) setCourse(course.data?.courseCode);
-  }, [course.data?.courseCode, selectedAplusCourse, setCourse]);
+  if (!selectedAplusCourse) setCourse(course.data?.courseCode); // Try to set course if not selected yet
 
   if (!course.data) return <>{t('general.loading')}</>;
 
