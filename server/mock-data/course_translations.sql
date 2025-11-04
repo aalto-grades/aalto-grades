@@ -11,7 +11,7 @@ INSERT INTO public.course_translation (course_id, language, course_name, created
 (2, 'SV', 'Y1', NOW(), NOW()),
 (3, 'EN', 'Example & grades', NOW(), NOW()),
 (3, 'FI', 'Esimerkki & arvosanat', NOW(), NOW()),
-(3, 'SV', 'Example & grades', NOW(), NOW()),
+(3, 'SV', 'Exempel & betyg', NOW(), NOW()),
 (4, 'EN', 'Example', NOW(), NOW()),
 (4, 'FI', 'Esimerkki', NOW(), NOW()),
-(4, 'SV', 'Example', NOW(), NOW());
+(4, 'SV', 'Exempel', NOW(), NOW());
