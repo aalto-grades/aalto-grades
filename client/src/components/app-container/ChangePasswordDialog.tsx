@@ -109,6 +109,7 @@ const ChangePasswordDialog = ({open, onClose}: PropsType): JSX.Element => {
                 form={form as unknown as FormikProps<{[key: string]: unknown}>}
                 value="newPassword"
                 label={`${t('shared.auth.password.new')}*`}
+                autoComplete="new-password"
                 type={showPassword.new ? 'text' : 'password'}
                 InputProps={{endAdornment: <ShowPasswordButton type="new" />}}
               />
