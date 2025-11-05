@@ -7,8 +7,11 @@ import {
   type UseMutationResult,
   type UseQueryOptions,
   type UseQueryResult,
+  type UseSuspenseQueryOptions,
+  type UseSuspenseQueryResult,
   useMutation,
   useQuery,
+  useSuspenseQuery,
 } from '@tanstack/react-query';
 
 import {
@@ -38,6 +41,23 @@ export const useGetRefreshToken = (
       const res = await axios.get('/api/v1/auth/self-info');
       if (res.status === 401) return null;
       return AuthDataSchema.parse(res.data);
+    },
+    ...options,
+  });
+
+export const useGetRefreshTokenSuspense = (
+  options?: Partial<UseSuspenseQueryOptions<AuthData | null>>
+): UseSuspenseQueryResult<AuthData | null> =>
+  useSuspenseQuery({
+    queryKey: ['refresh-token'],
+    queryFn: async () => {
+      try {
+        const res = await axios.get('/api/v1/auth/self-info');
+        if (res.status === 401) return null;
+        return AuthDataSchema.parse(res.data);
+      } catch {
+        return null;
+      }
     },
     ...options,
   });

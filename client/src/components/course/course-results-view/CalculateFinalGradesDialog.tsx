@@ -21,7 +21,7 @@ import {
   Typography,
 } from '@mui/material';
 import dayjs, {type Dayjs} from 'dayjs';
-import {type JSX, useEffect, useMemo, useState} from 'react';
+import {type JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
@@ -43,7 +43,10 @@ type PropsType = {
     gradingDate: Date,
   ) => Promise<boolean>;
 };
-
+/**
+ * CHANGE KEY TO RESET
+ * Dialog for creating final grades.
+ * */
 const CalculateFinalGradesDialog = ({
   open,
   onClose,
@@ -55,8 +58,22 @@ const CalculateFinalGradesDialog = ({
   const {courseId} = useParams() as {courseId: string};
   const allGradingModels = useGetAllGradingModels(courseId);
 
+  const findGradeDate = () => {
+    if (!open) return;
+
+    let latestDate = new Date(0);
+    for (const row of selectedRows) {
+      for (const courseTask of row.courseTasks) {
+        for (const grade of courseTask.grades) {
+          if (grade.date > latestDate) latestDate = grade.date;
+        }
+      }
+    }
+    return dayjs(latestDate);
+  };
+
   const [dateOverride, setDateOverride] = useState<boolean>(false);
-  const [gradingDate, setGradingDate] = useState<Dayjs>(dayjs());
+  const [gradingDate, setGradingDate] = useState<Dayjs>(findGradeDate() ?? dayjs());
   const [selectedModel, setSelectedModel] = useState<GradingModelData | null>(
     null,
   );
@@ -77,24 +94,8 @@ const CalculateFinalGradesDialog = ({
     [selectedRows, selectedModel],
   );
 
-  useEffect(() => {
-    if (!open) return;
-
-    let latestDate = new Date(0);
-    for (const row of selectedRows) {
-      for (const courseTask of row.courseTasks) {
-        for (const grade of courseTask.grades) {
-          if (grade.date > latestDate) latestDate = grade.date;
-        }
-      }
-    }
-    setGradingDate(dayjs(latestDate));
-  }, [open, selectedRows]);
-
-  useEffect(() => {
-    if (selectedModel === null && modelList.length > 0)
-      setSelectedModel(modelList[0]);
-  }, [modelList, selectedModel]);
+  if (selectedModel === null && modelList.length > 0)
+    setSelectedModel(modelList[0]);
 
   const handleSubmit = async (): Promise<void> => {
     if (selectedModel === null) return;

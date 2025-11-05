@@ -15,7 +15,6 @@ import {
   CourseRoleType,
   type GradingModelData,
   type GraphStructure,
-  type StudentRow,
   SystemRole,
 } from '@/common/types';
 import {batchCalculateCourseParts} from '@/common/util';
@@ -62,15 +61,6 @@ const ModelsView = (): JSX.Element => {
   });
   const grades = useGetGrades(courseId);
 
-  const [currentModel, setCurrentModel] = useState<GradingModelData | null>(
-    null
-  );
-  const [currentUserRow, setCurrentUserRow] = useState<StudentRow | null>(null);
-  const [coursePartValues, setCoursePartValues] = useState<{
-    [key: string]: number | null;
-  } | null>(null);
-  const [loadGraphId, setLoadGraphId] = useState<number>(-1);
-
   const [createDialogOpen, setCreateDialogOpen] = useState<{
     open: boolean;
     coursePart?: CoursePartData;
@@ -78,7 +68,6 @@ const ModelsView = (): JSX.Element => {
   const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
   const [editDialogModel, setEditDialogModel] =
     useState<GradingModelData | null>(null);
-  const [graphOpen, setGraphOpen] = useState<boolean>(false);
 
   // Sort models by archived status
   const models = useMemo(
@@ -123,19 +112,6 @@ const ModelsView = (): JSX.Element => {
     [auth?.role, isTeacherInCharge]
   );
 
-  useEffect(() => {
-    if (loadGraphId === -1) return;
-
-    for (const model of models!) {
-      if (model.id === loadGraphId) {
-        setCurrentModel(model);
-        setGraphOpen(true);
-        setLoadGraphId(-1);
-        navigate(`/${courseId}/models/${model.id}`);
-      }
-    }
-  }, [courseId, loadGraphId, models, navigate]);
-
   const renameSources = useCallback(
     (model: GradingModelData): GradingModelData => {
       if (courseTasks.data === undefined || courseParts.data === undefined)
@@ -165,88 +141,74 @@ const ModelsView = (): JSX.Element => {
     [courseParts.data, courseTasks.data]
   );
 
-  const loadGraph = useCallback(
-    (model: GradingModelData): void => {
-      setCurrentModel(renameSources(structuredClone(model))); // To remove references
-      setGraphOpen(true);
-    },
-    [renameSources]
-  );
+  // Derive currentModel from modelId URL param
+  const currentModel = useMemo(() => {
+    if (modelId === undefined || models === null) return null;
 
-  // Load modelId url param
+    const model = models.find(m => m.id === parseInt(modelId));
+    if (!model) return null;
+
+    return renameSources(structuredClone(model));
+  }, [modelId, models, renameSources]);
+
+  // Derive graphOpen from whether we have a valid currentModel
+  const graphOpen = currentModel !== null;
+
+  // Derive currentUserRow from userId URL param
+  const currentUserRow = useMemo(() => {
+    if (userId === undefined || grades.data === undefined) return null;
+    return grades.data.find(row => row.user.id === parseInt(userId)) ?? null;
+  }, [userId, grades.data]);
+
+  // Derive coursePartValues from currentUserRow
+  const coursePartValues = useMemo(() => {
+    if (currentUserRow === null || models === null) return null;
+
+    return batchCalculateCourseParts(models, [
+      {
+        userId: currentUserRow.user.id,
+        courseTasks: currentUserRow.courseTasks
+          .filter(task => task.grades.length > 0)
+          .map(task => ({
+            id: task.courseTaskId,
+            grade: findBestGrade(
+              task.grades,
+              getCoursePartExpiryDate(
+                courseParts.data,
+                courseTasks.data,
+                task.courseTaskId
+              )
+            )!.grade,
+          })),
+      },
+    ])[currentUserRow.user.id];
+  }, [currentUserRow, models, courseParts.data, courseTasks.data]);
+
+  // Handle invalid modelId
   useEffect(() => {
-    if (models === null) return;
+    if (modelId === undefined || models === null) return;
 
-    // If modelId is undefined, unload current model
-    if (modelId === undefined && currentModel !== null) {
-      setCurrentModel(null);
-      setGraphOpen(false);
+    const modelExists = models.some(m => m.id === parseInt(modelId));
+    if (!modelExists) {
+      enqueueSnackbar(t('course.models.model-not-found', {model: modelId}), {
+        variant: 'error',
+      });
+      navigate(`/${courseId}/models`);
     }
+  }, [courseId, modelId, models, navigate, t]);
 
-    if (modelId === undefined) return;
-    if (currentModel !== null && currentModel.id === parseInt(modelId)) return;
-
-    for (const model of models) {
-      if (model.id === parseInt(modelId)) {
-        loadGraph(model);
-        return;
-      }
-    }
-    enqueueSnackbar(t('course.models.model-not-found', {model: modelId}), {
-      variant: 'error',
-    });
-    navigate(`/${courseId}/models`);
-  }, [courseId, currentModel, loadGraph, modelId, models, navigate, t]);
-
-  // Load userId url param
+  // Handle invalid userId
   useEffect(() => {
-    if (userId === undefined || grades.data === undefined || models === null)
-      return;
-    if (currentUserRow !== null && currentUserRow.user.id === parseInt(userId))
-      return;
+    if (userId === undefined || grades.data === undefined) return;
 
-    const userRow = grades.data.find(row => row.user.id === parseInt(userId));
-    if (userRow === undefined) {
+    const userExists = grades.data.some(row => row.user.id === parseInt(userId));
+    if (!userExists) {
       enqueueSnackbar(t('course.models.grade-not-found', {user: userId}), {
         variant: 'error',
       });
       navigate(`/${courseId}/models/${modelId}`);
-      return;
     }
-
-    setCurrentUserRow(userRow);
-    setCoursePartValues(
-      batchCalculateCourseParts(models, [
-        {
-          userId: userRow.user.id,
-          courseTasks: userRow.courseTasks
-            .filter(task => task.grades.length > 0)
-            .map(task => ({
-              id: task.courseTaskId,
-              grade: findBestGrade(
-                task.grades,
-                getCoursePartExpiryDate(
-                  courseParts.data,
-                  courseTasks.data,
-                  task.courseTaskId
-                )
-              )!.grade,
-            })),
-        },
-      ])[userRow.user.id]
-    );
-  }, [
-    courseId,
-    currentUserRow,
-    grades.data,
-    modelId,
-    models,
-    navigate,
-    t,
-    userId,
-    courseParts.data,
-    courseTasks.data,
-  ]);
+  }, [courseId, userId, grades.data, modelId, navigate, t]);
 
   const handleArchiveModel = (
     gradingModelId: number,
@@ -328,9 +290,9 @@ const ModelsView = (): JSX.Element => {
       <CreateGradingModelDialog
         open={createDialogOpen.open}
         onClose={() => setCreateDialogOpen({open: false})}
-        onSubmit={(id) => {
-          allGradingModels.refetch();
-          setLoadGraphId(id);
+        onSubmit={async (id) => {
+          await allGradingModels.refetch();
+          navigate(`/${courseId}/models/${id}`);
         }}
         coursePart={createDialogOpen.coursePart}
       />
@@ -429,7 +391,7 @@ const ModelsView = (): JSX.Element => {
             )}
       </Collapse>
 
-      {graphOpen && currentModel !== null && (
+      {currentModel !== null && (
         <Graph
           key={currentModel.id} // Reset graph for each model
           initGraph={currentModel.graphStructure}

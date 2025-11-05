@@ -351,7 +351,7 @@ const GradesTableToolbar = (): JSX.Element => {
   const getGrades = useGetGrades(courseId);
   const addFinalGrades = useAddFinalGrades(courseId);
 
-  const [showCalculateDialog, setShowCalculateDialog] = useState<boolean>(false);
+  const [showCalculateDialog, setShowCalculateDialog] = useState<string | null>(null);
   const [showSisuDialog, setShowSisuDialog] = useState<boolean>(false);
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
@@ -489,8 +489,9 @@ const GradesTableToolbar = (): JSX.Element => {
         onClose={() => setAplusImportDialogOpen(false)}
       />
       <CalculateFinalGradesDialog
-        open={showCalculateDialog}
-        onClose={() => setShowCalculateDialog(false)}
+        key={showCalculateDialog}
+        open={!!showCalculateDialog}
+        onClose={() => setShowCalculateDialog(null)}
         selectedRows={table.getSelectedRowModel().rows.map(r => r.original)}
         gradeSelectOption={gradeSelectOption}
         calculateFinalGrades={handleCalculateFinalGrades}
@@ -602,7 +603,7 @@ const GradesTableToolbar = (): JSX.Element => {
                                     ? 'outlined'
                                     : 'contained'
                             }
-                            onClick={() => setShowCalculateDialog(true)}
+                            onClick={() => setShowCalculateDialog(self.crypto.randomUUID())}
                             disabled={table.getSelectedRowModel().rows.length === 0}
                           >
                             {missingFinalGrades
