@@ -96,14 +96,12 @@ const UploadDialogConfirm = ({
 
   // Check for errors
   let error = false;
-  let newError = false;
   for (const date of dates) {
-    if (date.expirationDate && date.expirationDate <= date.completionDate)
-      newError = true;
-  }
-  if (newError !== error) {
-    error = newError;
-    setReady(false);
+    if (date.expirationDate && date.expirationDate <= date.completionDate) {
+      error = true;
+      setReady(false);
+      break;
+    }
   }
 
   const onClear = (date: DateType) => (date.expirationDate = null);

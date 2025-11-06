@@ -68,7 +68,6 @@ const AplusImportDialog = ({open, onClose}: PropsType): JSX.Element | null => {
   }, [onClose, queryClient]);
 
   if (!open) return null;
-  console.log(!aplusTokenDialogOpen, !getToken(), aplusGrades.isError, !!aplusGrades.error);
   if (!aplusTokenDialogOpen && (!getToken() || (aplusGrades.isError && aplusGrades.error.message.includes('502') && aplusGrades.error.message.includes('401')))) {
     setAplusTokenDialogOpen(true);
   }

@@ -603,7 +603,7 @@ const GradesTableToolbar = (): JSX.Element => {
                                     ? 'outlined'
                                     : 'contained'
                             }
-                            onClick={() => setShowCalculateDialog(self.crypto.randomUUID())}
+                            onClick={() => setShowCalculateDialog(globalThis.crypto.randomUUID())}
                             disabled={table.getSelectedRowModel().rows.length === 0}
                           >
                             {missingFinalGrades

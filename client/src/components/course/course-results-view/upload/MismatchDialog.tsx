@@ -5,7 +5,6 @@
 import {
   Alert,
   Button,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -22,6 +21,8 @@ import {
 } from '@mui/material';
 import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
+
+import Dialog from '@/components/shared/Dialog';
 
 export type MismatchData = {
   columnKeys: string[];
@@ -101,7 +102,7 @@ const MismatchDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth>
+    <Dialog open={open} onClose={onClose} disableBackdropClick fullWidth>
       <DialogTitle>{t('course.results.upload.mismatch')}</DialogTitle>
       <DialogContent>
         <Alert severity={error === '' ? 'success' : 'error'} sx={{mb: 2}}>
