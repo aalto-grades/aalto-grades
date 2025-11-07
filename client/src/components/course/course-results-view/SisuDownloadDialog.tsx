@@ -185,12 +185,21 @@ const SisuDownloadDialog = ({
           label={t('course.results.override-date')}
         />
         <Collapse in={dateOverride}>
-          <LocalizedDatePicker
-            sx={{mt: 2}}
-            label={t('course.results.assessment-date')}
-            value={assessmentDate}
-            onChange={newDate => newDate && setAssessmentDate(newDate)}
-          />
+          <Box sx={{display: 'flex', alignItems: 'flex-start', gap: 1, mt: 2}}>
+            <LocalizedDatePicker
+              sx={{flex: 1}}
+              label={t('course.results.assessment-date')}
+              value={assessmentDate}
+              onChange={newDate => newDate && setAssessmentDate(newDate)}
+            />
+            <Button
+              variant="text"
+              sx={{alignSelf: 'stretch'}}
+              onClick={() => setAssessmentDate(dayjs())}
+            >
+              {t('general.today')}
+            </Button>
+          </Box>
         </Collapse>
         {exportedValuesInList && (
           <Box sx={{my: 2}}>
