@@ -6,6 +6,7 @@ import 'dayjs/locale/en-gb';
 
 import {
   Alert,
+  Box,
   Button,
   Collapse,
   Dialog,
@@ -188,12 +189,21 @@ const CalculateFinalGradesDialog = ({
           label={t('course.results.override-date')}
         />
         <Collapse in={dateOverride}>
-          <LocalizedDatePicker
-            label={t('general.grading-date')}
-            sx={{width: '100%', mt: 2}}
-            value={gradingDate}
-            onChange={newDate => newDate !== null && setGradingDate(newDate)}
-          />
+          <Box sx={{display: 'flex', alignItems: 'flex-start', gap: 1, mt: 2}}>
+            <LocalizedDatePicker
+              label={t('general.grading-date')}
+              sx={{flex: 1}}
+              value={gradingDate}
+              onChange={newDate => newDate !== null && setGradingDate(newDate)}
+            />
+            <Button
+              variant="text"
+              sx={{alignSelf: 'stretch'}}
+              onClick={() => setGradingDate(dayjs())}
+            >
+              {t('general.today')}
+            </Button>
+          </Box>
         </Collapse>
       </DialogContent>
       <DialogActions>
