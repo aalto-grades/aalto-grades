@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */ // Refer to UseEffect comment
 // SPDX-FileCopyrightText: 2024 The Ossi Developers
 //
 // SPDX-License-Identifier: MIT
@@ -80,7 +81,7 @@ const AverageNode = (props: NodeProps): JSX.Element => {
   const nodeValue = nodeValues[id] as AverageNodeValue;
 
   // Unoptimal useEffect, but we must update parent state (settings) when
-  // The node inputs change...
+  // the node inputs change...
   useEffect(() => {
     let change = false;
     let maxId = 0;

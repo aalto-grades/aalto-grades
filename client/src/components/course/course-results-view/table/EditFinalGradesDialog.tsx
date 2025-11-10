@@ -97,6 +97,7 @@ const EditFinalGradesDialog = ({
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>(initRows);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
+  const [tableKey, setTableKey] = useState<number>(0);
 
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge,
@@ -136,13 +137,13 @@ const EditFinalGradesDialog = ({
   }, [changes]);
 
   // Update selected column
-  useEffect(() => {
-    const newRows = rows.map(row => ({
+  if (rows.find(row => row.selected === 'selected')?.id !== bestGrade?.id) {
+    setRows(oldRows => oldRows.map(row => ({
       ...row,
       selected: bestGrade !== null && row.id === bestGrade.id ? 'selected' : '',
-    }));
-    if (JSON.stringify(rows) !== JSON.stringify(newRows)) setRows(newRows);
-  }, [bestGrade, rows]);
+    })));
+    setTableKey(oldKey => oldKey + 1);
+  }
 
   const columns: GridColDef<ColTypes>[] = [
     {
@@ -321,6 +322,7 @@ const EditFinalGradesDialog = ({
         <DialogContent>
           <div style={{height: '35vh'}}>
             <StyledDataGrid
+              key={tableKey}
               rows={rows}
               columns={columns}
               rowHeight={25}

@@ -21,6 +21,7 @@ const Header = (): JSX.Element => {
   // The logo variants are intended to be used randomly, so why not?
   // https://brand.aalto.fi/visual-identity/about/logo/
   const logoVariant = useMemo(
+    // eslint-disable-next-line react-hooks/purity
     () => ['!', '?', '”'][Math.floor(Math.random() * 3)],
     []
   );

@@ -141,6 +141,7 @@ const EditGradesDialog = ({
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>(initRows);
   const [editing, setEditing] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
+  const [tableKey, setTableKey] = useState<number>(0);
 
   const changes = useMemo(
     () =>
@@ -181,20 +182,13 @@ const EditGradesDialog = ({
   }, [changes]);
 
   // Update selected column
-  useEffect(() => {
-    const newRows = rows.map(row => ({
+  if (rows.find(row => row.selected === 'selected')?.id !== bestGrade?.id) {
+    setRows(oldRows => oldRows.map(row => ({
       ...row,
       selected: bestGrade !== null && row.id === bestGrade.id ? 'selected' : '',
-    }));
-    if (JSON.stringify(rows) !== JSON.stringify(newRows)) setRows(newRows);
-    // Autosize if table is already rendered
-    setTimeout(() => {
-      if (apiRef.current === null) return;
-      if (Object.keys(apiRef.current).length !== 0) {
-        apiRef.current.autosizeColumns();
-      }
-    }, 1);
-  }, [apiRef, bestGrade, rows]);
+    })));
+    setTableKey(oldKey => oldKey + 1);
+  }
 
   const courseTask =
     courseTasks.data?.find(task => task.id === courseTaskId) ?? null;
@@ -420,6 +414,7 @@ const EditGradesDialog = ({
         <DialogContent>
           <div style={{height: '30vh'}}>
             <StyledDataGrid
+              key={tableKey}
               apiRef={apiRef}
               rows={rows}
               columns={columns as GridColDef<GridValidRowModel>[]}

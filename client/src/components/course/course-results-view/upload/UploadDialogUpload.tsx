@@ -90,7 +90,7 @@ const UploadDialogUpload = ({
   const {t} = useTranslation();
   const [textFieldText, setTextFieldText] = useState<string>('');
   const [textFieldOpen, setTextFieldOpen] = useState<boolean>(false);
-  const [mismatchDialogOpen, setMismatchDialogOpen] = useState<boolean>(false);
+  const [mismatchDialogOpen, setMismatchDialogOpen] = useState<string | null>(null);
   const [mismatchData, setMismatchData] = useState<MismatchData | null>(null);
   const [editText, setEditText] = useState<boolean>(rows.length > 0);
   const [editing, setEditing] = useState<boolean>(false);
@@ -219,12 +219,12 @@ const UploadDialogUpload = ({
     }
 
     if (mismatches || !studentNoFound) {
-      setMismatchDialogOpen(true);
+      setMismatchDialogOpen(globalThis.crypto.randomUUID());
       setMismatchData({
         columnKeys,
         courseTasks,
         onImport: (keyMap) => {
-          setMismatchDialogOpen(false);
+          setMismatchDialogOpen(null);
           setRows(readData(dataRows.data, columnKeys, keyMap));
           setEditText(true);
           setExpanded('edit');
@@ -298,8 +298,9 @@ const UploadDialogUpload = ({
       </Dialog>
 
       <MismatchDialog
-        open={mismatchDialogOpen}
-        onClose={() => setMismatchDialogOpen(false)}
+        key={mismatchDialogOpen}
+        open={!!mismatchDialogOpen}
+        onClose={() => setMismatchDialogOpen(null)}
         mismatchData={
           mismatchData ?? {columnKeys: [], courseTasks: [], onImport: () => {}}
         }

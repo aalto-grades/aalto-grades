@@ -463,7 +463,7 @@ const CoursePartsView = (): JSX.Element => {
     if (params.row.coursePartId !== -1) {
       elements.push(
         <GridActionsCellItem
-          data-testId={`archive-row-${params.row.id}`}
+          data-testid={`archive-row-${params.row.id}`}
           icon={(
             <ArchivalButton
               name={params.row.name}
@@ -489,7 +489,7 @@ const CoursePartsView = (): JSX.Element => {
     if (!courseTasksWithGrades.has(params.row.id)) {
       elements.push(
         <GridActionsCellItem
-          data-testId={`delete-row-${params.row.id}`}
+          data-testid={`delete-row-${params.row.id}`}
           icon={<DeleteButton />}
           label={t('general.delete')}
           onClick={async () => {

@@ -69,8 +69,10 @@ const TokenDialog = ({
           <ExternalLink href={link}>{link}</ExternalLink>
         </Typography>
         {currentToken && (
-          <Typography>
-            {t('shared.auth.token.current') + ': '}
+          <>
+            <Typography>
+              {t('shared.auth.token.current') + ': '}
+            </Typography>
             <Box
               sx={{
                 display: 'flex',
@@ -98,7 +100,8 @@ const TokenDialog = ({
                   : t('shared.auth.token.show-token-tip')}
               </Button>
             </Box>
-          </Typography>
+          </>
+
         )}
         <TextField
           autoFocus
@@ -123,7 +126,7 @@ const TokenDialog = ({
       <DialogActions>
         <Button onClick={handleClose}>{t('general.cancel')}</Button>
         <Button
-          disabled={!tokenInput || tokenInput.length !== tokenLength}
+          disabled={tokenInput?.length !== tokenLength}
           variant="contained"
           onClick={handleSubmit}
         >

@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import {type JSX, useEffect, useState} from 'react';
+import {type JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
@@ -50,8 +50,6 @@ const NewAplusCourseTasksDialog = ({
   const modifyCourseTasks = useModifyCourseTasks(courseId);
   const addAplusGradeSources = useAddAplusGradeSources(courseId);
 
-  const [aplusTokenDialogOpen, setAplusTokenDialogOpen] =
-    useState<boolean>(false);
   const [step, setStep] = useState<number>(0);
   const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
 
@@ -59,9 +57,7 @@ const NewAplusCourseTasksDialog = ({
     [NewCourseTaskData, NewAplusGradeSourceData][]
   >([]);
 
-  useEffect(() => {
-    setAplusTokenDialogOpen(!getToken() || aplusCourses.isError);
-  }, [open, aplusCourses]);
+  const aplusTokenDialogOpen = open && (!getToken() || aplusCourses.isError);
 
   const handleResetAndClose = (): void => {
     setStep(0);
@@ -146,7 +142,6 @@ const NewAplusCourseTasksDialog = ({
         open={open && aplusTokenDialogOpen}
         onClose={onClose}
         onSubmit={() => {
-          setAplusTokenDialogOpen(false);
           aplusCourses.refetch();
         }}
         error={aplusCourses.isError}
