@@ -339,7 +339,7 @@ const UploadDialogConfirm = ({
                           )}
                           <LocalizedDatePicker
                             minDate={date.completionDate}
-                            disabled={date.expirationDate === null && false}
+                            disabled={date.expirationDate === null}
                             slotProps={{
                               field: {
                                 clearable: true,
