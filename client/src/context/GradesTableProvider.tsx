@@ -451,6 +451,7 @@ export const GradesTableProvider = ({
           return '-';
         },
         {
+          id: 'Exported to Sisu',
           header: t('course.results.table.exported'),
           meta: {PrettyChipPosition: 'last'},
           cell: ({getValue}) => getValue(),
