@@ -355,6 +355,8 @@
       "multiple-final": "Useita lopullisia arvosanoja",
       "final-for": "Lopulliset arvosanat",
       "final-on-date": "Lopullinen arvosana annettu {{date}}",
+      "number-and-name": "Nimi: {{name}}, Opiskelijanumero: {{studentNumber}}",
+      "number-no-name": "Opiskelijanumero: {{studentNumber}}",
       "not-participated": "Ei osallistunut",
       "edit-grade": "Muokkaa arvosanaa",
       "multiple-grade": "Useita arvosanoja",
