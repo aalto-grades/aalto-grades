@@ -283,12 +283,31 @@ export const GradesTableProvider = ({
           checked={table.getIsAllRowsSelected()}
           indeterminate={table.getIsSomeRowsSelected()}
           onChange={table.getToggleAllRowsSelectedHandler()}
+          sx={theme => ({
+            ...(theme.palette.mode === 'dark' && {
+              color: 'text.primary',
+              '&.Mui-checked': {
+                color: 'text.primary',
+              },
+              '&.MuiCheckbox-indeterminate': {
+                color: 'text.primary',
+              },
+            }),
+          })}
         />
         <span style={{marginLeft: '4px', marginRight: '15px'}}>
           <Badge
             badgeContent={table.getSelectedRowModel().rows.length || '0'}
             color="primary"
             max={999}
+            sx={theme => ({
+              ...(theme.palette.mode === 'dark' && {
+                '& .MuiBadge-badge': {
+                  backgroundColor: theme.palette.text.primary,
+                  color: theme.palette.primary.main,
+                },
+              }),
+            })}
           />
         </span>
       </>
