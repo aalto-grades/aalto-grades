@@ -333,13 +333,13 @@ export const GradesTableProvider = ({
         checked={row.getIsSelected()}
         onChange={row.getToggleSelectedHandler()}
         style={{
-          marginLeft: '21px',
+          marginLeft: '21%',
         }}
         sx={{
           '&::before': {
             content: '""',
             width: '11px',
-            height: '113%',
+            height: '60px',
             borderBlockEnd: '1px solid lightgray',
             borderLeft: '1px solid lightgray',
             borderEndStartRadius: '10px',
