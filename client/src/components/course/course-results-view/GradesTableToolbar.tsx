@@ -23,10 +23,10 @@ import {
   type JSX,
   type MouseEvent,
   forwardRef,
+  useEffect,
   useMemo,
   useState,
 } from 'react';
-import {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams, useSearchParams} from 'react-router-dom';
 import {z} from 'zod';
@@ -106,11 +106,11 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
     <>
       <span {...props} style={{display: 'flex'}} ref={ref}>
         <ButtonBase
-          style={{
+          sx={{
             display: 'flex',
             borderRadius: '8px',
             textAlign: 'center',
-            border: '1px solid black',
+            border: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.23)' : '1px solid black',
             alignContent: 'center',
             padding: '0px 8px',
             fontSize: '14px',
@@ -120,7 +120,9 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
             position: 'relative',
             backgroundColor: 'transparent',
             ...(isActive && {
-              backgroundColor: theme.palette.info.light,
+              backgroundColor: theme.palette.mode === 'dark'
+                ? theme.palette.info.dark
+                : theme.palette.info.light,
               border: 'none',
               borderRadius: '8px 0px 0px 8px',
             }),
@@ -152,7 +154,7 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
 
         {isActive && (
           <ButtonBase
-            style={{
+            sx={{
               display: 'flex',
               borderRadius: '0px 8px 8px 0',
               textAlign: 'center',
@@ -163,7 +165,9 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
               lineHeight: '20px',
               cursor: 'pointer',
               position: 'relative',
-              backgroundColor: theme.palette.info.light,
+              backgroundColor: theme.palette.mode === 'dark'
+                ? theme.palette.info.dark
+                : theme.palette.info.light,
               border: 'none',
             }}
             onClick={() => table.setGrouping([])}
@@ -247,11 +251,11 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
       <>
         <span {...props} style={{display: 'flex'}} ref={ref}>
           <ButtonBase
-            style={{
+            sx={{
               display: 'flex',
               borderRadius: '8px',
               textAlign: 'center',
-              border: '1px solid black',
+              border: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.23)' : '1px solid black',
               alignContent: 'center',
               padding: '0px 8px',
               fontSize: '14px',
@@ -261,7 +265,9 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
               position: 'relative',
               backgroundColor: 'transparent',
               ...(modelSelected && {
-                backgroundColor: theme.palette.info.light,
+                backgroundColor: theme.palette.mode === 'dark'
+                  ? theme.palette.info.dark
+                  : theme.palette.info.light,
                 border: 'none',
                 borderRadius: '8px 0px 0px 8px',
               }),
@@ -288,7 +294,7 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
           </ButtonBase>
           {modelSelected && (
             <ButtonBase
-              style={{
+              sx={{
                 display: 'flex',
                 borderRadius: '0px 8px 8px 0',
                 textAlign: 'center',
@@ -299,7 +305,9 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
                 lineHeight: '20px',
                 cursor: 'pointer',
                 position: 'relative',
-                backgroundColor: theme.palette.info.light,
+                backgroundColor: theme.palette.mode === 'dark'
+                  ? theme.palette.info.dark
+                  : theme.palette.info.light,
                 border: 'none',
               }}
               onClick={() => setSelectedGradingModel('any')}
