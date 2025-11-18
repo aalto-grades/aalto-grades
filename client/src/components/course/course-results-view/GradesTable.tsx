@@ -204,6 +204,7 @@ const GradesTable = (): JSX.Element => {
                     padding: '0px',
                     height: '50px',
                     textAlign: 'center',
+                    overflow: cell.column.id === 'select' ? 'visible' : 'hidden',
                     ...(cell.column.getIsResizing() || cell.column.getSize() !== cell.column.columnDef.size
                       ? {width: cell.column.getSize(), maxWidth: cell.column.getSize()}
                       : {}),
