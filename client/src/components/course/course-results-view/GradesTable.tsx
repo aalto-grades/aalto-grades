@@ -89,7 +89,7 @@ const GradesTable = (): JSX.Element => {
     count: rows.length,
     getScrollElement: () => tableContainerRef.current,
     estimateSize: () => 50, // Pixel height of each row
-    overscan: 5,
+    overscan: 10,
   });
 
   const virtualItems = rowVirtualizer.getVirtualItems();
