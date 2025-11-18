@@ -101,8 +101,8 @@ const GradesTable = (): JSX.Element => {
                     key={header.id}
                     className="table-header-cell"
                     style={{
+                      padding: 0,
                       height: '50px',
-                      padding: '4px 10px',
                       backgroundColor:
                       theme.palette.mode === 'dark'
                         ? theme.palette.primary.main
@@ -125,6 +125,7 @@ const GradesTable = (): JSX.Element => {
                                 : (header.column.columnDef.meta?.PrettyChipPosition ?? 'middle')
                             }
                             style={{
+                              padding: '4px 10px',
                               backgroundColor:
                                 theme.palette.mode === 'dark'
                                   ? theme.palette.primary.main
