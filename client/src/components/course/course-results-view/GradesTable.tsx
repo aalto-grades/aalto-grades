@@ -5,7 +5,8 @@
 import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
 import {Badge, Icon, IconButton, useTheme} from '@mui/material';
 import {type Cell, type Row, flexRender} from '@tanstack/react-table';
-import type {JSX} from 'react';
+import {useVirtualizer} from '@tanstack/react-virtual';
+import {type JSX, useRef} from 'react';
 
 import PrettyChip from '@/components/shared/PrettyChip';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
@@ -82,8 +83,23 @@ const GradesTable = (): JSX.Element => {
   const {table} = useTableContext();
   const {rows} = table.getRowModel();
 
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => tableContainerRef.current,
+    estimateSize: () => 50,
+    overscan: 10,
+  });
+
+  const virtualItems = rowVirtualizer.getVirtualItems();
+  const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
+  const paddingBottom = virtualItems.length > 0
+    ? rowVirtualizer.getTotalSize() - virtualItems[virtualItems.length - 1].end
+    : 0;
+
   return (
-    <div style={{overflowY: 'auto', height: 'calc(100vh - 255px)'}}>
+    <div ref={tableContainerRef} style={{overflowY: 'auto', height: 'calc(100vh - 255px)'}}>
       <style>
         {`
         thead:hover .column-resizer {
@@ -196,26 +212,39 @@ const GradesTable = (): JSX.Element => {
         </thead>
 
         <tbody>
-          {rows.map(row => (
-            <tr key={row.id}>
-              {row.getVisibleCells().map(cell => (
-                <td
-                  key={cell.id}
-                  style={{
-                    padding: '0px',
-                    height: '50px',
-                    textAlign: 'center',
-                    overflow: cell.column.id === 'select' ? 'visible' : 'hidden',
-                    ...(cell.column.getIsResizing() || cell.column.getSize() !== cell.column.columnDef.size
-                      ? {width: cell.column.getSize(), maxWidth: cell.column.getSize()}
-                      : {}),
-                  }}
-                >
-                  <RenderCell row={row} cell={cell} />
-                </td>
-              ))}
+          {paddingTop > 0 && (
+            <tr>
+              <td style={{height: `${paddingTop}px`}} />
             </tr>
-          ))}
+          )}
+          {virtualItems.map((virtualRow) => {
+            const row = rows[virtualRow.index];
+            return (
+              <tr key={row.id}>
+                {row.getVisibleCells().map(cell => (
+                  <td
+                    key={cell.id}
+                    style={{
+                      padding: '0px',
+                      height: '50px',
+                      textAlign: 'center',
+                      overflow: cell.column.id === 'select' ? 'visible' : 'hidden',
+                      ...(cell.column.getIsResizing() || cell.column.getSize() !== cell.column.columnDef.size
+                        ? {width: cell.column.getSize(), maxWidth: cell.column.getSize()}
+                        : {}),
+                    }}
+                  >
+                    <RenderCell row={row} cell={cell} />
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+          {paddingBottom > 0 && (
+            <tr>
+              <td style={{height: `${paddingBottom}px`}} />
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
