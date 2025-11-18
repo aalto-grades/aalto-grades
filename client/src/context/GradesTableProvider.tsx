@@ -4,6 +4,7 @@
 
 import {Badge, Checkbox} from '@mui/material';
 import {
+  type ColumnSizingState,
   type ExpandedState,
   type GroupingState,
   type RowData,
@@ -158,6 +159,7 @@ export const GradesTableProvider = ({
     errors: false,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [userGraphOpen, setUserGraphOpen] = useState<boolean>(false);
   const [userGraphData, setUserGraphData] = useState<{
     row: GroupedStudentRow;
@@ -352,7 +354,7 @@ export const GradesTableProvider = ({
         checked={row.getIsSelected()}
         onChange={row.getToggleSelectedHandler()}
         style={{
-          marginLeft: '21%',
+          marginLeft: '21px',
         }}
         sx={{
           '&::before': {
@@ -654,6 +656,9 @@ export const GradesTableProvider = ({
     enableGrouping: true,
     enableSorting: true,
     autoResetExpanded: false,
+    // Column Resizing
+    onColumnSizingChange: setColumnSizing,
+    columnResizeMode: 'onChange',
     state: {
       columnVisibility,
       rowSelection,
@@ -661,6 +666,7 @@ export const GradesTableProvider = ({
       grouping,
       sorting,
       globalFilter,
+      columnSizing,
     },
 
     getExpandedRowModel: getExpandedRowModel(),
