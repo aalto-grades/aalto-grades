@@ -88,8 +88,8 @@ const GradesTable = (): JSX.Element => {
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => tableContainerRef.current,
-    estimateSize: () => 50,
-    overscan: 10,
+    estimateSize: () => 50, // Pixel height of each row
+    overscan: 5,
   });
 
   const virtualItems = rowVirtualizer.getVirtualItems();
