@@ -24,12 +24,12 @@ const UnsavedChangesDialog = ({
   const {t} = useTranslation();
 
   const onClose = (): void => {
-    if (blocker !== undefined && blocker.state === 'blocked') blocker.reset();
+    if (blocker?.state === 'blocked') blocker.reset();
   };
 
   return (
     <Dialog
-      open={blocker !== undefined && blocker.state === 'blocked'}
+      open={blocker?.state === 'blocked'}
       onClose={onClose}
       scroll="paper"
     >
@@ -45,7 +45,7 @@ const UnsavedChangesDialog = ({
           color="error"
           onClick={() => {
             if (handleDiscard !== undefined) handleDiscard();
-            if (blocker !== undefined && blocker.state === 'blocked')
+            if (blocker?.state === 'blocked')
               blocker.proceed();
           }}
         >

@@ -23,15 +23,16 @@ const PrettyChip = ({children, ...props}: PropsType): JSX.Element => (
     <ButtonBase
       {...props}
       disableRipple={props.onClick === undefined}
-      style={{
+      sx={{
         cursor: props.onClick === undefined ? 'default' : 'pointer',
         textTransform: 'none',
         color: 'inherit',
-        backgroundColor: 'white',
+        backgroundColor: theme => theme.palette.mode === 'dark' ? theme.palette.grey[800] : 'white',
         width: '100%',
         height: '90%',
-        ...props.style,
+        ...props.sx,
       }}
+      style={props.style}
     >
       {children}
     </ButtonBase>

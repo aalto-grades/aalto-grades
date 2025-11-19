@@ -355,6 +355,8 @@
       "multiple-final": "Multiple final grades, click to show",
       "final-for": "Final grades for",
       "final-on-date": "Final grade obtained on {{date}}",
+      "number-and-name": "Name: {{name}}, Student number: {{studentNumber}}",
+      "number-no-name": "Student number: {{studentNumber}}",
       "not-participated": "Not participated",
       "edit-grade": "Edit grades",
       "multiple-grade": "Multiple grades, click to show",

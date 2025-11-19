@@ -83,141 +83,144 @@ const GradesTable = (): JSX.Element => {
   const {table} = useTableContext();
   const {rows} = table.getRowModel();
 
-  const parentRef = useRef<HTMLDivElement>(null);
-  const virtualizer = useVirtualizer({
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  const rowVirtualizer = useVirtualizer({
     count: rows.length,
-    getScrollElement: () => parentRef.current,
+    getScrollElement: () => tableContainerRef.current,
     estimateSize: () => 50, // Pixel height of each row
-    overscan: 5,
+    overscan: 10,
   });
 
+  const virtualItems = rowVirtualizer.getVirtualItems();
+  const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
+  const paddingBottom = virtualItems.length > 0
+    ? rowVirtualizer.getTotalSize() - virtualItems[virtualItems.length - 1].end
+    : 0;
+
   return (
-    <div
-      className="container"
-      ref={parentRef}
-      style={{
-        overflowY: 'auto', // Scrollable table container
-        position: 'relative', // Needed for sticky header
-        height: 'calc(100vh - 255px)', // Should be a fixed height
-        width: '100%',
-        borderRadius: 5,
-        maxWidth: '100%',
-      }}
-    >
-      <table
-        style={{
-          borderCollapse: 'collapse',
-          borderSpacing: '0',
-        }}
-      >
-        <thead
-          style={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 50,
-          }}
-        >
+    <div ref={tableContainerRef} style={{overflowY: 'auto', height: 'calc(100vh - 255px)'}}>
+      <style>
+        {`
+        thead:hover .column-resizer {
+          opacity: 1 !important;
+        }
+      `}
+      </style>
+      <table style={{borderCollapse: 'collapse', borderSpacing: '0'}}>
+        <thead style={{position: 'sticky', top: 0, zIndex: 50}}>
           {table.getHeaderGroups().map(headerGroup => (
-            <tr
-              key={headerGroup.id}
-              style={{
-                display: 'flex',
-                width: '100%',
-                backgroundColor:
-                  theme.palette.mode === 'dark'
-                    ? theme.palette.primary.main
-                    : theme.palette.primary.light,
-                borderBottom: '1px solid lightgray',
-              }}
-            >
-              {headerGroup.headers.map(header => (
-                <th
-                  key={header.id}
-                  style={{
-                    padding: '0px',
-                    height: '50px',
-                    display: 'flex',
-                    // Calculate correct size for groupHeaders
-                    width:
-                      header.subHeaders.length > 0
-                        ? header.subHeaders.reduce(
-                            (acc, subHeader) => acc + subHeader.getSize(),
-                            0
-                          )
-                        : header.getSize(),
-                  }}
-                  colSpan={header.colSpan}
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : (
-                        <PrettyChip
-                          position={
-                            header.column.columnDef.meta?.PrettyChipPosition === 'alone'
-                              ? undefined
-                              : (header.column.columnDef.meta?.PrettyChipPosition ?? 'middle')
-                          }
-                          style={{
-                            backgroundColor:
-                          theme.palette.mode === 'dark'
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.light,
-                            fontWeight: 'bold',
-                          }}
-                          onClick={
-                            header.column.getCanSort()
-                              ? header.column.getToggleSortingHandler()
-                              : undefined
-                          }
-                        >
-                          <>
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                            {!header.column.getCanSort()
-                              ? null
-                              : (
-                                  <Icon>
-                                    {header.column.getIsSorted() === 'asc'
-                                      ? <ArrowUpward />
-                                      : header.column.getIsSorted() === 'desc'
-                                        ? <ArrowUpward style={{rotate: '180deg'}} />
-                                        : <Sort />}
-                                  </Icon>
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header, i) => {
+                return (
+                  <th
+                    key={header.id}
+                    className="table-header-cell"
+                    style={{
+                      padding: 0,
+                      height: '50px',
+                      backgroundColor:
+                      theme.palette.mode === 'dark'
+                        ? theme.palette.primary.main
+                        : theme.palette.primary.light,
+                      borderTopRightRadius: i === headerGroup.headers.length - 1 ? 5 : 0,
+                      borderTopLeftRadius: i === 0 ? 5 : 0,
+                      ...(header.column.getIsResizing() || header.column.getSize() !== header.column.columnDef.size
+                        ? {width: header.getSize(), maxWidth: header.getSize()}
+                        : {}),
+                      position: 'relative',
+                    }}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : (
+                          <PrettyChip
+                            position={
+                              header.column.columnDef.meta?.PrettyChipPosition === 'alone'
+                                ? undefined
+                                : (header.column.columnDef.meta?.PrettyChipPosition ?? 'middle')
+                            }
+                            style={{
+                              padding: '4px 10px',
+                              backgroundColor:
+                                theme.palette.mode === 'dark'
+                                  ? theme.palette.primary.main
+                                  : theme.palette.primary.light,
+                              fontWeight: 'bold',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              maxWidth: '100%',
+                            }}
+                            onClick={
+                              header.column.getCanSort()
+                                ? header.column.getToggleSortingHandler()
+                                : undefined
+                            }
+                          >
+                            <span style={{display: 'inline-flex', alignItems: 'center', gap: 4, overflow: 'hidden', maxWidth: '100%'}}>
+                              <span style={{overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0}}>
+                                {flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
                                 )}
-                          </>
-                        </PrettyChip>
-                      )}
-                </th>
-              ))}
+                              </span>
+                              {header.column.getCanSort() && (
+                                <Icon>
+                                  {(() => {
+                                    const sorted = header.column.getIsSorted();
+                                    if (sorted === 'asc') return <ArrowUpward />;
+                                    if (sorted === 'desc') return <ArrowUpward style={{rotate: '180deg'}} />;
+                                    return <Sort />;
+                                  })()}
+                                </Icon>
+                              )}
+                            </span>
+                          </PrettyChip>
+                        )}
+                    <button
+                      type="button"
+                      aria-label="Resize column"
+                      onMouseDown={header.getResizeHandler()}
+                      onTouchStart={header.getResizeHandler()}
+                      onDoubleClick={() => header.column.resetSize()}
+                      className="column-resizer"
+                      style={{
+                        position: 'absolute',
+                        right: 0,
+                        top: 2,
+                        height: '90%',
+                        width: '5px',
+                        background: header.column.getIsResizing()
+                          ? (theme.palette.mode === 'dark' ? theme.palette.grey[400] : theme.palette.primary.dark)
+                          : (theme.palette.mode === 'dark' ? theme.palette.grey[500] : theme.palette.primary.main),
+                        cursor: 'col-resize',
+                        userSelect: 'none',
+                        touchAction: 'none',
+                        border: 'none',
+                        padding: 0,
+                        opacity: header.column.getIsResizing() ? 1 : 0,
+                        transition: 'opacity 0.15s ease-in-out',
+                        borderRadius: 5,
+                      }}
+                    />
+                  </th>
+                );
+              })}
             </tr>
           ))}
         </thead>
 
-        <tbody
-          style={{
-            display: 'grid',
-            height: `${virtualizer.getTotalSize()}px`, // Tells scrollbar how big the table is
-            position: 'relative', // Needed for absolute positioning of rows
-          }}
-        >
-          {virtualizer.getVirtualItems().map((virtualRow) => {
-            const row = table.getRowModel().rows[virtualRow.index];
+        <tbody>
+          {paddingTop > 0 && (
+            <tr>
+              <td style={{height: `${paddingTop}px`}} />
+            </tr>
+          )}
+          {virtualItems.map((virtualRow) => {
+            const row = rows[virtualRow.index];
             return (
-              <tr
-                key={row.id}
-                data-index={virtualRow.index} // Needed for dynamic row height measurement
-                ref={node => virtualizer.measureElement(node)} // Measure dynamic row height
-                style={{
-                  display: 'flex',
-                  position: 'absolute',
-                  // This should always be a `style` as it changes on scroll
-                  transform: `translateY(${virtualRow.start}px)`,
-                  width: '100%',
-                  zIndex: row.getIsGrouped() ? 5 : 'auto',
-                }}
-              >
+              <tr key={row.id}>
                 {row.getVisibleCells().map(cell => (
                   <td
                     key={cell.id}
@@ -225,9 +228,10 @@ const GradesTable = (): JSX.Element => {
                       padding: '0px',
                       height: '50px',
                       textAlign: 'center',
-                      display: 'flex',
-                      width: cell.column.getSize(),
-                      zIndex: 1,
+                      overflow: cell.column.id === 'select' ? 'visible' : 'hidden',
+                      ...(cell.column.getIsResizing() || cell.column.getSize() !== cell.column.columnDef.size
+                        ? {width: cell.column.getSize(), maxWidth: cell.column.getSize()}
+                        : {}),
                     }}
                   >
                     <RenderCell row={row} cell={cell} />
@@ -236,6 +240,11 @@ const GradesTable = (): JSX.Element => {
               </tr>
             );
           })}
+          {paddingBottom > 0 && (
+            <tr>
+              <td style={{height: `${paddingBottom}px`}} />
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

@@ -355,6 +355,8 @@
       "multiple-final": "Flera slutbetyg, klicka för att visa.",
       "final-for": "Slutbetyg för",
       "final-on-date": "Slutbetyg erhölls den {{date}}",
+      "number-and-name": "Namn: {{name}}, Studentnummer: {{studentNumber}}",
+      "number-no-name": "Studentnummer: {{studentNumber}}",
       "not-participated": "Ej deltagit",
       "edit-grade": "Redigera betyg",
       "multiple-grade": "Flera betyg, klicka för att visa.",

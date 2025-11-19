@@ -4,6 +4,7 @@
 
 import {Badge, Checkbox} from '@mui/material';
 import {
+  type ColumnSizingState,
   type ExpandedState,
   type GroupingState,
   type RowData,
@@ -158,6 +159,7 @@ export const GradesTableProvider = ({
     errors: false,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [userGraphOpen, setUserGraphOpen] = useState<boolean>(false);
   const [userGraphData, setUserGraphData] = useState<{
     row: GroupedStudentRow;
@@ -283,12 +285,31 @@ export const GradesTableProvider = ({
           checked={table.getIsAllRowsSelected()}
           indeterminate={table.getIsSomeRowsSelected()}
           onChange={table.getToggleAllRowsSelectedHandler()}
+          sx={theme => ({
+            ...(theme.palette.mode === 'dark' && {
+              color: 'text.primary',
+              '&.Mui-checked': {
+                color: 'text.primary',
+              },
+              '&.MuiCheckbox-indeterminate': {
+                color: 'text.primary',
+              },
+            }),
+          })}
         />
         <span style={{marginLeft: '4px', marginRight: '15px'}}>
           <Badge
             badgeContent={table.getSelectedRowModel().rows.length || '0'}
             color="primary"
             max={999}
+            sx={theme => ({
+              ...(theme.palette.mode === 'dark' && {
+                '& .MuiBadge-badge': {
+                  backgroundColor: theme.palette.text.primary,
+                  color: theme.palette.primary.main,
+                },
+              }),
+            })}
           />
         </span>
       </>
@@ -339,7 +360,7 @@ export const GradesTableProvider = ({
           '&::before': {
             content: '""',
             width: '11px',
-            height: '113%',
+            height: '60px',
             borderBlockEnd: '1px solid lightgray',
             borderLeft: '1px solid lightgray',
             borderEndStartRadius: '10px',
@@ -432,6 +453,7 @@ export const GradesTableProvider = ({
           return '-';
         },
         {
+          id: 'Exported to Sisu',
           header: t('course.results.table.exported'),
           meta: {PrettyChipPosition: 'last'},
           cell: ({getValue}) => getValue(),
@@ -634,6 +656,9 @@ export const GradesTableProvider = ({
     enableGrouping: true,
     enableSorting: true,
     autoResetExpanded: false,
+    // Column Resizing
+    onColumnSizingChange: setColumnSizing,
+    columnResizeMode: 'onChange',
     state: {
       columnVisibility,
       rowSelection,
@@ -641,6 +666,7 @@ export const GradesTableProvider = ({
       grouping,
       sorting,
       globalFilter,
+      columnSizing,
     },
 
     getExpandedRowModel: getExpandedRowModel(),
