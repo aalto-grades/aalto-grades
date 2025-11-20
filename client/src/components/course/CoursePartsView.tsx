@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  AccountTree,
+  AccountTreeOutlined,
   Add,
   AddCircle,
   Archive,
@@ -12,6 +14,7 @@ import {
   FontDownload,
   Inventory,
   Unarchive,
+  Warning,
 } from '@mui/icons-material';
 import {
   Alert,
@@ -42,11 +45,13 @@ import {enqueueSnackbar} from 'notistack';
 import {type JSX, useEffect, useMemo, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
-import {useBlocker, useParams} from 'react-router-dom';
+import {useBlocker, useNavigate, useParams} from 'react-router-dom';
 
 import {
   type AplusGradeSourceData,
   type CoursePartData,
+  CourseRoleType,
+  type GradingModelData,
   type ModifyCourseTasks,
   SystemRole,
 } from '@/common/types';
@@ -56,18 +61,26 @@ import StyledDataGrid from '@/components/shared/StyledDataGrid';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {
   useDeleteCoursePart,
+  useDeleteGradingModel,
   useEditCoursePart,
+  useEditGradingModel,
   useGetAllGradingModels,
+  useGetCourse,
   useGetCourseParts,
   useGetCourseTasks,
+  useGetFinalGrades,
   useGetGrades,
   useModifyCourseTasks,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
+import {getCourseRole} from '@/utils';
 import AddAplusGradeSourceDialog from './course-parts-view/AddAplusGradeSourceDialog';
 import CoursePartDialog from './course-parts-view/CoursePartDialog';
 import NewAplusCourseTasksDialog from './course-parts-view/NewAplusCourseTasksDialog';
 import ViewAplusGradeSourcesDialog from './course-parts-view/ViewAplusGradeSourcesDialog';
+import CreateGradingModelDialog from './models-view/CreateGradingModelDialog';
+import ModelButton from './models-view/ModelButton';
+import RenameGradingModelDialog from './models-view/RenameGradingModelDialog';
 
 type ColTypes = {
   id: number;
@@ -84,20 +97,55 @@ const CoursePartsView = (): JSX.Element => {
   const {t} = useTranslation();
   const {auth, isTeacherInCharge} = useAuth();
   const {courseId} = useParams() as {courseId: string};
+  const navigate = useNavigate();
 
+  const course = useGetCourse(courseId);
   const gradingModels = useGetAllGradingModels(courseId);
   const courseParts = useGetCourseParts(courseId);
   const editCoursePart = useEditCoursePart(courseId);
   const delCoursePart = useDeleteCoursePart(courseId);
+  const editGradingModel = useEditGradingModel();
+  const delGradingModel = useDeleteGradingModel();
 
   const courseTasks = useGetCourseTasks(courseId);
   const modifyCourseTasks = useModifyCourseTasks(courseId);
   const grades = useGetGrades(courseId);
+  const finalGrades = useGetFinalGrades(courseId, {
+    enabled:
+      auth !== null
+      && (auth.role === SystemRole.Admin
+        || (course.data
+          && getCourseRole(course.data, auth) === CourseRoleType.Teacher)),
+  });
 
   const [addPartDialogOpen, setAddPartDialogOpen] = useState<boolean>(false);
   const [editPartDialogOpen, setEditPartDialogOpen] = useState<boolean>(false);
+  const [createModelDialogOpen, setCreateModelDialogOpen] =
+    useState<boolean>(false);
+  const [createModelPart, setCreateModelPart] = useState<
+    CoursePartData | undefined
+  >(undefined);
+  const [renameModelDialogOpen, setRenameModelDialogOpen] =
+    useState<boolean>(false);
+  const [renameModel, setRenameModel] = useState<GradingModelData | null>(null);
   const [editPart, setEditPart] = useState<CoursePartData | null>(null);
   const [selectedPart, setSelectedPart] = useState<number | null>(null);
+
+  const finalGradeModels = useMemo(
+    () =>
+      gradingModels.data?.filter(model => model.coursePartId === null) ?? [],
+    [gradingModels.data]
+  );
+
+  const modelsWithFinalGrades = useMemo(() => {
+    const withGrades = new Set<number>();
+    if (finalGrades.data === undefined) return withGrades;
+    for (const grade of finalGrades.data) {
+      if (grade.gradingModelId)
+        withGrades.add(grade.gradingModelId);
+    }
+    return withGrades;
+  }, [finalGrades.data]);
 
   const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
@@ -395,6 +443,10 @@ const CoursePartsView = (): JSX.Element => {
   }: {
     coursePart: CoursePartData;
   }): JSX.Element => {
+    const hasModel = gradingModels.data?.some(
+      m => m.coursePartId === coursePart.id
+    );
+
     return (
       <ListItem
         sx={{
@@ -407,7 +459,46 @@ const CoursePartsView = (): JSX.Element => {
         secondaryAction={
           editRights
             ? (
-                <>
+                <Box sx={{display: 'flex', alignItems: 'center'}}>
+                  {!hasModel && (
+                    <Tooltip
+                      title={t('course.models.missing-models')}
+                      placement="top"
+                    >
+                      <Warning color="warning" sx={{mr: 1}} />
+                    </Tooltip>
+                  )}
+                  <Tooltip
+                    placement="top"
+                    title={
+                      hasModel
+                        ? t('course.parts.view-model')
+                        : t('course.parts.create-model')
+                    }
+                  >
+                    <IconButton
+                      onClick={() => {
+                        const model = gradingModels.data?.find(
+                          m => m.coursePartId === coursePart.id
+                        );
+                        if (model) {
+                          navigate(`/${courseId}/models/${model.id}`);
+                        } else {
+                          setCreateModelPart(coursePart);
+                          setCreateModelDialogOpen(true);
+                        }
+                      }}
+                      sx={
+                        !hasModel
+                          ? {color: 'warning.main'}
+                          : {}
+                      }
+                    >
+                      {hasModel
+                        ? <AccountTree />
+                        : <AccountTreeOutlined />}
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip placement="top" title={t('course.parts.edit-part')}>
                     <IconButton
                       data-testid={`edit-course-part-${coursePart.name}`}
@@ -435,7 +526,7 @@ const CoursePartsView = (): JSX.Element => {
                     disabled={isCoursePartDeletable(coursePart.id)}
                     onClick={async () => handleDeleteCoursePart(coursePart.id)}
                   />
-                </>
+                </Box>
               )
             : null
         }
@@ -669,6 +760,21 @@ const CoursePartsView = (): JSX.Element => {
         onClose={() => setEditPartDialogOpen(false)}
         coursePart={editPart}
       />
+      <CreateGradingModelDialog
+        open={createModelDialogOpen}
+        onClose={() => setCreateModelDialogOpen(false)}
+        onSubmit={(id) => {
+          setCreateModelDialogOpen(false);
+          navigate(`/${courseId}/models/${id}`);
+        }}
+        coursePart={createModelPart}
+      />
+      <RenameGradingModelDialog
+        open={renameModelDialogOpen}
+        onClose={() => setRenameModelDialogOpen(false)}
+        gradingModelId={renameModel?.id ?? null}
+        name={renameModel?.name ?? null}
+      />
       <NewAplusCourseTasksDialog
         open={aplusDialogOpen}
         onClose={() => setAplusDialogOpen(false)}
@@ -807,6 +913,113 @@ const CoursePartsView = (): JSX.Element => {
           </div>
         </Grid>
       </Grid>
+
+      <Box sx={{mt: 4}}>
+        <Typography width="fit-content" variant="h2">
+          {t('general.grading-models')}
+        </Typography>
+        <Box sx={{display: 'flex', gap: 1, mb: 1, mt: 1}}>
+          {editRights && (
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setCreateModelPart(undefined);
+                setCreateModelDialogOpen(true);
+              }}
+            >
+              {t('course.models.create-final-grade-model')}
+            </Button>
+          )}
+        </Box>
+        <Grid container>
+          <Grid size={{sm: 8, md: 6, lg: 4}}>
+            <Collapse
+              data-testid="final-grade-models"
+              in={finalGradeModels.some(model => !model.archived)}
+            >
+              <ListEntries
+                label={t('course.models.active-models')}
+                icon={<CheckCircle />}
+                color="success"
+                listWidth="100%"
+              >
+                {finalGradeModels
+                  .filter(model => !model.archived)
+                  .map(model => (
+                    <ModelButton
+                      key={model.id}
+                      model={model}
+                      editRights={editRights}
+                      modelsWithFinalGrades={modelsWithFinalGrades}
+                      onEdit={() => {
+                        setRenameModel(model);
+                        setRenameModelDialogOpen(true);
+                      }}
+                      onArchive={() => {
+                        editGradingModel.mutate({
+                          courseId,
+                          gradingModelId: model.id,
+                          gradingModel: {archived: !model.archived},
+                        });
+                      }}
+                      onDelete={() => {
+                        delGradingModel.mutate({
+                          courseId,
+                          gradingModelId: model.id,
+                        });
+                      }}
+                      onClick={() => {
+                        navigate(`/${courseId}/models/${model.id}`);
+                      }}
+                    />
+                  ))}
+              </ListEntries>
+            </Collapse>
+            <Collapse
+              data-testid="archived-final-grade-models"
+              in={finalGradeModels.some(model => model.archived)}
+              sx={{mt: 2}}
+            >
+              <ListEntries
+                label={t('course.models.archived-models')}
+                icon={<Inventory />}
+                listWidth="100%"
+              >
+                {finalGradeModels
+                  .filter(model => model.archived)
+                  .map(model => (
+                    <ModelButton
+                      key={model.id}
+                      model={model}
+                      editRights={editRights}
+                      modelsWithFinalGrades={modelsWithFinalGrades}
+                      onEdit={() => {
+                        setRenameModel(model);
+                        setRenameModelDialogOpen(true);
+                      }}
+                      onArchive={() => {
+                        editGradingModel.mutate({
+                          courseId,
+                          gradingModelId: model.id,
+                          gradingModel: {archived: !model.archived},
+                        });
+                      }}
+                      onDelete={() => {
+                        delGradingModel.mutate({
+                          courseId,
+                          gradingModelId: model.id,
+                        });
+                      }}
+                      onClick={() => {
+                        navigate(`/${courseId}/models/${model.id}`);
+                      }}
+                    />
+                  ))}
+              </ListEntries>
+            </Collapse>
+          </Grid>
+        </Grid>
+      </Box>
     </>
   );
 };
