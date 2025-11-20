@@ -326,7 +326,7 @@ const ModelsView = (): JSX.Element => {
           <Button
             sx={{mt: 1}}
             variant="outlined"
-            onClick={async () => navigate(`/${courseId}/models`)}
+            onClick={async () => navigate(-1)}
           >
             {t('course.models.back')}
           </Button>

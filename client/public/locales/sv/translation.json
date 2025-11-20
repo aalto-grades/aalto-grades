@@ -248,6 +248,8 @@
       "unarchive": "Avarkivera kursdel",
       "archive": "Arkivera kursdel",
       "cannot-delete-with-grades": "Kan inte ta bort en kursdel med betyg",
+      "create-model": "Skapa betygsmodell",
+      "view-model": "Visa betygsmodell",
       "edit-part": "Redigera kursdel",
       "delete-task": "Ta bort kursuppgift",
       "delete-task-message": "Vissa modeller använder denna kursuppgift. Är du säker på att du vill ta bort den?",

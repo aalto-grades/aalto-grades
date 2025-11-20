@@ -248,6 +248,8 @@
       "unarchive": "Unarchive course part",
       "archive": "Archive course part",
       "cannot-delete-with-grades": "Cannot delete a course part with grades",
+      "create-model": "Create grading part model",
+      "view-model": "View grading part model",
       "edit-part": "Edit course part",
       "delete-task": "Delete course task",
       "delete-task-message": "Some models are using this course task. Are you sure you want to delete it?",
