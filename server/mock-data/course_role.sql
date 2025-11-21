@@ -3,14 +3,15 @@
 -- SPDX-License-Identifier: MIT
 
 INSERT INTO public.course_role (user_id, course_id, role, created_at, updated_at) VALUES
-(2, 1, 'TEACHER', NOW(), NOW()),
-(4, 1, 'STUDENT', NOW(), NOW()),
-(2, 2, 'TEACHER', NOW(), NOW()),
-(2, 3, 'TEACHER', NOW(), NOW()),
-(4, 3, 'STUDENT', NOW(), NOW()),
-(2, 4, 'TEACHER', NOW(), NOW()),
-(4, 4, 'STUDENT', NOW(), NOW()),
+((SELECT id FROM public.user WHERE email='teacher@aalto.fi'), (SELECT id FROM public.course WHERE course_code='CS-A1234-DUMMY'), 'TEACHER', NOW(), NOW()),
+((SELECT id FROM public.user WHERE email='student@aalto.fi'), (SELECT id FROM public.course WHERE course_code='CS-A1234-DUMMY'), 'STUDENT', NOW(), NOW()),
+((SELECT id FROM public.user WHERE email='teacher@aalto.fi'), (SELECT id FROM public.course WHERE course_code='CS-A2345-DUMMY'), 'TEACHER', NOW(), NOW()),
+((SELECT id FROM public.user WHERE email='teacher@aalto.fi'), (SELECT id FROM public.course WHERE course_code='CS-A3456-DUMMY'), 'TEACHER', NOW(), NOW()),
+((SELECT id FROM public.user WHERE email='student@aalto.fi'), (SELECT id FROM public.course WHERE course_code='CS-A3456-DUMMY'), 'STUDENT', NOW(), NOW()),
+((SELECT id FROM public.user WHERE email='teacher@aalto.fi'), (SELECT id FROM public.course WHERE course_code='CS-A4567-DUMMY'), 'TEACHER', NOW(), NOW()),
+((SELECT id FROM public.user WHERE email='student@aalto.fi'), (SELECT id FROM public.course WHERE course_code='CS-A4567-DUMMY'), 'STUDENT', NOW(), NOW());
 
+/* Random students commented out to avoid conflicts with fake-data
 (6, 3, 'STUDENT', NOW(), NOW()),
 (7, 3, 'STUDENT', NOW(), NOW()),
 (8, 3, 'STUDENT', NOW(), NOW()),
@@ -61,8 +62,9 @@ INSERT INTO public.course_role (user_id, course_id, role, created_at, updated_at
 (53, 3, 'STUDENT', NOW(), NOW()),
 (54, 3, 'STUDENT', NOW(), NOW()),
 (55, 3, 'STUDENT', NOW(), NOW());
+*/
 
 INSERT INTO public.course_role (user_id, course_id, role, created_at, updated_at, expiry_date) VALUES
-(3, 1, 'ASSISTANT', NOW(), NOW(), CURRENT_DATE + INTERVAL '40 days'),
-(3, 3, 'ASSISTANT', NOW(), NOW(), CURRENT_DATE + INTERVAL '40 days'),
-(3, 4, 'ASSISTANT', NOW(), NOW(), CURRENT_DATE + INTERVAL '40 days');
+((SELECT id FROM public.user WHERE email='assistant@aalto.fi'), (SELECT id FROM public.course WHERE course_code='CS-A1234-DUMMY'), 'ASSISTANT', NOW(), NOW(), CURRENT_DATE + INTERVAL '40 days'),
+((SELECT id FROM public.user WHERE email='assistant@aalto.fi'), (SELECT id FROM public.course WHERE course_code='CS-A3456-DUMMY'), 'ASSISTANT', NOW(), NOW(), CURRENT_DATE + INTERVAL '40 days'),
+((SELECT id FROM public.user WHERE email='assistant@aalto.fi'), (SELECT id FROM public.course WHERE course_code='CS-A4567-DUMMY'), 'ASSISTANT', NOW(), NOW(), CURRENT_DATE + INTERVAL '40 days');

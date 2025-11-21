@@ -3,15 +3,15 @@
 -- SPDX-License-Identifier: MIT
 
 INSERT INTO public.course_translation (course_id, language, course_name, created_at, updated_at) VALUES
-(1, 'EN', 'O1', NOW(), NOW()),
-(1, 'FI', 'O1', NOW(), NOW()),
-(1, 'SV', 'O1', NOW(), NOW()),
-(2, 'EN', 'Y1', NOW(), NOW()),
-(2, 'FI', 'Y1', NOW(), NOW()),
-(2, 'SV', 'Y1', NOW(), NOW()),
-(3, 'EN', 'Example & grades', NOW(), NOW()),
-(3, 'FI', 'Esimerkki & arvosanat', NOW(), NOW()),
-(3, 'SV', 'Exempel & betyg', NOW(), NOW()),
-(4, 'EN', 'Example', NOW(), NOW()),
-(4, 'FI', 'Esimerkki', NOW(), NOW()),
-(4, 'SV', 'Exempel', NOW(), NOW());
+((SELECT id FROM public.course WHERE course_code='CS-A1234-DUMMY'), 'EN', 'O1', NOW(), NOW()),
+((SELECT id FROM public.course WHERE course_code='CS-A1234-DUMMY'), 'FI', 'O1', NOW(), NOW()),
+((SELECT id FROM public.course WHERE course_code='CS-A1234-DUMMY'), 'SV', 'O1', NOW(), NOW()),
+((SELECT id FROM public.course WHERE course_code='CS-A2345-DUMMY'), 'EN', 'Y1', NOW(), NOW()),
+((SELECT id FROM public.course WHERE course_code='CS-A2345-DUMMY'), 'FI', 'Y1', NOW(), NOW()),
+((SELECT id FROM public.course WHERE course_code='CS-A2345-DUMMY'), 'SV', 'Y1', NOW(), NOW()),
+((SELECT id FROM public.course WHERE course_code='CS-A3456-DUMMY'), 'EN', 'Example & grades', NOW(), NOW()),
+((SELECT id FROM public.course WHERE course_code='CS-A3456-DUMMY'), 'FI', 'Esimerkki & arvosanat', NOW(), NOW()),
+((SELECT id FROM public.course WHERE course_code='CS-A3456-DUMMY'), 'SV', 'Exempel & betyg', NOW(), NOW()),
+((SELECT id FROM public.course WHERE course_code='CS-A4567-DUMMY'), 'EN', 'Example', NOW(), NOW()),
+((SELECT id FROM public.course WHERE course_code='CS-A4567-DUMMY'), 'FI', 'Esimerkki', NOW(), NOW()),
+((SELECT id FROM public.course WHERE course_code='CS-A4567-DUMMY'), 'SV', 'Exempel', NOW(), NOW());
