@@ -13,7 +13,7 @@
     "migration:down": "npx sequelize-cli db:migrate:undo",
     "migration:down:all": "npx sequelize-cli db:migrate:undo:all",
     "migration:up": "npx sequelize-cli db:migrate",
-    "seed:down": "npx sequelize-cli db:seed:undo",
+    "seed:down": "npx sequelize-cli db:seed:undo:all",
     "seed:up": "npx sequelize-cli db:seed:all",
     "start": "node build/server/src/server.js",
     "test": "jest --verbose --detectOpenHandles --coverage",
