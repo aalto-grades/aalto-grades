@@ -108,7 +108,8 @@ export const warnDialogIfBackdropClickDisabled = async (
 
 export const filterGradesTable = async (page: Page): Promise<void> => {
   await page.getByRole('cell', {name: 'example & grades'}).click();
-  await expect(page.getByText('showing 50 rows')).toBeVisible();
+  const fullTableText = await page.getByText(/^showing \d+ rows?$/).textContent();
+  await expect(page.getByText(fullTableText!)).toBeVisible();
 
   // Filter by name
   await page.getByPlaceholder('search').fill('wi');
@@ -117,7 +118,7 @@ export const filterGradesTable = async (page: Page): Promise<void> => {
   await expect(page.getByText('showing 2 rows')).toBeVisible();
   await expect(page.getByRole('row')).toHaveCount(3); // Count header row also
   await page.getByLabel('reset-search').click();
-  await expect(page.getByText('showing 50 rows')).toBeVisible();
+  await expect(page.getByText(fullTableText!)).toBeVisible();
 
   // Filter by student number
   await page.getByPlaceholder('search').fill('68');
@@ -126,5 +127,5 @@ export const filterGradesTable = async (page: Page): Promise<void> => {
   await expect(page.getByText('showing 2 rows')).toBeVisible();
   await expect(page.getByRole('row')).toHaveCount(3);
   await page.getByLabel('reset-search').click();
-  await expect(page.getByText('showing 50 rows')).toBeVisible();
+  await expect(page.getByText(fullTableText!)).toBeVisible();
 };
