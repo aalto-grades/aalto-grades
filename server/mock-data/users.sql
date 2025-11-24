@@ -75,5 +75,5 @@ INSERT INTO public.user (email, student_number, password, name, idp_user, admin,
 ('thomas.siegel@aalto.fi', 'DUMMY-348576', null, 'Thomas Siegel', false, false, NOW(), NOW()),
 ('toney.ham@aalto.fi', 'DUMMY-495298', null, 'Toney Ham', false, false, NOW(), NOW()),
 ('vonda.morgan@aalto.fi', 'DUMMY-826139', null, 'Vonda Morgan', false, false, NOW(), NOW()),
-('william.thomas@aalto.fi', 'DUMMY-686426', null, 'William Thomas', false, false, NOW(), NOW())
+('william.thomas@aalto.fi', 'DUMMY-686429', null, 'William Thomas', false, false, NOW(), NOW())
 ON CONFLICT (email) DO NOTHING;

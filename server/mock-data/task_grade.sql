@@ -176,7 +176,10 @@ FROM
     ('DUMMY-495298', 'Exam 2024', 'Exam points', 13),
     ('DUMMY-826139', 'Exercises 2024', 'Exercise 1', 4),
     ('DUMMY-826139', 'Exercises 2024', 'Exercise 2', 3),
-    ('DUMMY-826139', 'Exam 2024', 'Exam points', 16)
+    ('DUMMY-826139', 'Exam 2024', 'Exam points', 16),
+    ('DUMMY-686429', 'Exercises 2024', 'Exercise 1', 4),
+    ('DUMMY-686429', 'Exercises 2024', 'Exercise 2', 3),
+    ('DUMMY-686429', 'Exam 2024', 'Exam points', 16)
   ) AS d (student_number, part_name, task_name, grade)
 JOIN public.user u ON u.student_number = d.student_number
 JOIN course_parts cp ON cp.name = d.part_name
