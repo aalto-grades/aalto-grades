@@ -5,5 +5,5 @@
 /build
 /coverage
 /.env
-custom-data/
+*/custom-data/*
 test-ids.json
