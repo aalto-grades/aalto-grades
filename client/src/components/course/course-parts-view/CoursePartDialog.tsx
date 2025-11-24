@@ -68,7 +68,7 @@ const CoursePartDialog = ({
   const initialValues: FormData = {
     name: coursePart?.name ?? '',
     expiryDate: coursePart?.expiryDate?.toISOString().split('T')[0] ?? null,
-    gradingModelName: (coursePart)?.gradingModelName ?? '',
+    gradingModelName: coursePart?.gradingModelName ?? '',
   };
   const ValidationSchema = z.strictObject({
     name: z.string().min(1),
