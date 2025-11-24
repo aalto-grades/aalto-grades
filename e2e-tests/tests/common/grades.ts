@@ -108,7 +108,7 @@ export const warnDialogIfBackdropClickDisabled = async (
 
 export const filterGradesTable = async (page: Page): Promise<void> => {
   await page.getByRole('cell', {name: 'example & grades'}).click();
-  const fullTableText = await page.getByText(/^showing \d+ rows?$/).textContent();
+  const fullTableText = await page.getByText('showing').textContent();
   await expect(page.getByText(fullTableText!)).toBeVisible();
 
   // Filter by name
