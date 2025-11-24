@@ -222,6 +222,7 @@
         "edit-title": "Redigera kursdel - {{name}}",
         "create-title": "Skapa ny kursdel",
         "name-help": "Kursdelsnamn",
+        "grading-model-name-help": "Namn på betygsmodell",
         "expiry-date-valid-help": "Utgångsdatum för kursdelen",
         "previously-used-dates": "Tidigare använda datum:"
       },

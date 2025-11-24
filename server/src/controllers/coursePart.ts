@@ -10,7 +10,9 @@ import {
   HttpCode,
   type NewCoursePartData,
 } from '@/common/types';
+import {sequelize} from '../database';
 import CoursePart from '../database/models/coursePart';
+import GradingModel from '../database/models/gradingModel';
 import {ApiError, type Endpoint} from '../types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
@@ -80,21 +82,37 @@ export const editCoursePart: Endpoint<EditCoursePartData, void> = async (
   );
 
   try {
-    await coursePart
-      .set({
-        name: req.body.name ?? coursePart.name,
-        expiryDate:
-          req.body.expiryDate !== undefined
-            ? req.body.expiryDate
-            : coursePart.expiryDate,
-        archived: req.body.archived ?? coursePart.archived,
-      })
-      .save();
+    await sequelize.transaction(async (t) => {
+      await coursePart
+        .set({
+          name: req.body.name ?? coursePart.name,
+          expiryDate:
+            req.body.expiryDate !== undefined
+              ? req.body.expiryDate
+              : coursePart.expiryDate,
+          archived: req.body.archived ?? coursePart.archived,
+        })
+        .save({transaction: t});
+
+      if (req.body.gradingModelName) {
+        const gradingModel = await GradingModel.findOne({
+          where: {
+            coursePartId: coursePart.id,
+          },
+          transaction: t,
+        });
+
+        if (gradingModel) {
+          await gradingModel
+            .update({name: req.body.gradingModelName}, {transaction: t});
+        }
+      }
+    });
   } catch (error) {
     // Duplicate name error
     if (error instanceof UniqueConstraintError) {
       throw new ApiError(
-        'There cannot be two course parts with the same name',
+        'There cannot be two course parts or grading models with the same name',
         HttpCode.Conflict
       );
     }

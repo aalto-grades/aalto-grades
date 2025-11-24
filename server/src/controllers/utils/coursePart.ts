@@ -6,6 +6,7 @@ import {type CoursePartData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
 import type Course from '../../database/models/course';
 import CoursePart from '../../database/models/coursePart';
+import GradingModel from '../../database/models/gradingModel';
 import {ApiError, stringToIdSchema} from '../../types';
 
 /**
@@ -95,15 +96,24 @@ export const getAllCourseCourseParts = async (
   courseId: number
 ): Promise<CoursePartData[]> => {
   const courseParts = await CoursePart.findAll({where: {courseId: courseId}});
+  const gradingModels = await GradingModel.findAll({where: {courseId: courseId}});
 
   return courseParts.map(
-    (coursePart): CoursePartData => ({
-      id: coursePart.id,
-      courseId: coursePart.courseId,
-      name: coursePart.name,
-      expiryDate:
-        coursePart.expiryDate !== null ? new Date(coursePart.expiryDate) : null,
-      archived: coursePart.archived,
-    })
+    (coursePart): CoursePartData => {
+      const gradingModel = gradingModels.find(
+        gm => gm.coursePartId === coursePart.id
+      );
+      return {
+        id: coursePart.id,
+        courseId: coursePart.courseId,
+        name: coursePart.name,
+        expiryDate:
+          coursePart.expiryDate !== null
+            ? new Date(coursePart.expiryDate)
+            : null,
+        archived: coursePart.archived,
+        gradingModelName: gradingModel?.name,
+      };
+    }
   );
 };

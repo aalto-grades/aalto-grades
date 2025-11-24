@@ -222,6 +222,7 @@
         "edit-title": "Muokkaa kurssin osa - {{name}}",
         "create-title": "Luo kurssin osa",
         "name-help": "Syötä kurssin osan nimi",
+        "grading-model-name-help": "Syötä arviointimallin nimi",
         "expiry-date-valid-help": "Syötä validi voimassaoloaika",
         "previously-used-dates": "Viimeksi käytetyt päivämäärät:"
       },
