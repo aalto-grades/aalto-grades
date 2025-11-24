@@ -28,7 +28,7 @@ let courseId = -1;
 let editCoursePartId = -1;
 
 let noRoleCourseId = -1;
-let noRoleCoursePartId = 26;
+let noRoleCoursePartId: number;
 
 const nonExistentId = 1000000;
 

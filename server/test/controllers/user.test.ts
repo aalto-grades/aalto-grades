@@ -37,7 +37,12 @@ beforeAll(async () => {
 
   // Create a course that the student is a part of
   const [courseId, , , modelId] = await createData.createCourse({});
-  await createData.createFinalGrade(courseId, STUDENT_ID, modelId, TEACHER_ID);
+  await createData.createFinalGrade(
+    courseId,
+    STUDENT_ID,
+    modelId,
+    TEACHER_ID
+  );
 
   let noTeacherModelId;
   [noTeachersCourseId, , , noTeacherModelId] = await createData.createCourse({
