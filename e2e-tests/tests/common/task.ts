@@ -10,9 +10,8 @@ export const addCoursePartTask = async (page: Page): Promise<void> => {
   await viewCourseParts(page);
   const coursePartName = await addOneCoursePart(page, randomName());
   await page
-    .getByRole('button')
-    .getByText(coursePartName, {exact: true})
-    .click();
+    .getByRole('button', {name: `${coursePartName} No expiry date`})
+    .click({position: {x: 10, y: 10}});
 
   await page.getByRole('button', {name: 'add new course task'}).click();
   await page.keyboard.type('task 1');
