@@ -94,7 +94,7 @@ export const editCoursePart: Endpoint<EditCoursePartData, void> = async (
         })
         .save({transaction: t});
 
-      if (req.body.gradingModelName) {
+      if (req.body.name) {
         const gradingModel = await GradingModel.findOne({
           where: {
             coursePartId: coursePart.id,
@@ -103,8 +103,7 @@ export const editCoursePart: Endpoint<EditCoursePartData, void> = async (
         });
 
         if (gradingModel) {
-          await gradingModel
-            .update({name: req.body.gradingModelName}, {transaction: t});
+          await gradingModel.update({name: req.body.name}, {transaction: t});
         }
       }
     });

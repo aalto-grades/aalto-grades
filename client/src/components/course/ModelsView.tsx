@@ -186,7 +186,8 @@ const ModelsView = (): JSX.Element => {
 
   // Handle invalid modelId
   useEffect(() => {
-    if (modelId === undefined || models === null) return;
+    if (modelId === undefined || models === null || allGradingModels.isFetching)
+      return;
 
     const modelExists = models.some(m => m.id === parseInt(modelId));
     if (!modelExists) {
@@ -195,7 +196,14 @@ const ModelsView = (): JSX.Element => {
       });
       navigate(`/${courseId}/models`);
     }
-  }, [courseId, modelId, models, navigate, t]);
+  }, [
+    courseId,
+    modelId,
+    models,
+    navigate,
+    t,
+    allGradingModels.isFetching,
+  ]);
 
   // Handle invalid userId
   useEffect(() => {

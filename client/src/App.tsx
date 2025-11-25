@@ -143,12 +143,12 @@ const router = createBrowserRouter([
                 element: <GradesView />,
               },
               {
-                path: '/:courseId/models/:modelId?/:userId?',
-                element: <ModelsView />,
+                path: '/:courseId/models',
+                element: <CoursePartsView />,
               },
               {
-                path: '/:courseId/course-parts',
-                element: <CoursePartsView />,
+                path: '/:courseId/models/:modelId/:userId?',
+                element: <ModelsView />,
               },
               {
                 path: '/:courseId/edit',

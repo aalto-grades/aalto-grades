@@ -94,38 +94,40 @@ export const createGradingModel = async (page: Page): Promise<void> => {
   const modelName = randomName();
 
   await page.getByRole('cell', {name: 'O1'}).click();
-  await page.getByRole('button', {name: 'Grading models'}).click();
-  await page.getByLabel('Create new final grade model').click();
+  await page.getByRole('link', {name: 'Grading models'}).click();
+  await page.getByRole('button', {name: 'Create new final grade model'}).click();
   await page.getByLabel('Name *').click();
   await page.getByLabel('Name *').fill(modelName);
   await page.getByLabel('Select template').click();
   await page.getByRole('option', {name: 'Addition'}).click();
   await page.getByRole('button', {name: 'Submit'}).click();
   await expect(page.getByTestId('rf__node-addition')).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Format'})).toBeVisible();
   await page.getByRole('button', {name: 'Format'}).click();
   await expect(
     page.locator('p').filter({hasText: 'Unsaved changes'})
   ).toBeVisible();
   await page.getByRole('button', {name: 'Save'}).click();
   await expect(page.getByText('Model saved successfully')).toBeVisible();
-  await page.getByRole('button', {name: 'Grades', exact: true}).click();
-  await page.getByRole('button', {name: 'Grading models'}).click();
+  await page.getByRole('link', {name: 'Grades', exact: true}).click();
+  await page.getByRole('link', {name: 'Grading models'}).click();
   await expect(page.getByRole('button', {name: modelName})).toBeVisible();
 };
 
 export const viewGradingModel = async (page: Page): Promise<void> => {
   await page.getByRole('cell', {name: 'O1'}).click();
-  await page.getByRole('button', {name: 'Grading models'}).click();
-  await page.getByRole('button', {name: 'Exercises 2024'}).click();
+  await page.getByRole('link', {name: 'Grading models'}).click();
+  await page
+    .getByRole('listitem')
+    .filter({hasText: 'Exercises 2024'})
+    .getByRole('button', {name: 'View grading part model'})
+    .click();
   await expect(page.getByTestId('rf__wrapper')).toBeVisible();
 };
 
 export const viewCourseParts = async (page: Page): Promise<void> => {
   await page.getByRole('cell', {name: 'O1'}).click();
-  await page
-    .getByRole('link', {name: 'Course parts'})
-    .getByRole('button')
-    .click();
+  await page.getByRole('link', {name: 'Grading models'}).click();
   await expect(page.getByText(/^Days valid$/)).toBeVisible();
   await expect(page.getByText('Exercises 2024')).toBeVisible();
 };

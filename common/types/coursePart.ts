@@ -12,13 +12,11 @@ export const CoursePartDataSchema = z.strictObject({
   name: z.string().min(1),
   expiryDate: DateSchema.nullable(),
   archived: z.boolean(),
-  gradingModelName: z.string().optional(),
 });
 export const NewCoursePartDataSchema = CoursePartDataSchema.omit({
   id: true,
   courseId: true,
   archived: true,
-  gradingModelName: true,
 }).strict();
 export const EditCoursePartDataSchema = CoursePartDataSchema.omit({
   id: true,

@@ -33,10 +33,7 @@ const CourseRedirect = (): JSX.Element => {
   )
     return <Navigate to={`/${courseId}/course-results`} />;
 
-  if (courseParts.data.length > 0 && courseTasks.data.length > 0)
-    return <Navigate to={`/${courseId}/models`} />;
-
-  return <Navigate to={`/${courseId}/course-parts`} />;
+  return <Navigate to={`/${courseId}/models`} />;
 };
 
 export default CourseRedirect;

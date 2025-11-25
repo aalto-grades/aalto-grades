@@ -457,9 +457,39 @@ const CoursePartsView = (): JSX.Element => {
         }}
         disablePadding
         secondaryAction={
-          editRights
-            ? (
-                <Box sx={{display: 'flex', alignItems: 'center'}}>
+          (
+            <Box sx={{display: 'flex', alignItems: 'center'}}>
+              {hasModel && (
+                <Tooltip placement="top" title={t('course.parts.view-model')}>
+                  <IconButton
+                    aria-label={t('course.parts.view-model')}
+                    onClick={() => {
+                      const model = gradingModels.data?.find(
+                        m => m.coursePartId === coursePart.id
+                      );
+                      if (model) navigate(`/${courseId}/models/${model.id}`);
+                    }}
+                  >
+                    <AccountTree />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {editRights && !hasModel && (
+                <Tooltip placement="top" title={t('course.parts.create-model')}>
+                  <IconButton
+                    aria-label={t('course.parts.create-model')}
+                    onClick={() => {
+                      setCreateModelPart(coursePart);
+                      setCreateModelDialogOpen(true);
+                    }}
+                    sx={{color: 'warning.main'}}
+                  >
+                    <AccountTreeOutlined />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {editRights && (
+                <>
                   {!hasModel && (
                     <Tooltip
                       title={t('course.models.missing-models')}
@@ -468,37 +498,6 @@ const CoursePartsView = (): JSX.Element => {
                       <Warning color="warning" sx={{mr: 1}} />
                     </Tooltip>
                   )}
-                  <Tooltip
-                    placement="top"
-                    title={
-                      hasModel
-                        ? t('course.parts.view-model')
-                        : t('course.parts.create-model')
-                    }
-                  >
-                    <IconButton
-                      onClick={() => {
-                        const model = gradingModels.data?.find(
-                          m => m.coursePartId === coursePart.id
-                        );
-                        if (model) {
-                          navigate(`/${courseId}/models/${model.id}`);
-                        } else {
-                          setCreateModelPart(coursePart);
-                          setCreateModelDialogOpen(true);
-                        }
-                      }}
-                      sx={
-                        !hasModel
-                          ? {color: 'warning.main'}
-                          : {}
-                      }
-                    >
-                      {hasModel
-                        ? <AccountTree />
-                        : <AccountTreeOutlined />}
-                    </IconButton>
-                  </Tooltip>
                   <Tooltip placement="top" title={t('course.parts.edit-part')}>
                     <IconButton
                       data-testid={`edit-course-part-${coursePart.name}`}
@@ -526,9 +525,10 @@ const CoursePartsView = (): JSX.Element => {
                     disabled={isCoursePartDeletable(coursePart.id)}
                     onClick={async () => handleDeleteCoursePart(coursePart.id)}
                   />
-                </Box>
-              )
-            : null
+                </>
+              )}
+            </Box>
+          )
         }
       >
         <ListItemButton

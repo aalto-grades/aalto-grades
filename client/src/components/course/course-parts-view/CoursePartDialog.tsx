@@ -40,11 +40,7 @@ const addDate = (newDate: string): void => {
   localStorage.setItem('lastDates', JSON.stringify(uniqueDates.slice(0, 5)));
 };
 
-type FormData = {
-  name: string;
-  expiryDate: string | null;
-  gradingModelName: string;
-};
+type FormData = {name: string; expiryDate: string | null};
 
 type PropsType = {
   open: boolean;
@@ -63,19 +59,14 @@ const CoursePartDialog = ({
   const addCoursePart = useAddCoursePart(courseId);
   const editCoursePart = useEditCoursePart(courseId);
   const lastUsedDates = getDates();
-  const hasGradingModel = coursePart?.gradingModelName !== undefined;
 
   const initialValues: FormData = {
     name: coursePart?.name ?? '',
     expiryDate: coursePart?.expiryDate?.toISOString().split('T')[0] ?? null,
-    gradingModelName: coursePart?.gradingModelName ?? '',
   };
   const ValidationSchema = z.strictObject({
     name: z.string().min(1),
     expiryDate: nullableDateSchema(t),
-    gradingModelName: hasGradingModel
-      ? z.string().min(1)
-      : z.string().optional(),
   });
 
   const onSubmit = async (
@@ -90,7 +81,6 @@ const CoursePartDialog = ({
           coursePart: {
             name: parsedValues.name,
             expiryDate: parsedValues.expiryDate,
-            gradingModelName: parsedValues.gradingModelName,
           },
         });
       } else {
@@ -161,15 +151,6 @@ const CoursePartDialog = ({
               helperText={t('course.parts.create.name-help')}
               type="string"
             />
-            {type === 'edit' && hasGradingModel && (
-              <FormField
-                form={form as unknown as FormikProps<{[key: string]: unknown}>}
-                value="gradingModelName"
-                label={`${t('general.grading-model')} ${t('general.name').toLowerCase()}*`}
-                helperText={t('course.parts.create.grading-model-name-help')}
-                type="string"
-              />
-            )}
             <Box
               sx={{
                 width: '100%',

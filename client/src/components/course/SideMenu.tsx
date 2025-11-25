@@ -3,8 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  AccountTree,
-  AccountTreeOutlined,
   ArrowBack,
   Edit,
   EditOutlined,
@@ -125,12 +123,6 @@ const SideMenu = (): JSX.Element => {
         <SideMenuButton
           text={t('general.grading-models')}
           to={`/${courseId}/models`}
-          Icon={AccountTree}
-          IconOutlined={AccountTreeOutlined}
-        />
-        <SideMenuButton
-          text={t('general.course-parts')}
-          to={`/${courseId}/course-parts`}
           Icon={Widgets}
           IconOutlined={WidgetsOutlined}
         />
