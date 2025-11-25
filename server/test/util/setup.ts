@@ -5,6 +5,8 @@
 // Load environment variables from .env file
 
 import * as dotenv from 'dotenv';
+import * as fs from 'fs';
+import * as path from 'path';
 import pg from 'pg';
 
 import {resetDb} from './resetDb';
@@ -32,7 +34,7 @@ const dbConfig = {
  * after tests
  */
 
-const setup = async () => {
+const setup = async (): Promise<void> => {
   const client = new pg.Client(dbConfig);
   await client.connect();
 
@@ -80,6 +82,24 @@ const setup = async () => {
   ) {
     throw new Error('Failed to create checkpoint database');
   }
+
+  // Fetch user IDs for tests
+  const userQuery = await client.query(
+    "SELECT id, email FROM \"user\" WHERE email IN ('admin@aalto.fi', 'teacher@aalto.fi', 'assistant@aalto.fi', 'student@aalto.fi')"
+  );
+
+  const ids: Record<string, number> = {};
+  userQuery.rows.forEach((row: {id: number; email: string}) => {
+    if (row.email === 'admin@aalto.fi') ids.ADMIN_ID = row.id;
+    if (row.email === 'teacher@aalto.fi') ids.TEACHER_ID = row.id;
+    if (row.email === 'assistant@aalto.fi') ids.ASSISTANT_ID = row.id;
+    if (row.email === 'student@aalto.fi') ids.STUDENT_ID = row.id;
+  });
+
+  fs.writeFileSync(
+    path.join(__dirname, 'test-ids.json'),
+    JSON.stringify(ids, null, 2)
+  );
 
   await client.end();
 };

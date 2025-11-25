@@ -31,8 +31,8 @@ export default {
       await queryInterface.sequelize.query(courseTranslation, {transaction});
       await queryInterface.sequelize.query(courseRole, {transaction});
       await queryInterface.sequelize.query(coursePart, {transaction});
-      await queryInterface.sequelize.query(gradingModel, {transaction});
       await queryInterface.sequelize.query(courseTask, {transaction});
+      await queryInterface.sequelize.query(gradingModel, {transaction});
       await queryInterface.sequelize.query(taskGrade, {transaction});
       await queryInterface.sequelize.query(finalGrade, {transaction});
       await transaction.commit();

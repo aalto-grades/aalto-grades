@@ -23,7 +23,8 @@ docker compose up --build
 Then launch Playwright in this directory in CLI mode:
 
 ```
-./start-test.sh
+# From root
+./e2e-tests/start-test.sh
 ```
 
 Or in UI mode (remember to select all projects when testing):

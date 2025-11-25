@@ -17,6 +17,7 @@ import {
 } from '@/common/types';
 import {initGraph} from '@/common/util';
 import {app} from '../../src/app';
+import Course from '../../src/database/models/course';
 import GradingModel from '../../src/database/models/gradingModel';
 import {createData} from '../util/createData';
 import {TEACHER_ID} from '../util/general';
@@ -39,10 +40,12 @@ let noRoleCourseId = -1;
 let noRoleModelId = -1;
 const nonExistentId = 1000000;
 
-const otherGradingModId = 1;
+let otherGradingModId = -1;
 
 beforeAll(async () => {
   cookies = await getCookies();
+
+  otherGradingModId = (await GradingModel.findOne({include: [{model: Course, where: {courseCode: 'CS-A3456-DUMMY'}}]}))!.id;
 
   [courseId, courseParts, courseTasks, gradingModId] =
     await createData.createCourse({});
