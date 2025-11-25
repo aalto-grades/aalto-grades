@@ -4,6 +4,9 @@
 #
 # SPDX-License-Identifier: MIT
 
+# Change to the script's directory
+cd "$(dirname "$0")" || exit 1
+
 rm -rf ./blob-reporter
 rm -rf ./playwright-report
 rm -rf ./blob-report

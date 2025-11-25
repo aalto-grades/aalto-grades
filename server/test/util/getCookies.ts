@@ -18,18 +18,21 @@ export type Cookies = {
   studentCookie: [string];
 };
 
-type UserCredentials = {id: number; email: string; password: string};
+type UserCredentials = {id?: number; email: string; password: string};
 const users: UserCredentials[] = [
-  {id: 1, email: 'admin@aalto.fi', password: 'password'},
-  {id: 2, email: 'teacher@aalto.fi', password: 'password'},
-  {id: 3, email: 'assistant@aalto.fi', password: 'password'},
-  {id: 4, email: 'student@aalto.fi', password: 'password'},
+  {email: 'admin@aalto.fi', password: 'password'},
+  {email: 'teacher@aalto.fi', password: 'password'},
+  {email: 'assistant@aalto.fi', password: 'password'},
+  {email: 'student@aalto.fi', password: 'password'},
 ];
 
 /** Generate a TOTP code for given user */
 const getUserToken = async (user: UserCredentials): Promise<string> => {
-  const dbUser = await User.findByPk(user.id);
-  const secret = dbUser?.mfaSecret as string;
+  const dbUser = await User.findByEmail(user.email);
+  if (!dbUser) {
+    throw new Error(`User not found: ${user.email}`);
+  }
+  const secret = dbUser.mfaSecret as string;
   return authenticator.generate(secret);
 };
 

@@ -24,6 +24,7 @@ import {
 } from '../../src/configs/constants';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
+import {ADMIN_ID} from '../util/general';
 import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
@@ -79,7 +80,7 @@ describe('Test GET /v1/auth/self-info - fetch own info', () => {
       .get('/v1/auth/self-info')
       .withCredentials(true)
       .expect(HttpCode.Unauthorized);
-    const token = await getToken(1);
+    const token = await getToken(ADMIN_ID);
     await agent
       .post('/v1/auth/login')
       .withCredentials(true)
@@ -110,7 +111,7 @@ describe('Test GET /v1/auth/self-info - fetch own info', () => {
 
 describe('Test POST /v1/auth/login - log in with an existing user', () => {
   it('should log in', async () => {
-    const result = await testLogin('admin@aalto.fi', 'password', 1);
+    const result = await testLogin('admin@aalto.fi', 'password', ADMIN_ID);
     expect(result.status).toBe('ok');
   });
 
@@ -188,7 +189,7 @@ describe('Test POST /v1/auth/login and expiry', () => {
     // Use the agent for cookie persistence
     const agent = supertest.agent(app);
     const realDate = new Date();
-    const token = await getToken(1);
+    const token = await getToken(ADMIN_ID);
     await agent
       .post('/v1/auth/login')
       .withCredentials(true)

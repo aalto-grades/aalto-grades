@@ -17,7 +17,7 @@ import {app} from '../../src/app';
 import TaskGrade from '../../src/database/models/taskGrade';
 import User from '../../src/database/models/user';
 import {createData} from '../util/createData';
-import {NEXT_YEAR, TEACHER_ID, convertDate} from '../util/general';
+import {ADMIN_ID, NEXT_YEAR, TEACHER_ID, convertDate} from '../util/general';
 import {type Cookies, getCookies} from '../util/getCookies';
 import {resetDb} from '../util/resetDb';
 import {ResponseTests} from '../util/responses';
@@ -235,8 +235,7 @@ describe('Test POST /v1/courses/:courseId/grades - add grades', () => {
         courseTaskId: courseTasks[0].id,
       },
     });
-
-    expect(taskGrade?.graderId).toBe(1);
+    expect(taskGrade?.graderId).toBe(ADMIN_ID);
   });
 
   it('grades should be in the database', async () => {
