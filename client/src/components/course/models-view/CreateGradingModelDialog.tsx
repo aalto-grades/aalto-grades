@@ -102,15 +102,17 @@ const CreateGradingModelDialog = ({
           : t('course.models.create-model.final-grade-title')}
       </DialogTitle>
       <DialogContent>
-        <TextField
-          sx={{mt: 1}}
-          label={t('general.name')}
-          required
-          fullWidth
-          value={name}
-          disabled={addGradingModel.isPending}
-          onChange={e => setName(e.target.value)}
-        />
+        {coursePart === undefined && (
+          <TextField
+            sx={{mt: 1}}
+            label={t('general.name')}
+            required
+            fullWidth
+            value={name}
+            disabled={addGradingModel.isPending}
+            onChange={e => setName(e.target.value)}
+          />
+        )}
         <FormControl
           fullWidth
           sx={{mt: 2}}

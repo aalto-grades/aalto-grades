@@ -248,6 +248,8 @@
       "unarchive": "Palauta arkistosta",
       "archive": "Arkistoi",
       "cannot-delete-with-grades": "Ei voi poistaa, koska sisältää arvosanoja",
+      "create-model": "Luo arviointimalli",
+      "view-model": "Näytä arviointimalli",
       "edit-part": "Muokkaa osaa",
       "delete-task": "Poista tehtävä",
       "delete-task-message": "Haluatko varmasti poistaa tämän tehtävän?",
