@@ -210,7 +210,7 @@
     "in-english": "in English",
     "in-finnish": "in Finnish",
     "in-swedish": "in Swedish",
-    "search": "search",
+    "search": "Search",
     "final-grades": "Final grades",
     "course-part-grade": "Course Part Grade",
     "not-int": "Value must be a valid integer"
@@ -406,6 +406,28 @@
       "final-grade-preview": "Final grade preview",
       "course-part-value-preview": "Course part value",
       "data-undefined": "Data is undefined"
+    },
+    "timeline": {
+      "today": "Today",
+      "title": "Grade Expiration Timeline",
+      "new-expiry-date": "New Expiry Date",
+      "sisu-export-status": "Sisu Export Status",
+      "all-students": "All Students",
+      "exported": "Exported to Sisu",
+      "not-exported": "Not Exported to Sisu",
+      "update-selected": "Update {{count}} Selected Items",
+      "update": "Update",
+      "selected-count": "{{count}} items selected",
+      "select-multiple-hint": "(Hold Ctrl/Cmd to select multiple items)",
+      "task-student": "Task / Student",
+      "loading": "Loading...",
+      "grade-updated-success": "Grade updated successfully",
+      "grade-update-fail": "Failed to update grade",
+      "items-updated-success": "Updated {{count}} items successfully",
+      "items-update-fail": "Failed to update items",
+      "expires": "Expires",
+      "never": "Never",
+      "unknown": "Unknown"
     },
     "edit": {
       "saved": "Course details saved.",

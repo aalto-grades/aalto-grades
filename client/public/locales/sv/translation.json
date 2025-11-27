@@ -405,7 +405,29 @@
       },
       "final-grade-preview": "Förhandsgranskning av slutbetyg",
       "course-part-value-preview": "Värde för kursdel",
-      "data-undefined": "Data är odefinierad."
+      "data-undefined": "Data är odefinierad"
+    },
+    "timeline": {
+      "today": "Idag",
+      "title": "Tidslinje för betygens utgång",
+      "new-expiry-date": "Nytt utgångsdatum",
+      "sisu-export-status": "Sisu-exportstatus",
+      "all-students": "Alla studenter",
+      "exported": "Exporterad till Sisu",
+      "not-exported": "Ej exporterad till Sisu",
+      "update-selected": "Uppdatera {{count}} valda objekt",
+      "update": "Uppdatera",
+      "selected-count": "{{count}} objekt valda",
+      "select-multiple-hint": "(Håll Ctrl/Cmd för att välja flera objekt)",
+      "task-student": "Uppgift / Student",
+      "loading": "Laddar...",
+      "grade-updated-success": "Betyg uppdaterat framgångsrikt",
+      "grade-update-fail": "Misslyckades med att uppdatera betyg",
+      "items-updated-success": "Uppdaterade {{count}} objekt framgångsrikt",
+      "items-update-fail": "Misslyckades med att uppdatera objekt",
+      "expires": "Går ut",
+      "never": "Aldrig",
+      "unknown": "Okänd"
     },
     "edit": {
       "saved": "Kursdetaljer sparade.",
