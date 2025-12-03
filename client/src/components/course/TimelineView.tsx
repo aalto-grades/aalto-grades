@@ -9,11 +9,15 @@ import {
 import {
   Box,
   Button,
+  Checkbox,
   FormControl,
   InputLabel,
+  ListItemText,
   MenuItem,
+  OutlinedInput,
   Paper,
   Select,
+  type SelectChangeEvent,
   Slider,
   Stack,
   Typography,
@@ -66,6 +70,8 @@ const TimelineView = (): JSX.Element => {
   const [bulkDate, setBulkDate] = useState<Dayjs | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [sisuFilter, setSisuFilter] = useState<'all' | 'exported' | 'not-exported'>('all');
+  const [groupBy, setGroupBy] = useState<'task' | 'date'>('date');
+  const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
   const [search, setSearch] = useState('');
   const [pxPerDay, setPxPerDay] = useState<number>(3);
   const [isDragging, setIsDragging] = useState(false);
@@ -79,8 +85,40 @@ const TimelineView = (): JSX.Element => {
     [auth?.role, isTeacherInCharge, isAssistant]
   );
 
+  const allTasks = useMemo(() => {
+    if (!gradesData) return [];
+    const tasks = new Map<number, string>();
+    gradesData.forEach((row) => {
+      row.courseTasks.forEach((task) => {
+        if (task.grades.length > 0) {
+          tasks.set(task.courseTaskId, task.courseTaskName);
+        }
+      });
+    });
+    return Array.from(tasks.entries())
+      .map(([id, name]) => ({id, name}))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [gradesData]);
+
+  const handleTaskFilterChange = (event: SelectChangeEvent<number[]>): void => {
+    const {
+      target: {value},
+    } = event;
+
+    const val = typeof value === 'string' ? value.split(',').map(Number) : value;
+
+    setSelectedTaskIds(val);
+  };
+
   // Process data
-  const {groups, items, minDate, itemsByGroup} = useTimelineData(gradesData, sisuFilter, expandedGroups, search);
+  const {groups, items, minDate, itemsByGroup} = useTimelineData(
+    gradesData,
+    sisuFilter,
+    expandedGroups,
+    search,
+    groupBy,
+    selectedTaskIds
+  );
 
   // Viewport state
   const viewStart = useMemo(() => {
@@ -224,8 +262,9 @@ const TimelineView = (): JSX.Element => {
             top: 0,
             height: '100%',
             borderLeft: `1px dashed ${theme.palette.divider}`,
-            pl: 1,
-            pt: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             fontSize: '12px',
             fontWeight: 500,
             color: theme.palette.text.secondary,
@@ -433,13 +472,43 @@ const TimelineView = (): JSX.Element => {
             <ZoomIn color="action" fontSize="small" />
           </Stack>
 
-          <Search
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            reset={() => setSearch('')}
-          />
+          <FormControl size="small" sx={{minWidth: 120}}>
+            <InputLabel id="group-by-label">{t('course.timeline.group-by')}</InputLabel>
+            <Select
+              labelId="group-by-label"
+              value={groupBy}
+              label={t('course.timeline.group-by')}
+              onChange={e => setGroupBy(e.target.value)}
+            >
+              <MenuItem value="date">{t('course.timeline.group-by-date')}</MenuItem>
+              <MenuItem value="task">{t('course.timeline.group-by-task')}</MenuItem>
+            </Select>
+          </FormControl>
 
-          <FormControl size="small" sx={{minWidth: 180}}>
+          <FormControl size="small" sx={{minWidth: 140, width: 'fit-content'}}>
+            <InputLabel id="task-filter-label" shrink>{t('course.timeline.filter-grading-models')}</InputLabel>
+            <Select
+              labelId="task-filter-label"
+              multiple
+              displayEmpty
+              value={selectedTaskIds}
+              onChange={handleTaskFilterChange}
+              input={<OutlinedInput label={t('course.timeline.filter-grading-models')} notched />}
+              renderValue={(selected) => {
+                if (selected.length === 0) return t('course.timeline.all-grading-models-selected');
+                return t('course.timeline.selected-count', {count: selected.length});
+              }}
+            >
+              {allTasks.map(task => (
+                <MenuItem key={task.id} value={task.id}>
+                  <Checkbox checked={selectedTaskIds.includes(task.id)} />
+                  <ListItemText primary={task.name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl size="small" sx={{minWidth: 140}}>
             <InputLabel id="sisu-filter-label">{t('course.timeline.sisu-export-status')}</InputLabel>
             <Select
               labelId="sisu-filter-label"
@@ -452,6 +521,13 @@ const TimelineView = (): JSX.Element => {
               <MenuItem value="not-exported">{t('course.timeline.not-exported')}</MenuItem>
             </Select>
           </FormControl>
+
+          <Search
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            reset={() => setSearch('')}
+          />
+
         </Stack>
       </Stack>
 
@@ -547,7 +623,7 @@ const TimelineView = (): JSX.Element => {
               color: theme.palette.text.primary,
             }}
           >
-            {t('course.timeline.task-student')}
+            {groupBy === 'task' ? t('course.timeline.group-by-task') : t('course.timeline.group-by-date')}
           </Box>
           <Box
             sx={{
