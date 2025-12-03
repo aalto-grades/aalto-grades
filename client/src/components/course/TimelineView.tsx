@@ -52,7 +52,9 @@ import {useTimelineData} from './timeline/useTimelineData';
 // Constants for layout
 const ROW_HEIGHT = 42;
 const HEADER_HEIGHT = 42;
-const SIDEBAR_WIDTH = 280;
+const DEFAULT_SIDEBAR_WIDTH = 280;
+const MIN_SIDEBAR_WIDTH = 150;
+const MAX_SIDEBAR_WIDTH = 600;
 const MIN_PX_PER_DAY = 1.5;
 const MAX_PX_PER_DAY = 10;
 
@@ -79,6 +81,8 @@ const TimelineView = (): JSX.Element => {
   const [panStart, setPanStart] = useState<{x: number; y: number; scrollLeft: number; scrollTop: number} | null>(null);
   const [selectionStart, setSelectionStart] = useState<{x: number; y: number} | null>(null);
   const [selectionCurrent, setSelectionCurrent] = useState<{x: number; y: number} | null>(null);
+  const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
+  const [isResizingSidebar, setIsResizingSidebar] = useState(false);
 
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge || isAssistant,
@@ -315,7 +319,7 @@ const TimelineView = (): JSX.Element => {
     const viewportX = e.clientX - rect.left;
     const viewportY = e.clientY - rect.top;
 
-    if (viewportX < SIDEBAR_WIDTH || viewportY < HEADER_HEIGHT) return;
+    if (viewportX < sidebarWidth || viewportY < HEADER_HEIGHT) return;
 
     // Middle mouse button panning
     if (e.button === 1) {
@@ -347,7 +351,21 @@ const TimelineView = (): JSX.Element => {
     }
   };
 
+  const handleResizeStart = (e: React.MouseEvent): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizingSidebar(true);
+  };
+
   const handleMouseMove = (e: React.MouseEvent): void => {
+    if (isResizingSidebar) {
+      const rect = parentRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const newWidth = e.clientX - rect.left;
+      setSidebarWidth(Math.min(Math.max(newWidth, MIN_SIDEBAR_WIDTH), MAX_SIDEBAR_WIDTH));
+      return;
+    }
+
     if (isPanning && panStart) {
       const dx = e.clientX - panStart.x;
       const dy = e.clientY - panStart.y;
@@ -366,6 +384,11 @@ const TimelineView = (): JSX.Element => {
   };
 
   const handleMouseUp = (e: React.MouseEvent): void => {
+    if (isResizingSidebar) {
+      setIsResizingSidebar(false);
+      return;
+    }
+
     if (isPanning) {
       setIsPanning(false);
       setPanStart(null);
@@ -373,8 +396,8 @@ const TimelineView = (): JSX.Element => {
     }
 
     if (isDragging && selectionStart && selectionCurrent) {
-      const minX = Math.min(selectionStart.x, selectionCurrent.x) - SIDEBAR_WIDTH;
-      const maxX = Math.max(selectionStart.x, selectionCurrent.x) - SIDEBAR_WIDTH;
+      const minX = Math.min(selectionStart.x, selectionCurrent.x) - sidebarWidth;
+      const maxX = Math.max(selectionStart.x, selectionCurrent.x) - sidebarWidth;
       const minY = Math.min(selectionStart.y, selectionCurrent.y);
       const maxY = Math.max(selectionStart.y, selectionCurrent.y);
 
@@ -422,6 +445,7 @@ const TimelineView = (): JSX.Element => {
   };
 
   const handleMouseLeave = (): void => {
+    setIsResizingSidebar(false);
     setIsDragging(false);
     setSelectionStart(null);
     setSelectionCurrent(null);
@@ -441,11 +465,11 @@ const TimelineView = (): JSX.Element => {
     if (!isLoading && parentRef.current && !hasScrolledRef.current) {
       const todayX = getX(dayjs().valueOf());
       const viewportWidth = parentRef.current.clientWidth;
-      const scrollPos = todayX - (viewportWidth - SIDEBAR_WIDTH) / 2;
+      const scrollPos = todayX - (viewportWidth - sidebarWidth) / 2;
       parentRef.current.scrollLeft = Math.max(0, scrollPos);
       hasScrolledRef.current = true;
     }
-  }, [isLoading, getX]);
+  }, [isLoading, getX, sidebarWidth]);
 
   if (isLoading) {
     return <Typography>{t('course.timeline.loading')}</Typography>;
@@ -599,7 +623,7 @@ const TimelineView = (): JSX.Element => {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: `${SIDEBAR_WIDTH}px 1fr`,
+            gridTemplateColumns: `${sidebarWidth}px 1fr`,
             width: 'max-content',
             minWidth: '100%',
           }}
@@ -624,6 +648,22 @@ const TimelineView = (): JSX.Element => {
             }}
           >
             {groupBy === 'task' ? t('course.timeline.group-by-task') : t('course.timeline.group-by-date')}
+            <Box
+              sx={{
+                position: 'absolute',
+                right: 0,
+                top: 0,
+                bottom: 0,
+                width: 4,
+                cursor: 'col-resize',
+                '&:hover': {
+                  bgcolor: 'primary.main',
+                },
+                zIndex: 51,
+              }}
+              onMouseDown={handleResizeStart}
+              onDoubleClick={() => setSidebarWidth(DEFAULT_SIDEBAR_WIDTH)}
+            />
           </Box>
           <Box
             sx={{
