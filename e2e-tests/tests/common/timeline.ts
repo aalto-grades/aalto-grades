@@ -6,7 +6,7 @@ import {type Page, expect} from '@playwright/test';
 
 export const viewTimeline = async (page: Page): Promise<void> => {
   await page.getByRole('link', {name: 'Timeline'}).click();
-  await expect(page.getByRole('heading', {name: 'Grade Expiration Timeline'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Timeline'})).toBeVisible();
   await expect(page.getByPlaceholder('Search')).toBeVisible();
   await expect(page.getByRole('slider')).toBeVisible();
 };

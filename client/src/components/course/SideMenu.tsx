@@ -123,7 +123,7 @@ const SideMenu = (): JSX.Element => {
           IconOutlined={FlagCircleOutlined}
         />
         <SideMenuButton
-          text="Timeline"
+          text={t('course.timeline.title')}
           to={`/${courseId}/timeline`}
           Icon={Timeline}
           IconOutlined={TimelineOutlined}

@@ -409,7 +409,7 @@
     },
     "timeline": {
       "today": "Idag",
-      "title": "Tidslinje för betygens utgång",
+      "title": "Tidslinje",
       "new-expiry-date": "Nytt utgångsdatum",
       "sisu-export-status": "Sisu-exportstatus",
       "all-students": "Alla studenter",
