@@ -30,6 +30,7 @@ import {useSnackbar} from 'notistack';
 import {
   type JSX,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -68,6 +69,8 @@ const TimelineView = (): JSX.Element => {
   const [search, setSearch] = useState('');
   const [pxPerDay, setPxPerDay] = useState<number>(3);
   const [isDragging, setIsDragging] = useState(false);
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState<{x: number; y: number; scrollLeft: number; scrollTop: number} | null>(null);
   const [selectionStart, setSelectionStart] = useState<{x: number; y: number} | null>(null);
   const [selectionCurrent, setSelectionCurrent] = useState<{x: number; y: number} | null>(null);
 
@@ -76,25 +79,28 @@ const TimelineView = (): JSX.Element => {
     [auth?.role, isTeacherInCharge, isAssistant]
   );
 
-  // Viewport state
-  // eslint-disable-next-line react/hook-use-state
-  const [viewStart] = useState(dayjs().startOf('month').subtract(1, 'month').valueOf());
-  const parentRef = useRef<HTMLDivElement>(null);
+  // Process data
+  const {groups, items, minDate, itemsByGroup} = useTimelineData(gradesData, sisuFilter, expandedGroups, search);
 
-  const toggleGroup = useCallback((groupId: string): void => {
-    setExpandedGroups((prev) => {
-      const next = new Set(prev);
-      if (next.has(groupId)) {
-        next.delete(groupId);
-      } else {
-        next.add(groupId);
-      }
-      return next;
-    });
+  // Viewport state
+  const viewStart = useMemo(() => {
+    if (minDate) {
+      return dayjs(minDate).subtract(1, 'month').startOf('month').valueOf();
+    }
+    return dayjs().subtract(2, 'year').startOf('year').valueOf();
+  }, [minDate]);
+
+  const viewEnd = useMemo(() => {
+    return dayjs().add(16, 'months').endOf('month').valueOf();
   }, []);
 
-  // Process data
-  const {groups, items} = useTimelineData(gradesData, sisuFilter, expandedGroups, search);
+  const totalWidth = useMemo(() => {
+    const diffDays = dayjs(viewEnd).diff(dayjs(viewStart), 'days', true);
+    return Math.max(diffDays * pxPerDay, 1000);
+  }, [viewStart, viewEnd, pxPerDay]);
+
+  const parentRef = useRef<HTMLDivElement>(null);
+  const hasScrolledRef = useRef(false);
 
   // Bulk Update
   const handleBulkUpdate = useCallback(async (): Promise<void> => {
@@ -128,7 +134,7 @@ const TimelineView = (): JSX.Element => {
     }
   }, [bulkDate, selectedItems, items, editGradeMutation, queryClient, courseId, enqueueSnackbar, t]);
 
-  const handleItemSelect = (itemId: number, e: React.MouseEvent): void => {
+  const handleItemSelect = useCallback((itemId: number, e: React.MouseEvent): void => {
     if (!editRights) return;
     e.stopPropagation();
     const isModifierPressed = e.ctrlKey || e.metaKey || e.shiftKey;
@@ -174,23 +180,32 @@ const TimelineView = (): JSX.Element => {
 
       return newSelected;
     });
-  };
+  }, [editRights, items]);
+
+  const toggleGroup = useCallback((groupId: string): void => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      return next;
+    });
+  }, []);
 
   // Rendering helpers
-  const getX = (time: number): number => {
+  const getX = useCallback((time: number): number => {
     const diffDays = dayjs(time).diff(dayjs(viewStart), 'days', true);
     return diffDays * pxPerDay;
-  };
+  }, [viewStart, pxPerDay]);
 
   const renderMonths = (): JSX.Element[] => {
     const months = [];
     const start = dayjs(viewStart);
-    // Calculate end based on a reasonable width
-    const visibleWidth = 3000;
-    const daysToRender = visibleWidth / pxPerDay;
-    const end = dayjs(viewStart).add(daysToRender, 'days');
+    const end = dayjs(viewEnd);
 
-    let current = start.clone().startOf('month');
+    let current = start.clone();
     while (current.isBefore(end)) {
       const x = getX(current.valueOf());
       const monthWidth = current.daysInMonth() * pxPerDay;
@@ -236,8 +251,25 @@ const TimelineView = (): JSX.Element => {
     overscan: 5,
   });
 
+  const virtualItems = rowVirtualizer.getVirtualItems();
+
+  const activeGroup = useMemo(() => {
+    if (virtualItems.length === 0) return null;
+    const firstItemIndex = virtualItems[0].index;
+    const firstGroup = groups[firstItemIndex];
+
+    if (firstGroup.parentId) {
+      return groups.find(g => g.id === firstGroup.parentId);
+    }
+
+    if (firstGroup.isRoot && firstGroup.expanded) {
+      return firstGroup;
+    }
+
+    return null;
+  }, [virtualItems, groups]);
+
   const handleMouseDown = (e: React.MouseEvent): void => {
-    if (!editRights) return;
     const rect = parentRef.current?.getBoundingClientRect();
     if (!rect) return;
 
@@ -245,6 +277,21 @@ const TimelineView = (): JSX.Element => {
     const viewportY = e.clientY - rect.top;
 
     if (viewportX < SIDEBAR_WIDTH || viewportY < HEADER_HEIGHT) return;
+
+    // Middle mouse button panning
+    if (e.button === 1) {
+      e.preventDefault();
+      setIsPanning(true);
+      setPanStart({
+        x: e.clientX,
+        y: e.clientY,
+        scrollLeft: parentRef.current?.scrollLeft ?? 0,
+        scrollTop: parentRef.current?.scrollTop ?? 0,
+      });
+      return;
+    }
+
+    if (e.button !== 0 || !editRights) return;
 
     e.preventDefault();
     e.stopPropagation();
@@ -262,64 +309,104 @@ const TimelineView = (): JSX.Element => {
   };
 
   const handleMouseMove = (e: React.MouseEvent): void => {
-    if (!isDragging || !selectionStart) return;
+    if (isPanning && panStart) {
+      const dx = e.clientX - panStart.x;
+      const dy = e.clientY - panStart.y;
 
-    const rect = parentRef.current?.getBoundingClientRect();
-    if (!rect) return;
+      parentRef.current!.scrollLeft = panStart.scrollLeft - dx;
+      parentRef.current!.scrollTop = panStart.scrollTop - dy;
+    } else if (isDragging && selectionStart) {
+      const rect = parentRef.current?.getBoundingClientRect();
+      if (!rect) return;
 
-    const x = e.clientX - rect.left + (parentRef.current?.scrollLeft ?? 0);
-    const y = e.clientY - rect.top + (parentRef.current?.scrollTop ?? 0);
+      const x = e.clientX - rect.left + (parentRef.current?.scrollLeft ?? 0);
+      const y = e.clientY - rect.top + (parentRef.current?.scrollTop ?? 0);
 
-    setSelectionCurrent({x, y});
+      setSelectionCurrent({x, y});
+    }
   };
 
   const handleMouseUp = (e: React.MouseEvent): void => {
-    if (!isDragging || !selectionStart || !selectionCurrent) return;
-
-    const minX = Math.min(selectionStart.x, selectionCurrent.x) - SIDEBAR_WIDTH;
-    const maxX = Math.max(selectionStart.x, selectionCurrent.x) - SIDEBAR_WIDTH;
-    const minY = Math.min(selectionStart.y, selectionCurrent.y);
-    const maxY = Math.max(selectionStart.y, selectionCurrent.y);
-
-    // Find overlapping groups
-    const startGroupIndex = Math.max(0, Math.floor((minY - HEADER_HEIGHT) / ROW_HEIGHT));
-    const endGroupIndex = Math.min(groups.length - 1, Math.floor((maxY - HEADER_HEIGHT) / ROW_HEIGHT));
-
-    const newSelectedIds = new Set<number>();
-
-    for (let i = startGroupIndex; i <= endGroupIndex; i++) {
-      const group = groups[i];
-      const groupItems = items.filter(item => item.groupId === group.id);
-
-      groupItems.forEach((item) => {
-        const itemStartX = getX(item.start);
-        const itemEndX = getX(item.end);
-        const itemWidth = Math.max(itemEndX - itemStartX, 24);
-
-        // Check horizontal overlap
-        if (itemStartX < maxX && (itemStartX + itemWidth) > minX) {
-          newSelectedIds.add(item.id);
-          if (item.isSummary && item.relatedGradeIds) {
-            item.relatedGradeIds.forEach(id => newSelectedIds.add(id));
-          }
-        }
-      });
+    if (isPanning) {
+      setIsPanning(false);
+      setPanStart(null);
+      return;
     }
 
-    setSelectedItems((prev) => {
-      const next = new Set(prev);
-      if (e.ctrlKey || e.metaKey) {
-        newSelectedIds.forEach(id => next.delete(id));
-      } else {
-        newSelectedIds.forEach(id => next.add(id));
+    if (isDragging && selectionStart && selectionCurrent) {
+      const minX = Math.min(selectionStart.x, selectionCurrent.x) - SIDEBAR_WIDTH;
+      const maxX = Math.max(selectionStart.x, selectionCurrent.x) - SIDEBAR_WIDTH;
+      const minY = Math.min(selectionStart.y, selectionCurrent.y);
+      const maxY = Math.max(selectionStart.y, selectionCurrent.y);
+
+      // Find overlapping groups
+      const startGroupIndex = Math.max(0, Math.floor((minY - HEADER_HEIGHT) / ROW_HEIGHT));
+      const endGroupIndex = Math.min(groups.length - 1, Math.floor((maxY - HEADER_HEIGHT) / ROW_HEIGHT));
+
+      const newSelectedIds = new Set<number>();
+
+      for (let i = startGroupIndex; i <= endGroupIndex; i++) {
+        const group = groups[i];
+        const groupItems = itemsByGroup[group.id] ?? [];
+
+        groupItems.forEach((item) => {
+          const itemStartX = getX(item.start);
+          const itemEndX = getX(item.end);
+          const itemWidth = itemEndX - itemStartX;
+
+          // Check horizontal overlap
+          if (itemStartX < maxX && (itemStartX + itemWidth) > minX) {
+            newSelectedIds.add(item.id);
+            if (item.isSummary && item.relatedGradeIds) {
+              item.relatedGradeIds.forEach(id => newSelectedIds.add(id));
+            }
+          }
+        });
       }
-      return Array.from(next);
-    });
+
+      setSelectedItems((prev) => {
+        const next = new Set(prev);
+        if (e.ctrlKey || e.metaKey) {
+          newSelectedIds.forEach(id => next.delete(id));
+        } else {
+          newSelectedIds.forEach(id => next.add(id));
+        }
+        return Array.from(next);
+      });
+    }
 
     setIsDragging(false);
     setSelectionStart(null);
     setSelectionCurrent(null);
+    setIsPanning(false);
+    setPanStart(null);
   };
+
+  const handleMouseLeave = (): void => {
+    setIsDragging(false);
+    setSelectionStart(null);
+    setSelectionCurrent(null);
+    setIsPanning(false);
+    setPanStart(null);
+  };
+
+  const handleWheel = (e: React.WheelEvent): void => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? 1 : -1;
+      setPxPerDay(prev => Math.min(Math.max(prev + delta * 0.5, MIN_PX_PER_DAY), MAX_PX_PER_DAY));
+    }
+  };
+
+  useEffect(() => {
+    if (!isLoading && parentRef.current && !hasScrolledRef.current) {
+      const todayX = getX(dayjs().valueOf());
+      const viewportWidth = parentRef.current.clientWidth;
+      const scrollPos = todayX - (viewportWidth - SIDEBAR_WIDTH) / 2;
+      parentRef.current.scrollLeft = Math.max(0, scrollPos);
+      hasScrolledRef.current = true;
+    }
+  }, [isLoading, getX]);
 
   if (isLoading) {
     return <Typography>{t('course.timeline.loading')}</Typography>;
@@ -424,23 +511,27 @@ const TimelineView = (): JSX.Element => {
           position: 'relative',
           borderRadius: 3,
           bgcolor: theme.palette.background.paper,
+          cursor: isPanning ? 'grabbing' : 'default',
         }}
         ref={parentRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        onWheel={handleWheel}
       >
         <Box
           sx={{
             display: 'grid',
             gridTemplateColumns: `${SIDEBAR_WIDTH}px 1fr`,
-            minWidth: 'fit-content',
+            width: 'max-content',
+            minWidth: '100%',
           }}
         >
           {/* Header Row */}
           <Box
             sx={{
+              gridColumn: 1,
               position: 'sticky',
               top: 0,
               left: 0,
@@ -460,13 +551,14 @@ const TimelineView = (): JSX.Element => {
           </Box>
           <Box
             sx={{
+              gridColumn: 2,
               position: 'sticky',
               top: 0,
               zIndex: 40,
               bgcolor: theme.palette.background.paper,
               borderBottom: `1px solid ${theme.palette.divider}`,
               height: HEADER_HEIGHT,
-              minWidth: '3000px',
+              minWidth: totalWidth,
             }}
           >
             {renderMonths()}
@@ -490,6 +582,22 @@ const TimelineView = (): JSX.Element => {
             </Box>
           </Box>
 
+          {/* Floating Header for Active Group */}
+          {activeGroup && (
+            <TimelineRow
+              key="floating-header"
+              group={activeGroup}
+              items={itemsByGroup[activeGroup.id] ?? []}
+              getX={getX}
+              toggleGroup={toggleGroup}
+              handleItemSelect={handleItemSelect}
+              selectedItems={selectedItems}
+              rowHeight={ROW_HEIGHT}
+              totalWidth={totalWidth}
+              isFloating
+            />
+          )}
+
           {/* Top Spacer */}
           {rowVirtualizer.getVirtualItems().length > 0 && (
             <Box sx={{gridColumn: '1 / -1', height: rowVirtualizer.getVirtualItems()[0].start}} />
@@ -502,12 +610,13 @@ const TimelineView = (): JSX.Element => {
               <TimelineRow
                 key={group.id}
                 group={group}
-                items={items}
+                items={itemsByGroup[group.id] ?? []}
                 getX={getX}
                 toggleGroup={toggleGroup}
                 handleItemSelect={handleItemSelect}
                 selectedItems={selectedItems}
                 rowHeight={ROW_HEIGHT}
+                totalWidth={totalWidth}
               />
             );
           })}

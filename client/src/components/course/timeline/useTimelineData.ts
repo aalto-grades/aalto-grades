@@ -41,15 +41,16 @@ export const useTimelineData = (
   sisuFilter: 'all' | 'exported' | 'not-exported',
   expandedGroups: Set<string>,
   search: string
-): {groups: TimelineGroup[]; items: TimelineItem[]} => {
+): {groups: TimelineGroup[]; items: TimelineItem[]; minDate: number | null; itemsByGroup: Record<string, TimelineItem[] | undefined>} => {
   const {t} = useTranslation();
 
   return useMemo(() => {
-    if (!gradesData) return {groups: [], items: []};
+    if (!gradesData) return {groups: [], items: [], minDate: null, itemsByGroup: {}};
 
     const groupsList: TimelineGroup[] = [];
     const itemsList: TimelineItem[] = [];
-    const now = dayjs();
+    const itemsByGroup: Record<string, TimelineItem[] | undefined> = {};
+    let globalMinStart: number | null = null;
     const searchLower = search.toLowerCase();
 
     const tasksMap = new Map<number, {
@@ -116,6 +117,10 @@ export const useTimelineData = (
           return start < min ? start : min;
         }, dayjs(matchingGrades[0].grade.date).valueOf());
 
+        if (globalMinStart === null || minStart < globalMinStart) {
+          globalMinStart = minStart;
+        }
+
         const maxExpiryDayjs = matchingGrades.reduce((max: Dayjs | null, {grade}) => {
           if (grade.expiryDate) {
             const exp = dayjs(grade.expiryDate);
@@ -132,23 +137,21 @@ export const useTimelineData = (
           ? dayjs().add(20, 'months').valueOf()
           : dayjs(maxExpiryDayjs).valueOf();
 
-        const isExpired = !hasForever && maxExpiryDayjs
-          ? dayjs(maxExpiryDayjs).isBefore(now)
-          : false;
-
-        if (!isExpired) {
-          itemsList.push({
-            id: -taskId,
-            groupId: taskGroupId,
-            title: `${taskName} (${t('course.timeline.all-students')})`,
-            start: minStart,
-            end: endTimeVal,
-            expiryDate: hasForever || !maxExpiryDayjs ? null : dayjs(maxExpiryDayjs).toDate(),
-            isSummary: true,
-            relatedGradeIds: matchingGrades.map(g => g.grade.id),
-            hasForever,
-          });
-        }
+        const item = {
+          id: -taskId,
+          groupId: taskGroupId,
+          title: `${taskName} (${t('course.timeline.all-students')})`,
+          start: minStart,
+          end: endTimeVal,
+          expiryDate: hasForever || !maxExpiryDayjs ? null : dayjs(maxExpiryDayjs).toDate(),
+          isSummary: true,
+          relatedGradeIds: matchingGrades.map(g => g.grade.id),
+          hasForever,
+        };
+        itemsList.push(item);
+        const taskGroupItems = itemsByGroup[taskGroupId] ?? [];
+        taskGroupItems.push(item);
+        itemsByGroup[taskGroupId] = taskGroupItems;
       }
 
       if (isExpanded) {
@@ -184,26 +187,26 @@ export const useTimelineData = (
           if (sGrades.length > 0) {
             const {grade, studentName} = sGrades[0];
             const expiryDayjs = grade.expiryDate ? dayjs(grade.expiryDate) : null;
-            const isExpired = expiryDayjs ? expiryDayjs.isBefore(now) : false;
-
-            if (!isExpired) {
-              itemsList.push({
-                id: grade.id,
-                groupId: studentGroupId,
-                title: `${studentName} - ${grade.grade}`,
-                start: dayjs(grade.date).valueOf(),
-                end: expiryDayjs ? expiryDayjs.valueOf() : dayjs().add(20, 'months').valueOf(),
-                gradeId: grade.id,
-                studentName: studentName,
-                expiryDate: grade.expiryDate,
-                hasForever: !grade.expiryDate,
-              });
-            }
+            const item: TimelineItem = {
+              id: grade.id,
+              groupId: studentGroupId,
+              title: `${studentName} - ${grade.grade}`,
+              start: dayjs(grade.date).valueOf(),
+              end: expiryDayjs ? expiryDayjs.valueOf() : dayjs().add(20, 'months').valueOf(),
+              gradeId: grade.id,
+              studentName: studentName,
+              expiryDate: grade.expiryDate,
+              hasForever: !grade.expiryDate,
+            };
+            itemsList.push(item);
+            const groupItems = itemsByGroup[studentGroupId] ?? [];
+            groupItems.push(item);
+            itemsByGroup[studentGroupId] = groupItems;
           }
         });
       }
     });
 
-    return {groups: groupsList, items: itemsList};
+    return {groups: groupsList, items: itemsList, minDate: globalMinStart, itemsByGroup};
   }, [gradesData, sisuFilter, expandedGroups, t, search]);
 };

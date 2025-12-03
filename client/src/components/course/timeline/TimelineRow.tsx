@@ -6,6 +6,8 @@ import {ExpandLess, ExpandMore} from '@mui/icons-material';
 import {
   Box,
   IconButton,
+  type SxProps,
+  type Theme,
   Tooltip,
   Typography,
   alpha,
@@ -14,6 +16,7 @@ import {
 } from '@mui/material';
 import dayjs from 'dayjs';
 import type {JSX} from 'react';
+import {memo} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import type {TimelineGroup, TimelineItem} from './useTimelineData';
@@ -26,9 +29,11 @@ interface TimelineRowProps {
   handleItemSelect: (itemId: number, e: React.MouseEvent) => void;
   getX: (time: number) => number;
   rowHeight: number;
+  totalWidth: number;
+  isFloating?: boolean;
 }
 
-const TimelineRow = ({
+const TimelineRow = memo(({
   group,
   items,
   selectedItems,
@@ -36,18 +41,35 @@ const TimelineRow = ({
   handleItemSelect,
   getX,
   rowHeight,
+  totalWidth,
+  isFloating,
 }: TimelineRowProps): JSX.Element => {
   const theme = useTheme();
   const {t} = useTranslation();
 
+  const isSticky = (group.isRoot && group.expanded) || isFloating;
+
+  const stickyStyles: SxProps<Theme> = isSticky
+    ? {
+        position: 'sticky',
+        top: 42, // HEADER_HEIGHT
+        marginBottom: isFloating ? -rowHeight : undefined,
+      }
+    : {};
+
+  const rootBgColor = theme.palette.mode === 'dark'
+    ? alpha(theme.palette.primary.main, 0.2)
+    : theme.palette.primary.light;
+
   return (
-    <Box sx={{display: 'contents'}}>
+    <>
       {/* Sidebar Cell */}
       <Box
         sx={{
+          gridColumn: 1,
           position: 'sticky',
           left: 0,
-          zIndex: 30,
+          zIndex: isSticky ? (isFloating ? 37 : 39) : 30,
           bgcolor: theme.palette.background.paper,
           borderBottom: `1px solid ${theme.palette.divider}`,
           borderRight: `1px solid ${theme.palette.divider}`,
@@ -61,39 +83,71 @@ const TimelineRow = ({
           '&:hover': {
             backgroundImage: `linear-gradient(${theme.palette.action.hover}, ${theme.palette.action.hover})`,
           },
+          ...stickyStyles,
         }}
         onClick={() => group.isRoot && toggleGroup(group.id)}
       >
         {group.isRoot && (
-          <IconButton size="small" sx={{mr: 1, p: 0.5}}>
-            {group.expanded ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
-          </IconButton>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              bgcolor: rootBgColor,
+              pointerEvents: 'none',
+            }}
+          />
         )}
-        <Typography
-          variant="body2"
-          noWrap
-          sx={{
-            fontWeight: group.isRoot ? 600 : 400,
-            color: group.isRoot ? theme.palette.text.primary : theme.palette.text.secondary,
-          }}
-          title={typeof group.title === 'string' ? group.title : ''}
-        >
-          {group.title}
-        </Typography>
+        <Box sx={{display: 'flex', alignItems: 'center', position: 'relative', zIndex: 1, width: '100%'}}>
+          {group.isRoot && (
+            <IconButton size="small" sx={{mr: 1, p: 0.5}}>
+              {group.expanded ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
+            </IconButton>
+          )}
+          <Typography
+            variant="body2"
+            noWrap
+            sx={{
+              fontWeight: group.isRoot ? 600 : 400,
+              color: group.isRoot ? theme.palette.text.primary : theme.palette.text.secondary,
+            }}
+            title={typeof group.title === 'string' ? group.title : ''}
+          >
+            {group.title}
+          </Typography>
+        </Box>
       </Box>
 
       {/* Timeline Cell */}
       <Box
         sx={{
+          gridColumn: 2,
           height: rowHeight,
           borderBottom: `1px solid ${theme.palette.divider}`,
           position: 'relative',
-          minWidth: '3000px',
-          bgcolor: group.isRoot
-            ? (theme.palette.mode === 'dark' ? alpha(theme.palette.primary.main, 0.2) : theme.palette.primary.light)
-            : 'transparent',
+          minWidth: totalWidth,
+          overflow: 'hidden',
+          bgcolor: isSticky ? theme.palette.background.paper : (group.isRoot ? rootBgColor : 'transparent'),
+          zIndex: isSticky ? (isFloating ? 36 : 38) : 1,
+          ...stickyStyles,
         }}
       >
+        {isSticky && group.isRoot && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              bgcolor: rootBgColor,
+              pointerEvents: 'none',
+              zIndex: 0,
+            }}
+          />
+        )}
         {/* Today Line Background */}
         <Box
           sx={{
@@ -108,10 +162,10 @@ const TimelineRow = ({
           }}
         />
 
-        {items.filter(i => i.groupId === group.id).map((item) => {
+        {items.map((item) => {
           const startX = getX(item.start);
           const endX = getX(item.end);
-          const width = Math.max(endX - startX, 24);
+          const width = endX - startX;
           const isSelected = selectedItems.includes(item.id);
 
           // Determine colors based on item type
@@ -206,8 +260,10 @@ const TimelineRow = ({
           );
         })}
       </Box>
-    </Box>
+    </>
   );
-};
+});
+
+TimelineRow.displayName = 'TimelineRow';
 
 export default TimelineRow;
