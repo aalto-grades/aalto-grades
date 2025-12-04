@@ -112,6 +112,7 @@ const TimelineRow = memo(({
             sx={{
               fontWeight: group.isRoot ? 600 : 400,
               color: group.isRoot ? theme.palette.text.primary : theme.palette.text.secondary,
+              userSelect: group.isRoot ? 'none' : 'auto',
             }}
             title={typeof group.title === 'string' ? group.title : ''}
           >

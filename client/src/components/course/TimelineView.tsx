@@ -3,30 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  ZoomIn,
-  ZoomOut,
-} from '@mui/icons-material';
-import {
   Box,
-  Button,
-  Checkbox,
-  FormControl,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
   Paper,
-  Select,
-  type SelectChangeEvent,
-  Slider,
-  Stack,
   Typography,
   alpha,
   useTheme,
 } from '@mui/material';
-import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
-import {DatePicker} from '@mui/x-date-pickers/DatePicker';
-import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {useQueryClient} from '@tanstack/react-query';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import dayjs, {type Dayjs} from 'dayjs';
@@ -43,11 +25,14 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
-import Search from '@/components/shared/Search';
-import {useEditGrade, useGetGrades} from '@/hooks/useApi';
+import {useEditGrade, useGetAllGradingModels, useGetCourseTasks, useGetGrades} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
+import TimelineBulkAction from './timeline/TimelineBulkAction';
 import TimelineRow from './timeline/TimelineRow';
+import TimelineToolbar from './timeline/TimelineToolbar';
 import {useTimelineData} from './timeline/useTimelineData';
+import {useTimelineFilters} from './timeline/useTimelineFilters';
+import {useTimelineInteractions} from './timeline/useTimelineInteractions';
 
 // Constants for layout
 const ROW_HEIGHT = 42;
@@ -64,55 +49,43 @@ const TimelineView = (): JSX.Element => {
   const theme = useTheme();
   const {auth, isTeacherInCharge, isAssistant} = useAuth();
   const {data: gradesData, isLoading} = useGetGrades(Number(courseId));
+  const {data: gradingModels} = useGetAllGradingModels(Number(courseId));
+  const {data: courseTasks} = useGetCourseTasks(Number(courseId));
   const editGradeMutation = useEditGrade(Number(courseId));
   const {enqueueSnackbar} = useSnackbar();
   const queryClient = useQueryClient();
 
+  // State
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [bulkDate, setBulkDate] = useState<Dayjs | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
-  const [sisuFilter, setSisuFilter] = useState<'all' | 'exported' | 'not-exported'>('all');
-  const [groupBy, setGroupBy] = useState<'task' | 'date'>('date');
-  const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
-  const [search, setSearch] = useState('');
   const [pxPerDay, setPxPerDay] = useState<number>(3);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isPanning, setIsPanning] = useState(false);
-  const [panStart, setPanStart] = useState<{x: number; y: number; scrollLeft: number; scrollTop: number} | null>(null);
-  const [selectionStart, setSelectionStart] = useState<{x: number; y: number} | null>(null);
-  const [selectionCurrent, setSelectionCurrent] = useState<{x: number; y: number} | null>(null);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
-  const [isResizingSidebar, setIsResizingSidebar] = useState(false);
+
+  // Filters Hook
+  const {
+    selectedGradingModelIds,
+    selectedTaskIds,
+    sisuFilter,
+    setSisuFilter,
+    groupBy,
+    search,
+    setSearch,
+    effectiveSelectedTaskIds,
+    visibleTasks,
+    handleGradingModelFilterChange,
+    handleTaskFilterChange,
+    handleGroupByChange,
+  } = useTimelineFilters({
+    gradingModels,
+    courseTasks,
+    gradesData,
+  });
 
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge || isAssistant,
     [auth?.role, isTeacherInCharge, isAssistant]
   );
-
-  const allTasks = useMemo(() => {
-    if (!gradesData) return [];
-    const tasks = new Map<number, string>();
-    gradesData.forEach((row) => {
-      row.courseTasks.forEach((task) => {
-        if (task.grades.length > 0) {
-          tasks.set(task.courseTaskId, task.courseTaskName);
-        }
-      });
-    });
-    return Array.from(tasks.entries())
-      .map(([id, name]) => ({id, name}))
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }, [gradesData]);
-
-  const handleTaskFilterChange = (event: SelectChangeEvent<number[]>): void => {
-    const {
-      target: {value},
-    } = event;
-
-    const val = typeof value === 'string' ? value.split(',').map(Number) : value;
-
-    setSelectedTaskIds(val);
-  };
 
   // Process data
   const {groups, items, minDate, itemsByGroup} = useTimelineData(
@@ -121,7 +94,7 @@ const TimelineView = (): JSX.Element => {
     expandedGroups,
     search,
     groupBy,
-    selectedTaskIds
+    effectiveSelectedTaskIds
   );
 
   // Viewport state
@@ -143,6 +116,42 @@ const TimelineView = (): JSX.Element => {
 
   const parentRef = useRef<HTMLDivElement>(null);
   const hasScrolledRef = useRef(false);
+
+  // Rendering helpers
+  const getX = useCallback((time: number): number => {
+    const diffDays = dayjs(time).diff(dayjs(viewStart), 'days', true);
+    return diffDays * pxPerDay;
+  }, [viewStart, pxPerDay]);
+
+  // Interactions Hook
+  const {
+    isDragging,
+    isPanning,
+    selectionStart,
+    selectionCurrent,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    handleMouseLeave,
+    handleWheel,
+    handleResizeStart,
+  } = useTimelineInteractions({
+    parentRef,
+    sidebarWidth,
+    setSidebarWidth,
+    setPxPerDay,
+    groups,
+    itemsByGroup,
+    getX,
+    setSelectedItems,
+    editRights,
+    minSidebarWidth: MIN_SIDEBAR_WIDTH,
+    maxSidebarWidth: MAX_SIDEBAR_WIDTH,
+    minPxPerDay: MIN_PX_PER_DAY,
+    maxPxPerDay: MAX_PX_PER_DAY,
+    headerHeight: HEADER_HEIGHT,
+    rowHeight: ROW_HEIGHT,
+  });
 
   // Bulk Update
   const handleBulkUpdate = useCallback(async (): Promise<void> => {
@@ -237,11 +246,6 @@ const TimelineView = (): JSX.Element => {
   }, []);
 
   // Rendering helpers
-  const getX = useCallback((time: number): number => {
-    const diffDays = dayjs(time).diff(dayjs(viewStart), 'days', true);
-    return diffDays * pxPerDay;
-  }, [viewStart, pxPerDay]);
-
   const renderMonths = (): JSX.Element[] => {
     const months = [];
     const start = dayjs(viewStart);
@@ -312,155 +316,6 @@ const TimelineView = (): JSX.Element => {
     return null;
   }, [virtualItems, groups]);
 
-  const handleMouseDown = (e: React.MouseEvent): void => {
-    const rect = parentRef.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    const viewportX = e.clientX - rect.left;
-    const viewportY = e.clientY - rect.top;
-
-    if (viewportX < sidebarWidth || viewportY < HEADER_HEIGHT) return;
-
-    // Middle mouse button panning
-    if (e.button === 1) {
-      e.preventDefault();
-      setIsPanning(true);
-      setPanStart({
-        x: e.clientX,
-        y: e.clientY,
-        scrollLeft: parentRef.current?.scrollLeft ?? 0,
-        scrollTop: parentRef.current?.scrollTop ?? 0,
-      });
-      return;
-    }
-
-    if (e.button !== 0 || !editRights) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    const x = viewportX + (parentRef.current?.scrollLeft ?? 0);
-    const y = viewportY + (parentRef.current?.scrollTop ?? 0);
-
-    setIsDragging(true);
-    setSelectionStart({x, y});
-    setSelectionCurrent({x, y});
-
-    if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
-      setSelectedItems([]);
-    }
-  };
-
-  const handleResizeStart = (e: React.MouseEvent): void => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsResizingSidebar(true);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent): void => {
-    if (isResizingSidebar) {
-      const rect = parentRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      const newWidth = e.clientX - rect.left;
-      setSidebarWidth(Math.min(Math.max(newWidth, MIN_SIDEBAR_WIDTH), MAX_SIDEBAR_WIDTH));
-      return;
-    }
-
-    if (isPanning && panStart) {
-      const dx = e.clientX - panStart.x;
-      const dy = e.clientY - panStart.y;
-
-      parentRef.current!.scrollLeft = panStart.scrollLeft - dx;
-      parentRef.current!.scrollTop = panStart.scrollTop - dy;
-    } else if (isDragging && selectionStart) {
-      const rect = parentRef.current?.getBoundingClientRect();
-      if (!rect) return;
-
-      const x = e.clientX - rect.left + (parentRef.current?.scrollLeft ?? 0);
-      const y = e.clientY - rect.top + (parentRef.current?.scrollTop ?? 0);
-
-      setSelectionCurrent({x, y});
-    }
-  };
-
-  const handleMouseUp = (e: React.MouseEvent): void => {
-    if (isResizingSidebar) {
-      setIsResizingSidebar(false);
-      return;
-    }
-
-    if (isPanning) {
-      setIsPanning(false);
-      setPanStart(null);
-      return;
-    }
-
-    if (isDragging && selectionStart && selectionCurrent) {
-      const minX = Math.min(selectionStart.x, selectionCurrent.x) - sidebarWidth;
-      const maxX = Math.max(selectionStart.x, selectionCurrent.x) - sidebarWidth;
-      const minY = Math.min(selectionStart.y, selectionCurrent.y);
-      const maxY = Math.max(selectionStart.y, selectionCurrent.y);
-
-      // Find overlapping groups
-      const startGroupIndex = Math.max(0, Math.floor((minY - HEADER_HEIGHT) / ROW_HEIGHT));
-      const endGroupIndex = Math.min(groups.length - 1, Math.floor((maxY - HEADER_HEIGHT) / ROW_HEIGHT));
-
-      const newSelectedIds = new Set<number>();
-
-      for (let i = startGroupIndex; i <= endGroupIndex; i++) {
-        const group = groups[i];
-        const groupItems = itemsByGroup[group.id] ?? [];
-
-        groupItems.forEach((item) => {
-          const itemStartX = getX(item.start);
-          const itemEndX = getX(item.end);
-          const itemWidth = itemEndX - itemStartX;
-
-          // Check horizontal overlap
-          if (itemStartX < maxX && (itemStartX + itemWidth) > minX) {
-            newSelectedIds.add(item.id);
-            if (item.isSummary && item.relatedGradeIds) {
-              item.relatedGradeIds.forEach(id => newSelectedIds.add(id));
-            }
-          }
-        });
-      }
-
-      setSelectedItems((prev) => {
-        const next = new Set(prev);
-        if (e.ctrlKey || e.metaKey) {
-          newSelectedIds.forEach(id => next.delete(id));
-        } else {
-          newSelectedIds.forEach(id => next.add(id));
-        }
-        return Array.from(next);
-      });
-    }
-
-    setIsDragging(false);
-    setSelectionStart(null);
-    setSelectionCurrent(null);
-    setIsPanning(false);
-    setPanStart(null);
-  };
-
-  const handleMouseLeave = (): void => {
-    setIsResizingSidebar(false);
-    setIsDragging(false);
-    setSelectionStart(null);
-    setSelectionCurrent(null);
-    setIsPanning(false);
-    setPanStart(null);
-  };
-
-  const handleWheel = (e: React.WheelEvent): void => {
-    if (e.ctrlKey || e.metaKey) {
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? 1 : -1;
-      setPxPerDay(prev => Math.min(Math.max(prev + delta * 0.5, MIN_PX_PER_DAY), MAX_PX_PER_DAY));
-    }
-  };
-
   useEffect(() => {
     if (!isLoading && parentRef.current && !hasScrolledRef.current) {
       const todayX = getX(dayjs().valueOf());
@@ -477,129 +332,32 @@ const TimelineView = (): JSX.Element => {
 
   return (
     <Box sx={{height: '85vh', display: 'flex', flexDirection: 'column', gap: 2, pt: 1}}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Typography variant="h2" width="fit-content">
-          {t('course.timeline.title')}
-        </Typography>
-
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Stack direction="row" spacing={1} alignItems="center" sx={{width: 200}}>
-            <ZoomOut color="action" fontSize="small" />
-            <Slider
-              value={pxPerDay}
-              min={MIN_PX_PER_DAY}
-              max={MAX_PX_PER_DAY}
-              step={0.5}
-              onChange={(_, val) => setPxPerDay(val)}
-              size="small"
-            />
-            <ZoomIn color="action" fontSize="small" />
-          </Stack>
-
-          <FormControl size="small" sx={{minWidth: 120}}>
-            <InputLabel id="group-by-label">{t('course.timeline.group-by')}</InputLabel>
-            <Select
-              labelId="group-by-label"
-              value={groupBy}
-              label={t('course.timeline.group-by')}
-              onChange={e => setGroupBy(e.target.value)}
-            >
-              <MenuItem value="date">{t('course.timeline.group-by-date')}</MenuItem>
-              <MenuItem value="task">{t('course.timeline.group-by-task')}</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControl size="small" sx={{minWidth: 140, width: 'fit-content'}}>
-            <InputLabel id="task-filter-label" shrink>{t('course.timeline.filter-grading-models')}</InputLabel>
-            <Select
-              labelId="task-filter-label"
-              multiple
-              displayEmpty
-              value={selectedTaskIds}
-              onChange={handleTaskFilterChange}
-              input={<OutlinedInput label={t('course.timeline.filter-grading-models')} notched />}
-              renderValue={(selected) => {
-                if (selected.length === 0) return t('course.timeline.all-grading-models-selected');
-                return t('course.timeline.selected-count', {count: selected.length});
-              }}
-            >
-              {allTasks.map(task => (
-                <MenuItem key={task.id} value={task.id}>
-                  <Checkbox checked={selectedTaskIds.includes(task.id)} />
-                  <ListItemText primary={task.name} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl size="small" sx={{minWidth: 140}}>
-            <InputLabel id="sisu-filter-label">{t('course.timeline.sisu-export-status')}</InputLabel>
-            <Select
-              labelId="sisu-filter-label"
-              value={sisuFilter}
-              label={t('course.timeline.sisu-export-status')}
-              onChange={e => setSisuFilter(e.target.value)}
-            >
-              <MenuItem value="all">{t('course.timeline.all-students')}</MenuItem>
-              <MenuItem value="exported">{t('course.timeline.exported')}</MenuItem>
-              <MenuItem value="not-exported">{t('course.timeline.not-exported')}</MenuItem>
-            </Select>
-          </FormControl>
-
-          <Search
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            reset={() => setSearch('')}
-          />
-
-        </Stack>
-      </Stack>
+      <TimelineToolbar
+        pxPerDay={pxPerDay}
+        setPxPerDay={setPxPerDay}
+        minPxPerDay={MIN_PX_PER_DAY}
+        maxPxPerDay={MAX_PX_PER_DAY}
+        groupBy={groupBy}
+        handleGroupByChange={handleGroupByChange}
+        selectedGradingModelIds={selectedGradingModelIds}
+        handleGradingModelFilterChange={handleGradingModelFilterChange}
+        gradingModels={gradingModels}
+        selectedTaskIds={selectedTaskIds}
+        handleTaskFilterChange={handleTaskFilterChange}
+        visibleTasks={visibleTasks}
+        sisuFilter={sisuFilter}
+        setSisuFilter={setSisuFilter}
+        search={search}
+        setSearch={setSearch}
+      />
 
       {selectedItems.length > 0 && editRights && (
-        <Paper
-          elevation={4}
-          sx={{
-            position: 'fixed',
-            bottom: 24,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 1000,
-            width: 'auto',
-            minWidth: 600,
-            p: 2,
-            bgcolor: theme.palette.background.paper,
-            border: `1px solid ${theme.palette.divider}`,
-            borderRadius: 4,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2
-          }}
-        >
-          <Typography variant="body2" sx={{fontWeight: 500}}>
-            {t('course.timeline.selected-count', {count: selectedItems.length})}
-          </Typography>
-          <Box sx={{flex: 1}} />
-          <Typography variant="body2" color="text.secondary">
-            {t('course.timeline.select-multiple-hint')}
-          </Typography>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              label={t('course.timeline.new-expiry-date')}
-              value={bulkDate}
-              onChange={newValue => setBulkDate(newValue as Dayjs | null)}
-              slotProps={{textField: {size: 'small'}}}
-            />
-          </LocalizationProvider>
-
-          <Button
-            variant="contained"
-            onClick={handleBulkUpdate}
-            disabled={!bulkDate}
-            disableElevation
-          >
-            {t('course.timeline.update')}
-          </Button>
-        </Paper>
+        <TimelineBulkAction
+          selectedCount={selectedItems.length}
+          bulkDate={bulkDate}
+          setBulkDate={setBulkDate}
+          handleBulkUpdate={handleBulkUpdate}
+        />
       )}
 
       <Paper
@@ -647,7 +405,6 @@ const TimelineView = (): JSX.Element => {
               color: theme.palette.text.primary,
             }}
           >
-            {groupBy === 'task' ? t('course.timeline.group-by-task') : t('course.timeline.group-by-date')}
             <Box
               sx={{
                 position: 'absolute',

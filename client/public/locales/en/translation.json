@@ -435,7 +435,14 @@
       "date-student": "Expiry Date / Student",
       "filter-grading-models": "Grading models",
       "all-grading-models": "All Grading Models",
-      "all-grading-models-selected": "All selected"
+      "all-grading-models-selected": "All selected",
+      "start-date": "Start date",
+      "end-date": "End date",
+      "grading-model": "Grading model",
+      "all-items": "All items",
+      "filter-exercises": "Exercises",
+      "all-selected": "All selected",
+      "all-exercises-selected": "All selected"
     },
     "edit": {
       "saved": "Course details saved.",

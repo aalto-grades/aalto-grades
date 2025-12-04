@@ -435,7 +435,14 @@
       "date-student": "Datum / Student",
       "filter-grading-models": "Betygsmodeller",
       "all-grading-models": "Alla betygsmodeller",
-      "all-grading-models-selected": "Alla valda"
+      "all-grading-models-selected": "Alla valda",
+      "start-date": "Startdatum",
+      "end-date": "Slutdatum",
+      "grading-model": "Betygsmodell",
+      "all-items": "Alla objekt",
+      "filter-exercises": "Övningar",
+      "all-selected": "Alla valda",
+      "all-exercises-selected": "Alla valda"
     },
     "edit": {
       "saved": "Kursdetaljer sparade.",

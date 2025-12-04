@@ -435,7 +435,14 @@
       "date-student": "Päivämäärä / Opiskelija",
       "filter-grading-models": "Arviointimalleilla",
       "all-grading-models": "Kaikki arviointimallit",
-      "all-grading-models-selected": "Kaikki valittu"
+      "all-grading-models-selected": "Kaikki valittu",
+      "start-date": "Aloituspäivämäärä",
+      "end-date": "Lopetuspäivämäärä",
+      "grading-model": "Arviointimalli",
+      "all-items": "Kaikki kohteet",
+      "filter-exercises": "Tehtävillä",
+      "all-selected": "Kaikki valittu",
+      "all-exercises-selected": "Kaikki valittu"
     },
     "edit": {
       "saved": "Kurssin tiedot tallennettu.",
