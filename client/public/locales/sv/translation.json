@@ -437,12 +437,20 @@
       "all-grading-models": "Alla betygsmodeller",
       "all-grading-models-selected": "Alla valda",
       "start-date": "Startdatum",
+      "added": "Tillagd",
       "end-date": "Slutdatum",
       "grading-model": "Betygsmodell",
       "all-items": "Alla objekt",
-      "filter-exercises": "Övningar",
+      "filter-exercises": "Uppgifter",
       "all-selected": "Alla valda",
-      "all-exercises-selected": "Alla valda"
+      "all-exercises-selected": "Alla valda",
+      "grades-table": "Betygstabell",
+      "sort-by": "Sortera efter",
+      "student-name": "Studentnamn",
+      "task-name": "Uppgiftsnamn",
+      "order": "Ordning",
+      "ascending": "Stigande",
+      "descending": "Fallande"
     },
     "edit": {
       "saved": "Kursdetaljer sparade.",

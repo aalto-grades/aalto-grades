@@ -437,12 +437,20 @@
       "all-grading-models": "All Grading Models",
       "all-grading-models-selected": "All selected",
       "start-date": "Start date",
+      "added": "Added",
       "end-date": "End date",
       "grading-model": "Grading model",
       "all-items": "All items",
-      "filter-exercises": "Exercises",
+      "filter-exercises": "Tasks",
       "all-selected": "All selected",
-      "all-exercises-selected": "All selected"
+      "all-exercises-selected": "All selected",
+      "grades-table": "Grades table",
+      "sort-by": "Sort by",
+      "student-name": "Student name",
+      "task-name": "Task name",
+      "order": "Order",
+      "ascending": "Ascending",
+      "descending": "Descending"
     },
     "edit": {
       "saved": "Course details saved.",

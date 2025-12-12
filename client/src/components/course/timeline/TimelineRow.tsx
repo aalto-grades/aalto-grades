@@ -199,13 +199,19 @@ const TimelineRow = memo(({
                   <Typography variant="body2" component="div">
                     {item.title}
                   </Typography>
+                  <Typography variant="caption" sx={{opacity: 0.8, display: 'block'}}>
+                    {t('course.timeline.added')}
+                    :
+                    {' '}
+                    {dayjs(item.start).format('DD-MM-YYYY')}
+                  </Typography>
                   <Typography variant="caption" sx={{opacity: 0.8}}>
                     {t('course.timeline.expires')}
                     :
                     {' '}
                     {item.hasForever
                       ? t('course.timeline.never')
-                      : dayjs(item.end).format('YYYY-MM-DD')}
+                      : dayjs(item.end).format('DD-MM-YYYY')}
                   </Typography>
                 </Box>
               )}

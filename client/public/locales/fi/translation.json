@@ -437,12 +437,20 @@
       "all-grading-models": "Kaikki arviointimallit",
       "all-grading-models-selected": "Kaikki valittu",
       "start-date": "Aloituspäivämäärä",
+      "added": "Lisätty",
       "end-date": "Lopetuspäivämäärä",
       "grading-model": "Arviointimalli",
       "all-items": "Kaikki kohteet",
       "filter-exercises": "Tehtävillä",
       "all-selected": "Kaikki valittu",
-      "all-exercises-selected": "Kaikki valittu"
+      "all-exercises-selected": "Kaikki valittu",
+      "grades-table": "Arvosanataulukko",
+      "sort-by": "Järjestä",
+      "student-name": "Opiskelijan nimi",
+      "task-name": "Tehtävän nimi",
+      "order": "Järjestys",
+      "ascending": "Nouseva",
+      "descending": "Laskeva"
     },
     "edit": {
       "saved": "Kurssin tiedot tallennettu.",

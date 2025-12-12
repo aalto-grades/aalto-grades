@@ -37,13 +37,18 @@ type GradeEntry = {
   taskName: string;
 };
 
+export type SortBy = 'student' | 'task' | 'date' | 'expiry';
+export type SortOrder = 'asc' | 'desc';
+
 export const useTimelineData = (
   gradesData: StudentRow[] | undefined,
   sisuFilter: 'all' | 'exported' | 'not-exported',
   expandedGroups: Set<string>,
   search: string,
   groupBy: string[],
-  selectedTaskIds: number[]
+  selectedTaskIds: number[],
+  sortBy: SortBy = 'task',
+  sortOrder: SortOrder = 'asc'
 ): {groups: TimelineGroup[]; items: TimelineItem[]; minDate: number | null; itemsByGroup: Record<string, TimelineItem[] | undefined>} => {
   const {t} = useTranslation();
 
@@ -133,7 +138,36 @@ export const useTimelineData = (
     const sortedGroupKeys = Array.from(groupedGrades.keys()).sort((a, b) => {
       const groupA = groupedGrades.get(a)!;
       const groupB = groupedGrades.get(b)!;
-      return groupA.sortKey.localeCompare(groupB.sortKey);
+
+      // If sorting by student, keep groups in natural order (by sortKey)
+      if (sortBy === 'student') {
+        return groupA.sortKey.localeCompare(groupB.sortKey);
+      }
+
+      let comparison = 0;
+
+      if (sortBy === 'task') {
+        const taskA = groupA.grades[0].taskName;
+        const taskB = groupB.grades[0].taskName;
+        comparison = taskA.localeCompare(taskB);
+      } else if (sortBy === 'date') {
+        const dateA = dayjs(groupA.grades[0].grade.date).valueOf();
+        const dateB = dayjs(groupB.grades[0].grade.date).valueOf();
+        comparison = dateA - dateB;
+      } else {
+        // expiry
+        type GradeItem = (typeof groupA.grades)[number];
+        const getExp = (g: GradeItem): number => g.grade.expiryDate ? dayjs(g.grade.expiryDate).valueOf() : Number.MAX_SAFE_INTEGER;
+        const expA = getExp(groupA.grades[0]);
+        const expB = getExp(groupB.grades[0]);
+        comparison = expA - expB;
+      }
+
+      if (comparison === 0) {
+        comparison = groupA.sortKey.localeCompare(groupB.sortKey);
+      }
+
+      return sortOrder === 'asc' ? comparison : -comparison;
     });
 
     sortedGroupKeys.forEach((groupKey, index) => {
@@ -203,9 +237,37 @@ export const useTimelineData = (
 
       if (isExpanded) {
         matchingGrades.sort((a, b) => {
-          const taskCompare = a.taskName.localeCompare(b.taskName);
-          if (taskCompare !== 0) return taskCompare;
-          return a.studentName.localeCompare(b.studentName);
+          let comparison = 0;
+          switch (sortBy) {
+            case 'student':
+              comparison = a.studentName.localeCompare(b.studentName);
+              break;
+            case 'task':
+              comparison = a.taskName.localeCompare(b.taskName);
+              break;
+            case 'date':
+              comparison = dayjs(a.grade.date).valueOf() - dayjs(b.grade.date).valueOf();
+              break;
+            case 'expiry': {
+              const aExp = a.grade.expiryDate ? dayjs(a.grade.expiryDate).valueOf() : Number.MAX_SAFE_INTEGER;
+              const bExp = b.grade.expiryDate ? dayjs(b.grade.expiryDate).valueOf() : Number.MAX_SAFE_INTEGER;
+              comparison = aExp - bExp;
+              break;
+            }
+          }
+
+          if (comparison === 0) {
+            // Secondary sort by student name if not already sorting by it
+            if (sortBy !== 'student') {
+              comparison = a.studentName.localeCompare(b.studentName);
+            }
+            // Tertiary sort by task name
+            if (comparison === 0 && sortBy !== 'task') {
+              comparison = a.taskName.localeCompare(b.taskName);
+            }
+          }
+
+          return sortOrder === 'asc' ? comparison : -comparison;
         });
 
         matchingGrades.forEach((entry) => {
@@ -240,5 +302,5 @@ export const useTimelineData = (
     });
 
     return {groups: groupsList, items: itemsList, minDate: globalMinStart, itemsByGroup};
-  }, [gradesData, sisuFilter, expandedGroups, t, search, groupBy, selectedTaskIds]);
+  }, [gradesData, sisuFilter, expandedGroups, t, search, groupBy, selectedTaskIds, sortBy, sortOrder]);
 };

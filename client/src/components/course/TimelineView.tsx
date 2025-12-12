@@ -2,8 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {MoreVert} from '@mui/icons-material';
 import {
   Box,
+  IconButton,
+  Menu,
+  MenuItem,
   Paper,
   Typography,
   alpha,
@@ -30,7 +34,7 @@ import useAuth from '@/hooks/useAuth';
 import TimelineBulkAction from './timeline/TimelineBulkAction';
 import TimelineRow from './timeline/TimelineRow';
 import TimelineToolbar from './timeline/TimelineToolbar';
-import {useTimelineData} from './timeline/useTimelineData';
+import {type SortBy, type SortOrder, useTimelineData} from './timeline/useTimelineData';
 import {useTimelineFilters} from './timeline/useTimelineFilters';
 import {useTimelineInteractions} from './timeline/useTimelineInteractions';
 
@@ -61,6 +65,10 @@ const TimelineView = (): JSX.Element => {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [pxPerDay, setPxPerDay] = useState<number>(3);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
+  const [isManualResize, setIsManualResize] = useState(false);
+  const [sortBy, setSortBy] = useState<SortBy>(() => 'date' as SortBy);
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   // Filters Hook
   const {
@@ -94,8 +102,45 @@ const TimelineView = (): JSX.Element => {
     expandedGroups,
     search,
     groupBy,
-    effectiveSelectedTaskIds
+    effectiveSelectedTaskIds,
+    sortBy,
+    sortOrder
   );
+
+  // Auto-resize sidebar based on content
+  useEffect(() => {
+    if (groups.length === 0 || isManualResize) return;
+
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    if (!context) return;
+
+    const fontBase = '0.875rem "Roboto", "Helvetica", "Arial", sans-serif';
+
+    let maxContentWidth = 0;
+
+    groups.forEach((group) => {
+      const isRoot = group.isRoot;
+      const text = group.title as string;
+
+      context.font = `${isRoot ? '600' : '400'} ${fontBase}`;
+      const textWidth = context.measureText(text).width;
+
+      const padding = isRoot ? 74 : 56;
+      const totalWidth = textWidth + padding;
+
+      if (totalWidth > maxContentWidth) {
+        maxContentWidth = totalWidth;
+      }
+    });
+
+    const finalWidth = Math.min(
+      Math.max(maxContentWidth + 20, MIN_SIDEBAR_WIDTH),
+      MAX_SIDEBAR_WIDTH
+    );
+
+    setSidebarWidth(finalWidth);
+  }, [groups, isManualResize]);
 
   // Viewport state
   const viewStart = useMemo(() => {
@@ -139,6 +184,7 @@ const TimelineView = (): JSX.Element => {
     parentRef,
     sidebarWidth,
     setSidebarWidth,
+    setIsManualResize,
     setPxPerDay,
     groups,
     itemsByGroup,
@@ -403,8 +449,88 @@ const TimelineView = (): JSX.Element => {
               px: 2,
               fontWeight: 600,
               color: theme.palette.text.primary,
+              justifyContent: 'space-between',
             }}
           >
+            <Typography variant="subtitle2" noWrap>
+              {t('course.timeline.grades-table')}
+            </Typography>
+            <IconButton
+              size="small"
+              onClick={e => setAnchorEl(e.currentTarget)}
+            >
+              <MoreVert fontSize="small" />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={() => setAnchorEl(null)}
+            >
+              <MenuItem disabled>
+                <Typography variant="caption" color="textSecondary">
+                  {t('course.timeline.sort-by')}
+                </Typography>
+              </MenuItem>
+              <MenuItem
+                selected={sortBy === 'student'}
+                onClick={() => {
+                  setSortBy('student');
+                  setAnchorEl(null);
+                }}
+              >
+                {t('course.timeline.student-name')}
+              </MenuItem>
+              <MenuItem
+                selected={sortBy === 'task'}
+                onClick={() => {
+                  setSortBy('task');
+                  setAnchorEl(null);
+                }}
+              >
+                {t('course.timeline.task-name')}
+              </MenuItem>
+              <MenuItem
+                selected={sortBy === 'date'}
+                onClick={() => {
+                  setSortBy('date');
+                  setAnchorEl(null);
+                }}
+              >
+                {t('course.timeline.added')}
+              </MenuItem>
+              <MenuItem
+                selected={sortBy === 'expiry'}
+                onClick={() => {
+                  setSortBy('expiry');
+                  setAnchorEl(null);
+                }}
+              >
+                {t('course.timeline.expires')}
+              </MenuItem>
+              <MenuItem disabled>
+                <Typography variant="caption" color="textSecondary">
+                  {t('course.timeline.order')}
+                </Typography>
+              </MenuItem>
+              <MenuItem
+                selected={sortOrder === 'asc'}
+                onClick={() => {
+                  setSortOrder('asc');
+                  setAnchorEl(null);
+                }}
+              >
+                {t('course.timeline.ascending')}
+              </MenuItem>
+              <MenuItem
+                selected={sortOrder === 'desc'}
+                onClick={() => {
+                  setSortOrder('desc');
+                  setAnchorEl(null);
+                }}
+              >
+                {t('course.timeline.descending')}
+              </MenuItem>
+            </Menu>
             <Box
               sx={{
                 position: 'absolute',
@@ -419,7 +545,7 @@ const TimelineView = (): JSX.Element => {
                 zIndex: 51,
               }}
               onMouseDown={handleResizeStart}
-              onDoubleClick={() => setSidebarWidth(DEFAULT_SIDEBAR_WIDTH)}
+              onDoubleClick={() => setIsManualResize(false)}
             />
           </Box>
           <Box

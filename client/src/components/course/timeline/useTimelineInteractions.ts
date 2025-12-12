@@ -17,6 +17,7 @@ interface UseTimelineInteractionsProps {
   parentRef: RefObject<HTMLDivElement | null>;
   sidebarWidth: number;
   setSidebarWidth: Dispatch<SetStateAction<number>>;
+  setIsManualResize: Dispatch<SetStateAction<boolean>>;
   setPxPerDay: Dispatch<SetStateAction<number>>;
   groups: TimelineGroup[];
   itemsByGroup: Record<string, TimelineItem[] | undefined>;
@@ -49,6 +50,7 @@ export const useTimelineInteractions = ({
   parentRef,
   sidebarWidth,
   setSidebarWidth,
+  setIsManualResize,
   setPxPerDay,
   groups,
   itemsByGroup,
@@ -113,6 +115,7 @@ export const useTimelineInteractions = ({
     e.preventDefault();
     e.stopPropagation();
     setIsResizingSidebar(true);
+    setIsManualResize(true);
   };
 
   const handleMouseMove = (e: MouseEvent): void => {
