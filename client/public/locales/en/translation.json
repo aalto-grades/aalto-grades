@@ -434,6 +434,8 @@
       "task-student": "Grading Model / Student",
       "date-student": "Expiry Date / Student",
       "filter-grading-models": "Grading models",
+      "filter-course-parts": "Course parts",
+      "all-course-parts-selected": "All selected",
       "all-grading-models": "All Grading Models",
       "all-grading-models-selected": "All selected",
       "start-date": "Start date",

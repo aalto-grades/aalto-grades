@@ -434,6 +434,8 @@
       "task-student": "Betygsmodell / Student",
       "date-student": "Datum / Student",
       "filter-grading-models": "Betygsmodeller",
+      "filter-course-parts": "Kursdelar",
+      "all-course-parts-selected": "Alla valda",
       "all-grading-models": "Alla betygsmodeller",
       "all-grading-models-selected": "Alla valda",
       "start-date": "Startdatum",

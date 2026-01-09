@@ -434,6 +434,8 @@
       "task-student": "Arviointimalli / Opiskelija",
       "date-student": "Päivämäärä / Opiskelija",
       "filter-grading-models": "Arviointimalleilla",
+      "filter-course-parts": "Kurssiosilla",
+      "all-course-parts-selected": "Kaikki valittu",
       "all-grading-models": "Kaikki arviointimallit",
       "all-grading-models-selected": "Kaikki valittu",
       "start-date": "Aloituspäivämäärä",

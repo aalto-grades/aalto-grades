@@ -73,6 +73,7 @@ const TimelineView = (): JSX.Element => {
   // Filters Hook
   const {
     selectedGradingModelIds,
+    selectedCoursePartIds,
     selectedTaskIds,
     sisuFilter,
     setSisuFilter,
@@ -81,7 +82,10 @@ const TimelineView = (): JSX.Element => {
     setSearch,
     effectiveSelectedTaskIds,
     visibleTasks,
+    pureGradingModels,
+    coursePartModels,
     handleGradingModelFilterChange,
+    handleCoursePartFilterChange,
     handleTaskFilterChange,
     handleGroupByChange,
   } = useTimelineFilters({
@@ -387,7 +391,10 @@ const TimelineView = (): JSX.Element => {
         handleGroupByChange={handleGroupByChange}
         selectedGradingModelIds={selectedGradingModelIds}
         handleGradingModelFilterChange={handleGradingModelFilterChange}
-        gradingModels={gradingModels}
+        gradingModels={pureGradingModels}
+        selectedCoursePartIds={selectedCoursePartIds}
+        handleCoursePartFilterChange={handleCoursePartFilterChange}
+        coursePartModels={coursePartModels}
         selectedTaskIds={selectedTaskIds}
         handleTaskFilterChange={handleTaskFilterChange}
         visibleTasks={visibleTasks}

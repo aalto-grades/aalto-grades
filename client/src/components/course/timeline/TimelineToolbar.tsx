@@ -35,6 +35,9 @@ interface TimelineToolbarProps {
   selectedGradingModelIds: number[];
   handleGradingModelFilterChange: (event: SelectChangeEvent<number[]>) => void;
   gradingModels: GradingModelData[] | undefined;
+  selectedCoursePartIds: number[];
+  handleCoursePartFilterChange: (event: SelectChangeEvent<number[]>) => void;
+  coursePartModels: GradingModelData[] | undefined;
   selectedTaskIds: number[];
   handleTaskFilterChange: (event: SelectChangeEvent<number[]>) => void;
   visibleTasks: {id: number; name: string}[];
@@ -54,6 +57,9 @@ const TimelineToolbar = ({
   selectedGradingModelIds,
   handleGradingModelFilterChange,
   gradingModels,
+  selectedCoursePartIds,
+  handleCoursePartFilterChange,
+  coursePartModels,
   selectedTaskIds,
   handleTaskFilterChange,
   visibleTasks,
@@ -135,6 +141,29 @@ const TimelineToolbar = ({
             {gradingModels?.map(model => (
               <MenuItem key={model.id} value={model.id}>
                 <Checkbox checked={selectedGradingModelIds.includes(model.id)} />
+                <ListItemText primary={model.name} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{minWidth: 140, width: 'fit-content'}}>
+          <InputLabel id="course-part-filter-label" shrink>{t('course.timeline.filter-course-parts')}</InputLabel>
+          <Select
+            labelId="course-part-filter-label"
+            multiple
+            displayEmpty
+            value={selectedCoursePartIds}
+            onChange={handleCoursePartFilterChange}
+            input={<OutlinedInput label={t('course.timeline.filter-course-parts')} notched />}
+            renderValue={(selected) => {
+              if (selected.length === 0) return t('course.timeline.all-course-parts-selected');
+              return t('course.timeline.selected-count', {count: selected.length});
+            }}
+          >
+            {coursePartModels?.map(model => (
+              <MenuItem key={model.id} value={model.id}>
+                <Checkbox checked={selectedCoursePartIds.includes(model.id)} />
                 <ListItemText primary={model.name} />
               </MenuItem>
             ))}
