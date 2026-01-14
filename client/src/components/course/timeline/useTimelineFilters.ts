@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import type {SelectChangeEvent} from '@mui/material';
-import {useMemo, useState} from 'react';
+import {useMemo, useRef, useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
 
 import type {CourseTaskData, GradingModelData, StudentRow} from '@/common/types';
 
@@ -39,12 +40,35 @@ export const useTimelineFilters = ({
   courseTasks,
   gradesData,
 }: UseTimelineFiltersProps): UseTimelineFiltersResult => {
-  const [selectedGradingModelIds, setSelectedGradingModelIds] = useState<number[]>([]);
-  const [selectedCoursePartIds, setSelectedCoursePartIds] = useState<number[]>([]);
-  const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
-  const [sisuFilter, setSisuFilter] = useState<SisuFilter>('all');
-  const [groupBy, setGroupBy] = useState<string[]>([]);
-  const [search, setSearch] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const selectedGradingModelIds = useMemo(() => {
+    const val = searchParams.get('models');
+    return val ? val.split(',').map(Number) : [];
+  }, [searchParams]);
+
+  const selectedCoursePartIds = useMemo(() => {
+    const val = searchParams.get('parts');
+    return val ? val.split(',').map(Number) : [];
+  }, [searchParams]);
+
+  const selectedTaskIds = useMemo(() => {
+    const val = searchParams.get('tasks');
+    return val ? val.split(',').map(Number) : [];
+  }, [searchParams]);
+
+  const sisuParam = searchParams.get('sisu');
+  const sisuFilter: SisuFilter =
+    sisuParam === 'exported' || sisuParam === 'not-exported'
+      ? sisuParam
+      : 'all';
+
+  const groupBy = useMemo(() => {
+    const val = searchParams.get('group');
+    return val ? val.split(',') : [];
+  }, [searchParams]);
+
+  const [localSearch, setLocalSearch] = useState(searchParams.get('search') || '');
 
   const {pureGradingModels, coursePartModels} = useMemo(() => {
     const pure: GradingModelData[] = [];
@@ -99,24 +123,26 @@ export const useTimelineFilters = ({
 
   const availableTaskIds = useMemo(() => {
     const ids = new Set<number>();
-    if (selectedGradingModelIds.length === 0 && selectedCoursePartIds.length === 0) {
+    if (
+      selectedGradingModelIds.length === 0
+      && selectedCoursePartIds.length === 0
+    ) {
       tasksByModel.forEach(tasks => tasks.forEach(taskId => ids.add(taskId)));
-      return ids;
+    } else {
+      selectedGradingModelIds.forEach((modelId) => {
+        const tasks = tasksByModel.get(modelId);
+        if (tasks) {
+          tasks.forEach(taskId => ids.add(taskId));
+        }
+      });
+
+      selectedCoursePartIds.forEach((modelId) => {
+        const tasks = tasksByModel.get(modelId);
+        if (tasks) {
+          tasks.forEach(taskId => ids.add(taskId));
+        }
+      });
     }
-
-    selectedGradingModelIds.forEach((modelId) => {
-      const tasks = tasksByModel.get(modelId);
-      if (tasks) {
-        tasks.forEach(taskId => ids.add(taskId));
-      }
-    });
-
-    selectedCoursePartIds.forEach((modelId) => {
-      const tasks = tasksByModel.get(modelId);
-      if (tasks) {
-        tasks.forEach(taskId => ids.add(taskId));
-      }
-    });
 
     return ids;
   }, [selectedGradingModelIds, selectedCoursePartIds, tasksByModel]);
@@ -146,12 +172,27 @@ export const useTimelineFilters = ({
   [allTasks, availableTaskIds]
   );
 
+  const updateSearchParam = (key: string, value: string | null): void => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (value === null) {
+          next.delete(key);
+        } else {
+          next.set(key, value);
+        }
+        return next;
+      },
+      {replace: true}
+    );
+  };
+
   const handleGradingModelFilterChange = (event: SelectChangeEvent<number[]>): void => {
     const {
       target: {value},
     } = event;
     const val = typeof value === 'string' ? value.split(',').map(Number) : value;
-    setSelectedGradingModelIds(val);
+    updateSearchParam('models', val.length > 0 ? val.join(',') : null);
   };
 
   const handleCoursePartFilterChange = (event: SelectChangeEvent<number[]>): void => {
@@ -159,7 +200,7 @@ export const useTimelineFilters = ({
       target: {value},
     } = event;
     const val = typeof value === 'string' ? value.split(',').map(Number) : value;
-    setSelectedCoursePartIds(val);
+    updateSearchParam('parts', val.length > 0 ? val.join(',') : null);
   };
 
   const handleTaskFilterChange = (event: SelectChangeEvent<number[]>): void => {
@@ -167,14 +208,33 @@ export const useTimelineFilters = ({
       target: {value},
     } = event;
     const val = typeof value === 'string' ? value.split(',').map(Number) : value;
-    setSelectedTaskIds(val);
+    updateSearchParam('tasks', val.length > 0 ? val.join(',') : null);
   };
 
   const handleGroupByChange = (event: SelectChangeEvent<string[]>): void => {
     const {
       target: {value},
     } = event;
-    setGroupBy(typeof value === 'string' ? value.split(',') : value);
+    const val = typeof value === 'string' ? value.split(',') : value;
+    updateSearchParam('group', val.length > 0 ? val.join(',') : null);
+  };
+
+  const setSisuFilter = (value: SisuFilter): void => {
+    updateSearchParam('sisu', value === 'all' ? null : value);
+  };
+
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const setSearch = (value: string): void => {
+    setLocalSearch(value);
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      updateSearchParam('search', value || null);
+    }, 300);
   };
 
   return {
@@ -184,7 +244,7 @@ export const useTimelineFilters = ({
     sisuFilter,
     setSisuFilter,
     groupBy,
-    search,
+    search: localSearch,
     setSearch,
     effectiveSelectedTaskIds,
     visibleTasks,
