@@ -7,6 +7,7 @@ import type {
   AverageNodeSettings,
   FullNodeData,
   GraphSourceValue,
+  MathNodeSettings,
   MaxNodeSettings,
   MinPointsNodeSettings,
   NodeValue,
@@ -28,7 +29,7 @@ export const initNodeValues = (
   let valuesFound = false;
 
   for (const node of nodes) {
-    const nodeType = node.type!;
+    const nodeType = node.type;
     nodeValues[node.id] = initNode(nodeType).value;
     const nodeValue = nodeValues[node.id];
     if (nodeValue.type !== 'source') continue;
@@ -75,6 +76,30 @@ export const updateNodeValue = (
         weightSum += settings.weights[key];
       }
       nodeValue.value = weightSum === 0 ? 0 : valueSum / weightSum;
+      break;
+    }
+    case 'math': {
+      const settings = nodeData[nodeId].settings as MathNodeSettings;
+      switch (settings.operator) {
+        case 'add':
+          nodeValue.value = nodeValue.source + settings.operand;
+          break;
+        case 'sub':
+          nodeValue.value = nodeValue.source - settings.operand;
+          break;
+        case 'mul':
+          nodeValue.value = nodeValue.source * settings.operand;
+          break;
+        case 'div':
+          nodeValue.value = nodeValue.source / settings.operand;
+          break;
+        case 'rem':
+          nodeValue.value = nodeValue.source % settings.operand;
+          break;
+        case 'pow':
+          nodeValue.value = nodeValue.source ** settings.operand;
+          break;
+      }
       break;
     }
     case 'require': {
