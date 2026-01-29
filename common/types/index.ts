@@ -13,5 +13,6 @@ export * from './gradingModel';
 export * from './graph';
 export * from './history';
 export * from './sisu';
+export * from './statistics';
 export * from './taskGrade';
 export * from './user';

@@ -21,6 +21,7 @@
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
     "@mui/types": "^7.4.1",
+    "@mui/x-charts": "^8.26.0",
     "@mui/x-data-grid": "^8.1.0",
     "@mui/x-date-pickers": "^8.1.0",
     "@tanstack/react-query": "^5.74.7",

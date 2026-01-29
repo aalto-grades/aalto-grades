@@ -16,9 +16,16 @@ import {
   getAllCourses,
   getCourse,
 } from '../controllers/course';
+import {getCourseStatistics} from '../controllers/statistics';
 import {handleInvalidRequestJson} from '../middleware';
-import {apiKeyAuthentication, jwtAuthentication} from '../middleware/authentication';
-import {authorization, courseAuthorization} from '../middleware/authorization';
+import {
+  apiKeyAuthentication,
+  jwtAuthentication,
+} from '../middleware/authentication';
+import {
+  authorization,
+  courseAuthorization,
+} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
 import {processRequestBody} from '../middleware/zodValidation';
 
@@ -33,7 +40,15 @@ router.get(
     CourseRoleType.Assistant,
     CourseRoleType.Student,
   ]),
-  controllerDispatcher(getCourse)
+  controllerDispatcher(getCourse),
+);
+
+router.get(
+  '/v1/courses/:courseId/statistics',
+  apiKeyAuthentication,
+  jwtAuthentication,
+  courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
+  controllerDispatcher(getCourseStatistics),
 );
 
 router.get(

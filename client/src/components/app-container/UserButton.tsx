@@ -132,6 +132,15 @@ const UserButton = (): JSX.Element => {
         >
           {t('general.a+-api-token')}
         </MenuItem>
+        <MenuItem
+          key="global-statistics"
+          onClick={() => {
+            setAnchorEl(null);
+            navigate('/global-statistics');
+          }}
+        >
+          {t('statistics.global-statistics')}
+        </MenuItem>
         {auth.role === SystemRole.Admin && [
           <MenuItem
             key="change-password"
