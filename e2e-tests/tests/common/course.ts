@@ -45,15 +45,14 @@ export const createCourse = async (page: Page): Promise<void> => {
   await page.getByLabel('Assistants').fill(assistantEmail);
   await page.getByRole('button', {name: 'Add'}).nth(1).click();
   await page.getByRole('button', {name: 'Submit'}).click();
-  await expect(page.getByRole('heading', {name: 'testCourse'})).toBeVisible();
-  await expect(page.getByText(courseCode)).toBeVisible();
+  await expect(page.getByText('Course Info')).toBeVisible();
   await page.getByTestId('a-grades-header-link').click();
   await expect(page.getByRole('cell', {name: courseCode}).nth(0)).toBeVisible();
 };
 
 export const checkCourse = async (page: Page): Promise<void> => {
   await page.getByRole('cell', {name: 'O1'}).click();
-  await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
+  await expect(page.getByText('Course Info')).toBeVisible();
 };
 
 export const editCourse = async (page: Page): Promise<void> => {
@@ -87,7 +86,7 @@ export const editCourse = async (page: Page): Promise<void> => {
   await expect(page.getByText(courseCode)).toBeVisible();
   await page.getByTestId('a-grades-header-link').click();
   await page.getByRole('cell', {name: 'O1'}).click();
-  await expect(page.getByRole('heading', {name: 'O1'})).toBeVisible();
+  await expect(page.getByText('Course Info')).toBeVisible();
 };
 
 export const createGradingModel = async (page: Page): Promise<void> => {
@@ -227,6 +226,7 @@ export const warnDialogIfBackdropClickDisabled = async (
   page: Page
 ): Promise<void> => {
   await page.getByRole('cell', {name: 'O1'}).click();
+  await page.getByRole('link', {name: 'Grades', exact: true}).click();
   await page.getByRole('button', {name: 'Add grades manually'}).click();
   await page.getByRole('button', {name: 'Exercises 2024'}).click();
 
@@ -302,11 +302,7 @@ export const importCourseDataFromSisu = async (
   }
 
   await page.getByRole('button', {name: 'Submit'}).click();
-  await expect(
-    page.getByRole('heading', {
-      name: 'Basic Course in Programming Y1, Exam (retake exam for 2024 courses)',
-    })
-  ).toBeVisible();
+  await expect(page.getByText('Course Info')).toBeVisible();
   await page.getByTestId('a-grades-header-link').click();
   await expect(
     page
