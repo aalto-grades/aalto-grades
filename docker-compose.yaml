@@ -13,6 +13,9 @@ services:
       - 8080:80
     volumes:
       - ./reverse-proxy-dev.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend
+      - backend
 
   frontend:
     build:

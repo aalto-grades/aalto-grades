@@ -25,6 +25,7 @@ import {
   importGradesWithText,
 } from './common/grades';
 import {addCoursePartTaskFail, addCoursePartTaskSuccess} from './common/task';
+import {searchTimeline, viewTimeline} from './common/timeline';
 import {aPlusToken} from './common/token';
 import {logOut} from './common/user';
 import {setupDb} from './helper';
@@ -127,6 +128,18 @@ test.describe('Test courses as teacher', () => {
   test.describe('Grades table', () => {
     test('Filter results', async ({page}) => {
       await filterGradesTable(page);
+    });
+  });
+
+  test.describe('Timeline', () => {
+    test('Teacher can view timeline', async ({page}) => {
+      await checkCourse(page);
+      await viewTimeline(page);
+    });
+
+    test('Teacher can search in timeline', async ({page}) => {
+      await checkCourse(page);
+      await searchTimeline(page, 'NonExistentStudent');
     });
   });
 
