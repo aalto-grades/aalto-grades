@@ -55,7 +55,7 @@ router.get(
   '/v1/courses',
   apiKeyAuthentication,
   jwtAuthentication,
-  authorization([SystemRole.Admin]),
+  authorization([SystemRole.Admin, SystemRole.User]),
   controllerDispatcher(getAllCourses)
 );
 
