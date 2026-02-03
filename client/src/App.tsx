@@ -37,6 +37,7 @@ import CoursePartsView from './components/course/CoursePartsView';
 import EditCourseView from './components/course/EditCourseView';
 import GradesView from './components/course/GradesView';
 import ModelsView from './components/course/ModelsView';
+import TimelineView from './components/course/TimelineView';
 import ConfirmDialog from './components/shared/ConfirmDialog';
 import NotistackWrapper from './context/NotistackWrapper';
 import type {CustomError} from './types';
@@ -156,6 +157,10 @@ const router = createBrowserRouter([
               {
                 path: '/:courseId/models',
                 element: <CoursePartsView />,
+              },
+              {
+                path: '/:courseId/timeline',
+                element: <TimelineView />,
               },
               {
                 path: '/:courseId/models/:modelId/:userId?',
