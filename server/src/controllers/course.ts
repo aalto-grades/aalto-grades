@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { type Transaction, UniqueConstraintError, type WhereOptions } from 'sequelize';
+import {type Transaction, UniqueConstraintError, type WhereOptions} from 'sequelize';
 
 import {
   type CourseData,
