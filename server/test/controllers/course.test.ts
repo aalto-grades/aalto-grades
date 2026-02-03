@@ -138,16 +138,16 @@ describe('Test GET /v1/courses - get all courses', () => {
     expect(result.success).toBeTruthy();
   });
 
-  it('should respond with 401 or 403 if not authorized', async () => {
+  it('should respond with 401 if not authorized', async () => {
     await responseTests.testUnauthorized('/v1/courses').get();
+  });
 
-    await responseTests
-      .testForbidden('/v1/courses', [
-        cookies.teacherCookie,
-        cookies.assistantCookie,
-        cookies.studentCookie,
-      ])
-      .get();
+  it('should respond with 200 for non-admin users', async () => {
+    await request
+      .get('/v1/courses')
+      .set('Cookie', cookies.studentCookie)
+      .set('Accept', 'application/json')
+      .expect(HttpCode.Ok);
   });
 });
 
