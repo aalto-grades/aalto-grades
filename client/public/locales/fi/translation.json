@@ -55,6 +55,8 @@
         "round-tooltip": "Pyöristä arvo",
         "substitute": "Korvaa",
         "substitute-tooltip": "Korvaa hylätyt arvot",
+        "table": "Taulukko",
+        "table-tooltip": "Määrittää kahden numeerisen syötteen perusteella arvon hakutaulukosta",
         "sink": "Kohde",
         "source": "Lähde",
         "value": "Arvo"
@@ -91,7 +93,9 @@
       "round-down": "Pyöristä alaspäin",
       "range": "Vaihteluväli",
       "new-row": "Uusi rivi",
+      "new-column": "Uusi sarake",
       "remove-row": "Poista rivi",
+      "remove-column": "Poista sarake",
       "substitution-num": "Korvausten määrä",
       "substitutes": "Korvaavat arvot",
       "substitution-value": "Korvausarvo",

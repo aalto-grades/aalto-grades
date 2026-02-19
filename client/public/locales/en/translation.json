@@ -55,6 +55,8 @@
         "round-tooltip": "Round value",
         "substitute": "Substitute",
         "substitute-tooltip": "Substitute failing values",
+        "table": "Table",
+        "table-tooltip": "Map up to two numeric inputs into a lookup table",
         "sink": "Sink",
         "source": "Source",
         "value": "Value"
@@ -91,7 +93,9 @@
       "round-down": "Round down",
       "range": "Range",
       "new-row": "New row",
+      "new-column": "New column",
       "remove-row": "Remove row",
+      "remove-column": "Remove column",
       "substitution-num": "Number of substitutions",
       "substitutes": "Substitutes",
       "substitution-value": "sub val",

@@ -57,6 +57,7 @@ export const calculateNodeValues = (
       case 'addition':
       case 'average':
       case 'max':
+      case 'table':
       case 'require':
       case 'substitute':
         for (const value of Object.values(nodeValue.sources)) {
@@ -128,6 +129,7 @@ export const calculateNodeValues = (
         case 'addition':
         case 'average':
         case 'max':
+        case 'table':
           nodeValue.sources[edge.targetHandle!] = {
             value: sourceValue === 'fail' ? 0 : sourceValue,
             isConnected: true,

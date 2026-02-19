@@ -11,12 +11,14 @@ import type {
   MinPointsNodeSettings,
   NodeValue,
   NodeValues,
+  NumberOrFail,
   RequireNodeSettings,
   RoundNodeSettings,
   SourceNodeSettings,
   StepperNodeSettings,
   SubstituteNodeSettings,
-  TypedNode,
+  TableNodeSettings,
+  TypedNode
 } from '../types/graph';
 
 /** Create initial nodeValues for a set of source values */
@@ -228,6 +230,62 @@ export const updateNodeValue = (
             nodeValue.values[key] = source.value;
           }
         }
+      }
+      break;
+    }
+    case 'table': {
+      const settings = nodeData[nodeId].settings as TableNodeSettings;
+      const connected = Object.entries(nodeValue.sources).filter(([, s]) => s.isConnected);
+      if (connected.length === 0) {
+        nodeValue.value = 0;
+        break;
+      }
+
+      const getNumeric = (v: number | NumberOrFail): number | null =>
+        v === 'fail' ? null : (typeof v === 'number' ? v : null);
+
+      const getBySuffix = (suffix: string): number | null => {
+        for (const [key, src] of Object.entries(nodeValue.sources)) {
+          if (!src.isConnected) continue;
+          if (key.endsWith(`-${suffix}`)) return getNumeric(src.value);
+        }
+        return null;
+      };
+
+      const fallbackFirst = connected.length > 0 ? getNumeric(connected[0][1].value) : null;
+      const fallbackSecond = connected.length > 1 ? getNumeric(connected[1][1].value) : null;
+
+      const first = getBySuffix('col') ?? fallbackFirst;
+      const second = getBySuffix('row') ?? fallbackSecond;
+      if (first === null || second === null) {
+        nodeValue.value = 0;
+        break;
+      }
+
+      const rowHeaders: number[] = settings.rowHeaders;
+      const colHeaders: number[] = settings.colHeaders;
+
+      if (colHeaders.length === 0 || rowHeaders.length === 0) {
+        nodeValue.value = 0;
+        break;
+      }
+
+      const colIndex = colHeaders.indexOf(first);
+      if (colIndex === -1) {
+        nodeValue.value = 0;
+        break;
+      }
+      const rowIndex = rowHeaders.indexOf(second);
+      if (rowIndex === -1) {
+        nodeValue.value = 0;
+        break;
+      }
+
+      const grid: number[][] = settings.grid;
+      if (grid[rowIndex] && typeof grid[rowIndex][colIndex] === 'number') {
+        nodeValue.value = grid[rowIndex][colIndex];
+      } else {
+        nodeValue.value = 0;
       }
       break;
     }

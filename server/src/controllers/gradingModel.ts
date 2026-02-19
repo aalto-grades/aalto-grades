@@ -7,9 +7,11 @@ import {ForeignKeyConstraintError, UniqueConstraintError} from 'sequelize';
 import {
   type EditGradingModelData,
   type GradingModelData,
+  type GraphStructure,
   HttpCode,
   type NewGradingModelData,
 } from '@/common/types';
+import {DEFAULT_TABLE_SETTINGS} from '@/common/util/tableDefaults';
 import GradingModel from '../database/models/gradingModel';
 import {ApiError, type Endpoint} from '../types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
@@ -19,6 +21,21 @@ import {
   checkGradingModelSources,
   validateGradingModelPath,
 } from './utils/gradingModel';
+
+const ensureTableNodeDefaults = (graphStructure: GraphStructure | undefined): void => {
+  if (!graphStructure) return;
+  for (const node of graphStructure.nodes) {
+    if (node.type !== 'table') continue;
+    if (node.id in graphStructure.nodeData) {
+      graphStructure.nodeData[node.id].settings ??= DEFAULT_TABLE_SETTINGS;
+    } else {
+      graphStructure.nodeData[node.id] = {
+        title: 'Table',
+        settings: DEFAULT_TABLE_SETTINGS,
+      };
+    }
+  }
+};
 
 /**
  * () => GradingModelData
@@ -107,6 +124,8 @@ export const addGradingModel: Endpoint<NewGradingModelData, number> = async (
 
   let modelId;
   try {
+    ensureTableNodeDefaults(req.body.graphStructure as GraphStructure | undefined);
+
     const [gradingModel, created] = await GradingModel.findOrCreate({
       where: {
         name: req.body.name,
@@ -159,6 +178,7 @@ export const editGradingModel: Endpoint<EditGradingModelData, void> = async (
 
   // Update grading model & catch duplicate name error.
   try {
+    ensureTableNodeDefaults(req.body.graphStructure);
     await gradingModel.update({
       name: req.body.name ?? gradingModel.name,
       graphStructure: req.body.graphStructure ?? gradingModel.graphStructure,

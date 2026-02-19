@@ -86,6 +86,7 @@ import SinkNode from './nodes/SinkNode';
 import SourceNode from './nodes/SourceNode';
 import StepperNode from './nodes/StepperNode';
 import SubstituteNode from './nodes/SubstituteNode';
+import TableNode from './nodes/TableNode';
 
 // TODO: Don't show word 'source' to user? (#886)
 // Instead we could check if is course part model or not
@@ -116,6 +117,7 @@ const nodeTypesMap: {
   source: SourceNode,
   stepper: StepperNode,
   substitute: SubstituteNode,
+  table: TableNode
 };
 
 // Load graph for the first time
@@ -300,8 +302,7 @@ const Graph = ({
     );
 
     if (
-      lastState === null
-      || lastState.nodes.length !== nodes.length
+      lastState?.nodes.length !== nodes.length
       || lastState.edges.length !== edges.length
       || JSON.stringify(lastState.nodeValues) !== JSON.stringify(nodeValues)
       || JSON.stringify(lastState.nodeSettings) !== JSON.stringify(nodeSettings)
