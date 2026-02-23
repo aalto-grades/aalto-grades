@@ -4,7 +4,7 @@
 
 import type {Edge} from '@xyflow/react';
 
-import {DEFAULT_TABLE_SETTINGS} from '@/common/util/tableDefaults';
+import {DEFAULT_TABLE_SETTINGS} from './tableDefaults';
 import type {
   CoursePartData,
   CourseTaskData,
