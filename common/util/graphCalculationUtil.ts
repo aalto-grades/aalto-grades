@@ -171,14 +171,6 @@ export const updateNodeValue = (
         break;
       }
 
-      if (mode === 'count') {
-        let count = 0;
-        if (baseline === null) count = numericValues.length;
-        else count = numericValues.filter(v => v >= baseline).length;
-        nodeValue.value = count === 0 ? baseline ?? 0 : count;
-        break;
-      }
-
       if (mode === 'stdev') {
         // Sample standard deviation (divide by n-1). If fewer than 2 numeric inputs, return 0.
         const n = numericValues.length;

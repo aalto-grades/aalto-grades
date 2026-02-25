@@ -163,10 +163,9 @@ const MaxNode = (props: NodeProps): JSX.Element => {
                   <option value="average">{t('shared.graph.node.mode.average')}</option>
                   <option value="median">{t('shared.graph.node.mode.median')}</option>
                   <option value="product">{t('shared.graph.node.mode.product')}</option>
-                  <option value="count">{t('shared.graph.node.mode.count')}</option>
                   <option value="stdev">{t('shared.graph.node.mode.stdev')}</option>
                 </select>
-                {['min', 'sum', 'count', 'max'].includes(localSettings.mode ?? 'max') && (
+                {['min', 'sum', 'max'].includes(localSettings.mode ?? 'max') && (
                   <input
                     title={t('shared.graph.node.baseline-tooltip')}
                     placeholder=""

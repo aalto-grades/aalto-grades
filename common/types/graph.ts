@@ -99,7 +99,7 @@ const AverageNodeSettingsSchema = z.strictObject({
 });
 const MaxNodeSettingsSchema = z.strictObject({
   mode: z
-    .enum(['max', 'min', 'sum', 'average', 'median', 'product', 'count', 'stdev'])
+    .enum(['max', 'min', 'sum', 'average', 'median', 'product', 'stdev'])
     .optional(),
   minValue: z.union([z.number(), z.null()]),
 });
