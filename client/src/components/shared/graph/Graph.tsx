@@ -131,7 +131,7 @@ const initGraphFn = (
   const extraNodeData: ExtraNodeData = {};
   for (const node of initGraph.nodes) {
     if (node.type !== 'source') continue;
-    const sourceId = parseInt(node.id.split('-')[1]);
+    const sourceId = Number.parseInt(node.id.split('-')[1]);
 
     const nodeSource = sources.find(source => source.id === sourceId);
     if (nodeSource === undefined) {
@@ -235,7 +235,7 @@ const Graph = ({
       initGraph.nodes
         .filter((node) => {
           if (node.type !== 'source') return false;
-          const sourceId = parseInt(node.id.split('-')[1]);
+          const sourceId = Number.parseInt(node.id.split('-')[1]);
 
           const nodeSource = sources.find(source => source.id === sourceId);
           return nodeSource === undefined || nodeSource.archived;
@@ -462,7 +462,7 @@ const Graph = ({
       if (initState.data.settings)
         setNodeSettings(nodeId, initState.data.settings);
     },
-    [getId, nodeTypeMap, reactFlowInstance, setNodes]
+    [getId, nodeTypeMap, reactFlowInstance, setNodes, setNodeTitle, setNodeSettings]
   );
 
   const dragAndDropNodes = getDragAndDropNodes(t);
@@ -547,14 +547,14 @@ const Graph = ({
                   .map(node => ({type: 'remove', id: node.id}))
               );
 
-              const selectedIds = selected.map(node => node.id);
+              const selectedIds = new Set(selected.map(node => node.id));
 
               onEdgesChange(
                 edges
                   .filter(
                     edge =>
-                      selectedIds.includes(edge.target)
-                      || selectedIds.includes(edge.source)
+                      selectedIds.has(edge.target)
+                      || selectedIds.has(edge.source)
                   )
                   .map(edge => ({type: 'remove', id: edge.id}))
               );
@@ -577,7 +577,7 @@ const Graph = ({
           <NodeDataContext.Provider
             value={useMemo(
               () => ({nodeData, setNodeTitle, setNodeSettings}),
-              [nodeData]
+              [nodeData, setNodeTitle, setNodeSettings]
             )}
           >
             <div style={{width: '100%', height: '60vh'}}>
