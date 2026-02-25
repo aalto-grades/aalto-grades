@@ -55,7 +55,7 @@ export const initNode = (
     case 'max':
       return {
         value: {type, sources, value: 0},
-        data: {title: 'Max', settings: {minValue: 0}},
+        data: {title: 'Aggregator', settings: {minValue: null}},
       };
     case 'minpoints':
       return {
@@ -175,7 +175,7 @@ export const initGraph = (
       id: 'max',
       type: 'max',
       size: 92,
-      data: {title: 'Max', settings: {minValue: 0}},
+      data: {title: 'Aggregator', settings: {minValue: null}},
     },
     addition: {
       id: 'addition',

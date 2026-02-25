@@ -98,7 +98,10 @@ const AverageNodeSettingsSchema = z.strictObject({
   percentageMode: z.boolean(),
 });
 const MaxNodeSettingsSchema = z.strictObject({
-  minValue: z.number(),
+  mode: z
+    .enum(['max', 'min', 'sum', 'average', 'median', 'product', 'stdev'])
+    .optional(),
+  minValue: z.union([z.number(), z.null()]),
 });
 const MinPointsNodeSettingsSchema = z.strictObject({
   minPoints: z.number(),
