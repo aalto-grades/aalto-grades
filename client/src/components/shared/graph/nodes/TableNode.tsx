@@ -8,12 +8,19 @@ import {
   type CSSProperties,
   type ChangeEvent,
   type JSX,
+  useCallback,
   useContext,
+  useEffect,
+  useMemo,
   useState,
 } from 'react';
 import {useTranslation} from 'react-i18next';
 
 import type {TableNodeSettings, TableNodeValue} from '@/common/types';
+import {
+  getDuplicateIndices,
+  getStableKeys,
+} from '@/common/util/duplicateKeys';
 import {
   DEFAULT_TABLE_COL_HEADERS,
   DEFAULT_TABLE_ROW_HEADERS,
@@ -22,6 +29,12 @@ import {
 import OutputValue from '@/components/shared/graph/nodes/parts/OutputValue';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
+
+const defaultSettings: TableNodeSettings = {
+  rowHeaders: DEFAULT_TABLE_ROW_HEADERS,
+  colHeaders: DEFAULT_TABLE_COL_HEADERS,
+  grid: DEFAULT_TRIANGULAR_GRID,
+};
 
 type LocalSettings = {
   rowHeaders: string[];
@@ -36,29 +49,13 @@ const TableNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;
   const nodeValues = useContext(NodeValuesContext);
 
-  const settings = (nodeData[id].settings ?? {
-    rowHeaders: [] as number[],
-    colHeaders: [] as number[],
-    grid: [] as number[][],
-  }) as TableNodeSettings;
+  const settings = (nodeData[id].settings ?? defaultSettings) as TableNodeSettings;
 
-  const initSettings: LocalSettings = {
-    rowHeaders: (settings.rowHeaders.length > 0
-      ? settings.rowHeaders
-      : DEFAULT_TABLE_ROW_HEADERS
-    ).map(v => v.toString()),
-    colHeaders: (settings.colHeaders.length > 0
-      ? settings.colHeaders
-      : DEFAULT_TABLE_COL_HEADERS
-    ).map(v => v.toString()),
-    grid: (settings.grid.length > 0
-      ? settings.grid
-      : DEFAULT_TRIANGULAR_GRID
-    ).map(row => row.map(v => v.toString())),
-  };
-
-  const [localSettings, setLocalSettings] =
-    useState<LocalSettings>(initSettings);
+  const [localSettings, setLocalSettings] = useState<LocalSettings>(() => ({
+    rowHeaders: settings.rowHeaders.map(String),
+    colHeaders: settings.colHeaders.map(String),
+    grid: settings.grid.map(row => row.map(String)),
+  }));
 
   const nodeValue = nodeValues[id] as TableNodeValue;
 
@@ -67,26 +64,41 @@ const TableNode = (props: NodeProps): JSX.Element => {
     typeof v === 'number' ? v : null;
 
   const sources = nodeValue.sources;
-  const getBySuffix = (suffix: string): number | null => {
-    for (const [key, src] of Object.entries(sources)) {
-      if (!src.isConnected) continue;
-      if (key.endsWith(`-${suffix}`)) return getNumericFromSource(src.value);
-    }
-    return null;
-  };
+  const getBySuffix = useMemo(
+    () =>
+      (suffix: string): number | null => {
+        for (const [key, src] of Object.entries(sources)) {
+          if (!src.isConnected) continue;
+          if (key.endsWith(`-${suffix}`))
+            return getNumericFromSource(src.value);
+        }
+        return null;
+      },
+    [sources],
+  );
 
-  const connectedValues = Object.values(sources)
-    .filter(s => s.isConnected)
-    .map(s => getNumericFromSource(s.value))
-    .filter((v): v is number => v !== null);
+  const connectedValues = useMemo(
+    () =>
+      Object.values(sources)
+        .filter(s => s.isConnected)
+        .map(s => getNumericFromSource(s.value))
+        .filter((v): v is number => v !== null),
+    [sources],
+  );
 
   const byCol = getBySuffix('col');
   const first = byCol ?? connectedValues[0];
   const byRow = getBySuffix('row');
   const second = byRow ?? connectedValues[1];
 
-  const rowNums = localSettings.rowHeaders.map(v => Number.parseFloat(v));
-  const colNums = localSettings.colHeaders.map(v => Number.parseFloat(v));
+  const rowNums = useMemo(
+    () => localSettings.rowHeaders.map(v => Number.parseFloat(v)),
+    [localSettings.rowHeaders],
+  );
+  const colNums = useMemo(
+    () => localSettings.colHeaders.map(v => Number.parseFloat(v)),
+    [localSettings.colHeaders],
+  );
 
   let activeColIndex: number | null = null;
   let activeRowIndex: number | null = null;
@@ -102,132 +114,125 @@ const TableNode = (props: NodeProps): JSX.Element => {
   }
 
   // Duplicate header indices for column/row highlighting
-  const getDuplicateIndices = (arr: string[]): Set<number> => {
-    const counts = new Map<string, number>();
-    for (const v of arr) counts.set(v, (counts.get(v) ?? 0) + 1);
-    const res = new Set<number>();
-    arr.forEach((v, i) => {
-      if ((counts.get(v) ?? 0) > 1) res.add(i);
-    });
-    return res;
-  };
+  const dupColIndices = useMemo(
+    () => getDuplicateIndices(localSettings.colHeaders),
+    [localSettings.colHeaders],
+  );
+  const dupRowIndices = useMemo(
+    () => getDuplicateIndices(localSettings.rowHeaders),
+    [localSettings.rowHeaders],
+  );
 
-  const dupColIndices = getDuplicateIndices(localSettings.colHeaders);
-  const dupRowIndices = getDuplicateIndices(localSettings.rowHeaders);
+  // rowKeys and colKeys are derived for table rendering
+  const rowKeys = useMemo(
+    () => getStableKeys(localSettings.rowHeaders),
+    [localSettings.rowHeaders],
+  );
+  const colKeys = useMemo(
+    () => getStableKeys(localSettings.colHeaders),
+    [localSettings.colHeaders],
+  );
 
-  // Generate stable keys for headers by appending an occurrence count for duplicates
-  const getStableKeys = (arr: string[]): string[] => {
-    const counts = new Map<string, number>();
-    return arr.map((v) => {
-      const c = counts.get(v) ?? 0;
-      counts.set(v, c + 1);
-      return c === 0 ? v : `${v}#${c}`;
-    });
-  };
+  const updateParent = useCallback(
+    (newLocal: LocalSettings): void => {
+      // convert to numbers
+      const rowHeaders = newLocal.rowHeaders.map(v => Number.parseFloat(v));
+      const colHeaders = newLocal.colHeaders.map(v => Number.parseFloat(v));
+      const grid = newLocal.grid.map(row =>
+        row.map(cell => Number.parseFloat(cell)),
+      );
+      setNodeSettings(id, {rowHeaders, colHeaders, grid});
+    },
+    [id, setNodeSettings],
+  );
 
-  const colKeys = getStableKeys(localSettings.colHeaders);
-  const rowKeys = getStableKeys(localSettings.rowHeaders);
+  const handleRowHeaderChange = useCallback(
+    (index: number, e: ChangeEvent<HTMLInputElement>) => {
+      setLocalSettings((prev) => {
+        const ns = {...prev, rowHeaders: [...prev.rowHeaders]};
+        ns.rowHeaders[index] = e.target.value;
+        return ns;
+      });
+    },
+    [],
+  );
 
-  const updateParent = (newLocal: LocalSettings): void => {
-    // convert to numbers
-    const rowHeaders = newLocal.rowHeaders.map(v => Number.parseFloat(v));
-    const colHeaders = newLocal.colHeaders.map(v => Number.parseFloat(v));
-    const grid = newLocal.grid.map(row =>
-      row.map(cell => Number.parseFloat(cell)),
-    );
-    setNodeSettings(id, {rowHeaders, colHeaders, grid});
-  };
+  const handleColHeaderChange = useCallback(
+    (index: number, e: ChangeEvent<HTMLInputElement>) => {
+      setLocalSettings((prev) => {
+        const ns = {...prev, colHeaders: [...prev.colHeaders]};
+        ns.colHeaders[index] = e.target.value;
+        return ns;
+      });
+    },
+    [],
+  );
 
-  const handleRowHeaderChange = (
-    index: number,
-    e: ChangeEvent<HTMLInputElement>,
-  ) => {
-    const ns = {...localSettings};
-    ns.rowHeaders[index] = e.target.value;
-    setLocalSettings(ns);
-    updateParent(ns);
-  };
+  const handleCellChange = useCallback(
+    (r: number, c: number, e: ChangeEvent<HTMLInputElement>) => {
+      setLocalSettings((prev) => {
+        const ns = {...prev, grid: prev.grid.map(row => [...row])};
+        ns.grid[r][c] = e.target.value;
+        return ns;
+      });
+    },
+    [],
+  );
 
-  const handleColHeaderChange = (
-    index: number,
-    e: ChangeEvent<HTMLInputElement>,
-  ) => {
-    const ns = {...localSettings};
-    ns.colHeaders[index] = e.target.value;
-    setLocalSettings(ns);
-    updateParent(ns);
-  };
-
-  const handleCellChange = (
-    r: number,
-    c: number,
-    e: ChangeEvent<HTMLInputElement>,
-  ) => {
-    const ns = {
-      ...localSettings,
-      grid: localSettings.grid.map(row => [...row]),
-    };
-    ns.grid[r][c] = e.target.value;
-    setLocalSettings(ns);
-    updateParent(ns);
-  };
-
-  const addRow = () => {
+  const addRow = useCallback(() => {
     const ns = {...localSettings};
     const last =
       ns.rowHeaders.length > 0
         ? Number.parseFloat(ns.rowHeaders.at(-1) ?? '0')
         : 0;
-    const newHeader = (
-      Number.isFinite(last) ? last + 1 : ns.rowHeaders.length + 1
-    ).toString();
-    ns.rowHeaders.push(newHeader);
-    // Fill new row following pattern: value = min(rowHeader, colHeader)
-    const newHeaderNum = Number.parseFloat(newHeader);
+    const newHeader = Number.isFinite(last)
+      ? last + 1
+      : ns.rowHeaders.length + 1;
+    const newHeaderStr = newHeader.toString();
+    ns.rowHeaders.push(newHeaderStr);
+    const newHeaderNum = Number.parseFloat(newHeaderStr);
     ns.grid.push(
       ns.colHeaders.map(ch =>
         String(
           Number.isFinite(newHeaderNum)
             ? Math.min(newHeaderNum, Number.parseFloat(ch))
-            : newHeader,
+            : newHeaderStr,
         ),
       ),
     );
     setLocalSettings(ns);
-    updateParent(ns);
-  };
-  const removeRow = () => {
+  }, [localSettings]);
+  const removeRow = useCallback(() => {
     if (localSettings.rowHeaders.length === 0) return;
     const ns = {...localSettings};
     ns.rowHeaders.pop();
     ns.grid.pop();
     setLocalSettings(ns);
-    updateParent(ns);
-  };
-  const addCol = () => {
+  }, [localSettings]);
+  const addCol = useCallback(() => {
     const ns = {...localSettings};
     const last =
       ns.colHeaders.length > 0
         ? Number.parseFloat(ns.colHeaders.at(-1) ?? '0')
         : 0;
-    const newHeader = (
-      Number.isFinite(last) ? last + 1 : ns.colHeaders.length + 1
-    ).toString();
-    ns.colHeaders.push(newHeader);
-    const newHeaderNum = Number.parseFloat(newHeader);
+    const newHeader = Number.isFinite(last)
+      ? last + 1
+      : ns.colHeaders.length + 1;
+    const newHeaderStr = newHeader.toString();
+    ns.colHeaders.push(newHeaderStr);
+    const newHeaderNum = Number.parseFloat(newHeaderStr);
     ns.grid = ns.grid.map((row, ri) => {
       const rowNum = Number.parseFloat(ns.rowHeaders[ri] ?? '0');
       const newVal = String(
         Number.isFinite(newHeaderNum)
           ? Math.min(rowNum, newHeaderNum)
-          : newHeader,
+          : newHeaderStr,
       );
       return row.concat(newVal);
     });
     setLocalSettings(ns);
-    updateParent(ns);
-  };
-  const removeCol = () => {
+  }, [localSettings]);
+  const removeCol = useCallback(() => {
     if (localSettings.colHeaders.length === 0) return;
     const ns = {...localSettings};
     ns.colHeaders.pop();
@@ -237,8 +242,11 @@ const TableNode = (props: NodeProps): JSX.Element => {
       return r;
     });
     setLocalSettings(ns);
-    updateParent(ns);
-  };
+  }, [localSettings]);
+
+  useEffect(() => {
+    updateParent(localSettings);
+  }, [localSettings, updateParent]);
 
   return (
     <BaseNode {...props}>
@@ -341,7 +349,7 @@ const TableNode = (props: NodeProps): JSX.Element => {
                 if (isSelectedCell)
                   cellStyle.backgroundColor = theme.palette.success.light;
                 return (
-                  <td key={`${rowKeys[ri]}-${colKeys[ci]}`} style={cellStyle}>
+                  <td key={`${ri}-${ci}`} style={cellStyle}>
                     <input
                       style={{width: '40px'}}
                       value={localSettings.grid[ri]?.[ci] ?? ''}

@@ -249,24 +249,30 @@ const Graph = ({
       unsaved && currentLocation.pathname !== nextLocation.pathname
   );
 
-  const setNodeTitle = (id: string, title: string): void => {
-    setNodeData(oldNodeData => ({
-      ...oldNodeData,
-      [id]: {
-        ...oldNodeData[id],
-        title,
-      },
-    }));
-  };
-  const setNodeSettings = (id: string, settings: NodeSettings): void => {
-    setNodeData(oldNodeSettings => ({
-      ...oldNodeSettings,
-      [id]: {
-        ...oldNodeSettings[id],
-        settings,
-      },
-    }));
-  };
+  const setNodeTitle = useCallback(
+    (id: string, title: string): void => {
+      setNodeData(oldNodeData => ({
+        ...oldNodeData,
+        [id]: {
+          ...oldNodeData[id],
+          title,
+        },
+      }));
+    },
+    [setNodeData],
+  );
+  const setNodeSettings = useCallback(
+    (id: string, settings: NodeSettings): void => {
+      setNodeData(oldNodeSettings => ({
+        ...oldNodeSettings,
+        [id]: {
+          ...oldNodeSettings[id],
+          settings,
+        },
+      }));
+    },
+    [setNodeData],
+  );
 
   const updateValues = useCallback(
     (newEdges: Edge[] | null = null) => {
