@@ -24,16 +24,15 @@ export const initNodeValues = (
   nodes: TypedNode[],
   sourceValues: GraphSourceValue[]
 ): [boolean, NodeValues] => {
-  const nodeValues: NodeValues = {};
+  const nodeValues: NodeValues = {} as NodeValues;
   let valuesFound = false;
 
   for (const node of nodes) {
-    const nodeType = node.type!;
+    const nodeType = node.type;
     nodeValues[node.id] = initNode(nodeType).value;
     const nodeValue = nodeValues[node.id];
     if (nodeValue.type !== 'source') continue;
 
-    // Find matching course part from student data
     const sourceValue = sourceValues.find(
       source => node.id === `source-${source.id}`
     );
@@ -46,10 +45,6 @@ export const initNodeValues = (
   return [valuesFound, nodeValues];
 };
 
-/**
- * Calculates a new value for the node and sets it to the nodeValue parameter by
- * mutating it.
- */
 export const updateNodeValue = (
   nodeId: string,
   nodeValue: NodeValue,
@@ -58,8 +53,10 @@ export const updateNodeValue = (
   switch (nodeValue.type) {
     case 'addition': {
       let sum = 0;
-      for (const source of Object.values(nodeValue.sources))
-        sum += source.value;
+      for (const source of Object.values(nodeValue.sources)) {
+        if (!source.isConnected) continue;
+        if (typeof source.value === 'number') sum += source.value;
+      }
       nodeValue.value = sum;
       break;
     }
@@ -70,7 +67,7 @@ export const updateNodeValue = (
       for (const key of Object.keys(settings.weights)) {
         if (!(key in nodeValue.sources)) continue;
         const source = nodeValue.sources[key];
-        if (!source.isConnected) continue;
+        if (!source.isConnected || typeof source.value !== 'number') continue;
         valueSum += source.value * settings.weights[key];
         weightSum += settings.weights[key];
       }
@@ -116,12 +113,89 @@ export const updateNodeValue = (
     }
     case 'max': {
       const settings = nodeData[nodeId].settings as MaxNodeSettings;
-      let maxValue = settings.minValue;
+      const mode = (settings as unknown as {mode?: string}).mode ?? 'max';
 
-      for (const value of Object.values(nodeValue.sources)) {
-        if (value.isConnected) maxValue = Math.max(maxValue, value.value);
+      const rawBaseline = (settings as unknown as {minValue?: number | null}).minValue;
+      const baseline = typeof rawBaseline === 'number' && Number.isFinite(rawBaseline) ? rawBaseline : null;
+
+      // Collect numeric connected source values only.
+      const numericValues = Object.values(nodeValue.sources)
+        .filter(s => s.isConnected && typeof s.value === 'number')
+        .map(s => s.value);
+
+      if (mode === 'min') {
+        if (baseline === null) {
+          nodeValue.value = numericValues.length === 0 ? 0 : Math.min(...numericValues);
+        } else {
+          let minValue = baseline;
+          for (const v of numericValues) minValue = Math.min(minValue, v);
+          nodeValue.value = minValue;
+        }
+        break;
       }
-      nodeValue.value = maxValue;
+
+      if (mode === 'sum') {
+        let sum = baseline ?? 0;
+        for (const v of numericValues) sum += v;
+        nodeValue.value = sum;
+        break;
+      }
+
+      if (mode === 'average') {
+        const sum = numericValues.reduce((a, b) => a + b, 0);
+        const count = numericValues.length;
+        nodeValue.value = count === 0 ? baseline ?? 0 : sum / count;
+        break;
+      }
+
+      if (mode === 'median') {
+        if (numericValues.length === 0) {
+          nodeValue.value = baseline ?? 0;
+        } else {
+          const values = [...numericValues].sort((a, b) => a - b);
+          const mid = Math.floor(values.length / 2);
+          nodeValue.value =
+            values.length % 2 === 1
+              ? values[mid]
+              : (values[mid - 1] + values[mid]) / 2;
+        }
+        break;
+      }
+
+      if (mode === 'product') {
+        if (numericValues.length === 0) {
+          nodeValue.value = baseline ?? 1;
+        } else {
+          nodeValue.value = numericValues.reduce((acc, v) => acc * v, 1);
+        }
+        break;
+      }
+
+      if (mode === 'count') {
+        let count = 0;
+        if (baseline === null) count = numericValues.length;
+        else count = numericValues.filter(v => v >= baseline).length;
+        nodeValue.value = count === 0 ? baseline ?? 0 : count;
+        break;
+      }
+
+      if (mode === 'stdev') {
+        // Sample standard deviation (divide by n-1). If fewer than 2 numeric inputs, return 0.
+        const n = numericValues.length;
+        if (n < 2) {
+          nodeValue.value = 0;
+        } else {
+          const mean = numericValues.reduce((a, b) => a + b, 0) / n;
+          const variance = numericValues.reduce((acc, v) => acc + (v - mean) ** 2, 0) / (n - 1);
+          nodeValue.value = Math.sqrt(variance);
+        }
+        break;
+      }
+
+      // Default max behavior
+      let maxValue = baseline ?? -Infinity;
+      for (const v of numericValues) maxValue = Math.max(maxValue, v);
+      nodeValue.value = maxValue === -Infinity ? 0 : maxValue;
       break;
     }
     case 'minpoints': {

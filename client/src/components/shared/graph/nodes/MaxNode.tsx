@@ -16,7 +16,7 @@ import type {MaxNodeSettings, MaxNodeValue} from '@/common/types';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
-type LocalSettings = {minValue: string};
+type LocalSettings = {minValue: string; mode: MaxNodeSettings['mode']};
 const handleStartHeight = 83 + 33.9;
 const rowHeight = 33.9;
 
@@ -31,7 +31,8 @@ const MaxNode = (props: NodeProps): JSX.Element => {
   const settings = nodeData[id].settings as MaxNodeSettings;
 
   const [localSettings, setLocalSettings] = useState<LocalSettings>({
-    minValue: settings.minValue.toString(),
+    minValue: settings.minValue === null ? '' : settings.minValue.toString(),
+    mode: settings.mode ?? 'max',
   });
   const [nextFree, setNextFree] = useState<number>(0);
   const [handles, setHandles] = useState<string[]>([]);
@@ -47,7 +48,7 @@ const MaxNode = (props: NodeProps): JSX.Element => {
     let maxId = 0;
     let newHandles = [...handles];
     for (const [key, source] of Object.entries(nodeValue.sources)) {
-      maxId = Math.max(maxId, parseInt(key.split('-').at(-1)!));
+      maxId = Math.max(maxId, Number.parseInt(key.split('-').at(-1)!));
       if (!handles.includes(key)) {
         newHandles.push(key);
         change = true;
@@ -69,15 +70,31 @@ const MaxNode = (props: NodeProps): JSX.Element => {
     newLocalSettings.minValue = event.target.value;
     setLocalSettings(newLocalSettings);
 
-    // Check if is not valid float
-    if (!/^\d+(?:\.\d+?)?$/.test(event.target.value)) {
+    // Allow empty (means null baseline) or a signed float
+    if (event.target.value !== '' && !/^-?\d+(?:\.\d+)?$/.test(event.target.value)) {
       setError(true);
       return;
     }
     setError(false);
 
     setLocalSettings(newLocalSettings);
-    setNodeSettings(id, {minValue: parseFloat(newLocalSettings.minValue)});
+    setNodeSettings(id, {
+      minValue: newLocalSettings.minValue === '' ? null : Number.parseFloat(newLocalSettings.minValue),
+      mode: newLocalSettings.mode,
+    });
+  };
+
+  const handleModeChange = (event: ChangeEvent<HTMLSelectElement>): void => {
+    const newMode = event.target.value;
+    const newLocalSettings = {...localSettings, mode: newMode as MaxNodeSettings['mode']};
+    setLocalSettings(newLocalSettings);
+    setNodeSettings(id, {
+      minValue:
+        newLocalSettings.minValue === ''
+          ? null
+          : Number.parseFloat(newLocalSettings.minValue),
+      mode: newMode as MaxNodeSettings['mode'],
+    });
   };
 
   let selectedIndex = -1;
@@ -136,12 +153,30 @@ const MaxNode = (props: NodeProps): JSX.Element => {
             }}
           >
             <td>
-              <input
-                style={{width: '50px'}}
-                onChange={handleChange}
-                type="number"
-                value={localSettings.minValue}
-              />
+              <div
+                style={{display: 'flex', gap: '6px', alignItems: 'center'}}
+              >
+                <select value={localSettings.mode} onChange={handleModeChange}>
+                  <option value="max">{t('shared.graph.node.mode.max')}</option>
+                  <option value="min">{t('shared.graph.node.mode.min')}</option>
+                  <option value="sum">{t('shared.graph.node.mode.sum')}</option>
+                  <option value="average">{t('shared.graph.node.mode.average')}</option>
+                  <option value="median">{t('shared.graph.node.mode.median')}</option>
+                  <option value="product">{t('shared.graph.node.mode.product')}</option>
+                  <option value="count">{t('shared.graph.node.mode.count')}</option>
+                  <option value="stdev">{t('shared.graph.node.mode.stdev')}</option>
+                </select>
+                {['min', 'sum', 'count', 'max'].includes(localSettings.mode ?? 'max') && (
+                  <input
+                    title={t('shared.graph.node.baseline-tooltip')}
+                    placeholder=""
+                    style={{width: '50px'}}
+                    onChange={handleChange}
+                    type="number"
+                    value={localSettings.minValue}
+                  />
+                )}
+              </div>
             </td>
           </tr>
 
