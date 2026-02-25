@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2026 The Ossi Developers
+//
 // SPDX-License-Identifier: MIT
 
 export const getDuplicateIndices = (arr: string[]): Set<number> => {
