@@ -52,8 +52,8 @@ import {
   getErrorCount,
   getMaxFinalGrade,
 } from '@/utils';
-import AplusImportDialog from './AplusImportDialog';
 import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
+import ImportGradesDialog from './ImportGradesDialog';
 import SisuDownloadDialog from './SisuDownloadDialog';
 import UploadDialog from './upload/UploadDialog';
 
@@ -363,7 +363,7 @@ const GradesTableToolbar = (): JSX.Element => {
   const [showSisuDialog, setShowSisuDialog] = useState<boolean>(false);
   const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
-  const [aplusImportDialogOpen, setAplusImportDialogOpen] = useState<boolean>(false);
+  const [importDialogOpen, setImportDialogOpen] = useState<boolean>(false);
   // Set initial search value from query param (only on first render)
   const [searchValue, setSearchValue] = useState<string>(initialSearch);
   // Keep table global filter in sync with searchValue
@@ -385,10 +385,21 @@ const GradesTableToolbar = (): JSX.Element => {
     [auth?.role, isTeacherInCharge]
   );
 
-  const hasAplusSources = useMemo(
+  // const hasAplusSources = useMemo(
+  //   () =>
+  //     courseTasks.data?.some(
+  //       task => !task.archived && (task.aplusGradeSources ?? []).length > 0
+  //     ),
+  //   [courseTasks.data]
+  // );
+
+  const hasImportSources = useMemo(
     () =>
       courseTasks.data?.some(
-        task => !task.archived && task.aplusGradeSources.length > 0
+        task =>
+          !task.archived
+          && ((task.aplusGradeSources?.length ?? 0) > 0
+            || (task.externalSources?.length ?? 0) > 0)
       ),
     [courseTasks.data]
   );
@@ -492,9 +503,9 @@ const GradesTableToolbar = (): JSX.Element => {
   return (
     <>
       <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} />
-      <AplusImportDialog
-        open={aplusImportDialogOpen}
-        onClose={() => setAplusImportDialogOpen(false)}
+      <ImportGradesDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
       />
       <CalculateFinalGradesDialog
         key={showCalculateDialog}
@@ -534,7 +545,7 @@ const GradesTableToolbar = (): JSX.Element => {
               >
                 {t('course.results.add-grades-manually')}
               </Button>
-              <Tooltip
+              {/* <Tooltip
                 title={
                   hasAplusSources
                     ? t('course.results.import-from-aplus')
@@ -550,6 +561,26 @@ const GradesTableToolbar = (): JSX.Element => {
                     color="primary"
                   >
                     {t('course.results.import-from-aplus')}
+                  </Button>
+                </span>
+              </Tooltip> */}
+              <Tooltip
+                placement="top"
+                title={
+                  hasImportSources
+                    ? t('course.results.import-from-services')
+                    : t('course.results.no-service-sources')
+                }
+              >
+                <span>
+                  <Button
+                    variant="tonal"
+                    onClick={() => setImportDialogOpen(true)}
+                    startIcon={<Add />}
+                    color="primary"
+                    disabled={!hasImportSources}
+                  >
+                    {t('course.results.import-from-services')}
                   </Button>
                 </span>
               </Tooltip>

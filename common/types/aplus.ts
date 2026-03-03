@@ -18,7 +18,7 @@ export const AplusCourseDataSchema = z.object({
   courseCode: z.string(),
   name: z.string(),
   instance: z.string(),
-  url: z.url(),
+  url: z.url().optional(),
 });
 export const AplusCourseDataArraySchema = z.array(AplusCourseDataSchema);
 
@@ -41,7 +41,7 @@ const AplusDifficultySchema = z.strictObject({
   maxGrade: z.number().int(),
 });
 
-export const AplusExerciseDataSchema = z.strictObject({
+export const AplusExerciseDataSchema = z.object({
   maxGrade: z.number().int(),
   modules: z.array(AplusModuleSchema),
   difficulties: z.array(AplusDifficultySchema),

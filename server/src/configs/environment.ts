@@ -61,6 +61,32 @@ QV0NJbg56kdCQAMOkRnJAV5fBFM7sKR9PdNzf8kvXBjnQkuL6wupR0f47ev6QhAQ
 r8eNaAVPkg0BnKCJYtrTkTXoJ9PGTWalth59qWMHfWByvyAu7LZ0FgCwWKHAJSMv
 RxouvV5JHszKuMt0iNqqSR+/KKx5OA==
 -----END PRIVATE KEY-----`.trim();
+/** Mock key to use in development */
+const devSamlCert = `
+-----BEGIN CERTIFICATE-----
+MIIDxzCCAq+gAwIBAgIUdUHSbqpg7BqLVHumIy2FCNXZSY0wDQYJKoZIhvcNAQEL
+BQAwczELMAkGA1UEBhMCZmkxEDAOBgNVBAgMB0ZpbmxhbmQxDjAMBgNVBAcMBUFh
+bHRvMQ4wDAYDVQQKDAVBYWx0bzEOMAwGA1UECwwFQWFsdG8xDTALBgNVBAMMBG9z
+c2kxEzARBgkqhkiG9w0BCQEWBG9zc2kwHhcNMjYwMTIzMTIwNjAyWhcNMjYwMjIy
+MTIwNjAyWjBzMQswCQYDVQQGEwJmaTEQMA4GA1UECAwHRmlubGFuZDEOMAwGA1UE
+BwwFQWFsdG8xDjAMBgNVBAoMBUFhbHRvMQ4wDAYDVQQLDAVBYWx0bzENMAsGA1UE
+AwwEb3NzaTETMBEGCSqGSIb3DQEJARYEb3NzaTCCASIwDQYJKoZIhvcNAQEBBQAD
+ggEPADCCAQoCggEBALyxqFTD8LGLNGbjMW6oUiMr4L45tfAdvQkKaXcIE8lEZZpH
+wz4zfP/yZiVzI/qflGQNcHy68eGrEbV+i3/GC6qUec1Yo6zsKtZi9KU3U2G62On5
+BCwmymus0l94nQHO0k7rWBPy1oQ6VQHtAxlLc35Lu4Juld9/d+kIdheE5263Dqb+
+o1REHqY74k4qfqunen+0SZC0Yq3f8Gtuu7oPsHGFQ1JAp7yvYjnkoMiyaU1a9Inf
+Q2uM1ncPOoEmnGm2uBBzL9/J+odudLj7UCZhtqhUxmZ1jgzJvA/FcppXM13quByg
+HE7ej1V9z/kCZSv1zoeYTZ4xDtFInpZUhpjeXXECAwEAAaNTMFEwHQYDVR0OBBYE
+FPYRmT60pnHFRXTIimPJMOxjcNWzMB8GA1UdIwQYMBaAFPYRmT60pnHFRXTIimPJ
+MOxjcNWzMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAIubpdgG
++Eb5MH4PxFrgeudVh/Y5sF5QQ1q8R81MLQ2G6bDdnLDbtzUt67o0DIlUIUzKK6d3
+Psub2k07veuOgqeRe58RqRculY5141BcsFmaGWvgPG4y4RZzj182RYLXOnDdrVdY
+IX+J3ZvTispxy3JVldaCsDtwb76RIX3AI61znK1ka4guDviWSwZrWl9zha2hIwvU
+T3dU+/g0gvPPcL5LoMhMbHpCMWF5bZWC1C1gv7i6dWPkdQVA47O9P8WOeRzQ8Mng
+Ulj0MuI8ZEBfXMkzNoLo7udoks05gnjeaM/4SLNXBTUeul4wkElazLBK5TtP9PXF
+kVJLDlZzpS1NfrU=
+-----END CERTIFICATE-----
+`.trim();
 
 /** Mock key to use in development */
 export const DEV_SAML_IDP_CERT: string = `
@@ -106,6 +132,8 @@ const defaults = {
   samlIssuer: 'https://aalto-grades.cs.aalto.fi',
   samlMetadataUrl: 'https://devel.idp.aalto.fi/idp/shibboleth',
   aPlusApiUrl: 'https://plus.cs.aalto.fi/api/v2',
+  myCoursesApiUrl: 'https://mycourses-test.aalto.fi/webservice/rest/server.php',
+  // myCoursesApiUrl: 'http://localhost/webservice/rest/server.php',
 
   // Hardcoded because production docker compose always copies to the same filename
   samlDecryptionKeyFile: '/keys/saml-decryption-key.pem',
@@ -168,7 +196,7 @@ export const SAML_METADATA_URL: string =
   process.env.SAML_METADATA_URL || defaults.samlMetadataUrl;
 
 // Default to dev key
-let SAML_DECRYPTION_PVK: string = devSamlKey;
+let SAML_DECRYPTION_PVK: string = devSamlCert;
 let SAML_PRIVATE_KEY: string = devSamlKey;
 try {
   SAML_DECRYPTION_PVK = readFileSync(defaults.samlDecryptionKeyFile, 'utf8');
@@ -179,9 +207,10 @@ try {
 }
 export {SAML_DECRYPTION_PVK, SAML_PRIVATE_KEY};
 
-export const SAML_SP_CERT_FILE = defaults.samlSpCertFile;
+export const SAML_SP_CERT_FILE = process.env.SAML_SP_CERT_FILE || defaults.samlSpCertFile;
 
 export const APLUS_API_URL = process.env.APLUS_API_URL || defaults.aPlusApiUrl;
+export const MYCOURSES_API_URL = process.env.MYCOURSES_API_URL || defaults.myCoursesApiUrl;
 
 export const SISU_API_URL: string =
   process.env.SISU_API_URL || defaults.sisuApiUrl;

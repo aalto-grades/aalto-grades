@@ -16,52 +16,58 @@ import {useParams} from 'react-router-dom';
 import type {
   AplusCourseData,
   EditCourseTaskData,
-  NewAplusGradeSourceData,
+  ExtServiceExerciseData,
   NewCourseTaskData,
+  NewExtServiceGradeSourceData,
 } from '@/common/types';
-import {aplusGradeSourcesEqual} from '@/common/util';
-import TokenDialog from '@/components/shared/auth/TokenDialog';
-import {
-  useAddAplusGradeSources,
-  useFetchAplusCourses,
-  useModifyCourseTasks,
-} from '@/hooks/useApi';
-import {getToken} from '@/utils';
-import CreateAplusCourseTasks from './aplus-components/CreateAplusCourseTasks';
-import SelectAplusCourse from './aplus-components/SelectAplusCourse';
-import SelectAplusGradeSources from './aplus-components/SelectAplusGradeSources';
+import CreateServiceCourseTasks from '@/components/course/course-parts-view/services-components/CreateServiceCourseTasks';
+import SelectServiceCourse from '@/components/course/course-parts-view/services-components/SelectServiceCourse';
+import SelectServiceGradeSources from '@/components/course/course-parts-view/services-components/SelectServiceGradeSources';
+import ServiceTokenDialog from '@/components/shared/auth/ServiceTokenDialog';
+import {useAddExtServiceGradeSources, useFetchExtServiceCourses} from '@/hooks/api/extServices';
+import {useModifyCourseTasks} from '@/hooks/useApi';
+import {getServiceToken} from '@/utils';
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
   coursePartId: number | null;
+  serviceInfo: {id: string; label: string; tokenLink: string};
 };
 
-const NewAplusCourseTasksDialog = ({
+export const NewServiceCourseTasksDialog = ({
   open,
   onClose,
   coursePartId,
+  serviceInfo,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
-  const aplusCourses = useFetchAplusCourses({
-    enabled: Boolean(getToken()),
+  const serviceCourses = useFetchExtServiceCourses(serviceInfo, {
+    enabled: Boolean(getServiceToken(serviceInfo.id)),
   });
   const modifyCourseTasks = useModifyCourseTasks(courseId);
-  const addAplusGradeSources = useAddAplusGradeSources(courseId);
+  // const addAplusGradeSources = useAddAplusGradeSources(courseId);
+  const addExtServiceGradeSources = useAddExtServiceGradeSources(
+    serviceInfo,
+    courseId,
+  );
 
   const [step, setStep] = useState<number>(0);
-  const [aplusCourse, setAplusCourse] = useState<AplusCourseData | null>(null);
+  const [serviceCourse, setServiceCourse] = useState<AplusCourseData | null>(
+    null,
+  );
 
   const [newTasks, setNewTasks] = useState<
-    [NewCourseTaskData, NewAplusGradeSourceData][]
+    [NewCourseTaskData, NewExtServiceGradeSourceData][]
   >([]);
 
-  const aplusTokenDialogOpen = open && (!getToken() || aplusCourses.isError);
+  const serviceTokenDialogOpen =
+    open && (!getServiceToken(serviceInfo.id) || serviceCourses.isError);
 
   const handleResetAndClose = (): void => {
     setStep(0);
-    setAplusCourse(null);
+    setServiceCourse(null);
     setNewTasks([]);
     onClose();
   };
@@ -70,10 +76,22 @@ const NewAplusCourseTasksDialog = ({
     checked: boolean,
     name: string,
     maxGrade: number,
-    source: NewAplusGradeSourceData
+    source: ExtServiceExerciseData[number]['items'][number],
+    // source: ExtServiceExerciseData[0]['items'][number],
   ): void => {
+    if (serviceCourse === null) {
+      return;
+    }
+
+    const newSource: NewExtServiceGradeSourceData = {
+      id: source.id,
+      sourceType: source.sourceType,
+      itemname: source.itemname ?? '',
+      extServiceCourse: serviceCourse,
+      courseTaskId: 0,
+    };
+
     if (checked) {
-      // Cannot use concat for some reason
       setNewTasks(oldTasks => [
         ...oldTasks,
         [
@@ -83,21 +101,21 @@ const NewAplusCourseTasksDialog = ({
             daysValid: null,
             maxGrade: maxGrade,
           },
-          source,
+          newSource,
         ],
       ]);
     } else {
       setNewTasks(oldTasks =>
         oldTasks.filter(
-          ([_, oldSource]) => !aplusGradeSourcesEqual(oldSource, source)
-        )
+          ([_, oldSource]) => oldSource.id !== newSource.id,
+        ),
       );
     }
   };
 
   const handleCourseTaskChange = (
     index: number,
-    courseTaskEdit: Omit<EditCourseTaskData, 'id'>
+    courseTaskEdit: Omit<EditCourseTaskData, 'id'>,
   ): void => {
     setNewTasks(
       newTasks.map(([courseTask, source], i) => {
@@ -119,7 +137,7 @@ const NewAplusCourseTasksDialog = ({
           ];
         }
         return [courseTask, source];
-      })
+      }),
     );
   };
 
@@ -133,42 +151,48 @@ const NewAplusCourseTasksDialog = ({
       courseTaskId,
     }));
 
-    await addAplusGradeSources.mutateAsync(newSources);
+    await addExtServiceGradeSources.mutateAsync(newSources);
   };
 
   return (
     <>
-      <TokenDialog
-        open={open && aplusTokenDialogOpen}
+      <ServiceTokenDialog
+        open={open && serviceTokenDialogOpen}
         onClose={onClose}
         onSubmit={() => {
-          aplusCourses.refetch();
+          serviceCourses.refetch();
         }}
-        error={aplusCourses.isError}
+        serviceInfo={serviceInfo}
+        error={serviceCourses.isError}
       />
       <Dialog
-        open={open && !aplusTokenDialogOpen}
+        open={open && !serviceTokenDialogOpen}
         onClose={handleResetAndClose}
         maxWidth="md"
         fullWidth
       >
         {step === 0 && (
           <>
-            <DialogTitle>{t('general.a+-courses')}</DialogTitle>
+            <DialogTitle>
+              {t('course.parts.external-source.add')}
+            </DialogTitle>
             <DialogContent>
-              {aplusCourses.data !== undefined && (
-                <SelectAplusCourse
-                  aplusCourses={aplusCourses.data}
-                  selectedAplusCourse={aplusCourse}
+              {serviceCourses.data !== undefined && (
+                <SelectServiceCourse
+                  aplusCourses={serviceCourses.data}
+                  selectedAplusCourse={serviceCourse}
                   setAplusCourse={(course) => {
-                    setAplusCourse(course);
+                    setServiceCourse(course);
                     if (course) setNewTasks([]);
                   }}
                 />
               )}
             </DialogContent>
             <DialogActions>
-              <Button disabled={!aplusCourse} onClick={() => setStep(step + 1)}>
+              <Button
+                disabled={!serviceCourse}
+                onClick={() => setStep(step + 1)}
+              >
                 {t('general.next')}
               </Button>
             </DialogActions>
@@ -177,11 +201,14 @@ const NewAplusCourseTasksDialog = ({
 
         {step === 1 && (
           <>
-            <DialogTitle>{t('course.parts.select-grade-sources')}</DialogTitle>
+            <DialogTitle>
+              {t('course.parts.external-source.select-course-tasks')}
+            </DialogTitle>
             <DialogContent>
-              {aplusCourse !== null && (
-                <SelectAplusGradeSources
-                  aplusCourse={aplusCourse}
+              {serviceCourse !== null && (
+                <SelectServiceGradeSources
+                  serviceInfo={serviceInfo}
+                  aplusCourse={serviceCourse}
                   selectedGradeSources={newTasks.map(([_, s]) => s)}
                   handleChange={handleSelectionChange}
                 />
@@ -205,8 +232,8 @@ const NewAplusCourseTasksDialog = ({
           <>
             <DialogTitle>{t('course.parts.create-tasks')}</DialogTitle>
             <DialogContent>
-              {aplusCourse !== null && (
-                <CreateAplusCourseTasks
+              {serviceCourse !== null && (
+                <CreateServiceCourseTasks
                   courseTasksWithSource={newTasks}
                   handleChange={handleCourseTaskChange}
                 />
@@ -231,5 +258,4 @@ const NewAplusCourseTasksDialog = ({
     </>
   );
 };
-
-export default NewAplusCourseTasksDialog;
+export default NewServiceCourseTasksDialog;

@@ -14,6 +14,7 @@ import {
 import {sequelize} from '..';
 import AplusGradeSource from './aplusGradeSource';
 import CourseTask from './courseTask';
+import ExternalSource from './externalSource';
 import User from './user';
 
 export default class TaskGrade extends Model<
@@ -24,10 +25,14 @@ export default class TaskGrade extends Model<
   declare userId: ForeignKey<User['id']>;
   declare courseTaskId: ForeignKey<CourseTask['id']>;
   declare graderId: ForeignKey<User['id']>;
+  /**
+    * @deprecated, use externalSourceId instead
+    */
   declare aplusGradeSourceId: CreationOptional<ForeignKey<
     AplusGradeSource['id']
   > | null>;
 
+  declare externalSourceId: CreationOptional<ForeignKey<ExternalSource['id']> | null>;
   declare grade: number;
   // Date when course part is completed (e.g., deadline or exam date)
   declare date: Date | string; // Database outputs 'yyyy-mm-dd' but inserting date is allowed
@@ -39,6 +44,7 @@ export default class TaskGrade extends Model<
   User?: User;
   CourseTask?: CourseTask;
   AplusGradeSource?: AplusGradeSource;
+  ExternalSource?: ExternalSource;
 }
 
 TaskGrade.init(
@@ -77,6 +83,14 @@ TaskGrade.init(
       allowNull: true,
       references: {
         model: 'aplus_grade_source',
+        key: 'id',
+      },
+    },
+    externalSourceId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'external_source',
         key: 'id',
       },
     },
@@ -126,3 +140,9 @@ AplusGradeSource.hasMany(TaskGrade, {
   onUpdate: 'CASCADE',
 });
 TaskGrade.belongsTo(AplusGradeSource, {foreignKey: 'aplusGradeSourceId'});
+
+ExternalSource.hasMany(TaskGrade, {
+  onDelete: 'SET NULL',
+  onUpdate: 'CASCADE',
+});
+TaskGrade.belongsTo(ExternalSource, {foreignKey: 'externalSourceId'});

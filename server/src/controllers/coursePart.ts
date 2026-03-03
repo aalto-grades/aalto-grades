@@ -11,14 +11,14 @@ import {
   type NewCoursePartData,
 } from '@/common/types';
 import {sequelize} from '../database';
-import CoursePart from '../database/models/coursePart';
-import GradingModel from '../database/models/gradingModel';
 import {ApiError, type Endpoint} from '../types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {
   getAllCourseCourseParts,
   validateCoursePartPath,
 } from './utils/coursePart';
+import CoursePart from '../database/models/coursePart';
+import GradingModel from '../database/models/gradingModel';
 
 /**
  * () => CoursePartData[]

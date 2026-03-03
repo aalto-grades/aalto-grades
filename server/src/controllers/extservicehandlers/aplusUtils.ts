@@ -7,8 +7,6 @@ import type {Request} from 'express';
 import {z} from 'zod';
 
 import {type AplusGradeSourceData, HttpCode} from '@/common/types';
-import {findAndValidateCourseId} from './course';
-import {validateCourseTaskBelongsToCourse} from './courseTask';
 import {AXIOS_TIMEOUT} from '../../configs/constants';
 import httpLogger from '../../configs/winston';
 import AplusGradeSource from '../../database/models/aplusGradeSource';
@@ -16,19 +14,25 @@ import type Course from '../../database/models/course';
 import {
   ApiError,
   createAplusPaginationSchema,
+  normalizeStringParam,
   stringToIdSchema,
 } from '../../types';
+import {findAndValidateCourseId} from '../utils/course';
+import {validateCourseTaskBelongsToCourse} from '../utils/courseTask';
 
 /**
  * Validates A+ course ID url param and returns it as a number.
  *
  * @throws ApiError(400) if invalid.
  */
-export const validateAplusCourseId = (aplusCourseId: string): number => {
-  const result = stringToIdSchema.safeParse(aplusCourseId);
+export const validateAplusCourseId = (
+  aplusCourseId: string | string[]
+): number => {
+  const parsedAplusCourseId = normalizeStringParam(aplusCourseId);
+  const result = stringToIdSchema.safeParse(parsedAplusCourseId);
   if (!result.success) {
     throw new ApiError(
-      `Invalid A+ course ID ${aplusCourseId}`,
+      `Invalid A+ course ID ${parsedAplusCourseId}`,
       HttpCode.BadRequest
     );
   }
@@ -41,12 +45,12 @@ export const validateAplusCourseId = (aplusCourseId: string): number => {
  * @throws ApiError(400) if not found.
  */
 const findAplusGradeSourceById = async (
-  aplusGradeSourceId: number
+  externalGradeSourceId: number
 ): Promise<AplusGradeSource> => {
-  const aplusGradeSource = await AplusGradeSource.findByPk(aplusGradeSourceId);
+  const aplusGradeSource = await AplusGradeSource.findByPk(externalGradeSourceId);
   if (aplusGradeSource === null) {
     throw new ApiError(
-      `A+ grade source with ID ${aplusGradeSourceId} not found`,
+      `A+ grade source with ID ${externalGradeSourceId} not found`,
       HttpCode.NotFound
     );
   }
@@ -58,13 +62,14 @@ const findAplusGradeSourceById = async (
  *
  * @throws ApiError(400|404) if invalid or not found.
  */
-const findAndValidateAplusGradeSourceId = async (
-  aplusGradeSourceId: string
+const findAndValidateexternalGradeSourceId = async (
+  externalGradeSourceId: string | string[]
 ): Promise<AplusGradeSource> => {
-  const result = stringToIdSchema.safeParse(aplusGradeSourceId);
+  const parsedexternalGradeSourceId = normalizeStringParam(externalGradeSourceId);
+  const result = stringToIdSchema.safeParse(parsedexternalGradeSourceId);
   if (!result.success) {
     throw new ApiError(
-      `Invalid A+ grade source ID ${aplusGradeSourceId}`,
+      `Invalid A+ grade source ID ${parsedexternalGradeSourceId}`,
       HttpCode.BadRequest
     );
   }
@@ -78,12 +83,12 @@ const findAndValidateAplusGradeSourceId = async (
  *   does not belong to the course.
  */
 export const validateAplusGradeSourcePath = async (
-  courseId: string,
-  aplusGradeSourceId: string
+  courseId: string | string[],
+  externalGradeSourceId: string | string[]
 ): Promise<[Course, AplusGradeSource]> => {
   const course = await findAndValidateCourseId(courseId);
   const aplusGradeSource =
-    await findAndValidateAplusGradeSourceId(aplusGradeSourceId);
+    await findAndValidateexternalGradeSourceId(externalGradeSourceId);
 
   await validateCourseTaskBelongsToCourse(
     course.id,
@@ -101,9 +106,9 @@ export const validateAplusGradeSourcePath = async (
  */
 export const validateAplusGradeSourceBelongsToCourseTask = async (
   courseTaskId: number,
-  aplusGradeSourceId: number
+  externalGradeSourceId: number
 ): Promise<void> => {
-  const aplusGradeSource = await findAplusGradeSourceById(aplusGradeSourceId);
+  const aplusGradeSource = await findAplusGradeSourceById(externalGradeSourceId);
   if (aplusGradeSource.courseTaskId !== courseTaskId) {
     throw new ApiError(
       `A+ grade source with ID ${aplusGradeSource.id} `
@@ -143,7 +148,7 @@ export const parseAplusToken = (req: Request): string => {
 
   const authArray = auth.split(' ');
   const result = z
-    .tuple([z.literal('Aplus-Token'), z.string().length(40)])
+    .tuple([z.literal('aplus-Token'), z.string().length(40)])
     .safeParse(authArray);
   if (!result.success) {
     throw new ApiError(result.error.message, HttpCode.BadRequest);
@@ -164,15 +169,13 @@ export const fetchFromAplus = async <T>(
 ): Promise<T> => {
   httpLogger.http(`Calling A+ With "GET ${url}"`);
 
-  const result = schema.safeParse(
-    (
-      await axios.get<T>(url, {
-        timeout: AXIOS_TIMEOUT,
-        validateStatus: (status: number) => status === 200,
-        headers: {Authorization: `Token ${aplusToken}`},
-      })
-    ).data
-  );
+  const queryRes = await axios.get<T>(url, {
+    timeout: AXIOS_TIMEOUT,
+    validateStatus: (status: number) => status === 200,
+    headers: {Authorization: `Token ${aplusToken}`},
+  });
+  console.log('I got', queryRes.data);
+  const result = schema.safeParse(queryRes.data);
 
   if (!result.success) {
     throw new ApiError(

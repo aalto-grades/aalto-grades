@@ -5,7 +5,12 @@
 import {HttpCode} from '@/common/types';
 import CourseRole from '../../database/models/courseRole';
 import User from '../../database/models/user';
-import {ApiError, type JwtClaims, stringToIdSchema} from '../../types';
+import {
+  ApiError,
+  type JwtClaims,
+  normalizeStringParam,
+  stringToIdSchema,
+} from '../../types';
 
 /**
  * Finds a user by its ID.
@@ -25,10 +30,13 @@ export const findUserById = async (userId: number): Promise<User> => {
  *
  * @throws ApiError(400|404) if invalid or not found.
  */
-export const findAndValidateUserId = async (userId: string): Promise<User> => {
-  const result = stringToIdSchema.safeParse(userId);
+export const findAndValidateUserId = async (
+  userId: string | string[]
+): Promise<User> => {
+  const parsedUserId = normalizeStringParam(userId);
+  const result = stringToIdSchema.safeParse(parsedUserId);
   if (!result.success) {
-    throw new ApiError(`Invalid user id ${userId}`, HttpCode.BadRequest);
+    throw new ApiError(`Invalid user id ${parsedUserId}`, HttpCode.BadRequest);
   }
   return findUserById(result.data);
 };
@@ -38,10 +46,13 @@ export const findAndValidateUserId = async (userId: string): Promise<User> => {
  *
  * @throws ApiError(400|404) if invalid or user not found.
  */
-export const validateUserId = async (userId: string): Promise<number> => {
-  const result = stringToIdSchema.safeParse(userId);
+export const validateUserId = async (
+  userId: string | string[]
+): Promise<number> => {
+  const parsedUserId = normalizeStringParam(userId);
+  const result = stringToIdSchema.safeParse(parsedUserId);
   if (!result.success) {
-    throw new ApiError(`Invalid user id ${userId}`, HttpCode.BadRequest);
+    throw new ApiError(`Invalid user id ${parsedUserId}`, HttpCode.BadRequest);
   }
   await findUserById(result.data);
   return result.data;

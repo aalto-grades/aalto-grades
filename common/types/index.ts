@@ -7,6 +7,7 @@ export * from './auth';
 export * from './course';
 export * from './coursePart';
 export * from './courseTask';
+export * from './extServices';
 export * from './finalGrade';
 export * from './general';
 export * from './gradingModel';

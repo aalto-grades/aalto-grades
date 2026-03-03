@@ -1,60 +1,58 @@
-// SPDX-FileCopyrightText: 2024 The Ossi Developers
+// SPDX-FileCopyrightText: 2026 The Ossi Developers
 //
 // SPDX-License-Identifier: MIT
 
 import express, {Router} from 'express';
 
-import {CourseRoleType, NewAplusGradeSourceArraySchema} from '@/common/types';
+import {CourseRoleType} from '@/common/types';
 import {
-  addAplusGradeSources,
-  deleteAplusGradeSource,
-  fetchAplusCourses,
-  fetchAplusExerciseData,
-  fetchAplusGrades,
-} from '../controllers/aplus';
+  addServiceGradeSources,
+  deleteServiceGradeSource,
+  fetchServiceCourses,
+  fetchServiceExerciseData,
+  fetchServiceGrades,
+} from '../controllers/extService';
 import {handleInvalidRequestJson} from '../middleware';
 import {apiKeyAuthentication, jwtAuthentication} from '../middleware/authentication';
 import {courseAuthorization} from '../middleware/authorization';
 import {controllerDispatcher} from '../middleware/errorHandler';
-import {processRequestBody} from '../middleware/zodValidation';
 
 export const router = Router();
 
 router.get(
-  '/v1/aplus/courses',
+  '/v1/ext-source/:serviceName/courses',
   apiKeyAuthentication,
   jwtAuthentication,
-  controllerDispatcher(fetchAplusCourses)
+  controllerDispatcher(fetchServiceCourses),
 );
 
 router.get(
-  '/v1/aplus/courses/:aplusCourseId',
+  '/v1/ext-source/:serviceName/courses/:serviceCourseId',
   apiKeyAuthentication,
   jwtAuthentication,
-  controllerDispatcher(fetchAplusExerciseData)
+  controllerDispatcher(fetchServiceExerciseData),
 );
 
 router.post(
-  '/v1/courses/:courseId/aplus-sources',
+  '/v1/ext-source/:serviceName/courses/:courseId/sources',
   jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher]),
   express.json(),
   handleInvalidRequestJson,
-  processRequestBody(NewAplusGradeSourceArraySchema),
-  controllerDispatcher(addAplusGradeSources)
+  controllerDispatcher(addServiceGradeSources),
 );
 
 router.delete(
-  '/v1/courses/:courseId/aplus-sources/:aplusGradeSourceId',
+  '/v1/ext-source/:serviceName/courses/:courseId/sources/:externalSourceId',
   jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher]),
-  controllerDispatcher(deleteAplusGradeSource)
+  controllerDispatcher(deleteServiceGradeSource),
 );
 
 router.get(
-  '/v1/courses/:courseId/aplus-fetch',
+  '/v1/ext-source/:serviceName/courses/:courseId/fetch',
   apiKeyAuthentication,
   jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
-  controllerDispatcher(fetchAplusGrades)
+  controllerDispatcher(fetchServiceGrades),
 );

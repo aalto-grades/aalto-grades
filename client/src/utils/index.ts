@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-export * from './aplus';
 export * from './bestGrade';
+export * from './servicesSource';
 export * from './table';
 export * from './textFormat';
 export * from './utils';
