@@ -6,23 +6,12 @@ import {Handle, type NodeProps, Position} from '@xyflow/react';
 import {type ChangeEvent, type JSX, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
+import type {MathNodeSettings, MathNodeValue} from '@/common/types';
 import OutputValue from '@/components/shared/graph/nodes/parts/OutputValue';
 import {NodeDataContext, NodeValuesContext} from '@/context/GraphProvider';
 import BaseNode from './BaseNode';
 
-type MathOperator = 'add' | 'sub' | 'mul' | 'div' | 'rem' | 'pow';
-
-interface MathNodeSettings {
-  operand: number;
-  operator: MathOperator;
-}
-
-interface MathNodeValue {
-  type: 'math';
-  value: number;
-}
-
-type LocalSettings = {operand: string; operator: MathOperator};
+type LocalSettings = {operand: string; operator: MathNodeSettings['operator']};
 
 const MathNode = (props: NodeProps): JSX.Element => {
   const {t} = useTranslation();
@@ -30,19 +19,14 @@ const MathNode = (props: NodeProps): JSX.Element => {
   const {id, isConnectable} = props;
   const nodeValues = useContext(NodeValuesContext);
 
-  const rawNode = nodeData[id] as {settings?: unknown} | undefined;
-  const settings = rawNode?.settings as MathNodeSettings | undefined;
+  const settings = nodeData[id].settings as MathNodeSettings;
 
-  const initSettings: LocalSettings = {
-    operator: settings?.operator ?? 'mul',
-    operand: settings?.operand.toString() ?? '1',
-  };
+  const [localSettings, setLocalSettings] = useState<LocalSettings>({
+    operator: settings.operator,
+    operand: settings.operand.toString(),
+  });
 
-  const [localSettings, setLocalSettings] =
-    useState<LocalSettings>(initSettings);
-
-  const nodeValue = nodeValues[id] as MathNodeValue | undefined;
-  const outputValue = nodeValue?.value ?? 0;
+  const outputValue = (nodeValues[id] as MathNodeValue).value;
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const newLocalSettings = {
@@ -61,7 +45,7 @@ const MathNode = (props: NodeProps): JSX.Element => {
   };
 
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    const value = event.target.value as MathOperator;
+    const value = event.target.value as MathNodeSettings['operator'];
     if (localSettings.operator === value) return;
 
     const newLocalSettings = {
