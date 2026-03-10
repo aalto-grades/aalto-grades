@@ -9,6 +9,8 @@ import {
   FlagCircle,
   FlagCircleOutlined,
   HomeMaxRounded,
+  Timeline,
+  TimelineOutlined,
   Widgets,
   WidgetsOutlined,
 } from '@mui/icons-material';
@@ -119,6 +121,12 @@ const SideMenu = (): JSX.Element => {
           to={`/${courseId}/course-results`}
           Icon={FlagCircle}
           IconOutlined={FlagCircleOutlined}
+        />
+        <SideMenuButton
+          text={t('course.timeline.title')}
+          to={`/${courseId}/timeline`}
+          Icon={Timeline}
+          IconOutlined={TimelineOutlined}
         />
         <SideMenuButton
           text={t('general.grading-models')}
