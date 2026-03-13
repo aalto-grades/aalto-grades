@@ -4,6 +4,8 @@
 
 import {
   ArrowBack,
+  Dashboard,
+  DashboardOutlined,
   Edit,
   EditOutlined,
   FlagCircle,
@@ -73,11 +75,17 @@ const SideMenuButton = ({
           }}
         >
           <ListItemIcon>
-            {(isPending || isTransitioning)
-              ? <CircularProgress />
-              : (isActive
-                  ? <Icon />
-                  : <IconOutlined />)}
+            {isPending || isTransitioning
+              ? (
+                  <CircularProgress />
+                )
+              : isActive
+                ? (
+                    <Icon />
+                  )
+                : (
+                    <IconOutlined />
+                  )}
           </ListItemIcon>
           <ListItemText primary={text} />
         </ListItemButton>
@@ -116,6 +124,12 @@ const SideMenu = (): JSX.Element => {
           viewTransition
         />
         <Divider sx={{my: 2}} />
+        <SideMenuButton
+          text={t('course.dashboard.title')}
+          to={`/${courseId}/overview`}
+          Icon={Dashboard}
+          IconOutlined={DashboardOutlined}
+        />
         <SideMenuButton
           text={t('general.grades')}
           to={`/${courseId}/course-results`}

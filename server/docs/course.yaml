@@ -228,7 +228,7 @@ definitions:
       200:
         description: >
           All of the courses in the database in the CourseData format.
-          Available only to admin users.
+          Admins see all courses. Users (Teachers/Assistants) see only their own courses.
         content:
           application/json:
             schema:

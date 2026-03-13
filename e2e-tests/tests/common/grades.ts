@@ -7,6 +7,7 @@ import path from 'path';
 
 export const downloadCSVGradeTemplate = async (page: Page): Promise<void> => {
   await page.getByRole('cell', {name: 'O1'}).click();
+  await page.getByRole('link', {name: 'Grades', exact: true}).click();
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', {name: 'Add grades manually'}).click();
   await page.getByRole('button', {name: 'Exercises 2024'}).click();
@@ -17,6 +18,7 @@ export const downloadCSVGradeTemplate = async (page: Page): Promise<void> => {
 
 export const downloadExcelGradeTemplate = async (page: Page): Promise<void> => {
   await page.getByRole('cell', {name: 'O1'}).click();
+  await page.getByRole('link', {name: 'Grades', exact: true}).click();
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', {name: 'Add grades manually'}).click();
   await page.getByRole('button', {name: 'Exercises 2024'}).click();
@@ -63,6 +65,7 @@ export const importGradesWithFile = async (
   type: 'xlsx' | 'csv'
 ): Promise<void> => {
   await page.getByRole('cell', {name: 'O1'}).click();
+  await page.getByRole('link', {name: 'Grades', exact: true}).click();
   const fileChooserPromise = page.waitForEvent('filechooser');
   await page.getByRole('button', {name: 'Add grades manually'}).click();
   await page.getByRole('button', {name: 'Exercises 2024'}).click();
@@ -79,6 +82,7 @@ export const importGradesWithText = async (page: Page): Promise<void> => {
   643456,1,1,1`;
 
   await page.getByRole('cell', {name: 'O1'}).click();
+  await page.getByRole('link', {name: 'Grades', exact: true}).click();
   await page.getByRole('button', {name: 'Add grades manually'}).click();
   await page.getByRole('button', {name: 'Exercises 2024'}).click();
   await page.getByRole('button', {name: 'Paste text'}).click();
@@ -91,6 +95,7 @@ export const warnDialogIfBackdropClickDisabled = async (
   page: Page
 ): Promise<void> => {
   await page.getByRole('cell', {name: 'O1'}).click();
+  await page.getByRole('link', {name: 'Grades', exact: true}).click();
   await page.getByRole('button', {name: 'Add grades manually'}).click();
   await page.getByRole('button', {name: 'Exercises 2024'}).click();
 
@@ -108,6 +113,7 @@ export const warnDialogIfBackdropClickDisabled = async (
 
 export const filterGradesTable = async (page: Page): Promise<void> => {
   await page.getByRole('cell', {name: 'example & grades'}).click();
+  await page.getByRole('link', {name: 'Grades', exact: true}).click();
   const fullTableText = await page.getByText('showing').textContent();
   await expect(page.getByText(fullTableText!)).toBeVisible();
 

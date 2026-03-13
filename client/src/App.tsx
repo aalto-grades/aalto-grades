@@ -14,12 +14,17 @@ import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugg
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, type Ref, useEffect} from 'react';
 import {GlobalModal, GlobalModalWrapper} from 'react-global-modal';
-import {RouterProvider, createBrowserRouter} from 'react-router-dom';
+import {
+  Navigate,
+  RouterProvider,
+  createBrowserRouter,
+} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
 import ThemeProvider from '@/theme/ThemeProvider';
 import AppContainer from './components/AppContainer';
 import FrontPageView from './components/FrontPageView';
+import GlobalStatisticsView from './components/GlobalStatisticsView';
 import LoginView from './components/LoginView';
 import ManageStudentsView from './components/ManageStudentsView';
 import NotFoundView from './components/NotFoundView';
@@ -27,8 +32,8 @@ import PrivateRoute from './components/PrivateRoute';
 import StaticPageView from './components/StaticPageView';
 import StudentsView from './components/StudentsView';
 import CourseContainer from './components/course/CourseContainer';
+import CourseDashboardView from './components/course/CourseDashboardView';
 import CoursePartsView from './components/course/CoursePartsView';
-import CourseRedirect from './components/course/CourseRedirect';
 import EditCourseView from './components/course/EditCourseView';
 import GradesView from './components/course/GradesView';
 import ModelsView from './components/course/ModelsView';
@@ -102,9 +107,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/support',
-        element: (
-          <StaticPageView url="/support.html" title="Support" />
-        ),
+        element: <StaticPageView url="/support.html" title="Support" />,
       },
       {
         path: '/',
@@ -131,13 +134,21 @@ const router = createBrowserRouter([
               </PrivateRoute>
             ),
           },
+          {
+            path: '/global-statistics',
+            element: <GlobalStatisticsView />,
+          },
 
           {
             path: '/:courseId',
             children: [
               {
                 index: true,
-                element: <CourseRedirect />,
+                element: <Navigate to="overview" replace />,
+              },
+              {
+                path: 'overview',
+                element: <CourseDashboardView />,
               },
               {
                 path: '/:courseId/course-results',

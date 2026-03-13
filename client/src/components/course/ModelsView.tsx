@@ -119,19 +119,19 @@ const ModelsView = (): JSX.Element => {
 
       for (const node of model.graphStructure.nodes) {
         if (node.type !== 'source') continue;
-        const sourceId = parseInt(node.id.split('-')[1]);
+        const sourceId = Number.parseInt(node.id.split('-')[1]);
 
         let sourceName = null;
-        if (model.coursePartId !== null) {
-          const sourceTask = courseTasks.data.find(
-            task => task.id === sourceId
-          );
-          sourceName = sourceTask?.name;
-        } else {
+        if (model.coursePartId === null) {
           const sourcePart = courseParts.data.find(
             task => task.id === sourceId
           );
           sourceName = sourcePart?.name;
+        } else {
+          const sourceTask = courseTasks.data.find(
+            task => task.id === sourceId
+          );
+          sourceName = sourceTask?.name;
         }
         if (sourceName)
           model.graphStructure.nodeData[node.id].title = sourceName;
@@ -145,7 +145,7 @@ const ModelsView = (): JSX.Element => {
   const currentModel = useMemo(() => {
     if (modelId === undefined || models === null) return null;
 
-    const model = models.find(m => m.id === parseInt(modelId));
+    const model = models.find(m => m.id === Number.parseInt(modelId));
     if (!model) return null;
 
     return renameSources(structuredClone(model));
@@ -157,7 +157,7 @@ const ModelsView = (): JSX.Element => {
   // Derive currentUserRow from userId URL param
   const currentUserRow = useMemo(() => {
     if (userId === undefined || grades.data === undefined) return null;
-    return grades.data.find(row => row.user.id === parseInt(userId)) ?? null;
+    return grades.data.find(row => row.user.id === Number.parseInt(userId)) ?? null;
   }, [userId, grades.data]);
 
   // Derive coursePartValues from currentUserRow
@@ -189,7 +189,7 @@ const ModelsView = (): JSX.Element => {
     if (modelId === undefined || models === null || allGradingModels.isFetching)
       return;
 
-    const modelExists = models.some(m => m.id === parseInt(modelId));
+    const modelExists = models.some(m => m.id === Number.parseInt(modelId));
     if (!modelExists) {
       enqueueSnackbar(t('course.models.model-not-found', {model: modelId}), {
         variant: 'error',
@@ -209,7 +209,7 @@ const ModelsView = (): JSX.Element => {
   useEffect(() => {
     if (userId === undefined || grades.data === undefined) return;
 
-    const userExists = grades.data.some(row => row.user.id === parseInt(userId));
+    const userExists = grades.data.some(row => row.user.id === Number.parseInt(userId));
     if (!userExists) {
       enqueueSnackbar(t('course.models.grade-not-found', {user: userId}), {
         variant: 'error',
@@ -253,9 +253,11 @@ const ModelsView = (): JSX.Element => {
         onArchive={() => handleArchiveModel(model.id, !model.archived)}
         onDelete={async () => handleDelModel(model.id)}
         onClick={() => {
-          if (userId !== undefined)
+          if (userId === undefined) {
+            navigate(`/${courseId}/models/${model.id}`);
+          } else {
             navigate(`/${courseId}/models/${model.id}/${userId}`);
-          else navigate(`/${courseId}/models/${model.id}`);
+          }
         }}
       />
     );
@@ -358,7 +360,7 @@ const ModelsView = (): JSX.Element => {
                   gap: 2,
                 }}
               >
-                <Collapse in={models.find(mod => !mod.archived) !== undefined}>
+                <Collapse in={models.some(mod => !mod.archived)}>
                   <ListEntries
                     label={t('course.models.active-models')}
                     icon={<CheckCircle />}
@@ -369,7 +371,7 @@ const ModelsView = (): JSX.Element => {
                       .map(model => getModelButton(model))}
                   </ListEntries>
                 </Collapse>
-                <Collapse in={models.find(mod => mod.archived) !== undefined}>
+                <Collapse in={models.some(mod => mod.archived)}>
                   <ListEntries
                     label={t('course.models.archived-models')}
                     icon={<Inventory />}
@@ -427,7 +429,7 @@ const ModelsView = (): JSX.Element => {
               : coursePartValues === null
                 ? null
                 : Object.entries(coursePartValues).map(([id, value]) => ({
-                    id: parseInt(id),
+                    id: Number.parseInt(id),
                     value: value ?? 0,
                   }))
           }

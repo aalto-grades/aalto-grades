@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {type Transaction, UniqueConstraintError} from 'sequelize';
+import {type Transaction, UniqueConstraintError, type WhereOptions} from 'sequelize';
 
 import {
   type CourseData,
@@ -11,6 +11,7 @@ import {
   HttpCode,
   Language,
   type NewCourseData,
+  SystemRole,
 } from '@/common/types';
 import {sequelize} from '../database';
 import Course from '../database/models/course';
@@ -22,6 +23,7 @@ import {
   ApiError,
   type CourseFull,
   type Endpoint,
+  type JwtClaims,
   type NewDbCourseRole,
 } from '../types';
 import {
@@ -46,10 +48,26 @@ export const getCourse: Endpoint<void, CourseData> = async (req, res) => {
 
 /** () => CourseData[] */
 export const getAllCourses: Endpoint<void, CourseData[]> = async (
-  _req,
+  req,
   res
 ) => {
+  const user = req.user as JwtClaims;
+  const where: WhereOptions<Course> = {};
+
+  if (user.role === SystemRole.User) {
+    const courseRoles = await CourseRole.findAll({
+      where: {
+        userId: user.id,
+        role: [CourseRoleType.Teacher, CourseRoleType.Assistant],
+      },
+      attributes: ['courseId'],
+    });
+
+    where.id = courseRoles.map(role => role.courseId);
+  }
+
   const courses = (await Course.findAll({
+    where,
     include: [{model: CourseTranslation}, {model: User, as: 'Users'}],
   })) as CourseFull[];
 
