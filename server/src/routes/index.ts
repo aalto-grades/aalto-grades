@@ -18,6 +18,7 @@ import {router as gradingModelRouter} from './gradingModel';
 import {router as sisuRouter} from './sisu';
 import {router as gradesRouter} from './taskGrade';
 import {router as userRouter} from './user';
+import {router as waitListRouter} from './waitList';
 import {FRONTEND_ORIGIN} from '../configs/environment';
 import {definition} from '../configs/swagger';
 
@@ -41,6 +42,7 @@ router.use(gradingModelRouter);
 router.use(externalSourcesRouter);
 router.use(sisuRouter);
 router.use(userRouter);
+router.use(waitListRouter);
 
 router.use('/api-docs', swaggerUI.serve);
 router.get('/api-docs', swaggerUI.setup(openapiSpecification));

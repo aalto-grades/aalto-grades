@@ -49,6 +49,7 @@ export const calculateNodeValues = (
       case 'source': // Except for sources
         break;
       case 'minpoints':
+      case 'math':
       case 'round':
       case 'sink':
       case 'stepper':
@@ -120,6 +121,7 @@ export const calculateNodeValues = (
         case 'source':
           throw new Error('Should not happen');
         case 'minpoints':
+        case 'math':
         case 'round':
         case 'sink':
         case 'stepper':
@@ -170,7 +172,7 @@ export const batchCalculateCourseParts = (
 
   for (const student of studentData) {
     result[student.userId] = {};
-    let sourceValues = student.courseTasks.map(task => ({
+    const sourceValues = student.courseTasks.map(task => ({
       id: task.id,
       value: task.grade,
     }));
@@ -194,10 +196,6 @@ export const batchCalculateCourseParts = (
       coursePartValues[model.coursePartId!] = partValue;
       result[student.userId][model.coursePartId!] = partValue;
     }
-    sourceValues = Object.entries(coursePartValues).map(([id, value]) => ({
-      id: parseInt(id),
-      value,
-    }));
   }
 
   return result;
@@ -223,7 +221,7 @@ export const batchCalculateFinalGrades = (
   const coursePartModelsIds = new Set<number>();
   for (const node of finalModel.graphStructure.nodes) {
     if (node.type !== 'source') continue;
-    const partId = parseInt(node.id.split('-')[1]);
+    const partId = Number.parseInt(node.id.split('-')[1]);
     coursePartModelsIds.add(partId);
   }
 
@@ -263,7 +261,7 @@ export const batchCalculateFinalGrades = (
       result[student.userId].courseParts[model.coursePartId!] = partValue;
     }
     sourceValues = Object.entries(coursePartValues).map(([id, value]) => ({
-      id: parseInt(id),
+      id: Number.parseInt(id),
       value,
     }));
 

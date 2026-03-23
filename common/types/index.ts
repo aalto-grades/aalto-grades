@@ -16,3 +16,4 @@ export * from './history';
 export * from './sisu';
 export * from './taskGrade';
 export * from './user';
+export * from './waitList';

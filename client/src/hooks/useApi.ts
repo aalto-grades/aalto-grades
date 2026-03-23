@@ -11,3 +11,4 @@ export * from './api/finalGrade';
 export * from './api/taskGrade';
 export * from './api/gradingModel';
 export * from './api/user';
+export * from './api/waitList';

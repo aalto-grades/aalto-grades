@@ -265,7 +265,6 @@ export default defineConfig(
           allowDefaultProject: ['*.js'],
         },
         tsconfigRootDir: import.meta.dirname,
-        // project: ['./tsconfig.node.json', './tsconfig.app.json'],
         ecmaFeatures: {
           jsx: true,
         },

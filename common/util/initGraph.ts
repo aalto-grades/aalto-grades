@@ -65,6 +65,14 @@ export const initNode = (
           settings: {minPoints: 0, onFailSetting: 'fullfail'},
         },
       };
+    case 'math':
+      return {
+        value: {type, source: 0, value: 0},
+        data: {
+          title: 'Math',
+          settings: {operand: 1, operator: 'mul'},
+        },
+      };
     case 'require':
       return {
         value: {type, sources, values, fullFail: false},

@@ -2,6 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+// Training of proctor
+// Policy on cheating
+// What happens if fail final twice
+
 import {Add} from '@mui/icons-material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -43,8 +47,10 @@ import {
   useGetCourseParts,
   useGetCourseTasks,
   useGetGrades,
+  useGetWaitList,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
+import {WaitListStatus as WaitListStatusValues} from '@/types/waitList';
 import {
   findBestGrade,
   findLatestGrade,
@@ -385,13 +391,7 @@ const GradesTableToolbar = (): JSX.Element => {
     [auth?.role, isTeacherInCharge]
   );
 
-  // const hasAplusSources = useMemo(
-  //   () =>
-  //     courseTasks.data?.some(
-  //       task => !task.archived && (task.aplusGradeSources ?? []).length > 0
-  //     ),
-  //   [courseTasks.data]
-  // );
+  const waitList = useGetWaitList(courseId, {enabled: editRights});
 
   const hasImportSources = useMemo(
     () =>
@@ -429,6 +429,26 @@ const GradesTableToolbar = (): JSX.Element => {
     dateOverride: boolean,
     gradingDate: Date
   ): Promise<boolean> => {
+    // Waitlist check, another check is also on the server side
+    const pendingStudentNumbers = new Set(
+      (waitList.data ?? [])
+        .filter(entry => entry.status === WaitListStatusValues.Pending)
+        .map(entry => entry.user.studentNumber)
+    );
+    const blockedStudents = selectedRows
+      .map(row => row.user.studentNumber)
+      .filter(studentNumber => pendingStudentNumbers.has(studentNumber));
+
+    if (blockedStudents.length > 0) {
+      enqueueSnackbar(
+        t('wait-list.blocked-final-grades', {
+          students: blockedStudents.join(', '),
+        }),
+        {variant: 'error'}
+      );
+      return false;
+    }
+    //
     const model = gradingModels?.find(
       gradingModel => gradingModel.id === gradingModelId
     );
