@@ -31,7 +31,7 @@ import {useTranslation} from 'react-i18next';
 import {useParams, useSearchParams} from 'react-router-dom';
 import {z} from 'zod';
 
-import {type StudentRow, SystemRole, WaitListStatus} from '@/common/types';
+import {type StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateFinalGrades} from '@/common/util';
 import Search from '@/components/shared/Search';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
@@ -46,6 +46,7 @@ import {
   useGetWaitList,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
+import {WaitListStatus as WaitListStatusValues} from '@/types/waitList';
 import {
   findBestGrade,
   findLatestGrade,
@@ -424,7 +425,7 @@ const GradesTableToolbar = (): JSX.Element => {
     // Waitlist check, another check is also on the server side
     const pendingStudentNumbers = new Set(
       (waitList.data ?? [])
-        .filter(entry => entry.status === WaitListStatus.Pending)
+        .filter(entry => entry.status === WaitListStatusValues.Pending)
         .map(entry => entry.user.studentNumber)
     );
     const blockedStudents = selectedRows

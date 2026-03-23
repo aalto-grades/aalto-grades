@@ -129,6 +129,8 @@ const SideMenu = (): JSX.Element => {
           to={`/${courseId}/wait-list`}
           Icon={ListAlt}
           IconOutlined={ListAltOutlined}
+        />
+        <SideMenuButton
           text={t('course.timeline.title')}
           to={`/${courseId}/timeline`}
           Icon={Timeline}
