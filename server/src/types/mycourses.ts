@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 The Ossi Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {z} from 'zod';
 
 const MoodleFunctionSchema = z.object({

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 The Ossi Developers
+//
+// SPDX-License-Identifier: MIT
+
 import type {ExternalSourceData} from '@/common/types';
 import type ExternalSource from '../../database/models/externalSource';
 
