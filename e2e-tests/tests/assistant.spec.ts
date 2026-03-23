@@ -5,6 +5,7 @@
 import {test} from '@playwright/test';
 
 import {checkCourse, viewCourseParts, viewGradingModel} from './common/course';
+import {viewTimeline} from './common/timeline';
 import {logOut} from './common/user';
 import {setupDb} from './helper';
 
@@ -33,5 +34,10 @@ test.describe('Test courses as Assistant', () => {
 
   test('View course parts', async ({page}) => {
     await viewCourseParts(page);
+  });
+
+  test('View timeline', async ({page}) => {
+    await page.getByRole('cell', {name: 'O1'}).click();
+    await viewTimeline(page);
   });
 });

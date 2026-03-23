@@ -11,6 +11,8 @@ import {
   HomeMaxRounded,
   ListAlt,
   ListAltOutlined,
+  Timeline,
+  TimelineOutlined,
   Widgets,
   WidgetsOutlined,
 } from '@mui/icons-material';
@@ -127,6 +129,10 @@ const SideMenu = (): JSX.Element => {
           to={`/${courseId}/wait-list`}
           Icon={ListAlt}
           IconOutlined={ListAltOutlined}
+          text={t('course.timeline.title')}
+          to={`/${courseId}/timeline`}
+          Icon={Timeline}
+          IconOutlined={TimelineOutlined}
         />
         <SideMenuButton
           text={t('general.grading-models')}
