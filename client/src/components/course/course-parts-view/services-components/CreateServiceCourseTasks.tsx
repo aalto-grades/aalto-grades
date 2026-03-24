@@ -16,18 +16,18 @@ import {useTranslation} from 'react-i18next';
 
 import type {
   EditCourseTaskData,
-  NewAplusGradeSourceData,
   NewCourseTaskData,
+  NewExtServiceGradeSourceData,
 } from '@/common/types';
 
 type PropsType = {
-  courseTasksWithSource: [NewCourseTaskData, NewAplusGradeSourceData][];
+  courseTasksWithSource: [NewCourseTaskData, NewExtServiceGradeSourceData][];
   handleChange: (
     index: number,
     courseTask: Omit<EditCourseTaskData, 'id'>
   ) => void;
 };
-const CreateAplusCourseTasks = ({
+const CreateExtServiceCourseTasks = ({
   courseTasksWithSource,
   handleChange,
 }: PropsType): JSX.Element => {
@@ -85,4 +85,4 @@ const CreateAplusCourseTasks = ({
   );
 };
 
-export default CreateAplusCourseTasks;
+export default CreateExtServiceCourseTasks;

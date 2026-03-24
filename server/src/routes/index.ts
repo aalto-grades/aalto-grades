@@ -8,11 +8,11 @@ import {Router} from 'express';
 import swaggerJsdoc, {type OAS3Options} from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
-import {router as aplusRouter} from './aplus';
 import {router as authRouter} from './auth';
 import {router as courseRouter} from './course';
 import {router as coursePartRouter} from './coursePart';
 import {router as courseTaskRouter} from './courseTask';
+import {router as externalSourcesRouter} from './externalSources';
 import {router as finalGradesRouter} from './finalGrade';
 import {router as gradingModelRouter} from './gradingModel';
 import {router as sisuRouter} from './sisu';
@@ -32,7 +32,6 @@ const openapiSpecification: object = swaggerJsdoc(options);
 export const router: Router = Router();
 
 router.use(cookieParser());
-router.use(aplusRouter);
 router.use(authRouter);
 router.use(courseRouter);
 router.use(coursePartRouter);
@@ -40,6 +39,7 @@ router.use(courseTaskRouter);
 router.use(finalGradesRouter);
 router.use(gradesRouter);
 router.use(gradingModelRouter);
+router.use(externalSourcesRouter);
 router.use(sisuRouter);
 router.use(userRouter);
 router.use(waitListRouter);

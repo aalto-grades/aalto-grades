@@ -10,7 +10,7 @@ import {validateUserAndGrader} from './taskGrade';
 import type Course from '../../database/models/course';
 import FinalGrade from '../../database/models/finalGrade';
 import User from '../../database/models/user';
-import {ApiError, stringToIdSchema} from '../../types';
+import {ApiError, normalizeStringParam, stringToIdSchema} from '../../types';
 
 /**
  * Finds a final grade by its ID.
@@ -35,13 +35,14 @@ export const findFinalGradeById = async (id: number): Promise<FinalGrade> => {
  * @throws ApiError(400|404|409) if invalid ids, not found, or didn't match.
  */
 export const findAndValidateFinalGradePath = async (
-  courseId: string,
-  finalGradeId: string
+  courseId: string | string[],
+  finalGradeId: string | string[]
 ): Promise<[Course, FinalGrade]> => {
-  const result = stringToIdSchema.safeParse(finalGradeId);
+  const parsedFinalGradeId = normalizeStringParam(finalGradeId);
+  const result = stringToIdSchema.safeParse(parsedFinalGradeId);
   if (!result.success) {
     throw new ApiError(
-      `Invalid final grade ID ${finalGradeId}`,
+      `Invalid final grade ID ${parsedFinalGradeId}`,
       HttpCode.BadRequest
     );
   }

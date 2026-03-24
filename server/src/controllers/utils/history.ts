@@ -14,6 +14,7 @@ export const parsePreviousState = (
     userId: previousState.userId,
     courseTaskId: previousState.courseTaskId,
     aplusGradeSourcesId: previousState.aplusGradeSourceId,
+    externalSourceId: previousState.externalSourceId,
     graderId: previousState.graderId,
     grade: previousState.grade,
     date: new Date(previousState.date),

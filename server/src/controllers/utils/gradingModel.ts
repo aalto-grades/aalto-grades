@@ -10,7 +10,7 @@ import {
 import {findAndValidateCourseId, findCourseById} from './course';
 import type Course from '../../database/models/course';
 import GradingModel from '../../database/models/gradingModel';
-import {ApiError, stringToIdSchema} from '../../types';
+import {ApiError, normalizeStringParam, stringToIdSchema} from '../../types';
 
 /**
  * Finds a grading model by id.
@@ -37,12 +37,13 @@ export const findGradingModelById = async (
  * @throws ApiError(400|404) if invalid or not found.
  */
 const findAndValidateGradingModelId = async (
-  modelId: string
+  modelId: string | string[]
 ): Promise<GradingModel> => {
-  const result = stringToIdSchema.safeParse(modelId);
+  const parsedModelId = normalizeStringParam(modelId);
+  const result = stringToIdSchema.safeParse(parsedModelId);
   if (!result.success) {
     throw new ApiError(
-      `Invalid grading model id ${modelId}`,
+      `Invalid grading model id ${parsedModelId}`,
       HttpCode.BadRequest
     );
   }
@@ -83,8 +84,8 @@ export const validateGradingModelBelongsToCourse = async (
  *   does not belong to the course.
  */
 export const validateGradingModelPath = async (
-  courseId: string,
-  gradingModelId: string
+  courseId: string | string[],
+  gradingModelId: string | string[]
 ): Promise<[Course, GradingModel]> => {
   const course = await findAndValidateCourseId(courseId);
   const gradingModel = await findAndValidateGradingModelId(gradingModelId);

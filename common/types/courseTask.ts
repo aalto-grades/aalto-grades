@@ -5,6 +5,7 @@
 import {z} from 'zod';
 
 import {AplusGradeSourceDataSchema} from './aplus';
+import {ExternalSourceDataSchema} from './extServices';
 import {IdSchema} from './general';
 
 export const CourseTaskDataSchema = z.strictObject({
@@ -14,18 +15,21 @@ export const CourseTaskDataSchema = z.strictObject({
   daysValid: z.number().int().nonnegative().nullable(),
   maxGrade: z.number().nullable(),
   archived: z.boolean(),
-  aplusGradeSources: z.array(AplusGradeSourceDataSchema),
+  aplusGradeSources: z.array(AplusGradeSourceDataSchema).optional(),
+  externalSources: z.array(ExternalSourceDataSchema).optional(),
 });
 
 export const NewCourseTaskSchema = CourseTaskDataSchema.omit({
   id: true,
   archived: true,
   aplusGradeSources: true,
+  externalSources: true,
 }).strict();
 
 export const EditCourseTaskSchema = CourseTaskDataSchema.omit({
   coursePartId: true,
   aplusGradeSources: true,
+  externalSources: true,
 })
   .strict()
   .partial({

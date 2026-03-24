@@ -27,7 +27,11 @@ export type NewDbTaskGradeData = {
   userId: number;
   courseTaskId: number;
   graderId: number;
+  /**
+  * @deprecated, use externalSourceId instead
+  */
   aplusGradeSourceId?: number;
+  externalSourceId?: number;
   grade: number;
   date: Date;
   sisuExportDate?: Date | null;

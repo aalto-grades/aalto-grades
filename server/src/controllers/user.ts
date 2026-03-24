@@ -31,6 +31,7 @@ import {
   type CourseFull,
   type Endpoint,
   type JwtClaims,
+  normalizeStringParam,
 } from '../types';
 import {parseCourseFull} from './utils/course';
 import {validateUserAndGrader} from './utils/taskGrade';
@@ -68,7 +69,7 @@ export const getCoursesOfUser: Endpoint<void, CourseWithFinalGrades[]> = async (
   req,
   res
 ) => {
-  const userId = await validateUserId(req.params.userId);
+  const userId = await validateUserId(normalizeStringParam(req.params.userId));
   const requester = req.user as JwtClaims;
 
   const needsRole =
@@ -346,7 +347,9 @@ export const deleteUser: Endpoint<void, void> = async (req, res) => {
     }
   }
 
-  const user = await findAndValidateUserId(req.params.userId);
+  const user = await findAndValidateUserId(
+    normalizeStringParam(req.params.userId)
+  );
 
   // Remove idpUser role
   if (role === 'idpUser') {

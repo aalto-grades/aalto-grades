@@ -105,7 +105,7 @@ router.post(
   '/v1/auth/login-idp/callback',
   express.urlencoded({extended: false}),
   authSamlLogin,
-  (_req, res) => res.redirect('/')
+  (_req, res) => res.redirect('/') // TODO: Redirect to frontend URL
 );
 
 router.get('/v1/auth/saml/metadata', controllerDispatcher(samlMetadata));

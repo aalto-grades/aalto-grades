@@ -6,7 +6,7 @@ import {type CoursePartData, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
 import type Course from '../../database/models/course';
 import CoursePart from '../../database/models/coursePart';
-import {ApiError, stringToIdSchema} from '../../types';
+import {ApiError, normalizeStringParam, stringToIdSchema} from '../../types';
 
 /**
  * Finds a course part by its ID.
@@ -30,12 +30,13 @@ export const findCoursePartById = async (id: number): Promise<CoursePart> => {
  * @throws ApiError(400|404) if not found.
  */
 const findAndValidateCoursePartId = async (
-  coursePartId: string
+  coursePartId: string | string[]
 ): Promise<CoursePart> => {
-  const result = stringToIdSchema.safeParse(coursePartId);
+  const parsedCoursePartId = normalizeStringParam(coursePartId);
+  const result = stringToIdSchema.safeParse(parsedCoursePartId);
   if (!result.success) {
     throw new ApiError(
-      `Invalid course part id ${coursePartId}`,
+      `Invalid course part id ${parsedCoursePartId}`,
       HttpCode.BadRequest
     );
   }
@@ -72,8 +73,8 @@ export const validateCoursePartBelongsToCourse = async (
  *   part does not belong to the course.
  */
 export const validateCoursePartPath = async (
-  courseId: string,
-  coursePartId: string
+  courseId: string | string[],
+  coursePartId: string | string[]
 ): Promise<[Course, CoursePart]> => {
   const course = await findAndValidateCourseId(courseId);
   const coursePart = await findAndValidateCoursePartId(coursePartId);

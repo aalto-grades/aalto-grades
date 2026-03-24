@@ -13,10 +13,10 @@ import {useNavigate} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
 import OtpAuthDialog from '@/components/shared/auth/OtpAuthDialog';
-import TokenDialog from '@/components/shared/auth/TokenDialog';
+import ServiceTokenDialog from '@/components/shared/auth/ServiceTokenDialog';
 import {useConfirmMfa, useLogOut, useResetOwnAuth} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
-import {resetToken} from '@/utils';
+import {resetAllServiceToken} from '@/utils';
 import ChangePasswordDialog from './ChangePasswordDialog';
 
 const UserButton = (): JSX.Element => {
@@ -37,7 +37,7 @@ const UserButton = (): JSX.Element => {
 
   const handleLogOut = async (): Promise<void> => {
     await logOut.mutateAsync();
-    resetToken();
+    resetAllServiceToken();
     setAuth(null);
     setAnchorEl(null);
     queryClient.clear();
@@ -74,7 +74,7 @@ const UserButton = (): JSX.Element => {
 
   return (
     <>
-      <TokenDialog
+      <ServiceTokenDialog
         open={tokenDialogOpen}
         onClose={() => setTokenDialogOpen(false)}
         onSubmit={() => setTokenDialogOpen(false)}
@@ -121,7 +121,7 @@ const UserButton = (): JSX.Element => {
         anchorEl={anchorEl}
         open={menuOpen}
         onClose={() => setAnchorEl(null)}
-        MenuListProps={{'aria-labelledby': 'user-button'}}
+        slotProps={{list: {'aria-labelledby': 'user-button'}}}
       >
         <MenuItem
           key="aplus-token"
