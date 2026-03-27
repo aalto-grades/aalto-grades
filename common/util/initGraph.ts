@@ -4,6 +4,7 @@
 
 import type {Edge} from '@xyflow/react';
 
+import {DEFAULT_TABLE_SETTINGS} from './tableDefaults';
 import type {
   CoursePartData,
   CourseTaskData,
@@ -113,6 +114,14 @@ export const initNode = (
         data: {
           title: 'Substitute',
           settings: {maxSubstitutions: 0, substituteValues: []},
+        },
+      };
+    case 'table':
+      return {
+        value: {type, sources, value: 0},
+        data: {
+          title: 'Table',
+          settings: DEFAULT_TABLE_SETTINGS,
         },
       };
   }

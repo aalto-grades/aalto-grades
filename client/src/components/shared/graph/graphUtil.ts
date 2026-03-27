@@ -41,6 +41,11 @@ export const getDragAndDropNodes = (
     tooltip: t('shared.graph.node.stepper-tooltip'),
   },
   {
+    type: 'table',
+    title: t('shared.graph.node.table'),
+    tooltip: t('shared.graph.node.table-tooltip'),
+  },
+  {
     type: 'minpoints',
     title: t('shared.graph.node.minpoints'),
     tooltip: t('shared.graph.node.min-tooltip'),
@@ -213,6 +218,18 @@ export const formatGraph = async (
         return {
           ...node,
           ports: [{id: node.id, properties: {side: 'WEST'}}],
+        };
+      }
+
+      // Special-case 'table' nodes: provide a NORTH port for columns and WEST port for rows
+      if (nodeValue.type === 'table') {
+        return {
+          ...node,
+          ports: [
+            {id: `${node.id}-row`, properties: {side: 'WEST'}},
+            {id: `${node.id}-col`, properties: {side: 'NORTH'}},
+            {id: `${node.id}-source`, properties: {side: 'EAST'}},
+          ],
         };
       } else if (
         nodeValue.type !== 'addition'

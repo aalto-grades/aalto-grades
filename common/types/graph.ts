@@ -67,6 +67,11 @@ export type SubstituteNodeValue = {
   sources: {[key: string]: {isConnected: boolean; value: NumberOrFail}};
   values: {[key: string]: NumberOrFail};
 };
+export type TableNodeValue = {
+  type: 'table';
+  sources: {[key: string]: {isConnected: boolean; value: number | NumberOrFail}};
+  value: number | NumberOrFail;
+};
 
 export type NodeValue =
   | AdditionNodeValue
@@ -79,7 +84,8 @@ export type NodeValue =
   | SinkNodeValue
   | SourceNodeValue
   | StepperNodeValue
-  | SubstituteNodeValue;
+  | SubstituteNodeValue
+  | TableNodeValue;
 
 export type NodeValues = {[key: string]: NodeValue};
 
@@ -88,6 +94,7 @@ const CustomNodeTypesSchema = z.enum([
   'addition',
   'average',
   'max',
+  'table',
   'minpoints',
   'math',
   'require',
@@ -135,6 +142,11 @@ const SubstituteNodeSettingsSchema = z.strictObject({
   maxSubstitutions: z.number(),
   substituteValues: z.array(z.number()),
 });
+const TableNodeSettingsSchema = z.strictObject({
+  rowHeaders: z.array(z.number()),
+  colHeaders: z.array(z.number()),
+  grid: z.array(z.array(z.number())),
+});
 
 const NodeSettingsSchema = z.union([
   AverageNodeSettingsSchema,
@@ -146,6 +158,7 @@ const NodeSettingsSchema = z.union([
   SourceNodeSettingsSchema,
   StepperNodeSettingsSchema,
   SubstituteNodeSettingsSchema,
+  TableNodeSettingsSchema,
 ]);
 const NodeDataSchema = z.strictObject({
   title: z.string(),
@@ -197,6 +210,7 @@ export type StepperNodeSettings = z.infer<typeof StepperNodeSettingsSchema>;
 export type SubstituteNodeSettings = z.infer<
   typeof SubstituteNodeSettingsSchema
 >;
+export type TableNodeSettings = z.infer<typeof TableNodeSettingsSchema>;
 
 export type NodeSettings = z.infer<typeof NodeSettingsSchema>;
 export type NodeData = z.infer<typeof NodeDataSchema>;

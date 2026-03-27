@@ -87,6 +87,7 @@ import SinkNode from './nodes/SinkNode';
 import SourceNode from './nodes/SourceNode';
 import StepperNode from './nodes/StepperNode';
 import SubstituteNode from './nodes/SubstituteNode';
+import TableNode from './nodes/TableNode';
 
 // TODO: Don't show word 'source' to user? (#886)
 // Instead we could check if is course part model or not
@@ -118,6 +119,7 @@ const nodeTypesMap: {
   source: SourceNode,
   stepper: StepperNode,
   substitute: SubstituteNode,
+  table: TableNode
 };
 
 // Load graph for the first time
@@ -235,7 +237,7 @@ const Graph = ({
       initGraph.nodes
         .filter((node) => {
           if (node.type !== 'source') return false;
-          const sourceId = parseInt(node.id.split('-')[1]);
+          const sourceId = Number.parseInt(node.id.split('-')[1]);
 
           const nodeSource = sources.find(source => source.id === sourceId);
           return nodeSource === undefined || nodeSource.archived;
@@ -249,24 +251,30 @@ const Graph = ({
       unsaved && currentLocation.pathname !== nextLocation.pathname
   );
 
-  const setNodeTitle = (id: string, title: string): void => {
-    setNodeData(oldNodeData => ({
-      ...oldNodeData,
-      [id]: {
-        ...oldNodeData[id],
-        title,
-      },
-    }));
-  };
-  const setNodeSettings = (id: string, settings: NodeSettings): void => {
-    setNodeData(oldNodeSettings => ({
-      ...oldNodeSettings,
-      [id]: {
-        ...oldNodeSettings[id],
-        settings,
-      },
-    }));
-  };
+  const setNodeTitle = useCallback(
+    (id: string, title: string): void => {
+      setNodeData(oldNodeData => ({
+        ...oldNodeData,
+        [id]: {
+          ...oldNodeData[id],
+          title,
+        },
+      }));
+    },
+    [setNodeData],
+  );
+  const setNodeSettings = useCallback(
+    (id: string, settings: NodeSettings): void => {
+      setNodeData(oldNodeSettings => ({
+        ...oldNodeSettings,
+        [id]: {
+          ...oldNodeSettings[id],
+          settings,
+        },
+      }));
+    },
+    [setNodeData],
+  );
 
   const updateValues = useCallback(
     (newEdges: Edge[] | null = null) => {
@@ -302,8 +310,7 @@ const Graph = ({
     );
 
     if (
-      lastState === null
-      || lastState.nodes.length !== nodes.length
+      lastState?.nodes.length !== nodes.length
       || lastState.edges.length !== edges.length
       || JSON.stringify(lastState.nodeValues) !== JSON.stringify(nodeValues)
       || JSON.stringify(lastState.nodeSettings) !== JSON.stringify(nodeSettings)
@@ -457,7 +464,7 @@ const Graph = ({
       if (initState.data.settings)
         setNodeSettings(nodeId, initState.data.settings);
     },
-    [getId, nodeTypeMap, reactFlowInstance, setNodes]
+    [getId, nodeTypeMap, reactFlowInstance, setNodes, setNodeTitle, setNodeSettings]
   );
 
   const dragAndDropNodes = getDragAndDropNodes(t);
@@ -542,14 +549,14 @@ const Graph = ({
                   .map(node => ({type: 'remove', id: node.id}))
               );
 
-              const selectedIds = selected.map(node => node.id);
+              const selectedIds = new Set(selected.map(node => node.id));
 
               onEdgesChange(
                 edges
                   .filter(
                     edge =>
-                      selectedIds.includes(edge.target)
-                      || selectedIds.includes(edge.source)
+                      selectedIds.has(edge.target)
+                      || selectedIds.has(edge.source)
                   )
                   .map(edge => ({type: 'remove', id: edge.id}))
               );
@@ -572,7 +579,7 @@ const Graph = ({
           <NodeDataContext.Provider
             value={useMemo(
               () => ({nodeData, setNodeTitle, setNodeSettings}),
-              [nodeData]
+              [nodeData, setNodeTitle, setNodeSettings]
             )}
           >
             <div style={{width: '100%', height: '60vh'}}>

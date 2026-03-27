@@ -57,6 +57,8 @@
         "round-tooltip": "Avrunda värdet",
         "substitute": "Ersätt",
         "substitute-tooltip": "Ersätt underkända värden",
+        "table": "Tabell",
+        "table-tooltip": "Avbilda upp till två numeriska indata till en uppslags-tabell",
         "sink": "Mottagare",
         "source": "Källa",
         "value": "Värde"
@@ -103,7 +105,9 @@
       "round-down": "Avrunda nedåt",
       "range": "Intervall",
       "new-row": "Ny rad",
+      "new-column": "Ny kolumn",
       "remove-row": "Ta bort rad",
+      "remove-column": "Ta bort kolumn",
       "substitution-num": "Antal ersättningar",
       "substitutes": "Ersätter",
       "substitution-value": "ers värde",
