@@ -80,6 +80,7 @@ export const getSamlStrategy = async (): Promise<SamlStrategy> =>
       privateKey: SAML_PRIVATE_KEY, // SP private key in .pem format
       signatureAlgorithm: 'sha256',
       identifierFormat: null,
+      disableRequestedAuthnContext: true,
     },
 
     async (profile: Profile | null, done: SamlVerifiedCallback) => {
