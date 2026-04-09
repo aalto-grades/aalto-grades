@@ -22,6 +22,24 @@
         "cancel": "Back to login"
       },
       "reset-mfa": "Reset MFA",
+      "register-passkey": "Register passkey",
+      "manage-passkeys": "Manage passkeys",
+      "passkey": {
+        "registered": "Passkey registered successfully",
+        "manage-title": "Manage passkeys",
+        "loading": "Loading passkeys...",
+        "none": "No passkeys registered",
+        "provider": "Provider",
+        "type": "Type",
+        "aaguid": "AAGUID",
+        "unknown": "unknown",
+        "id": "Credential",
+        "created": "Registered",
+        "delete": "Delete",
+        "delete-title": "Delete passkey",
+        "delete-message": "Are you sure you want to delete this passkey",
+        "deleted": "Passkey deleted successfully"
+      },
       "log-out": "Log out",
       "enter-totp": "Enter TOTP code",
       "hide-password": "Click to hide password from view",
@@ -650,7 +668,8 @@
       "title": "Local users",
       "body": "If you have been provided with credentials specifically for Ossi, use this login.",
       "mfa-code": "MFA code",
-      "button": "Log in"
+      "button": "Log in",
+      "passkey-button": "Log in with passkey"
     },
     "login-again": "Login again"
   },

@@ -14,10 +14,15 @@ import {useNavigate} from 'react-router-dom';
 import {SystemRole} from '@/common/types';
 import OtpAuthDialog from '@/components/shared/auth/OtpAuthDialog';
 import ServiceTokenDialog from '@/components/shared/auth/ServiceTokenDialog';
-import {useConfirmMfa, useLogOut, useResetOwnAuth} from '@/hooks/useApi';
+import {
+  useConfirmMfa,
+  useLogOut,
+  useResetOwnAuth,
+} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import {resetAllServiceToken} from '@/utils';
 import ChangePasswordDialog from './ChangePasswordDialog';
+import ManagePasskeysDialog from './ManagePasskeysDialog';
 
 const UserButton = (): JSX.Element => {
   const {t} = useTranslation();
@@ -29,10 +34,11 @@ const UserButton = (): JSX.Element => {
   const resetOwnAuth = useResetOwnAuth();
 
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-  const [tokenDialogOpen, setTokenDialogOpen] = useState<boolean>(false);
+  const [tokenDialogOpen, setTokenDialogOpen] = useState(false);
   const [changePasswordDialogOpen, setChangePasswordDialogOpen] =
-    useState<boolean>(false);
-  const [showMfaDialog, setShowMfaDialog] = useState<boolean>(false);
+    useState(false);
+  const [passkeyDialogOpen, setPasskeyDialogOpen] = useState(false);
+  const [showMfaDialog, setShowMfaDialog] = useState(false);
   const [otpAuth, setOtpAuth] = useState<string | null>(null);
 
   const handleLogOut = async (): Promise<void> => {
@@ -67,6 +73,11 @@ const UserButton = (): JSX.Element => {
     setOtpAuth(null);
   };
 
+  const openManagePasskeys = (): void => {
+    setAnchorEl(null);
+    setPasskeyDialogOpen(true);
+  };
+
   const menuOpen = Boolean(anchorEl);
 
   // eslint-disable-next-line react/jsx-no-useless-fragment
@@ -78,6 +89,10 @@ const UserButton = (): JSX.Element => {
         open={tokenDialogOpen}
         onClose={() => setTokenDialogOpen(false)}
         onSubmit={() => setTokenDialogOpen(false)}
+      />
+      <ManagePasskeysDialog
+        open={passkeyDialogOpen}
+        onClose={() => setPasskeyDialogOpen(false)}
       />
       {auth.role === SystemRole.Admin && (
         <>
@@ -144,6 +159,9 @@ const UserButton = (): JSX.Element => {
           </MenuItem>,
           <MenuItem key="reset-mfa" onClick={handleResetMfa}>
             {t('shared.auth.reset-mfa')}
+          </MenuItem>,
+          <MenuItem key="manage-passkeys" onClick={openManagePasskeys}>
+            {t('shared.auth.manage-passkeys')}
           </MenuItem>,
         ]}
         <MenuItem onClick={handleLogOut}>{t('shared.auth.log-out')}</MenuItem>
