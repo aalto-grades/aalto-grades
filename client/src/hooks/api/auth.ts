@@ -24,6 +24,21 @@ import {
   type LoginData,
   type LoginResult,
   LoginResultSchema,
+  type PasskeyDeleteOwnData,
+  type PasskeyListOwnResult,
+  PasskeyListOwnResultSchema,
+  type PasskeyLoginFinishData,
+  type PasskeyLoginFinishResult,
+  PasskeyLoginFinishResultSchema,
+  type PasskeyLoginStartData,
+  type PasskeyLoginStartResult,
+  PasskeyLoginStartResultSchema,
+  type PasskeyRegisterFinishData,
+  type PasskeyRegisterFinishResult,
+  PasskeyRegisterFinishResultSchema,
+  type PasskeyRegisterStartData,
+  type PasskeyRegisterStartResult,
+  PasskeyRegisterStartResultSchema,
   type ResetAuthData,
   type ResetAuthResult,
   ResetAuthResultSchema,
@@ -127,5 +142,77 @@ export const useConfirmMfa = (
 ): UseMutationResult<void, unknown, ConfirmMfaData> =>
   useMutation({
     mutationFn: async data => axios.post('/api/v1/auth/confirm-mfa', data),
+    ...options,
+  });
+
+export const usePasskeyLoginStart = (
+  options?: UseMutationOptions<PasskeyLoginStartResult, unknown, PasskeyLoginStartData>
+): UseMutationResult<PasskeyLoginStartResult, unknown, PasskeyLoginStartData> =>
+  useMutation({
+    mutationFn: async data =>
+      PasskeyLoginStartResultSchema.parse(
+        (await axios.post('/api/v1/auth/passkey/login/start', data)).data
+      ),
+    ...options,
+  });
+
+export const usePasskeyLoginFinish = (
+  options?: UseMutationOptions<
+    PasskeyLoginFinishResult,
+    unknown,
+    PasskeyLoginFinishData
+  >
+): UseMutationResult<
+  PasskeyLoginFinishResult,
+  unknown,
+  PasskeyLoginFinishData
+> =>
+  useMutation({
+    mutationFn: async data =>
+      PasskeyLoginFinishResultSchema.parse(
+        (await axios.post('/api/v1/auth/passkey/login/finish', data)).data
+      ),
+    ...options,
+  });
+
+export const usePasskeyRegisterStart = (
+  options?: UseMutationOptions<PasskeyRegisterStartResult, unknown, PasskeyRegisterStartData>
+): UseMutationResult<PasskeyRegisterStartResult, unknown, PasskeyRegisterStartData> =>
+  useMutation({
+    mutationFn: async data =>
+      PasskeyRegisterStartResultSchema.parse(
+        (await axios.post('/api/v1/auth/passkey/register/start', data)).data
+      ),
+    ...options,
+  });
+
+export const usePasskeyRegisterFinish = (
+  options?: UseMutationOptions<PasskeyRegisterFinishResult, unknown, PasskeyRegisterFinishData>
+): UseMutationResult<PasskeyRegisterFinishResult, unknown, PasskeyRegisterFinishData> =>
+  useMutation({
+    mutationFn: async data =>
+      PasskeyRegisterFinishResultSchema.parse(
+        (await axios.post('/api/v1/auth/passkey/register/finish', data)).data
+      ),
+    ...options,
+  });
+
+export const usePasskeyListOwn = (
+  options?: Partial<UseQueryOptions<PasskeyListOwnResult>>
+): UseQueryResult<PasskeyListOwnResult> =>
+  useQuery({
+    queryKey: ['passkeys-own'],
+    queryFn: async () =>
+      PasskeyListOwnResultSchema.parse(
+        (await axios.get('/api/v1/auth/passkey/list-own')).data
+      ),
+    ...options,
+  });
+
+export const usePasskeyDeleteOwn = (
+  options?: UseMutationOptions<void, unknown, PasskeyDeleteOwnData>
+): UseMutationResult<void, unknown, PasskeyDeleteOwnData> =>
+  useMutation({
+    mutationFn: async data => axios.post('/api/v1/auth/passkey/delete-own', data),
     ...options,
   });

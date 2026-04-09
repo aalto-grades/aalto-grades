@@ -101,6 +101,46 @@ export const ChangeOwnAuthResponseSchema = z.strictObject({
 
 export const ConfirmMfaDataSchema = z.strictObject({otp: z.string()});
 
+export const PasskeyLoginStartDataSchema = z.strictObject({
+  email: z.string(),
+});
+export const PasskeyLoginStartResultSchema = z.strictObject({
+  options: z.unknown(),
+});
+export const PasskeyLoginFinishDataSchema = z.strictObject({
+  email: z.string(),
+  authenticationResponse: z.unknown(),
+});
+export const PasskeyLoginFinishResultSchema = AuthDataSchema;
+
+export const PasskeyRegisterStartDataSchema = z.strictObject({});
+export const PasskeyRegisterStartResultSchema = z.strictObject({
+  options: z.unknown(),
+});
+export const PasskeyRegisterFinishDataSchema = z.strictObject({
+  registrationResponse: z.unknown(),
+});
+export const PasskeyRegisterFinishResultSchema = z.strictObject({
+  ok: z.literal(true),
+});
+export const PasskeyInfoSchema = z.strictObject({
+  id: IdSchema,
+  credentialId: z.string(),
+  authenticatorAttachment: z.string().nullable(),
+  transports: z.array(z.string()),
+  aaguid: z.string(),
+  credentialDeviceType: z.string(),
+  credentialBackedUp: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export const PasskeyListOwnResultSchema = z.strictObject({
+  passkeys: z.array(PasskeyInfoSchema),
+});
+export const PasskeyDeleteOwnDataSchema = z.strictObject({
+  passkeyId: IdSchema,
+});
+
 export type AuthData = z.infer<typeof AuthDataSchema>;
 export type LoginData = z.infer<typeof LoginDataSchema>;
 export type LoginResult = z.infer<typeof LoginResultSchema>;
@@ -110,3 +150,28 @@ export type ResetAuthResult = z.infer<typeof ResetAuthResultSchema>;
 export type ChangeOwnAuthData = z.infer<typeof ChangeOwnAuthDataSchema>;
 export type ChangeOwnAuthResponse = z.infer<typeof ChangeOwnAuthResponseSchema>;
 export type ConfirmMfaData = z.infer<typeof ConfirmMfaDataSchema>;
+export type PasskeyLoginStartData = z.infer<typeof PasskeyLoginStartDataSchema>;
+export type PasskeyLoginStartResult = z.infer<
+  typeof PasskeyLoginStartResultSchema
+>;
+export type PasskeyLoginFinishData = z.infer<
+  typeof PasskeyLoginFinishDataSchema
+>;
+export type PasskeyLoginFinishResult = z.infer<
+  typeof PasskeyLoginFinishResultSchema
+>;
+export type PasskeyRegisterStartData = z.infer<
+  typeof PasskeyRegisterStartDataSchema
+>;
+export type PasskeyRegisterStartResult = z.infer<
+  typeof PasskeyRegisterStartResultSchema
+>;
+export type PasskeyRegisterFinishData = z.infer<
+  typeof PasskeyRegisterFinishDataSchema
+>;
+export type PasskeyRegisterFinishResult = z.infer<
+  typeof PasskeyRegisterFinishResultSchema
+>;
+export type PasskeyInfo = z.infer<typeof PasskeyInfoSchema>;
+export type PasskeyListOwnResult = z.infer<typeof PasskeyListOwnResultSchema>;
+export type PasskeyDeleteOwnData = z.infer<typeof PasskeyDeleteOwnDataSchema>;

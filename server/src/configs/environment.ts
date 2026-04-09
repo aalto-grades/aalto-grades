@@ -128,9 +128,9 @@ const defaults = {
   frontendCorsOrigin: 'http://localhost:3005',
   // TODO: Fix SAML callback url to include /api/ (#848)
   samlCallback: 'https://ossi.cs.aalto.fi/v1/auth/login-idp/callback',
-  samlEntrypoint: 'https://devel.idp.aalto.fi/idp/profile/SAML2/Redirect/SSO',
-  samlIssuer: 'https://aalto-grades.cs.aalto.fi',
-  samlMetadataUrl: 'https://devel.idp.aalto.fi/idp/shibboleth',
+  samlEntrypoint: 'https://idp.aalto.fi/idp/profile/SAML2/Redirect/SSO',
+  samlIssuer: 'https://ossi.cs.aalto.fi',
+  samlMetadataUrl: 'https://idp.aalto.fi/idp/shibboleth',
   aPlusApiUrl: 'https://plus.cs.aalto.fi/api/v2',
   myCoursesApiUrl: 'https://mycourses-test.aalto.fi/webservice/rest/server.php',
   // myCoursesApiUrl: 'http://localhost/webservice/rest/server.php',
@@ -143,6 +143,7 @@ const defaults = {
   // Sisu API, default token is just a placeholder, not valid.
   sisuApiToken: '507f508dfa595cc9kya86d9200c7cca9f',
   sisuApiUrl: 'https://course.api.aalto.fi:443/api/sisu/v1',
+  webauthnRpName: 'Ossi',
 };
 
 // Config dotenv so environment variables are also accessible from .env file.
@@ -185,6 +186,14 @@ if (NODE_ENV !== 'test' && JWT_SECRET === defaults.jwtSecret) {
 
 export const FRONTEND_ORIGIN: string =
   process.env.AALTO_GRADES_FRONTEND_CORS_ORIGIN || defaults.frontendCorsOrigin;
+
+const normalizedOrigin = FRONTEND_ORIGIN.replace(/\/+$/, '');
+const derivedRpId = new URL(normalizedOrigin).hostname;
+export const WEBAUTHN_RP_NAME: string =
+  process.env.WEBAUTHN_RP_NAME || defaults.webauthnRpName;
+export const WEBAUTHN_RP_ID: string = process.env.WEBAUTHN_RP_ID || derivedRpId;
+export const WEBAUTHN_ORIGIN: string =
+  (process.env.WEBAUTHN_ORIGIN || normalizedOrigin).replace(/\/+$/, '');
 
 export const SAML_CALLBACK: string =
   process.env.SAML_CALLBACK || defaults.samlCallback;

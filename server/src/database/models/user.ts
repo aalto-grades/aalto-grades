@@ -27,6 +27,7 @@ export default class User extends Model<
   declare forcePasswordReset: CreationOptional<boolean | null>;
   declare mfaSecret: CreationOptional<string | null>;
   declare mfaConfirmed: CreationOptional<boolean>;
+  declare passkeyChallenge: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   static findByEmail: (email: string) => Promise<User | null>;
@@ -90,6 +91,10 @@ User.init(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
+    },
+    passkeyChallenge: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
