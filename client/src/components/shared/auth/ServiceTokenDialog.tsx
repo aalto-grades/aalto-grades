@@ -13,12 +13,12 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {type JSX, useState} from 'react';
+import {type JSX, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import Dialog from '@/components/shared/Dialog';
 import ExternalLink from '@/components/shared/ExternalLink';
-import {SERVICE_SOURCE_OPTIONS, type ServiceSourceOption, getServiceToken, setServiceToken} from '@/utils';
+import {SERVICE_SOURCE_OPTIONS, getServiceToken, setServiceToken} from '@/utils';
 
 type PropsType = {
   open: boolean;
@@ -36,13 +36,19 @@ const ServiceTokenDialog = ({
   error = false,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
-  const [selectedService, setSelectedService] = useState<ServiceSourceOption>(serviceInfo || SERVICE_SOURCE_OPTIONS[0]);
+  const [selectedService, setSelectedService] = useState(serviceInfo || SERVICE_SOURCE_OPTIONS[0]);
   const currentToken = getServiceToken(selectedService.id);
-  const [tokenInput, setTokenInput] = useState<string>('');
-  const [showFullToken, setShowFullToken] = useState<boolean>(false);
+  const [tokenInput, setTokenInput] = useState('');
+  const [showFullToken, setShowFullToken] = useState(false);
   const link = selectedService.tokenLink;
 
   const isError = error;
+  useEffect(() => {
+    if (open && serviceInfo) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedService(serviceInfo);
+    }
+  }, [open, serviceInfo]);
 
   const handleClose = (): void => {
     setTokenInput('');

@@ -47,13 +47,12 @@ export const NewServiceCourseTasksDialog = ({
     enabled: Boolean(getServiceToken(serviceInfo.id)),
   });
   const modifyCourseTasks = useModifyCourseTasks(courseId);
-  // const addAplusGradeSources = useAddAplusGradeSources(courseId);
   const addExtServiceGradeSources = useAddExtServiceGradeSources(
     serviceInfo,
     courseId,
   );
 
-  const [step, setStep] = useState<number>(0);
+  const [step, setStep] = useState(0);
   const [serviceCourse, setServiceCourse] = useState<AplusCourseData | null>(
     null,
   );
@@ -63,7 +62,7 @@ export const NewServiceCourseTasksDialog = ({
   >([]);
 
   const serviceTokenDialogOpen =
-    open && (!getServiceToken(serviceInfo.id) || serviceCourses.isError);
+    open && (!getServiceToken(serviceInfo.id) || (serviceCourses.isError ? serviceCourses.error.message.includes('401') : false));
 
   const handleResetAndClose = (): void => {
     setStep(0);
@@ -77,7 +76,6 @@ export const NewServiceCourseTasksDialog = ({
     name: string,
     maxGrade: number,
     source: ExtServiceExerciseData[number]['items'][number],
-    // source: ExtServiceExerciseData[0]['items'][number],
   ): void => {
     if (serviceCourse === null) {
       return;
@@ -175,6 +173,8 @@ export const NewServiceCourseTasksDialog = ({
           <>
             <DialogTitle>
               {t('course.parts.external-source.add')}
+              {' '}
+              {serviceInfo.label}
             </DialogTitle>
             <DialogContent>
               {serviceCourses.data !== undefined && (

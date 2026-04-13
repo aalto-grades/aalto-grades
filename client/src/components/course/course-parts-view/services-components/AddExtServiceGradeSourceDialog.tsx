@@ -48,13 +48,12 @@ const AddExtServiceGradeSourceDialog = ({
     courseId,
   );
 
-  const [step, setStep] = useState<number>(0);
+  const [step, setStep] = useState(0);
   const [serviceCourse, setServiceCourse] = useState<ExtServiceCourseData | null>(
     null,
   );
   const open = courseTaskId !== null;
-  const serviceTokenDialogOpen =
-    open && (!getServiceToken(serviceInfo.id) || serviceCourses.isError);
+  const serviceTokenDialogOpen = open && (!getServiceToken(serviceInfo.id) || serviceCourses.isError);
 
   const handleResetAndClose = (): void => {
     setStep(0);

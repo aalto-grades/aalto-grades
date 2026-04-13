@@ -100,12 +100,11 @@ const ImportGradesDialog = ({
   const addGrades = useAddGrades(courseId);
 
   const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
-  const [isImporting, setIsImporting] = useState<boolean>(false);
-  const [pendingImport, setPendingImport] = useState<boolean>(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [pendingImport, setPendingImport] = useState(false);
   const [previewGrades, setPreviewGrades] = useState<NewTaskGrade[] | null>(null);
 
-  const [serviceTokenDialogOpen, setServiceTokenDialogOpen] =
-    useState<boolean>(false);
+  const [serviceTokenDialogOpen, setServiceTokenDialogOpen] = useState(false);
   const [serviceTokenInfo, setServiceTokenInfo] =
     useState<ServiceSourceOption | null>(null);
 
