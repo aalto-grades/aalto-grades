@@ -174,7 +174,7 @@ export const fetchFromAplus = async <T>(
     validateStatus: (status: number) => status === 200,
     headers: {Authorization: `Token ${aplusToken}`},
   });
-  console.log('I got', queryRes.data);
+  // console.log('I got', queryRes.data);
   const result = schema.safeParse(queryRes.data);
 
   if (!result.success) {

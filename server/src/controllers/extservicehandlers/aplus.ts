@@ -21,10 +21,12 @@ import {
 } from './aplusUtils';
 import type {ExtServiceHandler} from './types';
 import {APLUS_API_URL} from '../../configs/environment';
+import httpLogger from '../../configs/winston';
 import CourseTaskExternalSource from '../../database/models/courseTaskExternalSource';
 import ExternalSource from '../../database/models/externalSource';
 import {
   ApiError,
+  AplusCoursesListResSchema,
   AplusCoursesResSchema,
   AplusExercisesResSchema,
   AplusPointsResSchema,
@@ -62,8 +64,18 @@ const fetchCourses: ExtServiceHandler['fetchCourses'] = async (req) => {
     aplusToken,
     AplusCoursesResSchema,
   );
+  let staffCourses = coursesRes.staff_courses;
 
-  const staffCourses = coursesRes.staff_courses;
+  if (coursesRes.username === 'ossi-bot') {
+    httpLogger.info('Bot token used');
+    const botCoursesRes = await fetchFromAplusPaginated(
+      `${APLUS_API_URL}/courses`,
+      aplusToken,
+      AplusCoursesListResSchema,
+    );
+    staffCourses = botCoursesRes;
+  }
+
   if (staffCourses.length === 0) {
     throw new ApiError('no staff courses found in A+', HttpCode.NotFound);
   }
