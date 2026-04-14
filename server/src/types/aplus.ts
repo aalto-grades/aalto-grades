@@ -27,18 +27,22 @@ export const createAplusPaginationSchema = <T extends z.ZodType>(
     results: resultSchema, // Changed from 'result' to 'results' and use the generic schema
   });
 
+export const AplusCourseSchema = z.object({
+  id: z.number().int(),
+  code: z.string(),
+  name: z.string(),
+  instance_name: z.string(),
+  html_url: z.url(),
+});
+
 // GET /users/me
 export const AplusCoursesResSchema = z.object({
-  staff_courses: z.array(
-    z.object({
-      id: z.number().int(),
-      code: z.string(),
-      name: z.string(),
-      instance_name: z.string(),
-      html_url: z.url(),
-    })
-  ),
+  username: z.string(),
+  staff_courses: z.array(AplusCourseSchema),
 });
+
+// GET /courses
+export const AplusCoursesListResSchema = z.array(AplusCourseSchema);
 
 // GET /courses/<course_id>/exercises
 export const AplusExercisesResSchema = z.object({

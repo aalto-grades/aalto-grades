@@ -11,6 +11,11 @@ export const resetAllServiceToken = (): void => {
   SERVICE_SOURCE_OPTIONS.forEach(service => resetServiceToken(service.id));
 };
 
+/**
+ * Gets the service token for the given service ID from localStorage.
+ * @param serviceId
+ * @returns service token if it exists, otherwise null
+ */
 export const getServiceToken = (serviceId: string): string | null => localStorage.getItem(serviceId);
 
 export type ServiceSourceOption = {

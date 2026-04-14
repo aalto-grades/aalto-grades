@@ -79,11 +79,7 @@ import {
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import {SERVICE_SOURCE_OPTIONS, getCourseRole} from '@/utils';
-import type {ServiceSourceOption} from '@/utils/servicesSource';
-// import AddAplusGradeSourceDialog from './course-parts-view/AddAplusGradeSourceDialog';
 import CoursePartDialog from './course-parts-view/CoursePartDialog';
-// import NewAplusCourseTasksDialog from './course-parts-view/NewAplusCourseTasksDialog';
-// import ViewAplusGradeSourcesDialog from './course-parts-view/ViewAplusGradeSourcesDialog';
 import ViewExternalSourcesDialog from './course-parts-view/ViewExternalSourcesDialog';
 import CreateGradingModelDialog from './models-view/CreateGradingModelDialog';
 import ModelButton from './models-view/ModelButton';
@@ -126,15 +122,15 @@ const CoursePartsView = (): JSX.Element => {
           && getCourseRole(course.data, auth) === CourseRoleType.Teacher)),
   });
 
-  const [addPartDialogOpen, setAddPartDialogOpen] = useState<boolean>(false);
-  const [editPartDialogOpen, setEditPartDialogOpen] = useState<boolean>(false);
+  const [addPartDialogOpen, setAddPartDialogOpen] = useState(false);
+  const [editPartDialogOpen, setEditPartDialogOpen] = useState(false);
   const [createModelDialogOpen, setCreateModelDialogOpen] =
-    useState<boolean>(false);
+    useState(false);
   const [createModelPart, setCreateModelPart] = useState<
     CoursePartData | undefined
   >(undefined);
   const [renameModelDialogOpen, setRenameModelDialogOpen] =
-    useState<boolean>(false);
+    useState(false);
   const [renameModel, setRenameModel] = useState<GradingModelData | null>(null);
   const [editPart, setEditPart] = useState<CoursePartData | null>(null);
   const [selectedPart, setSelectedPart] = useState<number | null>(null);
@@ -158,7 +154,7 @@ const CoursePartsView = (): JSX.Element => {
   const [initRows, setInitRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>([]);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
-  const [editing, setEditing] = useState<boolean>(false);
+  const [editing, setEditing] = useState(false);
   const [rowErrors, setRowErrors] = useState<{
     [key: GridRowId]: {daysValid: boolean; name: boolean; maxGrade: boolean};
   }>({});
@@ -168,18 +164,9 @@ const CoursePartsView = (): JSX.Element => {
       Object.values(errorObj).some(value => value === true)
     );
 
-  // const [aplusDialogOpen, setAplusDialogOpen] = useState<boolean>(false);
-  const [serviceDialogOpen, setServiceDialogOpen] = useState<boolean>(false);
+  const [serviceDialogOpen, setServiceDialogOpen] = useState(false);
   const serviceOptions = SERVICE_SOURCE_OPTIONS;
-  const [serviceDialogInfo, setServiceDialogInfo] =
-    useState<ServiceSourceOption>(serviceOptions[0]);
-  // const [addAplusSourcesTo, setAddAplusSourcesTo] = useState<{
-  //   courseTaskId: number | null;
-  //   aplusGradeSources: AplusGradeSourceData[];
-  // }>({
-  //   courseTaskId: null,
-  //   aplusGradeSources: [],
-  // });
+  const [serviceDialogInfo, setServiceDialogInfo] = useState(serviceOptions[0]);
   const [addExtServiceSourcesTo, setAddExtServiceSourcesTo] = useState<{
     courseTaskId: number | null;
     externalSources: ExternalSourceData[];
@@ -193,13 +180,10 @@ const CoursePartsView = (): JSX.Element => {
     courseTaskId: number;
     externalSources: ExternalSourceData[];
   } | null>(null);
-  // const [viewAplusSourcesOpen, setViewAplusSourcesOpen] =
-  //   useState<boolean>(false);
+
   const [viewExternalSourcesOpen, setViewExternalSourcesOpen] =
-    useState<boolean>(false);
-  // const [aplusGradeSources, setAplusGradeSources] = useState<
-  //   AplusGradeSourceData[]
-  // >([]);
+    useState(false);
+
   const [externalSources, setExternalSources] = useState<ExternalSourceData[]>([]);
 
   const courseTasksWithGrades = useMemo(() => {
@@ -784,17 +768,6 @@ const CoursePartsView = (): JSX.Element => {
         >
           {t('course.parts.add-new-task')}
         </Button>
-        {/* <Tooltip title={unsavedChanges ? t('course.parts.a+-disabled') : ''}>
-          <span>
-            <Button
-              startIcon={<Add />}
-              onClick={() => setAplusDialogOpen(true)}
-              disabled={selectedPart === null || unsavedChanges || !editRights}
-            >
-              {t('course.parts.add-from-a+')}
-            </Button>
-          </span>
-        </Tooltip> */}
         <Tooltip title={unsavedChanges ? t('course.parts.a+-disabled') : ''}>
           <span>
             <ServiceSourceMenuButton
@@ -855,17 +828,6 @@ const CoursePartsView = (): JSX.Element => {
         gradingModelId={renameModel?.id ?? null}
         name={renameModel?.name ?? null}
       />
-      {/* <NewAplusCourseTasksDialog
-        open={aplusDialogOpen}
-        onClose={() => setAplusDialogOpen(false)}
-        coursePartId={selectedPart}
-      /> */}
-      {/* <AddAplusGradeSourceDialog
-        onClose={() =>
-          setAddAplusSourcesTo({courseTaskId: null, aplusGradeSources: []})}
-        courseTaskId={addAplusSourcesTo.courseTaskId}
-        aplusGradeSources={addAplusSourcesTo.aplusGradeSources}
-      /> */}
       <AddExtServiceGradeSourceDialog
         onClose={() =>
           setAddExtServiceSourcesTo({courseTaskId: null, externalSources: []})}
@@ -901,11 +863,6 @@ const CoursePartsView = (): JSX.Element => {
           </MenuItem>
         ))}
       </Menu>
-      {/* <ViewAplusGradeSourcesDialog
-        open={viewAplusSourcesOpen}
-        onClose={() => setViewAplusSourcesOpen(false)}
-        aplusGradeSources={aplusGradeSources}
-      /> */}
       <ViewExternalSourcesDialog
         open={viewExternalSourcesOpen}
         onClose={() => setViewExternalSourcesOpen(false)}
