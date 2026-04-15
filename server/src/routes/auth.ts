@@ -9,6 +9,11 @@ import {
   ChangeOwnAuthDataSchema,
   ConfirmMfaDataSchema,
   LoginDataSchema,
+  PasskeyDeleteOwnDataSchema,
+  PasskeyLoginFinishDataSchema,
+  PasskeyLoginStartDataSchema,
+  PasskeyRegisterFinishDataSchema,
+  PasskeyRegisterStartDataSchema,
   ResetAuthDataSchema,
   ResetOwnPasswordDataSchema,
   SystemRole,
@@ -20,6 +25,12 @@ import {
   authSamlLogin,
   changeOwnAuth,
   confirmMfa,
+  passkeyDeleteOwn,
+  passkeyListOwn,
+  passkeyLoginFinish,
+  passkeyLoginStart,
+  passkeyRegisterFinish,
+  passkeyRegisterStart,
   resetAuth,
   samlMetadata,
   selfInfo,
@@ -91,6 +102,59 @@ router.post(
   controllerDispatcher(confirmMfa)
 );
 
+router.post(
+  '/v1/auth/passkey/login/start',
+  express.json(),
+  handleInvalidRequestJson,
+  processRequestBody(PasskeyLoginStartDataSchema),
+  controllerDispatcher(passkeyLoginStart)
+);
+
+router.post(
+  '/v1/auth/passkey/login/finish',
+  express.json(),
+  handleInvalidRequestJson,
+  processRequestBody(PasskeyLoginFinishDataSchema),
+  controllerDispatcher(passkeyLoginFinish)
+);
+
+router.post(
+  '/v1/auth/passkey/register/start',
+  jwtAuthentication,
+  authorization([SystemRole.Admin]),
+  express.json(),
+  handleInvalidRequestJson,
+  processRequestBody(PasskeyRegisterStartDataSchema),
+  controllerDispatcher(passkeyRegisterStart)
+);
+
+router.post(
+  '/v1/auth/passkey/register/finish',
+  jwtAuthentication,
+  authorization([SystemRole.Admin]),
+  express.json(),
+  handleInvalidRequestJson,
+  processRequestBody(PasskeyRegisterFinishDataSchema),
+  controllerDispatcher(passkeyRegisterFinish)
+);
+
+router.get(
+  '/v1/auth/passkey/list-own',
+  jwtAuthentication,
+  authorization([SystemRole.Admin]),
+  controllerDispatcher(passkeyListOwn)
+);
+
+router.post(
+  '/v1/auth/passkey/delete-own',
+  jwtAuthentication,
+  authorization([SystemRole.Admin]),
+  express.json(),
+  handleInvalidRequestJson,
+  processRequestBody(PasskeyDeleteOwnDataSchema),
+  controllerDispatcher(passkeyDeleteOwn)
+);
+
 router.get(
   '/v1/auth/login-idp',
   passport.authenticate('saml', {
@@ -105,7 +169,7 @@ router.post(
   '/v1/auth/login-idp/callback',
   express.urlencoded({extended: false}),
   authSamlLogin,
-  (_req, res) => res.redirect('/')
+  (_req, res) => res.redirect('/') // TODO: Redirect to frontend URL
 );
 
 router.get('/v1/auth/saml/metadata', controllerDispatcher(samlMetadata));

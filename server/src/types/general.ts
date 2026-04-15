@@ -34,6 +34,9 @@ export const stringToIdSchema = z
   .transform(val => parseInt(val, 10))
   .pipe(z.number().int().min(1));
 
+export const normalizeStringParam = (param: string | string[]): string =>
+  Array.isArray(param) ? (param[0] ?? '') : param;
+
 export const nonEmptyStringSchema = z.string().min(1).max(25);
 
 export type JwtClaims = {role: SystemRole; id: number};

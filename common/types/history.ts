@@ -18,10 +18,12 @@ export const PreviousStateSchema = BaseGradeDataSchema.omit({
   user: true,
   grader: true,
   aplusGradeSource: true,
+  externalSource: true,
 }).extend({
   userId: z.number(),
   graderId: z.number(),
   aplusGradeSourcesId: z.number().nullable(),
+  externalSourceId: z.number().nullable(),
   createdAt: DateSchema,
   updatedAt: DateSchema,
 });

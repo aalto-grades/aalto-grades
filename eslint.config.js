@@ -261,9 +261,10 @@ export default defineConfig(
         ...globals.es2020,
       },
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ['*.js'],
+        },
         tsconfigRootDir: import.meta.dirname,
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
         ecmaFeatures: {
           jsx: true,
         },

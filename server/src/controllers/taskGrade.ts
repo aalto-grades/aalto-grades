@@ -35,7 +35,7 @@ import {
   type NewDbTaskGradeData,
   type NewDbTaskGradeLogData,
 } from '../types';
-import {validateAplusGradeSourceBelongsToCourseTask} from './utils/aplus';
+import {validateAplusGradeSourceBelongsToCourseTask} from './extservicehandlers/aplusUtils';
 import {validateCourseId} from './utils/course';
 import {validateCourseTaskBelongsToCourse} from './utils/courseTask';
 import {parseFinalGrade} from './utils/finalGrade';
@@ -254,17 +254,17 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
       validCourseTaskIds.add(grade.courseTaskId);
     }
 
-    // Validate A+ course task id
-    if (
-      grade.aplusGradeSourceId !== null
-      && !validAPlusCourseTaskIds.has(grade.aplusGradeSourceId)
-    ) {
-      await validateAplusGradeSourceBelongsToCourseTask(
-        grade.courseTaskId,
-        grade.aplusGradeSourceId
-      );
-      validAPlusCourseTaskIds.add(grade.aplusGradeSourceId);
-    }
+    // // Validate A+ course task id
+    // if (
+    //   grade?.externalSourceId !== undefined && grade.externalSourceId !== null
+    //   && !validAPlusCourseTaskIds.has(grade.externalSourceId)
+    // ) {
+    //   await validateAplusGradeSourceBelongsToCourseTask(
+    //     grade.courseTaskId,
+    //     grade.externalSourceId
+    //   );
+    //   validAPlusCourseTaskIds.add(grade.externalSourceId);
+    // }
   }
 
   // Check all users (students) exists in db, create new users if needed.
@@ -316,12 +316,34 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
 
       // If a student already has a grade for a particular A+ grade source,
       // don't create a new grade row. Instead, update the existing one.
-      if (gradeEntry.aplusGradeSourceId !== null) {
+      if (gradeEntry.externalSourceId !== undefined && gradeEntry.externalSourceId !== null) {
         const grade = await TaskGrade.findOne({
           where: {
             userId: userId,
             courseTaskId: gradeEntry.courseTaskId,
-            aplusGradeSourceId: gradeEntry.aplusGradeSourceId,
+            externalSourceId: gradeEntry.externalSourceId,
+          },
+        });
+
+        if (grade) {
+          await grade
+            .set({
+              grade: gradeEntry.grade,
+              date: gradeEntry.date,
+              expiryDate: gradeEntry.expiryDate,
+              graderId: grader.id,
+            })
+            .save({transaction: t});
+          continue;
+        }
+      }
+
+      if (gradeEntry.externalSourceId !== undefined && gradeEntry.externalSourceId !== null) {
+        const grade = await TaskGrade.findOne({
+          where: {
+            userId: userId,
+            courseTaskId: gradeEntry.courseTaskId,
+            externalSourceId: gradeEntry.externalSourceId,
           },
         });
 
@@ -342,7 +364,7 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
         userId: userId,
         courseTaskId: gradeEntry.courseTaskId,
         graderId: grader.id,
-        aplusGradeSourceId: gradeEntry.aplusGradeSourceId ?? undefined,
+        externalSourceId: gradeEntry.externalSourceId ?? undefined,
         date: gradeEntry.date,
         expiryDate: gradeEntry.expiryDate,
         grade: gradeEntry.grade,
@@ -436,7 +458,7 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
     );
   }
 
-  if (gradeData.aplusGradeSourceId !== null && grade !== undefined) {
+  if (gradeData.externalSourceId !== null && grade !== undefined) {
     throw new ApiError(
       'Grade field of A+ grades cannot be edited',
       HttpCode.BadRequest

@@ -8,15 +8,15 @@ import {
   type TaskGradeData,
   type TeacherData,
 } from '@/common/types';
-import {parseAplusGradeSource} from './aplus';
 import {findAndValidateCourseId} from './course';
 import {findCoursePartById} from './coursePart';
 import {findCourseTaskById} from './courseTask';
+import {parseExternalSource} from './extSource';
 import httpLogger from '../../configs/winston';
 import type Course from '../../database/models/course';
 import type FinalGrade from '../../database/models/finalGrade';
 import TaskGrade from '../../database/models/taskGrade';
-import {ApiError, stringToIdSchema} from '../../types';
+import {ApiError, normalizeStringParam, stringToIdSchema} from '../../types';
 
 /**
  * Finds a grade by its ID.
@@ -37,12 +37,13 @@ export const findTaskGradeById = async (id: number): Promise<TaskGrade> => {
  * @throws ApiError(400|404|409) if invalid ids, not found, or didn't match.
  */
 export const findAndValidateTaskGradePath = async (
-  courseId: string,
-  gradeId: string
+  courseId: string | string[],
+  gradeId: string | string[]
 ): Promise<[Course, TaskGrade]> => {
-  const result = stringToIdSchema.safeParse(gradeId);
+  const parsedGradeId = normalizeStringParam(gradeId);
+  const result = stringToIdSchema.safeParse(parsedGradeId);
   if (!result.success) {
-    throw new ApiError(`Invalid grade ID ${gradeId}`, HttpCode.BadRequest);
+    throw new ApiError(`Invalid grade ID ${parsedGradeId}`, HttpCode.BadRequest);
   }
 
   const course = await findAndValidateCourseId(courseId);
@@ -132,8 +133,9 @@ export const parseTaskGrade = (taskGrade: TaskGrade): TaskGradeData => {
     courseTaskId: taskGrade.courseTaskId,
     user: user,
     grader: grader,
-    aplusGradeSource: taskGrade.AplusGradeSource
-      ? parseAplusGradeSource(taskGrade.AplusGradeSource)
+    aplusGradeSource: null,
+    externalSource: taskGrade.ExternalSource
+      ? parseExternalSource(taskGrade.ExternalSource)
       : null,
     grade: taskGrade.grade,
     date: new Date(taskGrade.date),

@@ -8,7 +8,12 @@ import Course from '../../database/models/course';
 import type CourseRole from '../../database/models/courseRole';
 import CourseTranslation from '../../database/models/courseTranslation';
 import User from '../../database/models/user';
-import {ApiError, type CourseFull, stringToIdSchema} from '../../types';
+import {
+  ApiError,
+  type CourseFull,
+  normalizeStringParam,
+  stringToIdSchema,
+} from '../../types';
 
 /**
  * Finds a course by its ID.
@@ -61,11 +66,15 @@ export const findCourseFullById = async (
  * @throws ApiError(400|404) if invalid or course not found.
  */
 export const findAndValidateCourseId = async (
-  courseId: string
+  courseId: string | string[]
 ): Promise<Course> => {
-  const result = stringToIdSchema.safeParse(courseId);
+  const parsedCourseId = normalizeStringParam(courseId);
+  const result = stringToIdSchema.safeParse(parsedCourseId);
   if (!result.success)
-    throw new ApiError(`Invalid course id ${courseId}`, HttpCode.BadRequest);
+    throw new ApiError(
+      `Invalid course id ${parsedCourseId}`,
+      HttpCode.BadRequest
+    );
   return findCourseById(result.data);
 };
 
@@ -74,10 +83,16 @@ export const findAndValidateCourseId = async (
  *
  * @throws ApiError(400|404) if invalid or course not found.
  */
-export const validateCourseId = async (courseId: string): Promise<number> => {
-  const result = stringToIdSchema.safeParse(courseId);
+export const validateCourseId = async (
+  courseId: string | string[]
+): Promise<number> => {
+  const parsedCourseId = normalizeStringParam(courseId);
+  const result = stringToIdSchema.safeParse(parsedCourseId);
   if (!result.success)
-    throw new ApiError(`Invalid course id ${courseId}`, HttpCode.BadRequest);
+    throw new ApiError(
+      `Invalid course id ${parsedCourseId}`,
+      HttpCode.BadRequest
+    );
   await findCourseById(result.data);
   return result.data;
 };
