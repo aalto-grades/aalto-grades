@@ -10,6 +10,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import {useQueryClient} from '@tanstack/react-query';
 import {MuiOtpInput} from 'mui-one-time-password-input';
 import {type JSX, type SyntheticEvent, useState} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -27,6 +28,7 @@ const LoginView = (): JSX.Element => {
   const {setAuth} = useAuth();
   const navigate = useNavigate();
   const logIn = useLogIn();
+  const queryClient = useQueryClient();
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
@@ -62,13 +64,17 @@ const LoginView = (): JSX.Element => {
         setShowOtpPrompt(true);
         break;
       case 'ok':
-        setAuth({
-          id: auth.id,
-          name: auth.name,
-          email: auth.email,
-          role: auth.role,
-        });
-        navigate('/');
+        {
+          const authData = {
+            id: auth.id,
+            name: auth.name,
+            email: auth.email,
+            role: auth.role,
+          };
+          setAuth(authData);
+          queryClient.setQueryData(['refresh-token'], authData);
+          navigate('/');
+        }
         break;
     }
   };
