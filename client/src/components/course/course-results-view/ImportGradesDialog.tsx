@@ -60,20 +60,7 @@ type SourceEntry = {
   id: string;
   label: string;
   courseTaskId: number;
-  sourceKind: 'external';
   serviceId?: string;
-};
-
-type TaskEntry = {
-  id: number;
-  name: string;
-  sources: SourceEntry[];
-};
-
-type PartEntry = {
-  id: number;
-  name: string;
-  tasks: TaskEntry[];
 };
 
 type TaskListEntry = {
@@ -87,6 +74,11 @@ type SelectedTasks = {
   externalTaskIdsByService: Map<string, number[]>;
   externalTaskIdsByServiceRecord: Record<string, number[]>;
 };
+
+const SERVICE_SOURCE_OPTIONS_BY_ID: Partial<Record<string, ServiceSourceOption>> =
+  Object.fromEntries(
+    SERVICE_SOURCE_OPTIONS.map(option => [option.id.toLowerCase(), option])
+  );
 
 const ImportGradesDialog = ({
   open,
@@ -108,89 +100,68 @@ const ImportGradesDialog = ({
   const [serviceTokenInfo, setServiceTokenInfo] =
     useState<ServiceSourceOption | null>(null);
 
-  const serviceOptions = SERVICE_SOURCE_OPTIONS;
-
-  const serviceOptionMap = useMemo(() => {
-    const map = new Map<string, ServiceSourceOption>();
-    for (const option of serviceOptions) {
-      map.set(option.id.toLowerCase(), option);
-    }
-    return map;
-  }, [serviceOptions]);
+  const formatSourceLabel = (
+    serviceLabel: string,
+    sourceName: string,
+    instance?: string
+  ): string => {
+    const instancePrefix = instance ? `${instance} | ` : '';
+    return `${serviceLabel}: ${instancePrefix}${sourceName}`.trim();
+  };
 
   const externalSourceLabelById = useMemo(() => {
     const map = new Map<number, string>();
     for (const task of courseTasks.data ?? []) {
       for (const source of task.externalSources ?? []) {
-        const serviceId = source.externalServiceName.toLowerCase();
-        const serviceLabel =
-          serviceOptionMap.get(serviceId)?.label ?? source.externalServiceName;
-        const sourceName = source.sourceInfo.itemname ?? '';
-        map.set(source.id, `${serviceLabel}: ${sourceName}`);
+        map.set(
+          source.id,
+          formatSourceLabel(SERVICE_SOURCE_OPTIONS_BY_ID[source.externalServiceName.toLowerCase()]?.label ?? '', source.sourceInfo.itemname ?? '', source.externalCourse.instance)
+        );
       }
     }
     return map;
-  }, [courseTasks.data, serviceOptionMap]);
+  }, [courseTasks.data]);
 
-  const getPreviewSourceLabel = useCallback(
-    (row: NewTaskGrade): string =>
-      row.externalSourceId
-        ? externalSourceLabelById.get(row.externalSourceId) ?? '-'
-        : '-',
-    [externalSourceLabelById]
-  );
-
-  const parts = useMemo<PartEntry[]>(() => {
-    if (!courseParts.data || !courseTasks.data) return [];
-
-    const partMap = new Map<number, PartEntry>();
-    for (const part of courseParts.data) {
-      partMap.set(part.id, {id: part.id, name: part.name, tasks: []});
+  const partNameById = useMemo(() => {
+    const map = new Map<number, string>();
+    for (const part of courseParts.data ?? []) {
+      map.set(part.id, part.name);
     }
+    return map;
+  }, [courseParts.data]);
+
+  const taskList = useMemo<TaskListEntry[]>(() => {
+    if (!courseTasks.data) return [];
+
+    const result: TaskListEntry[] = [];
 
     for (const task of courseTasks.data) {
       if (task.archived) continue;
 
       const sources: SourceEntry[] = [];
-      const externalSources = task.externalSources ?? [];
-      for (const source of externalSources) {
+      for (const source of task.externalSources ?? []) {
         const serviceId = source.externalServiceName.toLowerCase();
-        const serviceLabel =
-          serviceOptionMap.get(serviceId)?.label ?? source.externalServiceName;
-        const sourceName = source.sourceInfo.itemname ?? '';
+        const label = externalSourceLabelById.get(source.id) ?? '';
         sources.push({
-          id: `ext:${serviceId}:${source.id}`,
-          label: `${serviceLabel}: ${sourceName}`,
+          id: `ext:${source.id}`,
+          label,
           courseTaskId: task.id,
-          sourceKind: 'external',
           serviceId,
         });
       }
 
       if (sources.length === 0) continue;
 
-      const partEntry = partMap.get(task.coursePartId) ?? {
-        id: task.coursePartId,
-        name: t('general.course-part'),
-        tasks: [],
-      };
-      partEntry.tasks.push({id: task.id, name: task.name, sources});
-      partMap.set(task.coursePartId, partEntry);
-    }
-
-    return Array.from(partMap.values()).filter(part => part.tasks.length > 0);
-  }, [courseParts.data, courseTasks.data, serviceOptionMap, t]);
-
-  const taskList = useMemo<TaskListEntry[]>(() =>
-    parts.flatMap(part =>
-      part.tasks.map(task => ({
-        partName: part.name,
+      result.push({
+        partName: partNameById.get(task.coursePartId) ?? t('general.course-part'),
         taskId: task.id,
         taskName: task.name,
-        sources: task.sources,
-      }))
-    ),
-  [parts]);
+        sources,
+      });
+    }
+
+    return result;
+  }, [courseTasks.data, partNameById, t]);
 
   const sourcesByTaskId = useMemo(() => {
     const map = new Map<number, SourceEntry[]>();
@@ -215,16 +186,6 @@ const ImportGradesDialog = ({
       return Array.from(next);
     });
   };
-
-  const getServiceOption = useCallback(
-    (serviceId: string): ServiceSourceOption =>
-      serviceOptionMap.get(serviceId) ?? {
-        id: serviceId,
-        label: serviceId,
-        tokenLink: '',
-      },
-    [serviceOptionMap]
-  );
 
   const selectedTasksByService = useMemo<SelectedTasks>(() => {
     const externalTaskIdSetsByService = new Map<string, Set<number>>();
@@ -261,58 +222,47 @@ const ImportGradesDialog = ({
   const gradeQueries = useGetExtServiceGradesForServices(
     courseId,
     selectedTasksByService.externalTaskIdsByServiceRecord,
-    serviceOptions,
+    SERVICE_SOURCE_OPTIONS,
     {enabled: false}
   );
 
   const gradeQueryByServiceId = useMemo(
     () => new Map(
-      serviceOptions.map((serviceInfo, index) => [serviceInfo.id, gradeQueries[index]])
+      SERVICE_SOURCE_OPTIONS.map((serviceInfo, index) => [serviceInfo.id, gradeQueries[index]])
     ),
-    [gradeQueries, serviceOptions]
-  );
-
-  const ensureTokens = useCallback(
-    ({externalTaskIdsByService}: SelectedTasks): boolean => {
-      for (const [serviceId] of externalTaskIdsByService) {
-        if (!getServiceToken(serviceId)) {
-          setServiceTokenInfo(getServiceOption(serviceId));
-          setServiceTokenDialogOpen(true);
-          setPendingImport(true);
-          return false;
-        }
-      }
-
-      return true;
-    },
-    [getServiceOption]
-  );
-
-  const fetchGrades = useCallback(
-    async ({externalTaskIdsByService}: SelectedTasks): Promise<NewTaskGrade[]> => {
-      const responses: NewTaskGrade[][] = [];
-
-      for (const [serviceId] of externalTaskIdsByService) {
-        const query = gradeQueryByServiceId.get(serviceId);
-        if (!query) continue;
-        const result = await query.refetch();
-        responses.push(result.data ?? []);
-      }
-
-      return responses.flat();
-    },
-    [gradeQueryByServiceId]
+    [gradeQueries]
   );
 
   const handleFetchGrades = useCallback(async (): Promise<void> => {
     if (selectedTaskIds.length === 0) return;
 
     const selectedTasks = selectedTasksByService;
-    if (!ensureTokens(selectedTasks)) return;
+    for (const [serviceId] of selectedTasks.externalTaskIdsByService) {
+      if (getServiceToken(serviceId)) continue;
+
+      setServiceTokenInfo(SERVICE_SOURCE_OPTIONS_BY_ID[serviceId] ?? {
+        id: serviceId,
+        label: serviceId,
+        tokenLink: '',
+      });
+      setServiceTokenDialogOpen(true);
+      setPendingImport(true);
+      return;
+    }
 
     try {
       setIsImporting(true);
-      const allGrades = await fetchGrades(selectedTasks);
+      const responses: NewTaskGrade[][] = [];
+
+      for (const [serviceId] of selectedTasks.externalTaskIdsByService) {
+        const query = gradeQueryByServiceId.get(serviceId);
+        if (!query) continue;
+
+        const result = await query.refetch();
+        responses.push(result.data ?? []);
+      }
+
+      const allGrades = responses.flat();
 
       if (allGrades.length === 0) {
         enqueueSnackbar(t('course.results.no-service-grades'), {
@@ -325,13 +275,7 @@ const ImportGradesDialog = ({
     } finally {
       setIsImporting(false);
     }
-  }, [
-    ensureTokens,
-    fetchGrades,
-    selectedTasksByService,
-    selectedTaskIds.length,
-    t,
-  ]);
+  }, [gradeQueryByServiceId, selectedTaskIds.length, selectedTasksByService, t]);
 
   const handleSubmit = async (): Promise<void> => {
     if (!previewGrades || previewGrades.length === 0) return;
@@ -377,7 +321,7 @@ const ImportGradesDialog = ({
             </Box>
           )}
 
-          {!isImporting && !previewGrades && parts.length === 0 && (
+          {!isImporting && !previewGrades && taskList.length === 0 && (
             <Typography>{t('course.results.no-service-sources')}</Typography>
           )}
 
@@ -458,7 +402,7 @@ const ImportGradesDialog = ({
                       <TableCell>
                         {courseTasks.data?.find(task => task.id === row.courseTaskId)?.name ?? row.courseTaskId}
                       </TableCell>
-                      <TableCell>{getPreviewSourceLabel(row)}</TableCell>
+                      <TableCell>{externalSourceLabelById.get(row.externalSourceId ?? 0) ?? ''}</TableCell>
                       <TableCell>{row.grade}</TableCell>
                       <TableCell>{row.date.toDateString()}</TableCell>
                       <TableCell>

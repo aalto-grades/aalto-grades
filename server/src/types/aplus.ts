@@ -35,8 +35,19 @@ export const AplusCourseSchema = z.object({
   html_url: z.url(),
 });
 
+export const AplusCourseInfoSchema = z.object({
+  id: z.number().int(),
+  code: z.string(),
+  name: z.string(),
+  instance_name: z.string(),
+  html_url: z.url(),
+  language: z.string(),
+  starting_time: z.iso.datetime({offset: true}),
+  ending_time: z.iso.datetime({offset: true}),
+});
+
 // GET /users/me
-export const AplusCoursesResSchema = z.object({
+export const AplusUserInfoResSchema = z.object({
   username: z.string(),
   staff_courses: z.array(AplusCourseSchema),
 });
@@ -84,7 +95,7 @@ const AplusStudentPointsSchema = z.object({
 // GET /courses/<course_id>/points
 export const AplusPointsResSchema = z.array(AplusStudentPointsSchema);
 
-export type AplusCoursesRes = z.infer<typeof AplusCoursesResSchema>;
+export type AplusCoursesRes = z.infer<typeof AplusUserInfoResSchema>;
 export type AplusExercisesRes = z.infer<typeof AplusExercisesResSchema>;
 export type AplusStudentPoints = z.infer<typeof AplusStudentPointsSchema>;
 export type AplusPointsRes = z.infer<typeof AplusPointsResSchema>;
