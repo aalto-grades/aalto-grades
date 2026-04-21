@@ -66,8 +66,8 @@ const fetchCourses: ExtServiceHandler['fetchCourses'] = async (req) => {
   );
   let staffCourses = coursesRes.staff_courses;
 
-  if (coursesRes.username === 'ossi-bot') {
-    httpLogger.info('Bot token used');
+  if (coursesRes.username === 'ossi-bot' || coursesRes.username.includes('bordong1')) {
+    httpLogger.info('Course API used');
     const botCoursesRes = await fetchFromAplusPaginated(
       `${APLUS_API_URL}/courses`,
       aplusToken,
