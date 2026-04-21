@@ -2,10 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Training of proctor
-// Policy on cheating
-// What happens if fail final twice
-
 import {Add} from '@mui/icons-material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -366,12 +362,12 @@ const GradesTableToolbar = (): JSX.Element => {
   const addFinalGrades = useAddFinalGrades(courseId);
 
   const [showCalculateDialog, setShowCalculateDialog] = useState<string | null>(null);
-  const [showSisuDialog, setShowSisuDialog] = useState<boolean>(false);
-  const [missingFinalGrades, setMissingFinalGrades] = useState<boolean>(false);
-  const [uploadOpen, setUploadOpen] = useState<boolean>(false);
-  const [importDialogOpen, setImportDialogOpen] = useState<boolean>(false);
+  const [showSisuDialog, setShowSisuDialog] = useState(false);
+  const [missingFinalGrades, setMissingFinalGrades] = useState(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
   // Set initial search value from query param (only on first render)
-  const [searchValue, setSearchValue] = useState<string>(initialSearch);
+  const [searchValue, setSearchValue] = useState(initialSearch);
   // Keep table global filter in sync with searchValue
   useEffect(() => {
     table.setGlobalFilter(searchValue);

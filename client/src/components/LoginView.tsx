@@ -10,8 +10,8 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {useQueryClient} from '@tanstack/react-query';
 import {startAuthentication} from '@simplewebauthn/browser';
+import {useQueryClient} from '@tanstack/react-query';
 import {MuiOtpInput} from 'mui-one-time-password-input';
 import {type JSX, type SyntheticEvent, useState} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -53,7 +53,7 @@ const LoginView = (): JSX.Element => {
     name: string;
     email: string;
     role: SystemRole;
-  }): void => {    
+  }): void => {
     const authData = {
       id: auth.id,
       name: auth.name,
