@@ -11,6 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import {startAuthentication} from '@simplewebauthn/browser';
+import {useQueryClient} from '@tanstack/react-query';
 import {MuiOtpInput} from 'mui-one-time-password-input';
 import {type JSX, type SyntheticEvent, useState} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -33,6 +34,7 @@ const LoginView = (): JSX.Element => {
   const {setAuth} = useAuth();
   const navigate = useNavigate();
   const logIn = useLogIn();
+  const queryClient = useQueryClient();
   const passkeyLoginStart = usePasskeyLoginStart();
   const passkeyLoginFinish = usePasskeyLoginFinish();
 
@@ -52,12 +54,14 @@ const LoginView = (): JSX.Element => {
     email: string;
     role: SystemRole;
   }): void => {
-    setAuth({
+    const authData = {
       id: auth.id,
       name: auth.name,
       email: auth.email,
       role: auth.role,
-    });
+    };
+    setAuth(authData);
+    queryClient.setQueryData(['refresh-token'], authData);
     navigate('/');
   };
 
