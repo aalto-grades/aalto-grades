@@ -28,6 +28,7 @@ const RenderCell = ({
           <Badge
             badgeContent={row.getIsExpanded() ? null : row.subRows.length}
             color="primary"
+            max={99999}
           >
             <IconButton
               size="small"

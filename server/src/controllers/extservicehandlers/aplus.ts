@@ -26,10 +26,11 @@ import CourseTaskExternalSource from '../../database/models/courseTaskExternalSo
 import ExternalSource from '../../database/models/externalSource';
 import {
   ApiError,
+  AplusCourseInfoSchema,
   AplusCoursesListResSchema,
-  AplusCoursesResSchema,
   AplusExercisesResSchema,
   AplusPointsResSchema,
+  AplusUserInfoResSchema,
   normalizeStringParam,
 } from '../../types';
 import {validateCourseTaskPath} from '../utils/courseTask';
@@ -54,7 +55,6 @@ const AplusSourceInfoSchema = z.looseObject({
   sourceId: z.number().optional().or(z.string().optional()),
   itemname: z.string().optional(),
   difficulty: z.string().optional(),
-  date: z.coerce.date().optional(),
 });
 
 const fetchCourses: ExtServiceHandler['fetchCourses'] = async (req) => {
@@ -62,7 +62,7 @@ const fetchCourses: ExtServiceHandler['fetchCourses'] = async (req) => {
   const coursesRes = await fetchFromAplus(
     `${APLUS_API_URL}/users/me`,
     aplusToken,
-    AplusCoursesResSchema,
+    AplusUserInfoResSchema,
   );
   let staffCourses = coursesRes.staff_courses;
 
@@ -258,6 +258,11 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (req) => {
           AplusPointsResSchema,
         );
       }
+      const courseInfo = await fetchFromAplus(
+        `${APLUS_API_URL}/courses/${aplusCourseId}?format=json`,
+        aplusToken,
+        AplusCourseInfoSchema,
+      );
 
       const points = pointsResCache[aplusCourseId];
       for (const student of points) {
@@ -324,18 +329,16 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (req) => {
             break;
           }
         }
-
-        const date = sourceInfo.date ?? source.createdAt;
-        const expiryDate = new Date(date);
-        expiryDate.setDate(date.getDate() + (courseTask.daysValid ?? 0));
+        // Completion date is ending date of instance
+        const date = new Date(courseInfo.ending_time);
 
         newGrades.push({
           studentNumber: student.student_id,
           courseTaskId: courseTask.id,
           externalSourceId: source.id,
           grade,
-          date,
-          expiryDate: courseTask.daysValid !== null ? expiryDate : null,
+          date: date,
+          expiryDate: courseTask.daysValid === null ? null : new Date((new Date(date).setDate(date.getDate() + (courseTask.daysValid ?? 0)))),
           comment: null,
         });
       }

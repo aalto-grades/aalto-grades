@@ -60,7 +60,7 @@ type HistoryButtonProps = {
 const HistoryButton = forwardRef<HTMLSpanElement, HistoryButtonProps>(
   ({courseTaskId, studentUser}): JSX.Element => {
     const {t} = useTranslation();
-    const [historyOpen, setHistoryOpen] = useState<boolean>(false);
+    const [historyOpen, setHistoryOpen] = useState(false);
 
     return (
       <>
@@ -93,7 +93,7 @@ type ColTypes = {
   gradeId: number;
   expiryDate: Date | null;
   comment: string;
-  aplusGrade: boolean;
+  externalSource: string | null;
 } & ColTypeBase;
 
 type PropsType = {
@@ -135,13 +135,13 @@ const EditGradesDialog = ({
     expiryDate: grade.expiryDate,
     comment: grade.comment ?? '',
     selected: '',
-    aplusGrade: grade.aplusGradeSource !== null,
+    externalSource: grade.externalSource ? `${grade.externalSource.externalCourse.instance}: ${grade.externalSource.sourceInfo.itemname}` : null,
   }));
 
   const [rows, setRows] = useState<GridRowsProp<ColTypes>>(initRows);
-  const [editing, setEditing] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
-  const [tableKey, setTableKey] = useState<number>(0);
+  const [editing, setEditing] = useState(false);
+  const [error, setError] = useState(false);
+  const [tableKey, setTableKey] = useState(0);
 
   const changes = useMemo(
     () =>
@@ -240,6 +240,12 @@ const EditGradesDialog = ({
       ],
     },
     {
+      field: 'externalSource',
+      headerName: t('general.grade-sources'),
+      type: 'string',
+      editable: false,
+    },
+    {
       field: 'selected',
       type: 'string',
       headerName: '',
@@ -262,7 +268,7 @@ const EditGradesDialog = ({
             : null,
           comment: '',
           selected: '',
-          aplusGrade: false,
+          externalSource: null,
         };
         return oldRows.concat(newRow);
       });
@@ -322,7 +328,7 @@ const EditGradesDialog = ({
           editedGrades.push({
             gradeId: newRow!.gradeId,
             data: {
-              grade: newRow!.aplusGrade ? undefined : newRow!.grade,
+              grade: newRow!.externalSource ? undefined : newRow!.grade,
               date: newRow!.date,
               expiryDate: newRow!.expiryDate,
               comment: newRow!.comment,
@@ -374,8 +380,18 @@ const EditGradesDialog = ({
   const getRowClassName = (
     params: GridRowClassNameParams<ColTypes>
   ): string => {
+    const classes: string[] = [];
+
+    if (params.row.selected === 'selected') {
+      classes.push('row-selected');
+    }
+
     const invalidValue = maxGrade !== null && params.row.grade > maxGrade;
-    return invalidValue ? 'invalid-value-data-grid' : '';
+    if (invalidValue) {
+      classes.push('invalid-value-data-grid');
+    }
+
+    return classes.join(' ');
   };
 
   const confirmDiscard = async (): Promise<void> => {
@@ -432,7 +448,7 @@ const EditGradesDialog = ({
               onRowEditStart={() => setEditing(true)}
               onRowEditStop={() => setEditing(false)}
               isCellEditable={(params: GridCellParams<ColTypes>) =>
-                !(params.row.aplusGrade && params.field === 'grade')}
+                !(params.row.externalSource && params.field === 'grade')}
               processRowUpdate={processRowUpdate as unknown as ProcessRowUpdate}
               onProcessRowUpdateError={(rowError: Error) => {
                 setError(true);

@@ -209,7 +209,7 @@ export const fetchFromAplusPaginated = async <T extends readonly unknown[]>(
       validateStatus: (status: number) => status === 200,
       headers: {Authorization: `Token ${aplusToken}`},
     });
-
+    // console.log('I got', response.data);
     const result = paginatedSchema.safeParse(response.data);
 
     if (!result.success) {

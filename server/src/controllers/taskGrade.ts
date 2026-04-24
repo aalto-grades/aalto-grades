@@ -45,6 +45,7 @@ import {
   parseTaskGrade,
   validateUserAndGrader,
 } from './utils/taskGrade';
+import ExternalSource from '../database/models/externalSource';
 
 /**
  * () => StudentRow[]
@@ -69,7 +70,7 @@ export const getGrades: Endpoint<void, StudentRow[]> = async (req, res) => {
         as: 'grader',
         attributes: ['id', 'name', 'email', 'studentNumber'],
       },
-      {model: AplusGradeSource},
+      {model: ExternalSource},
     ],
     where: {
       courseTaskId: courseTasks.map(courseTask => courseTask.id),
@@ -246,25 +247,12 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
 
   // Validate that course tasks and A+ grade sources belong to correct course
   const validCourseTaskIds = new Set<number>();
-  const validAPlusCourseTaskIds = new Set<number>();
   for (const grade of req.body) {
     // Validate course task id
     if (!validCourseTaskIds.has(grade.courseTaskId)) {
       await validateCourseTaskBelongsToCourse(courseId, grade.courseTaskId);
       validCourseTaskIds.add(grade.courseTaskId);
     }
-
-    // // Validate A+ course task id
-    // if (
-    //   grade?.externalSourceId !== undefined && grade.externalSourceId !== null
-    //   && !validAPlusCourseTaskIds.has(grade.externalSourceId)
-    // ) {
-    //   await validateAplusGradeSourceBelongsToCourseTask(
-    //     grade.courseTaskId,
-    //     grade.externalSourceId
-    //   );
-    //   validAPlusCourseTaskIds.add(grade.externalSourceId);
-    // }
   }
 
   // Check all users (students) exists in db, create new users if needed.

@@ -154,13 +154,13 @@ export const GradesTableProvider = ({
   const [rowSelection, setRowSelection] = useState({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [grouping, setGrouping] = useState<GroupingState>([]);
-  const [globalFilter, setGlobalFilter] = useState<string>('');
+  const [globalFilter, setGlobalFilter] = useState('');
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     errors: false,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
-  const [userGraphOpen, setUserGraphOpen] = useState<boolean>(false);
+  const [userGraphOpen, setUserGraphOpen] = useState(false);
   const [userGraphData, setUserGraphData] = useState<{
     row: GroupedStudentRow;
     gradingModel: GradingModelData | null;
@@ -395,6 +395,12 @@ export const GradesTableProvider = ({
       const b = valB.predictedGraphValues?.[predictedModelId].finalGrade ?? -1;
 
       return a - b;
+    },
+    getGroupingValue: (row) => {
+      if (predictedModelId === 'any') return null; // Grouping by predicted grade doesn't make sense if there is more than one model
+
+      const value = row.predictedGraphValues?.[predictedModelId].finalGrade;
+      return value !== undefined ? String(value) : null;
     },
     cell: ({getValue}) => (
       <PredictedGradeCell
