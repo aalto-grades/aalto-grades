@@ -11,6 +11,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  type DialogProps,
   DialogTitle,
   FormControlLabel,
   LinearProgress,
@@ -43,17 +44,21 @@ import {useParams} from 'react-router-dom';
 import type {NewTaskGrade} from '@/common/types';
 import ServiceTokenDialog from '@/components/shared/auth/ServiceTokenDialog';
 import {
+  type ExtServiceImportStreamEvent,
+  ExtServiceImportStreamEventType,
+  fetchExtServiceGradesStream,
+} from '@/hooks/api/extServices';
+import {
   useAddGrades,
   useGetCourseParts,
   useGetCourseTasks,
-  useGetExtServiceGradesForServices,
 } from '@/hooks/useApi';
 import {SERVICE_SOURCE_OPTIONS, getServiceToken} from '@/utils';
 import type {ServiceSourceOption} from '@/utils/servicesSource';
 
 type PropsType = {
   open: boolean;
-  onClose: () => void;
+  onClose: (() => void);
 };
 
 type SourceEntry = {
@@ -72,7 +77,6 @@ type TaskListEntry = {
 
 type SelectedTasks = {
   externalTaskIdsByService: Map<string, number[]>;
-  externalTaskIdsByServiceRecord: Record<string, number[]>;
 };
 
 const SERVICE_SOURCE_OPTIONS_BY_ID: Partial<Record<string, ServiceSourceOption>> =
@@ -95,6 +99,11 @@ const ImportGradesDialog = ({
   const [isImporting, setIsImporting] = useState(false);
   const [pendingImport, setPendingImport] = useState(false);
   const [previewGrades, setPreviewGrades] = useState<NewTaskGrade[] | null>(null);
+  const [importStatusMessage, setImportStatusMessage] = useState<string | null>(null);
+  const [importProgress, setImportProgress] = useState<{
+    completedTasks: number;
+    totalTasks: number;
+  } | null>(null);
 
   const [serviceTokenDialogOpen, setServiceTokenDialogOpen] = useState(false);
   const [serviceTokenInfo, setServiceTokenInfo] =
@@ -161,7 +170,7 @@ const ImportGradesDialog = ({
     }
 
     return result;
-  }, [courseTasks.data, partNameById, t]);
+  }, [courseTasks.data, externalSourceLabelById, partNameById, t]);
 
   const sourcesByTaskId = useMemo(() => {
     const map = new Map<number, SourceEntry[]>();
@@ -209,29 +218,10 @@ const ImportGradesDialog = ({
       externalTaskIdsByService.set(serviceId, Array.from(taskIdSet));
     }
 
-    const externalTaskIdsByServiceRecord = Object.fromEntries(
-      Array.from(externalTaskIdsByService.entries())
-    ) as Record<string, number[]>;
-
     return {
       externalTaskIdsByService,
-      externalTaskIdsByServiceRecord,
     };
   }, [selectedTaskIds, sourcesByTaskId]);
-
-  const gradeQueries = useGetExtServiceGradesForServices(
-    courseId,
-    selectedTasksByService.externalTaskIdsByServiceRecord,
-    SERVICE_SOURCE_OPTIONS,
-    {enabled: false}
-  );
-
-  const gradeQueryByServiceId = useMemo(
-    () => new Map(
-      SERVICE_SOURCE_OPTIONS.map((serviceInfo, index) => [serviceInfo.id, gradeQueries[index]])
-    ),
-    [gradeQueries]
-  );
 
   const handleFetchGrades = useCallback(async (): Promise<void> => {
     if (selectedTaskIds.length === 0) return;
@@ -252,14 +242,48 @@ const ImportGradesDialog = ({
 
     try {
       setIsImporting(true);
+      setImportStatusMessage(null);
+      setImportProgress(null);
       const responses: NewTaskGrade[][] = [];
 
-      for (const [serviceId] of selectedTasks.externalTaskIdsByService) {
-        const query = gradeQueryByServiceId.get(serviceId);
-        if (!query) continue;
+      for (const [serviceId, courseTaskIds] of selectedTasks.externalTaskIdsByService) {
+        const serviceInfo = SERVICE_SOURCE_OPTIONS_BY_ID[serviceId] ?? {
+          id: serviceId,
+          label: serviceId,
+          tokenLink: '',
+        };
 
-        const result = await query.refetch();
-        responses.push(result.data ?? []);
+        setImportStatusMessage(
+          t('course.results.fetching-grades-wait-service', {
+            service: serviceInfo.label,
+          }),
+        );
+        setImportProgress({
+          completedTasks: 0,
+          totalTasks: courseTaskIds.length,
+        });
+
+        const grades: NewTaskGrade[] = await fetchExtServiceGradesStream(
+          courseId,
+          courseTaskIds,
+          serviceInfo,
+          (event: ExtServiceImportStreamEvent) => {
+            if (event.type === ExtServiceImportStreamEventType.Heartbeat) {
+              return;
+            }
+
+            setImportStatusMessage(event.message);
+
+            if ('completedTasks' in event && 'totalTasks' in event) {
+              setImportProgress({
+                completedTasks: event.completedTasks,
+                totalTasks: event.totalTasks,
+              });
+            }
+          },
+        );
+
+        responses.push(grades);
       }
 
       const allGrades = responses.flat();
@@ -272,15 +296,32 @@ const ImportGradesDialog = ({
       }
 
       setPreviewGrades(allGrades);
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
+
+      enqueueSnackbar(
+        error instanceof Error ? error.message : t('general.error'),
+        {variant: 'error'},
+      );
     } finally {
       setIsImporting(false);
     }
-  }, [gradeQueryByServiceId, selectedTaskIds.length, selectedTasksByService, t]);
+  }, [courseId, selectedTaskIds.length, selectedTasksByService, t]);
 
   const handleSubmit = async (): Promise<void> => {
     if (!previewGrades || previewGrades.length === 0) return;
     await addGrades.mutateAsync(previewGrades);
     enqueueSnackbar(t('course.results.grades-saved'), {variant: 'success'});
+    onClose();
+  };
+
+  const handleDialogClose: NonNullable<DialogProps['onClose']> = (
+    _,
+    reason,
+  ): void => {
+    if (reason === 'backdropClick') return;
     onClose();
   };
 
@@ -298,13 +339,15 @@ const ImportGradesDialog = ({
     setServiceTokenDialogOpen(false);
     setServiceTokenInfo(null);
     setPreviewGrades(null);
+    setImportStatusMessage(null);
+    setImportProgress(null);
   }, [open]);
 
   if (!open) return null;
 
   return (
     <>
-      <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <Dialog open={open} onClose={handleDialogClose} maxWidth="md" fullWidth>
         <DialogTitle>
           {previewGrades
             ? t('course.results.confirm-service-grades', {
@@ -316,8 +359,21 @@ const ImportGradesDialog = ({
         <DialogContent>
           {isImporting && (
             <Box sx={{mb: 2}}>
-              <Typography>{t('course.parts.fetching-grades')}</Typography>
-              <LinearProgress sx={{mt: 1}} />
+              <Typography>
+                {importStatusMessage ?? t('course.parts.fetching-grades')}
+              </Typography>
+              <LinearProgress
+                variant={importProgress ? 'buffer' : 'indeterminate'}
+                value={
+                  importProgress && importProgress.totalTasks > 0
+                    ? (importProgress.completedTasks / importProgress.totalTasks) * 100
+                    : undefined
+                }
+                valueBuffer={importProgress && importProgress.totalTasks > 0
+                  ? (importProgress.completedTasks / importProgress.totalTasks) * 100
+                  : undefined}
+                sx={{mt: 1}}
+              />
             </Box>
           )}
 
@@ -436,8 +492,8 @@ const ImportGradesDialog = ({
               )
             : (
                 <>
-                  <Button onClick={onClose} disabled={isImporting}>
-                    {t('general.close')}
+                  <Button onClick={onClose}>
+                    {isImporting ? t('general.cancel') : t('general.close')}
                   </Button>
                   <Button
                     variant="contained"

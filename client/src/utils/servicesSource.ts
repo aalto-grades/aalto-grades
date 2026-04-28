@@ -24,6 +24,6 @@ export type ServiceSourceOption = {
   tokenLink: string;
 };
 export const SERVICE_SOURCE_OPTIONS: ServiceSourceOption[] = [
-  {id: 'mycourses', label: 'MyCourses', tokenLink: 'https://mycourses.aalto.fi/'},
+  {id: 'mycourses', label: 'MyCourses', tokenLink: 'https://mycourses-test.aalto.fi/user/managetoken.php'},
   {id: 'aplus', label: 'A+', tokenLink: 'https://plus.cs.aalto.fi/accounts/accounts/'},
 ];

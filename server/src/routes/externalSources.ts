@@ -11,6 +11,7 @@ import {
   fetchServiceCourses,
   fetchServiceExerciseData,
   fetchServiceGrades,
+  streamFetchServiceGrades,
 } from '../controllers/extService';
 import {handleInvalidRequestJson} from '../middleware';
 import {apiKeyAuthentication, jwtAuthentication} from '../middleware/authentication';
@@ -55,4 +56,14 @@ router.get(
   jwtAuthentication,
   courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
   controllerDispatcher(fetchServiceGrades),
+);
+
+router.post(
+  '/v1/ext-source/:serviceName/courses/:courseId/fetch-stream',
+  apiKeyAuthentication,
+  jwtAuthentication,
+  courseAuthorization([CourseRoleType.Teacher, CourseRoleType.Assistant]),
+  express.json(),
+  handleInvalidRequestJson,
+  controllerDispatcher(streamFetchServiceGrades),
 );

@@ -125,6 +125,7 @@ afterAll(async () => {
 describe('Test GET /v1/aplus/courses - get A+ courses', () => {
   it('should respond with correct data', async () => {
     const data: AplusCoursesRes = {
+      username: 'test-user',
       staff_courses: [
         {
           id: 1,

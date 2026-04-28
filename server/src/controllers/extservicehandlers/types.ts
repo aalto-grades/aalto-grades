@@ -10,9 +10,22 @@ import type {
   NewTaskGrade,
 } from '@/common/types';
 
+export type ExtServiceImportProgress = {
+  message: string;
+  completedTasks: number;
+  totalTasks: number;
+};
+
+export type ExtServiceImportProgressReporter = (
+  progress: ExtServiceImportProgress,
+) => void;
+
 export type ExtServiceHandler = {
   externalServiceName: string;
   fetchCourses: (req: Request) => Promise<AplusCourseData[]>;
   fetchExerciseData: (req: Request) => Promise<ExtServiceExerciseData>;
-  fetchGrades: (req: Request) => Promise<NewTaskGrade[]>;
+  fetchGrades: (
+    req: Request,
+    reportProgress?: ExtServiceImportProgressReporter,
+  ) => Promise<NewTaskGrade[]>;
 };
