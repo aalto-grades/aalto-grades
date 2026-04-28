@@ -7,6 +7,7 @@ import type {Request} from 'express';
 import {z} from 'zod';
 
 import {type AplusGradeSourceData, HttpCode} from '@/common/types';
+import type {ExtServiceImportProgress, ExtServiceImportProgressReporter} from './types';
 import {AXIOS_TIMEOUT} from '../../configs/constants';
 import httpLogger from '../../configs/winston';
 import AplusGradeSource from '../../database/models/aplusGradeSource';
@@ -195,15 +196,20 @@ export const fetchFromAplus = async <T>(
 export const fetchFromAplusPaginated = async <T extends readonly unknown[]>(
   url: string,
   aplusToken: string,
-  schema: z.ZodType<T>
+  schema: z.ZodType<T>,
+  reportProgress: ExtServiceImportProgressReporter | null = null,
+  progressObject: ExtServiceImportProgress | null = null
 ): Promise<T> => {
-  httpLogger.http(`Calling A+ With "GET ${url}"`);
+  httpLogger.http(`Calling A+ With "GET ${url}" Paginated`);
 
   const paginatedSchema = createAplusPaginationSchema(schema);
   const resultArray: T[number][] = [];
   let currentUrl: string | null = url;
-
+  let i = 1;
   do {
+    if (reportProgress && progressObject) {
+      reportProgress({...progressObject, message: progressObject.message + ` | Page ${i} fetching`});
+    }
     const response = await axios.get(currentUrl, {
       timeout: AXIOS_TIMEOUT,
       validateStatus: (status: number) => status === 200,
@@ -222,6 +228,7 @@ export const fetchFromAplusPaginated = async <T extends readonly unknown[]>(
     // result.data.results is of type T (the full array), so we spread it
     resultArray.push(...(result.data.results as T));
     currentUrl = result.data.next;
+    i++;
   } while (currentUrl);
 
   return resultArray as unknown as T;

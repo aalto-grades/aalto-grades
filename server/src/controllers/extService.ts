@@ -28,7 +28,7 @@ import ExternalSource from '../database/models/externalSource';
 const parseServiceName = (serviceNameParam: string | string[]): string =>
   normalizeStringParam(serviceNameParam).toLowerCase();
 
-const STREAM_KEEPALIVE_INTERVAL_MS = 10_000;
+const STREAM_KEEPALIVE_INTERVAL_MS = 10000;
 
 const parseImportRequest = (body: unknown): number[] => {
   const result = ExtServiceImportRequestSchema.safeParse(body);
@@ -284,12 +284,7 @@ export const streamFetchServiceGrades: Endpoint<
     });
   }, STREAM_KEEPALIVE_INTERVAL_MS);
 
-  const cleanup = (): void => {
-    clearInterval(heartbeatInterval);
-  };
-
-  req.on('close', cleanup);
-  res.on('close', cleanup);
+  res.on('close', () => clearInterval(heartbeatInterval));
 
   try {
     writeStreamChunk(res, {

@@ -268,20 +268,20 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (
       const sourceInfo = sourceInfoResult.data;
       const aplusCourseId = courseResult.data.id;
 
-      reportProgress?.({
-        message:
-          sourceInfo.itemname
-            ? `Fetching ${source.externalCourse.instance} ${sourceInfo.itemname} for ${courseTask.name}`
-            : `Fetching source for ${courseTask.name}`,
-        completedTasks: taskIndex + ((aplusSources.indexOf(source) + 1) / aplusSources.length),
-        totalTasks: courseTaskIds.length,
-      });
-
       if (!(aplusCourseId in pointsResCache)) {
         pointsResCache[aplusCourseId] = await fetchFromAplusPaginated(
           `${APLUS_API_URL}/courses/${aplusCourseId}/points?format=json`,
           aplusToken,
           AplusPointsResSchema,
+          reportProgress,
+          {
+            message:
+          sourceInfo.itemname
+            ? `Fetching ${source.externalCourse.instance} ${sourceInfo.itemname} for ${courseTask.name}`
+            : `Fetching source for ${courseTask.name}`,
+            completedTasks: taskIndex + ((aplusSources.indexOf(source) + 0.5) / aplusSources.length),
+            totalTasks: courseTaskIds.length,
+          }
         );
       }
       const courseInfo = await fetchFromAplus(
