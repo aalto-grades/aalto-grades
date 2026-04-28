@@ -2,26 +2,59 @@
 //
 // SPDX-License-Identifier: MIT
 
+import type {Request, Response} from 'express';
+
 import {
+  ExtServiceImportRequestSchema,
+  ExtServiceImportStreamEventType,
   type ExternalSourceInfo,
   HttpCode,
   type NewExtServiceGradeSourceData,
   type NewTaskGrade,
 } from '@/common/types';
 import {sequelize} from '../database';
-import {getExtServiceHandler} from './extservicehandlers';
-import {validateCourseTaskPath} from './utils/courseTask';
-import CourseTaskExternalSource from '../database/models/courseTaskExternalSource';
-import ExternalSource from '../database/models/externalSource';
 import {
   ApiError,
   type Endpoint,
   normalizeStringParam,
   stringToIdSchema,
 } from '../types';
+import {getExtServiceHandler} from './extservicehandlers';
+import type {ExtServiceImportProgress} from './extservicehandlers/types';
+import {validateCourseTaskPath} from './utils/courseTask';
+import CourseTaskExternalSource from '../database/models/courseTaskExternalSource';
+import ExternalSource from '../database/models/externalSource';
 
 const parseServiceName = (serviceNameParam: string | string[]): string =>
   normalizeStringParam(serviceNameParam).toLowerCase();
+
+const STREAM_KEEPALIVE_INTERVAL_MS = 10_000;
+
+const parseImportRequest = (body: unknown): number[] => {
+  const result = ExtServiceImportRequestSchema.safeParse(body);
+  if (!result.success) {
+    throw new ApiError(result.error.message, HttpCode.BadRequest);
+  }
+
+  return result.data.courseTaskIds;
+};
+
+const createFetchGradesRequest = (
+  req: Request,
+  courseTaskIds: number[],
+): Request => ({
+  headers: req.headers,
+  params: req.params,
+  query: {
+    'course-tasks': JSON.stringify(courseTaskIds),
+  },
+} as unknown as Request);
+
+const writeStreamChunk = (res: Response, chunk: object): void => {
+  res.write(`${JSON.stringify(chunk)}\n`);
+};
+
+const isStreamClosed = (res: Response): boolean => res.writableEnded || res.destroyed;
 
 /**
  * () => ServiceCourseData[]
@@ -220,4 +253,91 @@ export const fetchServiceGrades: Endpoint<void, NewTaskGrade[]> = async (
   const handler = getExtServiceHandler(serviceName);
   const grades = await handler.fetchGrades(req);
   res.json(grades);
+};
+
+/**
+ * ({ courseTaskIds: number[] }) => streamed import progress and result
+ */
+export const streamFetchServiceGrades: Endpoint<
+  {courseTaskIds: number[]},
+  void
+> = async (req, res) => {
+  const courseTaskIds = parseImportRequest(req.body);
+  const serviceName = parseServiceName(req.params.serviceName);
+  const handler = getExtServiceHandler(serviceName);
+
+  res.status(HttpCode.Ok);
+  res.setHeader('Content-Type', 'application/x-ndjson; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders();
+
+  const heartbeatInterval = setInterval(() => {
+    if (isStreamClosed(res)) {
+      return;
+    }
+
+    writeStreamChunk(res, {
+      type: ExtServiceImportStreamEventType.Heartbeat,
+      timestamp: new Date(),
+    });
+  }, STREAM_KEEPALIVE_INTERVAL_MS);
+
+  const cleanup = (): void => {
+    clearInterval(heartbeatInterval);
+  };
+
+  req.on('close', cleanup);
+  res.on('close', cleanup);
+
+  try {
+    writeStreamChunk(res, {
+      type: ExtServiceImportStreamEventType.Progress,
+      message: `Starting ${serviceName} import`,
+      completedTasks: 0,
+      totalTasks: courseTaskIds.length,
+    });
+
+    const grades = await handler.fetchGrades(
+      createFetchGradesRequest(req, courseTaskIds),
+      ({message, completedTasks, totalTasks}: ExtServiceImportProgress) => {
+        if (isStreamClosed(res)) {
+          return;
+        }
+
+        writeStreamChunk(res, {
+          type: ExtServiceImportStreamEventType.Progress,
+          message,
+          completedTasks,
+          totalTasks,
+        });
+      },
+    );
+
+    if (!isStreamClosed(res)) {
+      writeStreamChunk(res, {
+        type: ExtServiceImportStreamEventType.Result,
+        message: `Imported ${grades.length} grades`,
+        completedTasks: courseTaskIds.length,
+        totalTasks: courseTaskIds.length,
+        grades,
+      });
+    }
+  } catch (error) {
+    if (!isStreamClosed(res)) {
+      writeStreamChunk(res, {
+        type: ExtServiceImportStreamEventType.Error,
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Import failed unexpectedly',
+      });
+    }
+  } finally {
+    clearInterval(heartbeatInterval);
+    if (!isStreamClosed(res)) {
+      res.end();
+    }
+  }
 };

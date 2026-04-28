@@ -195,7 +195,10 @@ const fetchExerciseData: ExtServiceHandler['fetchExerciseData'] = async (req) =>
   return exerciseArr;
 };
 
-const fetchGrades: ExtServiceHandler['fetchGrades'] = async (req) => {
+const fetchGrades: ExtServiceHandler['fetchGrades'] = async (
+  req,
+  reportProgress,
+) => {
   const aplusToken = parseAplusToken(req);
   const courseTaskIds = parseCourseTaskIdsFromQuery(req.query['course-tasks']);
   const parsedCourseId = normalizeStringParam(req.params.courseId);
@@ -204,11 +207,25 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (req) => {
     {};
   const newGrades: NewTaskGrade[] = [];
 
-  for (const courseTaskId of courseTaskIds) {
+  if (courseTaskIds.length > 0) {
+    reportProgress?.({
+      message: 'Preparing A+ import',
+      completedTasks: 0,
+      totalTasks: courseTaskIds.length,
+    });
+  }
+
+  for (const [taskIndex, courseTaskId] of courseTaskIds.entries()) {
     const [, , courseTask] = await validateCourseTaskPath(
       parsedCourseId,
       String(courseTaskId),
     );
+
+    reportProgress?.({
+      message: `Fetching grades for ${courseTask.name}`,
+      completedTasks: taskIndex,
+      totalTasks: courseTaskIds.length,
+    });
 
     const links = await CourseTaskExternalSource.findAll({
       where: {courseTaskId: courseTask.id},
@@ -250,6 +267,15 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (req) => {
 
       const sourceInfo = sourceInfoResult.data;
       const aplusCourseId = courseResult.data.id;
+
+      reportProgress?.({
+        message:
+          sourceInfo.itemname
+            ? `Fetching ${source.externalCourse.instance} ${sourceInfo.itemname} for ${courseTask.name}`
+            : `Fetching source for ${courseTask.name}`,
+        completedTasks: taskIndex + ((aplusSources.indexOf(source) + 1) / aplusSources.length),
+        totalTasks: courseTaskIds.length,
+      });
 
       if (!(aplusCourseId in pointsResCache)) {
         pointsResCache[aplusCourseId] = await fetchFromAplusPaginated(
@@ -343,6 +369,12 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (req) => {
         });
       }
     }
+
+    reportProgress?.({
+      message: `Finished ${courseTask.name}`,
+      completedTasks: taskIndex + 1,
+      totalTasks: courseTaskIds.length,
+    });
   }
 
   return newGrades;

@@ -11,6 +11,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  type DialogProps,
   DialogTitle,
   FormControlLabel,
   LinearProgress,
@@ -35,7 +36,6 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import {useTranslation} from 'react-i18next';
@@ -58,7 +58,7 @@ import type {ServiceSourceOption} from '@/utils/servicesSource';
 
 type PropsType = {
   open: boolean;
-  onClose: () => void;
+  onClose: (() => void);
 };
 
 type SourceEntry = {
@@ -108,7 +108,6 @@ const ImportGradesDialog = ({
   const [serviceTokenDialogOpen, setServiceTokenDialogOpen] = useState(false);
   const [serviceTokenInfo, setServiceTokenInfo] =
     useState<ServiceSourceOption | null>(null);
-  const importAbortControllerRef = useRef<AbortController | null>(null);
 
   const formatSourceLabel = (
     serviceLabel: string,
@@ -264,9 +263,6 @@ const ImportGradesDialog = ({
           totalTasks: courseTaskIds.length,
         });
 
-        const abortController = new AbortController();
-        importAbortControllerRef.current = abortController;
-
         const grades: NewTaskGrade[] = await fetchExtServiceGradesStream(
           courseId,
           courseTaskIds,
@@ -285,7 +281,6 @@ const ImportGradesDialog = ({
               });
             }
           },
-          abortController.signal,
         );
 
         responses.push(grades);
@@ -311,7 +306,6 @@ const ImportGradesDialog = ({
         {variant: 'error'},
       );
     } finally {
-      importAbortControllerRef.current = null;
       setIsImporting(false);
     }
   }, [courseId, selectedTaskIds.length, selectedTasksByService, t]);
@@ -323,6 +317,14 @@ const ImportGradesDialog = ({
     onClose();
   };
 
+  const handleDialogClose: NonNullable<DialogProps['onClose']> = (
+    _,
+    reason,
+  ): void => {
+    if (reason === 'backdropClick') return;
+    onClose();
+  };
+
   useEffect(() => {
     if (!pendingImport) return;
     setPendingImport(false);
@@ -331,8 +333,6 @@ const ImportGradesDialog = ({
 
   useEffect(() => {
     if (open) return;
-    importAbortControllerRef.current?.abort();
-    importAbortControllerRef.current = null;
     setSelectedTaskIds([]);
     setIsImporting(false);
     setPendingImport(false);
@@ -343,15 +343,11 @@ const ImportGradesDialog = ({
     setImportProgress(null);
   }, [open]);
 
-  useEffect(() => () => {
-    importAbortControllerRef.current?.abort();
-  }, []);
-
   if (!open) return null;
 
   return (
     <>
-      <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <Dialog open={open} onClose={handleDialogClose} maxWidth="md" fullWidth>
         <DialogTitle>
           {previewGrades
             ? t('course.results.confirm-service-grades', {
@@ -496,8 +492,8 @@ const ImportGradesDialog = ({
               )
             : (
                 <>
-                  <Button onClick={onClose} disabled={isImporting}>
-                    {t('general.close')}
+                  <Button onClick={onClose}>
+                    {isImporting ? t('general.cancel') : t('general.close')}
                   </Button>
                   <Button
                     variant="contained"

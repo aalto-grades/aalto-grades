@@ -197,7 +197,10 @@ const fetchExerciseData: ExtServiceHandler['fetchExerciseData'] = async (req) =>
   ];
 };
 
-const fetchGrades: ExtServiceHandler['fetchGrades'] = async (req) => {
+const fetchGrades: ExtServiceHandler['fetchGrades'] = async (
+  req,
+  reportProgress,
+) => {
   const myCoursesToken = parseAuthToken(req);
   const courseTaskIds = parseCourseTaskIdsFromQuery(req.query['course-tasks']);
   const parsedCourseId = normalizeStringParam(req.params.courseId);
@@ -207,11 +210,25 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (req) => {
   } = {};
   const newGrades: NewTaskGrade[] = [];
 
-  for (const courseTaskId of courseTaskIds) {
+  if (courseTaskIds.length > 0) {
+    reportProgress?.({
+      message: 'Preparing MyCourses import',
+      completedTasks: 0,
+      totalTasks: courseTaskIds.length,
+    });
+  }
+
+  for (const [taskIndex, courseTaskId] of courseTaskIds.entries()) {
     const [, , courseTask] = await validateCourseTaskPath(
       parsedCourseId,
       String(courseTaskId),
     );
+
+    reportProgress?.({
+      message: `Fetching grades for ${courseTask.name}`,
+      completedTasks: taskIndex,
+      totalTasks: courseTaskIds.length,
+    });
 
     const links = await CourseTaskExternalSource.findAll({
       where: {courseTaskId: courseTask.id},
@@ -255,6 +272,15 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (req) => {
 
       const sourceInfo = sourceInfoResult.data;
       const moodleCourseId = courseResult.data.id;
+
+      reportProgress?.({
+        message:
+          sourceInfo.itemname
+            ? `Fetching ${source.externalCourse.instance} ${sourceInfo.itemname} for ${courseTask.name}`
+            : `Fetching source for ${courseTask.name}`,
+        completedTasks: taskIndex,
+        totalTasks: courseTaskIds.length,
+      });
 
       if (!(moodleCourseId in gradesResCache)) {
         gradesResCache[moodleCourseId] = await fetchFromMyCourses(
@@ -336,6 +362,12 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (req) => {
         });
       }
     }
+
+    reportProgress?.({
+      message: `Finished ${courseTask.name}`,
+      completedTasks: taskIndex + 1,
+      totalTasks: courseTaskIds.length,
+    });
   }
 
   return newGrades;
