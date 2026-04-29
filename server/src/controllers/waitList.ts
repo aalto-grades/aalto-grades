@@ -30,7 +30,6 @@ import {
 } from '../types';
 import {validateCourseId} from './utils/course';
 import {validateCourseTaskBelongsToCourse} from './utils/courseTask';
-import {studentNumbersExist} from './utils/finalGrade';
 
 const parseWaitListEntry = (entry: WaitListEntry): WaitListEntryData => {
   if (entry.User === undefined) {
@@ -75,7 +74,22 @@ const normalizeDateResolved = (
 const resolveUsersByStudentNumber = async (
   studentNumbers: string[]
 ): Promise<Map<string, User>> => {
-  await studentNumbersExist(studentNumbers);
+  const existingUsers = await User.findAll({
+    where: {studentNumber: {[Op.in]: studentNumbers}},
+  });
+
+  const foundNumbers = new Set(
+    existingUsers
+      .filter(u => u.studentNumber !== null)
+      .map(u => u.studentNumber as string)
+  );
+  const missing = studentNumbers.filter(sn => !foundNumbers.has(sn));
+
+  if (missing.length > 0) {
+    await User.bulkCreate(
+      missing.map(studentNumber => ({studentNumber})),
+    );
+  }
 
   const users = await User.findAll({
     where: {studentNumber: {[Op.in]: studentNumbers}},
