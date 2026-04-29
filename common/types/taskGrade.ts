@@ -5,6 +5,7 @@
 import {z} from 'zod';
 
 import {AplusGradeSourceDataSchema} from './aplus';
+import {ExternalSourceDataSchema} from './extServices';
 import {FinalGradeDataArraySchema} from './finalGrade';
 import {DateSchema, IdSchema} from './general';
 import {StudentDataSchema, TeacherDataSchema} from './user';
@@ -15,6 +16,7 @@ export const BaseGradeDataSchema = z.strictObject({
   courseTaskId: IdSchema,
   grader: TeacherDataSchema,
   aplusGradeSource: AplusGradeSourceDataSchema.nullable(),
+  externalSource: ExternalSourceDataSchema.nullable(),
   grade: z.number(),
   date: DateSchema,
   expiryDate: DateSchema.nullable(),
@@ -28,7 +30,11 @@ export const NewTaskGradeSchema = z
   .strictObject({
     studentNumber: z.string(),
     courseTaskId: IdSchema,
-    aplusGradeSourceId: IdSchema.nullable(),
+    /**
+    * @deprecated The method should not be used
+    */
+    aplusGradeSourceId: IdSchema.nullable().optional(),
+    externalSourceId: IdSchema.nullable().optional(),
     grade: z.number(),
     date: DateSchema,
     expiryDate: DateSchema.nullable(),
@@ -40,6 +46,7 @@ export const NewTaskGradeSchema = z
 export const EditTaskGradeDataSchema = BaseGradeDataSchema.omit({
   id: true,
   aplusGradeSource: true,
+  externalSource: true,
   grader: true,
 })
   .strict()

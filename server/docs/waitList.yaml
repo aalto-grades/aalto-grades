@@ -1,0 +1,316 @@
+# SPDX-FileCopyrightText: 2026 The Ossi Developers
+#
+# SPDX-License-Identifier: MIT
+---
+definitions:
+  WaitListEntryId:
+    type: integer
+    format: int32
+    description: Internal wait list entry database ID.
+    minimum: 1
+    example: 42
+  WaitListEntryIdArray:
+    type: array
+    items:
+      $ref: "#/definitions/WaitListEntryId"
+  WaitListStatus:
+    type: string
+    enum: [PENDING, PASSED, FAILED]
+  WaitListDate:
+    type: string
+    format: date
+    example: 2026-02-09T00:00:00.000Z
+  NullableWaitListDate:
+    type: string
+    format: date
+    nullable: true
+    example: 2026-02-10T00:00:00.000Z
+  NullableWaitListReason:
+    type: string
+    nullable: true
+    example: Suspected plagiarism
+
+  WaitListEntryData:
+    type: object
+    properties:
+      id:
+        $ref: "#/definitions/WaitListEntryId"
+      user:
+        $ref: "#/definitions/StudentData"
+      courseId:
+        $ref: "#/definitions/CourseId"
+      reason:
+        $ref: "#/definitions/NullableWaitListReason"
+      dateAdded:
+        $ref: "#/definitions/WaitListDate"
+      dateResolved:
+        $ref: "#/definitions/NullableWaitListDate"
+      status:
+        $ref: "#/definitions/WaitListStatus"
+    required:
+      - id
+      - user
+      - courseId
+      - reason
+      - dateAdded
+      - dateResolved
+      - status
+
+  NewWaitListEntry:
+    type: object
+    properties:
+      studentNumber:
+        $ref: "#/definitions/StudentNumber"
+      reason:
+        $ref: "#/definitions/NullableWaitListReason"
+      dateAdded:
+        $ref: "#/definitions/NullableWaitListDate"
+      dateResolved:
+        $ref: "#/definitions/NullableWaitListDate"
+      status:
+        $ref: "#/definitions/WaitListStatus"
+    required:
+      - studentNumber
+
+  EditWaitListEntry:
+    type: object
+    properties:
+      id:
+        $ref: "#/definitions/WaitListEntryId"
+      reason:
+        $ref: "#/definitions/NullableWaitListReason"
+      dateAdded:
+        $ref: "#/definitions/NullableWaitListDate"
+      dateResolved:
+        $ref: "#/definitions/NullableWaitListDate"
+      status:
+        $ref: "#/definitions/WaitListStatus"
+    required:
+      - id
+
+  WaitListManualGrade:
+    type: object
+    properties:
+      courseTaskId:
+        $ref: "#/definitions/CourseTaskId"
+      grade:
+        type: number
+        example: 4
+      comment:
+        type: string
+        nullable: true
+        example: Manual override on release
+    required:
+      - courseTaskId
+      - grade
+
+  WaitListRelease:
+    type: object
+    properties:
+      entryIds:
+        type: array
+        items:
+          $ref: "#/definitions/WaitListEntryId"
+      status:
+        type: string
+        enum: [PASSED, FAILED]
+      dateResolved:
+        $ref: "#/definitions/NullableWaitListDate"
+      manualGrade:
+        $ref: "#/definitions/WaitListManualGrade"
+    required:
+      - entryIds
+      - status
+
+  WaitListImportEntry:
+    type: object
+    properties:
+      entryId:
+        $ref: "#/definitions/WaitListEntryId"
+      studentNumber:
+        $ref: "#/definitions/StudentNumber"
+      reason:
+        $ref: "#/definitions/NullableWaitListReason"
+      dateAdded:
+        $ref: "#/definitions/NullableWaitListDate"
+      dateResolved:
+        $ref: "#/definitions/NullableWaitListDate"
+      status:
+        $ref: "#/definitions/WaitListStatus"
+    required:
+      - studentNumber
+
+/v1/courses/{courseId}/wait-list:
+  get:
+    tags: [Wait List]
+    description: >
+      Get wait list entries for a course.
+      Available to teachers and assistants.
+    parameters:
+      - $ref: "#/parameters/courseId"
+    responses:
+      200:
+        description: Returns wait list entries.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/definitions/WaitListEntryData"
+      400:
+        $ref: "#/responses/BadRequest"
+      401:
+        $ref: "#/responses/Unauthorized"
+      403:
+        $ref: "#/responses/Forbidden"
+      404:
+        $ref: "#/responses/NotFound"
+    security:
+      - cookieAuth: []
+  post:
+    tags: [Wait List]
+    description: >
+      Add wait list entries to a course.
+      Available to teachers and assistants.
+    parameters:
+      - $ref: "#/parameters/courseId"
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/NewWaitListEntry"
+    responses:
+      201:
+        description: Wait list entries created.
+      400:
+        $ref: "#/responses/BadRequest"
+      401:
+        $ref: "#/responses/Unauthorized"
+      403:
+        $ref: "#/responses/Forbidden"
+      404:
+        $ref: "#/responses/NotFound"
+      409:
+        $ref: "#/responses/Conflict"
+    security:
+      - cookieAuth: []
+  put:
+    tags: [Wait List]
+    description: >
+      Bulk update wait list entries.
+      Available to teachers and assistants.
+    parameters:
+      - $ref: "#/parameters/courseId"
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/EditWaitListEntry"
+    responses:
+      200:
+        description: Wait list entries updated.
+      400:
+        $ref: "#/responses/BadRequest"
+      401:
+        $ref: "#/responses/Unauthorized"
+      403:
+        $ref: "#/responses/Forbidden"
+      404:
+        $ref: "#/responses/NotFound"
+      409:
+        $ref: "#/responses/Conflict"
+    security:
+      - cookieAuth: []
+
+/v1/courses/{courseId}/wait-list/import:
+  post:
+    tags: [Wait List]
+    description: >
+      Import or upsert wait list entries from CSV/Excel data.
+      Available to teachers and assistants.
+    parameters:
+      - $ref: "#/parameters/courseId"
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/WaitListImportEntry"
+    responses:
+      200:
+        description: Wait list entries imported.
+      400:
+        $ref: "#/responses/BadRequest"
+      401:
+        $ref: "#/responses/Unauthorized"
+      403:
+        $ref: "#/responses/Forbidden"
+      404:
+        $ref: "#/responses/NotFound"
+      409:
+        $ref: "#/responses/Conflict"
+    security:
+      - cookieAuth: []
+
+/v1/courses/{courseId}/wait-list/release:
+  post:
+    tags: [Wait List]
+    description: >
+      Release wait list entries and optionally add a manual grade.
+      Available to teachers and assistants.
+    parameters:
+      - $ref: "#/parameters/courseId"
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/definitions/WaitListRelease"
+    responses:
+      200:
+        description: Wait list entries released.
+      400:
+        $ref: "#/responses/BadRequest"
+      401:
+        $ref: "#/responses/Unauthorized"
+      403:
+        $ref: "#/responses/Forbidden"
+      404:
+        $ref: "#/responses/NotFound"
+      409:
+        $ref: "#/responses/Conflict"
+    security:
+      - cookieAuth: []
+
+/v1/courses/{courseId}/wait-list/delete:
+  post:
+    tags: [Wait List]
+    description: >
+      Remove wait list entries from a course.
+      Available to teachers and assistants.
+    parameters:
+      - $ref: "#/parameters/courseId"
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/definitions/WaitListEntryIdArray"
+    responses:
+      200:
+        description: Wait list entries deleted.
+      400:
+        $ref: "#/responses/BadRequest"
+      401:
+        $ref: "#/responses/Unauthorized"
+      403:
+        $ref: "#/responses/Forbidden"
+      404:
+        $ref: "#/responses/NotFound"
+      409:
+        $ref: "#/responses/Conflict"
+    security:
+      - cookieAuth: []

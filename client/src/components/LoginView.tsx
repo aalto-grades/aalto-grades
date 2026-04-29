@@ -10,12 +10,19 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import {startAuthentication} from '@simplewebauthn/browser';
+import {useQueryClient} from '@tanstack/react-query';
 import {MuiOtpInput} from 'mui-one-time-password-input';
 import {type JSX, type SyntheticEvent, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 
-import {useLogIn} from '@/hooks/useApi';
+import type {SystemRole} from '@/common/types';
+import {
+  useLogIn,
+  usePasskeyLoginFinish,
+  usePasskeyLoginStart,
+} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import ExternalAuth from './login/ExternalAuth';
 import ResetPasswordDialog from './login/ResetPasswordDialog';
@@ -27,16 +34,48 @@ const LoginView = (): JSX.Element => {
   const {setAuth} = useAuth();
   const navigate = useNavigate();
   const logIn = useLogIn();
+  const queryClient = useQueryClient();
+  const passkeyLoginStart = usePasskeyLoginStart();
+  const passkeyLoginFinish = usePasskeyLoginFinish();
 
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showResetPasswordDialog, setShowResetPasswordDialog] =
-    useState<boolean>(false);
-  const [showMfaDialog, setShowMfaDialog] = useState<boolean>(false);
+    useState(false);
+  const [showMfaDialog, setShowMfaDialog] = useState(false);
   const [otpAuth, setOtpAuth] = useState<string | null>(null);
-  const [showOtpPrompt, setShowOtpPrompt] = useState<boolean>(false);
-  const [otp, setOtp] = useState<string>('');
+  const [showOtpPrompt, setShowOtpPrompt] = useState(false);
+  const [otp, setOtp] = useState('');
+
+  const completeAuth = (auth: {
+    id: number;
+    name: string;
+    email: string;
+    role: SystemRole;
+  }): void => {
+    const authData = {
+      id: auth.id,
+      name: auth.name,
+      email: auth.email,
+      role: auth.role,
+    };
+    setAuth(authData);
+    queryClient.setQueryData(['refresh-token'], authData);
+    navigate('/');
+  };
+
+  const handlePasskeyLogin = async (): Promise<void> => {
+    const start = await passkeyLoginStart.mutateAsync({email});
+    const authenticationResponse = await startAuthentication({
+      optionsJSON: start.options as Parameters<typeof startAuthentication>[0]['optionsJSON'],
+    });
+    const auth = await passkeyLoginFinish.mutateAsync({
+      email,
+      authenticationResponse,
+    });
+    completeAuth(auth);
+  };
 
   const handleSubmit = async (
     event: SyntheticEvent | null,
@@ -47,7 +86,7 @@ const LoginView = (): JSX.Element => {
     const auth = await logIn.mutateAsync({
       email,
       password: newPassword ?? password,
-      otp: fullOtp ?? (otp !== '' ? otp : null),
+      otp: fullOtp ?? (otp === '' ? null : otp),
     });
 
     switch (auth.status) {
@@ -62,13 +101,7 @@ const LoginView = (): JSX.Element => {
         setShowOtpPrompt(true);
         break;
       case 'ok':
-        setAuth({
-          id: auth.id,
-          name: auth.name,
-          email: auth.email,
-          role: auth.role,
-        });
-        navigate('/');
+        completeAuth(auth);
         break;
     }
   };
@@ -185,6 +218,16 @@ const LoginView = (): JSX.Element => {
               disabled={email === '' || password === ''}
             >
               {t('login.local.button')}
+            </Button>
+            <Button
+              variant="outlined"
+              fullWidth
+              type="button"
+              sx={{mt: 1}}
+              disabled={email === ''}
+              onClick={handlePasskeyLogin}
+            >
+              {t('login.local.passkey-button')}
             </Button>
           </form>
         </Box>

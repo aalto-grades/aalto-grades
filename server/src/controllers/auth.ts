@@ -2,11 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {
+  generateAuthenticationOptions,
+  generateRegistrationOptions,
+  verifyAuthenticationResponse,
+  verifyRegistrationResponse,
+} from '@simplewebauthn/server';
 import * as argon from 'argon2';
-import type {Request, RequestHandler} from 'express';
-import {readFileSync} from 'fs';
+import type {Request, RequestHandler, Response} from 'express';
 import generator from 'generate-password';
 import jwt from 'jsonwebtoken';
+import {readFileSync} from 'node:fs';
 import {authenticator} from 'otplib';
 import passport from 'passport';
 import {Strategy as JWTStrategy, type VerifiedCallback} from 'passport-jwt';
@@ -20,17 +26,36 @@ import {
   HttpCode,
   type LoginData,
   type LoginResult,
+  type PasskeyDeleteOwnData,
+  type PasskeyListOwnResult,
+  type PasskeyLoginFinishData,
+  type PasskeyLoginFinishResult,
+  type PasskeyLoginStartData,
+  type PasskeyLoginStartResult,
+  type PasskeyRegisterFinishData,
+  type PasskeyRegisterFinishResult,
+  type PasskeyRegisterStartData,
+  type PasskeyRegisterStartResult,
   PasswordSchema,
   type ResetAuthData,
   type ResetAuthResult,
   type ResetOwnPasswordData,
+  SystemRole,
 } from '@/common/types';
 import {validateLogin} from './utils/auth';
 import {getSamlStrategy} from './utils/saml';
 import {findAndValidateUserId, findUserById} from './utils/user';
 import {JWT_COOKIE_EXPIRY_MS, JWT_EXPIRY_SECONDS} from '../configs/constants';
-import {JWT_SECRET, NODE_ENV, SAML_SP_CERT_FILE} from '../configs/environment';
+import {
+  JWT_SECRET,
+  NODE_ENV,
+  SAML_SP_CERT_FILE,
+  WEBAUTHN_ORIGIN,
+  WEBAUTHN_RP_ID,
+  WEBAUTHN_RP_NAME,
+} from '../configs/environment';
 import httpLogger from '../configs/winston';
+import Passkey from '../database/models/passkey';
 import User from '../database/models/user';
 import {
   ApiError,
@@ -39,6 +64,38 @@ import {
   type LoginCallback,
   type SyncEndpoint,
 } from '../types';
+
+type RegistrationResponse = Parameters<typeof verifyRegistrationResponse>[0]['response'];
+type AuthenticationResponse = Parameters<
+  typeof verifyAuthenticationResponse
+>[0]['response'];
+
+const toUint8Array = (base64url: string): ReturnType<Uint8Array['slice']> =>
+  new Uint8Array(Buffer.from(base64url, 'base64url'));
+
+const setJwtCookie = (res: Response, loginResult: AuthData): void => {
+  const body: JwtClaims = {id: loginResult.id, role: loginResult.role};
+  const token = jwt.sign(body, JWT_SECRET, {expiresIn: JWT_EXPIRY_SECONDS});
+
+  res.cookie('jwt', token, {
+    httpOnly: true,
+    secure: NODE_ENV !== 'test',
+    sameSite: 'none',
+    maxAge: JWT_COOKIE_EXPIRY_MS,
+  });
+};
+
+const sendLoginSuccess = (res: Response, loginResult: AuthData): void => {
+  setJwtCookie(res, loginResult);
+  res
+    .json({
+      status: 'ok',
+      id: loginResult.id,
+      name: loginResult.name,
+      email: loginResult.email,
+      role: loginResult.role,
+    });
+};
 
 /**
  * () => AuthData
@@ -139,23 +196,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
 
     if (!user.mfaConfirmed) await user.set({mfaConfirmed: true}).save();
 
-    const body: JwtClaims = {id: loginResult.id, role: loginResult.role};
-    const token = jwt.sign(body, JWT_SECRET, {expiresIn: JWT_EXPIRY_SECONDS});
-
-    res
-      .cookie('jwt', token, {
-        httpOnly: true,
-        secure: NODE_ENV !== 'test',
-        sameSite: 'none',
-        maxAge: JWT_COOKIE_EXPIRY_MS,
-      })
-      .json({
-        status: 'ok',
-        id: loginResult.id,
-        name: loginResult.name,
-        email: loginResult.email,
-        role: loginResult.role,
-      });
+    sendLoginSuccess(res, loginResult);
   };
 
   const authenticate = passport.authenticate('login', login) as RequestHandler;
@@ -313,6 +354,275 @@ export const changeOwnAuth: Endpoint<
     return res.json({otpAuth});
   }
   res.json({otpAuth: null});
+};
+
+/** ({}) => PasskeyRegisterStartResult */
+export const passkeyRegisterStart: Endpoint<
+  PasskeyRegisterStartData,
+  PasskeyRegisterStartResult
+> = async (req, res) => {
+  const user = req.user as JwtClaims;
+
+  const dbUser = await User.findByPk(user.id);
+  if (dbUser === null) {
+    throw new ApiError(
+      'User not found after validating credentials',
+      HttpCode.InternalServerError
+    );
+  }
+
+  if (dbUser.email === null || dbUser.name === null) {
+    throw new ApiError(
+      'User not found after validating credentials',
+      HttpCode.InternalServerError
+    );
+  }
+
+  const existingPasskeys = await Passkey.findAll({
+    where: {userId: dbUser.id},
+    attributes: ['credentialId'],
+  });
+
+  const options = await generateRegistrationOptions({
+    rpName: WEBAUTHN_RP_NAME,
+    rpID: WEBAUTHN_RP_ID,
+    userID: new TextEncoder().encode(dbUser.id.toString()),
+    userName: dbUser.email,
+    userDisplayName: dbUser.name,
+    attestationType: 'none',
+    authenticatorSelection: {
+      residentKey: 'preferred',
+      userVerification: 'preferred',
+    },
+    excludeCredentials: existingPasskeys.map(passkey => ({
+      id: passkey.credentialId,
+    })),
+  });
+
+  await dbUser.set({passkeyChallenge: options.challenge}).save();
+  res.json({options});
+};
+
+/** (PasskeyRegisterFinishData) => PasskeyRegisterFinishResult */
+export const passkeyRegisterFinish: Endpoint<
+  PasskeyRegisterFinishData,
+  PasskeyRegisterFinishResult
+> = async (req, res) => {
+  const user = req.user as JwtClaims;
+
+  const dbUser = await User.findByPk(user.id);
+  if (dbUser === null) {
+    throw new ApiError('Passkey registration not initialized', HttpCode.BadRequest);
+  }
+
+  if (dbUser.passkeyChallenge === null) {
+    throw new ApiError('Passkey registration not initialized', HttpCode.BadRequest);
+  }
+
+  let verified = false;
+  let credentialId: string | null = null;
+  let publicKey: string | null = null;
+  let counter: number | null = null;
+  let aaguid: string | null = null;
+  let credentialDeviceType: string | null = null;
+  let credentialBackedUp: boolean | null = null;
+
+  const registrationResponse = req.body.registrationResponse as RegistrationResponse;
+
+  try {
+    const verification = await verifyRegistrationResponse({
+      response: registrationResponse,
+      expectedChallenge: dbUser.passkeyChallenge,
+      expectedOrigin: WEBAUTHN_ORIGIN,
+      expectedRPID: WEBAUTHN_RP_ID,
+      requireUserVerification: false,
+    });
+
+    verified = verification.verified;
+    if (verification.registrationInfo) {
+      credentialId = verification.registrationInfo.credential.id;
+      publicKey = Buffer.from(
+        verification.registrationInfo.credential.publicKey
+      ).toString('base64url');
+      counter = verification.registrationInfo.credential.counter;
+      aaguid = verification.registrationInfo.aaguid;
+      credentialDeviceType = verification.registrationInfo.credentialDeviceType;
+      credentialBackedUp = verification.registrationInfo.credentialBackedUp;
+    }
+  } catch {
+    throw new ApiError('Invalid passkey registration response', HttpCode.Unauthorized);
+  }
+
+  if (
+    !verified
+    || credentialId === null
+    || publicKey === null
+    || counter === null
+    || aaguid === null
+    || credentialDeviceType === null
+    || credentialBackedUp === null
+  ) {
+    throw new ApiError('Passkey registration failed', HttpCode.Unauthorized);
+  }
+
+  const authenticatorAttachment = registrationResponse.authenticatorAttachment ?? null;
+  const transports = registrationResponse.response.transports ?? [];
+
+  await Passkey.upsert({
+    userId: dbUser.id,
+    credentialId,
+    publicKey,
+    counter,
+    authenticatorAttachment,
+    transports,
+    aaguid,
+    credentialDeviceType,
+    credentialBackedUp,
+  });
+  await dbUser.set({passkeyChallenge: null}).save();
+
+  res.json({ok: true});
+};
+
+/** (PasskeyLoginStartData) => PasskeyLoginStartResult */
+export const passkeyLoginStart: Endpoint<
+  PasskeyLoginStartData,
+  PasskeyLoginStartResult
+> = async (req, res) => {
+  const user = await User.findByEmail(req.body.email);
+  if (!user?.admin) {
+    throw new ApiError('Incorrect email or passkey', HttpCode.Unauthorized);
+  }
+
+  const passkeys = await Passkey.findAll({
+    where: {userId: user.id},
+    attributes: ['credentialId'],
+  });
+
+  if (passkeys.length === 0) {
+    throw new ApiError('Incorrect email or passkey', HttpCode.Unauthorized);
+  }
+
+  const options = await generateAuthenticationOptions({
+    rpID: WEBAUTHN_RP_ID,
+    userVerification: 'preferred',
+    allowCredentials: passkeys.map(passkey => ({id: passkey.credentialId})),
+  });
+
+  await user.set({passkeyChallenge: options.challenge}).save();
+  res.json({options});
+};
+
+/** (PasskeyLoginFinishData) => PasskeyLoginFinishResult */
+export const passkeyLoginFinish: Endpoint<
+  PasskeyLoginFinishData,
+  PasskeyLoginFinishResult
+> = async (req, res) => {
+  const user = await User.findByEmail(req.body.email);
+  if (
+    user === null
+    || !user.admin
+    || user.name === null
+    || user.email === null
+    || user.passkeyChallenge === null
+  ) {
+    throw new ApiError('Incorrect email or passkey', HttpCode.Unauthorized);
+  }
+
+  const authenticationResponse = req.body
+    .authenticationResponse as AuthenticationResponse;
+  const passkey = await Passkey.findOne({
+    where: {
+      userId: user.id,
+      credentialId: authenticationResponse.id,
+    },
+  });
+  if (passkey === null) {
+    throw new ApiError('Incorrect email or passkey', HttpCode.Unauthorized);
+  }
+
+  let verified = false;
+  let newCounter: number;
+
+  try {
+    const verification = await verifyAuthenticationResponse({
+      response: authenticationResponse,
+      expectedChallenge: user.passkeyChallenge,
+      expectedOrigin: WEBAUTHN_ORIGIN,
+      expectedRPID: WEBAUTHN_RP_ID,
+      credential: {
+        id: passkey.credentialId,
+        publicKey: toUint8Array(passkey.publicKey),
+        counter: passkey.counter,
+      },
+      requireUserVerification: false,
+    });
+
+    verified = verification.verified;
+    newCounter = verification.authenticationInfo.newCounter;
+  } catch {
+    throw new ApiError('Invalid passkey authentication response', HttpCode.Unauthorized);
+  }
+
+  if (!verified) {
+    throw new ApiError('Incorrect email or passkey', HttpCode.Unauthorized);
+  }
+
+  await passkey.set({counter: newCounter}).save();
+  await user.set({passkeyChallenge: null}).save();
+
+  const authResult = {
+    id: user.id,
+    role: SystemRole.Admin,
+    email: user.email,
+    name: user.name,
+  };
+
+  setJwtCookie(res, authResult);
+  res.json(authResult);
+};
+
+/** ({}) => PasskeyListOwnResult */
+export const passkeyListOwn: Endpoint<
+  Record<string, never>,
+  PasskeyListOwnResult
+> = async (req, res) => {
+  const user = req.user as JwtClaims;
+  const passkeys = await Passkey.findAll({
+    where: {userId: user.id},
+    order: [['createdAt', 'ASC']],
+  });
+
+  res.json({
+    passkeys: passkeys.map(passkey => ({
+      id: passkey.id,
+      credentialId: passkey.credentialId,
+      authenticatorAttachment: passkey.authenticatorAttachment,
+      transports: passkey.transports ?? [],
+      aaguid: passkey.aaguid,
+      credentialDeviceType: passkey.credentialDeviceType,
+      credentialBackedUp: passkey.credentialBackedUp,
+      createdAt: passkey.createdAt.toISOString(),
+      updatedAt: passkey.updatedAt.toISOString(),
+    })),
+  });
+};
+
+/** (PasskeyDeleteOwnData) => void */
+export const passkeyDeleteOwn: Endpoint<PasskeyDeleteOwnData, void> = async (
+  req,
+  res
+) => {
+  const user = req.user as JwtClaims;
+  const passkey = await Passkey.findOne({
+    where: {id: req.body.passkeyId, userId: user.id},
+  });
+  if (passkey === null) {
+    throw new ApiError('Passkey not found', HttpCode.NotFound);
+  }
+
+  await passkey.destroy();
+  res.sendStatus(HttpCode.Ok);
 };
 
 /**

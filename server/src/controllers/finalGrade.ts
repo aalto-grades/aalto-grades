@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {stringify} from 'csv-stringify';
+import {Op} from 'sequelize';
 
 import {
   type EditFinalGrade,
@@ -11,9 +12,11 @@ import {
   HttpCode,
   type NewFinalGrade,
   type SisuCsvUpload,
+  WaitListStatus,
 } from '@/common/types';
 import FinalGrade from '../database/models/finalGrade';
 import User from '../database/models/user';
+import WaitListEntry from '../database/models/waitListEntry';
 import {
   ApiError,
   type Endpoint,
@@ -84,6 +87,26 @@ export const addFinalGrades: Endpoint<NewFinalGrade[], void> = async (
 ) => {
   const grader = req.user as JwtClaims;
   const course = await findAndValidateCourseId(req.params.courseId);
+  const userIds = req.body.map(finalGrade => finalGrade.userId);
+  // Waitlist check
+  const pendingEntries = await WaitListEntry.findAll({
+    where: {
+      courseId: course.id,
+      userId: {[Op.in]: userIds},
+      status: WaitListStatus.Pending,
+    },
+    include: [{model: User, attributes: ['studentNumber']}],
+  });
+
+  if (pendingEntries.length > 0) {
+    const blockedStudentNumbers = pendingEntries
+      .map(entry => entry.User?.studentNumber)
+      .filter((value): value is string => value !== null && value !== undefined);
+    throw new ApiError(
+      `Final grades cannot be calculated while students are pending investigation: ${blockedStudentNumbers.join(', ')}`,
+      HttpCode.Conflict
+    );
+  }
 
   // Validate that grading models belong to the course
   const gradingModels = new Set<number>();

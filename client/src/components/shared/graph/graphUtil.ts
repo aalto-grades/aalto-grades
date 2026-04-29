@@ -51,6 +51,11 @@ export const getDragAndDropNodes = (
     tooltip: t('shared.graph.node.min-tooltip'),
   },
   {
+    type: 'math',
+    title: t('shared.graph.node.math'),
+    tooltip: t('shared.graph.node.math-tooltip'),
+  },
+  {
     type: 'max',
     title: t('shared.graph.node.max'),
     tooltip: t('shared.graph.node.max-tooltip'),
@@ -257,15 +262,15 @@ export const formatGraph = async (
           )
             return -1;
           return (
-            parseInt(key1.split('-').at(-1)!)
-            - parseInt(key2.split('-').at(-1)!)
+            Number.parseInt(key1.split('-').at(-1)!)
+            - Number.parseInt(key2.split('-').at(-1)!)
           );
         });
       } else {
         sortedKeys.sort(
           (key1, key2) =>
-            parseInt(key1.split('-').at(-1)!)
-            - parseInt(key2.split('-').at(-1)!)
+            Number.parseInt(key1.split('-').at(-1)!)
+            - Number.parseInt(key2.split('-').at(-1)!)
         );
       }
       const sourcePorts = [...sortedKeys].reverse().map(key => ({

@@ -10,7 +10,6 @@ import {
   type ModifyCourseTasks,
 } from '@/common/types';
 import {sequelize} from '../database';
-import CourseTask from '../database/models/courseTask';
 import {ApiError, type Endpoint} from '../types';
 import {findAndValidateCourseId, validateCourseId} from './utils/course';
 import {validateCoursePartBelongsToCourse} from './utils/coursePart';
@@ -18,6 +17,7 @@ import {
   getAllCourseCourseTasks,
   validateCourseTaskPath,
 } from './utils/courseTask';
+import CourseTask from '../database/models/courseTask';
 
 /**
  * () => CourseTaskData[]
@@ -51,14 +51,14 @@ export const modifyCourseTasks: Endpoint<ModifyCourseTasks, number[]> = async (
 
   const editIds = editTasks.map(editTask => editTask.id);
 
-  if (editIds.length !== [...new Set(editIds)].length) {
+  if (editIds.length !== (new Set(editIds)).size) {
     throw new ApiError(
       'Tried to edit the same course task multiple times',
       HttpCode.Conflict
     );
   }
 
-  if (deleteIds.length !== [...new Set(deleteIds)].length) {
+  if (deleteIds.length !== (new Set(deleteIds)).size) {
     throw new ApiError(
       'Tried to delete the same course task multiple times',
       HttpCode.Conflict

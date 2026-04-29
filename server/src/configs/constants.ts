@@ -4,7 +4,7 @@
 
 // This file contains all hard coded constants.
 
-export const AXIOS_TIMEOUT: number = 15000;
+export const AXIOS_TIMEOUT: number = 1500000;
 
 // 25 hours in seconds.
 export const JWT_EXPIRY_SECONDS: number = 25 * 60 * 60;

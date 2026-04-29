@@ -29,6 +29,11 @@ export type MinPointsNodeValue = {
   value: NumberOrFail;
   fullFail: boolean;
 };
+export type MathNodeValue = {
+  type: 'math';
+  source: number;
+  value: number;
+};
 export type RequireNodeValue = {
   type: 'require';
   sources: {[key: string]: {isConnected: boolean; value: NumberOrFail}};
@@ -73,6 +78,7 @@ export type NodeValue =
   | AverageNodeValue
   | MaxNodeValue
   | MinPointsNodeValue
+  | MathNodeValue
   | RequireNodeValue
   | RoundNodeValue
   | SinkNodeValue
@@ -90,6 +96,7 @@ const CustomNodeTypesSchema = z.enum([
   'max',
   'table',
   'minpoints',
+  'math',
   'require',
   'round',
   'sink',
@@ -110,6 +117,10 @@ const MaxNodeSettingsSchema = z.strictObject({
 const MinPointsNodeSettingsSchema = z.strictObject({
   minPoints: z.number(),
   onFailSetting: z.enum(['fullfail', 'fail']),
+});
+const MathNodeSettingsSchema = z.strictObject({
+  operand: z.number(),
+  operator: z.enum(['add', 'sub', 'mul', 'div', 'rem', 'pow']),
 });
 const RequireNodeSettingsSchema = z.strictObject({
   numFail: z.number(),
@@ -141,6 +152,7 @@ const NodeSettingsSchema = z.union([
   AverageNodeSettingsSchema,
   MaxNodeSettingsSchema,
   MinPointsNodeSettingsSchema,
+  MathNodeSettingsSchema,
   RequireNodeSettingsSchema,
   RoundNodeSettingsSchema,
   SourceNodeSettingsSchema,
@@ -190,6 +202,7 @@ export type CustomNodeTypes = z.infer<typeof CustomNodeTypesSchema>;
 export type AverageNodeSettings = z.infer<typeof AverageNodeSettingsSchema>;
 export type MaxNodeSettings = z.infer<typeof MaxNodeSettingsSchema>;
 export type MinPointsNodeSettings = z.infer<typeof MinPointsNodeSettingsSchema>;
+export type MathNodeSettings = z.infer<typeof MathNodeSettingsSchema>;
 export type RequireNodeSettings = z.infer<typeof RequireNodeSettingsSchema>;
 export type RoundNodeSettings = z.infer<typeof RoundNodeSettingsSchema>;
 export type SourceNodeSettings = z.infer<typeof SourceNodeSettingsSchema>;

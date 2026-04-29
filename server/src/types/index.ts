@@ -7,3 +7,4 @@ export * from './auth';
 export * from './aplus';
 export * from './dataTypes';
 export * from './general';
+export * from './mycourses';

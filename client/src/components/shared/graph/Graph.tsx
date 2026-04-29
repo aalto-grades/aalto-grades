@@ -78,6 +78,7 @@ import {
 } from './graphUtil';
 import AdditionNode from './nodes/AdditionNode';
 import AverageNode from './nodes/AverageNode';
+import MathNode from './nodes/MathNode';
 import MaxNode from './nodes/MaxNode';
 import MinPointsNode from './nodes/MinPointsNode';
 import RequireNode from './nodes/RequireNode';
@@ -110,6 +111,7 @@ const nodeTypesMap: {
   addition: AdditionNode,
   average: AverageNode,
   max: MaxNode,
+  math: MathNode,
   minpoints: MinPointsNode,
   require: RequireNode,
   round: RoundNode,

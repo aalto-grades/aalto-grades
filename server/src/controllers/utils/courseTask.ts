@@ -3,14 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import {type CourseTaskData, HttpCode} from '@/common/types';
-import {parseAplusGradeSource} from './aplus';
+// import {parseAplusGradeSource} from './aplus';
 import {findAndValidateCourseId} from './course';
 import {findCoursePartById} from './coursePart';
 import AplusGradeSource from '../../database/models/aplusGradeSource';
 import type Course from '../../database/models/course';
 import CoursePart from '../../database/models/coursePart';
 import CourseTask from '../../database/models/courseTask';
-import {ApiError, stringToIdSchema} from '../../types';
+import ExternalSource from '../../database/models/externalSource';
+import {ApiError, normalizeStringParam, stringToIdSchema} from '../../types';
 
 /**
  * Finds a course task by its ID.
@@ -34,12 +35,13 @@ export const findCourseTaskById = async (id: number): Promise<CourseTask> => {
  * @throws ApiError(400|404) if not found.
  */
 const findAndValidateCourseTaskId = async (
-  courseTaskId: string
+  courseTaskId: string | string[]
 ): Promise<CourseTask> => {
-  const result = stringToIdSchema.safeParse(courseTaskId);
+  const parsedCourseTaskId = normalizeStringParam(courseTaskId);
+  const result = stringToIdSchema.safeParse(parsedCourseTaskId);
   if (!result.success) {
     throw new ApiError(
-      `Invalid course task id ${courseTaskId}`,
+      `Invalid course task id ${parsedCourseTaskId}`,
       HttpCode.BadRequest
     );
   }
@@ -77,8 +79,8 @@ export const validateCourseTaskBelongsToCourse = async (
  *   task does not belong to the course.
  */
 export const validateCourseTaskPath = async (
-  courseId: string,
-  courseTaskId: string
+  courseId: string | string[],
+  courseTaskId: string | string[]
 ): Promise<[Course, CoursePart, CourseTask]> => {
   const course = await findAndValidateCourseId(courseId);
   const courseTask = await findAndValidateCourseTaskId(courseTaskId);
@@ -104,10 +106,11 @@ export const getAllCourseCourseTasks = async (
 
   const courseTasks = (await CourseTask.findAll({
     where: {coursePartId: courseParts.map(part => part.id)},
-    include: AplusGradeSource,
+    include: [AplusGradeSource, ExternalSource],
     order: [['id', 'ASC']],
   })) as (CourseTask & {
     AplusGradeSources: AplusGradeSource[];
+    ExternalSources: ExternalSource[];
   })[];
 
   return courseTasks.map(
@@ -118,9 +121,15 @@ export const getAllCourseCourseTasks = async (
       daysValid: courseTask.daysValid,
       maxGrade: courseTask.maxGrade,
       archived: courseTask.archived,
-      aplusGradeSources: courseTask.AplusGradeSources.map(gradeSource =>
-        parseAplusGradeSource(gradeSource)
-      ),
+      // aplusGradeSources: courseTask.AplusGradeSources.map(gradeSource =>
+      //   parseAplusGradeSource(gradeSource)
+      // ),
+      externalSources: courseTask.ExternalSources.map(source => ({
+        id: source.id,
+        externalCourse: source.externalCourse,
+        externalServiceName: source.externalServiceName,
+        sourceInfo: source.sourceInfo,
+      })),
     })
   );
 };

@@ -38,7 +38,7 @@ const convertSettingsToFloats = (
   weights: Object.fromEntries(
     Object.entries(settings.weights).map(([key, value]) => [
       key,
-      parseFloat(value),
+      Number.parseFloat(value),
     ])
   ),
 });
