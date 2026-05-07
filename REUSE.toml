@@ -1,0 +1,17 @@
+version = 1
+SPDX-PackageName = "Ossi"
+SPDX-PackageSupplier = "The Ossi Developers"
+SPDX-PackageDownloadLocation = "https://github.com/aalto-grades"
+
+[[annotations]]
+path = [".github/PULL_REQUEST_TEMPLATE.md","pnpm**.json", "package**.json", "client/package**.json", "common/package**.json", "e2e-tests/package**.json", "server/package**.json", "server/pgAdminpass", "server/pgAdminSetup.json"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "The Ossi Developers"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = [".github/ISSUE_TEMPLATE/bug-report.md", ".github/ISSUE_TEMPLATE/feature-request.md"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "The Ossi Developers"
+SPDX-License-Identifier = "MIT"
+SPDX-FileComment = "\n These files are based on GitHub's default bug report and feature request issue\n templates, which appear to be in the public domain. Any modifications are\n licensed under the Expat (MIT) License."
