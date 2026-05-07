@@ -16,18 +16,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
       - name: Install linter packages
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       # - name: Install client packages
-      #   run: npm --prefix ./client ci
+      #   run: pnpm --filter ./client install --frozen-lockfile
       # - name: Install server packages
-      #   run: npm --prefix ./server ci
+      #   run: pnpm --filter ./server install --frozen-lockfile
       # - name: Install e2e-tests packages
-      #   run: npm --prefix ./e2e-tests ci
+      #   run: pnpm --filter ./e2e-tests install --frozen-lockfile
       # - name: Install common packages
-      #   run: npm --prefix ./common ci
+      #   run: pnpm --filter ./common install --frozen-lockfile
       - name: Run linter
-        run: npm run lint
+        run: pnpm run lint
 
   # lint_yaml_files:
   #   name: Lint project YAML files

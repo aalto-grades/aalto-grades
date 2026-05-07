@@ -23,7 +23,7 @@ jobs:
         id: generate-cache-key
         run: |
           # Create a cache key based on relevant files
-          echo "key=docker-images-${{ runner.os }}-${{ hashFiles('**/Dockerfile*', '**/package*.json', 'docker-compose*.yaml') }}-${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "key=docker-images-${{ runner.os }}-${{ hashFiles('**/Dockerfile*', '**/package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'docker-compose*.yaml') }}-${{ github.sha }}" >> $GITHUB_OUTPUT
 
       - name: Activate caches
         id: docker-images-cache
