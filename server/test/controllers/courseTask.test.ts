@@ -37,11 +37,11 @@ const nonExistentId = 1000000;
 beforeAll(async () => {
   cookies = await getCookies();
 
-  let courseParts: CoursePartData[] = [];
+  let courseParts: CoursePartData[];
   [courseId, courseParts] = await createData.createCourse({});
   coursePartId = courseParts[0].id;
 
-  let courseTasks: CourseTaskData[] = [];
+  let courseTasks: CourseTaskData[];
   [noRoleCourseId, courseParts, courseTasks] = await createData.createCourse({
     hasTeacher: false,
     hasAssistant: false,

@@ -9,8 +9,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid,
   Link,
+  Stack,
 } from '@mui/material';
 import {Formik, type FormikHelpers, type FormikProps} from 'formik';
 import {enqueueSnackbar} from 'notistack';
@@ -136,11 +136,11 @@ const ResetPasswordDialog = ({
         {form => (
           <>
             <DialogContent>
-              <Grid
-                container
-                direction="column"
-                alignItems="center"
-                justifyContent="center"
+              <Stack
+                sx={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
                 <FormField
                   form={
@@ -178,7 +178,7 @@ const ResetPasswordDialog = ({
                     {t('shared.auth.password.requirements')}
                   </Link>
                 </Box>
-              </Grid>
+              </Stack>
             </DialogContent>
             <DialogActions>
               <Button

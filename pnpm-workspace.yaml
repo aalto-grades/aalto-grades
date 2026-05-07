@@ -1,0 +1,16 @@
+packages:
+  - "client"
+  - "server"
+  - "e2e-tests"
+  - "common"
+linkWorkspacePackages: true
+minimumReleaseAge: 1440
+allowBuilds:
+  "@parcel/watcher": true
+  "@scarf/scarf": false
+  "@swc/core": true
+  argon2: true
+  esbuild: true
+  protobufjs: true
+  "react-global-modal": true
+  unrs-resolver: true

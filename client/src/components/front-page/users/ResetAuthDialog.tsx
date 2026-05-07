@@ -54,7 +54,7 @@ const ResetAuthDialog = ({open, onClose, user}: PropsType): JSX.Element => {
         variant: 'success',
       });
 
-    if (resetPassword) setTemporaryPassword(res.temporaryPassword as string);
+    if (resetPassword) setTemporaryPassword(res.temporaryPassword);
     else onClose();
   };
 

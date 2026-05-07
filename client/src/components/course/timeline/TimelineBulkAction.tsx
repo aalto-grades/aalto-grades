@@ -56,7 +56,12 @@ const TimelineBulkAction = ({
         {t('course.timeline.selected-count', {count: selectedCount})}
       </Typography>
       <Box sx={{flex: 1}} />
-      <Typography variant="body2" color="text.secondary">
+      <Typography
+        variant="body2"
+        sx={{
+          color: 'text.secondary'
+        }}
+      >
         {t('course.timeline.select-multiple-hint')}
       </Typography>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -67,7 +72,6 @@ const TimelineBulkAction = ({
           slotProps={{textField: {size: 'small'}}}
         />
       </LocalizationProvider>
-
       <Button
         variant="contained"
         onClick={handleBulkUpdate}

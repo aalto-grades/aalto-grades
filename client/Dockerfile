@@ -5,22 +5,14 @@
 # Build stage
 FROM node:24-alpine AS build
 
+RUN corepack enable
+
 # Install packages first to make following builds faster
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY common/package.json ./common/
 COPY client/package.json ./client/
-RUN npm ci
-
-# ### Fixes added for a weird missing package during build instead of npm ci
-# # Install git for GitHub dependencies
-# RUN apk add --no-cache git
-# # Clear npm cache and remove any platform-specific issues
-# RUN rm -rf node_modules package-lock.json
-# RUN npm install
-# # Ensure all optional dependencies are installed for the current platform
-# RUN npm rebuild
-# ###
+RUN pnpm install --frozen-lockfile --filter ./common... --filter ./client...
 
 # Copy only necessary files
 WORKDIR /app/common
@@ -34,7 +26,7 @@ COPY client/public ./public
 COPY client/src ./src
 
 # Build
-RUN npm run build
+RUN pnpm run build
 
 # Run stage
 FROM nginx:1.28-alpine AS run

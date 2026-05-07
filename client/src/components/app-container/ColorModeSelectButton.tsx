@@ -74,7 +74,9 @@ const ColorModeSelectButton = (): JSX.Element => {
         anchorEl={anchorEl}
         open={menuOpen}
         onClose={handleClose}
-        MenuListProps={{'aria-labelledby': 'color-mode-button'}}
+        slotProps={{
+          list: {'aria-labelledby': 'color-mode-button'}
+        }}
       >
         <MenuItem selected={mode === 'system'} onClick={handleMode('system')}>
           {t('color-mode.system')}

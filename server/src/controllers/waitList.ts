@@ -11,8 +11,8 @@ import {
   HttpCode,
   type NewWaitListEntry,
   type WaitListEntryData,
-  type WaitListImportEntry,
   type WaitListEntryIdArray,
+  type WaitListImportEntry,
   type WaitListRelease,
   WaitListStatus,
 } from '@/common/types';

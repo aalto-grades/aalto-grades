@@ -125,7 +125,7 @@ const CreateGradingModelDialog = ({
             labelId="select-model-template"
             value={template}
             label={t('course.models.create-model.select-template')}
-            onChange={e => setTemplate(e.target.value as GraphTemplate)}
+            onChange={e => setTemplate(e.target.value)}
           >
             <MenuItem value="none">
               {t('course.models.create-model.none')}

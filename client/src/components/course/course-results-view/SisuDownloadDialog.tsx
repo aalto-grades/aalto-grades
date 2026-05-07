@@ -131,7 +131,7 @@ const SisuDownloadDialog = ({
           dateOverride && assessmentDate !== null
             ? assessmentDate.toDate()
             : null,
-        studentNumbers: studentNumbers as [string, ...string[]], // Non-empty array
+        studentNumbers: studentNumbers, // Non-empty array
       },
     });
     if (!exportedValuesInList) onClose();
@@ -142,8 +142,10 @@ const SisuDownloadDialog = ({
       open={open}
       onClose={onClose}
       transitionDuration={{exit: 800}}
-      TransitionProps={{onExited: onExited}}
       fullWidth
+      slotProps={{
+        transition: {onExited: onExited}
+      }}
     >
       <DialogTitle>
         {t('course.results.download-final-as-sisu-csv')}

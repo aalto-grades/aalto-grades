@@ -8,7 +8,7 @@ import type {NodeData, NodeSettings, NodeValues} from '@/common/types';
 
 type NodeValuesContext = NodeValues;
 export const NodeValuesContext = createContext<NodeValuesContext>(
-  {} as NodeValuesContext
+  {}
 );
 
 type NodeDataContext = {
@@ -25,5 +25,5 @@ export type ExtraNodeData = {
 };
 type ExtraNodeDataContext = ExtraNodeData;
 export const ExtraNodeDataContext = createContext<ExtraNodeDataContext>(
-  {} as ExtraNodeDataContext
+  {}
 );

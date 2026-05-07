@@ -28,7 +28,7 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
 
-    "baseUrl": ".",
+    // "baseUrl": ".",
     "paths": {
       "@/common/*": ["../common/*"],
       "@/*": ["./src/*"]

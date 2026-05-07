@@ -58,6 +58,7 @@ export const calculateNodeValues = (
       case 'addition':
       case 'average':
       case 'max':
+      case 'table':
       case 'require':
       case 'substitute':
         for (const value of Object.values(nodeValue.sources)) {
@@ -89,7 +90,7 @@ export const calculateNodeValues = (
 
     // Go through all targets and update their sources
     for (const edge of nodeTargets[sourceNodeId]) {
-      let sourceValue: NumberOrFail = 0;
+      let sourceValue: NumberOrFail;
 
       // Handle nodes with multiple sources
       if (
@@ -130,6 +131,7 @@ export const calculateNodeValues = (
         case 'addition':
         case 'average':
         case 'max':
+        case 'table':
           nodeValue.sources[edge.targetHandle!] = {
             value: sourceValue === 'fail' ? 0 : sourceValue,
             isConnected: true,

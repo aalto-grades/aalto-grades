@@ -18,20 +18,24 @@ jobs:
         working-directory: ./server
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
       - name: Docker compose down
         run: docker-compose down --volumes --remove-orphans
       - name: Run database
         run: docker-compose up -d database
       - name: Install dependencies
-        run: npm --prefix ../ ci
+        working-directory: ./
+        run: pnpm install --frozen-lockfile
       # - name: Install common dependencies
-      #   run: npm --prefix ../common ci
+      #   run: pnpm --filter ./common install --frozen-lockfile
       - name: Build server
-        run: npm run build
+        run: pnpm run build
       - name: Migrate and seed database
-        run: npm run migration:up && npm run seed:up
+        run: pnpm run migration:up && pnpm run seed:up
       - name: Run tests
-        run: npm run citest
+        run: pnpm run citest

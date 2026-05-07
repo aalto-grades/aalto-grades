@@ -41,7 +41,9 @@ const LanguageSelectButton = (): JSX.Element => {
         anchorEl={anchorEl}
         open={menuOpen}
         onClose={handleClose}
-        MenuListProps={{'aria-labelledby': 'language-button'}}
+        slotProps={{
+          list: {'aria-labelledby': 'language-button'}
+        }}
       >
         <MenuItem onClick={() => setLanguage('en')}>
           <Box
