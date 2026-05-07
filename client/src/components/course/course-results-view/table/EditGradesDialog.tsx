@@ -37,8 +37,6 @@ import type {
 } from '@/common/types';
 import GradesHistoryDialog from '@/components/course/course-results-view/HistoryDialog';
 import StyledDataGrid, {
-  type GetRowClassName,
-  type ProcessRowUpdate,
 } from '@/components/shared/StyledDataGrid';
 import UnsavedChangesDialog from '@/components/shared/UnsavedChangesDialog';
 import {useTableContext} from '@/context/useTableContext';
@@ -449,12 +447,12 @@ const EditGradesDialog = ({
               onRowEditStop={() => setEditing(false)}
               isCellEditable={(params: GridCellParams<ColTypes>) =>
                 !(params.row.externalSource && params.field === 'grade')}
-              processRowUpdate={processRowUpdate as unknown as ProcessRowUpdate}
+              processRowUpdate={processRowUpdate}
               onProcessRowUpdateError={(rowError: Error) => {
                 setError(true);
                 enqueueSnackbar(rowError.message, {variant: 'error'});
               }}
-              getRowClassName={getRowClassName as unknown as GetRowClassName}
+              getRowClassName={getRowClassName}
             />
           </div>
         </DialogContent>

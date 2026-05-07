@@ -66,7 +66,7 @@ const TimelineView = (): JSX.Element => {
   const [pxPerDay, setPxPerDay] = useState<number>(3);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
   const [isManualResize, setIsManualResize] = useState(false);
-  const [sortBy, setSortBy] = useState<SortBy>(() => 'date' as SortBy);
+  const [sortBy, setSortBy] = useState<SortBy>(() => 'date');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 

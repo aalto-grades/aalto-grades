@@ -34,7 +34,6 @@ import {
   type ChangeEvent,
   type JSX,
   useCallback,
-  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -97,7 +96,6 @@ const ImportGradesDialog = ({
 
   const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
   const [isImporting, setIsImporting] = useState(false);
-  const [pendingImport, setPendingImport] = useState(false);
   const [previewGrades, setPreviewGrades] = useState<NewTaskGrade[] | null>(null);
   const [importStatusMessage, setImportStatusMessage] = useState<string | null>(null);
   const [importProgress, setImportProgress] = useState<{
@@ -236,7 +234,6 @@ const ImportGradesDialog = ({
         tokenLink: '',
       });
       setServiceTokenDialogOpen(true);
-      setPendingImport(true);
       return;
     }
 
@@ -322,26 +319,16 @@ const ImportGradesDialog = ({
     reason,
   ): void => {
     if (reason === 'backdropClick') return;
-    onClose();
-  };
-
-  useEffect(() => {
-    if (!pendingImport) return;
-    setPendingImport(false);
-    void handleFetchGrades();
-  }, [handleFetchGrades, pendingImport]);
-
-  useEffect(() => {
-    if (open) return;
     setSelectedTaskIds([]);
     setIsImporting(false);
-    setPendingImport(false);
     setServiceTokenDialogOpen(false);
     setServiceTokenInfo(null);
     setPreviewGrades(null);
     setImportStatusMessage(null);
     setImportProgress(null);
-  }, [open]);
+
+    onClose();
+  };
 
   if (!open) return null;
 
@@ -425,7 +412,14 @@ const ImportGradesDialog = ({
                         />
                       )}
                       secondary={(
-                        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          useFlexGap
+                          sx={{
+                            flexWrap: 'wrap'
+                          }}
+                        >
                           {entry.sources.map(source => (
                             <Chip key={source.id} label={source.label} size="small" />
                           ))}
@@ -506,17 +500,15 @@ const ImportGradesDialog = ({
               )}
         </DialogActions>
       </Dialog>
-
       {serviceTokenInfo && (
         <ServiceTokenDialog
           open={serviceTokenDialogOpen}
           onClose={() => {
             setServiceTokenDialogOpen(false);
-            setPendingImport(false);
           }}
           onSubmit={() => {
             setServiceTokenDialogOpen(false);
-            setPendingImport(true);
+            void handleFetchGrades();
           }}
           serviceInfo={serviceTokenInfo}
         />

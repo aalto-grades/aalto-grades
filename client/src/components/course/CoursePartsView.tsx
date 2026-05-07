@@ -6,7 +6,7 @@ import {
   AccountTree,
   AccountTreeOutlined,
   Add,
-  AddCircleOutline,
+  AddCircleOutlineOutlined,
   Archive,
   CheckCircle,
   Delete,
@@ -386,7 +386,7 @@ const CoursePartsView = (): JSX.Element => {
           <span>
             <GridActionsCellItem
               label={t('course.parts.external-source.list-title')}
-              icon={<AddCircleOutline />}
+              icon={<AddCircleOutlineOutlined />}
               disabled={unsavedChanges}
               onClick={(event) => {
                 setAddExtServiceSourceTarget({
@@ -883,7 +883,12 @@ const CoursePartsView = (): JSX.Element => {
         }}
       />
       <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-        <Typography width="fit-content" variant="h2">
+        <Typography
+          variant="h2"
+          sx={{
+            width: 'fit-content'
+          }}
+        >
           {t('general.course-parts')}
         </Typography>
         <SaveBar
@@ -893,7 +898,6 @@ const CoursePartsView = (): JSX.Element => {
           disabled={editing || hasError}
         />
       </div>
-
       <Box sx={{display: 'flex', gap: 1, mb: 1, mt: 1}}>
         {editRights && (
           <Button variant="outlined" onClick={() => setAddPartDialogOpen(true)}>
@@ -901,12 +905,10 @@ const CoursePartsView = (): JSX.Element => {
           </Button>
         )}
       </Box>
-
       <Grid
         container
         spacing={2}
-        direction={{xs: 'column', lg: 'row'}}
-        sx={{mt: 2}}
+        sx={{mt: 2, direction: {xs: 'column', md: 'row'}}}
       >
         <Grid size={{sm: 8, md: 6, lg: 4}}>
           <Collapse in={hasError}>
@@ -999,9 +1001,13 @@ const CoursePartsView = (): JSX.Element => {
           </div>
         </Grid>
       </Grid>
-
       <Box sx={{mt: 4}}>
-        <Typography width="fit-content" variant="h2">
+        <Typography
+          variant="h2"
+          sx={{
+            width: 'fit-content'
+          }}
+        >
           {t('general.grading-models')}
         </Typography>
         <Box sx={{display: 'flex', gap: 1, mb: 1, mt: 1}}>

@@ -1,10 +1,9 @@
 // SPDX-FileCopyrightText: 2022 The Ossi Developers
 //
 // SPDX-License-Identifier: MIT
-
 {
   "compilerOptions": {
-  
+    "rootDir": "..",
     "module": "commonjs",
     // "module": "ESNext",
     "paths": {
@@ -19,5 +18,9 @@
     "skipLibCheck": true, // Avoid error with old dependency saml-passport, hoepfully will be fixed in the future
   },
   "exclude": ["node_modules"],
-  "include": ["src/**/*", "test/**/*", "jest.config.ts"]
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "jest.config.ts"
+  ]
 }

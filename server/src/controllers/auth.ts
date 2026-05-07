@@ -13,7 +13,7 @@ import type {Request, RequestHandler, Response} from 'express';
 import generator from 'generate-password';
 import jwt from 'jsonwebtoken';
 import {readFileSync} from 'node:fs';
-import {authenticator} from 'otplib';
+import {generateSecret, generateURI, verify} from 'otplib';
 import passport from 'passport';
 import {Strategy as JWTStrategy, type VerifiedCallback} from 'passport-jwt';
 import {type IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
@@ -161,10 +161,14 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
     // Get MFA secret
     let mfaSecret = user.mfaSecret;
     if (mfaSecret === null) {
-      mfaSecret = authenticator.generateSecret(64);
+      mfaSecret = generateSecret({length: 64});
       await user.set({mfaSecret, mfaConfirmed: false}).save();
     }
-    const otpAuth = authenticator.keyuri(req.body.email, 'Ossi', mfaSecret);
+    const otpAuth = generateURI({
+      label: req.body.email,
+      issuer: 'Ossi',
+      secret: mfaSecret
+    });
 
     // Force password reset
     if (user.forcePasswordReset) return res.json({status: 'resetPassword'});
@@ -184,7 +188,7 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
 
     if (
       NODE_ENV !== 'development'
-      && !authenticator.verify({
+      && await verify({
         token: req.body.otp,
         secret: user.mfaSecret as string,
       })
@@ -344,13 +348,13 @@ export const changeOwnAuth: Endpoint<
   }
 
   if (req.body.resetMfa) {
-    const mfaSecret = authenticator.generateSecret(64);
+    const mfaSecret = generateSecret({length: 64});
     await dbUser.set({mfaSecret, mfaConfirmed: false}).save();
-    const otpAuth = authenticator.keyuri(
-      dbUser.email as string,
-      'Ossi',
-      mfaSecret
-    );
+    const otpAuth = generateURI({
+      label: dbUser.email as string,
+      issuer: 'Ossi',
+      secret: mfaSecret
+    });
     return res.json({otpAuth});
   }
   res.json({otpAuth: null});
@@ -419,7 +423,7 @@ export const passkeyRegisterFinish: Endpoint<
     throw new ApiError('Passkey registration not initialized', HttpCode.BadRequest);
   }
 
-  let verified = false;
+  let verified: boolean;
   let credentialId: string | null = null;
   let publicKey: string | null = null;
   let counter: number | null = null;
@@ -541,7 +545,7 @@ export const passkeyLoginFinish: Endpoint<
     throw new ApiError('Incorrect email or passkey', HttpCode.Unauthorized);
   }
 
-  let verified = false;
+  let verified: boolean;
   let newCounter: number;
 
   try {
@@ -644,7 +648,7 @@ export const confirmMfa: Endpoint<ConfirmMfaData, void> = async (req, res) => {
 
   if (
     NODE_ENV !== 'development'
-    && !authenticator.verify({
+    && await verify({
       token: req.body.otp,
       secret: dbUser.mfaSecret as string,
     })

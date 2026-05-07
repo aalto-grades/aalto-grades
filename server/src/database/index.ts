@@ -37,6 +37,6 @@ export const connectToDatabase = async (): Promise<void> => {
       dbLogger.error('database connection failed with an unknown error type');
     }
 
-    throw new Error('database connection failed');
+    throw new Error('database connection failed', {cause: error});
   }
 };

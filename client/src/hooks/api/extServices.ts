@@ -43,7 +43,7 @@ export {ExtServiceImportStreamEventType};
 const getHeaders = (serviceInfo: ServiceInfo): AxiosRequestConfig => ({
   headers: {
     Authorization: `${serviceInfo.id}-Token ${getServiceToken(serviceInfo.id)}`,
-  } as AxiosRequestConfig['headers'],
+  },
 });
 
 const getErrorMessage = async (response: Response): Promise<string> => {

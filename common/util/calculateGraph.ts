@@ -90,7 +90,7 @@ export const calculateNodeValues = (
 
     // Go through all targets and update their sources
     for (const edge of nodeTargets[sourceNodeId]) {
-      let sourceValue: NumberOrFail = 0;
+      let sourceValue: NumberOrFail;
 
       // Handle nodes with multiple sources
       if (

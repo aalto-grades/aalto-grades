@@ -11,8 +11,8 @@ import {
   Model,
 } from 'sequelize';
 
-import {sequelize} from '..';
 import {WaitListStatus} from '@/common/types';
+import {sequelize} from '..';
 import Course from './course';
 import User from './user';
 

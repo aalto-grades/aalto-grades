@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import type {NextFunction, Request, Response} from 'express';
-import type {ParsedQs} from 'qs';
 import type {z} from 'zod';
 
 import {HttpCode} from '@/common/types';
@@ -68,7 +67,7 @@ export const processRequestQuery = <T>(schema: z.ZodType<T>) => {
         return;
       }
 
-      req.query = result.data as ParsedQs;
+      req.query = result.data as typeof req.query;
       next();
     } catch {
       res.status(HttpCode.InternalServerError).json([
@@ -142,7 +141,7 @@ export const processRequest = <
         if (!queryResult.success) {
           errors.push({type: 'Query', errors: queryResult.error});
         } else {
-          req.query = queryResult.data as ParsedQs;
+          req.query = queryResult.data as typeof req.query;
         }
       }
 
