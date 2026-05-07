@@ -14,10 +14,12 @@ type PropsType = {children?: JSX.Element; roles: SystemRole[]};
 
 const LoadingFallback = (): JSX.Element => (
   <Box
-    display="flex"
-    justifyContent="center"
-    alignItems="center"
-    minHeight="100vh"
+    sx={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '100vh'
+    }}
   >
     <CircularProgress />
   </Box>

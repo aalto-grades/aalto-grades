@@ -20,8 +20,18 @@ const GradesView = (): JSX.Element => {
   const gradesQuery = useGetGrades(courseId);
 
   return (
-    <Box textAlign="left" alignItems="left">
-      <Typography width="fit-content" variant="h2">
+    <Box
+      sx={{
+        textAlign: 'left',
+        alignItems: 'left'
+      }}
+    >
+      <Typography
+        variant="h2"
+        sx={{
+          width: 'fit-content'
+        }}
+      >
         {t('general.grades')}
       </Typography>
       {gradesQuery.data !== undefined && !isTransitioning && (

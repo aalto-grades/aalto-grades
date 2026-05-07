@@ -6,13 +6,13 @@
     "lint": "eslint . --report-unused-disable-directives"
   },
   "dependencies": {
-    "zod": "^4.0.0",
+    "zod": "^4.4.3",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "@types/react": "^19.0.0",
-    "@types/zxcvbn": "^4.4.4",
-    "@xyflow/react": "^12.8.2"
+    "@types/react": "^19.2.14",
+    "@types/zxcvbn": "^4.4.5",
+    "@xyflow/react": "^12.10.2"
   },
   "engines": {
     "node": ">=20"

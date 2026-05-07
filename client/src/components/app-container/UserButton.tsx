@@ -63,7 +63,7 @@ const UserButton = (): JSX.Element => {
       resetMfa: true,
     });
 
-    setOtpAuth(otpAuthRes.otpAuth as string);
+    setOtpAuth(otpAuthRes.otpAuth);
     setShowMfaDialog(true);
   };
 

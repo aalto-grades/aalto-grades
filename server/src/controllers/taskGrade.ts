@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2024 The Ossi Developers
 //
 // SPDX-License-Identifier: MIT
-import cloneDeep from 'lodash/cloneDeep';
 import {Op, type WhereOptions} from 'sequelize';
 
 import {
@@ -35,7 +34,6 @@ import {
   type NewDbTaskGradeData,
   type NewDbTaskGradeLogData,
 } from '../types';
-import {validateAplusGradeSourceBelongsToCourseTask} from './extservicehandlers/aplusUtils';
 import {validateCourseId} from './utils/course';
 import {validateCourseTaskBelongsToCourse} from './utils/courseTask';
 import {parseFinalGrade} from './utils/finalGrade';
@@ -148,7 +146,7 @@ export const getGradeLogs: Endpoint<void, TaskGradeHistoryArray> = async (
   const isConvertibleToInteger = (value: string | undefined): boolean => {
     return (
       value !== undefined
-      && !isNaN(Number(value))
+      && !Number.isNaN(Number(value))
       && Number.isInteger(Number(value))
     );
   };
@@ -372,7 +370,7 @@ export const addGrades: Endpoint<NewTaskGrade[], void> = async (req, res) => {
           courseTaskId: taskGrade.courseTaskId,
           taskGradeId: taskGrade.id,
           actionType: ActionType.Create,
-          previousState: cloneDeep(taskGrade),
+          previousState: structuredClone(taskGrade),
         });
       }
       await TaskGradeLog.bulkCreate(preparedLogsBulkCreate, {
@@ -453,7 +451,7 @@ export const editGrade: Endpoint<EditTaskGradeData, void> = async (
     );
   }
 
-  const previousState = cloneDeep(gradeData);
+  const previousState = structuredClone(gradeData);
 
   await gradeData
     .set({

@@ -6,7 +6,7 @@ import {
   Box,
   Button,
   Collapse,
-  Grid,
+  Stack,
   TextField,
   Typography,
 } from '@mui/material';
@@ -137,12 +137,12 @@ const LoginView = (): JSX.Element => {
           return true;
         }}
       />
-      <Grid
-        container
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-        sx={{mt: 2}}
+      <Stack
+        sx={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          mt: 2,
+        }}
       >
         <Typography variant="h2">{t('login.title')}</Typography>
         <ExternalAuth />
@@ -231,7 +231,7 @@ const LoginView = (): JSX.Element => {
             </Button>
           </form>
         </Box>
-      </Grid>
+      </Stack>
     </>
   );
 };

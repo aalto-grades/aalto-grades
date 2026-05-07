@@ -89,6 +89,7 @@ export default defineConfig(
       // General JS rules
       camelcase: 'warn',
       eqeqeq: 'warn',
+      'no-useless-assignment': 'warn',
       'func-names': 'warn',
       'func-style': ['warn', 'expression'],
       'no-constant-condition': ['warn', {checkLoops: false}],
@@ -258,7 +259,7 @@ export default defineConfig(
       sourceType: 'module',
       globals: {
         ...globals.browser,
-        ...globals.es2020,
+        ...globals.es2027,
       },
       parserOptions: {
         projectService: {

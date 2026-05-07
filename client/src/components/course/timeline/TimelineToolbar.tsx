@@ -71,13 +71,36 @@ const TimelineToolbar = ({
   const {t} = useTranslation();
 
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="center">
-      <Typography variant="h2" width="fit-content">
+    <Stack
+      direction="row"
+      sx={{
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}
+    >
+      <Typography
+        variant="h2"
+        sx={{
+          width: 'fit-content'
+        }}
+      >
         {t('course.timeline.title')}
       </Typography>
-
-      <Stack direction="row" spacing={2} alignItems="center">
-        <Stack direction="row" spacing={1} alignItems="center" sx={{width: 200}}>
+      <Stack
+        direction="row"
+        spacing={2}
+        sx={{
+          alignItems: 'center'
+        }}
+      >
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            alignItems: 'center',
+            width: 200
+          }}
+        >
           <ZoomOut color="action" fontSize="small" />
           <Slider
             value={pxPerDay}

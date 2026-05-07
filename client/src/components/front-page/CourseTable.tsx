@@ -111,7 +111,13 @@ const CourseTable = ({courses}: PropsType): JSX.Element => {
 
   return (
     <>
-      <Grid container justifyContent="flex-start" sx={{mt: 1}}>
+      <Grid
+        container
+        sx={{
+          justifyContent: 'flex-start',
+          mt: 1
+        }}
+      >
         <Search
           value={searchText}
           onChange={onChange}

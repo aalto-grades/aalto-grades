@@ -319,7 +319,12 @@ const EditCourseView = (): JSX.Element => {
       {form => (
         <Form>
           <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-            <Typography width="fit-content" variant="h2">
+            <Typography
+              variant="h2"
+              sx={{
+                width: 'fit-content'
+              }}
+            >
               {t('course.edit.title')}
             </Typography>
             <SaveBar
@@ -340,9 +345,12 @@ const EditCourseView = (): JSX.Element => {
 
           <Grid
             container
-            justifyContent="flex-start"
-            gap={5}
-            sx={{overflow: 'auto', height: '100%'}}
+            sx={{
+              justifyContent: 'flex-start',
+              gap: 5,
+              overflow: 'auto',
+              height: '100%'
+            }}
           >
             <Grid size={{xs: 12, md: 5.5}}>
               <FormField

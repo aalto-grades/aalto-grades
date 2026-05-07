@@ -86,31 +86,59 @@ const ManagePasskeysDialog = ({open, onClose}: ManagePasskeysDialogProps): JSX.E
             <Stack
               key={passkey.id}
               direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{border: 1, borderColor: 'divider', borderRadius: 1, p: 1}}
+              sx={{
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: 1,
+                p: 1
+              }}
             >
               <Box>
                 <Typography variant="body2" sx={{fontWeight: 600}}>
                   {resolvePasskeyProviderName(passkey.aaguid)}
                 </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{display: 'block'}}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                    display: 'block'
+                  }}
+                >
                   {t('shared.auth.passkey.id')}
                   {': '}
                   {passkey.credentialId.slice(0, 16)}
                   ...
                 </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{display: 'block'}}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                    display: 'block'
+                  }}
+                >
                   {t('shared.auth.passkey.type')}
                   {': '}
                   {passkey.authenticatorAttachment ?? t('shared.auth.passkey.unknown')}
                 </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{display: 'block'}}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                    display: 'block'
+                  }}
+                >
                   {t('shared.auth.passkey.aaguid')}
                   {': '}
                   {passkey.aaguid}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary'
+                  }}
+                >
                   {t('shared.auth.passkey.created')}
                   {': '}
                   {new Date(passkey.createdAt).toLocaleString()}

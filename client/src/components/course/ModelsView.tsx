@@ -121,7 +121,7 @@ const ModelsView = (): JSX.Element => {
         if (node.type !== 'source') continue;
         const sourceId = parseInt(node.id.split('-')[1]);
 
-        let sourceName = null;
+        let sourceName: string | undefined;
         if (model.coursePartId !== null) {
           const sourceTask = courseTasks.data.find(
             task => task.id === sourceId
@@ -310,8 +310,12 @@ const ModelsView = (): JSX.Element => {
         gradingModelId={editDialogModel?.id ?? null}
         name={editDialogModel?.name ?? null}
       />
-
-      <Typography width="fit-content" variant="h2">
+      <Typography
+        variant="h2"
+        sx={{
+          width: 'fit-content'
+        }}
+      >
         {t('general.grading-models')}
       </Typography>
       <Box sx={{display: 'flex', mb: 1}}>
@@ -340,11 +344,15 @@ const ModelsView = (): JSX.Element => {
           </Button>
         )}
       </Box>
-
       <Collapse in={!graphOpen}>
         {models.length + coursePartsWithoutModels.length === 0
           ? (
-              <Typography textAlign="left" sx={{p: 2}}>
+              <Typography
+                sx={{
+                  textAlign: 'left',
+                  p: 2
+                }}
+              >
                 {t('course.models.no-models')}
               </Typography>
             )
@@ -398,7 +406,6 @@ const ModelsView = (): JSX.Element => {
               </Box>
             )}
       </Collapse>
-
       {currentModel !== null && (
         <Graph
           key={currentModel.id} // Reset graph for each model

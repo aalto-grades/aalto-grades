@@ -30,6 +30,7 @@ import {
 } from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
+import '@tanstack/react-table';
 
 import {
   type CourseTaskData,
@@ -73,7 +74,7 @@ export type TableContextProps = {
 export const GradesTableContext = createContext<TableContextProps | null>(null);
 
 // Table creation
-declare module '@tanstack/table-core' {
+declare module '@tanstack/react-table' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
     PrettyChipPosition: 'first' | 'middle' | 'last' | 'alone';

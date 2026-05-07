@@ -2,10 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {CookieAccessInfo} from 'cookiejar';
-import * as fs from 'fs';
 import mockdate from 'mockdate';
-import {authenticator} from 'otplib';
+import * as fs from 'node:fs';
+import {generate, generateSecret} from 'otplib';
 import supertest from 'supertest';
 
 import {
@@ -49,7 +48,7 @@ jest.mock('fs', () => ({__esModule: true, ...jest.requireActual('fs')}));
 const getToken = async (userId: number): Promise<string> => {
   const dbUser = await User.findByPk(userId);
   const secret = dbUser?.mfaSecret as string;
-  return authenticator.generate(secret);
+  return generate({secret: secret});
 };
 
 const testLogin = async (
@@ -116,7 +115,7 @@ describe('Test POST /v1/auth/login - log in with an existing user', () => {
   });
 
   it('should force reset password if necessary', async () => {
-    const secret = authenticator.generateSecret(64);
+    const secret = generateSecret({length: 64});
     const user = await createData.createAuthUser({
       forcePasswordReset: true,
       mfaSecret: secret,
@@ -200,7 +199,7 @@ describe('Test POST /v1/auth/login and expiry', () => {
       .get('/v1/auth/self-info')
       .withCredentials(true)
       .expect(HttpCode.Ok);
-    const jwt = agent.jar.getCookie('jwt', CookieAccessInfo.All);
+    const jwt = agent.jar.getCookie('jwt', null as unknown as Parameters<typeof agent.jar.getCookie>[1]);
     if (!jwt) throw new Error('jwt not available');
 
     // Simulate situation where the browser does not properly expire the cookie
@@ -230,7 +229,7 @@ describe('Test POST /v1/auth/login and expiry', () => {
 
 describe('Test POST /v1/auth/reset-own-password - reset own password', () => {
   it('should reset own password', async () => {
-    const secret = authenticator.generateSecret(64);
+    const secret = generateSecret({length: 64});
     const user = await createData.createAuthUser({
       forcePasswordReset: true,
       mfaSecret: secret,
@@ -373,7 +372,7 @@ describe("Test POST /v1/auth/reset-auth/:userId - reset other admin's auth detai
 
 describe('Test POST /v1/auth/change-own-auth - change own auth', () => {
   const createUser = async (): Promise<[UserData, string[]]> => {
-    const secret = authenticator.generateSecret(64);
+    const secret = generateSecret({length: 64});
     const user = await createData.createAuthUser({
       mfaSecret: secret,
     });

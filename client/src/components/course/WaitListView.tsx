@@ -5,7 +5,7 @@
 import {
   Add,
   CloudUpload,
-  DeleteOutline,
+  DeleteOutlineOutlined,
   DoneAll,
   EditNote,
 } from '@mui/icons-material';
@@ -185,7 +185,7 @@ const AddWaitListEntryDialog = ({
             labelId="wait-list-status-label"
             value={status}
             label={t('wait-list.status.label')}
-            onChange={e => setStatus(e.target.value as WaitListStatus)}
+            onChange={e => setStatus(e.target.value)}
           >
             <MenuItem value={WaitListStatusValues.Pending}>
               {t('wait-list.status.pending')}
@@ -284,7 +284,7 @@ const BulkEditWaitListDialog = ({
             value={status}
             label={t('wait-list.status.label')}
             onChange={e =>
-              setStatus(e.target.value as WaitListStatus | 'unchanged')}
+              setStatus(e.target.value)}
           >
             <MenuItem value="unchanged">{t('general.no-change')}</MenuItem>
             <MenuItem value={WaitListStatusValues.Pending}>
@@ -375,7 +375,7 @@ const ReleaseWaitListDialog = ({
             labelId="wait-list-release-status"
             value={status}
             label={t('wait-list.status.label')}
-            onChange={e => setStatus(e.target.value as WaitListStatus)}
+            onChange={e => setStatus(e.target.value)}
           >
             <MenuItem value={WaitListStatusValues.Passed}>
               {t('wait-list.status.passed')}
@@ -542,7 +542,7 @@ const ImportWaitListDialog = ({
       : '';
 
     return {
-      entryId: Number.isNaN(entryId as number) ? null : entryId,
+      entryId: Number.isNaN(entryId) ? null : entryId,
       studentNumber,
       reason: reason || null,
       status: statusValue ? parseStatus(statusValue) : null,
@@ -758,7 +758,7 @@ const WaitListView = (): JSX.Element => {
           label={formatStatus(t, params.value as WaitListStatus)}
         />
       ),
-      valueFormatter: value => formatStatus(t, value as WaitListStatus),
+      valueFormatter: value => formatStatus(t, value),
     },
   ];
 
@@ -829,9 +829,19 @@ const WaitListView = (): JSX.Element => {
   };
 
   return (
-    <Box textAlign="left" alignItems="left">
+    <Box
+      sx={{
+        textAlign: 'left',
+        alignItems: 'left'
+      }}
+    >
       <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
-        <Typography width="fit-content" variant="h2">
+        <Typography
+          variant="h2"
+          sx={{
+            width: 'fit-content'
+          }}
+        >
           {t('wait-list.title')}
         </Typography>
         {editRights && (
@@ -879,7 +889,7 @@ const WaitListView = (): JSX.Element => {
             <Button
               variant="outlined"
               color="error"
-              startIcon={<DeleteOutline />}
+              startIcon={<DeleteOutlineOutlined />}
               onClick={handleRemoveEntries}
               disabled={selectedRows.length === 0}
             >
@@ -889,7 +899,6 @@ const WaitListView = (): JSX.Element => {
         )}
         <Search value={searchValue} onChange={handleSearch} reset={resetSearch} />
       </Stack>
-
       <Box sx={{height: '70vh'}}>
         <StyledDataGrid
           rows={rows}
@@ -909,7 +918,6 @@ const WaitListView = (): JSX.Element => {
           }}
         />
       </Box>
-
       <AddWaitListEntryDialog
         open={addDialogOpen}
         onClose={() => setAddDialogOpen(false)}

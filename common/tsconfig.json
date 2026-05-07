@@ -4,6 +4,7 @@
 
 // For @typescript-eslint to work
 {
+  "rootDir": ".",
   "compilerOptions": {
     "module": "commonjs",
     "lib": ["dom", "dom.iterable", "esnext"],

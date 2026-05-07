@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {authenticator} from 'otplib';
+import {generate} from 'otplib';
 import supertest from 'supertest';
 
 import {HttpCode} from '@/common/types';
@@ -33,7 +33,7 @@ const getUserToken = async (user: UserCredentials): Promise<string> => {
     throw new Error(`User not found: ${user.email}`);
   }
   const secret = dbUser.mfaSecret as string;
-  return authenticator.generate(secret);
+  return generate({secret: secret});
 };
 
 /** Generate MFA token for a user by logging in once */

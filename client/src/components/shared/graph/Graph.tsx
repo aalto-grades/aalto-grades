@@ -315,6 +315,7 @@ const Graph = ({
       || JSON.stringify(lastState.nodeValues) !== JSON.stringify(nodeValues)
       || JSON.stringify(lastState.nodeSettings) !== JSON.stringify(nodeSettings)
     ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLastState(structuredClone({nodes, edges, nodeValues, nodeSettings}));
       updateValues();
     }

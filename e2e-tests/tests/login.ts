@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import type {Page} from '@playwright/test';
-import {authenticator} from 'otplib';
+import {generate} from 'otplib';
 
 type UserType = 'admin' | 'teacher' | 'assistant' | 'student';
 const mfaSecrets = {
@@ -49,7 +49,7 @@ export const login = async (user: UserType, page: Page): Promise<void> => {
 
   // Try MFA 3 times in case the code expires
   for (let attempt = 0; attempt < 3; attempt++) {
-    const token = authenticator.generate(mfaSecrets[user]);
+    const token = await generate({secret: mfaSecrets[user]});
 
     for (let i = 0; i < mfaInputFields.length; i++) {
       await mfaInputFields[i].fill(token[i]);

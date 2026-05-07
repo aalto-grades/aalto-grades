@@ -5,12 +5,14 @@
 # Build stage
 FROM node:24-alpine AS build
 
+RUN corepack enable
+
 # Install packages first to make following builds faster
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY common/package.json ./common/
 COPY server/package.json ./server/
-RUN npm ci
+RUN pnpm install --frozen-lockfile --filter ./common... --filter ./server...
 
 # Copy only necessary files
 WORKDIR /app/common
@@ -22,17 +24,19 @@ COPY server/tsconfig.json ./
 COPY server/src ./src
 
 # Build
-RUN npm run build
+RUN pnpm run build
 
 # Run stage
 FROM node:24-alpine AS run
 
+RUN corepack enable
+
 WORKDIR /app
 RUN mkdir logs && chown node:node logs
 
-COPY package.json package-lock.json /app/
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml /app/
 COPY server/package.json /app/server/
-RUN npm ci --omit=dev && npm cache clean --force
+RUN pnpm install --frozen-lockfile --prod --filter ./server...
 
 WORKDIR /app/server/
 COPY server/.sequelizerc ./
@@ -43,6 +47,6 @@ COPY --from=build /app/server/build ./build
 USER node
 EXPOSE 3000
 CMD ["/bin/sh", "-c", "\
-    npm run migration:up && \
-    npm run seed:up && \
-    npm run start"]
+    pnpm run migration:up && \
+    pnpm run seed:up && \
+    pnpm run start"]

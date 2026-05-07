@@ -65,12 +65,12 @@ const Header = (): JSX.Element => {
             <Typography
               align="left"
               variant="h6"
-              fontWeight="bold"
               sx={{
+                fontWeight: 'bold',
                 color: 'primary.main',
                 display: 'flex',
                 alignItems: 'center',
-                height: '100%',
+                height: '100%'
               }}
             >
               {course.data.courseCode}
