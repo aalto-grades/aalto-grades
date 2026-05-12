@@ -29,6 +29,7 @@ RUN pnpm run build
 # Run stage
 FROM node:24-alpine AS run
 
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable
 
 WORKDIR /app
