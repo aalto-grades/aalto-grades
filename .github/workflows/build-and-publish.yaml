@@ -15,6 +15,10 @@ on:
       server_image_name:
         required: true
         type: string
+      image_tags:
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build_and_publish_client_and_server:
@@ -35,15 +39,33 @@ jobs:
 
       - name: Extract metadata for client
         id: meta_front
+        if: ${{ inputs.image_tags == '' }}
         uses: docker/metadata-action@v5
         with:
           images: ${{ inputs.registry }}/${{ inputs.client_image_name }}
 
+      - name: Extract metadata for client with custom tags
+        id: meta_front_custom
+        if: ${{ inputs.image_tags != '' }}
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ inputs.registry }}/${{ inputs.client_image_name }}
+          tags: ${{ inputs.image_tags }}
+
       - name: Extract metadata for server
         id: meta_back
+        if: ${{ inputs.image_tags == '' }}
         uses: docker/metadata-action@v5
         with:
           images: ${{ inputs.registry }}/${{ inputs.server_image_name }}
+
+      - name: Extract metadata for server with custom tags
+        id: meta_back_custom
+        if: ${{ inputs.image_tags != '' }}
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ inputs.registry }}/${{ inputs.server_image_name }}
+          tags: ${{ inputs.image_tags }}
 
       - name: Build and push client Docker image
         uses: docker/build-push-action@v6
@@ -51,8 +73,8 @@ jobs:
           context: .
           file: client/Dockerfile.prod
           push: true
-          tags: ${{ steps.meta_front.outputs.tags }}
-          labels: ${{ steps.meta_front.outputs.labels }}
+          tags: ${{ inputs.image_tags != '' && steps.meta_front_custom.outputs.tags || steps.meta_front.outputs.tags }}
+          labels: ${{ inputs.image_tags != '' && steps.meta_front_custom.outputs.labels || steps.meta_front.outputs.labels }}
 
       - name: Build and push server Docker image
         uses: docker/build-push-action@v6
@@ -60,5 +82,5 @@ jobs:
           context: .
           file: server/Dockerfile.prod
           push: true
-          tags: ${{ steps.meta_back.outputs.tags }}
-          labels: ${{ steps.meta_back.outputs.labels }}
+          tags: ${{ inputs.image_tags != '' && steps.meta_back_custom.outputs.tags || steps.meta_back.outputs.tags }}
+          labels: ${{ inputs.image_tags != '' && steps.meta_back_custom.outputs.labels || steps.meta_back.outputs.labels }}

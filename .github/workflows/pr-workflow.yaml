@@ -10,6 +10,11 @@ on:
     branches:
       - main
       - dev
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
 
 jobs:
   run_e2e_tests:
@@ -18,3 +23,13 @@ jobs:
     uses: ./.github/workflows/server-tests.yaml
   lint_project:
     uses: ./.github/workflows/lint-project.yaml
+  build_pr_containers:
+    if: ${{ github.event.pull_request.draft == false }}
+    uses: ./.github/workflows/build-and-publish.yaml
+    with:
+      registry: ghcr.io
+      client_image_name: aalto-grades/aalto-grades-frontend-pr
+      server_image_name: aalto-grades/aalto-grades-backend-pr
+      image_tags: |
+        type=raw,value=pr-${{ github.event.pull_request.number }}
+        type=raw,value=sha-${{ github.event.pull_request.head.sha }}
