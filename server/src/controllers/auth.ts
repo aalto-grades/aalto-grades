@@ -13,7 +13,7 @@ import type {Request, RequestHandler, Response} from 'express';
 import generator from 'generate-password';
 import jwt from 'jsonwebtoken';
 import {readFileSync} from 'node:fs';
-import {generateSecret, generateURI, verify} from 'otplib';
+import {generateSecret, generateURI, verifySync} from 'otplib';
 import passport from 'passport';
 import {Strategy as JWTStrategy, type VerifiedCallback} from 'passport-jwt';
 import {type IVerifyOptions, Strategy as LocalStrategy} from 'passport-local';
@@ -188,10 +188,10 @@ export const authLogin: SyncEndpoint<LoginData, LoginResult> = (
 
     if (
       NODE_ENV !== 'development'
-      && await verify({
+      && !verifySync({
         token: req.body.otp,
         secret: user.mfaSecret as string,
-      })
+      }).valid
     ) {
       return res.status(HttpCode.Unauthorized).send({
         errors: ['Incorrect TOTP code'],
@@ -648,10 +648,10 @@ export const confirmMfa: Endpoint<ConfirmMfaData, void> = async (req, res) => {
 
   if (
     NODE_ENV !== 'development'
-    && !((await verify({
+    && !verifySync({
       token: req.body.otp,
       secret: dbUser.mfaSecret as string,
-    })).valid)
+    }).valid
   ) {
     throw new ApiError('Incorrect TOTP code', HttpCode.Unauthorized);
   }
