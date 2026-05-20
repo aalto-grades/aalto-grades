@@ -648,10 +648,10 @@ export const confirmMfa: Endpoint<ConfirmMfaData, void> = async (req, res) => {
 
   if (
     NODE_ENV !== 'development'
-    && !(await verify({
+    && !((await verify({
       token: req.body.otp,
       secret: dbUser.mfaSecret as string,
-    })).valid
+    })).valid)
   ) {
     throw new ApiError('Incorrect TOTP code', HttpCode.Unauthorized);
   }
