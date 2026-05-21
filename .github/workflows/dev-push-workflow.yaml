@@ -2,13 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-name: Dev Push Workflow
-run-name: Dev push workflow (${{ github.actor }})
+name: Main Push Workflow
+run-name: Main push workflow (${{ github.actor }})
 
 on:
   push:
     branches:
-      - dev
+      - main
 
 jobs:
   run_e2e_tests:

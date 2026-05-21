@@ -63,7 +63,7 @@ README file of the corresponding directory, such as `client/README.md` and
 
 ### New feature
 
-1. Create a new feature or fix branch from the `dev` branch.
+1. Create a new feature or fix branch from the `main` branch.
 2. Do your additions and changes.
 3. Create tests for new functionality and check that all tests pass.
 4. Run linters.
@@ -74,7 +74,7 @@ README file of the corresponding directory, such as `client/README.md` and
 6. Update documentation and API definition as needed.
 7. When developing the client, update (at minimum) the translation keys of all
    languages using `npm run trans-parse` as described in `client/README.md`.
-8. Create a pull request to the `dev` branch.
+8. Create a pull request to the `main` branch.
 9. Check that all requirements pass.
 10. Request someone to review your PR.
 
