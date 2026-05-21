@@ -18,7 +18,7 @@
     "lint:fix": "eslint . --report-unused-disable-directives --fix"
   },
   "devDependencies": {
-    "@eslint/compat": "^2.0.5",
+    "@eslint/compat": "^2.1.0",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
@@ -32,7 +32,7 @@
     "eslint-plugin-yml": "^3.3.2",
     "globals": "^17.6.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.2"
+    "typescript-eslint": "^8.59.4"
   },
   "engines": {
     "node": ">=20"

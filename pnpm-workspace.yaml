@@ -4,7 +4,7 @@ packages:
   - "e2e-tests"
   - "common"
 linkWorkspacePackages: true
-minimumReleaseAge: 1440
+minimumReleaseAge: 2880
 allowBuilds:
   "@parcel/watcher": true
   "@scarf/scarf": false

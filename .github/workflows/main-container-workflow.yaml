@@ -4,14 +4,51 @@
 ---
 name: Main Image Creation Workflow
 run-name: Main image creation (${{ github.actor }})
+permissions:
+  contents: read
+
+permissions:
+  contents: read
+  packages: read
 
 on:
   push:
     branches:
       - main
+    tags:
+      - '*'
 
 jobs:
-  build_and_publish:
+  build_and_publish_dev:
+    if: ${{ github.ref_type == 'branch' && github.ref_name == 'main' }}
+    uses: ./.github/workflows/build-and-publish.yaml
+    with:
+      registry: ghcr.io
+      client_image_name: aalto-grades/aalto-grades-frontend-dev
+      server_image_name: aalto-grades/aalto-grades-backend-dev
+
+  verify_release_tag_points_to_main:
+    if: ${{ github.ref_type == 'tag' }}
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify tag commit is reachable from main
+        run: |
+          git fetch origin main --depth=1
+          if ! git merge-base --is-ancestor "${GITHUB_SHA}" "origin/main"; then
+            echo "Release tags must point to commits on main."
+            exit 1
+          fi
+
+  build_and_publish_prod:
+    if: ${{ github.ref_type == 'tag' }}
+    needs: verify_release_tag_points_to_main
     uses: ./.github/workflows/build-and-publish.yaml
     with:
       registry: ghcr.io
