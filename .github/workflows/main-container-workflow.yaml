@@ -6,9 +6,6 @@ name: Main Image Creation Workflow
 run-name: Main image creation (${{ github.actor }})
 permissions:
   contents: read
-
-permissions:
-  contents: read
   packages: read
 
 on:
