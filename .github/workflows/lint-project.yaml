@@ -12,7 +12,7 @@ jobs:
     name: Lint project code
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -36,7 +36,7 @@ jobs:
   #   name: Lint project YAML files
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v6
   #     - name: Install yamllint
   #       run: pip install yamllint
   #     - name: Lint YAML files
@@ -46,5 +46,5 @@ jobs:
     name: Check REUSE compliance
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: fsfe/reuse-action@v4

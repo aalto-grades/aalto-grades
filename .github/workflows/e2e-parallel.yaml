@@ -32,7 +32,7 @@ jobs:
     needs: [test-chrome, test-firefox]
     if: always() && (needs.test-chrome.result == 'success' || needs.test-firefox.result == 'success')
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: pnpm/action-setup@v4
 

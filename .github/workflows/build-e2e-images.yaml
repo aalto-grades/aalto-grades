@@ -17,7 +17,7 @@ jobs:
     outputs:
       docker-images-cache-key: ${{ steps.generate-cache-key.outputs.key }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Generate Docker images cache key
         id: generate-cache-key
