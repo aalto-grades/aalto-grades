@@ -4,6 +4,8 @@
 ---
 name: Main Image Creation Workflow
 run-name: Main image creation (${{ github.actor }})
+permissions:
+  contents: read
 
 on:
   push:
@@ -23,6 +25,8 @@ jobs:
 
   verify_release_tag_points_to_main:
     if: ${{ github.ref_type == 'tag' }}
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
