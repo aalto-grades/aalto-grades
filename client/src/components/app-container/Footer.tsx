@@ -41,7 +41,7 @@ const Footer = (): JSX.Element => {
         {t('app.footer.licenses')}
       </Link>
       <ExternalLink
-        href={`https://github.com/aalto-grades/aalto-grades/tree/v${AALTO_GRADES_VERSION}`}
+        href="https://github.com/aalto-grades/aalto-grades"
       >
         {t('app.footer.source-text')}
       </ExternalLink>
@@ -49,7 +49,7 @@ const Footer = (): JSX.Element => {
         {t('app.footer.feedback-text')}
       </ExternalLink>
       <Typography sx={{color: 'text.secondary'}}>
-        {'Ossi v' + AALTO_GRADES_VERSION}
+        {'Ossi ' + AALTO_GRADES_VERSION}
       </Typography>
     </Box>
   );

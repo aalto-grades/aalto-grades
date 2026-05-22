@@ -7,7 +7,7 @@
 ---
 services:
   reverse-proxy:
-    image: nginx:1.27-alpine
+    image: nginx:stable-alpine
     container_name: aalto-grades-reverse-proxy-dev
     ports:
       - 8080:80
