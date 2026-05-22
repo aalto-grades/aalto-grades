@@ -48,3 +48,6 @@ jobs:
       registry: ghcr.io
       client_image_name: aalto-grades/aalto-grades-frontend
       server_image_name: aalto-grades/aalto-grades-backend
+      image_tags: |
+        type=raw,value=${{ github.ref_name }}
+        type=raw,value=stable

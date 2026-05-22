@@ -1,0 +1,36 @@
+# SPDX-FileCopyrightText: 2026 The Ossi Developers
+#
+# SPDX-License-Identifier: MIT
+---
+name: Delete Untagged GHCR Images
+run-name: Delete untagged GHCR images (${{ github.actor }})
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '30 2 * * 0'
+
+jobs:
+  cleanup_untagged_images:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        package_name:
+          - aalto-grades/aalto-grades-frontend
+          - aalto-grades/aalto-grades-backend
+          - aalto-grades/aalto-grades-frontend-dev
+          - aalto-grades/aalto-grades-backend-dev
+    steps:
+      - name: Delete untagged versions
+        uses: actions/delete-package-versions@v5
+        with:
+          owner: ${{ github.repository_owner }}
+          package-name: ${{ matrix.package_name }}
+          package-type: container
+          min-versions-to-keep: 0
+          delete-only-untagged-versions: 'true'
+          token: ${{ secrets.GITHUB_TOKEN }}
