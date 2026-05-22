@@ -20,7 +20,7 @@ services:
     extends:
       file: ./docker-compose-from-images.yaml
       service: frontend
-    image: ghcr.io/aalto-grades/aalto-grades-frontend-dev:main
+    image: ghcr.io/aalto-grades/aalto-grades-frontend:canary
 
   backend:
     extends:
@@ -32,7 +32,7 @@ services:
       OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
       NODE_OPTIONS: >-
         --require @opentelemetry/auto-instrumentations-node/register
-    image: ghcr.io/aalto-grades/aalto-grades-backend-dev:main
+    image: ghcr.io/aalto-grades/aalto-grades-backend:canary
 
   database:
     extends:

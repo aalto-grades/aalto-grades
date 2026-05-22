@@ -40,14 +40,14 @@ jobs:
       - name: Extract metadata for client
         id: meta_front
         if: ${{ inputs.image_tags == '' }}
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ inputs.registry }}/${{ inputs.client_image_name }}
 
       - name: Extract metadata for client with custom tags
         id: meta_front_custom
         if: ${{ inputs.image_tags != '' }}
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ inputs.registry }}/${{ inputs.client_image_name }}
           tags: ${{ inputs.image_tags }}
@@ -55,20 +55,20 @@ jobs:
       - name: Extract metadata for server
         id: meta_back
         if: ${{ inputs.image_tags == '' }}
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ inputs.registry }}/${{ inputs.server_image_name }}
 
       - name: Extract metadata for server with custom tags
         id: meta_back_custom
         if: ${{ inputs.image_tags != '' }}
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ inputs.registry }}/${{ inputs.server_image_name }}
           tags: ${{ inputs.image_tags }}
 
       - name: Build and push client Docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: client/Dockerfile.prod
@@ -77,7 +77,7 @@ jobs:
           labels: ${{ inputs.image_tags != '' && steps.meta_front_custom.outputs.labels || steps.meta_front.outputs.labels }}
 
       - name: Build and push server Docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: server/Dockerfile.prod
