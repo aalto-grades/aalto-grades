@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-name: Main Push Workflow
+name:  "[main] Push Workflow"
 run-name: Main push workflow (${{ github.actor }})
 
 on:

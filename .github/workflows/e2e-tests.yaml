@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-name: End-to-end Tests
+name: E2E Tests
 on:
   workflow_call:
     inputs: {}
