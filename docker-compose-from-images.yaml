@@ -9,7 +9,7 @@
 ---
 services:
   reverse-proxy:
-    image: nginx:1.27-alpine
+    image: nginx:stable-alpine
     container_name: aalto-grades-reverse-proxy
     restart: always
     ports:
@@ -29,13 +29,13 @@ services:
       - backend
 
   frontend:
-    image: ghcr.io/aalto-grades/aalto-grades-frontend:main
+    image: ghcr.io/aalto-grades/aalto-grades-frontend:stable
     container_name: aalto-grades-frontend
     restart: always
     tty: true
 
   backend:
-    image: ghcr.io/aalto-grades/aalto-grades-backend:main
+    image: ghcr.io/aalto-grades/aalto-grades-backend:stable
     container_name: aalto-grades-backend
     restart: always
     tty: true
