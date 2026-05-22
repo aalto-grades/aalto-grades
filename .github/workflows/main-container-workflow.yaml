@@ -13,13 +13,15 @@ on:
       - '*'
 
 jobs:
-  build_and_publish_dev:
+  build_and_publish_canary:
     if: ${{ github.ref_type == 'branch' && github.ref_name == 'main' }}
     uses: ./.github/workflows/build-and-publish.yaml
     with:
       registry: ghcr.io
-      client_image_name: aalto-grades/aalto-grades-frontend-dev
-      server_image_name: aalto-grades/aalto-grades-backend-dev
+      client_image_name: aalto-grades/aalto-grades-frontend
+      server_image_name: aalto-grades/aalto-grades-backend
+      image_tags: |
+        type=raw,value=canary
 
   verify_release_tag_points_to_main:
     if: ${{ github.ref_type == 'tag' }}
