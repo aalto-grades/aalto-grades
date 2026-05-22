@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-name: Build E2E Images
+name: E2E Build Images
 on:
   workflow_call:
     outputs:
@@ -27,7 +27,7 @@ jobs:
 
       - name: Activate caches
         id: docker-images-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: /tmp/docker-images
           key: ${{ steps.generate-cache-key.outputs.key }}
