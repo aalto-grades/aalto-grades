@@ -5,9 +5,6 @@
 # Build stage
 FROM ghcr.io/pnpm/pnpm:latest AS build
 
-WORKDIR /app
-RUN mkdir common server
-
 # Install packages first to make following builds faster
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -26,25 +23,30 @@ COPY server/src ./src
 
 # Build
 RUN pnpm run build
+WORKDIR /app
+RUN pnpm deploy --legacy --filter=aalto-grades-server --prod /prod/server
 
 # Run stage
-FROM ghcr.io/pnpm/pnpm:latest AS run
+FROM node:26-alpine AS run
 
 ENV NODE_ENV=production
-WORKDIR /app
-# RUN mkdir logs && chown node:node logs
-# RUN mkdir keys && chown node:node keys
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml /app/
-COPY server/package.json /app/server/
-RUN pnpm install --frozen-lockfile --prod --filter ./server...
+ENV CI=true
+
+RUN npm install -g pnpm@latest-11
 
 WORKDIR /app/server/
+COPY --from=build /prod/server ./
+
 COPY server/.sequelizerc ./
 COPY server/docs ./docs
 COPY --from=build /app/server/build ./build
 
+# pnpm creates temporary files under /app during script execution.
+# Ensure runtime user can write there.
+RUN mkdir -p /app/logs && chown -R node:node /app
+
 USER node
 EXPOSE 3000
 CMD ["/bin/sh", "-c", "\
-    pnpm run migration:up && \
-    pnpm run start"]
+    pnpm --config.verify-deps-before-run=false run migration:up && \
+    pnpm --config.verify-deps-before-run=false run start"]

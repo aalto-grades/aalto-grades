@@ -23,20 +23,20 @@ COPY server/src ./src
 
 # Build
 RUN pnpm run build
+WORKDIR /app
+RUN pnpm deploy --legacy --filter=aalto-grades-server --prod /prod/server
 
 # Run stage
 FROM node:26-alpine AS run
 
+ENV NODE_ENV=production
+ENV CI=true
+
 RUN npm install -g pnpm@latest-11
 
-WORKDIR /app
-RUN mkdir logs && chown node:node logs
-
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml /app/
-COPY server/package.json /app/server/
-RUN pnpm install --frozen-lockfile --prod --filter ./server...
-
 WORKDIR /app/server/
+COPY --from=build /prod/server ./
+
 COPY server/.sequelizerc ./
 COPY server/mock-data ./mock-data
 COPY server/docs ./docs
@@ -44,11 +44,11 @@ COPY --from=build /app/server/build ./build
 
 # pnpm creates temporary files under /app during script execution.
 # Ensure runtime user can write there.
-RUN chown -R node:node /app
+RUN mkdir -p /app/logs && chown -R node:node /app
 
 USER node
 EXPOSE 3000
 CMD ["/bin/sh", "-c", "\
-    pnpm run migration:up && \
-    pnpm run seed:up && \
-    pnpm run start"]
+    pnpm --config.verify-deps-before-run=false run migration:up && \
+    pnpm --config.verify-deps-before-run=false run seed:up && \
+    pnpm --config.verify-deps-before-run=false run start"]
