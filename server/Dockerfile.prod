@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 # Build stage
-FROM node:24-alpine AS build
+FROM node:26-alpine AS build
 
+RUN npm install -g corepack
 RUN corepack enable
 
 WORKDIR /app
@@ -30,9 +31,10 @@ COPY server/src ./src
 RUN pnpm run build
 
 # Run stage
-FROM node:24-alpine AS run
+FROM node:26-alpine AS run
 
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN npm install -g corepack
 RUN corepack enable
 
 ENV NODE_ENV=production

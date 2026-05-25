@@ -10,7 +10,7 @@ import {defineConfig} from 'vite';
 import viteTsconfigPaths from 'vite-tsconfig-paths';
 
 import libreJs from './libre-js-plugin';
-
+console.log('Current Node Version:', process.version);
 const rootPackageVersion = (
   JSON.parse(fs.readFileSync('../package.json').toString()) as {
     version: string;
@@ -26,20 +26,20 @@ const runGitCommand = (command: string): string | null => {
 };
 
 const gitShortSha =
-  (process.env.GITHUB_SHA?.slice(0, 7)
+  (process.env.GIT_SHA?.slice(0, 7)
     ?? runGitCommand('git rev-parse --short=7 HEAD')
     ?? 'unknown');
 
-const gitCommitDate =
-  runGitCommand('git show -s --date=format:%d/%m/%Y --format=%cd HEAD')
-  ?? 'unknown-date';
+const buildTime = Temporal.Now.zonedDateTimeISO('Europe/Helsinki').toString({
+  smallestUnit: 'minute',
+  fractionalSecondDigits: 0,
+  calendarName: 'never',
+  timeZoneName: 'auto',
+});
 
-const gitTagName =
-  process.env.GITHUB_REF_TYPE === 'tag'
-    ? process.env.GITHUB_REF_NAME
-    : null;
+const gitTagName = process.env.GIT_REF_TYPE === 'tag' ? (process.env.GIT_REF_NAME ?? null) : null;
 
-const resolvedVersion = gitTagName ?? `⇛ ${gitShortSha} - ${gitCommitDate}`;
+const resolvedVersion = gitTagName ?? `⇛ ${gitShortSha} - ${buildTime}`;
 
 export default defineConfig({
   plugins: [

@@ -3,9 +3,18 @@
 # SPDX-License-Identifier: MIT
 
 # Build stage
-FROM node:24-alpine AS build
+FROM node:26-alpine AS build
 
+RUN npm install -g corepack
 RUN corepack enable
+
+ARG GIT_REF_TYPE
+ARG GIT_REF_NAME
+ARG GIT_SHA
+
+ENV GIT_REF_TYPE=${GIT_REF_TYPE}
+ENV GIT_REF_NAME=${GIT_REF_NAME}
+ENV GIT_SHA=${GIT_SHA}
 
 # Install packages first to make following builds faster
 WORKDIR /app

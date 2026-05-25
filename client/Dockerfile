@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 # Build stage
-FROM node:24-alpine AS build
+FROM node:26-alpine AS build
 
+RUN npm install -g corepack
 RUN corepack enable
 
 # Install packages first to make following builds faster

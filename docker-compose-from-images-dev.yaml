@@ -26,13 +26,9 @@ services:
     extends:
       file: ./docker-compose-from-images.yaml
       service: backend
+    image: ghcr.io/aalto-grades/aalto-grades-backend:canary
     environment:
       OTEL_SERVICE_NAME: "ossi-test-backend"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-lgtm:4317"
-      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
-      NODE_OPTIONS: >-
-        --require @opentelemetry/auto-instrumentations-node/register
-    image: ghcr.io/aalto-grades/aalto-grades-backend:canary
 
   database:
     extends:
