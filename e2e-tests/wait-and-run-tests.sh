@@ -18,5 +18,5 @@ echo "URL reached, sleeping for extra 10 seconds to make sure everything is load
 sleep 10
 
 echo "Starting tests"
-# npx playwright test
+# pnpm exec playwright test
 ./start-test.sh

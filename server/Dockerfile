@@ -3,10 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 # Build stage
-FROM node:26-alpine AS build
-
-RUN npm install -g corepack
-RUN corepack enable
+FROM ghcr.io/pnpm/pnpm:latest AS build
 
 # Install packages first to make following builds faster
 WORKDIR /app
@@ -30,9 +27,7 @@ RUN pnpm run build
 # Run stage
 FROM node:26-alpine AS run
 
-ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN npm install -g corepack
-RUN corepack enable
+RUN npm install -g pnpm@latest-11
 
 WORKDIR /app
 RUN mkdir logs && chown node:node logs
@@ -46,6 +41,10 @@ COPY server/.sequelizerc ./
 COPY server/mock-data ./mock-data
 COPY server/docs ./docs
 COPY --from=build /app/server/build ./build
+
+# pnpm creates temporary files under /app during script execution.
+# Ensure runtime user can write there.
+RUN chown -R node:node /app
 
 USER node
 EXPOSE 3000

@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 
 > The first time (or to update the tested browser agents):
     ```
-    npx playwright install
+    pnpm exec playwright install
     ```
 
 Start the website in Docker by running Docker Compose at the root of the
@@ -30,5 +30,5 @@ Then launch Playwright in this directory in CLI mode:
 Or in UI mode (remember to select all projects when testing):
 
 ```
-npx playwright test --ui
+pnpm exec playwright test --ui
 ```

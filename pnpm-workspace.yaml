@@ -4,13 +4,16 @@ packages:
   - "e2e-tests"
   - "common"
 linkWorkspacePackages: true
+syncInjectedDepsAfterScripts:
+- build
+injectWorkspacePackages: true
 minimumReleaseAge: 2880
 allowBuilds:
-  "@parcel/watcher": true
+  "@parcel/watcher": false
   "@scarf/scarf": false
-  "@swc/core": true
-  argon2: true
-  esbuild: true
-  protobufjs: true
+  "@swc/core": false
+  argon2: false
+  esbuild: false
+  protobufjs: false
   "react-global-modal": true
-  unrs-resolver: true
+  unrs-resolver: false

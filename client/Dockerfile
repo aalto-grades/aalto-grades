@@ -3,10 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 # Build stage
-FROM node:26-alpine AS build
-
-RUN npm install -g corepack
-RUN corepack enable
+FROM ghcr.io/pnpm/pnpm:latest AS build
 
 # Install packages first to make following builds faster
 WORKDIR /app

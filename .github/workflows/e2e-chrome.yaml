@@ -83,7 +83,7 @@ jobs:
           echo "Services started successfully"
 
       - name: Install Chrome browser for Playwright
-        run: npx playwright install chromium --with-deps
+        run: pnpm exec playwright install chromium --with-deps
 
       - name: Wait for application to be ready
         run: |
@@ -112,7 +112,7 @@ jobs:
 
       - name: Run Chrome E2E tests
         run: |
-          npx playwright test --project chromium --reporter=list,blob
+          pnpm exec playwright test --project chromium --reporter=list,blob
           # Move Chrome-specific report if it exists
           if [ -f ./blob-report/report-chromium.zip ]; then
             mv ./blob-report/report-chromium.zip ./blob-reporter/chrome-report.zip
@@ -120,7 +120,7 @@ jobs:
 
       - name: Generate HTML test report
         if: always()
-        run: npx playwright merge-reports --reporter=html ./blob-reporter
+        run: pnpm exec playwright merge-reports --reporter=html ./blob-reporter
 
       - name: Upload HTML test report
         if: always()

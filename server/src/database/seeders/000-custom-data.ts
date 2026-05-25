@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import fs from 'fs';
-import path from 'path';
-import type {QueryInterface} from 'sequelize';
+import fs from 'node:fs';
+import path from 'node:path';
+import {QueryTypes, type QueryInterface} from 'sequelize';
 
 import {dbLogger} from '../../configs/winston';
 
@@ -34,6 +34,20 @@ export default {
   up: async (queryInterface: QueryInterface): Promise<void> => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
+      const existingUsers = await queryInterface.sequelize.query<{hasRows: boolean}>(
+        'SELECT EXISTS(SELECT 1 FROM "user" LIMIT 1) AS "hasRows";',
+        {
+          type: QueryTypes.SELECT,
+          transaction,
+        }
+      );
+
+      if (existingUsers.length > 0 && existingUsers[0].hasRows) {
+        dbLogger.info('Custom data already exists, skipping seed 000-custom-data.');
+        await transaction.commit();
+        return;
+      }
+
       if (users) await queryInterface.sequelize.query(users, {transaction});
       if (courses) await queryInterface.sequelize.query(courses, {transaction});
       if (courseTranslation) await queryInterface.sequelize.query(courseTranslation, {transaction});

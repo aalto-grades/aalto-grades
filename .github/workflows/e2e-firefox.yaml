@@ -83,7 +83,7 @@ jobs:
           echo "Services started successfully"
 
       - name: Install Firefox browser for Playwright
-        run: npx playwright install firefox --with-deps
+        run: pnpm exec playwright install firefox --with-deps
 
       - name: Wait for application to be ready
         run: |
@@ -112,7 +112,7 @@ jobs:
 
       - name: Run Firefox E2E tests
         run: |
-          npx playwright test --project firefox --reporter=list,blob
+          pnpm exec playwright test --project firefox --reporter=list,blob
           # Move Firefox-specific report if it exists
           if [ -f ./blob-report/report-firefox.zip ]; then
             mv ./blob-report/report-firefox.zip ./blob-reporter/firefox-report.zip
@@ -120,7 +120,7 @@ jobs:
 
       - name: Generate HTML test report
         if: always()
-        run: npx playwright merge-reports --reporter=html ./blob-reporter
+        run: pnpm exec playwright merge-reports --reporter=html ./blob-reporter
 
       - name: Upload HTML test report
         if: always()

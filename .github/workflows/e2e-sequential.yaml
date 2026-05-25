@@ -43,7 +43,7 @@ jobs:
         working-directory: ./
         run: docker compose up -d
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: pnpm exec playwright install --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
       - name: Run Playwright tests
         run: ./wait-and-run-tests.sh

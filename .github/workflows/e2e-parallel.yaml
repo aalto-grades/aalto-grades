@@ -79,7 +79,7 @@ jobs:
 
           # Merge reports if we have any
           if [ -n "$(ls -A ./blob-reporter/)" ]; then
-            npx playwright merge-reports --reporter=html ./blob-reporter
+            pnpm exec playwright merge-reports --reporter=html ./blob-reporter
           else
             echo "No reports to merge"
           fi

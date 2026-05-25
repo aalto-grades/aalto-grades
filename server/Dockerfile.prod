@@ -3,10 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 # Build stage
-FROM node:26-alpine AS build
-
-RUN npm install -g corepack
-RUN corepack enable
+FROM ghcr.io/pnpm/pnpm:latest AS build
 
 WORKDIR /app
 RUN mkdir common server
@@ -31,16 +28,12 @@ COPY server/src ./src
 RUN pnpm run build
 
 # Run stage
-FROM node:26-alpine AS run
-
-ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN npm install -g corepack
-RUN corepack enable
+FROM ghcr.io/pnpm/pnpm:latest AS run
 
 ENV NODE_ENV=production
 WORKDIR /app
-RUN mkdir logs && chown node:node logs
-RUN mkdir keys && chown node:node keys
+# RUN mkdir logs && chown node:node logs
+# RUN mkdir keys && chown node:node keys
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml /app/
 COPY server/package.json /app/server/
 RUN pnpm install --frozen-lockfile --prod --filter ./server...
