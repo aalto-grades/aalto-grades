@@ -306,6 +306,7 @@ export const getSisuFormattedGradingCSV: Endpoint<
     {
       header: true,
       delimiter: ',', // Accepted delimiters in Sisu are semicolon ; and comma ,
+      quoted: true, // fix for SISU
     },
     (_err, data) => {
       res
