@@ -6,12 +6,12 @@
   },
   "dependencies": {
     "dotenv": "^17.4.2",
-    "otplib": "^13.4.0",
+    "otplib": "^13.4.1",
     "pg": "^8.21.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.2",
     "@types/pg": "^8.20.0"
   },
   "engines": {

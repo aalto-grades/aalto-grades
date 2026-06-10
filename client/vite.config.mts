@@ -7,7 +7,6 @@ import {execSync} from 'node:child_process';
 import fs from 'node:fs';
 import license from 'rollup-plugin-license';
 import {defineConfig} from 'vite';
-import viteTsconfigPaths from 'vite-tsconfig-paths';
 
 import libreJs from './libre-js-plugin';
 console.log('Current Node Version:', process.version);
@@ -42,9 +41,11 @@ const gitTagName = process.env.GIT_REF_TYPE === 'tag' ? (process.env.GIT_REF_NAM
 const resolvedVersion = gitTagName ?? `⇛ ${gitShortSha} - ${buildTime}`;
 
 export default defineConfig({
+  resolve: {
+    tsconfigPaths: true,
+  },
   plugins: [
     react(),
-    viteTsconfigPaths(),
     license({
       thirdParty: {
         includePrivate: false,
@@ -68,10 +69,6 @@ export default defineConfig({
     // The build will contain a syntax error if we don't manually insert quotes
     AALTO_GRADES_VERSION: '"' + (resolvedVersion || rootPackageVersion) + '"',
   },
-  esbuild: {
-    loader: 'tsx',
-    pure: ['console.log'],
-  },
   optimizeDeps: {
     include: ['common'],
   },
@@ -79,9 +76,6 @@ export default defineConfig({
     outDir: './build',
     commonjsOptions: {
       include: [/common/, /node_modules/],
-    },
-    rollupOptions: {
-      plugins: [],
     },
   },
   server: {
