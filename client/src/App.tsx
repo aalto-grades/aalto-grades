@@ -12,7 +12,7 @@ import {
 } from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
 import {enqueueSnackbar} from 'notistack';
-import {type JSX, type Ref, useEffect} from 'react';
+import {type JSX, type Ref, useCallback, useEffect} from 'react';
 import {GlobalModal, GlobalModalWrapper} from 'react-global-modal';
 import {RouterProvider, createBrowserRouter} from 'react-router-dom';
 
@@ -38,6 +38,32 @@ import ConfirmDialog from './components/shared/ConfirmDialog';
 import NotistackWrapper from './context/NotistackWrapper';
 import type {CustomError} from './types';
 
+const ErrorSnackbarContent = ({
+  error,
+}: {
+  error: CustomError;
+}): JSX.Element => {
+  let jsonError: Array<{message: string}> | undefined = undefined;
+  if (error?.message.length <= 100) {
+    return <>{error?.message}</>;
+  } else {
+    try {
+      jsonError = JSON.parse(error.message) as Array<{message: string}>;
+    } catch {
+      jsonError = undefined;
+    }
+
+    return (
+      <details>
+        <summary>
+          {`${jsonError?.length ?? ''} Errors`}
+        </summary>
+        <textarea readOnly style={{height: '200px', width: '400px', overflow: 'auto'}}>{error?.message}</textarea>
+      </details>
+    );
+  }
+};
+
 let globalModalRef: GlobalModalWrapper | null = null;
 
 const Root = (): JSX.Element => {
@@ -45,12 +71,12 @@ const Root = (): JSX.Element => {
     GlobalModal.setUpModal(globalModalRef as Ref<GlobalModalWrapper | null>);
   }, []);
 
-  const handleError = (error: CustomError): void => {
-    enqueueSnackbar(error.message, {
+  const handleError = useCallback((error: CustomError): void => {
+    enqueueSnackbar(<ErrorSnackbarContent error={error} />, {
       variant: 'error',
       action: error.action,
     });
-  };
+  }, []);
 
   const queryClient = new QueryClient({
     queryCache: new QueryCache({onError: handleError}),
@@ -103,9 +129,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/support',
-        element: (
-          <StaticPageView url="/support.html" title="Support" />
-        ),
+        element: <StaticPageView url="/support.html" title="Support" />,
       },
       {
         path: '/',
