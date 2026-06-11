@@ -11,7 +11,7 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
-import {type SnackbarKey, enqueueSnackbar} from 'notistack';
+import {enqueueSnackbar} from 'notistack';
 import {type JSX, type Ref, useCallback, useEffect} from 'react';
 import {GlobalModal, GlobalModalWrapper} from 'react-global-modal';
 import {RouterProvider, createBrowserRouter} from 'react-router-dom';
