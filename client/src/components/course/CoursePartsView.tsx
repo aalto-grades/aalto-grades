@@ -55,7 +55,6 @@ import {
   type ExternalSourceData,
   type GradingModelData,
   type ModifyCourseTasks,
-  type ServiceSourceOption,
   SystemRole,
 } from '@/common/types';
 import AddExtServiceGradeSourceDialog from '@/components/course/course-parts-view/services-components/AddExtServiceGradeSourceDialog';
