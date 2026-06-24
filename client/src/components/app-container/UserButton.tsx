@@ -4,7 +4,7 @@
 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import PersonIcon from '@mui/icons-material/Person';
-import {Box, Button, Menu, MenuItem} from '@mui/material';
+import {Box, Button, Divider, Menu, MenuItem} from '@mui/material';
 import {useQueryClient} from '@tanstack/react-query';
 import {type JSX, useState} from 'react';
 import {AsyncConfirmationModal} from 'react-global-modal';
@@ -16,6 +16,7 @@ import OtpAuthDialog from '@/components/shared/auth/OtpAuthDialog';
 import ServiceTokenDialog from '@/components/shared/auth/ServiceTokenDialog';
 import {
   useConfirmMfa,
+  useGetClientEnvVariables,
   useLogOut,
   useResetOwnAuth,
 } from '@/hooks/useApi';
@@ -28,6 +29,7 @@ const UserButton = (): JSX.Element => {
   const {t} = useTranslation();
   const {auth, setAuth} = useAuth();
   const navigate = useNavigate();
+  const {data: clientEnv} = useGetClientEnvVariables();
   const queryClient = useQueryClient();
   const confirmMfa = useConfirmMfa();
   const logOut = useLogOut();
@@ -43,7 +45,7 @@ const UserButton = (): JSX.Element => {
 
   const handleLogOut = async (): Promise<void> => {
     await logOut.mutateAsync();
-    resetAllServiceToken();
+    resetAllServiceToken(clientEnv?.EXTERNAL_SERVICES || []);
     setAuth(null);
     setAnchorEl(null);
     queryClient.clear();
@@ -148,6 +150,7 @@ const UserButton = (): JSX.Element => {
           {t('general.a+-api-token')}
         </MenuItem>
         {auth.role === SystemRole.Admin && [
+          <Divider key="divider-1" />,
           <MenuItem
             key="change-password"
             onClick={() => {
@@ -164,6 +167,7 @@ const UserButton = (): JSX.Element => {
             {t('shared.auth.manage-passkeys')}
           </MenuItem>,
         ]}
+        <Divider key="divider-1" />
         <MenuItem onClick={handleLogOut}>{t('shared.auth.log-out')}</MenuItem>
       </Menu>
     </>

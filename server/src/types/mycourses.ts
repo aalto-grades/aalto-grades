@@ -64,7 +64,7 @@ export const MoodleCourseSchema = z.object({
   completionusertracked: z.boolean(),
   category: z.number(),
   progress: z.number().nullable(),
-  completed: z.boolean(),
+  completed: z.boolean().nullable(),
   startdate: z.number(),
   enddate: z.number(),
   marker: z.number(),
@@ -73,7 +73,7 @@ export const MoodleCourseSchema = z.object({
   hidden: z.boolean(),
   overviewfiles: z.array(z.unknown()),
   showactivitydates: z.boolean(),
-  showcompletionconditions: z.boolean(),
+  showcompletionconditions: z.boolean().nullable(),
   timemodified: z.number()
 });
 

@@ -45,7 +45,7 @@
       "hide-password": "Click to hide password from view",
       "show-password": "Click to show password",
       "token": {
-        "intro": "You can find your API token by logging in to {{service}} and navigating to",
+        "intro": "You can get your token with this link",
         "current": "Your current token",
         "hide-token-tip": "Hide token",
         "show-token-tip": "Show full token",

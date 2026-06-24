@@ -5,7 +5,7 @@
 import {Button, Menu, MenuItem} from '@mui/material';
 import {type JSX, type MouseEvent, type ReactNode, useState} from 'react';
 
-import type {ServiceSourceOption} from '@/utils/servicesSource';
+import type {ServiceSourceOption} from '@/common/types';
 
 type Props = {
   buttonLabel: string;

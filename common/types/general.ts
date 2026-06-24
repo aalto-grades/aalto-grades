@@ -48,4 +48,21 @@ export const LocalizedStringSchema = z.strictObject({
   sv: z.string(),
 });
 
+export const ServiceSourceOptionSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  tokenLink: z.string(),
+});
+
+export type ServiceSourceOption = z.infer<typeof ServiceSourceOptionSchema>;
+
+export const ClientEnvVariablesSchema = z.object({
+  AALTO_GRADES_VERSION: z.string(),
+  PROTOCOL_HANDLER_NAME: z.string(),
+  PROTOCOL_HANDLER_URL: z.string(),
+  EXTERNAL_SERVICES: z.array(ServiceSourceOptionSchema),
+});
+
+export type ClientEnvVariables = z.infer<typeof ClientEnvVariablesSchema>;
+
 export type LocalizedString = z.infer<typeof LocalizedStringSchema>;

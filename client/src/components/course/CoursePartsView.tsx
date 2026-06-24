@@ -55,6 +55,7 @@ import {
   type ExternalSourceData,
   type GradingModelData,
   type ModifyCourseTasks,
+  type ServiceSourceOption,
   SystemRole,
 } from '@/common/types';
 import AddExtServiceGradeSourceDialog from '@/components/course/course-parts-view/services-components/AddExtServiceGradeSourceDialog';
@@ -70,6 +71,7 @@ import {
   useEditCoursePart,
   useEditGradingModel,
   useGetAllGradingModels,
+  useGetClientEnvVariables,
   useGetCourse,
   useGetCourseParts,
   useGetCourseTasks,
@@ -78,7 +80,7 @@ import {
   useModifyCourseTasks,
 } from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
-import {SERVICE_SOURCE_OPTIONS, getCourseRole} from '@/utils';
+import {getCourseRole} from '@/utils';
 import CoursePartDialog from './course-parts-view/CoursePartDialog';
 import ViewExternalSourcesDialog from './course-parts-view/ViewExternalSourcesDialog';
 import CreateGradingModelDialog from './models-view/CreateGradingModelDialog';
@@ -164,8 +166,9 @@ const CoursePartsView = (): JSX.Element => {
       Object.values(errorObj).some(value => value === true)
     );
 
+  const {data: clientEnv} = useGetClientEnvVariables();
   const [serviceDialogOpen, setServiceDialogOpen] = useState(false);
-  const serviceOptions = SERVICE_SOURCE_OPTIONS;
+  const serviceOptions = clientEnv?.EXTERNAL_SERVICES || [];
   const [serviceDialogInfo, setServiceDialogInfo] = useState(serviceOptions[0]);
   const [addExtServiceSourcesTo, setAddExtServiceSourcesTo] = useState<{
     courseTaskId: number | null;

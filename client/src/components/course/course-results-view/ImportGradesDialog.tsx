@@ -40,7 +40,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
-import type {NewTaskGrade} from '@/common/types';
+import type {NewTaskGrade, ServiceSourceOption} from '@/common/types';
 import ServiceTokenDialog from '@/components/shared/auth/ServiceTokenDialog';
 import {
   type ExtServiceImportStreamEvent,
@@ -49,11 +49,11 @@ import {
 } from '@/hooks/api/extServices';
 import {
   useAddGrades,
+  useGetClientEnvVariables,
   useGetCourseParts,
   useGetCourseTasks,
 } from '@/hooks/useApi';
-import {SERVICE_SOURCE_OPTIONS, getServiceToken} from '@/utils';
-import type {ServiceSourceOption} from '@/utils/servicesSource';
+import {getServiceToken} from '@/utils';
 
 type PropsType = {
   open: boolean;
@@ -78,17 +78,20 @@ type SelectedTasks = {
   externalTaskIdsByService: Map<string, number[]>;
 };
 
-const SERVICE_SOURCE_OPTIONS_BY_ID: Partial<Record<string, ServiceSourceOption>> =
-  Object.fromEntries(
-    SERVICE_SOURCE_OPTIONS.map(option => [option.id.toLowerCase(), option])
-  );
-
 const ImportGradesDialog = ({
   open,
   onClose,
 }: PropsType): JSX.Element | null => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
+  const {data: clientEnv} = useGetClientEnvVariables();
+
+  const services = clientEnv?.EXTERNAL_SERVICES || [];
+
+  const serviceOptionsById: Partial<Record<string, ServiceSourceOption>> =
+    Object.fromEntries(
+      services.map(option => [option.id.toLowerCase(), option])
+    );
 
   const courseParts = useGetCourseParts(courseId);
   const courseTasks = useGetCourseTasks(courseId);
@@ -122,7 +125,12 @@ const ImportGradesDialog = ({
       for (const source of task.externalSources ?? []) {
         map.set(
           source.id,
-          formatSourceLabel(SERVICE_SOURCE_OPTIONS_BY_ID[source.externalServiceName.toLowerCase()]?.label ?? '', source.sourceInfo.itemname ?? '', source.externalCourse.instance)
+          formatSourceLabel(
+            serviceOptionsById[source.externalServiceName.toLowerCase()]?.label
+            ?? '',
+            source.sourceInfo.itemname ?? '',
+            source.externalCourse.instance
+          )
         );
       }
     }
@@ -228,7 +236,7 @@ const ImportGradesDialog = ({
     for (const [serviceId] of selectedTasks.externalTaskIdsByService) {
       if (getServiceToken(serviceId)) continue;
 
-      setServiceTokenInfo(SERVICE_SOURCE_OPTIONS_BY_ID[serviceId] ?? {
+      setServiceTokenInfo(serviceOptionsById[serviceId] ?? {
         id: serviceId,
         label: serviceId,
         tokenLink: '',
@@ -244,7 +252,7 @@ const ImportGradesDialog = ({
       const responses: NewTaskGrade[][] = [];
 
       for (const [serviceId, courseTaskIds] of selectedTasks.externalTaskIdsByService) {
-        const serviceInfo = SERVICE_SOURCE_OPTIONS_BY_ID[serviceId] ?? {
+        const serviceInfo = serviceOptionsById[serviceId] ?? {
           id: serviceId,
           label: serviceId,
           tokenLink: '',
