@@ -213,6 +213,7 @@ try {
 } catch (error) {
   if (NODE_ENV === 'production') throw error as Error;
   httpLogger.warn('SAML Private keys not read: ' + (error as Error).message);
+  httpLogger.warn('KEY:' + SAML_PRIVATE_KEY);
 }
 export {SAML_DECRYPTION_PVK, SAML_PRIVATE_KEY};
 

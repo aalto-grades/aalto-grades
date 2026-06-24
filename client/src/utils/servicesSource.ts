@@ -24,6 +24,6 @@ export type ServiceSourceOption = {
   tokenLink: string;
 };
 export const SERVICE_SOURCE_OPTIONS: ServiceSourceOption[] = [
-  {id: 'mycourses', label: 'MyCourses', tokenLink: 'https://mycourses-test.aalto.fi/user/managetoken.php'},
+  {id: 'mycourses', label: 'MyCourses', tokenLink: `https://mycourses.aalto.fi/admin/tool/mobile/launch.php?service=moodle_mobile_app&passport=${(Math.random() * 10000).toFixed(0)}&urlscheme=${encodeURIComponent(OSSI_PROTOCOL)}`},
   {id: 'aplus', label: 'A+', tokenLink: 'https://plus.cs.aalto.fi/accounts/accounts/'},
 ];

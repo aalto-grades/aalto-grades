@@ -3,10 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 import react from '@vitejs/plugin-react';
+import mkcert from 'vite-plugin-mkcert';
 import {execSync} from 'node:child_process';
 import fs from 'node:fs';
 import license from 'rollup-plugin-license';
-import {defineConfig} from 'vite';
+import {defineConfig, loadEnv} from 'vite';
 
 import libreJs from './libre-js-plugin';
 console.log('Current Node Version:', process.version);
@@ -40,54 +41,64 @@ const gitTagName = process.env.GIT_REF_TYPE === 'tag' ? (process.env.GIT_REF_NAM
 
 const resolvedVersion = gitTagName ?? `⇛ ${gitShortSha} - ${buildTime}`;
 
-export default defineConfig({
-  resolve: {
-    tsconfigPaths: true,
-  },
-  plugins: [
-    react(),
-    license({
-      thirdParty: {
-        includePrivate: false,
-        output: {
-          file: 'build/dependencies.json',
-          template(dependencies) {
-            return JSON.stringify(dependencies);
+export default defineConfig(({mode}) => {
+  const env = loadEnv(mode, '../server', 'OSSI_');
+
+  return {
+    resolve: {
+      tsconfigPaths: true,
+    },
+    plugins: [
+      mkcert(),
+      react(),
+      license({
+        thirdParty: {
+          includePrivate: false,
+          output: {
+            file: 'build/dependencies.json',
+            template(dependencies) {
+              return JSON.stringify(dependencies);
+            },
           },
         },
-      },
-    }),
-    libreJs({
-      indexFile: 'index.html',
-      webLabelsFile: 'javascript.html',
-      dependenciesFile: 'dependencies.json',
-      projectLicense: 'Expat',
-      licenseExceptions: ['0BSD'],
-    }),
-  ],
-  define: {
+      }),
+      libreJs({
+        indexFile: 'index.html',
+        webLabelsFile: 'javascript.html',
+        dependenciesFile: 'dependencies.json',
+        projectLicense: 'Expat',
+        licenseExceptions: ['0BSD'],
+      }),
+    ],
+    define: {
     // The build will contain a syntax error if we don't manually insert quotes
-    AALTO_GRADES_VERSION: '"' + (resolvedVersion || rootPackageVersion) + '"',
-  },
-  optimizeDeps: {
-    include: ['common'],
-  },
-  build: {
-    outDir: './build',
-    commonjsOptions: {
-      include: [/common/, /node_modules/],
+      AALTO_GRADES_VERSION: JSON.stringify(resolvedVersion || rootPackageVersion),
+      OSSI_PROTOCOL: JSON.stringify(env.OSSI_PROTOCOL || 'ossi-test'),
+      OSSI_PROTOCOL_CALLBACK: JSON.stringify(
+        env.OSSI_PROTOCOL_CALLBACK
+        || 'https://aalto-grades-test.cs.aalto.fi/auth-callback?data=%s'
+      ),
     },
-  },
-  server: {
-    open: true,
-    port: 3005,
-
-    // Forward `/api/v1/*` to `localhost:3000/v1/*`
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        rewrite: path => path.replace(/^\/api/, ''),
+    optimizeDeps: {
+      include: ['common'],
+    },
+    build: {
+      outDir: './build',
+      commonjsOptions: {
+        include: [/common/, /node_modules/],
       },
     },
-  },
+    server: {
+      open: true,
+      port: 3005,
+      https: true,
+      // Forward `/api/v1/*` to `localhost:3000/v1/*`
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000',
+          rewrite: path => path.replace(/^\/api/, ''),
+        },
+      },
+    },
+  };
 });

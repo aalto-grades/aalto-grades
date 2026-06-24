@@ -17,6 +17,7 @@ import {GlobalModal, GlobalModalWrapper} from 'react-global-modal';
 import {RouterProvider, createBrowserRouter} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
+import MoodleTokenCallbackView from '@/components/MoodleTokenCallbackView';
 import ThemeProvider from '@/theme/ThemeProvider';
 import AppContainer from './components/AppContainer';
 import FrontPageView from './components/FrontPageView';
@@ -91,6 +92,25 @@ const Root = (): JSX.Element => {
 
   return (
     <ThemeProvider>
+
+      <button onClick={() => {
+        if (navigator.registerProtocolHandler) {
+          console.log(`Registering protocol handler for ${OSSI_PROTOCOL} with callback ${OSSI_PROTOCOL_CALLBACK}`);
+          try {
+            navigator.registerProtocolHandler(
+              OSSI_PROTOCOL,
+              OSSI_PROTOCOL_CALLBACK
+            );
+          } catch (err) {
+            console.error('Could not register protocol handler', err);
+          }
+        } else {
+          console.warn('Protocol handler registration not supported in this browser');
+        }
+      }}
+      >
+        Register Protocol Handler
+      </button>
       <NotistackWrapper />
       <GlobalModalWrapper
         customModal={ConfirmDialog}
@@ -113,6 +133,7 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       {path: '/login', element: <LoginView />},
+      {path: '/moodle-token-callback', element: <MoodleTokenCallbackView />},
       {
         path: '/licenses',
         element: <StaticPageView url="/javascript.html" title="Licenses" />,
