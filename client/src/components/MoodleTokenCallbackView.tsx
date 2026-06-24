@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 The Ossi Developers
+//
+// SPDX-License-Identifier: MIT
+
 import {Box, CircularProgress, Typography} from '@mui/material';
 import type React from 'react';
 import {useEffect, useState} from 'react';
