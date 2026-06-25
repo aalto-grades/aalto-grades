@@ -144,6 +144,8 @@ const defaults = {
   sisuApiToken: '507f508dfa595cc9kya86d9200c7cca9f',
   sisuApiUrl: 'https://course.api.aalto.fi:443/api/sisu/v1',
   webauthnRpName: 'Ossi',
+  protocol: 'web+ossidev',
+  protocolCallback: 'http://localhost:3005/auth-callback?data=%s',
 };
 
 // Config dotenv so environment variables are also accessible from .env file.
@@ -199,6 +201,12 @@ export const SAML_CALLBACK: string =
   process.env.SAML_CALLBACK || defaults.samlCallback;
 export const SAML_ENTRYPOINT: string =
   process.env.SAML_ENTRYPOINT || defaults.samlEntrypoint;
+
+export const PROTOCOL_HANDLER_NAME: string =
+  process.env.OSSI_PROTOCOL || defaults.protocol;
+export const PROTOCOL_HANDLER_URL: string =
+  process.env.OSSI_PROTOCOL_CALLBACK || defaults.protocolCallback;
+
 export const SAML_ISSUER: string =
   process.env.SAML_ISSUER || defaults.samlIssuer;
 export const SAML_METADATA_URL: string =
@@ -213,6 +221,7 @@ try {
 } catch (error) {
   if (NODE_ENV === 'production') throw error as Error;
   httpLogger.warn('SAML Private keys not read: ' + (error as Error).message);
+  httpLogger.warn(`current KEY: ${SAML_PRIVATE_KEY.split('\n')[1]}...`);
 }
 export {SAML_DECRYPTION_PVK, SAML_PRIVATE_KEY};
 

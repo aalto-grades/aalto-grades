@@ -18,7 +18,11 @@ import {useTranslation} from 'react-i18next';
 
 import Dialog from '@/components/shared/Dialog';
 import ExternalLink from '@/components/shared/ExternalLink';
-import {SERVICE_SOURCE_OPTIONS, getServiceToken, setServiceToken} from '@/utils';
+import {useGetClientEnvVariables} from '@/hooks/api/meta';
+import {
+  getServiceToken,
+  setServiceToken,
+} from '@/utils';
 
 type PropsType = {
   open: boolean;
@@ -36,7 +40,12 @@ const ServiceTokenDialog = ({
   error = false,
 }: PropsType): JSX.Element => {
   const {t} = useTranslation();
-  const [selectedService, setSelectedService] = useState(serviceInfo || SERVICE_SOURCE_OPTIONS[0]);
+  const {data: clientEnv} = useGetClientEnvVariables();
+  const services = clientEnv?.EXTERNAL_SERVICES || [];
+
+  const [selectedService, setSelectedService] = useState(
+    serviceInfo || services[0] || {id: '', label: '', tokenLink: ''}
+  );
   const currentToken = getServiceToken(selectedService.id);
   const [tokenInput, setTokenInput] = useState('');
   const [showFullToken, setShowFullToken] = useState(false);
@@ -77,13 +86,13 @@ const ServiceTokenDialog = ({
           variant="standard"
           value={selectedService.id}
           onChange={(e) => {
-            const selectedOption = SERVICE_SOURCE_OPTIONS.find(option => option.id === e.target.value);
+            const selectedOption = services.find(option => option.id === e.target.value);
             if (selectedOption) {
               setSelectedService(selectedOption);
             }
           }}
         >
-          {SERVICE_SOURCE_OPTIONS.map(option => (
+          {services.map(option => (
             <MenuItem key={option.id} value={option.id} selected={option.id === selectedService.id}>
               <Typography variant="h6">
                 {option.label}
@@ -95,6 +104,40 @@ const ServiceTokenDialog = ({
         {t('shared.auth.token.label')}
       </DialogTitle>
       <DialogContent>
+        {selectedService.id === 'mycourses' && (
+          <>
+
+            {'First register Ossi to receive the token from MyCourses, use this button: '}
+            <Button
+              variant="outlined"
+              disabled={!clientEnv}
+              onClick={() => {
+                if (navigator.registerProtocolHandler && clientEnv) {
+                  console.log(
+                    `Registering protocol handler for ${clientEnv.PROTOCOL_HANDLER_NAME} with callback ${clientEnv.PROTOCOL_HANDLER_URL}`
+                  );
+                  try {
+                    navigator.registerProtocolHandler(
+                      clientEnv.PROTOCOL_HANDLER_NAME,
+                      clientEnv.PROTOCOL_HANDLER_URL
+                    );
+                  } catch (err) {
+                    console.error('Could not register protocol handler', err);
+                  }
+                } else {
+                  console.warn(
+                    'Protocol handler registration not supported in this browser or environment variables not loaded'
+                  );
+                }
+              }}
+            >
+              Register Handler
+            </Button>
+            <Typography sx={{mt: 2}}>
+              {`Logout from MyCourses before opening the link `}
+            </Typography>
+          </>
+        )}
         <Typography sx={{mb: 2}}>
           {t('shared.auth.token.intro', {service: selectedService.label}) + ': '}
           <ExternalLink href={link}>{link}</ExternalLink>

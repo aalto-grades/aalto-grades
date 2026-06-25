@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import react from '@vitejs/plugin-react';
+import mkcert from 'vite-plugin-mkcert';
 import {execSync} from 'node:child_process';
 import fs from 'node:fs';
 import license from 'rollup-plugin-license';
@@ -45,6 +46,7 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   plugins: [
+    mkcert(),
     react(),
     license({
       thirdParty: {
@@ -67,7 +69,7 @@ export default defineConfig({
   ],
   define: {
     // The build will contain a syntax error if we don't manually insert quotes
-    AALTO_GRADES_VERSION: '"' + (resolvedVersion || rootPackageVersion) + '"',
+    AALTO_GRADES_VERSION: JSON.stringify(resolvedVersion || rootPackageVersion),
   },
   optimizeDeps: {
     include: ['common'],
@@ -81,7 +83,7 @@ export default defineConfig({
   server: {
     open: true,
     port: 3005,
-
+    https: { },
     // Forward `/api/v1/*` to `localhost:3000/v1/*`
     proxy: {
       '/api': {
@@ -89,5 +91,6 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api/, ''),
       },
     },
-  },
+  }
+
 });

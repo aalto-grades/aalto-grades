@@ -5,13 +5,14 @@ packages:
   - "common"
 linkWorkspacePackages: true
 syncInjectedDepsAfterScripts:
-- build
+  - build
 minimumReleaseAge: 2880
 allowBuilds:
   "@parcel/watcher": false
   "@scarf/scarf": false
   "@swc/core": false
   argon2: false
+  core-js-pure: false
   esbuild: false
   protobufjs: false
   "react-global-modal": true

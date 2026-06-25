@@ -42,4 +42,4 @@ services:
     volumes:
       - "./grafana_volume/data:/data"
     environment:
-      - OTEL_RESOURCE_ATTRIBUTES=service.name=otel-lgtm-dev
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=otel-lgtm-canary

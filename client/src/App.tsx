@@ -17,6 +17,7 @@ import {GlobalModal, GlobalModalWrapper} from 'react-global-modal';
 import {RouterProvider, createBrowserRouter} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
+import MoodleTokenCallbackView from '@/components/MoodleTokenCallbackView';
 import ThemeProvider from '@/theme/ThemeProvider';
 import AppContainer from './components/AppContainer';
 import FrontPageView from './components/FrontPageView';
@@ -113,6 +114,7 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       {path: '/login', element: <LoginView />},
+      {path: '/moodle-token-callback', element: <MoodleTokenCallbackView />},
       {
         path: '/licenses',
         element: <StaticPageView url="/javascript.html" title="Licenses" />,
