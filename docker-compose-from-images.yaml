@@ -32,9 +32,6 @@ services:
     container_name: aalto-grades-frontend
     restart: always
     tty: true
-    environment:
-      OSSI_PROTOCOL:"${OSSI_PROTOCOL}"
-      OSSI_PROTOCOL_CALLBACK:"${OSSI_PROTOCOL_CALLBACK}"
 
   backend:
     image: ghcr.io/aalto-grades/aalto-grades-backend:stable
