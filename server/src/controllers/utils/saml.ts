@@ -86,11 +86,16 @@ export const getSamlStrategy = async (): Promise<SamlStrategy> =>
 
     async (profile: Profile | null, done: SamlVerifiedCallback) => {
       try {
+        console.log(profile);
         const eduUser = profile?.['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] as string;
         const email = profile?.['urn:oid:0.9.2342.19200300.100.1.3'] as string;
         const name = profile?.['urn:oid:2.16.840.1.113730.3.1.241'] as string;
         if (!email)
           throw new ApiError('No email in assertion', HttpCode.Unauthorized);
+        if (!eduUser)
+          throw new ApiError('No eduPersonPrincipalName in assertion', HttpCode.Unauthorized);
+        if (!name)
+          throw new ApiError('No displayName in assertion', HttpCode.Unauthorized);
 
         // We only allow SAML login if user has been added as an idpUser to the system
         // Or if CREATE_USERS_ON_SAML_LOGIN is true
@@ -99,7 +104,8 @@ export const getSamlStrategy = async (): Promise<SamlStrategy> =>
           if (CREATE_USERS_ON_SAML_LOGIN) {
             // Create user if they don't exist
             user = await User.create({
-              email,
+              email: email,
+              name: name,
               idpUser: true
             });
           } else {
@@ -108,10 +114,10 @@ export const getSamlStrategy = async (): Promise<SamlStrategy> =>
               HttpCode.Unauthorized
             );
           }
+        } else {
+          await user.update({name: name, email: email}); // Update user info
         }
         if (!user.eduUser) await user.update({eduUser: eduUser});
-        if (!user.name || user.name === user.email)
-          await user.update({name: name});
 
         // When logging in through saml give user role even though user might also have admin rights.
         // We only allow admin login through the local login
