@@ -7,7 +7,7 @@
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": "^26.3.1",
+      "version": "^26.4.0",
       "onFail": "download"
     },
     "packageManager": {
@@ -40,9 +40,9 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
-    "eslint-plugin-yml": "^3.4.0",
-    "globals": "^17.6.0",
+    "eslint-plugin-yml": "^3.5.0",
+    "globals": "^17.7.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.1"
+    "typescript-eslint": "^8.62.0"
   }
 }
