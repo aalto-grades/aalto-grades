@@ -125,7 +125,7 @@ const defaults = {
   nodeEnv: 'development',
   backendPort: 3000,
   jwtSecret: 'TOP_SECRET',
-  frontendCorsOrigin: 'http://localhost:3005',
+  frontendCorsOrigin: 'https://localhost:3005',
   // TODO: Fix SAML callback url to include /api/ (#848)
   samlCallback: 'https://ossi.cs.aalto.fi/v1/auth/login-idp/callback',
   samlEntrypoint: 'https://idp.aalto.fi/idp/profile/SAML2/Redirect/SSO',
@@ -145,7 +145,9 @@ const defaults = {
   sisuApiUrl: 'https://course.api.aalto.fi:443/api/sisu/v1',
   webauthnRpName: 'Ossi',
   protocol: 'web+ossidev',
-  protocolCallback: 'http://localhost:3005/auth-callback?data=%s',
+  protocolCallback: 'https://localhost:3005/auth-callback?data=%s',
+
+  createUsersOnSamlLogin: false,
 };
 
 // Config dotenv so environment variables are also accessible from .env file.
@@ -251,3 +253,5 @@ if (!STUDENTS_SERVICE_API_KEY) {
 } else {
   httpLogger.info('STUDENTS_SERVICE_API_KEY is: ' + STUDENTS_SERVICE_API_KEY);
 }
+
+export const CREATE_USERS_ON_SAML_LOGIN: boolean = Boolean(process.env.CREATE_USERS_ON_SAML_LOGIN ?? defaults.createUsersOnSamlLogin);

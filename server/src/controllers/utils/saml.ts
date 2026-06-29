@@ -13,6 +13,7 @@ import {type SelectReturnType, isArrayOfNodes, useNamespaces} from 'xpath';
 
 import {HttpCode, SystemRole} from '@/common/types';
 import {
+  CREATE_USERS_ON_SAML_LOGIN,
   DEV_SAML_IDP_CERT,
   NODE_ENV,
   SAML_CALLBACK,
@@ -92,12 +93,21 @@ export const getSamlStrategy = async (): Promise<SamlStrategy> =>
           throw new ApiError('No email in assertion', HttpCode.Unauthorized);
 
         // We only allow SAML login if user has been added as an idpUser to the system
-        const user = await User.findIdpUserByEmail(email);
+        // Or if CREATE_USERS_ON_SAML_LOGIN is true
+        let user = await User.findIdpUserByEmail(email);
         if (!user) {
-          throw new ApiError(
-            'User not authorized, please ask admin for permissions',
-            HttpCode.Unauthorized
-          );
+          if (CREATE_USERS_ON_SAML_LOGIN) {
+            // Create user if they don't exist
+            user = await User.create({
+              email,
+              idpUser: true
+            });
+          } else {
+            throw new ApiError(
+              'User not authorized, please ask admin for permissions',
+              HttpCode.Unauthorized
+            );
+          }
         }
         if (!user.eduUser) await user.update({eduUser: eduUser});
         if (!user.name || user.name === user.email)
