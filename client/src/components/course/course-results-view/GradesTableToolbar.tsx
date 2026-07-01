@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   ButtonBase,
+  Divider,
   Fade,
   Menu,
   MenuItem,
@@ -164,7 +165,22 @@ const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
           onClose={handleClose}
           style={{maxHeight: '50vh'}}
         >
-          {(gradingModels ?? []).map(model => (
+          {(gradingModels ?? []).filter(model => model.coursePartId).map(model => (
+            <MenuItem
+              key={model.id}
+              onClick={() => {
+                table.resetColumnFilters();
+                setSelectedGradingModel(model);
+                handleClose();
+              }}
+              value={model.id}
+              selected={modelSelected && model.id === selectedGradingModel.id}
+            >
+              {model.name}
+            </MenuItem>
+          ))}
+          <Divider />
+          {(gradingModels ?? []).filter(model => !model.coursePartId).map(model => (
             <MenuItem
               key={model.id}
               onClick={() => {
