@@ -41,6 +41,7 @@ import {
   type GridRowParams,
   type GridRowsProp,
   Toolbar,
+  useGridApiRef,
 } from '@mui/x-data-grid';
 import {enqueueSnackbar} from 'notistack';
 import {type JSX, useEffect, useMemo, useState} from 'react';
@@ -164,6 +165,15 @@ const CoursePartsView = (): JSX.Element => {
     && Object.values(rowErrors).some(errorObj =>
       Object.values(errorObj).some(value => value === true)
     );
+
+  const apiRef = useGridApiRef();
+
+  // Auto-size the name column whenever rows change
+  useEffect(() => {
+    if (apiRef.current && rows.length > 0) {
+      apiRef.current.autosizeColumns();
+    }
+  }, [apiRef, rows]);
 
   const {data: clientEnv} = useGetClientEnvVariables();
   const [serviceDialogOpen, setServiceDialogOpen] = useState(false);
@@ -979,6 +989,7 @@ const CoursePartsView = (): JSX.Element => {
         <Grid size={{md: 12, lg: 8}}>
           <div style={{height: '100%', maxHeight: '70vh'}}>
             <StyledDataGrid
+              apiRef={apiRef}
               rows={rows}
               columns={columns}
               rowHeight={25}

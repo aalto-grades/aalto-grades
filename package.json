@@ -7,12 +7,12 @@
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": "^26.4.0",
+      "version": "^26.5.1",
       "onFail": "download"
     },
     "packageManager": {
       "name": "pnpm",
-      "version": "11.2.0",
+      "version": "11.18.0",
       "onFail": "download"
     }
   },
@@ -30,19 +30,20 @@
   },
   "devDependencies": {
     "@eslint/compat": "^2.1.0",
-    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
-    "eslint": "^9.39.4",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "eslint": "^9.8.0",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-no-relative-import-paths": "^1.6.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
-    "eslint-plugin-yml": "^3.5.0",
-    "globals": "^17.7.0",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.62.0"
+    "eslint-plugin-yml": "^3.6.0",
+    "globals": "^17.8.0",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript-eslint": "^8.65.0"
   }
 }

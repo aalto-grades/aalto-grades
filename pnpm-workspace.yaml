@@ -15,5 +15,5 @@ allowBuilds:
   core-js-pure: false
   esbuild: false
   protobufjs: false
-  "react-global-modal": true
+  react-global-modal@https://github.com/gubo97000/react-global-modal/releases/download/v0.0.28/react-global-modal-0.0.28.tgz: true
   unrs-resolver: false
