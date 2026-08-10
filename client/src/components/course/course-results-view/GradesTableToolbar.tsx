@@ -601,7 +601,7 @@ const GradesTableToolbar = (): JSX.Element => {
           >
             <Button
               sx={{
-                background: theme.palette.error.light,
+                // background: theme.palette.error.light,
                 color: theme.palette.error.main,
                 fontWeight: '500',
                 p: 0.5,
@@ -683,7 +683,7 @@ const GradesTableToolbar = (): JSX.Element => {
           >
             <Button
               sx={{
-                background: theme.palette.info.light,
+                // background: theme.palette.info.light,
                 color: theme.palette.info.main,
                 fontWeight: '500',
                 p: 0.5,
