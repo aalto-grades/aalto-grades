@@ -226,6 +226,7 @@ const GradesTableToolbar = (): JSX.Element => {
   const [searchValue, setSearchValue] = useState(initialSearch);
   // Keep table global filter in sync with searchValue
   useEffect(() => {
+    console.log(table.state.globalFilter);
     table.setGlobalFilter(searchValue);
   }, [searchValue, table]);
 
@@ -633,6 +634,82 @@ const GradesTableToolbar = (): JSX.Element => {
                   selectedGradingModel
                 ),
               })}
+            </Button>
+          </Fade>
+          <Fade
+            in={
+              table.getPreFilteredRowModel().rows.some(
+                row => row.original.finalGrades.some(fg => fg.sisuExportDate !== null)
+              )
+            }
+          >
+            <Button
+              sx={{
+                // background: theme.palette.success.light,
+                color: theme.palette.success.main,
+                fontWeight: '500',
+                p: 0.5,
+                px: 2,
+                py: 0.5,
+                borderRadius: 3,
+                display: 'flex',
+                gap: 1,
+                alignItems: 'center',
+                height: '36px',
+                boxSizing: 'border-box',
+                border:
+                  table.getColumn('Exported to Sisu')?.getFilterValue() === 'hideExported'
+                    ? `1px solid ${theme.palette.success.main}`
+                    : 'none',
+              }}
+              onClick={() => {
+                const currentFilter = table.getColumn('Exported to Sisu')?.getFilterValue();
+                if (currentFilter === 'hideExported') {
+                  table.getColumn('Exported to Sisu')?.setFilterValue(undefined);
+                } else {
+                  table.getColumn('Exported to Sisu')?.setFilterValue('hideExported');
+                }
+              }}
+            >
+              {t('course.results.hide-exported-sisu')}
+            </Button>
+          </Fade>
+          <Fade
+            in={
+              table.getPreFilteredRowModel().rows.some(row =>
+                row.original.activeGradeInfo?.hasActiveGrade ?? false
+              )
+            }
+          >
+            <Button
+              sx={{
+                background: theme.palette.info.light,
+                color: theme.palette.info.main,
+                fontWeight: '500',
+                p: 0.5,
+                px: 2,
+                py: 0.5,
+                borderRadius: 3,
+                display: 'flex',
+                gap: 1,
+                alignItems: 'center',
+                height: '36px',
+                boxSizing: 'border-box',
+                border:
+                  table.getColumn('activeStudents')?.getFilterValue() === 'activeOnly'
+                    ? `1px solid ${theme.palette.info.main}`
+                    : 'none',
+              }}
+              onClick={() => {
+                const currentFilter = table.getColumn('activeStudents')?.getFilterValue();
+                if (currentFilter === 'activeOnly') {
+                  table.getColumn('activeStudents')?.setFilterValue(undefined);
+                } else {
+                  table.getColumn('activeStudents')?.setFilterValue('activeOnly');
+                }
+              }}
+            >
+              {t('course.results.show-active-only')}
             </Button>
           </Fade>
         </Box>

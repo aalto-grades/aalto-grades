@@ -61,6 +61,7 @@ import {
   groupByLatestBestGrade,
   predictGrades,
 } from '@/utils';
+import {checkStudentActiveGrades, getGradingModelSourceIds} from '@/utils/table';
 
 // Define the shape of the context
 export type TableContextProps = {
@@ -101,11 +102,16 @@ export type RowError =
 export type RowErrorType = RowError['type'];
 
 export type PredictedGraphValues = {
-  [key: number]: {courseParts: {[key: string]: number}; finalGrade: number};
+  [key: number]: {courseParts?: {[key: string]: number}; finalGrade: number};
+};
+export type ActiveGradeInfo = {
+  hasActiveGrade: boolean;
+  activeTaskIds: number[];
 };
 export type ExtendedStudentRow = StudentRow & {
   predictedGraphValues?: PredictedGraphValues;
   errors?: RowError[];
+  activeGradeInfo?: ActiveGradeInfo;
 };
 
 export type GroupedStudentRow = ExtendedStudentRow & {
@@ -166,6 +172,7 @@ export const GradesTableProvider = ({
   const [globalFilter, setGlobalFilter] = useState('');
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     errors: false,
+    activeStudents: false,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
   const [userGraphOpen, setUserGraphOpen] = useState(false);
@@ -211,23 +218,34 @@ export const GradesTableProvider = ({
     () =>
       batchCalculateCourseParts(
         allGradingModels.data ?? [],
-        data.map(row => ({
-          userId: row.user.id,
-          courseTasks: row.courseTasks
-            .filter(task => task.grades.length > 0)
-            .map(task => ({
-              id: task.courseTaskId,
-              grade: findBestGrade(
-                task.grades,
-                getCoursePartExpiryDateFromTaskId(task.courseTaskId)
-              )
-                ? findBestGrade(
+        data.map((row) => {
+          return {
+            userId: row.user.id,
+            courseTasks: row.courseTasks
+              .filter(task => task.grades.length > 0)
+              .flatMap((task) => {
+                const grade = findBestGrade(
                   task.grades,
-                  getCoursePartExpiryDateFromTaskId(task.courseTaskId)
-                )!.grade
-                : 0,
-            })),
-        }))
+                  getCoursePartExpiryDateFromTaskId(task.courseTaskId),
+                  {expiredOption: 'non_expired', gradeSelectOption}
+                )?.grade;
+                return (grade === undefined)
+                  ? []
+                  : [{
+                      id: task.courseTaskId,
+                      grade: findBestGrade(
+                        task.grades,
+                        getCoursePartExpiryDateFromTaskId(task.courseTaskId)
+                      )
+                        ? findBestGrade(
+                          task.grades,
+                          getCoursePartExpiryDateFromTaskId(task.courseTaskId)
+                        )!.grade
+                        : 0,
+                    }];
+              }),
+          };
+        })
       ),
     [allGradingModels.data, data, getCoursePartExpiryDateFromTaskId]
   );
@@ -246,6 +264,12 @@ export const GradesTableProvider = ({
       );
     }
 
+    // Get source IDs for active grade checking
+    const sourceIds = getGradingModelSourceIds(
+      selectedGradingModel,
+      allGradingModels.data ?? []
+    );
+
     // Add all auxiliary columns to the data
     return groupByLatestBestGrade(
       // Creating the extended rows
@@ -256,6 +280,14 @@ export const GradesTableProvider = ({
             value[row.user.id],
           ])
         );
+
+        // Check for active grades using the utility function
+        const activeGradeInfo = checkStudentActiveGrades(
+          row,
+          sourceIds,
+          getCoursePartExpiryDateFromTaskId
+        );
+
         return {
           ...row,
           // Keep the same structure of predictedGrades but only show result for the student
@@ -267,6 +299,7 @@ export const GradesTableProvider = ({
             studentPredictedGrades,
             course.data?.gradingScale ?? GradingScale.Numerical
           ),
+          activeGradeInfo,
         };
       }),
       gradeSelectOption,
@@ -280,6 +313,8 @@ export const GradesTableProvider = ({
     t,
     courseTasks.data,
     course.data?.gradingScale,
+    selectedGradingModel,
+    allGradingModels.data,
   ]);
 
   // --- Selection column ---
@@ -455,6 +490,14 @@ export const GradesTableProvider = ({
             id: 'Exported to Sisu',
             header: t('course.results.table.exported'),
             meta: {PrettyChipPosition: 'last'},
+            enableHiding: true,
+            filterFn: (row, _columnId, filterValue) => {
+              if (filterValue === 'hideExported') {
+                // Hide rows that have at least one final grade exported to Sisu
+                return !row.original.finalGrades.some(fg => fg.sisuExportDate !== null);
+              }
+              return true;
+            },
             cell: info => info.getValue(),
           }
         ),
@@ -615,10 +658,29 @@ export const GradesTableProvider = ({
       header: t('course.results.table.errors'),
       id: 'errors',
       enableHiding: true,
-      filterFn: (row) => {
-        // Not sure which solution is the best one, for now we keep both
-        // return getErrorCount([row.original], selectedGradingModel) > 0;
-        return (row.original.errors?.length ?? 0) > 0;
+      filterFn: (row, _columnId, filterValue) => {
+        if (filterValue === 'errorsFilter') {
+          return (row.original.errors?.length ?? 0) > 0;
+        }
+        return true;
+      },
+    }),
+    // Used for filtering only active students (those with at least one non-expired grade)
+    // Also displays the active task IDs for debugging/visibility
+    columnHelper.accessor(row => row.activeGradeInfo, {
+      header: t('course.results.table.active'),
+      id: 'activeStudents',
+      enableHiding: true,
+      filterFn: (row, _columnId, filterValue) => {
+        if (filterValue === 'activeOnly') {
+          // Use the pre-calculated activeGradeInfo from the row
+          return row.original.activeGradeInfo?.hasActiveGrade ?? false;
+        }
+        return true;
+      },
+      cell: (info) => {
+        const activeTaskIds = info.getValue()?.activeTaskIds ?? [];
+        return activeTaskIds.length > 0 ? activeTaskIds.join(', ') : '-';
       },
     }),
     columnHelper.accessor('user.studentNumber', {
@@ -653,6 +715,14 @@ export const GradesTableProvider = ({
     autoResetExpanded: false,
     // Column Resizing
     columnResizeMode: 'onChange',
+    // globalFilterFn: (row, columnId, filterValue) => {
+    //   row.getAllCells().forEach((cell) => {
+    //     console.log(cell.renderValue());
+    //   });
+
+    //   if (!filterValue) return false;
+    //   return true;
+    // },
     state: {
       columnVisibility,
       rowSelection,

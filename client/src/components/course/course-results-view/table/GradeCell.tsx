@@ -97,7 +97,8 @@ const GradeCell = ({cell}: GradeCellProps): ReactNode => {
       <span>
         {sourceValue.type === 'courseTask'
           ? (bestGrade?.grade ?? '-')
-          : (sourceValue.grade ?? t('course.results.not-participated'))}
+          // : (sourceValue.grade ?? t('course.results.not-participated'))}
+          : (sourceValue.grade ?? null)}
       </span>
 
       {/* Course task specific elements */}
