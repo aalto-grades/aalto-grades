@@ -4,7 +4,6 @@
 
 import {Badge, Checkbox} from '@mui/material';
 import {
-  type Cell,
   type ExpandedState,
   type GroupingState,
   type RowData,
