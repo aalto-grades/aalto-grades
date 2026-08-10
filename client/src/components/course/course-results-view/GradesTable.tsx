@@ -3,23 +3,23 @@
 // SPDX-License-Identifier: MIT
 
 import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
-import {Badge, Icon, IconButton, useTheme} from '@mui/material';
-import {type Cell, type Row, flexRender} from '@tanstack/react-table';
+import {Badge, Icon, useTheme} from '@mui/material';
+import {type Cell, FlexRender, flexRender} from '@tanstack/react-table';
 import {useVirtualizer} from '@tanstack/react-virtual';
-import {type JSX, useRef} from 'react';
+import {type JSX, type ReactNode, useRef} from 'react';
 
 import PrettyChip from '@/components/shared/PrettyChip';
-import type {GroupedStudentRow} from '@/context/GradesTableProvider';
+import type {GroupedStudentRow, features} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 
 /** Render table cell */
 const RenderCell = ({
-  row,
   cell,
 }: {
-  row: Row<GroupedStudentRow>;
-  cell: Cell<GroupedStudentRow, unknown>;
-}): JSX.Element => {
+  cell: Cell<typeof features, GroupedStudentRow>;
+}): ReactNode => {
+  const row = cell.row;
+  if (!row) return;
   // If it's a grouped cell, add an expander and row count
   if (cell.getIsGrouped()) {
     return (
@@ -30,15 +30,17 @@ const RenderCell = ({
             color="primary"
             max={99999}
           >
-            <IconButton
-              size="small"
+            <Icon
+              // size="small"
               color="primary"
-              disabled={!row.getCanExpand()}
+              // disabled={!row.getCanExpand()}
             >
               {row.getIsExpanded() ? <ExpandLess /> : <ExpandMore />}
-            </IconButton>
+            </Icon>
           </Badge>
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          <FlexRender cell={cell} />
+
+          {/* {flexRender(cell.column.columnDef.cell, cell.getContext())} */}
         </>
       </PrettyChip>
     );
@@ -47,12 +49,13 @@ const RenderCell = ({
   // If the cell is aggregated, use the Aggregated renderer for cell
   if (cell.getIsAggregated()) {
     return (
-      <>
-        {flexRender(
-          cell.column.columnDef.aggregatedCell ?? cell.column.columnDef.cell,
-          cell.getContext()
-        )}
-      </>
+      <FlexRender cell={cell} />
+      // <>
+      //   {flexRender(
+      //     cell.column.columnDef.aggregatedCell ?? cell.column.columnDef.cell,
+      //     cell.getContext()
+      //   )}
+      // </>
     );
   }
 
@@ -60,6 +63,7 @@ const RenderCell = ({
   if (cell.getIsPlaceholder()) return <></>;
 
   if (cell.getValue() === undefined) {
+    return <FlexRender cell={cell} />;
     return <>{flexRender(cell.column.columnDef.cell, cell.getContext())}</>;
   }
 
@@ -74,7 +78,10 @@ const RenderCell = ({
         width: '100%',
       }}
     >
-      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+
+      <FlexRender cell={cell} />
+
+      {/* {flexRender(cell.column.columnDef.cell, cell.getContext())} */}
     </div>
   );
 };
@@ -83,7 +90,7 @@ const GradesTable = (): JSX.Element => {
   const theme = useTheme();
   const {table} = useTableContext();
   const {rows} = table.getRowModel();
-
+  console.log('GradesTable rows', rows);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -126,7 +133,7 @@ const GradesTable = (): JSX.Element => {
                         : theme.palette.primary.light,
                       borderTopRightRadius: i === headerGroup.headers.length - 1 ? 5 : 0,
                       borderTopLeftRadius: i === 0 ? 5 : 0,
-                      ...(header.column.getIsResizing() || header.column.getSize() !== header.column.columnDef.size
+                      ...(header.column.getIsResizing() || header.getSize() !== header.getSize()
                         ? {width: header.getSize(), maxWidth: header.getSize()}
                         : {}),
                       position: 'relative',
@@ -235,7 +242,7 @@ const GradesTable = (): JSX.Element => {
                         : {}),
                     }}
                   >
-                    <RenderCell row={row} cell={cell} />
+                    <RenderCell cell={cell} />
                   </td>
                 ))}
               </tr>

@@ -10,7 +10,7 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "@types/react": "^19.2.17",
+    "@types/react": "^19.2.18",
     "@types/zxcvbn": "^4.4.5",
     "@xyflow/react": "^12.11.2"
   },
