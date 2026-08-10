@@ -4,19 +4,20 @@
 
 import {AccountTreeRounded, Error} from '@mui/icons-material';
 import {Box, Tooltip} from '@mui/material';
-import type {JSX} from 'react';
+import type {Cell} from '@tanstack/react-table';
+import type {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import type {GradingScale} from '@/common/types';
 import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
-import type {GroupedStudentRow} from '@/context/GradesTableProvider';
+import type {GroupedStudentRow, features} from '@/context/GradesTableProvider';
 import {useGetAllGradingModels} from '@/hooks/useApi';
 import {getGradeString} from '@/utils';
 
 // If gradingScale is null then value is defined.
 type PropsType = {
-  row: GroupedStudentRow;
+  cell: Cell<typeof features, GroupedStudentRow, GroupedStudentRow>;
   gradingModelIds: number[];
   onClick: () => void;
   gradingScale?: GradingScale | null;
@@ -28,17 +29,17 @@ type PropsType = {
  * this is a course part grade preview cell
  */
 const PredictedGradeCell = ({
-  row,
+  cell,
   gradingModelIds,
   onClick,
   gradingScale = null,
   value = null,
-}: PropsType): JSX.Element => {
+}: PropsType): ReactNode => {
   const {t} = useTranslation();
   const {courseId} = useParams() as {courseId: string};
   const gradingModels = useGetAllGradingModels(courseId);
 
-  const gradeErrors = row.errors?.filter(
+  const gradeErrors = cell.row.original.errors?.filter(
     e =>
       (e.type === 'InvalidPredictedGrade'
         || e.type === 'OutOfRangePredictedGrade')
@@ -53,12 +54,15 @@ const PredictedGradeCell = ({
         getGradeString(
           t,
           gradingScale,
-          row.predictedGraphValues?.[modelId]?.finalGrade
+          cell.row.original.predictedGraphValues?.[modelId]?.finalGrade
         )
       )
       .join(' / ');
   }
 
+  if (cell.getValue() === undefined) return (null);
+  if (cell.getIsPlaceholder()) return (null);
+  if (cell.getIsGrouped()) return (<>{previewValue}</>);
   return (
     <div
       className="hoverable-container"

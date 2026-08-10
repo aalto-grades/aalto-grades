@@ -34,7 +34,7 @@ import {z} from 'zod';
 import {type StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateFinalGrades} from '@/common/util';
 import Search from '@/components/shared/Search';
-import type {GroupedStudentRow} from '@/context/GradesTableProvider';
+import type {GroupedStudentRow, features} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 import {
   useAddFinalGrades,
@@ -256,7 +256,7 @@ const GradesTableToolbar = (): JSX.Element => {
     [courseTasks.data]
   );
 
-  const [oldRows, setOldRows] = useState<Row<GroupedStudentRow>[] | null>(null);
+  const [oldRows, setOldRows] = useState<Row<typeof features, GroupedStudentRow>[] | null>(null);
   if (table.getSelectedRowModel().rows !== oldRows) {
     setOldRows(table.getSelectedRowModel().rows);
 

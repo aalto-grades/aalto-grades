@@ -10,11 +10,13 @@ import {
 } from '@mui/icons-material';
 import {Box, Tooltip, Typography, useTheme} from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import {type JSX, useMemo, useState} from 'react';
+import type {Cell} from '@tanstack/react-table';
+import {type ReactNode, useMemo, useState} from 'react';
 import {Trans, useTranslation} from 'react-i18next';
 
-import type {CourseTaskGradesData, StudentData} from '@/common/types';
+import type {CourseTaskGradesData} from '@/common/types';
 import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
+import type {GroupedStudentRow, features} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 import {findBestGrade, gradeIsExpired} from '@/utils';
 import EditGradesDialog from './EditGradesDialog';
@@ -26,26 +28,35 @@ export type GradeCellSourceValue =
     maxGrade: number | null;
     coursePartExpiryDate: Date | null | undefined;
   }
-  | {type: 'coursePart'; grade: number | null};
+  | {
+    type: 'coursePart';
+    grade: number | null;
+  } | undefined;
 
 type GradeCellProps = {
-  studentUser: StudentData;
-  sourceValue: GradeCellSourceValue;
+  cell: Cell<typeof features, GroupedStudentRow, GradeCellSourceValue>;
 };
-const GradeCell = ({studentUser, sourceValue}: GradeCellProps): JSX.Element => {
+const GradeCell = ({cell}: GradeCellProps): ReactNode => {
   const {t} = useTranslation();
   const {gradeSelectOption} = useTableContext();
   const theme = useTheme();
 
   const [gradeDialogOpen, setGradeDialogOpen] = useState(false);
+  const sourceValue = cell.getValue();
+  const studentUser = cell.row.original.user;
 
   const hasInvalidGrade = useMemo(() => {
+    if (!sourceValue) return null;
     if (sourceValue.type === 'coursePart') return false;
     if (sourceValue.maxGrade === null) return false;
     return sourceValue.task.grades.some(
       grade => grade.grade > sourceValue.maxGrade!
     );
   }, [sourceValue]);
+
+  if (cell.getIsGrouped()) return (cell.row.groupingValue?.toString?.() ?? '-');
+  if (cell.getIsPlaceholder()) return (null);
+  if (!sourceValue) return null;
 
   const bestGrade =
     sourceValue.type === 'coursePart'

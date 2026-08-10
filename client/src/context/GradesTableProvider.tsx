@@ -4,19 +4,19 @@
 
 import {Badge, Checkbox} from '@mui/material';
 import {
-  type ColumnSizingState,
   type ExpandedState,
   type GroupingState,
   type RowData,
   type SortingState,
-  type VisibilityState,
+  type TableFeatures,
+  aggregationFn_sum,
   createColumnHelper,
-  getCoreRowModel,
-  getExpandedRowModel,
-  getFilteredRowModel,
-  getGroupedRowModel,
-  getSortedRowModel,
-  useReactTable,
+  createExpandedRowModel,
+  createFilteredRowModel,
+  createGroupedRowModel,
+  createSortedRowModel,
+  stockFeatures,
+  useTable,
 } from '@tanstack/react-table';
 import {
   type Dispatch,
@@ -64,7 +64,7 @@ import {
 
 // Define the shape of the context
 export type TableContextProps = {
-  table: ReturnType<typeof useReactTable<GroupedStudentRow>>;
+  table: ReturnType<typeof useTable<typeof features, GroupedStudentRow>>;
   gradeSelectOption: 'best' | 'latest';
   setGradeSelectOption: Dispatch<SetStateAction<'best' | 'latest'>>;
   selectedGradingModel: GradingModelData | 'any';
@@ -76,7 +76,7 @@ export const GradesTableContext = createContext<TableContextProps | null>(null);
 // Table creation
 declare module '@tanstack/react-table' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface ColumnMeta<TData extends RowData, TValue> {
+  interface ColumnMeta<TFeatures, TData extends RowData, TValue> {
     PrettyChipPosition: 'first' | 'middle' | 'last' | 'alone';
     coursePart?: boolean;
   }
@@ -137,7 +137,15 @@ const findPreviouslyExportedToSisu = (
   return null;
 };
 
-const columnHelper = createColumnHelper<GroupedStudentRow>();
+const features: TableFeatures = {...stockFeatures,
+  sortedRowModel: createSortedRowModel(),
+  groupedRowModel: createGroupedRowModel(),
+  expandedRowModel: createExpandedRowModel(),
+  filteredRowModel: createFilteredRowModel(),
+};
+export {features};
+
+const columnHelper = createColumnHelper<typeof features, GroupedStudentRow>();
 
 type PropsType = {data: StudentRow[]} & PropsWithChildren;
 export const GradesTableProvider = ({
@@ -156,11 +164,10 @@ export const GradesTableProvider = ({
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [grouping, setGrouping] = useState<GroupingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     errors: false,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [userGraphOpen, setUserGraphOpen] = useState(false);
   const [userGraphData, setUserGraphData] = useState<{
     row: GroupedStudentRow;
@@ -280,11 +287,12 @@ export const GradesTableProvider = ({
     id: 'select',
     size: 70,
     meta: {PrettyChipPosition: grouping.length > 0 ? 'last' : 'alone'},
+    aggregationFn: aggregationFn_sum,
     header: ({table}) => (
       <>
         <Checkbox
           checked={table.getIsAllRowsSelected()}
-          indeterminate={table.getIsSomeRowsSelected()}
+          indeterminate={table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
           onChange={table.getToggleAllRowsSelectedHandler()}
           sx={theme => ({
             ...(theme.palette.mode === 'dark' && {
@@ -321,19 +329,8 @@ export const GradesTableProvider = ({
           <Checkbox
             checked={row.getIsAllSubRowsSelected()}
             indeterminate={row.getIsSomeSelected()}
-            onChange={() => {
-              if (row.getIsSomeSelected()) {
-                // If some rows are selected, select all
-                row.subRows.forEach((subRow) => {
-                  if (!subRow.getIsSelected())
-                    subRow.getToggleSelectedHandler()(subRow);
-                });
-              } else {
-                // All rows are selected, deselect all (and vice versa)
-                row.subRows.forEach(subRow =>
-                  subRow.getToggleSelectedHandler()(subRow)
-                );
-              }
+            onChange={(e) => {
+              row.getToggleSelectedHandler({selectChildren: true})(e);
             }}
           />
           <span style={{marginLeft: '4px', marginRight: '15px'}}>
@@ -387,7 +384,7 @@ export const GradesTableProvider = ({
     header: t('course.results.table.preview'),
     meta: {PrettyChipPosition: 'middle'},
     enableSorting: predictedModelId !== 'any',
-    sortingFn: (rowA, rowB, colId) => {
+    sortFn: (rowA, rowB, colId) => {
       if (predictedModelId === 'any') return 0; // Makes no sense to sort if there is more than one model
 
       const valA = rowA.getValue<GroupedStudentRow>(colId);
@@ -403,9 +400,9 @@ export const GradesTableProvider = ({
       const value = row.predictedGraphValues?.[predictedModelId].finalGrade;
       return value !== undefined ? String(value) : null;
     },
-    cell: ({getValue}) => (
+    cell: info => (
       <PredictedGradeCell
-        row={getValue()}
+        cell={info.cell}
         gradingModelIds={
           selectedGradingModel === 'any'
             ? (finalGradeModels?.map(model => model.id) ?? [])
@@ -414,94 +411,86 @@ export const GradesTableProvider = ({
         onClick={() => {
           if (finalGradeModels === undefined || finalGradeModels.length === 0)
             return;
-          setUserGraphData({row: getValue(), gradingModel: null});
+          setUserGraphData({row: info.getValue(), gradingModel: null});
           setUserGraphOpen(true);
         }}
         gradingScale={course.data?.gradingScale ?? GradingScale.Numerical}
       />
     ),
-    aggregatedCell: () => null,
   });
 
   // --- Model specific columns ---
-  let modelColumns = [];
-  if (finalGradeModelSelected) {
-    modelColumns = [
-      // Final grade column
-      columnHelper.accessor(row => row.finalGrades, {
-        header: t('general.final-grade'),
-        id: 'finalGrade',
-        getGroupingValue: row => findBestFinalGrade(row.finalGrades)?.grade,
-        sortingFn: (a, b) =>
-          (findBestFinalGrade(a.original.finalGrades)?.grade ?? -1)
-          - (findBestFinalGrade(b.original.finalGrades)?.grade ?? -1),
-        cell: ({getValue, row}) => (
-          <FinalGradeCell
-            user={row.original.user}
-            studentNumber={row.original.user.studentNumber}
-            finalGrades={getValue()}
-            gradingScale={course.data?.gradingScale ?? GradingScale.Numerical}
-          />
-        ),
-      }),
+  const modelColumns = finalGradeModelSelected
+    ? [
+        // Final grade column
+        columnHelper.accessor(row => row.finalGrades, {
+          header: t('general.final-grade'),
+          id: 'finalGrade',
+          getGroupingValue: row => findBestFinalGrade(row.finalGrades)?.grade,
+          sortFn: (a, b) => (findBestFinalGrade(a.original.finalGrades)?.grade ?? -1)
+            - (findBestFinalGrade(b.original.finalGrades)?.grade ?? -1),
+          cell: info => (
+            <FinalGradeCell
+              cell={info.cell}
+              gradingScale={course.data?.gradingScale ?? GradingScale.Numerical}
+            />
+          ),
+        }),
 
-      // Predicted grade column
-      predictedGradeColumn,
+        // Predicted grade column
+        predictedGradeColumn,
 
-      // Exported to Sisu column
-      columnHelper.accessor(
-        (row) => {
-          // ATTENTION this function needs to have the same parameters of the one inside the grade cell
-          // Clearly can be done in a better way
-          const bestFinalGrade = findBestFinalGrade(row.finalGrades);
-          if (!bestFinalGrade) return '-';
-          if (bestFinalGrade.sisuExportDate) return '✅';
-          if (findPreviouslyExportedToSisu(bestFinalGrade, row)) return '⚠️';
-          return '-';
-        },
-        {
-          id: 'Exported to Sisu',
-          header: t('course.results.table.exported'),
-          meta: {PrettyChipPosition: 'last'},
-          cell: ({getValue}) => getValue(),
-          aggregatedCell: () => null,
-        }
-      ),
-    ];
-  } else {
-    modelColumns = [
-      // Dynamic course part grade
-      columnHelper.accessor(row => row, {
-        header: t('general.course-part-grade'),
-        id: 'coursePartGrade',
-        sortingFn: (rowA, rowB) => {
-          const partId = selectedGradingModel.coursePartId!;
-          const a = coursePartValues[rowA.original.user.id][partId] ?? -1;
-          const b = coursePartValues[rowB.original.user.id][partId] ?? -1;
-          return a - b;
-        },
-        getGroupingValue: row => findBestFinalGrade(row.finalGrades)?.grade,
-        cell: ({getValue}) => (
-          <PredictedGradeCell
-            row={getValue()}
-            gradingModelIds={[selectedGradingModel.id]}
-            onClick={() => {
-              setUserGraphData({
-                row: getValue(),
-                gradingModel: selectedGradingModel,
-              });
-              setUserGraphOpen(true);
-            }}
-            value={
-              coursePartValues[getValue().user.id][
-                selectedGradingModel.coursePartId!
-              ]
-            }
-          />
+        // Exported to Sisu column
+        columnHelper.accessor(
+          (row) => {
+            // ATTENTION this function needs to have the same parameters of the one inside the grade cell
+            // Clearly can be done in a better way
+            const bestFinalGrade = findBestFinalGrade(row.finalGrades);
+            if (!bestFinalGrade) return '-';
+            if (bestFinalGrade.sisuExportDate) return '✅';
+            if (findPreviouslyExportedToSisu(bestFinalGrade, row)) return '⚠️';
+            return '-';
+          },
+          {
+            id: 'Exported to Sisu',
+            header: t('course.results.table.exported'),
+            meta: {PrettyChipPosition: 'last'},
+            cell: info => info.getValue(),
+          }
         ),
-      }),
-    ];
-  }
+      ]
+    : [
+        // Dynamic course part grade
+        columnHelper.accessor(row => row, {
+          header: t('general.course-part-grade'),
+          id: 'coursePartGrade',
+          sortFn: (rowA, rowB) => {
+            const partId = selectedGradingModel.coursePartId!;
+            const a = coursePartValues[rowA.original.user.id][partId] ?? -1;
+            const b = coursePartValues[rowB.original.user.id][partId] ?? -1;
+            return a - b;
+          },
+          getGroupingValue: row => findBestFinalGrade(row.finalGrades)?.grade,
+          cell: info => (
+            <PredictedGradeCell
+              cell={info.cell}
+              gradingModelIds={[selectedGradingModel.id]}
+              onClick={() => {
+                setUserGraphData({
+                  row: info.getValue(),
+                  gradingModel: selectedGradingModel,
+                });
+                setUserGraphOpen(true);
+              }}
+              value={
+                coursePartValues[info.getValue().user.id][
+                  selectedGradingModel.coursePartId!
+                ]
+              }
+            />
+          ),
+        }),
+      ];
 
   // --- Source column sources ---
   const selectedModelSources = useMemo(() => {
@@ -561,9 +550,10 @@ export const GradesTableProvider = ({
                 getCoursePartExpiryDateFromTaskId(task.courseTaskId)
               )?.grade;
             },
-            sortingFn: (rowA, rowB, colId) => {
+            sortFn: (rowA, rowB, colId) => {
               const a = rowA.getValue<GradeCellSourceValue>(colId);
               const b = rowB.getValue<GradeCellSourceValue>(colId);
+              if (a === undefined || b === undefined) return 0;
               if (a.type === 'coursePart' && b.type === 'coursePart')
                 return (a.grade ?? -1) - (b.grade ?? -1);
               else if (a.type === 'courseTask' && b.type === 'courseTask') {
@@ -581,12 +571,13 @@ export const GradesTableProvider = ({
               return 0; // Shouldn't happen
             },
             size: 80,
-            cell: ({getValue, row}) => (
-              <GradeCell
-                studentUser={row.original.user}
-                sourceValue={getValue()}
-              />
-            ),
+            cell: (info) => {
+              return (
+                <GradeCell
+                  cell={info.cell}
+                />
+              );
+            },
             footer: source.name,
           }
         )
@@ -641,18 +632,15 @@ export const GradesTableProvider = ({
     }),
     ...modelColumns,
     ...sourceColumns,
-  ];
+  ] as ReturnType<typeof columnHelper.accessor>[];
 
-  const table = useReactTable({
+  const table = useTable({
+    features: features,
     data: groupedData,
     columns,
     defaultColumn: {size: 100},
-    getCoreRowModel: getCoreRowModel(),
     // Selection
-    onRowSelectionChange: (selection) => {
-      setRowSelection(selection);
-      table.options.state.rowSelection = rowSelection;
-    },
+    onRowSelectionChange: setRowSelection,
     enableRowSelection: true,
     // Grouping / Expanding
     onGroupingChange: setGrouping,
@@ -664,7 +652,6 @@ export const GradesTableProvider = ({
     enableSorting: true,
     autoResetExpanded: false,
     // Column Resizing
-    onColumnSizingChange: setColumnSizing,
     columnResizeMode: 'onChange',
     state: {
       columnVisibility,
@@ -673,13 +660,7 @@ export const GradesTableProvider = ({
       grouping,
       sorting,
       globalFilter,
-      columnSizing,
     },
-
-    getExpandedRowModel: getExpandedRowModel(),
-    getGroupedRowModel: getGroupedRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   });
 
   return (

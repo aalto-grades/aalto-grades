@@ -61,7 +61,7 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
       })),
   ];
 
-  const tableGrouping = table.getState().grouping;
+  const tableGrouping = table.state.grouping;
   const isActive = useMemo(() => tableGrouping.length > 0, [tableGrouping]);
 
   return (
@@ -101,7 +101,7 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
             {t('course.results.group-by', {
               grouping: groupByElements
                 .flat()
-                .filter(el => table.getState().grouping.includes(el.id))
+                .filter(el => table.state.grouping.includes(el.id))
                 .map(el => el.name)
                 .join(', '),
             })}
@@ -153,7 +153,7 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
               disableInteractive
             >
               <MenuItem
-                selected={table.getState().grouping.includes(element.id)}
+                selected={table.state.grouping.includes(element.id)}
                 onClick={() => {
                   console.log(table.getAllColumns());
                   table.setGrouping(old =>

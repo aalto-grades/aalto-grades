@@ -4,34 +4,38 @@
 
 import {MoreVert} from '@mui/icons-material';
 import {Box, Tooltip, useTheme} from '@mui/material';
-import type {} from '@mui/material/themeCssVarsAugmentation';
-import {type JSX, useState} from 'react';
+import type {Cell} from '@tanstack/react-table';
+import {type ReactNode, useState} from 'react';
 import {Trans, useTranslation} from 'react-i18next';
 
-import type {FinalGradeData, GradingScale, UserData} from '@/common/types';
+import type {FinalGradeData, GradingScale} from '@/common/types';
 import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
+import type {GroupedStudentRow, features} from '@/context/GradesTableProvider';
 import {findBestFinalGrade, getGradeString} from '@/utils';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
 
 type PropsType = {
-  user: UserData;
-  studentNumber: string;
-  finalGrades: FinalGradeData[];
   gradingScale: GradingScale;
+  cell: Cell<typeof features, GroupedStudentRow, FinalGradeData[]>;
 };
 const FinalGradeCell = ({
-  user,
-  studentNumber,
-  finalGrades,
   gradingScale,
-}: PropsType): JSX.Element => {
+  cell,
+}: PropsType): ReactNode => {
   const {t} = useTranslation();
   const theme = useTheme();
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
-  const bestFinalGrade = findBestFinalGrade(finalGrades);
+  if (cell.getValue() === undefined) return (null);
+  if (cell.getIsGrouped()) return (<>{cell.row.groupingValue ?? '-'}</>);
+  if (cell.getIsPlaceholder()) return (null);
 
+  const finalGrades = cell.row.original.finalGrades;
+  const user = cell.row.original.user;
+  const studentNumber = user.studentNumber;
+
+  const bestFinalGrade = findBestFinalGrade(finalGrades);
   return (
     <Box
       className="hoverable-container"
