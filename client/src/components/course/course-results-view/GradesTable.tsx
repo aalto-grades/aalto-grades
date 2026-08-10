@@ -50,21 +50,13 @@ const RenderCell = ({
   if (cell.getIsAggregated()) {
     return (
       <FlexRender cell={cell} />
-      // <>
-      //   {flexRender(
-      //     cell.column.columnDef.aggregatedCell ?? cell.column.columnDef.cell,
-      //     cell.getContext()
-      //   )}
-      // </>
     );
   }
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  if (cell.getIsPlaceholder()) return <></>;
+  if (cell.getIsPlaceholder()) return null;
 
   if (cell.getValue() === undefined) {
     return <FlexRender cell={cell} />;
-    return <>{flexRender(cell.column.columnDef.cell, cell.getContext())}</>;
   }
 
   return (
@@ -78,10 +70,7 @@ const RenderCell = ({
         width: '100%',
       }}
     >
-
       <FlexRender cell={cell} />
-
-      {/* {flexRender(cell.column.columnDef.cell, cell.getContext())} */}
     </div>
   );
 };
@@ -90,7 +79,6 @@ const GradesTable = (): JSX.Element => {
   const theme = useTheme();
   const {table} = useTableContext();
   const {rows} = table.getRowModel();
-  console.log('GradesTable rows', rows);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({

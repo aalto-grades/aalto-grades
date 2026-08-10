@@ -168,7 +168,6 @@ export const GradesTableProvider = ({
     errors: false,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
-
   const [userGraphOpen, setUserGraphOpen] = useState(false);
   const [userGraphData, setUserGraphData] = useState<{
     row: GroupedStudentRow;

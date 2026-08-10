@@ -485,7 +485,7 @@ const GradesTableToolbar = (): JSX.Element => {
                   <div style={{alignContent: 'center'}}>
                     {t('course.results.selected-student', {
                       count: table.getSelectedRowModel().rows.length,
-                    }) }
+                    })}
                   </div>
                   {editRights && (
                     <Box
