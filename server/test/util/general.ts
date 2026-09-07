@@ -34,10 +34,13 @@ export const ErrorSchema = z.strictObject({
 
 export const ZodErrorSchema = z.array(
   z.strictObject({
-    type: z.literal('Body'),
+    type: z.union([z.literal('Body'), z.literal('Query'), z.literal('Params')]),
     errors: z.strictObject({
-      name: z.literal('ZodError'),
-      message: z.string(),
+      issues: z.array(
+        z.looseObject({
+          message: z.string(),
+        })
+      ),
     }),
   })
 );

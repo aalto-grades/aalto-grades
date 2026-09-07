@@ -17,6 +17,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import dayjs, {type Dayjs} from 'dayjs';
 import {useSnackbar} from 'notistack';
+import {AsyncConfirmationModal} from 'react-global-modal';
 import {
   type JSX,
   useCallback,
@@ -29,7 +30,7 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 
 import {SystemRole} from '@/common/types';
-import {useEditGrade, useGetAllGradingModels, useGetCourseTasks, useGetGrades} from '@/hooks/useApi';
+import {useDeleteGrade, useEditGrade, useGetAllGradingModels, useGetCourseTasks, useGetGrades} from '@/hooks/useApi';
 import useAuth from '@/hooks/useAuth';
 import TimelineBulkAction from './timeline/TimelineBulkAction';
 import TimelineRow from './timeline/TimelineRow';
@@ -56,6 +57,7 @@ const TimelineView = (): JSX.Element => {
   const {data: gradingModels} = useGetAllGradingModels(Number(courseId));
   const {data: courseTasks} = useGetCourseTasks(Number(courseId));
   const editGradeMutation = useEditGrade(Number(courseId));
+  const deleteGradeMutation = useDeleteGrade(Number(courseId));
   const {enqueueSnackbar} = useSnackbar();
   const queryClient = useQueryClient();
 
@@ -235,6 +237,42 @@ const TimelineView = (): JSX.Element => {
     }
   }, [bulkDate, selectedItems, items, editGradeMutation, queryClient, courseId, enqueueSnackbar, t]);
 
+  // Bulk Delete
+  const handleBulkDelete = useCallback(async (): Promise<void> => {
+    if (selectedItems.length === 0) return;
+
+    const gradeIdsToDelete = new Set<number>();
+
+    selectedItems.forEach((itemId) => {
+      if (itemId > 0) {
+        gradeIdsToDelete.add(itemId);
+      } else {
+        const item = items.find(i => i.id === itemId);
+        if (item?.isSummary && item.relatedGradeIds) {
+          item.relatedGradeIds.forEach(id => gradeIdsToDelete.add(id));
+        }
+      }
+    });
+
+    const confirmation = await AsyncConfirmationModal({
+      title: t('course.timeline.delete-selected', {count: gradeIdsToDelete.size}),
+      message: t('course.timeline.delete-selected-message', {count: gradeIdsToDelete.size}),
+      confirmDelete: true,
+    });
+    if (!confirmation) return;
+
+    try {
+      await Promise.all(Array.from(gradeIdsToDelete).map(async gradeId =>
+        deleteGradeMutation.mutateAsync(gradeId)
+      ));
+      await queryClient.invalidateQueries({queryKey: ['grades', Number(courseId)]});
+      setSelectedItems([]);
+      enqueueSnackbar(t('course.timeline.items-deleted-success', {count: gradeIdsToDelete.size}), {variant: 'success'});
+    } catch {
+      enqueueSnackbar(t('course.timeline.items-delete-fail'), {variant: 'error'});
+    }
+  }, [selectedItems, items, deleteGradeMutation, queryClient, courseId, enqueueSnackbar, t]);
+
   const handleItemSelect = useCallback((itemId: number, e: React.MouseEvent): void => {
     if (!editRights) return;
     e.stopPropagation();
@@ -410,6 +448,7 @@ const TimelineView = (): JSX.Element => {
           bulkDate={bulkDate}
           setBulkDate={setBulkDate}
           handleBulkUpdate={handleBulkUpdate}
+          handleBulkDelete={handleBulkDelete}
         />
       )}
 

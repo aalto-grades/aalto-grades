@@ -252,35 +252,11 @@
     "course-part-grade": "Course Part Grade",
     "not-int": "Value must be a valid integer"
   },
-  "wait-list": {
-    "title": "Wait list",
-    "add-entry": "Add to wait list",
-    "bulk-update": "Bulk update",
-    "bulk-update-hint": "Leave empty to keep existing values",
-    "release": "Release",
-    "remove": "Remove",
-    "remove-confirm": "Remove selected students from the wait list?",
-    "removed": "Students removed from the wait list",
-    "import": "Import CSV/XLSX",
-    "import-hint": "Expected headers: studentNumber, reason, status, dateAdded, dateResolved, entryId (optional)",
-    "import-missing-student": "Import is missing a student number column",
-    "added": "Wait list entry added",
-    "updated": "Wait list updated",
-    "imported": "Wait list import completed",
-    "released": "Students released from the wait list",
-    "reason": "Reason for investigation",
-    "date-added": "Date added",
-    "date-resolved": "Date resolved",
-    "add-manual-grade": "Add a manual grade on release",
-    "manual-grade-task": "Task",
-    "manual-grade-value": "Manual grade",
-    "blocked-final-grades": "Final grades blocked for pending investigations: {{students}}",
-    "status": {
-      "label": "Status",
-      "pending": "Pending",
-      "passed": "Passed",
-      "failed": "Failed"
-    }
+  "final-grades-view": {
+    "manual-model": "Manual",
+    "no-snapshot": "Detailed grading information not available for these final grades",
+    "unknown-model": "Unknown model",
+    "filter-by-model": "Filter by grading model"
   },
   "wait-list": {
     "title": "Wait list",
@@ -375,7 +351,9 @@
       "max-grade-error": "Max grade must be empty, zero, or a positive number",
       "no-course-parts": "No course parts. Please add course parts to get started.",
       "active-parts": "Active course parts",
-      "archived-parts": "Archived course parts"
+      "archived-parts": "Archived course parts",
+      "grade-count_one": "{{count}} grade",
+      "grade-count_other": "{{count}} grades"
     },
     "models": {
       "has-multiple-warnings": "Model has multiple warnings",
@@ -396,6 +374,8 @@
       "unarchive": "Unarchive grading model",
       "archive": "Archive grading model",
       "cannot-delete-with-final": "Cannot delete a model with final grades",
+      "final-grade-count_one": "{{count}} final grade calculated with this model",
+      "final-grade-count_other": "{{count}} final grades calculated with this model",
       "delete-grading-model": "Delete grading model",
       "model-not-found": "Couldn't find grading model with ID {{model}}",
       "grade-not-found": "Couldn't find grades for user with ID {{user}}",
@@ -546,6 +526,13 @@
       "grade-update-fail": "Failed to update grade",
       "items-updated-success": "Updated {{count}} items successfully",
       "items-update-fail": "Failed to update items",
+      "delete-selected_one": "Delete {{count}} selected item",
+      "delete-selected_other": "Delete {{count}} selected items",
+      "delete-selected-message_one": "Are you sure you want to delete the selected grade? This action cannot be undone.",
+      "delete-selected-message_other": "Are you sure you want to delete the selected grades? This action cannot be undone.",
+      "items-deleted-success_one": "Deleted {{count}} item successfully",
+      "items-deleted-success_other": "Deleted {{count}} items successfully",
+      "items-delete-fail": "Failed to delete items",
       "group-by": "Group by",
       "group-by-task": "Grading model",
       "group-by-date": "Expiry date",

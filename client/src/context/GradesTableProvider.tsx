@@ -4,18 +4,12 @@
 
 import {Badge, Checkbox} from '@mui/material';
 import {
+  type ColumnFiltersState,
   type ExpandedState,
   type GroupingState,
-  type RowData,
   type SortingState,
-  type TableFeatures,
   aggregationFn_sum,
   createColumnHelper,
-  createExpandedRowModel,
-  createFilteredRowModel,
-  createGroupedRowModel,
-  createSortedRowModel,
-  stockFeatures,
   useTable,
 } from '@tanstack/react-table';
 import {
@@ -30,7 +24,7 @@ import {
 } from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
-import '@tanstack/react-table';
+import {z} from 'zod';
 
 import {
   type CourseTaskData,
@@ -47,6 +41,8 @@ import GradeCell, {
 } from '@/components/course/course-results-view/table/GradeCell';
 import PredictedGradeCell from '@/components/course/course-results-view/table/PredictedGradeCell';
 import PrettyChip from '@/components/shared/PrettyChip';
+import {features} from '@/components/shared/table/features';
+import {usePersistedTableState} from '@/components/shared/table/usePersistedTableState';
 import {
   useGetAllGradingModels,
   useGetCourse,
@@ -73,15 +69,6 @@ export type TableContextProps = {
 };
 // Create the context
 export const GradesTableContext = createContext<TableContextProps | null>(null);
-
-// Table creation
-declare module '@tanstack/react-table' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface ColumnMeta<TFeatures, TData extends RowData, TValue> {
-    PrettyChipPosition: 'first' | 'middle' | 'last' | 'alone';
-    coursePart?: boolean;
-  }
-}
 
 export type RowError =
   | {
@@ -143,15 +130,20 @@ const findPreviouslyExportedToSisu = (
   return null;
 };
 
-const features: TableFeatures = {...stockFeatures,
-  sortedRowModel: createSortedRowModel(),
-  groupedRowModel: createGroupedRowModel(),
-  expandedRowModel: createExpandedRowModel(),
-  filteredRowModel: createFilteredRowModel(),
-};
-export {features};
-
 const columnHelper = createColumnHelper<typeof features, GroupedStudentRow>();
+
+// Schemas validating the persisted view state, so stale or corrupted storage
+// (e.g. a deleted grading model) falls back to the defaults instead of
+// breaking the table
+const persistedStateSchemas = {
+  expanded: z.union([z.boolean(), z.record(z.string(), z.boolean())]),
+  grouping: z.array(z.string()),
+  sorting: z.array(z.object({id: z.string(), desc: z.boolean()})),
+  columnVisibility: z.record(z.string(), z.boolean()),
+  columnFilters: z.array(z.object({id: z.string(), value: z.unknown()})),
+  gradeSelectOption: z.union([z.literal('best'), z.literal('latest')]),
+  gradingModelId: z.union([z.number(), z.literal('any')]),
+};
 
 type PropsType = {data: StudentRow[]} & PropsWithChildren;
 export const GradesTableProvider = ({
@@ -166,31 +158,71 @@ export const GradesTableProvider = ({
   const courseParts = useGetCourseParts(courseId);
   const courseTasks = useGetCourseTasks(courseId);
 
+  // View state persisted to localStorage (shared object per course) so
+  // grouping, sorting, filters etc. survive a page refresh. Row selection and
+  // the search box are intentionally not persisted: selections are transient
+  // and search is already synced to the ?search= query parameter.
+  const tableStateKey = `grades-table-state-${courseId}`;
+
   const [rowSelection, setRowSelection] = useState({});
-  const [expanded, setExpanded] = useState<ExpandedState>({});
-  const [grouping, setGrouping] = useState<GroupingState>([]);
+  const [expanded, setExpanded] = usePersistedTableState<ExpandedState>(
+    tableStateKey,
+    'expanded',
+    {},
+    (raw) => {
+      const parsed = persistedStateSchemas.expanded.parse(raw);
+      // The table always controls expansion with the object form
+      return typeof parsed === 'boolean' ? {} : parsed;
+    }
+  );
+  const [grouping, setGrouping] = usePersistedTableState<GroupingState>(
+    tableStateKey,
+    'grouping',
+    [],
+    raw => persistedStateSchemas.grouping.parse(raw)
+  );
   const [globalFilter, setGlobalFilter] = useState('');
-  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
-    errors: false,
-    activeStudents: false,
-  });
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnVisibility, setColumnVisibility] = usePersistedTableState<
+    Record<string, boolean>
+  >(
+    tableStateKey,
+    'columnVisibility',
+    {errors: false, activeStudents: false},
+    raw => persistedStateSchemas.columnVisibility.parse(raw)
+  );
+  const [columnFilters, setColumnFilters] =
+    usePersistedTableState<ColumnFiltersState>(
+      tableStateKey,
+      'columnFilters',
+      [],
+      raw => persistedStateSchemas.columnFilters.parse(raw)
+    );
+  const [sorting, setSorting] = usePersistedTableState<SortingState>(
+    tableStateKey,
+    'sorting',
+    [],
+    raw => persistedStateSchemas.sorting.parse(raw)
+  );
   const [userGraphOpen, setUserGraphOpen] = useState(false);
   const [userGraphData, setUserGraphData] = useState<{
     row: GroupedStudentRow;
     gradingModel: GradingModelData | null;
   } | null>(null);
 
-  const [gradeSelectOption, setGradeSelectOption] = useState<'best' | 'latest'>(
-    'best'
+  const [gradeSelectOption, setGradeSelectOption] = usePersistedTableState<
+  'best' | 'latest'
+  >(tableStateKey, 'gradeSelectOption', 'best', raw =>
+    persistedStateSchemas.gradeSelectOption.parse(raw)
   );
-  const [selectedGradingModel, setSelectedGradingModel] = useState<
-    GradingModelData | 'any'
-  >('any');
-
-  const finalGradeModelSelected =
-    selectedGradingModel === 'any'
-    || selectedGradingModel.coursePartId === null;
+  // Only the model id is persisted, the model itself is resolved from the
+  // loaded grading models so a deleted model falls back to 'any'
+  const [selectedGradingModelId, setSelectedGradingModelId] =
+    usePersistedTableState<number | 'any'>(
+      tableStateKey,
+      'gradingModelId',
+      'any',
+      raw => persistedStateSchemas.gradingModelId.parse(raw)
+    );
 
   // Filter out archived models
   const gradingModels = useMemo(
@@ -203,6 +235,37 @@ export const GradesTableProvider = ({
   const finalGradeModels = gradingModels?.filter(
     model => model.coursePartId === null
   );
+
+  const selectedGradingModel = useMemo<GradingModelData | 'any'>(() => {
+    if (selectedGradingModelId === 'any') return 'any';
+    // While models are loading or if the model was deleted, fall back to 'any'
+    return gradingModels?.find(model => model.id === selectedGradingModelId) ?? 'any';
+  }, [selectedGradingModelId, gradingModels]);
+
+  const setSelectedGradingModel: Dispatch<
+    SetStateAction<GradingModelData | 'any'>
+  > = useCallback(
+    (action) => {
+      setSelectedGradingModelId((prevId) => {
+        const prev =
+          prevId === 'any'
+            ? 'any'
+            : gradingModels?.find(model => model.id === prevId) ?? 'any';
+        const next =
+          typeof action === 'function'
+            ? (
+                action
+              )(prev)
+            : action;
+        return next === 'any' ? 'any' : next.id;
+      });
+    },
+    [gradingModels, setSelectedGradingModelId]
+  );
+
+  const finalGradeModelSelected =
+    selectedGradingModel === 'any'
+    || selectedGradingModel.coursePartId === null;
 
   const getCoursePartExpiryDateFromTaskId = useCallback(
     (courseTaskId: number): Date | null | undefined => {
@@ -285,6 +348,7 @@ export const GradesTableProvider = ({
         const activeGradeInfo = checkStudentActiveGrades(
           row,
           sourceIds,
+          courseTasks.data ?? [],
           getCoursePartExpiryDateFromTaskId
         );
 
@@ -424,15 +488,15 @@ export const GradesTableProvider = ({
 
       const valA = rowA.getValue<GroupedStudentRow>(colId);
       const valB = rowB.getValue<GroupedStudentRow>(colId);
-      const a = valA.predictedGraphValues?.[predictedModelId].finalGrade ?? -1;
-      const b = valB.predictedGraphValues?.[predictedModelId].finalGrade ?? -1;
+      const a = valA.predictedGraphValues?.[predictedModelId]?.finalGrade ?? -1;
+      const b = valB.predictedGraphValues?.[predictedModelId]?.finalGrade ?? -1;
 
       return a - b;
     },
     getGroupingValue: (row) => {
       if (predictedModelId === 'any') return null; // Grouping by predicted grade doesn't make sense if there is more than one model
 
-      const value = row.predictedGraphValues?.[predictedModelId].finalGrade;
+      const value = row.predictedGraphValues?.[predictedModelId]?.finalGrade ?? null;
       return value !== undefined ? String(value) : null;
     },
     cell: info => (
@@ -709,6 +773,7 @@ export const GradesTableProvider = ({
     onExpandedChange: setExpanded,
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
+    onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     enableGrouping: true,
     enableSorting: true,
@@ -725,6 +790,7 @@ export const GradesTableProvider = ({
     // },
     state: {
       columnVisibility,
+      columnFilters,
       rowSelection,
       expanded,
       grouping,

@@ -28,8 +28,9 @@ import {
   ExtServiceImportStreamEventSchema,
   ExtServiceImportStreamEventType,
 } from '@/common/types/extServiceImport';
-import type {Numeric} from '@/types';
+import {CustomError, type Numeric} from '@/types';
 import {getServiceToken} from '@/utils';
+import {extractZodIssues, formatZodIssues} from '@/utils/apiErrors';
 import axios from './axios';
 
 type ServiceInfo = {
@@ -46,30 +47,37 @@ const getHeaders = (serviceInfo: ServiceInfo): AxiosRequestConfig => ({
   },
 });
 
-const getErrorMessage = async (response: Response): Promise<string> => {
+const getError = async (response: Response): Promise<Error> => {
   const responseText = await response.text();
 
   if (!responseText) {
-    return `${response.status} - ${response.statusText}`;
+    return new Error(`${response.status} - ${response.statusText}`);
   }
 
   try {
-    const parsed = JSON.parse(responseText) as
-      | {errors?: string[]}
-      | Array<{errors?: {issues?: Array<{message: string}>}}>;
+    const parsed = JSON.parse(responseText) as unknown;
 
-    if ('errors' in parsed && Array.isArray(parsed.errors)) {
-      return `${response.status} - ${response.statusText}: ${parsed.errors.join(', ')}`;
+    if (
+      parsed !== null
+      && typeof parsed === 'object'
+      && 'errors' in parsed
+      && Array.isArray(parsed.errors)
+    ) {
+      return new Error(`${response.status} - ${response.statusText}: ${parsed.errors.join(', ')}`);
     }
 
-    if (Array.isArray(parsed) && parsed[0]?.errors?.issues) {
-      return `${response.status} - ${response.statusText}: ${parsed[0].errors.issues.map(issue => issue.message).join(', ')}`;
+    const issues = extractZodIssues(parsed);
+    if (issues !== null) {
+      return new CustomError({
+        message: `${response.status} - ${response.statusText}: ${formatZodIssues(issues)}`,
+        issues,
+      });
     }
   } catch {
-    return `${response.status} - ${response.statusText}: ${responseText}`;
+    return new Error(`${response.status} - ${response.statusText}: ${responseText}`);
   }
 
-  return `${response.status} - ${response.statusText}: ${responseText}`;
+  return new Error(`${response.status} - ${response.statusText}: ${responseText}`);
 };
 
 export const fetchExtServiceGradesStream = async (
@@ -94,7 +102,7 @@ export const fetchExtServiceGradesStream = async (
   );
 
   if (!response.ok) {
-    throw new Error(await getErrorMessage(response));
+    throw await getError(response);
   }
 
   if (!response.body) {

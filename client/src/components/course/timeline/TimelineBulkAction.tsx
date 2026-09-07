@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {Delete} from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -21,6 +22,7 @@ interface TimelineBulkActionProps {
   bulkDate: Dayjs | null;
   setBulkDate: (date: Dayjs | null) => void;
   handleBulkUpdate: () => void;
+  handleBulkDelete: () => void;
 }
 
 const TimelineBulkAction = ({
@@ -28,6 +30,7 @@ const TimelineBulkAction = ({
   bulkDate,
   setBulkDate,
   handleBulkUpdate,
+  handleBulkDelete,
 }: TimelineBulkActionProps): JSX.Element => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -79,6 +82,15 @@ const TimelineBulkAction = ({
         disableElevation
       >
         {t('course.timeline.update')}
+      </Button>
+      <Button
+        variant="outlined"
+        color="error"
+        onClick={handleBulkDelete}
+        startIcon={<Delete />}
+        disableElevation
+      >
+        {t('general.delete')}
       </Button>
     </Paper>
   );

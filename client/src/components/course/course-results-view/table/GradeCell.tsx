@@ -16,7 +16,8 @@ import {Trans, useTranslation} from 'react-i18next';
 
 import type {CourseTaskGradesData} from '@/common/types';
 import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
-import type {GroupedStudentRow, features} from '@/context/GradesTableProvider';
+import type {GroupedStudentRow} from '@/context/GradesTableProvider';
+import type {features} from '@/components/shared/table/features';
 import {useTableContext} from '@/context/useTableContext';
 import {findBestGrade, gradeIsExpired} from '@/utils';
 import EditGradesDialog from './EditGradesDialog';

@@ -235,6 +235,12 @@
     "course-part-grade": "Betyg för kursdel",
     "not-int": "Värdet måste vara ett giltigt heltal"
   },
+  "final-grades-view": {
+    "manual-model": "Manuell",
+    "no-snapshot": "Detaljerad bedömningsinformation är inte tillgänglig för dessa slutbetyg",
+    "unknown-model": "Okänd bedömningsmodell",
+    "filter-by-model": "Filtrera efter bedömningsmodell"
+  },
   "wait-list": {
     "title": "Väntelista",
     "add-entry": "Lägg till i väntelistan",
@@ -329,7 +335,9 @@
       "max-grade-error": "Maxpoäng måste vara tomt, noll eller ett positivt tal",
       "no-course-parts": "Inga kursdelar. Vänligen lägg till kursdelar för att komma igång.",
       "active-parts": "Aktiva kursdelar",
-      "archived-parts": "Arkiverade kursdelar"
+      "archived-parts": "Arkiverade kursdelar",
+      "grade-count_one": "{{count}} betyg",
+      "grade-count_other": "{{count}} betyg"
     },
     "models": {
       "has-multiple-warnings": "Modellen har flera varningar",
@@ -350,6 +358,8 @@
       "unarchive": "Avarkivera betygsmodell",
       "archive": "Arkivera betygsmodell",
       "cannot-delete-with-final": "Kan inte ta bort en modell med slutbetyg",
+      "final-grade-count_one": "{{count}} slutbetyg har beräknats med denna modell",
+      "final-grade-count_other": "{{count}} slutbetyg har beräknats med denna modell",
       "delete-grading-model": "Radera betygsmodell",
       "model-not-found": "Kunde inte hitta betygsmodell med ID {{model}}",
       "grade-not-found": "Kunde inte hitta betyg för användare med ID {{user}}",
@@ -500,6 +510,13 @@
       "grade-update-fail": "Misslyckades med att uppdatera betyg",
       "items-updated-success": "Uppdaterade {{count}} objekt framgångsrikt",
       "items-update-fail": "Misslyckades med att uppdatera objekt",
+      "delete-selected_one": "Ta bort {{count}} valt objekt",
+      "delete-selected_other": "Ta bort {{count}} valda objekt",
+      "delete-selected-message_one": "Är du säker på att du vill ta bort det valda betyget? Åtgärden kan inte ångras.",
+      "delete-selected-message_other": "Är du säker på att du vill ta bort de valda betygen? Åtgärden kan inte ångras.",
+      "items-deleted-success_one": "Tog bort {{count}} objekt framgångsrikt",
+      "items-deleted-success_other": "Tog bort {{count}} objekt framgångsrikt",
+      "items-delete-fail": "Misslyckades med att ta bort objekt",
       "group-by": "Gruppera efter",
       "group-by-task": "Betygsmodell",
       "group-by-date": "Datum",

@@ -10,7 +10,8 @@ import {Trans, useTranslation} from 'react-i18next';
 
 import type {FinalGradeData, GradingScale} from '@/common/types';
 import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
-import type {GroupedStudentRow, features} from '@/context/GradesTableProvider';
+import type {GroupedStudentRow} from '@/context/GradesTableProvider';
+import type {features} from '@/components/shared/table/features';
 import {findBestFinalGrade, getGradeString} from '@/utils';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
 

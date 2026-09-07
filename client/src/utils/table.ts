@@ -285,43 +285,72 @@ export const getErrorCount = (
 };
 
 /**
- * Gets the set of source task IDs from a list of grading models
+ * Source IDs of the (non-archived) sources in a grading model.
+ * In course part models source node IDs are course task IDs, while in
+ * final-grade models (coursePartId === null) they are course part IDs.
+ */
+export type GradingModelSourceIds = {
+  taskIds: Set<number>;
+  partIds: Set<number>;
+};
+
+/**
+ * Gets the set of source task IDs and course part IDs from a grading model
+ * (or from all models when 'any' is selected)
  */
 export const getGradingModelSourceIds = (
   models: GradingModelData | 'any',
   allModels: GradingModelData[] = []
-): Set<number> => {
+): GradingModelSourceIds => {
   const modelsToUse = models === 'any' ? allModels : [models];
 
-  return new Set(
-    modelsToUse
-      .filter((model: any) => !model.archived)
-      .flatMap((model: any) =>
-        model.graphStructure.nodes
-          .filter((node: any) => node.type === 'source')
-          .map((node: any) => parseInt(node.id.split('-')[1]))
-      )
-  );
+  const taskIds = new Set<number>();
+  const partIds = new Set<number>();
+
+  for (const model of modelsToUse) {
+    if (model.archived) continue;
+    const ids = model.graphStructure.nodes
+      .filter(node => node.type === 'source')
+      .map(node => parseInt(node.id.split('-')[1]));
+
+    if (model.coursePartId === null) {
+      for (const id of ids) partIds.add(id);
+    } else {
+      for (const id of ids) taskIds.add(id);
+    }
+  }
+
+  return {taskIds, partIds};
 };
 
 /**
  * Checks if a student has at least one non-expired grade in relevant tasks
  * @param studentRow - The student row to check
- * @param sourceIds - Set of task IDs that are relevant (sources in the grading model)
+ * @param sourceIds - IDs of the sources in the grading model (task or part IDs)
+ * @param courseTasks - Course task metadata, used to map tasks to course parts
  * @param getCoursePartExpiryDate - Function to get expiry date for a task from course part
  * @returns Object with hasActiveGrade flag and list of active task IDs
  */
 export const checkStudentActiveGrades = (
   studentRow: StudentRow,
-  sourceIds: Set<number>,
+  sourceIds: GradingModelSourceIds,
+  courseTasks: CourseTaskData[],
   getCoursePartExpiryDate: (courseTaskId: number) => Date | null | undefined
 ): {hasActiveGrade: boolean; activeTaskIds: number[]} => {
   const activeTaskIds: number[] = [];
   const now = new Date();
 
+  const coursePartIdByTaskId = new Map(
+    courseTasks.map(task => [task.id, task.coursePartId])
+  );
+
   for (const task of studentRow.courseTasks) {
-    // Only consider tasks that are part of the selected grading model
-    if (!sourceIds.has(task.courseTaskId)) {
+    // Only consider tasks that are part of the selected grading model.
+    // A task is relevant if it is a source itself, or if it belongs to a
+    // course part that is a source (final-grade models).
+    const partId = coursePartIdByTaskId.get(task.courseTaskId);
+    const inPartSource = partId !== undefined && sourceIds.partIds.has(partId);
+    if (!sourceIds.taskIds.has(task.courseTaskId) && !inPartSource) {
       continue;
     }
 
