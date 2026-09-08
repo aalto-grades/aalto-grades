@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import {Op} from 'sequelize';
 import {z} from 'zod';
 
 import {
@@ -24,6 +25,7 @@ import {APLUS_API_URL} from '../../configs/environment';
 import httpLogger from '../../configs/winston';
 import CourseTaskExternalSource from '../../database/models/courseTaskExternalSource';
 import ExternalSource from '../../database/models/externalSource';
+import User from '../../database/models/user';
 import {
   ApiError,
   AplusCourseInfoSchema,
@@ -56,6 +58,82 @@ const AplusSourceInfoSchema = z.looseObject({
   itemname: z.string().optional(),
   difficulty: z.string().optional(),
 });
+
+interface AplusStudentIdentity {
+  studentNumber: string;
+  fullName: string | null;
+}
+
+interface MatchedStudent {
+  user: User;
+  identity: AplusStudentIdentity;
+}
+
+/**
+ * Matches the given A+ student identities to Ossi users, by student number
+ */
+const matchAplusStudentsToUsers = async (
+  identities: Map<string, AplusStudentIdentity>
+): Promise<MatchedStudent[]> => {
+  const studentNumbers = Array.from(identities.keys());
+  const users = await User.findAll({
+    where: {studentNumber: {[Op.in]: studentNumbers}},
+  });
+
+  const matched: MatchedStudent[] = [];
+
+  for (const user of users) {
+    const identity = user.studentNumber
+      ? identities.get(user.studentNumber)
+      : undefined;
+    if (identity !== undefined) {
+      matched.push({user, identity});
+    }
+  }
+
+  return matched;
+};
+
+/**
+ * Syncs the full names (and student numbers) of A+ students into the Ossi user
+ * database. A+ is treated as the authoritative source for names. Failures are
+ * only logged, never thrown, so that name syncing can never break a points
+ * import.
+ */
+const syncUserNamesFromAplus = async (
+  identities: Map<string, AplusStudentIdentity>
+): Promise<void> => {
+  if (identities.size === 0) {
+    return;
+  }
+
+  try {
+    const matched = await matchAplusStudentsToUsers(identities);
+
+    let updated = 0;
+    for (const {user, identity} of matched) {
+      const changes: {name?: string; studentNumber?: string} = {};
+      if (identity.fullName && user.name !== identity.fullName) {
+        changes.name = identity.fullName;
+      }
+      if (!user.studentNumber && identity.studentNumber) {
+        changes.studentNumber = identity.studentNumber;
+      }
+      if (Object.keys(changes).length > 0) {
+        await user.update(changes);
+        updated++;
+      }
+    }
+
+    httpLogger.info(
+      `A+ name sync: ${updated} users updated out of ${identities.size} students`
+    );
+  } catch (error) {
+    httpLogger.warn(
+      `Failed to sync user names from A+: ${(error as Error).message}`
+    );
+  }
+};
 
 const fetchCourses: ExtServiceHandler['fetchCourses'] = async (req) => {
   const aplusToken = parseAplusToken(req);
@@ -206,6 +284,7 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (
   const pointsResCache: {[key: number]: z.output<typeof AplusPointsResSchema>} =
     {};
   const newGrades: NewTaskGrade[] = [];
+  const studentIdentities = new Map<string, AplusStudentIdentity>();
 
   if (courseTaskIds.length > 0) {
     reportProgress?.({
@@ -291,15 +370,22 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (
       );
 
       const points = pointsResCache[aplusCourseId];
-      for (const student of points) {
-        if (!student.student_id) {
+      for (const aplusStudent of points) {
+        if (!aplusStudent.student_id) {
           continue;
+        }
+
+        if (!studentIdentities.has(aplusStudent.student_id)) {
+          studentIdentities.set(aplusStudent.student_id, {
+            studentNumber: aplusStudent.student_id,
+            fullName: aplusStudent.full_name ?? null,
+          });
         }
 
         let grade: number | null = null;
         switch (sourceInfo.sourceType) {
           case ExtServiceGradeSourceType.FullPoints:
-            grade = student.points;
+            grade = aplusStudent.points;
             break;
           case ExtServiceGradeSourceType.Module: {
             const moduleId = sourceInfo.sourceId;
@@ -309,7 +395,7 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (
                 HttpCode.InternalServerError,
               );
             }
-            const module = student.modules.find(mod => mod.id === moduleId);
+            const module = aplusStudent.modules.find(mod => mod.id === moduleId);
             if (module === undefined) {
               throw new ApiError(
                 `A+ course with ID ${aplusCourseId} has no module with ID ${moduleId}`,
@@ -328,7 +414,7 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (
               );
             }
 
-            for (const module of student.modules) {
+            for (const module of aplusStudent.modules) {
               for (const exercise of module.exercises) {
                 if (exercise.id === exerciseId) {
                   grade = exercise.points;
@@ -351,7 +437,7 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (
                 HttpCode.InternalServerError,
               );
             }
-            grade = student.points_by_difficulty[difficulty] ?? 0;
+            grade = aplusStudent.points_by_difficulty[difficulty] ?? 0;
             break;
           }
         }
@@ -359,7 +445,7 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (
         const date = new Date(courseInfo.ending_time);
 
         newGrades.push({
-          studentNumber: student.student_id,
+          studentNumber: aplusStudent.student_id,
           courseTaskId: courseTask.id,
           externalSourceId: source.id,
           grade,
@@ -376,6 +462,10 @@ const fetchGrades: ExtServiceHandler['fetchGrades'] = async (
       totalTasks: courseTaskIds.length,
     });
   }
+
+  // Sync student names into Ossi regardless of whether the fetched grades are
+  // ever confirmed. Failures are logged and never fail the import.
+  await syncUserNamesFromAplus(studentIdentities);
 
   return newGrades;
 };

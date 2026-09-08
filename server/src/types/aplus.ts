@@ -76,6 +76,8 @@ export const AplusExercisesResSchema = z.object({
 
 const AplusStudentPointsSchema = z.object({
   student_id: z.string().nullable(),
+  username: z.string().nullable().optional(),
+  full_name: z.string().nullable().optional(),
   points: z.number().int(),
   points_by_difficulty: z.record(z.string(), z.number().int()),
   modules: z.array(
