@@ -17,7 +17,6 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import dayjs, {type Dayjs} from 'dayjs';
 import {useSnackbar} from 'notistack';
-import {AsyncConfirmationModal} from 'react-global-modal';
 import {
   type JSX,
   useCallback,
@@ -26,6 +25,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 

@@ -2,56 +2,56 @@
 //
 // SPDX-License-Identifier: MIT
 
-import "react-global-modal/dist/react-global-modal.css";
+import 'react-global-modal/dist/react-global-modal.css';
 
 import {
   MutationCache,
   QueryCache,
   QueryClient,
   QueryClientProvider,
-} from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools"; // For debugging
-import { enqueueSnackbar } from "notistack";
-import { type JSX, type Ref, useCallback, useEffect } from "react";
-import { GlobalModal, GlobalModalWrapper } from "react-global-modal";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+} from '@tanstack/react-query';
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools'; // For debugging
+import {enqueueSnackbar} from 'notistack';
+import {type JSX, type Ref, useCallback, useEffect} from 'react';
+import {GlobalModal, GlobalModalWrapper} from 'react-global-modal';
+import {RouterProvider, createBrowserRouter} from 'react-router-dom';
 
-import { SystemRole } from "@/common/types";
-import MoodleTokenCallbackView from "@/components/MoodleTokenCallbackView";
-import ThemeProvider from "@/theme/ThemeProvider";
-import AppContainer from "./components/AppContainer";
-import FrontPageView from "./components/FrontPageView";
-import LoginView from "./components/LoginView";
-import ManageStudentsView from "./components/ManageStudentsView";
-import NotFoundView from "./components/NotFoundView";
-import PrivateRoute from "./components/PrivateRoute";
-import StaticPageView from "./components/StaticPageView";
-import StudentsView from "./components/StudentsView";
-import CourseContainer from "./components/course/CourseContainer";
-import CoursePartsView from "./components/course/CoursePartsView";
-import CourseRedirect from "./components/course/CourseRedirect";
-import EditCourseView from "./components/course/EditCourseView";
-import GradesView from "./components/course/GradesView";
-import ModelsView from "./components/course/ModelsView";
-import TimelineView from "./components/course/TimelineView";
-import WaitListView from "./components/course/WaitListView";
-import FinalGradesView from "./components/course/finalized-grades-view/FinalGradesView";
-import ConfirmDialog from "./components/shared/ConfirmDialog";
-import NotistackWrapper from "./context/NotistackWrapper";
-import type { CustomError } from "./types";
+import {SystemRole} from '@/common/types';
+import MoodleTokenCallbackView from '@/components/MoodleTokenCallbackView';
+import ThemeProvider from '@/theme/ThemeProvider';
+import AppContainer from './components/AppContainer';
+import FrontPageView from './components/FrontPageView';
+import LoginView from './components/LoginView';
+import ManageStudentsView from './components/ManageStudentsView';
+import NotFoundView from './components/NotFoundView';
+import PrivateRoute from './components/PrivateRoute';
+import StaticPageView from './components/StaticPageView';
+import StudentsView from './components/StudentsView';
+import CourseContainer from './components/course/CourseContainer';
+import CoursePartsView from './components/course/CoursePartsView';
+import CourseRedirect from './components/course/CourseRedirect';
+import EditCourseView from './components/course/EditCourseView';
+import GradesView from './components/course/GradesView';
+import ModelsView from './components/course/ModelsView';
+import TimelineView from './components/course/TimelineView';
+import WaitListView from './components/course/WaitListView';
+import FinalGradesView from './components/course/finalized-grades-view/FinalGradesView';
+import ConfirmDialog from './components/shared/ConfirmDialog';
+import NotistackWrapper from './context/NotistackWrapper';
+import type {CustomError} from './types';
 
 const ErrorSnackbarContent = ({
   error,
 }: {
   error: CustomError;
 }): JSX.Element => {
-  let jsonError: Array<{ message: string }> | undefined = error?.issues;
+  let jsonError: Array<{message: string}> | undefined = error?.issues;
   if (error?.message.length <= 100 && jsonError === undefined)
     return <>{error?.message}</>;
 
   if (jsonError === undefined) {
     try {
-      jsonError = JSON.parse(error.message) as Array<{ message: string }>;
+      jsonError = JSON.parse(error.message) as Array<{message: string}>;
     } catch {
       jsonError = undefined;
     }
@@ -59,10 +59,10 @@ const ErrorSnackbarContent = ({
 
   return (
     <details>
-      <summary>{`${jsonError?.length ?? ""} Errors`}</summary>
+      <summary>{`${jsonError?.length ?? ''} Errors`}</summary>
       <textarea
         readOnly
-        style={{ height: "200px", width: "400px", overflow: "auto" }}
+        style={{height: '200px', width: '400px', overflow: 'auto'}}
       >
         {error?.message}
       </textarea>
@@ -79,14 +79,14 @@ const Root = (): JSX.Element => {
 
   const handleError = useCallback((error: CustomError): void => {
     enqueueSnackbar(<ErrorSnackbarContent error={error} />, {
-      variant: "error",
+      variant: 'error',
       action: error.action,
     });
   }, []);
 
   const queryClient = new QueryClient({
-    queryCache: new QueryCache({ onError: handleError }),
-    mutationCache: new MutationCache({ onError: handleError }),
+    queryCache: new QueryCache({onError: handleError}),
+    mutationCache: new MutationCache({onError: handleError}),
     defaultOptions: {
       queries: {
         staleTime: 1000 * 60 * 5, // 5 minutes
@@ -115,31 +115,31 @@ const Root = (): JSX.Element => {
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <Root />,
     children: [
-      { path: "/login", element: <LoginView /> },
-      { path: "/moodle-token-callback", element: <MoodleTokenCallbackView /> },
+      {path: '/login', element: <LoginView />},
+      {path: '/moodle-token-callback', element: <MoodleTokenCallbackView />},
       {
-        path: "/licenses",
+        path: '/licenses',
         element: <StaticPageView url="/javascript.html" title="Licenses" />,
       },
       {
-        path: "/accessibility-statement",
+        path: '/accessibility-statement',
         element: <StaticPageView url="/accessibility-statement.html" />,
       },
       {
-        path: "/privacy-notice",
+        path: '/privacy-notice',
         element: (
           <StaticPageView url="/privacy-notice.html" title="Privacy Notice" />
         ),
       },
       {
-        path: "/support",
+        path: '/support',
         element: <StaticPageView url="/support.html" title="Support" />,
       },
       {
-        path: "/",
+        path: '/',
         element: (
           <PrivateRoute roles={[SystemRole.User, SystemRole.Admin]}>
             <CourseContainer />
@@ -148,15 +148,15 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            path: "/",
+            path: '/',
             element: <FrontPageView />,
           },
           {
-            path: "/students/:userId?",
+            path: '/students/:userId?',
             element: <StudentsView />,
           },
           {
-            path: "/manage-students",
+            path: '/manage-students',
             element: (
               <PrivateRoute roles={[SystemRole.Admin]}>
                 <ManageStudentsView />
@@ -165,38 +165,38 @@ const router = createBrowserRouter([
           },
 
           {
-            path: "/:courseId",
+            path: '/:courseId',
             children: [
               {
                 index: true,
                 element: <CourseRedirect />,
               },
               {
-                path: "/:courseId/course-results",
+                path: '/:courseId/course-results',
                 element: <GradesView />,
               },
               {
-                path: "/:courseId/final-grades",
+                path: '/:courseId/final-grades',
                 element: <FinalGradesView />,
               },
               {
-                path: "/:courseId/wait-list",
+                path: '/:courseId/wait-list',
                 element: <WaitListView />,
               },
               {
-                path: "/:courseId/models",
+                path: '/:courseId/models',
                 element: <CoursePartsView />,
               },
               {
-                path: "/:courseId/timeline",
+                path: '/:courseId/timeline',
                 element: <TimelineView />,
               },
               {
-                path: "/:courseId/models/:modelId/:userId?",
+                path: '/:courseId/models/:modelId/:userId?',
                 element: <ModelsView />,
               },
               {
-                path: "/:courseId/edit",
+                path: '/:courseId/edit',
                 element: <EditCourseView />,
               },
             ],
@@ -204,7 +204,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "*",
+        path: '*',
         element: <NotFoundView />,
       },
     ],
