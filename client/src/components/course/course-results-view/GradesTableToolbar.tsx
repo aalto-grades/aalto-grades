@@ -3,38 +3,22 @@
 // SPDX-License-Identifier: MIT
 
 import {Add} from '@mui/icons-material';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ClearIcon from '@mui/icons-material/Clear';
-import {
-  Box,
-  Button,
-  ButtonBase,
-  Divider,
-  Fade,
-  Menu,
-  MenuItem,
-  Tooltip,
-  useTheme,
-} from '@mui/material';
+import {Box, Button, Fade, Tooltip, useTheme} from '@mui/material';
 import type {Row} from '@tanstack/react-table';
 import {enqueueSnackbar} from 'notistack';
-import {
-  type ChangeEvent,
-  type JSX,
-  type MouseEvent,
-  forwardRef,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import {type JSX, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useParams, useSearchParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {z} from 'zod';
 
 import {type StudentRow, SystemRole} from '@/common/types';
 import {batchCalculateFinalGrades} from '@/common/util';
 import Search from '@/components/shared/Search';
-import type {GroupedStudentRow, features} from '@/context/GradesTableProvider';
+import FilterMenuButton from '@/components/shared/table/FilterMenuButton';
+import GroupByButton, {type GroupByElement} from '@/components/shared/table/GroupByButton';
+import type {features} from '@/components/shared/table/features';
+import {useTableSearch} from '@/components/shared/table/useTableSearch';
+import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useTableContext} from '@/context/useTableContext';
 import {
   useAddFinalGrades,
@@ -55,160 +39,31 @@ import {
   getMaxFinalGrade,
 } from '@/utils';
 import CalculateFinalGradesDialog from './CalculateFinalGradesDialog';
-import GroupByButton from './GroupByButton';
 import ImportGradesDialog from './ImportGradesDialog';
 import SisuDownloadDialog from './SisuDownloadDialog';
 import UploadDialog from './upload/UploadDialog';
-
-const AssessmentFilterButton = forwardRef<HTMLSpanElement>(
-  (props, ref): JSX.Element => {
-    const {t} = useTranslation();
-    const {courseId} = useParams() as {courseId: string};
-    const {table} = useTableContext();
-    const {selectedGradingModel, setSelectedGradingModel} = useTableContext();
-
-    const theme = useTheme();
-    const allGradingModels = useGetAllGradingModels(courseId);
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-    const open = Boolean(anchorEl);
-    const handleClick = (event: MouseEvent<HTMLElement>): void => {
-      setAnchorEl(event.currentTarget);
-    };
-    const handleClose = (): void => {
-      setAnchorEl(null);
-    };
-
-    // Filter out archived models
-    const gradingModels = useMemo(
-      () =>
-        allGradingModels.data !== undefined
-          ? allGradingModels.data.filter(model => !model.archived)
-          : undefined,
-      [allGradingModels.data]
-    );
-
-    const modelSelected = selectedGradingModel !== 'any';
-
-    return (
-      <>
-        <span {...props} style={{display: 'flex'}} ref={ref}>
-          <ButtonBase
-            sx={{
-              display: 'flex',
-              borderRadius: '8px',
-              textAlign: 'center',
-              border: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.23)' : '1px solid black',
-              alignContent: 'center',
-              padding: '0px 8px',
-              fontSize: '14px',
-              alignItems: 'center',
-              lineHeight: '20px',
-              cursor: 'pointer',
-              position: 'relative',
-              backgroundColor: 'transparent',
-              ...(modelSelected && {
-                backgroundColor: theme.palette.mode === 'dark'
-                  ? theme.palette.info.dark
-                  : theme.palette.info.light,
-                border: 'none',
-                borderRadius: '8px 0px 0px 8px',
-              }),
-            }}
-            onClick={handleClick}
-          >
-            <div
-              style={{
-                alignContent: 'center',
-                padding: '0px 8px',
-                width: 'max-content',
-              }}
-            >
-              {modelSelected
-                ? selectedGradingModel.name
-                : t('general.grading-model')}
-            </div>
-
-            {!modelSelected && (
-              <ArrowDropDownIcon
-                style={{alignContent: 'center', fontSize: '18px'}}
-              />
-            )}
-          </ButtonBase>
-          {modelSelected && (
-            <ButtonBase
-              sx={{
-                display: 'flex',
-                borderRadius: '0px 8px 8px 0',
-                textAlign: 'center',
-                alignContent: 'center',
-                padding: '0px 8px',
-                fontSize: '14px',
-                alignItems: 'center',
-                lineHeight: '20px',
-                cursor: 'pointer',
-                position: 'relative',
-                backgroundColor: theme.palette.mode === 'dark'
-                  ? theme.palette.info.dark
-                  : theme.palette.info.light,
-                border: 'none',
-              }}
-              onClick={() => setSelectedGradingModel('any')}
-            >
-              <ClearIcon style={{alignContent: 'center', fontSize: '18px'}} />
-            </ButtonBase>
-          )}
-        </span>
-        <Menu
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          style={{maxHeight: '50vh'}}
-        >
-          {(gradingModels ?? []).filter(model => model.coursePartId).map(model => (
-            <MenuItem
-              key={model.id}
-              onClick={() => {
-                table.resetColumnFilters();
-                setSelectedGradingModel(model);
-                handleClose();
-              }}
-              value={model.id}
-              selected={modelSelected && model.id === selectedGradingModel.id}
-            >
-              {model.name}
-            </MenuItem>
-          ))}
-          <Divider />
-          {(gradingModels ?? []).filter(model => !model.coursePartId).map(model => (
-            <MenuItem
-              key={model.id}
-              onClick={() => {
-                table.resetColumnFilters();
-                setSelectedGradingModel(model);
-                handleClose();
-              }}
-              value={model.id}
-              selected={modelSelected && model.id === selectedGradingModel.id}
-            >
-              {model.name}
-            </MenuItem>
-          ))}
-        </Menu>
-      </>
-    );
-  }
-);
-AssessmentFilterButton.displayName = 'AssessmentFilterButton';
 
 const GradesTableToolbar = (): JSX.Element => {
   const {t} = useTranslation();
   const {auth, isTeacherInCharge} = useAuth();
   const {courseId} = useParams() as {courseId: string};
-  const {table, gradeSelectOption, selectedGradingModel} = useTableContext();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const initialSearch = searchParams.get('search') ?? '';
+  const {table, gradeSelectOption, selectedGradingModel, setSelectedGradingModel} =
+    useTableContext();
+  const {searchValue, handleSearch, resetSearch} = useTableSearch(table);
   const theme = useTheme();
+
+  const extraGroups: GroupByElement[][] = [
+    [
+      {
+        id: 'latestBestGrade',
+        name: t('course.results.table.latest-grade'),
+        info: t('course.results.group-by-latest-grade'),
+      },
+      {id: 'Exported to Sisu', name: t('course.results.table.exported')},
+      {id: 'finalGrade', name: t('general.final-grade')},
+      {id: 'Grade preview', name: t('course.results.table.preview')},
+    ],
+  ];
 
   const course = useGetCourse(courseId);
   const allGradingModels = useGetAllGradingModels(courseId);
@@ -222,12 +77,6 @@ const GradesTableToolbar = (): JSX.Element => {
   const [missingFinalGrades, setMissingFinalGrades] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
-  // Set initial search value from query param (only on first render)
-  const [searchValue, setSearchValue] = useState(initialSearch);
-  // Keep table global filter in sync with searchValue
-  useEffect(() => {
-    table.setGlobalFilter(searchValue);
-  }, [searchValue, table]);
 
   // Filter out archived models
   const gradingModels = useMemo(
@@ -355,21 +204,6 @@ const GradesTableToolbar = (): JSX.Element => {
       variant: 'success',
     });
     return true;
-  };
-
-  const resetSearch = (): void => {
-    setSearchValue('');
-  };
-  const handleSearch = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ): void => {
-    setSearchValue(e.target.value);
-    if (e.target.value) {
-      searchParams.set('search', e.target.value);
-    } else {
-      searchParams.delete('search');
-    }
-    setSearchParams(searchParams, {replace: true});
   };
 
   return (
@@ -570,7 +404,7 @@ const GradesTableToolbar = (): JSX.Element => {
           placement="top"
           disableInteractive
         >
-          <GroupByButton />
+          <GroupByButton table={table} extraGroups={extraGroups} />
         </Tooltip>
         {(gradingModels?.length ?? 0) > 1 && (
           <Tooltip
@@ -578,7 +412,30 @@ const GradesTableToolbar = (): JSX.Element => {
             placement="top"
             disableInteractive
           >
-            <AssessmentFilterButton />
+            <FilterMenuButton
+              label={
+                selectedGradingModel !== 'any'
+                  ? selectedGradingModel.name
+                  : t('general.grading-model')
+              }
+              selected={selectedGradingModel !== 'any'}
+              options={[
+                (gradingModels ?? []).filter(m => m.coursePartId),
+                (gradingModels ?? []).filter(m => !m.coursePartId),
+              ].map(section =>
+                section.map(m => ({id: m.id, name: m.name}))
+              )}
+              selectedId={
+                selectedGradingModel !== 'any' ? selectedGradingModel.id : undefined
+              }
+              onSelect={(id) => {
+                const model = gradingModels?.find(m => m.id === id);
+                if (model === undefined) return;
+                table.resetColumnFilters();
+                setSelectedGradingModel(model);
+              }}
+              onClear={() => setSelectedGradingModel('any')}
+            />
           </Tooltip>
         )}
         <Search
@@ -600,7 +457,7 @@ const GradesTableToolbar = (): JSX.Element => {
           >
             <Button
               sx={{
-                background: theme.palette.error.light,
+                // background: theme.palette.error.light,
                 color: theme.palette.error.main,
                 fontWeight: '500',
                 p: 0.5,
@@ -633,6 +490,82 @@ const GradesTableToolbar = (): JSX.Element => {
                   selectedGradingModel
                 ),
               })}
+            </Button>
+          </Fade>
+          <Fade
+            in={
+              table.getPreFilteredRowModel().rows.some(
+                row => row.original.finalGrades.some(fg => fg.sisuExportDate !== null)
+              )
+            }
+          >
+            <Button
+              sx={{
+                // background: theme.palette.success.light,
+                color: theme.palette.success.main,
+                fontWeight: '500',
+                p: 0.5,
+                px: 2,
+                py: 0.5,
+                borderRadius: 3,
+                display: 'flex',
+                gap: 1,
+                alignItems: 'center',
+                height: '36px',
+                boxSizing: 'border-box',
+                border:
+                  table.getColumn('Exported to Sisu')?.getFilterValue() === 'hideExported'
+                    ? `1px solid ${theme.palette.success.main}`
+                    : 'none',
+              }}
+              onClick={() => {
+                const currentFilter = table.getColumn('Exported to Sisu')?.getFilterValue();
+                if (currentFilter === 'hideExported') {
+                  table.getColumn('Exported to Sisu')?.setFilterValue(undefined);
+                } else {
+                  table.getColumn('Exported to Sisu')?.setFilterValue('hideExported');
+                }
+              }}
+            >
+              {t('course.results.hide-exported-sisu')}
+            </Button>
+          </Fade>
+          <Fade
+            in={
+              table.getPreFilteredRowModel().rows.some(row =>
+                row.original.activeGradeInfo?.hasActiveGrade ?? false
+              )
+            }
+          >
+            <Button
+              sx={{
+                // background: theme.palette.info.light,
+                color: theme.palette.info.main,
+                fontWeight: '500',
+                p: 0.5,
+                px: 2,
+                py: 0.5,
+                borderRadius: 3,
+                display: 'flex',
+                gap: 1,
+                alignItems: 'center',
+                height: '36px',
+                boxSizing: 'border-box',
+                border:
+                  table.getColumn('activeStudents')?.getFilterValue() === 'activeOnly'
+                    ? `1px solid ${theme.palette.info.main}`
+                    : 'none',
+              }}
+              onClick={() => {
+                const currentFilter = table.getColumn('activeStudents')?.getFilterValue();
+                if (currentFilter === 'activeOnly') {
+                  table.getColumn('activeStudents')?.setFilterValue(undefined);
+                } else {
+                  table.getColumn('activeStudents')?.setFilterValue('activeOnly');
+                }
+              }}
+            >
+              {t('course.results.show-active-only')}
             </Button>
           </Fade>
         </Box>

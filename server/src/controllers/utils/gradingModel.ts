@@ -120,7 +120,7 @@ export const checkGradingModelSources = (
   const modelSourceIds = [];
   for (const node of gradingModel.graphStructure.nodes) {
     if (node.type !== 'source') continue;
-    modelSourceIds.push(parseInt(node.id.split('-')[1]));
+    modelSourceIds.push(Number.parseInt(node.id.split('-')[1], 10));
   }
 
   const sourceIds = new Set(sources.map(source => source.id));
@@ -128,8 +128,8 @@ export const checkGradingModelSources = (
     if (!sourceIds.has(sourceId)) hasDeletedSources = true;
   }
   for (const source of sources) {
-    if (modelSourceIds.includes(source.id) && source.archived)
-      hasArchivedSources = true;
+    if (!modelSourceIds.includes(source.id)) continue;
+    if (source.archived) hasArchivedSources = true;
     if ('expiryDate' in source && source.expiryDate && source.expiryDate < now)
       hasExpiredSources = true;
   }

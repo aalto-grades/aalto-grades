@@ -33,6 +33,7 @@ export default class FinalGrade extends Model<
   declare date: Date | string; // Database outputs yyyy-mm-dd but inserting date is allowed
   declare sisuExportDate: CreationOptional<Date | null>;
   declare comment: CreationOptional<string | null>;
+  declare frozenInfo: CreationOptional<object | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   grader?: User;
@@ -93,6 +94,10 @@ FinalGrade.init(
     },
     comment: {
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+    frozenInfo: {
+      type: DataTypes.JSON,
       allowNull: true,
     },
     createdAt: DataTypes.DATE,

@@ -4,7 +4,7 @@
 
 import {Op} from 'sequelize';
 
-import {type FinalGradeData, HttpCode} from '@/common/types';
+import {type FinalGradeData, type FinalGradeFrozenInfo, HttpCode} from '@/common/types';
 import {findAndValidateCourseId} from './course';
 import {validateUserAndGrader} from './taskGrade';
 import type Course from '../../database/models/course';
@@ -74,6 +74,7 @@ export const parseFinalGrade = (finalGrade: FinalGrade): FinalGradeData => {
     date: new Date(finalGrade.date),
     sisuExportDate: finalGrade.sisuExportDate,
     comment: finalGrade.comment,
+    frozenInfo: finalGrade.frozenInfo as FinalGradeFrozenInfo | null,
   };
 };
 

@@ -107,6 +107,18 @@ const ModelsView = (): JSX.Element => {
     return withFinalGrades;
   }, [finalGrades.data]);
 
+  // Number of final grades calculated with each grading model
+  const finalGradeCounts = useMemo(() => {
+    const counts: {[gradingModelId: number]: number} = {};
+    if (finalGrades.data === undefined) return counts;
+    for (const finalGrade of finalGrades.data) {
+      if (finalGrade.gradingModelId !== null)
+        counts[finalGrade.gradingModelId] =
+          (counts[finalGrade.gradingModelId] ?? 0) + 1;
+    }
+    return counts;
+  }, [finalGrades.data]);
+
   const editRights = useMemo(
     () => auth?.role === SystemRole.Admin || isTeacherInCharge,
     [auth?.role, isTeacherInCharge]
@@ -246,6 +258,7 @@ const ModelsView = (): JSX.Element => {
         model={model}
         editRights={editRights}
         modelsWithFinalGrades={modelsWithFinalGrades}
+        finalGradeCount={finalGradeCounts[model.id] ?? 0}
         onEdit={() => {
           setEditDialogModel(model);
           setEditDialogOpen(true);

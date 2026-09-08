@@ -235,6 +235,12 @@
     "course-part-grade": "Kurssin osan arvosana",
     "not-int": "Arvon on oltava validi kokonaisluku"
   },
+  "final-grades-view": {
+    "manual-model": "Käsin",
+    "no-snapshot": "Yksityiskohtaista arviointitietoa ei ole näissä lopullisissa arvosanoissa",
+    "unknown-model": "Tuntematon arviointimalli",
+    "filter-by-model": "Suodata arviointimallin mukaan"
+  },
   "wait-list": {
     "title": "Odotuslista",
     "add-entry": "Lisää odotuslistaan",
@@ -329,7 +335,9 @@
       "max-grade-error": "Enimmäispisteiden on oltava tyhjä, nolla tai positiivinen numero",
       "no-course-parts": "Ei kurssin osia",
       "active-parts": "Aktiiviset kurssin osat",
-      "archived-parts": "Arkistoidut kurssin osat"
+      "archived-parts": "Arkistoidut kurssin osat",
+      "grade-count_one": "{{count}} arvosana",
+      "grade-count_other": "{{count}} arvosanaa"
     },
     "models": {
       "has-multiple-warnings": "Sisältää useita varoituksia",
@@ -350,6 +358,8 @@
       "unarchive": "Palauta arkistosta",
       "archive": "Arkistoi",
       "cannot-delete-with-final": "Ei voi poistaa, koska sisältää lopullisia arvosanoja",
+      "final-grade-count_one": "{{count}} lopullinen arvosana laskettu tällä mallilla",
+      "final-grade-count_other": "{{count}} lopullista arvosanaa laskettu tällä mallilla",
       "delete-grading-model": "Poista arviointimalli",
       "model-not-found": "Mallia ei löytynyt tunnisteella {{model}}",
       "grade-not-found": "Arvosanaa ei löytynyt käyttäjälle {{user}}",
@@ -405,6 +415,9 @@
       "show-model-parts": "Näytä mallin osat",
       "showing-n-rows": "Näytetään {{n}} riviä",
       "n-errors": "{{n}} virhettä",
+      "hide-exported-sisu": "Piilota Sisuun viety",
+      "show-active-only": "Näytä vain aktiiviset",
+      "active-task-ids": "Aktiiviset tehtävä-IDt",
       "final-downloaded": "Lopullinen arvosana ladattu",
       "download-at-least-one": "Lataa vähintään yksi",
       "fetching-sisu-csv": "Haetaan Sisu CSV",
@@ -497,6 +510,13 @@
       "grade-update-fail": "Arvosanan päivitys epäonnistui",
       "items-updated-success": "Päivitetty {{count}} kohdetta onnistuneesti",
       "items-update-fail": "Kohteiden päivitys epäonnistui",
+      "delete-selected_one": "Poista {{count}} valittu kohde",
+      "delete-selected_other": "Poista {{count}} valittua kohdetta",
+      "delete-selected-message_one": "Haluatko varmasti poistaa valitun arvosanan? Tätä ei voi perua.",
+      "delete-selected-message_other": "Haluatko varmasti poistaa valitut arvosanat? Tätä ei voi perua.",
+      "items-deleted-success_one": "{{count}} kohde poistettu onnistuneesti",
+      "items-deleted-success_other": "{{count}} kohdetta poistettu onnistuneesti",
+      "items-delete-fail": "Kohteiden poisto epäonnistui",
       "group-by": "Ryhmittely mukaan",
       "group-by-task": "Arviointimallin",
       "group-by-date": "Päivämäärän",

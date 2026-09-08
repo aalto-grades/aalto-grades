@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 The Ossi Developers
+// SPDX-FileCopyrightText: 2026 The Ossi Developers
 //
 // SPDX-License-Identifier: MIT
 
@@ -12,23 +12,45 @@ import {
   Tooltip,
   useTheme,
 } from '@mui/material';
-import {type JSX, type MouseEvent, forwardRef, useMemo, useState} from 'react';
+import type {RowData} from '@tanstack/react-table';
+import {type JSX, type MouseEvent, type Ref, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
-import {useTableContext} from '@/context/useTableContext';
+import type {SharedTable} from './features';
 
-/** Toggle a string in an array */
-const toggleString = (arr: string[], str: string): string[] => {
-  const index = arr.indexOf(str);
-  if (index > -1) arr.splice(index, 1);
-  else arr.push(str);
+/**
+ * Toggle a string in an array.
+ *
+ * Must stay immutable: TanStack v9 compares the updater result against the
+ * current state slice and drops it when the contents are unchanged, so
+ * mutating the previous array would make the update a silent no-op.
+ */
+const toggleString = (arr: string[], str: string): string[] =>
+  arr.includes(str) ? arr.filter(e => e !== str) : [...arr, str];
 
-  return arr;
+export type GroupByElement = {
+  id: string;
+  name: string;
+  info?: string;
 };
 
-const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
+type PropsType<TData extends RowData> = {
+  table: SharedTable<TData>;
+  /**
+   * Extra grouping options shown above the automatically detected source
+   * columns (columns with `meta.coursePart`). Each inner array becomes a
+   * section separated by a divider.
+   */
+  extraGroups?: GroupByElement[][];
+  ref?: Ref<HTMLSpanElement>;
+};
+
+const GroupByButton = <TData extends RowData>({
+  table,
+  extraGroups = [],
+  ref,
+}: PropsType<TData>): JSX.Element => {
   const {t} = useTranslation();
-  const {table} = useTableContext();
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -39,34 +61,27 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
   const handleClose = (): void => {
     setAnchorEl(null);
   };
-  const groupByElements = [
-    [
-      {
-        id: 'latestBestGrade',
-        name: t('course.results.table.latest-grade'),
-        info: t('course.results.group-by-latest-grade'),
-      },
-      {id: 'Exported to Sisu', name: t('course.results.table.exported')},
-      {id: 'finalGrade', name: t('general.final-grade')},
-      {id: 'Grade preview', name: t('course.results.table.preview')},
-    ],
 
-    table
-      .getAllColumns()
-      .filter(c => c.columnDef.meta?.coursePart)
-      .map(column => ({
-        id: column.id,
-        name: column.id,
-        info: column.id,
-      })),
-  ];
+  const sourceGroups = table
+    .getAllColumns()
+    .filter(c => c.columnDef.meta?.coursePart)
+    .map(column => ({
+      id: column.id,
+      name: column.id,
+      info: column.id,
+    }));
+
+  const groupByElements = [
+    ...extraGroups,
+    sourceGroups,
+  ].filter(group => group.length > 0);
 
   const tableGrouping = table.state.grouping;
   const isActive = useMemo(() => tableGrouping.length > 0, [tableGrouping]);
 
   return (
     <>
-      <span {...props} style={{display: 'flex'}} ref={ref}>
+      <span style={{display: 'flex'}} ref={ref}>
         <ButtonBase
           sx={{
             display: 'flex',
@@ -101,7 +116,7 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
             {t('course.results.group-by', {
               grouping: groupByElements
                 .flat()
-                .filter(el => table.state.grouping.includes(el.id))
+                .filter(el => tableGrouping.includes(el.id))
                 .map(el => el.name)
                 .join(', '),
             })}
@@ -148,17 +163,14 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
           ...groups.map(element => (
             <Tooltip
               key={element.id}
-              title={element.info}
+              title={element.info ?? element.name}
               placement="top"
               disableInteractive
             >
               <MenuItem
-                selected={table.state.grouping.includes(element.id)}
+                selected={tableGrouping.includes(element.id)}
                 onClick={() => {
-                  console.log(table.getAllColumns());
-                  table.setGrouping(old =>
-                    structuredClone(toggleString(old, element.id))
-                  );
+                  table.setGrouping(old => toggleString(old, element.id));
                   handleClose();
                 }}
               >
@@ -175,7 +187,7 @@ const GroupByButton = forwardRef<HTMLSpanElement>((props, ref): JSX.Element => {
       </Menu>
     </>
   );
-});
+};
 
 GroupByButton.displayName = 'GroupByButton';
 

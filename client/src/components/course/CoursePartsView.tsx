@@ -19,6 +19,7 @@ import {
   Alert,
   Box,
   Button,
+  Chip,
   CircularProgress,
   Collapse,
   Grid,
@@ -97,6 +98,7 @@ type ColTypes = {
   aplusGradeSources: AplusGradeSourceData[];
   externalSources: ExternalSourceData[];
   new: boolean;
+  gradeCount: number;
 };
 
 const CoursePartsView = (): JSX.Element => {
@@ -223,6 +225,43 @@ const CoursePartsView = (): JSX.Element => {
     return withModels;
   }, [gradingModels.data]);
 
+  // Total number of grade rows per course task
+  const taskGradeCounts = useMemo(() => {
+    const counts: {[courseTaskId: number]: number} = {};
+    if (grades.data === undefined) return counts;
+    for (const studentRow of grades.data) {
+      for (const courseTask of studentRow.courseTasks) {
+        counts[courseTask.courseTaskId] =
+          (counts[courseTask.courseTaskId] ?? 0) + courseTask.grades.length;
+      }
+    }
+    return counts;
+  }, [grades.data]);
+
+  // Total number of grade rows per course part (sum of its tasks)
+  const coursePartGradeCounts = useMemo(() => {
+    const counts: {[coursePartId: number]: number} = {};
+    if (courseTasks.data === undefined) return counts;
+    for (const courseTask of courseTasks.data) {
+      counts[courseTask.coursePartId] =
+        (counts[courseTask.coursePartId] ?? 0)
+        + (taskGradeCounts[courseTask.id] ?? 0);
+    }
+    return counts;
+  }, [courseTasks.data, taskGradeCounts]);
+
+  // Number of final grades calculated with each grading model
+  const finalGradeCounts = useMemo(() => {
+    const counts: {[gradingModelId: number]: number} = {};
+    if (finalGrades.data === undefined) return counts;
+    for (const finalGrade of finalGrades.data) {
+      if (finalGrade.gradingModelId !== null)
+        counts[finalGrade.gradingModelId] =
+          (counts[finalGrade.gradingModelId] ?? 0) + 1;
+    }
+    return counts;
+  }, [finalGrades.data]);
+
   const courseTasksByCoursePartId = (coursePartId: number): Array<number> => {
     if (courseTasks.data) {
       return courseTasks.data
@@ -312,6 +351,7 @@ const CoursePartsView = (): JSX.Element => {
         aplusGradeSources: courseTask.aplusGradeSources ?? [],
         externalSources: courseTask.externalSources ?? [],
         new: false,
+        gradeCount: taskGradeCounts[courseTask.id] ?? 0,
       }));
     setRows(newRows);
     setInitRows(structuredClone(newRows));
@@ -523,6 +563,20 @@ const CoursePartsView = (): JSX.Element => {
         secondaryAction={
           (
             <Box sx={{display: 'flex', alignItems: 'center'}}>
+              {(coursePartGradeCounts[coursePart.id] ?? 0) > 0 && (
+                <Tooltip
+                  placement="top"
+                  title={t('course.parts.grade-count', {
+                    count: coursePartGradeCounts[coursePart.id] ?? 0,
+                  })}
+                >
+                  <Chip
+                    size="small"
+                    label={coursePartGradeCounts[coursePart.id] ?? 0}
+                    sx={{mr: 1}}
+                  />
+                </Tooltip>
+              )}
               {hasModel && (
                 <Tooltip placement="top" title={t('course.parts.view-model')}>
                   <IconButton
@@ -729,6 +783,13 @@ const CoursePartsView = (): JSX.Element => {
       width: 150,
     },
     {
+      field: 'gradeCount',
+      headerName: '#' + t('general.grades'),
+      type: 'number',
+      width: 110,
+      sortable: true,
+    },
+    {
       field: 'archived',
       headerName: t('course.parts.archived'),
       type: 'boolean',
@@ -760,6 +821,7 @@ const CoursePartsView = (): JSX.Element => {
           aplusGradeSources: [],
           externalSources: [],
           new: true,
+          gradeCount: 0,
         };
         return oldRows.concat(newRow);
       });
@@ -1056,6 +1118,7 @@ const CoursePartsView = (): JSX.Element => {
                       model={model}
                       editRights={editRights}
                       modelsWithFinalGrades={modelsWithFinalGrades}
+                      finalGradeCount={finalGradeCounts[model.id] ?? 0}
                       onEdit={() => {
                         setRenameModel(model);
                         setRenameModelDialogOpen(true);
@@ -1098,6 +1161,7 @@ const CoursePartsView = (): JSX.Element => {
                       model={model}
                       editRights={editRights}
                       modelsWithFinalGrades={modelsWithFinalGrades}
+                      finalGradeCount={finalGradeCounts[model.id] ?? 0}
                       onEdit={() => {
                         setRenameModel(model);
                         setRenameModelDialogOpen(true);

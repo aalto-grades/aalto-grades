@@ -11,7 +11,8 @@ import {useParams} from 'react-router-dom';
 
 import type {GradingScale} from '@/common/types';
 import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
-import type {GroupedStudentRow, features} from '@/context/GradesTableProvider';
+import type {features} from '@/components/shared/table/features';
+import type {GroupedStudentRow} from '@/context/GradesTableProvider';
 import {useGetAllGradingModels} from '@/hooks/useApi';
 import {getGradeString} from '@/utils';
 
@@ -47,7 +48,7 @@ const PredictedGradeCell = ({
   );
 
   let previewValue = 'N/A';
-  if (gradingScale === null) previewValue = value ? value.toString() : '0';
+  if (gradingScale === null) previewValue = value ? value.toString() : '-';
   else {
     previewValue = gradingModelIds
       .map(modelId =>

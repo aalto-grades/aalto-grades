@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import type {ActionType, CourseRoleType} from '@/common/types';
+import type {ActionType, CourseRoleType, FinalGradeFrozenInfo} from '@/common/types';
 import type TaskGrade from '../database/models/taskGrade';
 
 export type NewDbCourseRole = {
@@ -21,6 +21,7 @@ export type NewDbFinalGradeData = {
   date: Date;
   sisuExportDate?: Date | null;
   comment?: string | null;
+  frozenInfo?: FinalGradeFrozenInfo | null;
 };
 
 export type NewDbTaskGradeData = {

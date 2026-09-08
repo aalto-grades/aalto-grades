@@ -35,6 +35,7 @@ import GradesView from './components/course/GradesView';
 import ModelsView from './components/course/ModelsView';
 import TimelineView from './components/course/TimelineView';
 import WaitListView from './components/course/WaitListView';
+import FinalGradesView from './components/course/finalized-grades-view/FinalGradesView';
 import ConfirmDialog from './components/shared/ConfirmDialog';
 import NotistackWrapper from './context/NotistackWrapper';
 import type {CustomError} from './types';
@@ -44,25 +45,29 @@ const ErrorSnackbarContent = ({
 }: {
   error: CustomError;
 }): JSX.Element => {
-  let jsonError: Array<{message: string}> | undefined = undefined;
-  if (error?.message.length <= 100) {
+  let jsonError: Array<{message: string}> | undefined = error?.issues;
+  if (error?.message.length <= 100 && jsonError === undefined)
     return <>{error?.message}</>;
-  } else {
+
+  if (jsonError === undefined) {
     try {
       jsonError = JSON.parse(error.message) as Array<{message: string}>;
     } catch {
       jsonError = undefined;
     }
-
-    return (
-      <details>
-        <summary>
-          {`${jsonError?.length ?? ''} Errors`}
-        </summary>
-        <textarea readOnly style={{height: '200px', width: '400px', overflow: 'auto'}}>{error?.message}</textarea>
-      </details>
-    );
   }
+
+  return (
+    <details>
+      <summary>{`${jsonError?.length ?? ''} Errors`}</summary>
+      <textarea
+        readOnly
+        style={{height: '200px', width: '400px', overflow: 'auto'}}
+      >
+        {error?.message}
+      </textarea>
+    </details>
+  );
 };
 
 let globalModalRef: GlobalModalWrapper | null = null;
@@ -169,6 +174,10 @@ const router = createBrowserRouter([
               {
                 path: '/:courseId/course-results',
                 element: <GradesView />,
+              },
+              {
+                path: '/:courseId/final-grades',
+                element: <FinalGradesView />,
               },
               {
                 path: '/:courseId/wait-list',

@@ -166,8 +166,7 @@ const UploadDialog = ({open, onClose}: PropsType): JSX.Element => {
     for (const row of rows) {
       for (const courseTask of courseTaskData) {
         const grade = row[courseTask.name];
-        if (!(courseTask.name in row) || grade === null) continue; // Skip empty cells
-
+        if (!(courseTask.name in row) || grade === null || Number.isNaN(grade)) continue; // Skip empty cells
         const dateData = dates.find(
           date => date.courseTaskName === courseTask.name
         )!;

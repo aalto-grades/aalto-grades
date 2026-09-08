@@ -8,13 +8,22 @@ import {Op} from 'sequelize';
 import {
   type EditFinalGrade,
   type FinalGradeData,
+  type FinalGradeFrozenInfo,
+  type FrozenCoursePart,
+  type FrozenGradingModel,
+  type FrozenTaskGrade,
   GradingScale,
+  type GraphStructure,
   HttpCode,
   type NewFinalGrade,
   type SisuCsvUpload,
   WaitListStatus,
 } from '@/common/types';
+import CoursePart from '../database/models/coursePart';
+import CourseTask from '../database/models/courseTask';
 import FinalGrade from '../database/models/finalGrade';
+import GradingModel from '../database/models/gradingModel';
+import TaskGrade from '../database/models/taskGrade';
 import User from '../database/models/user';
 import WaitListEntry from '../database/models/waitListEntry';
 import {
@@ -70,10 +79,168 @@ export const getFinalGrades: Endpoint<void, FinalGradeData[]> = async (
       date: new Date(finalGrade.date),
       sisuExportDate: finalGrade.sisuExportDate,
       comment: finalGrade.comment,
+      frozenInfo: finalGrade.frozenInfo as FinalGradeFrozenInfo | null,
     });
   }
 
   return res.json(finalGrades);
+};
+
+const toIsoDate = (date: Date | string | null): string | null =>
+  date === null ? null : new Date(date).toISOString();
+
+const isExpired = (date: Date | null): boolean =>
+  date !== null && Date.now() > date.getTime();
+
+/** Whether a grade has expired, taking the expiry date of its course part into account */
+const gradeIsExpired = (
+  grade: TaskGrade,
+  partExpiryDate: Date | null | undefined
+): boolean => {
+  if (grade.expiryDate !== null && !isExpired(new Date(grade.expiryDate)))
+    return false;
+  return (
+    isExpired(grade.expiryDate === null ? null : new Date(grade.expiryDate))
+    || isExpired(partExpiryDate ?? null)
+  );
+};
+
+/** Whether a grade is better than another, newer grades winning ties */
+const gradeIsBetter = (grade: TaskGrade, other: TaskGrade): boolean => {
+  if (grade.grade !== other.grade) return grade.grade > other.grade;
+  const date = new Date(grade.date).getTime();
+  const otherDate = new Date(other.date).getTime();
+  if (date !== otherDate) return date > otherDate;
+  return grade.id > other.id;
+};
+
+/** Hard copy of a grading model */
+const freezeGradingModel = (
+  model: GradingModel
+): FrozenGradingModel => ({
+  id: model.id,
+  name: model.name,
+  graphStructure: model.graphStructure,
+});
+
+/** Ids of the sources (course parts or tasks) feeding a grading graph */
+const graphSourceIds = (graphStructure: GraphStructure): number[] =>
+  graphStructure.nodes
+    .filter(node => node.type === 'source')
+    .map(node => Number.parseInt(node.id.split('-')[1] ?? '', 10))
+    .filter(id => !Number.isNaN(id));
+
+/**
+ * Builds the frozen snapshot of grading data for a set of students.
+ * The snapshot contains hard copies of the grading model, the course parts it
+ * uses with their grading models, and the tasks with each student's grades, so
+ * the data stays intact even if models or tasks change later. Parts, tasks and
+ * grades not used by the model are left out.
+ */
+const buildFrozenInfos = async (
+  courseId: number,
+  userIds: number[],
+  gradingModel: GradingModel
+): Promise<Map<number, FinalGradeFrozenInfo>> => {
+  const sources = graphSourceIds(gradingModel.graphStructure);
+  // A final grade model takes course parts as sources, a course part model
+  // takes the tasks of a single part
+  const partIds = gradingModel.coursePartId === null
+    ? sources
+    : [gradingModel.coursePartId];
+
+  const courseParts = await CoursePart.findAll({
+    where: {id: partIds},
+  });
+  const partModels = await GradingModel.findAll({
+    where: {coursePartId: partIds},
+  });
+  const courseTasks = await CourseTask.findAll({
+    where:
+      gradingModel.coursePartId === null
+        ? {
+            id: partModels.flatMap(model =>
+              graphSourceIds(model.graphStructure)
+            ),
+          }
+        : {id: sources},
+  });
+
+  const modelsByPart = new Map<number, FrozenGradingModel>(
+    partModels.map(model => [
+      model.coursePartId as number,
+      freezeGradingModel(model),
+    ])
+  );
+
+  const frozenCourseParts: FrozenCoursePart[] = courseParts
+    .map(part => ({
+      id: part.id,
+      name: part.name,
+      expiryDate: toIsoDate(part.expiryDate),
+      gradingModel: modelsByPart.get(part.id) ?? null,
+    }))
+    .sort((a, b) => a.id - b.id);
+
+  const taskGrades = await TaskGrade.findAll({
+    where: {
+      userId: {[Op.in]: userIds},
+      courseTaskId: courseTasks.map(task => task.id),
+    },
+    order: [['id', 'ASC']],
+  });
+
+  const taskById = new Map(courseTasks.map(task => [task.id, task]));
+  const expiryDateByPart = new Map(
+    courseParts.map(part => [
+      part.id,
+      part.expiryDate === null ? null : new Date(part.expiryDate),
+    ])
+  );
+  // Only the grade actually used by the calculation is worth keeping
+  const usedGrades = new Map<string, TaskGrade>();
+  for (const taskGrade of taskGrades) {
+    const partExpiryDate = expiryDateByPart.get(
+      taskById.get(taskGrade.courseTaskId)?.coursePartId ?? -1
+    );
+    if (gradeIsExpired(taskGrade, partExpiryDate)) continue;
+    const key = `${taskGrade.userId}:${taskGrade.courseTaskId}`;
+    const previous = usedGrades.get(key);
+    if (previous === undefined || gradeIsBetter(taskGrade, previous))
+      usedGrades.set(key, taskGrade);
+  }
+
+  const gradesByTaskUser = new Map<string, FrozenTaskGrade[]>();
+  for (const [key, taskGrade] of usedGrades) {
+    gradesByTaskUser.set(key, [
+      {
+        grade: taskGrade.grade,
+        date: toIsoDate(taskGrade.date) as string,
+        expiryDate: toIsoDate(taskGrade.expiryDate) as string | null,
+      },
+    ]);
+  }
+
+  return new Map(
+    userIds.map(userId => [
+      userId,
+      {
+        gradingModel: freezeGradingModel(gradingModel),
+        courseParts: frozenCourseParts,
+        tasks: courseTasks
+          .map(task => ({
+            id: task.id,
+            coursePartId: task.coursePartId,
+            name: task.name,
+            daysValid: task.daysValid,
+            maxGrade: task.maxGrade,
+            grades: gradesByTaskUser.get(`${userId}:${task.id}`) ?? [],
+          }))
+          .filter(task => task.grades.length > 0)
+          .sort((a, b) => a.id - b.id),
+      },
+    ])
+  );
 };
 
 /**
@@ -133,8 +300,27 @@ export const addFinalGrades: Endpoint<NewFinalGrade[], void> = async (
       );
     }
   }
+  const modelsById = new Map<number, GradingModel>();
   for (const modelId of gradingModels) {
-    await validateGradingModelBelongsToCourse(course.id, modelId);
+    const [, model] = await validateGradingModelBelongsToCourse(course.id, modelId);
+    modelsById.set(modelId, model);
+  }
+
+  // Snapshot the grading data used for the final grades. Manual grades have
+  // no model and thus nothing to snapshot
+  const frozenInfos = new Map<string, FinalGradeFrozenInfo>();
+  const userIdsByModel = new Map<number, number[]>();
+  for (const finalGrade of req.body) {
+    if (finalGrade.gradingModelId === null) continue;
+    if (!userIdsByModel.has(finalGrade.gradingModelId))
+      userIdsByModel.set(finalGrade.gradingModelId, []);
+    userIdsByModel.get(finalGrade.gradingModelId)?.push(finalGrade.userId);
+  }
+  for (const [modelId, userIdsForModel] of userIdsByModel) {
+    const model = modelsById.get(modelId);
+    if (model === undefined) continue;
+    const infos = await buildFrozenInfos(course.id, userIdsForModel, model);
+    for (const [userId, info] of infos) frozenInfos.set(`${userId}:${modelId}`, info);
   }
 
   const preparedBulkCreate: NewDbFinalGradeData[] = req.body.map(
@@ -146,6 +332,7 @@ export const addFinalGrades: Endpoint<NewFinalGrade[], void> = async (
       date: finalGrade.date,
       grade: finalGrade.grade,
       comment: finalGrade.comment,
+      frozenInfo: frozenInfos.get(`${finalGrade.userId}:${finalGrade.gradingModelId ?? null}`) ?? null,
     })
   );
 

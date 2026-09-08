@@ -40,13 +40,29 @@ export const nullableDateSchema = (
 ) =>
   z.iso.date().pipe(z.coerce.date()).nullable();
 
+export type ZodIssueLike = {
+  path?: Array<string | number>;
+  message: string;
+};
+
 export class CustomError extends Error {
   action?: () => JSX.Element;
+  /** Structured validation issues, when available, for error display */
+  issues?: ZodIssueLike[];
 
-  constructor({message, action}: {message: string; action: () => JSX.Element}) {
+  constructor({
+    message,
+    action,
+    issues,
+  }: {
+    message: string;
+    action?: () => JSX.Element;
+    issues?: ZodIssueLike[];
+  }) {
     super();
     this.message = message;
     this.action = action;
+    this.issues = issues;
   }
 }
 

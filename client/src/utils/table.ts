@@ -84,9 +84,7 @@ export const predictGrades = (
   gradingModels: GradingModelData[],
   gradeSelectOption: GradeSelectOption,
   getCoursePartExpiryDate: (courseTaskId: number) => Date | null | undefined
-): {
-  [key: GradingModelData['id']]: ReturnType<typeof batchCalculateFinalGrades>;
-} => {
+) => {
   const result: {
     [key: GradingModelData['id']]: ReturnType<typeof batchCalculateFinalGrades>;
   } = {};
@@ -95,19 +93,28 @@ export const predictGrades = (
     result[gradingModel.id] = batchCalculateFinalGrades(
       gradingModel,
       gradingModels,
-      rows.map(row => ({
-        userId: row.user.id,
-        courseTasks: row.courseTasks.map(task => ({
-          id: task.courseTaskId,
-          // TODO: Manage expired task grades? (#696)
-          grade:
-            findBestGrade(
-              task.grades,
-              getCoursePartExpiryDate(task.courseTaskId),
-              {expiredOption: 'non_expired', gradeSelectOption}
-            )?.grade ?? 0,
-        })),
-      }))
+      rows.flatMap((row) => {
+        const courseTasks = row.courseTasks.flatMap((task) => {
+          const grade = findBestGrade(
+            task.grades,
+            getCoursePartExpiryDate(task.courseTaskId),
+            {expiredOption: 'non_expired', gradeSelectOption}
+          )?.grade;
+          return (grade === undefined)
+            ? []
+            : [{
+                id: task.courseTaskId,
+                grade: grade,
+              }];
+        });
+        return (courseTasks.length === 0)
+          ? []
+          : [{
+              userId: row.user.id,
+              courseTasks: courseTasks,
+            }];
+      }
+      )
     );
   }
   return result;
@@ -150,7 +157,8 @@ export const predictedGradesErrorCheck = (
   const errors: RowError[] = [];
   for (const [modelId, grade] of Object.entries(studentPredictedGrades)) {
     // Check if model is a course part model.
-    if (Object.keys(grade.courseParts).length === 0) continue;
+    if (grade === undefined) continue;
+    if (Object.keys(grade.courseParts ?? {}).length === 0) continue;
 
     if (grade.finalGrade % 1 !== 0) {
       errors.push({
@@ -274,4 +282,110 @@ export const getErrorCount = (
   }
 
   return totalErrors;
+};
+
+/**
+ * Source IDs of the (non-archived) sources in a grading model.
+ * In course part models source node IDs are course task IDs, while in
+ * final-grade models (coursePartId === null) they are course part IDs.
+ */
+export type GradingModelSourceIds = {
+  taskIds: Set<number>;
+  partIds: Set<number>;
+};
+
+/**
+ * Gets the set of source task IDs and course part IDs from a grading model
+ * (or from all models when 'any' is selected)
+ */
+export const getGradingModelSourceIds = (
+  models: GradingModelData | 'any',
+  allModels: GradingModelData[] = []
+): GradingModelSourceIds => {
+  const modelsToUse = models === 'any' ? allModels : [models];
+
+  const taskIds = new Set<number>();
+  const partIds = new Set<number>();
+
+  for (const model of modelsToUse) {
+    if (model.archived) continue;
+    const ids = model.graphStructure.nodes
+      .filter(node => node.type === 'source')
+      .map(node => parseInt(node.id.split('-')[1]));
+
+    if (model.coursePartId === null) {
+      for (const id of ids) partIds.add(id);
+    } else {
+      for (const id of ids) taskIds.add(id);
+    }
+  }
+
+  return {taskIds, partIds};
+};
+
+/**
+ * Checks if a student has at least one non-expired grade in relevant tasks
+ * @param studentRow - The student row to check
+ * @param sourceIds - IDs of the sources in the grading model (task or part IDs)
+ * @param courseTasks - Course task metadata, used to map tasks to course parts
+ * @param getCoursePartExpiryDate - Function to get expiry date for a task from course part
+ * @returns Object with hasActiveGrade flag and list of active task IDs
+ */
+export const checkStudentActiveGrades = (
+  studentRow: StudentRow,
+  sourceIds: GradingModelSourceIds,
+  courseTasks: CourseTaskData[],
+  getCoursePartExpiryDate: (courseTaskId: number) => Date | null | undefined
+): {hasActiveGrade: boolean; activeTaskIds: number[]} => {
+  const activeTaskIds: number[] = [];
+  const now = new Date();
+
+  const coursePartIdByTaskId = new Map(
+    courseTasks.map(task => [task.id, task.coursePartId])
+  );
+
+  for (const task of studentRow.courseTasks) {
+    // Only consider tasks that are part of the selected grading model.
+    // A task is relevant if it is a source itself, or if it belongs to a
+    // course part that is a source (final-grade models).
+    const partId = coursePartIdByTaskId.get(task.courseTaskId);
+    const inPartSource = partId !== undefined && sourceIds.partIds.has(partId);
+    if (!sourceIds.taskIds.has(task.courseTaskId) && !inPartSource) {
+      continue;
+    }
+
+    // Get the expiry date from the course part
+    const taskExpiryDate = getCoursePartExpiryDate(task.courseTaskId);
+
+    // Check if any grade in this task is still active (not expired)
+    const hasActiveGrade = task.grades.some((grade) => {
+      // First check the grade's own expiryDate if it exists
+      if (grade.expiryDate !== null && grade.expiryDate !== undefined) {
+        const gradeExpiryDate = new Date(grade.expiryDate);
+        if (now > gradeExpiryDate) {
+          return false; // Grade is expired
+        }
+      }
+
+      // Also check the task's expiry date from course part
+      if (taskExpiryDate !== null && taskExpiryDate !== undefined) {
+        const taskExpiry = new Date(taskExpiryDate);
+        if (now > taskExpiry) {
+          return false; // Task is expired
+        }
+      }
+
+      // If we get here, the grade is not expired
+      return true;
+    });
+
+    if (hasActiveGrade) {
+      activeTaskIds.push(task.courseTaskId);
+    }
+  }
+
+  return {
+    hasActiveGrade: activeTaskIds.length > 0,
+    activeTaskIds,
+  };
 };

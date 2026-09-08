@@ -15,6 +15,8 @@ import {
   TimelineOutlined,
   Widgets,
   WidgetsOutlined,
+  WorkspacePremium,
+  WorkspacePremiumOutlined,
 } from '@mui/icons-material';
 import {
   Box,
@@ -123,6 +125,12 @@ const SideMenu = (): JSX.Element => {
           to={`/${courseId}/course-results`}
           Icon={FlagCircle}
           IconOutlined={FlagCircleOutlined}
+        />
+        <SideMenuButton
+          text={t('general.final-grades')}
+          to={`/${courseId}/final-grades`}
+          Icon={WorkspacePremium}
+          IconOutlined={WorkspacePremiumOutlined}
         />
         <SideMenuButton
           text={t('wait-list.title')}

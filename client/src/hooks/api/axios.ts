@@ -4,10 +4,10 @@
 
 import axios from 'axios';
 import {t} from 'i18next';
-import type {ZodError} from 'zod';
 
 import LoginAgainButton from '@/components/shared/LoginAgainButton';
 import {CustomError} from '@/types';
+import {extractZodIssues, formatZodIssues} from '@/utils/apiErrors';
 
 const axiosInstance = axios.create({
   withCredentials: true,
@@ -17,17 +17,20 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use((response) => {
   const resData = response.data as
     | {errors: string[]}
-    | {errors: ZodError}[]
+    | Array<{type: string; errors: unknown}>
     | null; // Type is missing non-error states
 
   // Zod error
   if (response.status === 400 && Array.isArray(resData)) {
-    const resErrors = resData[0];
+    const issues = extractZodIssues(resData);
+    if (issues !== null) {
+      throw new CustomError({
+        message: `${response.status} - ${response.statusText}: ${formatZodIssues(issues)}`,
+        issues,
+      });
+    }
     throw new Error(
-      `${response.status} - ${response.statusText}: `
-      + resErrors.errors.issues
-        .map(issue => `'/${issue.path.join('/')} : ${issue.message}'`)
-        .join(', ')
+      `${response.status} - ${response.statusText}: ${JSON.stringify(resData)}`
     );
   }
 

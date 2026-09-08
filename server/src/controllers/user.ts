@@ -11,6 +11,7 @@ import {
   type CourseData,
   CourseRoleType,
   type CourseWithFinalGrades,
+  type FinalGradeFrozenInfo,
   type FullUserData,
   HttpCode,
   type NewUser,
@@ -149,6 +150,7 @@ export const getCoursesOfUser: Endpoint<void, CourseWithFinalGrades[]> = async (
           date: new Date(finalGrade.date),
           sisuExportDate: finalGrade.sisuExportDate,
           comment: finalGrade.comment,
+          frozenInfo: finalGrade.frozenInfo as FinalGradeFrozenInfo | null,
         };
       }),
     });

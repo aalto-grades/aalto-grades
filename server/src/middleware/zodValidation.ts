@@ -21,7 +21,7 @@ export const processRequestBody = <T>(schema: z.ZodType<T>) => {
         res.status(HttpCode.BadRequest).json([
           {
             type: 'Body',
-            errors: result.error,
+            errors: {issues: result.error.issues},
           },
         ]);
         return;
@@ -61,7 +61,7 @@ export const processRequestQuery = <T>(schema: z.ZodType<T>) => {
         res.status(HttpCode.BadRequest).json([
           {
             type: 'Query',
-            errors: result.error,
+            errors: {issues: result.error.issues},
           },
         ]);
         return;
@@ -93,7 +93,7 @@ export const processRequestParams = <T>(schema: z.ZodType<T>) => {
         res.status(HttpCode.BadRequest).json([
           {
             type: 'Params',
-            errors: result.error,
+            errors: {issues: result.error.issues},
           },
         ]);
         return;
@@ -123,13 +123,13 @@ export const processRequest = <
 ) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {
-      const errors: Array<{type: string; errors: z.ZodError}> = [];
+      const errors: Array<{type: string; errors: {issues: z.ZodIssue[]}}> = [];
 
       // Validate body
       if (schemas.body) {
         const bodyResult = schemas.body.safeParse(req.body);
         if (!bodyResult.success) {
-          errors.push({type: 'Body', errors: bodyResult.error});
+          errors.push({type: 'Body', errors: {issues: bodyResult.error.issues}});
         } else {
           req.body = bodyResult.data;
         }
@@ -139,7 +139,7 @@ export const processRequest = <
       if (schemas.query) {
         const queryResult = schemas.query.safeParse(req.query);
         if (!queryResult.success) {
-          errors.push({type: 'Query', errors: queryResult.error});
+          errors.push({type: 'Query', errors: {issues: queryResult.error.issues}});
         } else {
           req.query = queryResult.data as typeof req.query;
         }
@@ -149,7 +149,7 @@ export const processRequest = <
       if (schemas.params) {
         const paramsResult = schemas.params.safeParse(req.params);
         if (!paramsResult.success) {
-          errors.push({type: 'Params', errors: paramsResult.error});
+          errors.push({type: 'Params', errors: {issues: paramsResult.error.issues}});
         } else {
           req.params = paramsResult.data as Record<string, string>;
         }
