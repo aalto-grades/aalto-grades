@@ -59,7 +59,7 @@ const GradesTableToolbar = (): JSX.Element => {
         name: t('course.results.table.latest-grade'),
         info: t('course.results.group-by-latest-grade'),
       },
-      {id: 'Exported to Sisu', name: t('course.results.table.exported')},
+      {id: 'exportedToSisu', name: t('course.results.table.exported')},
       {id: 'finalGrade', name: t('general.final-grade')},
       {id: 'Grade preview', name: t('course.results.table.preview')},
     ],
@@ -514,16 +514,16 @@ const GradesTableToolbar = (): JSX.Element => {
                 height: '36px',
                 boxSizing: 'border-box',
                 border:
-                  table.getColumn('Exported to Sisu')?.getFilterValue() === 'hideExported'
+                  table.getColumn('exportedToSisu')?.getFilterValue() === 'hideExported'
                     ? `1px solid ${theme.palette.success.main}`
                     : 'none',
               }}
               onClick={() => {
-                const currentFilter = table.getColumn('Exported to Sisu')?.getFilterValue();
+                const currentFilter = table.getColumn('exportedToSisu')?.getFilterValue();
                 if (currentFilter === 'hideExported') {
-                  table.getColumn('Exported to Sisu')?.setFilterValue(undefined);
+                  table.getColumn('exportedToSisu')?.setFilterValue(undefined);
                 } else {
-                  table.getColumn('Exported to Sisu')?.setFilterValue('hideExported');
+                  table.getColumn('exportedToSisu')?.setFilterValue('hideExported');
                 }
               }}
             >

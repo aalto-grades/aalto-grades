@@ -4,8 +4,11 @@
 
 import {Download} from '@mui/icons-material';
 import {Box, Button, Fade, Tooltip, useTheme} from '@mui/material';
+import {enqueueSnackbar} from 'notistack';
 import {type JSX, useState} from 'react';
+import {AsyncConfirmationModal} from 'react-global-modal';
 import {useTranslation} from 'react-i18next';
+import {useParams} from 'react-router-dom';
 
 import SisuDownloadDialog from '@/components/course/course-results-view/SisuDownloadDialog';
 import Search from '@/components/shared/Search';
@@ -15,13 +18,18 @@ import FilterMenuButton, {
 import GroupByButton, {type GroupByElement} from '@/components/shared/table/GroupByButton';
 import {useTableSearch} from '@/components/shared/table/useTableSearch';
 import {useFinalGradesTableContext} from '@/context/useFinalGradesTableContext';
+import {useDeleteFinalGrades, useUndoSisuExportFinalGrades} from '@/hooks/useApi';
 
 const FinalGradesToolbar = (): JSX.Element => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const {courseId} = useParams() as {courseId: string};
   const {table, selectedModel, setSelectedModel, modelOptions} =
     useFinalGradesTableContext();
   const {searchValue, handleSearch, resetSearch} = useTableSearch(table);
+
+  const deleteFinalGrades = useDeleteFinalGrades(courseId);
+  const undoSisuExportFinalGrades = useUndoSisuExportFinalGrades(courseId);
 
   const [showSisuDialog, setShowSisuDialog] = useState(false);
 
@@ -30,13 +38,57 @@ const FinalGradesToolbar = (): JSX.Element => {
       {id: 'model', name: t('general.grading-model')},
       {id: 'finalGrade', name: t('general.final-grade')},
       {id: 'date', name: t('general.date')},
-      {id: 'Exported to Sisu', name: t('course.results.table.exported')},
+      {id: 'exportedToSisu', name: t('course.results.table.exported')},
     ],
   ];
 
   const modelFilterOptions: FilterOption[][] = [modelOptions];
 
   const selectedRows = table.getSelectedRowModel().rows;
+
+  const handleUndoSisuExport = async (): Promise<void> => {
+    const finalGradeIds = selectedRows
+      .filter(row => row.original.sisuExportDate !== null)
+      .map(row => row.original.id);
+    if (finalGradeIds.length === 0) {
+      enqueueSnackbar(t('final-grades-view.no-exported-selected'), {
+        variant: 'info',
+      });
+      return;
+    }
+    const confirmation = await AsyncConfirmationModal({
+      title: t('final-grades-view.undo-sisu-export'),
+      message: t('final-grades-view.undo-sisu-export-confirm', {
+        count: finalGradeIds.length,
+      }),
+      confirmButtonText: t('final-grades-view.undo-sisu-export'),
+    });
+    if (!confirmation) return;
+    await undoSisuExportFinalGrades.mutateAsync(finalGradeIds);
+    table.resetRowSelection();
+    enqueueSnackbar(t('final-grades-view.sisu-export-undone'), {
+      variant: 'success',
+    });
+  };
+
+  const handleDeleteFinalGrades = async (): Promise<void> => {
+    const finalGradeIds = selectedRows.map(row => row.original.id);
+    if (finalGradeIds.length === 0) return;
+    const confirmation = await AsyncConfirmationModal({
+      title: t('final-grades-view.delete-final-grades'),
+      message: t('final-grades-view.delete-final-grades-confirm', {
+        count: finalGradeIds.length,
+      }),
+      confirmButtonText: t('general.delete'),
+      confirmDelete: true,
+    });
+    if (!confirmation) return;
+    await deleteFinalGrades.mutateAsync(finalGradeIds);
+    table.resetRowSelection();
+    enqueueSnackbar(t('final-grades-view.final-grades-deleted'), {
+      variant: 'success',
+    });
+  };
 
   return (
     <>
@@ -62,6 +114,7 @@ const FinalGradesToolbar = (): JSX.Element => {
                   p: 0.5,
                   borderRadius: 3,
                   display: 'flex',
+                  gap: 1,
                   backgroundColor: theme.palette.primary.light,
                   width: '700px',
                 }}
@@ -74,6 +127,34 @@ const FinalGradesToolbar = (): JSX.Element => {
                 >
                   {t('course.results.download-sisu-csv')}
                 </Button>
+                <Tooltip
+                  title={t('final-grades-view.undo-sisu-export-hint')}
+                  placement="top"
+                >
+                  <span>
+                    <Button
+                      variant="tonal"
+                      onClick={() => void handleUndoSisuExport()}
+                      color="primary"
+                    >
+                      {t('final-grades-view.undo-sisu-export')}
+                    </Button>
+                  </span>
+                </Tooltip>
+                <Tooltip
+                  title={t('final-grades-view.delete-final-grades-hint')}
+                  placement="top"
+                >
+                  <span>
+                    <Button
+                      variant="tonal"
+                      onClick={() => void handleDeleteFinalGrades()}
+                      color="error"
+                    >
+                      {t('final-grades-view.delete-final-grades')}
+                    </Button>
+                  </span>
+                </Tooltip>
               </Box>
             </Fade>
           )}
@@ -145,18 +226,18 @@ const FinalGradesToolbar = (): JSX.Element => {
                 height: '36px',
                 boxSizing: 'border-box',
                 border:
-                  table.getColumn('Exported to Sisu')?.getFilterValue() === 'hideExported'
+                  table.getColumn('exportedToSisu')?.getFilterValue() === 'hideExported'
                     ? `1px solid ${theme.palette.success.main}`
                     : 'none',
               }}
               onClick={() => {
                 const currentFilter = table
-                  .getColumn('Exported to Sisu')
+                  .getColumn('exportedToSisu')
                   ?.getFilterValue();
                 if (currentFilter === 'hideExported') {
-                  table.getColumn('Exported to Sisu')?.setFilterValue(undefined);
+                  table.getColumn('exportedToSisu')?.setFilterValue(undefined);
                 } else {
-                  table.getColumn('Exported to Sisu')?.setFilterValue('hideExported');
+                  table.getColumn('exportedToSisu')?.setFilterValue('hideExported');
                 }
               }}
             >

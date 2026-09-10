@@ -37,7 +37,7 @@ import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
 import PrettyChip from '@/components/shared/PrettyChip';
 import {features} from '@/components/shared/table/features';
 import {usePersistedTableState} from '@/components/shared/table/usePersistedTableState';
-import {useGetCourse} from '@/hooks/useApi';
+import {useGetAllGradingModels, useGetCourse} from '@/hooks/useApi';
 import {getGradeString} from '@/utils';
 import {bestFrozenGrade, frozenPartGrade} from '@/utils/frozen';
 
@@ -128,6 +128,8 @@ export const FinalGradesTableProvider = ({
   const {courseId} = useParams() as {courseId: string};
   const course = useGetCourse(courseId);
   const gradingScale = course.data?.gradingScale ?? GradingScale.Numerical;
+  // Live models, used to name final grades that have no frozen snapshot
+  const gradingModels = useGetAllGradingModels(courseId);
 
   // View state persisted to localStorage (shared object per course) so
   // grouping, sorting and filters survive a page refresh. Row selection and
@@ -175,9 +177,13 @@ export const FinalGradesTableProvider = ({
       buildRows(data, modelId =>
         modelId === null
           ? t('final-grades-view.manual-model')
-          : t('final-grades-view.unknown-model')
+          : (
+              gradingModels.data?.find(model => model.id === modelId)?.name
+              // Models without a frozen snapshot fall back to the id
+              ?? `#${modelId}`
+            )
       ),
-    [data, t]
+    [data, t, gradingModels.data]
   );
 
   // Model filter options, in the same order as the groups
@@ -261,6 +267,7 @@ export const FinalGradesTableProvider = ({
     header: ({table}) => (
       <>
         <Checkbox
+          size="small"
           checked={table.getIsAllRowsSelected()}
           indeterminate={table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
           onChange={table.getToggleAllRowsSelectedHandler()}
@@ -297,6 +304,7 @@ export const FinalGradesTableProvider = ({
       <PrettyChip position="last">
         <>
           <Checkbox
+            size="small"
             checked={row.getIsAllSubRowsSelected()}
             indeterminate={row.getIsSomeSelected()}
             onChange={(e) => {
@@ -319,6 +327,7 @@ export const FinalGradesTableProvider = ({
     ),
     cell: ({row}) => (
       <Checkbox
+        size="small"
         checked={row.getIsSelected()}
         onChange={row.getToggleSelectedHandler()}
         style={{
@@ -401,7 +410,7 @@ export const FinalGradesTableProvider = ({
       size: 120,
     }),
     columnHelper.accessor(row => row.sisuExportDate, {
-      id: 'Exported to Sisu',
+      id: 'exportedToSisu',
       header: t('course.results.table.exported'),
       size: 80,
       meta: {PrettyChipPosition: 'last'},

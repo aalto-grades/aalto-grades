@@ -16,6 +16,7 @@ import {
   type EditFinalGrade,
   type FinalGradeData,
   FinalGradeDataArraySchema,
+  type FinalGradeIdArray,
   type NewFinalGrade,
   type SisuCsvUpload,
 } from '@/common/types';
@@ -85,6 +86,52 @@ export const useDeleteFinalGrade = (
       queryClient.invalidateQueries({
         queryKey: ['course-parts', courseId],
       });
+    },
+    ...options,
+  });
+};
+
+const invalidateGradeQueries = (queryClient: ReturnType<typeof useQueryClient>, courseId: Numeric): void => {
+  queryClient.invalidateQueries({queryKey: ['grades', courseId]});
+  queryClient.invalidateQueries({queryKey: ['final-grades', courseId]});
+  queryClient.invalidateQueries({queryKey: ['course-parts', courseId]});
+};
+
+export const useDeleteFinalGrades = (
+  courseId: Numeric,
+  options?: UseMutationOptions<void, unknown, FinalGradeIdArray>
+): UseMutationResult<void, unknown, FinalGradeIdArray> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async finalGradeIds =>
+      axios.post(
+        `/api/v1/courses/${courseId}/final-grades/delete`,
+        finalGradeIds
+      ),
+
+    onSuccess: () => {
+      invalidateGradeQueries(queryClient, courseId);
+    },
+    ...options,
+  });
+};
+
+export const useUndoSisuExportFinalGrades = (
+  courseId: Numeric,
+  options?: UseMutationOptions<void, unknown, FinalGradeIdArray>
+): UseMutationResult<void, unknown, FinalGradeIdArray> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async finalGradeIds =>
+      axios.post(
+        `/api/v1/courses/${courseId}/final-grades/undo-sisu-export`,
+        finalGradeIds
+      ),
+
+    onSuccess: () => {
+      invalidateGradeQueries(queryClient, courseId);
     },
     ...options,
   });

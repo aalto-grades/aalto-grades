@@ -28,7 +28,6 @@ import {z} from 'zod';
 
 import {
   type CourseTaskData,
-  type FinalGradeData,
   type GradingModelData,
   GradingScale,
   type StudentRow,
@@ -52,10 +51,11 @@ import {
 import {
   findBestFinalGrade,
   findBestGrade,
+  findPreviouslyExportedToSisu,
   getCoursePartExpiryDate,
   getRowErrors,
   groupByLatestBestGrade,
-  predictGrades,
+  predictGrades
 } from '@/utils';
 import {checkStudentActiveGrades, getGradingModelSourceIds} from '@/utils/table';
 
@@ -103,31 +103,6 @@ export type ExtendedStudentRow = StudentRow & {
 
 export type GroupedStudentRow = ExtendedStudentRow & {
   latestBestGrade: string;
-};
-
-/**
- * Finds a previous grade that has been exported to Sisu, excluding the best
- * grade.
- *
- * @returns The previous grade that has been exported to Sisu, or null if not
- *   found.
- */
-const findPreviouslyExportedToSisu = (
-  bestGrade: FinalGradeData,
-  row: StudentRow
-): FinalGradeData | null => {
-  for (const fg of row.finalGrades) {
-    if (bestGrade.id === fg.id) continue; // Skip the best grade
-    if (fg.sisuExportDate === null) continue; // And those not exported to sisu
-
-    if (bestGrade.sisuExportDate !== null) {
-      // If the best grade is also exported, we need to check which one is newer
-      if (bestGrade.sisuExportDate < fg.sisuExportDate) return fg;
-    } else {
-      return fg;
-    }
-  }
-  return null;
 };
 
 const columnHelper = createColumnHelper<typeof features, GroupedStudentRow>();
@@ -187,7 +162,7 @@ export const GradesTableProvider = ({
   >(
     tableStateKey,
     'columnVisibility',
-    {errors: false, activeStudents: false},
+    {errors: false, activeStudents: false, exportedToSisu: false},
     raw => persistedStateSchemas.columnVisibility.parse(raw)
   );
   const [columnFilters, setColumnFilters] =
@@ -207,6 +182,9 @@ export const GradesTableProvider = ({
   const [userGraphData, setUserGraphData] = useState<{
     row: GroupedStudentRow;
     gradingModel: GradingModelData | null;
+    // Id of the model shown first in the model selector, e.g. the grading
+    // model of the course part the dialog was opened from
+    firstModelId?: number;
   } | null>(null);
 
   const [gradeSelectOption, setGradeSelectOption] = usePersistedTableState<
@@ -261,6 +239,17 @@ export const GradesTableProvider = ({
       });
     },
     [gradingModels, setSelectedGradingModelId]
+  );
+
+  // The exported to Sisu column is hidden by default, overriding any stale
+  // value that may have been persisted to storage, unless it is being grouped
+  // by, in which case the grouped value needs to be shown. Must stay
+  // referentially stable, otherwise the table reports a visibility change on
+  // every render and loops.
+  const exportedToSisuGrouped = grouping.includes('exportedToSisu');
+  const effectiveColumnVisibility = useMemo(
+    () => ({...columnVisibility, exportedToSisu: exportedToSisuGrouped}),
+    [columnVisibility, exportedToSisuGrouped]
   );
 
   const finalGradeModelSelected =
@@ -551,7 +540,7 @@ export const GradesTableProvider = ({
             return '-';
           },
           {
-            id: 'Exported to Sisu',
+            id: 'exportedToSisu',
             header: t('course.results.table.exported'),
             meta: {PrettyChipPosition: 'last'},
             enableHiding: true,
@@ -679,9 +668,27 @@ export const GradesTableProvider = ({
             },
             size: 80,
             cell: (info) => {
+              // Course part cells get a button for viewing the grading model
+              // graph, with the graph of this course part shown first
+              const coursePartModelId = finalGradeModelSelected
+                ? gradingModels?.find(model => model.coursePartId === source.id)
+                  ?.id
+                : undefined;
               return (
                 <GradeCell
                   cell={info.cell}
+                  onViewGraph={
+                    coursePartModelId === undefined
+                      ? undefined
+                      : () => {
+                          setUserGraphData({
+                            row: info.row.original,
+                            gradingModel: null,
+                            firstModelId: coursePartModelId,
+                          });
+                          setUserGraphOpen(true);
+                        }
+                  }
                 />
               );
             },
@@ -694,6 +701,7 @@ export const GradesTableProvider = ({
       finalGradeModelSelected,
       selectedModelSources,
       getCoursePartExpiryDateFromTaskId,
+      gradingModels,
     ]
   );
 
@@ -789,7 +797,7 @@ export const GradesTableProvider = ({
     //   return true;
     // },
     state: {
-      columnVisibility,
+      columnVisibility: effectiveColumnVisibility,
       columnFilters,
       rowSelection,
       expanded,
@@ -818,6 +826,12 @@ export const GradesTableProvider = ({
           gradingModels === undefined
             ? null
             : [...gradingModels].sort((a, b) => {
+                // Return the explicitly requested model first
+                if (userGraphData?.firstModelId !== undefined) {
+                  if (a.id === userGraphData.firstModelId) return -1;
+                  if (b.id === userGraphData.firstModelId) return 1;
+                }
+
                 // Sort final grade models first
                 if (a.coursePartId === null && b.coursePartId !== null)
                   return -1;

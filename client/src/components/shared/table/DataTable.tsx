@@ -101,7 +101,7 @@ const DataTable = <TData extends RowData>({
     : 0;
 
   return (
-    <div ref={tableContainerRef} style={{overflowY: 'auto', height}}>
+    <div ref={tableContainerRef} style={{overflowY: 'auto', overflowX: 'auto', height}}>
       <style>
         {`
         thead:hover .column-resizer {
@@ -109,7 +109,15 @@ const DataTable = <TData extends RowData>({
         }
       `}
       </style>
-      <table style={{borderCollapse: 'collapse', borderSpacing: '0'}}>
+      <table
+        style={{
+          borderCollapse: 'collapse',
+          borderSpacing: '0',
+          tableLayout: 'fixed',
+          width: 'max-content',
+          // minWidth: '100%',
+        }}
+      >
         <thead style={{position: 'sticky', top: 0, zIndex: 50}}>
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
@@ -127,9 +135,8 @@ const DataTable = <TData extends RowData>({
                         : theme.palette.primary.light,
                       borderTopRightRadius: i === headerGroup.headers.length - 1 ? 5 : 0,
                       borderTopLeftRadius: i === 0 ? 5 : 0,
-                      ...(header.column.getIsResizing() || header.getSize() !== header.getSize()
-                        ? {width: header.getSize(), maxWidth: header.getSize()}
-                        : {}),
+                      width: header.getSize(),
+                      maxWidth: header.getSize(),
                       position: 'relative',
                     }}
                   >
@@ -231,9 +238,8 @@ const DataTable = <TData extends RowData>({
                       height: `${rowHeight}px`,
                       textAlign: 'center',
                       overflow: cell.column.id === 'select' ? 'visible' : 'hidden',
-                      ...(cell.column.getIsResizing() || cell.column.getSize() !== cell.column.columnDef.size
-                        ? {width: cell.column.getSize(), maxWidth: cell.column.getSize()}
-                        : {}),
+                      width: cell.column.getSize(),
+                      maxWidth: cell.column.getSize(),
                     }}
                   >
                     <RenderCell cell={cell} />

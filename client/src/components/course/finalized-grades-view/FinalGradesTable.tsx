@@ -9,6 +9,6 @@ import {useFinalGradesTableContext} from '@/context/useFinalGradesTableContext';
 
 const FinalGradesTable = (): JSX.Element => {
   const {table} = useFinalGradesTableContext();
-  return <DataTable table={table} />;
+  return <DataTable table={table} rowHeight={32} />;
 };
 export default FinalGradesTable;
