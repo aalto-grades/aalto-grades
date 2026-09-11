@@ -100,12 +100,12 @@ const GradeCell = ({cell, onViewGraph}: GradeCellProps): ReactNode => {
     >
       <span>
         {sourceValue.type === 'courseTask'
-          ? (bestGrade?.grade ?? '-')
+          ? (sourceValue.task.grades.length > 0 && bestGrade === null) ? '-' : (bestGrade?.grade ?? null)
           // : (sourceValue.grade ?? t('course.results.not-participated'))}
           : (sourceValue.grade ?? null)}
       </span>
 
-      {onViewGraph !== undefined && (
+      {onViewGraph !== undefined && sourceValue.type !== 'courseTask' && sourceValue.grade !== null && (
         <IconButtonWithTip
           defaultVisible={false}
           onClick={onViewGraph}
