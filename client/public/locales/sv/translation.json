@@ -239,7 +239,18 @@
     "manual-model": "Manuell",
     "no-snapshot": "Detaljerad bedömningsinformation är inte tillgänglig för dessa slutbetyg",
     "unknown-model": "Okänd bedömningsmodell",
-    "filter-by-model": "Filtrera efter bedömningsmodell"
+    "filter-by-model": "Filtrera efter bedömningsmodell",
+    "undo-sisu-export": "Ångra Sisu-export",
+    "undo-sisu-export-hint": "Rensa exportdatumen för de valda slutbetygen till Sisu så att de kan exporteras igen.",
+    "undo-sisu-export-confirm_one": "Ångra Sisu-exporten för {{count}} slutbetyg? Betyget kan exporteras till Sisu igen.",
+    "undo-sisu-export-confirm_other": "Ångra Sisu-exporten för {{count}} slutbetyg? Betygen kan exporteras till Sisu igen.",
+    "sisu-export-undone": "Sisu-exporten ångrades.",
+    "no-exported-selected": "Inga av de valda slutbetygen har exporterats till Sisu.",
+    "delete-final-grades": "Ta bort slutbetyg",
+    "delete-final-grades-hint": "Ta bort de valda slutbetygen permanent.",
+    "delete-final-grades-confirm_one": "Ta bort {{count}} slutbetyg permanent? Detta kan inte ångras.",
+    "delete-final-grades-confirm_other": "Ta bort {{count}} slutbetyg permanent? Detta kan inte ångras.",
+    "final-grades-deleted": "Slutbetygen har tagits bort."
   },
   "wait-list": {
     "title": "Väntelista",
@@ -452,6 +463,9 @@
       "grade-expired-on": "Betyg löpte ut den {{date}}",
       "all-grades-expired": "Alla betyg är utgångna.",
       "view-graph": "Visa graf",
+      "exported-tooltip-exported": "Detta betyg har exporterats till Sisu",
+      "exported-tooltip-zero-exported": "Detta betyg har exporterats till Sisu, men är 0",
+      "exported-tooltip-other-exported": "Det finns ett annat nollskilt betyg som har exporterats tidigare. Du kan behöva kontakta studietjänster för att registrera ett nytt betyg i Sisu",
       "upload": {
         "bulk-edit-dialog-title": "Ange datum för valda kursdelar",
         "all-done": "Allt klart!",

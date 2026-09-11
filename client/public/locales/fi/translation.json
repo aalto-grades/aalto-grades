@@ -239,7 +239,18 @@
     "manual-model": "Käsin",
     "no-snapshot": "Yksityiskohtaista arviointitietoa ei ole näissä lopullisissa arvosanoissa",
     "unknown-model": "Tuntematon arviointimalli",
-    "filter-by-model": "Suodata arviointimallin mukaan"
+    "filter-by-model": "Suodata arviointimallin mukaan",
+    "undo-sisu-export": "Peru SISu-vienti",
+    "undo-sisu-export-hint": "Tyhjennä valittujen lopullisten arvosanojen SISu-vientipäivämäärät, jotta ne voidaan viedä uudelleen.",
+    "undo-sisu-export-confirm_one": "Peru {{count}} lopullisen arvosanan SISu-vienti? Arvosana voidaan viedä SISuun uudelleen.",
+    "undo-sisu-export-confirm_other": "Peru {{count}} lopullisen arvosanan SISu-vienti? Arvosanat voidaan viedä SISuun uudelleen.",
+    "sisu-export-undone": "SISu-vienti peruttu.",
+    "no-exported-selected": "Valituista lopullisista arvosanoista ei ole yhtään viety SISuun.",
+    "delete-final-grades": "Poista lopulliset arvosanat",
+    "delete-final-grades-hint": "Poista valitut lopulliset arvosanat pysyvästi.",
+    "delete-final-grades-confirm_one": "Poistetaanko {{count}} lopullinen arvosana pysyvästi? Tätä ei voi perua.",
+    "delete-final-grades-confirm_other": "Poistetaanko {{count}} lopullista arvosanaa pysyvästi? Tätä ei voi perua.",
+    "final-grades-deleted": "Lopulliset arvosanat poistettu."
   },
   "wait-list": {
     "title": "Odotuslista",
@@ -452,6 +463,9 @@
       "grade-expired-on": "Arvosana vanhentunut {{date}}",
       "all-grades-expired": "Kaikki arvosanat vanhentuneet",
       "view-graph": "Näytä kaavio",
+      "exported-tooltip-exported": "Tämä arvosana on viety Sisuun",
+      "exported-tooltip-zero-exported": "Tämä arvosana on viety Sisuun, mutta se on 0",
+      "exported-tooltip-other-exported": "On olemassa toinen nollasta poikkeava arvosana, joka on viety aiemmin. Sinun kannattaa ehkä ottaa yhteyttä opintopalveluihin uuden arvosanan rekisteröimiseksi Sisussa",
       "upload": {
         "bulk-edit-dialog-title": "Aseta päivämäärä valituille kurssin osille",
         "all-done": "Kaikki valmista!",

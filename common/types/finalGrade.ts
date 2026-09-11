@@ -82,6 +82,9 @@ export const SisuCsvUploadSchema = z.strictObject({
   studentNumbers: z.array(z.string()).nonempty(),
 });
 
+/** Ids of final grades to operate on in bulk */
+export const FinalGradeIdArraySchema = z.array(IdSchema).nonempty();
+
 export const NewFinalGradeArraySchema = z.array(NewFinalGradeSchema);
 export const FinalGradeDataArraySchema = z.array(FinalGradeDataSchema);
 
@@ -94,3 +97,4 @@ export type FrozenTaskGrade = z.infer<typeof FrozenTaskGradeSchema>;
 export type NewFinalGrade = z.infer<typeof NewFinalGradeSchema>;
 export type EditFinalGrade = z.infer<typeof EditFinalGradeSchema>;
 export type SisuCsvUpload = z.infer<typeof SisuCsvUploadSchema>;
+export type FinalGradeIdArray = z.infer<typeof FinalGradeIdArraySchema>;

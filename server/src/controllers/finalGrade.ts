@@ -9,6 +9,7 @@ import {
   type EditFinalGrade,
   type FinalGradeData,
   type FinalGradeFrozenInfo,
+  type FinalGradeIdArray,
   type FrozenCoursePart,
   type FrozenGradingModel,
   type FrozenTaskGrade,
@@ -399,6 +400,70 @@ export const deleteFinalGrade: Endpoint<void, void> = async (req, res) => {
   );
 
   await finalGrade.destroy();
+
+  res.sendStatus(HttpCode.Ok);
+};
+
+/**
+ * Delete multiple final grades.
+ *
+ * (FinalGradeIdArray) => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const deleteFinalGrades: Endpoint<FinalGradeIdArray, void> = async (
+  req,
+  res
+) => {
+  const course = await findAndValidateCourseId(req.params.courseId);
+
+  const finalGrades = await FinalGrade.findAll({
+    where: {id: {[Op.in]: req.body}, courseId: course.id},
+  });
+
+  if (finalGrades.length !== req.body.length) {
+    throw new ApiError(
+      'Some final grades were not found for this course',
+      HttpCode.NotFound
+    );
+  }
+
+  await FinalGrade.destroy({
+    where: {id: {[Op.in]: req.body}, courseId: course.id},
+  });
+
+  res.sendStatus(HttpCode.Ok);
+};
+
+/**
+ * Undo the Sisu export of multiple final grades, i.e. clear their export
+ * dates so they can be exported again.
+ *
+ * (FinalGradeIdArray) => void
+ *
+ * @throws ApiError(400|404|409)
+ */
+export const undoSisuExportFinalGrades: Endpoint<
+  FinalGradeIdArray,
+  void
+> = async (req, res) => {
+  const course = await findAndValidateCourseId(req.params.courseId);
+
+  const finalGrades = await FinalGrade.findAll({
+    where: {id: {[Op.in]: req.body}, courseId: course.id},
+  });
+
+  if (finalGrades.length !== req.body.length) {
+    throw new ApiError(
+      'Some final grades were not found for this course',
+      HttpCode.NotFound
+    );
+  }
+
+  await FinalGrade.update(
+    {sisuExportDate: null},
+    {where: {id: {[Op.in]: req.body}, courseId: course.id}}
+  );
 
   res.sendStatus(HttpCode.Ok);
 };

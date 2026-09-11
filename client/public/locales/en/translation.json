@@ -256,7 +256,18 @@
     "manual-model": "Manual",
     "no-snapshot": "Detailed grading information not available for these final grades",
     "unknown-model": "Unknown model",
-    "filter-by-model": "Filter by grading model"
+    "filter-by-model": "Filter by grading model",
+    "undo-sisu-export": "Undo Sisu export",
+    "undo-sisu-export-hint": "Clear the Sisu export dates of the selected final grades so they can be exported again.",
+    "undo-sisu-export-confirm_one": "Undo the Sisu export of {{count}} final grade? The grade can be exported to Sisu again.",
+    "undo-sisu-export-confirm_other": "Undo the Sisu export of {{count}} final grades? The grades can be exported to Sisu again.",
+    "sisu-export-undone": "Sisu export undone successfully.",
+    "no-exported-selected": "None of the selected final grades have been exported to Sisu.",
+    "delete-final-grades": "Delete final grades",
+    "delete-final-grades-hint": "Permanently delete the selected final grades.",
+    "delete-final-grades-confirm_one": "Permanently delete {{count}} final grade? This cannot be undone.",
+    "delete-final-grades-confirm_other": "Permanently delete {{count}} final grades? This cannot be undone.",
+    "final-grades-deleted": "Final grades deleted successfully."
   },
   "wait-list": {
     "title": "Wait list",
@@ -468,6 +479,9 @@
       "grade-expired-on": "Grade expired on {{date}}",
       "all-grades-expired": "All grades are expired",
       "view-graph": "View graph",
+      "exported-tooltip-exported": "This grade was exported to Sisu",
+      "exported-tooltip-zero-exported": "This grade was exported to Sisu, but is a 0",
+      "exported-tooltip-other-exported": "There is another non-zero grade that was exported before. You might need to contact Learning Service to register a new grade in Sisu",
       "upload": {
         "bulk-edit-dialog-title": "Set date to selected course parts",
         "all-done": "All done!",

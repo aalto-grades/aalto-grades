@@ -12,7 +12,7 @@ import type {FinalGradeData, GradingScale} from '@/common/types';
 import IconButtonWithTip from '@/components/shared/IconButtonWithTooltip';
 import type {features} from '@/components/shared/table/features';
 import type {GroupedStudentRow} from '@/context/GradesTableProvider';
-import {findBestFinalGrade, getGradeString} from '@/utils';
+import {findBestFinalGrade, findPreviouslyExportedToSisu, getGradeString} from '@/utils';
 import EditFinalGradesDialog from './EditFinalGradesDialog';
 
 type PropsType = {
@@ -37,6 +37,22 @@ const FinalGradeCell = ({
   const studentNumber = user.studentNumber;
 
   const bestFinalGrade = findBestFinalGrade(finalGrades);
+
+  const exportedToSisuState = (() => {
+    if (!bestFinalGrade) return null;
+    if (bestFinalGrade.sisuExportDate)
+      if (bestFinalGrade.grade !== 0) return 'exported';
+      else return 'zero-exported';
+    if (findPreviouslyExportedToSisu(bestFinalGrade, cell.row.original)?.grade) return 'other-exported'; // It's ok because a grade 0 exported is not a problem
+    return null;
+  })();
+
+  const exportIcon = {
+    exported: '✅',
+    'zero-exported': '☑️',
+    'other-exported': '⚠️',
+  };
+
   return (
     <Box
       className="hoverable-container"
@@ -53,6 +69,13 @@ const FinalGradeCell = ({
         justifyContent: 'center',
       }}
     >
+      <Tooltip
+        placement="top"
+        title={exportedToSisuState ? t(`course.results.exported-tooltip-${exportedToSisuState}`) : undefined}
+        disableInteractive
+      >
+        <span>{exportedToSisuState ? exportIcon[exportedToSisuState] : null}</span>
+      </Tooltip>
       <span>{getGradeString(t, gradingScale, bestFinalGrade?.grade)}</span>
       {/* If there are multiple final grades "show more" icon*/}
       <IconButtonWithTip

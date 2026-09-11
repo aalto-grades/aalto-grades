@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  AccountTreeRounded,
   EventBusyOutlined,
   InfoOutlined,
   MoreVert,
@@ -36,8 +37,10 @@ export type GradeCellSourceValue =
 
 type GradeCellProps = {
   cell: Cell<typeof features, GroupedStudentRow, GradeCellSourceValue>;
+  // If set, a button for viewing the grading model graph is shown in the cell
+  onViewGraph?: () => void;
 };
-const GradeCell = ({cell}: GradeCellProps): ReactNode => {
+const GradeCell = ({cell, onViewGraph}: GradeCellProps): ReactNode => {
   const {t} = useTranslation();
   const {gradeSelectOption} = useTableContext();
   const theme = useTheme();
@@ -97,10 +100,20 @@ const GradeCell = ({cell}: GradeCellProps): ReactNode => {
     >
       <span>
         {sourceValue.type === 'courseTask'
-          ? (bestGrade?.grade ?? '-')
+          ? (sourceValue.task.grades.length > 0 && bestGrade === null) ? '-' : (bestGrade?.grade ?? null)
           // : (sourceValue.grade ?? t('course.results.not-participated'))}
           : (sourceValue.grade ?? null)}
       </span>
+
+      {onViewGraph !== undefined && sourceValue.type !== 'courseTask' && sourceValue.grade !== null && (
+        <IconButtonWithTip
+          defaultVisible={false}
+          onClick={onViewGraph}
+          title={t('course.results.view-graph')}
+        >
+          <AccountTreeRounded color="primary" />
+        </IconButtonWithTip>
+      )}
 
       {/* Course task specific elements */}
       {sourceValue.type === 'courseTask' && (

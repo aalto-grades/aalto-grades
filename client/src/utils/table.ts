@@ -6,6 +6,7 @@ import type {TFunction} from 'i18next';
 
 import {
   type CourseTaskData,
+  type FinalGradeData,
   type GradingModelData,
   GradingScale,
   type StudentRow,
@@ -388,4 +389,29 @@ export const checkStudentActiveGrades = (
     hasActiveGrade: activeTaskIds.length > 0,
     activeTaskIds,
   };
+};
+
+/**
+ * Finds a previous grade that has been exported to Sisu, excluding the best
+ * grade.
+ *
+ * @returns The previous grade that has been exported to Sisu, or null if not
+ *   found.
+ */
+export const findPreviouslyExportedToSisu = (
+  bestGrade: FinalGradeData,
+  row: StudentRow
+): FinalGradeData | null => {
+  for (const fg of row.finalGrades) {
+    if (bestGrade.id === fg.id) continue; // Skip the best grade
+    if (fg.sisuExportDate === null) continue; // And those not exported to sisu
+
+    if (bestGrade.sisuExportDate !== null) {
+      // If the best grade is also exported, we need to check which one is newer
+      if (bestGrade.sisuExportDate < fg.sisuExportDate) return fg;
+    } else {
+      return fg;
+    }
+  }
+  return null;
 };

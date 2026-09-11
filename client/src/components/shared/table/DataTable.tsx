@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import {ArrowUpward, ExpandLess, ExpandMore, Sort} from '@mui/icons-material';
+import {ArrowUpward, ExpandLess, ExpandMore} from '@mui/icons-material';
 import {Badge, Icon, useTheme} from '@mui/material';
 import {type Cell, FlexRender, type RowData, flexRender} from '@tanstack/react-table';
 import {useVirtualizer} from '@tanstack/react-virtual';
@@ -101,7 +101,7 @@ const DataTable = <TData extends RowData>({
     : 0;
 
   return (
-    <div ref={tableContainerRef} style={{overflowY: 'auto', height}}>
+    <div ref={tableContainerRef} style={{overflowY: 'auto', overflowX: 'auto', height}}>
       <style>
         {`
         thead:hover .column-resizer {
@@ -109,7 +109,19 @@ const DataTable = <TData extends RowData>({
         }
       `}
       </style>
-      <table style={{borderCollapse: 'collapse', borderSpacing: '0'}}>
+      <table
+        style={{
+          borderCollapse: 'collapse',
+          borderSpacing: '0',
+          // Auto layout: columns size to their content (single line, nowrap),
+          // so both the cell values and the full column headers always fit on
+          // one line. fit-content keeps the table at its natural width: it
+          // never stretches to fill the container, and only scrolls
+          // horizontally when the content is wider than the viewport.
+          tableLayout: 'auto',
+          width: 'fit-content',
+        }}
+      >
         <thead style={{position: 'sticky', top: 0, zIndex: 50}}>
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
@@ -127,9 +139,7 @@ const DataTable = <TData extends RowData>({
                         : theme.palette.primary.light,
                       borderTopRightRadius: i === headerGroup.headers.length - 1 ? 5 : 0,
                       borderTopLeftRadius: i === 0 ? 5 : 0,
-                      ...(header.column.getIsResizing() || header.getSize() !== header.getSize()
-                        ? {width: header.getSize(), maxWidth: header.getSize()}
-                        : {}),
+                      minWidth: header.getSize(),
                       position: 'relative',
                     }}
                   >
@@ -167,14 +177,13 @@ const DataTable = <TData extends RowData>({
                                   header.getContext()
                                 )}
                               </span>
-                              {header.column.getCanSort() && (
+                              {/* Only show the icon when sorted, so it does
+                                  not eat into the header text */}
+                              {header.column.getIsSorted() && (
                                 <Icon>
-                                  {(() => {
-                                    const sorted = header.column.getIsSorted();
-                                    if (sorted === 'asc') return <ArrowUpward />;
-                                    if (sorted === 'desc') return <ArrowUpward style={{rotate: '180deg'}} />;
-                                    return <Sort />;
-                                  })()}
+                                  {header.column.getIsSorted() === 'asc'
+                                    ? <ArrowUpward />
+                                    : <ArrowUpward style={{rotate: '180deg'}} />}
                                 </Icon>
                               )}
                             </span>
@@ -230,10 +239,9 @@ const DataTable = <TData extends RowData>({
                       padding: '0px',
                       height: `${rowHeight}px`,
                       textAlign: 'center',
+                      whiteSpace: 'nowrap',
                       overflow: cell.column.id === 'select' ? 'visible' : 'hidden',
-                      ...(cell.column.getIsResizing() || cell.column.getSize() !== cell.column.columnDef.size
-                        ? {width: cell.column.getSize(), maxWidth: cell.column.getSize()}
-                        : {}),
+                      minWidth: cell.column.getSize(),
                     }}
                   >
                     <RenderCell cell={cell} />
